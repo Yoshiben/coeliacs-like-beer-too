@@ -16,9 +16,42 @@ h1 {
     color: white;
     text-align: center;
     margin-bottom: 30px;
-    font-weight: 300;
-    font-size: 2.5em;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    font-weight: 800; /* Extra bold */
+    font-size: 3em; /* Bigger */
+    text-shadow: 
+        0 2px 4px rgba(0,0,0,0.5),
+        0 4px 8px rgba(0,0,0,0.3),
+        0 8px 16px rgba(0,0,0,0.2),
+        2px 2px 0px #5a67d8,
+        4px 4px 0px #4c51bf,
+        6px 6px 0px #434190; /* 3D layered effect */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    letter-spacing: 2px; /* Spread letters out */
+    transform: perspective(500px) rotateX(15deg); /* Slight 3D tilt */
+    background: linear-gradient(45deg, #ffffff, #f0f8ff, #e6f3ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: titleGlow 3s ease-in-out infinite alternate; /* Subtle glow animation */
+}
+
+/* Add a subtle glow animation */
+@keyframes titleGlow {
+    0% {
+        filter: drop-shadow(0 0 5px rgba(255,255,255,0.3));
+    }
+    100% {
+        filter: drop-shadow(0 0 15px rgba(255,255,255,0.6));
+    }
+}
+
+/* Make it responsive on mobile */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2.2em;
+        letter-spacing: 1px;
+        transform: perspective(300px) rotateX(10deg);
+    }
 }
 
 /* ================================
