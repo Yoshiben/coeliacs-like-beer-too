@@ -12,44 +12,16 @@ body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Replace your existing h1 styles with this enhanced version */
+/* Enhanced title styling */
 h1 {
     color: white;
     text-align: center;
     margin-bottom: 30px;
-    font-weight: 800; /* Extra bold */
-    font-size: 3em; /* Bigger */
-    text-shadow: 
-        0 2px 4px rgba(0,0,0,0.5),
-        0 4px 8px rgba(0,0,0,0.3),
-        0 8px 16px rgba(0,0,0,0.2),
-        2px 2px 0px #5a67d8,
-        4px 4px 0px #4c51bf,
-        6px 6px 0px #434190; /* 3D layered effect */
+    font-weight: 700; /* Bold but not crazy */
+    font-size: 2.8em; /* Slightly bigger */
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3); /* Just a simple shadow */
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    letter-spacing: 2px; /* Spread letters out */
-    transform: perspective(500px) rotateX(15deg); /* Slight 3D tilt */
-    color: white; /* Keep it clean white */
-    animation: titleGlow 3s ease-in-out infinite alternate; /* Subtle glow animation */
-}
-
-/* Add a subtle glow animation */
-@keyframes titleGlow {
-    0% {
-        filter: drop-shadow(0 0 5px rgba(255,255,255,0.3));
-    }
-    100% {
-        filter: drop-shadow(0 0 15px rgba(255,255,255,0.6));
-    }
-}
-
-/* Make it responsive on mobile */
-@media (max-width: 768px) {
-    h1 {
-        font-size: 2.2em;
-        letter-spacing: 1px;
-        transform: perspective(300px) rotateX(10deg);
-    }
+    letter-spacing: 1px; /* Slightly spaced out */
 }
 
 /* ================================
@@ -65,6 +37,7 @@ h1 {
     backdrop-filter: blur(10px);
     box-shadow: 0 8px 32px rgba(0,0,0,0.1);
     z-index: 1000;
+    box-sizing: border-box; /* Include padding in width */
 }
 
 .search-grid {
@@ -72,6 +45,7 @@ h1 {
     grid-template-rows: auto auto;
     gap: 15px;
     width: 100%;
+    box-sizing: border-box;
 }
 
 .search-row {
@@ -103,6 +77,7 @@ h1 {
     transition: all 0.3s ease;
     width: 160px;
     flex-shrink: 0;
+    box-sizing: border-box;
 }
 
 .search-type-dropdown:focus {
@@ -119,6 +94,9 @@ h1 {
     transition: all 0.3s ease;
     flex: 1;
     min-width: 300px;
+    width: 100%;
+    box-sizing: border-box; /* IMPORTANT: Include padding in width calculation */
+    max-width: 100%; /* Prevent any overflow */
 }
 
 #searchInput:focus {
@@ -607,27 +585,6 @@ label {
     justify-content: center;
 }
 
-.map-control-btn {
-    background: rgba(255, 255, 255, 0.95);
-    color: #4a5568;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    backdrop-filter: blur(10px);
-    min-width: 90px;
-}
-
-.map-control-btn:hover {
-    background: rgba(255, 255, 255, 1);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-
 .beer-options-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -919,18 +876,23 @@ label {
    MOBILE-FIRST IMPROVEMENTS
    ================================ */
 
-/* Responsive viewport meta tag (add to HTML head):
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-*/
-
 /* Mobile-first media queries */
 @media (max-width: 768px) {
+    /* Enhanced title for mobile */
+    h1 {
+        font-size: 2em;
+        letter-spacing: 0.5px;
+        margin-bottom: 20px;
+        padding: 0 10px;
+    }
+    
     /* ================================
        MOBILE SEARCH CONTAINER
        ================================ */
     .search-container {
         padding: 10px;
         margin: 0 10px 20px;
+        box-sizing: border-box;
     }
     
     .search-row {
@@ -942,7 +904,9 @@ label {
     .search-type-dropdown,
     #searchInput {
         width: 100%;
-        min-width: unset;
+        min-width: unset; /* Remove the min-width on mobile */
+        box-sizing: border-box; /* Critical for preventing overflow */
+        max-width: 100%; /* Prevent any overflow */
     }
     
     .gf-checkbox {
@@ -1124,14 +1088,8 @@ label {
     }
     
     /* ================================
-       MOBILE TYPOGRAPHY
+       MOBILE LOCATION STATUS
        ================================ */
-    h1 {
-        font-size: 2em;
-        margin-bottom: 20px;
-        padding: 0 10px;
-    }
-    
     .location-status {
         margin: 10px;
         font-size: 12px;
