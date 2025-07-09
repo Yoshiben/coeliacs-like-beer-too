@@ -23,7 +23,7 @@ body {
 .hero-section {
     background: linear-gradient(135deg, rgba(102, 126, 234, 0.95) 0%, rgba(118, 75, 162, 0.95) 100%);
     color: white;
-    padding: 40px 20px;
+    padding: 25px 20px; /* Reduced from 40px to 25px */
     text-align: center;
     position: relative;
     overflow: hidden;
@@ -34,7 +34,7 @@ body {
     position: absolute;
     font-size: 200px;
     opacity: 0.1;
-    top: -50px;
+    top: -30px; /* Moved up from -50px to -30px */
     right: -50px;
     z-index: 1;
 }
@@ -138,9 +138,9 @@ body {
    ================================ */
 .search-section {
     max-width: 1200px;
-    margin: -30px auto 40px;
+    margin: -25px auto 40px; /* Changed from -30px to -25px for less gap */
     background: rgba(255,255,255,0.95);
-    padding: 30px;
+    padding: 25px 30px; /* Reduced top/bottom padding from 30px to 25px */
     border-radius: 20px;
     backdrop-filter: blur(10px);
     box-shadow: 0 8px 32px rgba(0,0,0,0.15);
@@ -152,7 +152,7 @@ body {
     font-size: 1.4em;
     font-weight: 600;
     color: #2d3748;
-    margin-bottom: 20px;
+    margin-bottom: 15px; /* Reduced from 20px to 15px for tighter spacing */
     text-align: center;
 }
 
@@ -1197,7 +1197,12 @@ button:hover {
 @media (max-width: 768px) {
     /* Hero Section Mobile */
     .hero-section {
-        padding: 30px 15px;
+        padding: 20px 15px; /* Reduced mobile padding */
+    }
+    
+    .hero-section::before {
+        top: -20px; /* Adjusted for mobile */
+        font-size: 150px; /* Smaller beer glass on mobile */
     }
     
     .hero-title {
@@ -1233,8 +1238,8 @@ button:hover {
     
     /* Search Section Mobile */
     .search-section {
-        margin: -20px 15px 30px;
-        padding: 20px;
+        margin: -15px 15px 30px; /* Adjusted mobile margins */
+        padding: 20px; /* Reduced mobile padding */
     }
     
     .search-row {
@@ -1555,369 +1560,5 @@ label {
     body {
         padding-top: env(safe-area-inset-top);
         padding-bottom: env(safe-area-inset-bottom);
-    }
-}
-
-/* ================================
-   ENHANCED MODAL STYLES
-   ================================ */
-
-/* Pub search suggestions - FIXED POSITIONING */
-.pub-suggestions {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    max-height: 200px;
-    overflow-y: auto;
-    background: white;
-    border: 2px solid #e2e8f0;
-    border-top: none;
-    border-radius: 0 0 10px 10px;
-    z-index: 1000;
-    display: none;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-
-/* Ensure parent form group has relative positioning */
-.form-group {
-    position: relative;
-}
-
-.pub-suggestion-item {
-    padding: 12px 15px;
-    cursor: pointer;
-    border-bottom: 1px solid #f0f0f0;
-    transition: background 0.2s ease;
-}
-
-.pub-suggestion-item:hover {
-    background: #f7fafc;
-}
-
-.pub-suggestion-item.add-new {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-}
-
-.pub-suggestion-item.add-new:hover {
-    background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
-}
-
-.pub-suggestion-item strong {
-    display: block;
-    margin-bottom: 2px;
-}
-
-.no-pub-found {
-    padding: 15px;
-    text-align: center;
-    color: #4a5568;
-}
-
-.btn-add-new {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 15px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    margin-top: 8px;
-    transition: all 0.3s ease;
-}
-
-.btn-add-new:hover {
-    background: linear-gradient(135deg, #059669 0%, #047857 100%);
-    transform: translateY(-1px);
-}
-
-/* Selected pub info */
-.selected-pub-info {
-    margin-bottom: 20px;
-}
-
-.selected-pub-card {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: white;
-    padding: 15px;
-    border-radius: 10px;
-    position: relative;
-}
-
-.selected-pub-card strong {
-    font-size: 1.1em;
-    display: block;
-    margin-bottom: 5px;
-}
-
-.btn-clear {
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 15px;
-    font-size: 11px;
-    cursor: pointer;
-    margin-top: 8px;
-    transition: all 0.3s ease;
-}
-
-.btn-clear:hover {
-    background: rgba(255, 255, 255, 0.3);
-}
-
-/* New pub fields */
-.new-pub-fields {
-    background: rgba(102, 126, 234, 0.05);
-    padding: 20px;
-    border-radius: 10px;
-    border: 2px dashed #667eea;
-    margin-bottom: 20px;
-}
-
-.new-pub-fields h4 {
-    color: #667eea;
-    margin: 0 0 15px 0;
-    font-size: 1.1em;
-}
-
-/* About Us modal specific styles */
-.about-modal-content {
-    max-width: 600px;
-    max-height: 80vh;
-    overflow-y: auto;
-}
-
-.about-content {
-    padding: 0;
-}
-
-.about-section {
-    margin-bottom: 25px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid #e2e8f0;
-}
-
-.about-section:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-}
-
-.about-section h3 {
-    color: #2d3748;
-    margin: 0 0 12px 0;
-    font-size: 1.2em;
-}
-
-.about-section p {
-    color: #4a5568;
-    line-height: 1.6;
-    margin: 0;
-}
-
-.contact-info {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 20px;
-    border-radius: 12px;
-    text-align: center;
-    margin-top: 10px;
-}
-
-.contact-info h3 {
-    color: white;
-    margin: 0 0 10px 0;
-}
-
-.contact-info p {
-    color: rgba(255, 255, 255, 0.9);
-    margin: 0 0 15px 0;
-}
-
-.btn-contact {
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    padding: 10px 20px;
-    border-radius: 20px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.btn-contact:hover {
-    background: rgba(255, 255, 255, 0.3);
-    border-color: rgba(255, 255, 255, 0.5);
-}
-
-/* GF Info modal specific styles */
-.gf-modal-content {
-    max-width: 700px;
-    max-height: 85vh;
-    overflow-y: auto;
-}
-
-.gf-content {
-    padding: 0;
-}
-
-.gf-section {
-    margin-bottom: 30px;
-    padding-bottom: 25px;
-    border-bottom: 2px solid #e2e8f0;
-}
-
-.gf-section:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-}
-
-.gf-section h3 {
-    color: #2d3748;
-    margin: 0 0 15px 0;
-    font-size: 1.3em;
-}
-
-.standards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 15px;
-    margin-top: 15px;
-}
-
-.standard-item {
-    background: rgba(102, 126, 234, 0.1);
-    padding: 15px;
-    border-radius: 10px;
-    text-align: center;
-}
-
-.standard-item strong {
-    display: block;
-    color: #667eea;
-    margin-bottom: 5px;
-    font-size: 1.1em;
-}
-
-.beer-types {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    margin-top: 15px;
-}
-
-.beer-type-item {
-    background: #f7fafc;
-    padding: 15px;
-    border-radius: 10px;
-    border-left: 4px solid #667eea;
-}
-
-.beer-type-item strong {
-    display: block;
-    color: #2d3748;
-    margin-bottom: 8px;
-    font-size: 1.05em;
-}
-
-.beer-type-item p {
-    color: #4a5568;
-    margin: 0;
-    line-height: 1.5;
-}
-
-.safety-notes {
-    background: rgba(239, 68, 68, 0.1);
-    padding: 20px;
-    border-radius: 10px;
-    border-left: 4px solid #ef4444;
-    margin-top: 15px;
-}
-
-.safety-notes li {
-    color: #4a5568;
-    margin-bottom: 8px;
-    line-height: 1.5;
-}
-
-.safety-notes strong {
-    color: #dc2626;
-}
-
-.brand-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-top: 15px;
-}
-
-.brand-tag {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: white;
-    padding: 6px 12px;
-    border-radius: 15px;
-    font-size: 0.9em;
-    font-weight: 500;
-}
-
-.disclaimer {
-    background: rgba(251, 191, 36, 0.1);
-    border: 2px solid #f59e0b;
-    border-radius: 10px;
-    padding: 15px;
-    margin-top: 20px;
-}
-
-.disclaimer p {
-    color: #92400e;
-    margin: 0;
-    font-size: 0.9em;
-    line-height: 1.5;
-}
-
-/* Mobile responsiveness for new modals */
-@media (max-width: 768px) {
-    .about-modal-content,
-    .gf-modal-content {
-        width: 95%;
-        max-height: 90vh;
-        padding: 15px;
-    }
-    
-    .standards-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .beer-types {
-        gap: 12px;
-    }
-    
-    .brand-grid {
-        gap: 8px;
-    }
-    
-    .brand-tag {
-        font-size: 0.8em;
-        padding: 5px 10px;
-    }
-    
-    .about-section,
-    .gf-section {
-        margin-bottom: 20px;
-        padding-bottom: 15px;
-    }
-    
-    .pub-suggestions {
-        max-height: 150px;
-    }
-    
-    .selected-pub-card {
-        padding: 12px;
-    }
-    
-    .new-pub-fields {
-        padding: 15px;
     }
 }
