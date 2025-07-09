@@ -1924,3 +1924,462 @@ body {
 }
 
 .action
+
+/* ================================
+   MOBILE RESPONSIVE FIXES NEW VERSION
+   ================================ */
+
+/* Fix the mobile result items layout */
+@media (max-width: 768px) {
+    .result-item {
+        display: block; /* Change from grid to block on mobile */
+        padding: 20px;
+        gap: 0;
+    }
+    
+    /* Pub details section */
+    .result-details {
+        text-align: left;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .result-details strong {
+        font-size: 1.2em;
+        margin-bottom: 8px;
+        display: block;
+    }
+    
+    .result-details .address {
+        margin-bottom: 5px;
+    }
+    
+    .result-details .local-authority {
+        margin-bottom: 10px;
+    }
+    
+    /* Action buttons container */
+    .result-details div[style*="margin-top"] {
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+        flex-wrap: wrap;
+    }
+    
+    /* Make action buttons consistent */
+    .result-details button {
+        flex: 1;
+        min-width: 120px;
+        padding: 10px 12px;
+        font-size: 13px;
+        border-radius: 20px;
+        border: none;
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    
+    /* Beer column */
+    .beer-column {
+        padding-left: 0;
+        border-left: none;
+        border-top: none;
+        padding-top: 0;
+        text-align: left;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .beer-column h4 {
+        text-align: left;
+        margin-bottom: 12px;
+        color: #4a5568;
+        font-size: 1em;
+    }
+    
+    /* Update button section */
+    .button-column {
+        justify-content: stretch;
+        align-items: stretch;
+    }
+    
+    .update-button {
+        width: 100%;
+        padding: 14px 24px;
+        font-size: 16px;
+        border-radius: 25px;
+        background: linear-gradient(135deg, #059669 0%, #047857 100%);
+        color: white;
+        border: none;
+        font-weight: 600;
+        cursor: pointer;
+        min-height: 48px; /* Touch-friendly */
+        box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+    }
+    
+    .update-button:hover {
+        background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(5, 150, 105, 0.4);
+    }
+    
+    /* Remove the overlapping issue */
+    .result-item:last-child {
+        border-bottom: none;
+        border-radius: 0 0 20px 20px;
+    }
+    
+    /* Update form mobile fixes */
+    .update-form {
+        margin-top: 15px;
+        padding: 20px;
+        background: rgba(248, 250, 252, 0.95);
+        border-radius: 15px;
+        border: 2px solid #e2e8f0;
+    }
+    
+    .beer-options-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+        margin: 15px 0;
+    }
+    
+    .beer-option {
+        padding: 15px;
+        background: white;
+        border-radius: 12px;
+        border: 2px solid #e2e8f0;
+    }
+    
+    .beer-input {
+        padding: 12px;
+        font-size: 16px; /* Prevents zoom on iOS */
+        border-radius: 8px;
+        border: 2px solid #e2e8f0;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    .save-beer-btn {
+        width: 100%;
+        padding: 16px 24px;
+        font-size: 18px;
+        border-radius: 25px;
+        min-height: 48px;
+    }
+}
+
+/* ================================
+   GENERAL MOBILE IMPROVEMENTS
+   ================================ */
+@media (max-width: 768px) {
+    /* Search section improvements */
+    .search-section {
+        margin: -15px 15px 25px;
+        padding: 18px;
+    }
+    
+    .section-title {
+        font-size: 1.2em;
+        margin-top: 0;
+        margin-bottom: 15px;
+    }
+    
+    /* Button improvements */
+    .search-btn,
+    .map-control-btn {
+        width: 100%;
+        padding: 14px;
+        font-size: 15px;
+        min-height: 48px;
+        border-radius: 25px;
+        margin-bottom: 8px;
+    }
+    
+    .search-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    /* Input improvements */
+    .search-input,
+    #searchInput,
+    .search-type-dropdown {
+        padding: 14px 18px;
+        font-size: 16px;
+        min-height: 48px;
+        border-radius: 25px;
+    }
+    
+    .gf-checkbox {
+        padding: 14px;
+        min-height: 48px;
+        justify-content: center;
+        background: rgba(102, 126, 234, 0.1);
+        border-radius: 25px;
+        margin: 8px 0;
+    }
+    
+    /* Map container mobile */
+    .map-container {
+        padding: 0 15px;
+    }
+    
+    #map {
+        height: 300px;
+        border-radius: 15px;
+    }
+    
+    /* Results header mobile */
+    .results-header {
+        padding: 18px 20px;
+        border-radius: 20px 20px 0 0;
+    }
+    
+    .results-header .section-title {
+        font-size: 1.3em;
+        margin-bottom: 0;
+    }
+    
+    /* Features section mobile */
+    .features-section {
+        padding: 0 15px;
+        margin-top: 30px;
+    }
+    
+    .feature-card {
+        padding: 25px 20px;
+        text-align: center;
+    }
+    
+    .feature-action {
+        padding: 14px 20px;
+        font-size: 15px;
+        min-height: 48px;
+        border-radius: 25px;
+    }
+    
+    /* Activity section mobile */
+    .activity-section {
+        padding: 0 15px;
+        margin-top: 30px;
+    }
+    
+    .activity-card {
+        padding: 25px 20px;
+    }
+    
+    /* Hero section mobile spacing */
+    .hero-section {
+        padding: 20px 15px;
+    }
+    
+    .hero-title {
+        font-size: 2.2em;
+        margin-bottom: 15px;
+        margin-top: 5px;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.1em;
+        margin-bottom: 25px;
+    }
+    
+    .hero-stats {
+        gap: 30px;
+        margin-bottom: 25px;
+    }
+    
+    .stat-number {
+        font-size: 2em;
+    }
+    
+    /* Modal improvements mobile */
+    .report-modal .modal-content,
+    .coordinate-modal .modal-content {
+        width: 95%;
+        max-height: 90%;
+        padding: 25px 20px;
+        border-radius: 20px;
+    }
+    
+    .modal-header h2 {
+        font-size: 1.4em;
+    }
+    
+    .form-group input,
+    .form-group select {
+        padding: 14px 16px;
+        font-size: 16px;
+        min-height: 48px;
+        border-radius: 12px;
+    }
+    
+    .btn-submit,
+    .btn-cancel {
+        padding: 14px 20px;
+        font-size: 16px;
+        min-height: 48px;
+        border-radius: 25px;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .btn-submit,
+    .btn-cancel {
+        width: 100%;
+    }
+    
+    /* Toast mobile positioning */
+    .toast {
+        bottom: 20px;
+        left: 15px;
+        right: 15px;
+        max-width: none;
+        border-radius: 15px;
+    }
+    
+    .toast-content {
+        padding: 16px 20px;
+        font-size: 15px;
+    }
+    
+    /* Pagination mobile */
+    .pagination-controls {
+        padding: 20px 15px;
+    }
+    
+    .pagination-btn {
+        min-width: 44px;
+        min-height: 44px;
+        padding: 10px 12px;
+        font-size: 14px;
+        margin: 2px;
+    }
+    
+    /* Suggestions mobile */
+    #suggestions {
+        left: 15px;
+        right: 15px;
+        max-height: 280px;
+        border-radius: 15px;
+    }
+    
+    #suggestions div {
+        padding: 16px 18px;
+        font-size: 15px;
+        line-height: 1.4;
+    }
+    
+    .postcode-suggestion {
+        padding: 18px;
+        margin: 8px;
+        border-radius: 12px;
+    }
+}
+
+/* ================================
+   TOUCH IMPROVEMENTS
+   ================================ */
+@media (max-width: 768px) {
+    /* Ensure all interactive elements are touch-friendly */
+    button, 
+    input, 
+    select, 
+    .pub-suggestion-item,
+    .postcode-suggestion,
+    #suggestions div {
+        min-height: 44px;
+        touch-action: manipulation;
+    }
+    
+    /* Better tap targets */
+    .activity-item {
+        padding: 18px 0;
+        min-height: 60px;
+    }
+    
+    .feature-card {
+        min-height: 200px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    
+    /* Prevent text selection on buttons */
+    button {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+    }
+}
+
+/* ================================
+   LANDSCAPE PHONE FIXES
+   ================================ */
+@media (max-width: 896px) and (orientation: landscape) {
+    .hero-section {
+        padding: 15px;
+    }
+    
+    .hero-title {
+        font-size: 1.8em;
+        margin-bottom: 10px;
+    }
+    
+    .hero-subtitle {
+        font-size: 1em;
+        margin-bottom: 20px;
+    }
+    
+    .hero-stats {
+        gap: 25px;
+        margin-bottom: 20px;
+    }
+    
+    .stat-number {
+        font-size: 1.6em;
+    }
+    
+    #map {
+        height: 250px;
+    }
+}
+
+/* ================================
+   VERY SMALL SCREENS (iPhone SE, etc.)
+   ================================ */
+@media (max-width: 375px) {
+    .search-section {
+        padding: 15px;
+        margin: -10px 10px 20px;
+    }
+    
+    .result-item {
+        padding: 15px;
+    }
+    
+    .features-section,
+    .activity-section {
+        padding: 0 10px;
+    }
+    
+    .hero-title {
+        font-size: 1.9em;
+    }
+    
+    .hero-stats {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .stat-item {
+        min-width: 120px;
+    }
+}
