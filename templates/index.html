@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+// Close modals when clicking outside
+            document.getElementById('coordinateModal').addEventListener('click', (e) => {
+                <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -29,12 +31,6 @@
                     <span class="stat-label">This Month</span>
                 </div>
             </div>
-            
-            <div class="quick-actions">
-                <a href="#search" class="action-btn primary" onclick="scrollToSearch()">Find GF Beer</a>
-                <a href="#" class="action-btn" onclick="openReportModal()">Report GF Beer</a>
-                <a href="#" class="action-btn" onclick="showAboutUs()">About Us</a>
-            </div>
         </div>
     </div>
 
@@ -55,12 +51,22 @@
             <div class="search-actions">
                 <button onclick="searchPubs()" class="search-btn">Search Pubs</button>
                 <button class="search-btn secondary" onclick="findNearbyPubs()">Pubs Near Me</button>
-                <button class="map-control-btn" id="toggleMapBtn">🗺️ Hide Map</button>
+                <button class="map-control-btn" id="toggleMapBtn" onclick="toggleMap()">🗺️ Show Map</button>
                 <button class="map-control-btn" onclick="centerOnLocation()">📍 My Location</button>
             </div>
         </div>
         <div id="suggestions"></div>
     </div>
+
+    <!-- Map Section (Hidden by Default) -->
+    <div class="map-container" id="mapContainer" style="display: none;">
+        <div class="map-section-header">
+            <h2 class="section-title">🗺️ Interactive Map</h2>
+        </div>
+        <div id="map"></div>
+    </div>
+
+    <!-- Map Section (Moved from bottom, now hidden by default) -->
 
     <!-- Location Status -->
     <div id="locationStatus" class="location-status location-loading" style="display: none;">
@@ -125,14 +131,6 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Map Section -->
-    <div class="map-container">
-        <div class="map-section-header">
-            <h2 class="section-title">🗺️ Interactive Map</h2>
-        </div>
-        <div id="map"></div>
     </div>
 
     <!-- Results Section -->
@@ -311,7 +309,7 @@
                     <ul class="safety-notes">
                         <li><strong>Cross-contamination</strong> can happen in breweries that also make regular beer</li>
                         <li><strong>Always check labels</strong> and ask staff about preparation methods</li>
-                        <li><strong>Individual sensitivity varies</strong> - what's safe for one person might not be for another</li>
+                        <li><strong>Coeliacs vs Gluten Intolerant</strong> - Coeliac disease is an autoimmune condition requiring strict gluten avoidance, while gluten intolerance is a separate digestive sensitivity</li>
                         <li><strong>When in doubt</strong>, choose certified gluten-free options</li>
                     </ul>
                 </div>
@@ -392,9 +390,39 @@
         
         let selectedPubData = null;
         let pubSearchTimeout = null;
+        let mapVisible = false;
         
         function scrollToSearch() {
             document.getElementById('search').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Enhanced map toggle functionality
+        function toggleMap() {
+            mapVisible = !mapVisible;
+            const mapContainer = document.getElementById('mapContainer');
+            const toggleBtn = document.getElementById('toggleMapBtn');
+            
+            if (mapVisible) {
+                mapContainer.style.display = 'block';
+                toggleBtn.innerHTML = '🗺️ Hide Map';
+                
+                // Initialize map if not already done, or resize if it exists
+                setTimeout(() => {
+                    if (map) {
+                        map.invalidateSize();
+                    }
+                }, 100);
+                
+                // Smooth scroll to show the map
+                setTimeout(() => {
+                    mapContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 150);
+            } else {
+                mapContainer.style.display = 'none';
+                toggleBtn.innerHTML = '🗺️ Show Map';
+            }
+            
+            AppState.save();
         }
 
         function openReportModal() {
@@ -573,7 +601,7 @@
                     searchType: currentSearchType,
                     gfOnly: currentGfOnly,
                     page: currentPage,
-                    mapVisible: document.getElementById('map').style.display !== 'none',
+                    mapVisible: mapVisible,
                     specificPubId: pubId || null,
                     timestamp: Date.now()
                 };
@@ -607,11 +635,15 @@
                     currentSearchType = state.searchType || 'all';
                     currentGfOnly = state.gfOnly || false;
                     currentPage = state.page || 1;
+                    mapVisible = state.mapVisible || false;
                     
-                    const mapElement = document.getElementById('map');
+                    const mapContainer = document.getElementById('mapContainer');
                     const toggleBtn = document.getElementById('toggleMapBtn');
-                    if (!state.mapVisible) {
-                        mapElement.style.display = 'none';
+                    if (mapVisible) {
+                        mapContainer.style.display = 'block';
+                        toggleBtn.innerHTML = '🗺️ Hide Map';
+                    } else {
+                        mapContainer.style.display = 'none';
                         toggleBtn.innerHTML = '🗺️ Show Map';
                     }
                     
@@ -1573,23 +1605,7 @@
                 }
             });
 
-            // Toggle map visibility
-            const toggleMapButton = document.getElementById('toggleMapBtn');
-            let mapVisible = true;
-            toggleMapButton.addEventListener('click', () => {
-                mapVisible = !mapVisible;
-                const mapElement = document.getElementById('map');
-                
-                mapElement.style.display = mapVisible ? 'block' : 'none';
-                toggleMapButton.innerHTML = mapVisible ? '🗺️ Hide Map' : '🗺️ Show Map';
-                
-                AppState.save();
-                
-                if (mapVisible) {
-                    setTimeout(() => map.invalidateSize(), 100);
-                }
-            });
-
+            // Toggle map visibility - REMOVED (now handled by toggleMap function)
             // Save state on form changes
             document.getElementById('searchType').addEventListener('change', () => AppState.save());
             document.getElementById('gfOnly').addEventListener('change', () => AppState.save());
