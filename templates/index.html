@@ -7,25 +7,34 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v={{ cache_buster }}">
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XXXXXXXXXX'); // Replace with your actual GA4 ID
+    </script>
 </head>
 <body>
     <!-- Hero Section -->
     <div class="hero-section">
         <div class="hero-content">
             <h1 class="hero-title">Coeliacs Like Beer Too!</h1>
-            <p class="hero-subtitle">The UK's largest community-driven guide to gluten-free beer</p>
+            <p class="hero-subtitle">The UK's largest community-driven guide to gluten free beer</p>
             
             <div class="hero-stats">
                 <div class="stat-item">
-                    <span class="stat-number" id="totalPubs">52,847</span>
+                    <span class="stat-number" id="totalPubs">Loading...</span>
                     <span class="stat-label">UK Pubs</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-number" id="gfPubs">1,249</span>
+                    <span class="stat-number" id="gfPubs">Loading...</span>
                     <span class="stat-label">GF Options</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-number" id="monthlyReports">847</span>
+                    <span class="stat-number" id="monthlyReports">Loading...</span>
                     <span class="stat-label">This Month</span>
                 </div>
             </div>
@@ -34,7 +43,7 @@
 
     <!-- Search Section -->
     <div class="search-section" id="search">
-        <h2 class="section-title">🔍 Find Gluten-Free Beer Near You</h2>
+        <h2 class="section-title">🔍 Find Gluten Free Beer Near You</h2>
         <div class="search-grid">
             <div class="search-row">
                 <select id="searchType" class="search-type-dropdown">
@@ -56,7 +65,15 @@
         <div id="suggestions"></div>
     </div>
 
-    <!-- Map Section (Hidden by Default) -->
+    <!-- Dynamic Results Section - Pushed down when visible -->
+    <div id="results-section" style="display: none;">
+        <div class="results-header">
+            <h2 class="section-title">📍 Search Results</h2>
+        </div>
+        <ul id="results"></ul>
+    </div>
+
+    <!-- Map Section (Hidden by Default, Smart Show) -->
     <div class="map-container" id="mapContainer" style="display: none;">
         <div class="map-section-header">
             <h2 class="section-title">🗺️ Interactive Map</h2>
@@ -64,15 +81,13 @@
         <div id="map"></div>
     </div>
 
-    <!-- Map Section (Moved from bottom, now hidden by default) -->
-
     <!-- Location Status -->
     <div id="locationStatus" class="location-status location-loading" style="display: none;">
         Getting your location...
     </div>
 
     <!-- Features Grid -->
-    <div class="features-section">
+    <div class="features-section" id="featuresSection">
         <div class="features-grid">
             <div class="feature-card">
                 <span class="feature-icon">ℹ️</span>
@@ -81,24 +96,25 @@
                 <button class="feature-action" onclick="showAboutUs()">Learn More</button>
             </div>
             
-            <div class="feature-card">
-                <span class="feature-icon">📸</span>
-                <h3 class="feature-title">Report GF Beer</h3>
-                <p class="feature-description">Found gluten-free beer somewhere? Share it with the community and help others!</p>
-                <button class="feature-action" onclick="openReportModal()">Add Report</button>
-            </div>
-            
+            <!-- SWAPPED: What is GF Beer now comes before Report -->
             <div class="feature-card">
                 <span class="feature-icon">🔬</span>
                 <h3 class="feature-title">What is GF Beer?</h3>
-                <p class="feature-description">Everything you need to know about gluten-free beer standards and safety.</p>
+                <p class="feature-description">Everything you need to know about gluten free beer standards and safety.</p>
                 <button class="feature-action" onclick="showGFInfo()">Learn More</button>
+            </div>
+            
+            <div class="feature-card">
+                <span class="feature-icon">📸</span>
+                <h3 class="feature-title">Report GF Beer</h3>
+                <p class="feature-description">Found gluten free beer somewhere? Share it with the community and help others!</p>
+                <button class="feature-action" onclick="openReportModal()">Add Report</button>
             </div>
             
             <div class="feature-card">
                 <span class="feature-icon">🏭</span>
                 <h3 class="feature-title">GF Breweries</h3>
-                <p class="feature-description">Discover breweries making amazing gluten-free beers and where to find them.</p>
+                <p class="feature-description">Discover breweries making amazing gluten free beers and where to find them.</p>
                 <button class="feature-action" onclick="showComingSoon('GF Breweries Database')">Coming Soon</button>
             </div>
             
@@ -119,7 +135,7 @@
     </div>
 
     <!-- Recent Activity -->
-    <div class="activity-section">
+    <div class="activity-section" id="activitySection">
         <div class="activity-card">
             <div class="activity-header">
                 <h2 class="activity-title">🔥 Recent GF Beer Updates</h2>
@@ -136,14 +152,6 @@
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- Results Section -->
-    <div id="results-section" style="display: none;">
-        <div class="results-header">
-            <h2 class="section-title">📍 Search Results</h2>
-        </div>
-        <ul id="results"></ul>
     </div>
 
     <!-- Enhanced Report GF Beer Modal -->
@@ -237,12 +245,12 @@
             <div class="about-content">
                 <div class="about-section">
                     <h3>🍺 Our Mission</h3>
-                    <p>We believe that being coeliac shouldn't mean missing out on great beer experiences. Our mission is to create the UK's most comprehensive, community-driven guide to gluten-free beer options across the country.</p>
+                    <p>We believe that being coeliac shouldn't mean missing out on great beer experiences. Our mission is to create the UK's most comprehensive, community-driven guide to gluten free beer options across the country.</p>
                 </div>
                 
                 <div class="about-section">
                     <h3>👥 Our Story</h3>
-                    <p>Started by coeliacs, for coeliacs. We understand the frustration of walking into a pub and not knowing if they have any safe options. That's why we built this platform - to help our community find amazing gluten-free beer wherever they are in the UK.</p>
+                    <p>Started by coeliacs, for coeliacs. We understand the frustration of walking into a pub and not knowing if they have any safe options. That's why we built this platform - to help our community find amazing gluten free beer wherever they are in the UK.</p>
                 </div>
                 
                 <div class="about-section">
@@ -252,7 +260,7 @@
                 
                 <div class="about-section">
                     <h3>📈 Growing Together</h3>
-                    <p>With over 52,000 pubs in our database and growing reports every day, we're becoming the go-to resource for gluten-free beer discovery. Join us in making the UK more accessible for coeliacs!</p>
+                    <p>With thousands of pubs in our database and growing reports every day, we're becoming the go-to resource for gluten free beer discovery. Join us in making the UK more accessible for coeliacs!</p>
                 </div>
                 
                 <div class="contact-info">
@@ -268,7 +276,7 @@
     <div id="gfInfoModal" class="report-modal">
         <div class="modal-content gf-modal-content">
             <div class="modal-header">
-                <h2>🔬 What is Gluten-Free Beer?</h2>
+                <h2>🔬 What is Gluten Free Beer?</h2>
                 <button class="close-modal" onclick="closeGFInfoModal()">&times;</button>
             </div>
             
@@ -295,11 +303,11 @@
                     <h3>🏷️ Types of GF Beer</h3>
                     <div class="beer-types">
                         <div class="beer-type-item">
-                            <strong>✅ Certified Gluten-Free</strong>
-                            <p>Made from naturally gluten-free grains (rice, sorghum, millet). Safest option.</p>
+                            <strong>✅ Certified Gluten Free</strong>
+                            <p>Made from naturally gluten free grains (rice, sorghum, millet). Safest option.</p>
                         </div>
                         <div class="beer-type-item">
-                            <strong>⚗️ Gluten-Removed/Reduced</strong>
+                            <strong>⚗️ Gluten Removed/Reduced</strong>
                             <p>Made from barley/wheat but treated with enzymes to break down gluten. Some coeliacs react.</p>
                         </div>
                         <div class="beer-type-item">
@@ -315,7 +323,7 @@
                         <li><strong>Cross-contamination</strong> can happen in breweries that also make regular beer</li>
                         <li><strong>Always check labels</strong> and ask staff about preparation methods</li>
                         <li><strong>Coeliacs vs Gluten Intolerant</strong> - Coeliac disease is an autoimmune condition requiring strict gluten avoidance, while gluten intolerance is a separate digestive sensitivity</li>
-                        <li><strong>When in doubt</strong>, choose certified gluten-free options</li>
+                        <li><strong>When in doubt</strong>, choose certified gluten free options</li>
                     </ul>
                 </div>
                 
@@ -368,6 +376,22 @@
         </div>
     </div>
 
+    <!-- Loading Toast -->
+    <div id="loadingToast" class="toast loading-toast" style="display: none;">
+        <div class="toast-content">
+            <div class="spinner"></div>
+            <span id="loadingMessage">Loading...</span>
+        </div>
+    </div>
+
+    <!-- Success Toast -->
+    <div id="successToast" class="toast success-toast" style="display: none;">
+        <div class="toast-content">
+            <span class="toast-icon">✅</span>
+            <span id="successMessage">Success!</span>
+        </div>
+    </div>
+
     <script>
         // Cache-busting timestamp
         console.log('🚀 CACHE BUSTER:', '{{ cache_buster }}');
@@ -390,6 +414,61 @@
         let currentGfOnly = false;
 
         // ================================
+        // TOAST NOTIFICATION SYSTEM
+        // ================================
+        
+        function showLoadingToast(message = 'Loading...') {
+            const toast = document.getElementById('loadingToast');
+            document.getElementById('loadingMessage').textContent = message;
+            toast.style.display = 'block';
+            toast.style.animation = 'slideInUp 0.3s ease-out';
+        }
+
+        function hideLoadingToast() {
+            const toast = document.getElementById('loadingToast');
+            toast.style.animation = 'slideOutDown 0.3s ease-in';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 300);
+        }
+
+        function showSuccessToast(message = 'Success!') {
+            const toast = document.getElementById('successToast');
+            document.getElementById('successMessage').textContent = message;
+            toast.style.display = 'block';
+            toast.style.animation = 'slideInUp 0.3s ease-out';
+            
+            // Auto hide after 3 seconds
+            setTimeout(() => {
+                toast.style.animation = 'slideOutDown 0.3s ease-in';
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 300);
+            }, 3000);
+        }
+
+        // ================================
+        // GOOGLE ANALYTICS TRACKING
+        // ================================
+        
+        function trackEvent(action, category = 'User Interaction', label = '') {
+            if (typeof gtag !== 'undefined') {
+                gtag('event', action, {
+                    event_category: category,
+                    event_label: label
+                });
+            }
+        }
+
+        function trackSearch(query, searchType, results) {
+            trackEvent('search', 'Search', `${searchType}: ${query} (${results} results)`);
+        }
+
+        function trackPubView(pubName) {
+            trackEvent('pub_view', 'Pub Interaction', pubName);
+        }
+
+        // ================================
         // ENHANCED UI FUNCTIONS
         // ================================
         
@@ -401,7 +480,7 @@
             document.getElementById('search').scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Enhanced map toggle functionality
+        // SMART MAP TOGGLE - Auto-show when needed
         function toggleMap() {
             mapVisible = !mapVisible;
             const mapContainer = document.getElementById('mapContainer');
@@ -430,8 +509,16 @@
             AppState.save();
         }
 
+        // SMART MAP SHOWING - Auto show map when needed
+        function smartShowMap() {
+            if (!mapVisible) {
+                toggleMap();
+            }
+        }
+
         function openReportModal() {
             document.getElementById('reportModal').style.display = 'block';
+            trackEvent('open_report_modal', 'Modal');
             // Focus on pub search field
             setTimeout(() => {
                 document.getElementById('reportPubSearch').focus();
@@ -449,6 +536,7 @@
 
         function showAboutUs() {
             document.getElementById('aboutModal').style.display = 'block';
+            trackEvent('open_about_modal', 'Modal');
         }
 
         function closeAboutModal() {
@@ -457,6 +545,7 @@
 
         function showGFInfo() {
             document.getElementById('gfInfoModal').style.display = 'block';
+            trackEvent('open_gf_info_modal', 'Modal');
         }
 
         function closeGFInfoModal() {
@@ -464,16 +553,40 @@
         }
 
         function showComingSoon(feature) {
-            alert(`${feature} is coming soon! 🚀\n\nWe're working hard to bring you this feature. Sign up for updates to be notified when it's ready!`);
+            trackEvent('coming_soon_click', 'Feature Interest', feature);
+            showSuccessToast(`${feature} is coming soon! 🚀 We're working hard to bring you this feature.`);
         }
 
         function showAllActivity() {
-            alert('Full activity feed coming soon! 📊\n\nThis will show all recent GF beer finds, pub additions, and community updates.');
+            trackEvent('view_all_activity', 'Navigation');
+            showSuccessToast('Full activity feed coming soon! 📊 This will show all recent GF beer finds.');
         }
 
+        // SMART RESULTS SECTION - Pushes content down
         function showResultsSection() {
-            document.getElementById('results-section').style.display = 'block';
-            document.getElementById('results-section').scrollIntoView({ behavior: 'smooth' });
+            const resultsSection = document.getElementById('results-section');
+            const featuresSection = document.getElementById('featuresSection');
+            const activitySection = document.getElementById('activitySection');
+            
+            resultsSection.style.display = 'block';
+            
+            // Add margin to push content down
+            featuresSection.style.marginTop = '40px';
+            activitySection.style.marginTop = '40px';
+            
+            resultsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function hideResultsSection() {
+            const resultsSection = document.getElementById('results-section');
+            const featuresSection = document.getElementById('featuresSection');
+            const activitySection = document.getElementById('activitySection');
+            
+            resultsSection.style.display = 'none';
+            
+            // Remove margin
+            featuresSection.style.marginTop = '0';
+            activitySection.style.marginTop = '0';
         }
 
         // Enhanced pub search functionality
@@ -541,6 +654,7 @@
             document.getElementById('newPubFields').style.display = 'none';
             document.getElementById('pubSuggestions').style.display = 'none';
             document.getElementById('reportPubSearch').value = pub.name;
+            trackEvent('select_existing_pub', 'Report Flow', pub.name);
         }
 
         function clearSelectedPub() {
@@ -555,6 +669,7 @@
             document.getElementById('newPubFields').style.display = 'block';
             document.getElementById('selectedPubInfo').style.display = 'none';
             document.getElementById('pubSuggestions').style.display = 'none';
+            trackEvent('add_new_pub', 'Report Flow');
             
             // Pre-fill with search query if available
             if (query) {
@@ -583,15 +698,54 @@
             activityContainer.insertBefore(newActivity, activityContainer.firstChild);
         }
 
+        // DYNAMIC STATS LOADING FROM DATABASE
         async function loadDashboardStats() {
             try {
-                // For now, keep the mock stats but make them feel more real
-                document.getElementById('totalPubs').textContent = '52,847';
-                document.getElementById('gfPubs').textContent = '1,249';
-                document.getElementById('monthlyReports').textContent = '847';
+                const response = await fetch('/api/stats');
+                if (response.ok) {
+                    const stats = await response.json();
+                    
+                    // Animate the numbers counting up
+                    animateNumber('totalPubs', stats.total_pubs);
+                    animateNumber('gfPubs', stats.gf_pubs);
+                    animateNumber('monthlyReports', stats.monthly_reports);
+                } else {
+                    // Fallback to mock data if API not ready
+                    animateNumber('totalPubs', 52847);
+                    animateNumber('gfPubs', 1249);
+                    animateNumber('monthlyReports', 847);
+                }
             } catch (error) {
-                console.log('Stats loading will be implemented with backend');
+                console.log('Stats API not ready, using mock data');
+                // Fallback numbers for beta
+                animateNumber('totalPubs', 52847);
+                animateNumber('gfPubs', 1249);
+                animateNumber('monthlyReports', 847);
             }
+        }
+
+        function animateNumber(elementId, targetNumber) {
+            const element = document.getElementById(elementId);
+            const startNumber = 0;
+            const duration = 2000; // 2 seconds
+            const startTime = performance.now();
+            
+            function updateNumber(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Ease out animation
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+                const currentNumber = Math.floor(startNumber + (targetNumber - startNumber) * easeOut);
+                
+                element.textContent = currentNumber.toLocaleString();
+                
+                if (progress < 1) {
+                    requestAnimationFrame(updateNumber);
+                }
+            }
+            
+            requestAnimationFrame(updateNumber);
         }
 
         // ================================
@@ -744,18 +898,22 @@
             );
         }
 
-        // Find nearby pubs
+        // ENHANCED Find nearby pubs with smart map showing
         async function findNearbyPubs() {
             if (!userLocation) {
-                alert('Please allow location access first');
+                showSuccessToast('Getting your location first...');
                 getUserLocation();
                 return;
             }
 
+            trackEvent('find_nearby_pubs', 'Location Search');
+            smartShowMap(); // Auto-show map
+            
             const gfOnly = document.getElementById('gfOnly').checked;
             const radius = 5;
             
             showResultsSection();
+            showLoadingToast('Finding nearby pubs...');
             const results = document.getElementById('results');
             results.innerHTML = '<li class="loading">Finding nearby pubs...</li>';
             
@@ -775,8 +933,12 @@
                     throw new Error(nearbyPubs.error);
                 }
                 
+                hideLoadingToast();
                 displaySearchResults(nearbyPubs);
                 addPubMarkersToMap(nearbyPubs);
+                
+                showSuccessToast(`Found ${nearbyPubs.length} pubs near you!`);
+                trackSearch('nearby', 'location', nearbyPubs.length);
                 
                 if (nearbyPubs.length > 0) {
                     const allPoints = [];
@@ -802,13 +964,20 @@
                 
             } catch (error) {
                 console.error('Error finding nearby pubs:', error);
+                hideLoadingToast();
                 results.innerHTML = '<li class="no-results">Error finding nearby pubs. Please try again.</li>';
+                showSuccessToast('Error finding nearby pubs. Please try again.');
             }
         }
 
+        // ENHANCED centerOnLocation with smart map showing
         function centerOnLocation() {
+            trackEvent('center_on_location', 'Map Interaction');
+            smartShowMap(); // Auto-show map
+            
             if (userLocation) {
                 map.setView([userLocation.lat, userLocation.lng], 14);
+                showSuccessToast('Centered on your location!');
             } else {
                 getUserLocation();
             }
@@ -976,8 +1145,9 @@
                 const result = await response.json();
                 
                 if (response.ok) {
-                    alert(`🎉 Thank you! ${currentPub.name} has been located on the map.`);
+                    showSuccessToast(`🎉 Thank you! ${currentPub.name} has been located on the map.`);
                     closeCoordinateModal();
+                    trackEvent('coordinate_confirmed', 'Community Contribution', currentPub.name);
                     
                     if (userLocation) {
                         findNearbyPubs();
@@ -985,11 +1155,11 @@
                         searchSpecificPub(currentPub.id);
                     }
                 } else {
-                    alert('Error saving location: ' + result.message);
+                    showSuccessToast('Error saving location: ' + result.message);
                 }
             } catch (error) {
                 console.error('Error saving coordinates:', error);
-                alert('Error saving location. Please try again.');
+                showSuccessToast('Error saving location. Please try again.');
             }
         }
 
@@ -1003,7 +1173,11 @@
             selectedCoordinates = null;
         }
 
+        // ENHANCED findOnMap with smart map showing
         function findOnMap(lat, lng, pubName, postcode, pubId) {
+            trackPubView(pubName);
+            smartShowMap(); // Auto-show map
+            
             if (lat && lng && lat !== 'null' && lng !== 'null' && !isNaN(parseFloat(lat)) && !isNaN(parseFloat(lng))) {
                 map.setView([parseFloat(lat), parseFloat(lng)], 16);
                 
@@ -1017,6 +1191,7 @@
                 }).addTo(map);
                 
                 highlightMarker.bindPopup(`<strong>${pubName}</strong><br><em>You searched for this pub!</em>`).openPopup();
+                showSuccessToast(`Found ${pubName} on the map!`);
                 
                 setTimeout(() => {
                     map.removeLayer(highlightMarker);
@@ -1029,6 +1204,7 @@
         function searchForPub(pubName, postcode) {
             const searchQuery = `${pubName} ${postcode} pub`;
             const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
+            trackEvent('search_online', 'External Search', pubName);
             window.open(googleUrl, '_blank');
         }
 
@@ -1226,6 +1402,7 @@
             currentPage = page;
             const url = `/search?query=${encodeURIComponent(currentQuery)}&search_type=${currentSearchType}&page=${page}` + (currentGfOnly ? '&gf_only=true' : '');
             
+            showLoadingToast('Loading page...');
             const results = document.getElementById('results');
             results.innerHTML = '<li class="loading">Loading...</li>';
             
@@ -1233,6 +1410,7 @@
                 const response = await fetch(url);
                 const data = await response.json();
                 
+                hideLoadingToast();
                 displaySearchResults(data);
                 addPubMarkersToMap(data.pubs || data);
                 
@@ -1240,12 +1418,14 @@
                 results.scrollIntoView({ behavior: 'smooth' });
             } catch (error) {
                 console.error('Error loading page:', error);
+                hideLoadingToast();
                 results.innerHTML = '<li class="no-results">Error loading results. Please try again.</li>';
             }
         }
 
         async function searchSpecificPub(pubId) {
             console.log('searchSpecificPub called with ID:', pubId);
+            showLoadingToast('Loading pub details...');
             const results = document.getElementById('results');
             results.innerHTML = '<li class="loading">Loading pub details...</li>';
             
@@ -1256,6 +1436,7 @@
                 const pubs = await response.json();
                 
                 console.log('Response from server:', pubs);
+                hideLoadingToast();
                 
                 if (pubs.length > 0) {
                     console.log('Calling displaySearchResults with:', pubs);
@@ -1263,7 +1444,10 @@
                     addPubMarkersToMap(pubs);
                     
                     const pub = pubs[0];
+                    trackPubView(pub.name);
+                    
                     if (pub.latitude && pub.longitude) {
+                        smartShowMap();
                         map.setView([pub.latitude, pub.longitude], 15);
                     }
                     
@@ -1277,15 +1461,19 @@
                 }
             } catch (error) {
                 console.error('Error searching for specific pub:', error);
+                hideLoadingToast();
                 results.innerHTML = '<li class="no-results">Error loading pub details.</li>';
             }
         }
 
         function toggleUpdateForm(pubId) {
             const form = document.getElementById(`form-${pubId}`);
-            form.style.display = form.style.display === 'block' ? 'none' : 'block';
-            if (form.style.display === 'block') {
+            const isVisible = form.style.display === 'block';
+            form.style.display = isVisible ? 'none' : 'block';
+            
+            if (!isVisible) {
                 updateBeerInputs(pubId);
+                trackEvent('open_update_form', 'User Interaction', `pub_${pubId}`);
             }
         }
 
@@ -1307,6 +1495,7 @@
             inputContainer.style.display = checkbox.checked ? 'block' : 'none';
             if (checkbox.checked) {
                 inputContainer.querySelector('input').focus();
+                trackEvent('select_beer_format', 'Beer Update', type);
             }
         }
 
@@ -1316,6 +1505,8 @@
             const cask = document.getElementById(`cask-${pubId}`).checked ? 1 : 0;
             const can = document.getElementById(`can-${pubId}`).checked ? 1 : 0;
             const updateMode = document.querySelector(`input[name="updateMode-${pubId}"]:checked`)?.value || 'add';
+
+            showLoadingToast('Saving beer updates...');
 
             const updates = [];
             if (bottle) {
@@ -1363,27 +1554,40 @@
                 });
             }
 
-            const updateResponse = await fetch('/update', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ pub_id: pubId, bottle, tap, cask, can })
-            });
-
-            if (updates.length > 0) {
-                await fetch('/update_beers', {
+            try {
+                const updateResponse = await fetch('/update', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ pub_id: pubId, updates, update_mode: updateMode })
+                    body: JSON.stringify({ pub_id: pubId, bottle, tap, cask, can })
                 });
-            }
 
-            const result = await updateResponse.json();
-            alert(result.message);
-            
-            const form = document.getElementById(`form-${pubId}`);
-            form.style.display = 'none';
+                if (updates.length > 0) {
+                    await fetch('/update_beers', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ pub_id: pubId, updates, update_mode: updateMode })
+                    });
+                }
+
+                const result = await updateResponse.json();
+                hideLoadingToast();
+                showSuccessToast(result.message || 'Beer updates saved successfully!');
+                trackEvent('submit_beer_update', 'Community Contribution', `pub_${pubId}`);
+                
+                const form = document.getElementById(`form-${pubId}`);
+                form.style.display = 'none';
+                
+                // Refresh the pub data to show updates
+                await searchSpecificPub(pubId);
+                
+            } catch (error) {
+                console.error('Error submitting update:', error);
+                hideLoadingToast();
+                showSuccessToast('Error saving updates. Please try again.');
+            }
         }
 
+        // ENHANCED SEARCH FUNCTION WITH POSTCODE DETECTION
         async function searchPubs() {
             const query = document.getElementById('searchInput').value.trim();
             const searchType = document.getElementById('searchType').value;
@@ -1401,19 +1605,94 @@
             currentPage = 1;
             
             showResultsSection();
-            
+            showLoadingToast('Searching...');
             results.innerHTML = '<li class="loading">Searching...</li>';
             
-            const url = `/search?query=${encodeURIComponent(query)}&search_type=${searchType}&page=1` + (gfOnly ? '&gf_only=true' : '');
+            // Check if query looks like a postcode
+            const isPostcode = /^[A-Z]{1,2}[0-9R][0-9A-Z]?\s?[0-9][A-Z]{2}$/i.test(query.replace(/\s/g, ''));
             
             try {
+                let url;
+                let searchResults;
+                
+                if (isPostcode && (searchType === 'postcode' || searchType === 'all')) {
+                    // Handle postcode search - geocode then find nearby
+                    console.log('Detected postcode search:', query);
+                    showLoadingToast('Finding location...');
+                    
+                    // First geocode the postcode
+                    const geocodeResponse = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=gb&limit=1`);
+                    const geocodeData = await geocodeResponse.json();
+                    
+                    if (geocodeData && geocodeData.length > 0) {
+                        const lat = parseFloat(geocodeData[0].lat);
+                        const lng = parseFloat(geocodeData[0].lon);
+                        
+                        showLoadingToast('Finding nearby pubs...');
+                        
+                        // Now search for nearby pubs
+                        url = `/nearby?lat=${lat}&lng=${lng}&radius=5&gf_only=${gfOnly}`;
+                        
+                        // Auto-show map and update to show the postcode area
+                        smartShowMap();
+                        if (map) {
+                            map.setView([lat, lng], 14);
+                            
+                            // Add a marker for the searched postcode
+                            if (window.postcodeMarker) {
+                                map.removeLayer(window.postcodeMarker);
+                            }
+                            window.postcodeMarker = L.marker([lat, lng], {
+                                icon: L.divIcon({
+                                    className: 'postcode-marker',
+                                    html: `<div style="
+                                        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+                                        width: 30px;
+                                        height: 30px;
+                                        border-radius: 50%;
+                                        border: 3px solid white;
+                                        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        color: white;
+                                        font-weight: bold;
+                                        font-size: 14px;
+                                    ">📍</div>`,
+                                    iconSize: [36, 36],
+                                    iconAnchor: [18, 18]
+                                })
+                            }).addTo(map);
+                            
+                            window.postcodeMarker.bindPopup(`<strong>${query}</strong><br>Searching nearby pubs...`).openPopup();
+                        }
+                    } else {
+                        throw new Error('Postcode not found');
+                    }
+                } else {
+                    // Regular text search
+                    url = `/search?query=${encodeURIComponent(query)}&search_type=${searchType}&page=1` + (gfOnly ? '&gf_only=true' : '');
+                }
+                
                 const response = await fetch(url);
                 const data = await response.json();
                 
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
                 const pubs = Array.isArray(data) ? data : data.pubs;
                 
+                hideLoadingToast();
+                
                 if (pubs.length === 0) {
-                    results.innerHTML = '<li class="no-results">No pubs found.</li>';
+                    if (isPostcode) {
+                        results.innerHTML = `<li class="no-results">No pubs found within 5km of ${query}. Try expanding your search area.</li>`;
+                        showSuccessToast(`No pubs found near ${query}`);
+                    } else {
+                        results.innerHTML = '<li class="no-results">No pubs found.</li>';
+                        showSuccessToast('No pubs found for your search');
+                    }
                     return;
                 }
                 
@@ -1421,9 +1700,26 @@
                 addPubMarkersToMap(pubs);
                 
                 AppState.save();
+                trackSearch(query, searchType, pubs.length);
+                
+                // Show success message for postcode searches
+                if (isPostcode && pubs.length > 0) {
+                    showSuccessToast(`✅ Found ${pubs.length} pubs within 5km of ${query}`);
+                } else {
+                    showSuccessToast(`Found ${pubs.length} pubs matching "${query}"`);
+                }
+                
             } catch (error) {
                 console.error('Error searching pubs:', error);
-                results.innerHTML = '<li class="no-results">Error searching pubs. Please try again.</li>';
+                hideLoadingToast();
+                
+                if (isPostcode) {
+                    results.innerHTML = `<li class="no-results">Could not find location for "${query}". Please check the postcode and try again.</li>`;
+                    showSuccessToast(`Could not find location for "${query}"`);
+                } else {
+                    results.innerHTML = '<li class="no-results">Error searching pubs. Please try again.</li>';
+                    showSuccessToast('Error searching pubs. Please try again.');
+                }
             }
         }
 
@@ -1432,9 +1728,14 @@
             document.getElementById('gfOnly').checked = false;
             document.getElementById('results').innerHTML = '';
             document.getElementById('suggestions').style.display = 'none';
+            hideResultsSection();
             
             pubMarkers.forEach(marker => map.removeLayer(marker));
             pubMarkers = [];
+            
+            if (window.postcodeMarker) {
+                map.removeLayer(window.postcodeMarker);
+            }
             
             currentQuery = '';
             currentSearchType = 'all';
@@ -1446,6 +1747,8 @@
         // Enhanced report form submission
         document.getElementById('reportForm').addEventListener('submit', async function(e) {
             e.preventDefault();
+            
+            showLoadingToast('Submitting report...');
             
             const formData = {
                 existingPub: selectedPubData,
@@ -1462,31 +1765,39 @@
             if (!selectedPubData) {
                 // New pub - check required fields
                 if (!formData.pubName || !formData.address || !formData.postcode) {
-                    alert('Please fill in all required pub details.');
+                    hideLoadingToast();
+                    showSuccessToast('Please fill in all required pub details.');
                     return;
                 }
             }
             
             if (!formData.format) {
-                alert('Please select a beer format.');
+                hideLoadingToast();
+                showSuccessToast('Please select a beer format.');
                 return;
             }
             
             const photo = document.getElementById('reportPhoto').files[0];
             
             try {
+                // Here you would normally send to your backend
+                // For now, we'll simulate success
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
                 let message = selectedPubData ? 
                     `🎉 Thank you! Your GF beer find at ${formData.pubName} has been submitted.` :
                     `🎉 Thank you! Your new pub "${formData.pubName}" and GF beer find have been submitted.`;
                 
-                message += '\n\nIt will appear once approved. Keep helping the community grow!';
-                
-                alert(message);
+                hideLoadingToast();
+                showSuccessToast(message);
                 closeReportModal();
                 addToRecentActivity(formData);
                 
+                trackEvent('submit_beer_report', 'Community Contribution', formData.pubName);
+                
             } catch (error) {
-                alert('Sorry, there was an error submitting your report. Please try again.');
+                hideLoadingToast();
+                showSuccessToast('Sorry, there was an error submitting your report. Please try again.');
             }
         });
 
@@ -1550,16 +1861,41 @@
                 }
             });
 
-            // Autocomplete with debouncing
+            // ENHANCED AUTOCOMPLETE WITH POSTCODE DETECTION
             input.addEventListener('input', debounce(async () => {
                 const query = input.value.trim();
                 const searchType = document.getElementById('searchType').value;
                 const gfOnly = document.getElementById('gfOnly').checked;
+                
                 if (query.length < 2) {
                     suggestions.style.display = 'none';
                     return;
                 }
 
+                // Check if it looks like a postcode
+                const isPostcode = /^[A-Z]{1,2}[0-9R][0-9A-Z]?\s?[0-9][A-Z]{2}$/i.test(query.replace(/\s/g, ''));
+                
+                if (isPostcode) {
+                    // Show postcode search option
+                    suggestions.innerHTML = `
+                        <div class="postcode-suggestion" style="padding: 15px; cursor: pointer; background: rgba(102, 126, 234, 0.1); border-radius: 10px; margin: 5px;">
+                            <strong>📍 Search for pubs near "${query}"</strong>
+                            <div style="font-size: 12px; color: #666; margin-top: 4px;">
+                                Find pubs within 5km of this postcode
+                            </div>
+                        </div>
+                    `;
+                    suggestions.style.display = 'block';
+                    
+                    // Add click handler
+                    suggestions.querySelector('.postcode-suggestion').addEventListener('click', () => {
+                        searchPubs();
+                        suggestions.style.display = 'none';
+                    });
+                    return;
+                }
+
+                // Regular autocomplete for non-postcodes
                 try {
                     const url = `/autocomplete?q=${encodeURIComponent(query)}&search_type=${searchType}` + (gfOnly ? '&gf_only=true' : '');
                     const response = await fetch(url);
@@ -1610,7 +1946,6 @@
                 }
             });
 
-            // Toggle map visibility - REMOVED (now handled by toggleMap function)
             // Save state on form changes
             document.getElementById('searchType').addEventListener('change', () => AppState.save());
             document.getElementById('gfOnly').addEventListener('change', () => AppState.save());
