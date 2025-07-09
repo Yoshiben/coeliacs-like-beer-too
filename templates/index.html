@@ -1,4 +1,6 @@
-<!DOCTYPE html>
+// Close modals when clicking outside
+            document.getElementById('coordinateModal').addEventListener('click', (e) => {
+                <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -75,10 +77,24 @@
     <div class="features-section">
         <div class="features-grid">
             <div class="feature-card">
+                <span class="feature-icon">ℹ️</span>
+                <h3 class="feature-title">About Us</h3>
+                <p class="feature-description">Learn about our mission to help coeliacs find great beer across the UK.</p>
+                <button class="feature-action" onclick="showAboutUs()">Learn More</button>
+            </div>
+            
+            <div class="feature-card">
                 <span class="feature-icon">📸</span>
                 <h3 class="feature-title">Report GF Beer</h3>
                 <p class="feature-description">Found gluten-free beer somewhere? Share it with the community and help others!</p>
                 <button class="feature-action" onclick="openReportModal()">Add Report</button>
+            </div>
+            
+            <div class="feature-card">
+                <span class="feature-icon">🔬</span>
+                <h3 class="feature-title">What is GF Beer?</h3>
+                <p class="feature-description">Everything you need to know about gluten-free beer standards and safety.</p>
+                <button class="feature-action" onclick="showGFInfo()">Learn More</button>
             </div>
             
             <div class="feature-card">
@@ -96,17 +112,10 @@
             </div>
             
             <div class="feature-card">
-                <span class="feature-icon">ℹ️</span>
-                <h3 class="feature-title">About Us</h3>
-                <p class="feature-description">Learn about our mission to help coeliacs find great beer across the UK.</p>
-                <button class="feature-action" onclick="showAboutUs()">Learn More</button>
-            </div>
-            
-            <div class="feature-card">
-                <span class="feature-icon">🔬</span>
-                <h3 class="feature-title">What is GF Beer?</h3>
-                <p class="feature-description">Everything you need to know about gluten-free beer standards and safety.</p>
-                <button class="feature-action" onclick="showGFInfo()">Learn More</button>
+                <span class="feature-icon">⭐</span>
+                <h3 class="feature-title">GF Beer Reviews</h3>
+                <p class="feature-description">Real reviews from coeliacs - discover which beers are worth trying and which to avoid.</p>
+                <button class="feature-action" onclick="showComingSoon('Beer Reviews')">Coming Soon</button>
             </div>
         </div>
     </div>
