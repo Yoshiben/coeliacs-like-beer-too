@@ -1562,7 +1562,7 @@ label {
    ENHANCED MODAL STYLES
    ================================ */
 
-/* Pub search suggestions */
+/* Pub search suggestions - FIXED POSITIONING */
 .pub-suggestions {
     position: absolute;
     top: 100%;
@@ -1576,6 +1576,12 @@ label {
     border-radius: 0 0 10px 10px;
     z-index: 1000;
     display: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Ensure parent form group has relative positioning */
+.form-group {
+    position: relative;
 }
 
 .pub-suggestion-item {
