@@ -1243,32 +1243,87 @@
         }
 
         // ENHANCED findOnMap with smart map showing
+        // ENHANCED findOnMap function - Replace in your JavaScript
+
         function findOnMap(lat, lng, pubName, postcode, pubId) {
             trackPubView(pubName);
-            smartShowMap(); // Auto-show map
+            
+            // Always show the map when someone clicks "Find on Map"
+            if (!mapVisible) {
+                toggleMap();
+            }
             
             if (lat && lng && lat !== 'null' && lng !== 'null' && !isNaN(parseFloat(lat)) && !isNaN(parseFloat(lng))) {
-                map.setView([parseFloat(lat), parseFloat(lng)], 16);
-                
-                const highlightMarker = L.circleMarker([parseFloat(lat), parseFloat(lng)], {
-                    radius: 12,
-                    fillColor: '#ff6b6b',
-                    color: '#fff',
-                    weight: 3,
-                    opacity: 1,
-                    fillOpacity: 0.9
-                }).addTo(map);
-                
-                highlightMarker.bindPopup(`<strong>${pubName}</strong><br><em>You searched for this pub!</em>`).openPopup();
-                showSuccessToast(`Found ${pubName} on the map!`);
-                
+                // Wait a moment for map to be visible if it was just shown
                 setTimeout(() => {
-                    map.removeLayer(highlightMarker);
-                }, 5000);
+                    // Zoom to the location
+                    map.setView([parseFloat(lat), parseFloat(lng)], 17); // Closer zoom for individual pubs
+                    
+                    // Remove any existing highlight markers
+                    if (window.currentHighlightMarker) {
+                        map.removeLayer(window.currentHighlightMarker);
+                    }
+                    
+                    // Create a special highlight marker
+                    window.currentHighlightMarker = L.circleMarker([parseFloat(lat), parseFloat(lng)], {
+                        radius: 15,
+                        fillColor: '#ff6b6b',
+                        color: '#fff',
+                        weight: 4,
+                        opacity: 1,
+                        fillOpacity: 0.9,
+                        className: 'pulsing-marker'
+                    }).addTo(map);
+                    
+                    // Add pulsing animation
+                    const markerElement = window.currentHighlightMarker.getElement();
+                    if (markerElement) {
+                        markerElement.style.animation = 'pulse 2s infinite';
+                    }
+                    
+                    window.currentHighlightMarker.bindPopup(`
+                        <div style="text-align: center; padding: 5px;">
+                            <strong style="color: #2d3748; font-size: 16px;">${pubName}</strong>
+                            <br><em style="color: #667eea;">📍 You found this pub!</em>
+                        </div>
+                    `).openPopup();
+                    
+                    // Scroll to map section smoothly
+                    document.getElementById('mapContainer').scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'start' 
+                    });
+                    
+                    showSuccessToast(`📍 Found ${pubName} on the map!`);
+                    
+                    // Remove the highlight marker after 8 seconds
+                    setTimeout(() => {
+                        if (window.currentHighlightMarker) {
+                            map.removeLayer(window.currentHighlightMarker);
+                            window.currentHighlightMarker = null;
+                        }
+                    }, 8000);
+                    
+                }, mapVisible ? 50 : 300); // Shorter delay if map already visible
+                
             } else {
-                openCoordinateModal(pubName, postcode, pubId);
+                // If no coordinates, show map anyway and open coordinate modal
+                setTimeout(() => {
+                    document.getElementById('mapContainer').scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'start' 
+                    });
+                    showSuccessToast(`📍 Help us locate ${pubName} on the map!`);
+                    
+                    // Small delay before opening coordinate modal
+                    setTimeout(() => {
+                        openCoordinateModal(pubName, postcode, pubId);
+                    }, 500);
+                }, mapVisible ? 50 : 300);
             }
         }
+        
+        // Add this CSS for the pulsing animation - add to your style.css
 
         function searchForPub(pubName, postcode) {
             const searchQuery = `${pubName} ${postcode} pub`;
