@@ -1,0 +1,107 @@
+# Accessibility Statement
+
+**Coeliacs Like Beer Too**  
+*Last updated: 10/07/2025*
+
+## Our Commitment
+
+We are committed to making coeliacslikebeer.co.uk accessible to everyone, including people with disabilities. We believe that finding gluten-free beer should be easy for all members of the coeliac community.
+
+## Accessibility Standards
+
+This website aims to conform to the Web Content Accessibility Guidelines (WCAG) 2.1 Level AA standards. These guidelines help make web content more accessible for people with disabilities.
+
+## What We've Done
+
+### Navigation and Structure
+- ✅ Clear, logical page structure with proper headings
+- ✅ Consistent navigation throughout the site
+- ✅ Skip links to main content areas
+- ✅ Descriptive page titles and link text
+
+### Visual Design
+- ✅ High contrast color scheme for better readability
+- ✅ Text remains readable when zoomed to 200%
+- ✅ No content relies solely on color to convey information
+- ✅ Focus indicators for keyboard navigation
+
+### Interactive Elements
+- ✅ All functionality available via keyboard
+- ✅ Touch targets are at least 44px for mobile users
+- ✅ Form fields have clear labels and error messages
+- ✅ Buttons and links have descriptive text
+
+### Images and Media
+- ✅ Alternative text for all meaningful images
+- ✅ Icons supplemented with text labels
+- ✅ Maps include text-based alternatives
+
+### Technical Features
+- ✅ Semantic HTML markup
+- ✅ ARIA labels where appropriate
+- ✅ Responsive design for all devices
+- ✅ Works without JavaScript for core functionality
+
+## Known Limitations
+
+We're continuously working to improve accessibility. Current limitations include:
+
+- **Interactive Map**: Some map features may be challenging for screen reader users (text-based search alternatives provided)
+- **User-Generated Images**: Photos uploaded by community members may lack alt text
+- **Third-Party Content**: Some embedded content (maps, analytics) may have accessibility limitations
+
+## Assistive Technologies
+
+This website has been tested with:
+- Screen readers (NVDA, JAWS, VoiceOver)
+- Keyboard-only navigation
+- Voice control software
+- Zoom software up to 200%
+
+## Feedback and Contact
+
+We welcome feedback on the accessibility of this website. If you encounter any barriers or have suggestions for improvement:
+
+**Contact Methods:**
+- Email: legal@coeliacslikebeer.co.uk (Subject: "Accessibility Feedback")
+- Describe the specific page and issue you encountered
+- Include details about your assistive technology if relevant
+
+**Response Time:**
+We aim to respond to accessibility feedback within 3 business days and implement fixes within 2 weeks where possible.
+
+## Ongoing Improvements
+
+We regularly:
+- Review and test our website's accessibility
+- Provide accessibility training for our team
+- Consult with disability community members
+- Update content to meet evolving standards
+
+## Legal Compliance
+
+This statement reflects our commitment to accessibility and our efforts to comply with:
+- UK Equality Act 2010
+- EU Web Accessibility Directive
+- Section 508 (US Federal accessibility requirements)
+
+## Alternative Access
+
+If you cannot access content or features on our website, we can provide information in alternative formats:
+- Large print versions of key information
+- Email summaries of pub listings for specific areas
+- Phone assistance for finding gluten-free options
+
+Contact us to request alternative formats.
+
+## Third-Party Content
+
+Some content is provided by third parties (maps, analytics). We work with providers who share our commitment to accessibility, but cannot guarantee the accessibility of all third-party features.
+
+## Updates
+
+We review this accessibility statement annually and update it when we make significant changes to the website.
+
+---
+
+*This statement was prepared in accordance with the UK's accessibility regulations and reflects our ongoing commitment to digital inclusion.*
