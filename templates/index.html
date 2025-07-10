@@ -8,13 +8,22 @@
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     
-    <!-- Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+    <!-- Google Analytics with GDPR compliance -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WSHR39KSXS"></script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
+        
+        // Set default consent to denied (GDPR compliant)
+        gtag('consent', 'default', {
+            'analytics_storage': 'denied'
+        });
+        
         gtag('js', new Date());
-        gtag('config', 'G-WSHR39KSXS'); // Replace with your actual GA4 ID
+        gtag('config', 'G-WSHR39KSXS', {
+            'anonymize_ip': true,
+            'cookie_flags': 'SameSite=None;Secure'
+        });
     </script>
 </head>
 <body>
@@ -645,6 +654,164 @@
             featuresSection.style.marginTop = '0';
             activitySection.style.marginTop = '0';
         }
+
+        function checkCookieConsent() {
+    const consent = localStorage.getItem('cookieConsent');
+    const analyticsConsent = localStorage.getItem('analyticsConsent');
+    
+    if (!consent) {
+        // Show cookie banner after page loads
+        setTimeout(() => {
+            document.getElementById('cookieConsent').style.display = 'block';
+        }, 1000);
+    } else {
+        // Show floating cookie settings button
+        document.getElementById('cookieSettingsFloat').style.display = 'block';
+        
+        // Initialize analytics if user previously consented
+        if (analyticsConsent === 'true') {
+            initializeAnalytics();
+        }
+    }
+}
+
+        // Accept all cookies
+        function acceptAllCookies() {
+            localStorage.setItem('cookieConsent', 'true');
+            localStorage.setItem('analyticsConsent', 'true');
+            
+            hideCookieBanner();
+            initializeAnalytics();
+            showSuccessToast('✅ Cookie preferences saved. Thanks!');
+            
+            trackEvent('cookie_consent', 'Privacy', 'accept_all');
+        }
+        
+        // Accept essential cookies only
+        function acceptEssentialOnly() {
+            localStorage.setItem('cookieConsent', 'true');
+            localStorage.setItem('analyticsConsent', 'false');
+            
+            hideCookieBanner();
+            showSuccessToast('✅ Essential cookies only. You can change this anytime.');
+            
+            // Track with basic method (no GA needed)
+            console.log('Cookie consent: essential only');
+        }
+        
+        // Show cookie settings modal
+        function showCookieSettings() {
+            document.getElementById('cookieSettings').style.display = 'block';
+            
+            // Set current preferences in modal
+            const analyticsConsent = localStorage.getItem('analyticsConsent');
+            document.getElementById('analyticsConsent').checked = analyticsConsent === 'true';
+        }
+        
+        // Close cookie settings modal
+        function closeCookieSettings() {
+            document.getElementById('cookieSettings').style.display = 'none';
+        }
+        
+        // Save cookie preferences from settings modal
+        function savesCookiePreferences() {
+            const analyticsConsent = document.getElementById('analyticsConsent').checked;
+            
+            localStorage.setItem('cookieConsent', 'true');
+            localStorage.setItem('analyticsConsent', analyticsConsent.toString());
+            
+            closeCookieSettings();
+            hideCookieBanner();
+            
+            if (analyticsConsent) {
+                initializeAnalytics();
+                showSuccessToast('✅ Preferences saved. Analytics enabled.');
+                trackEvent('cookie_consent', 'Privacy', 'analytics_enabled');
+            } else {
+                showSuccessToast('✅ Preferences saved. Analytics disabled.');
+                console.log('Cookie consent: analytics disabled');
+            }
+        }
+        
+        // Accept all from settings modal
+        function acceptAllFromSettings() {
+            document.getElementById('analyticsConsent').checked = true;
+            savesCookiePreferences();
+        }
+        
+        // Hide cookie banner
+        function hideCookieBanner() {
+            const banner = document.getElementById('cookieConsent');
+            banner.style.animation = 'slideOutDown 0.3s ease-in';
+            setTimeout(() => {
+                banner.style.display = 'none';
+                document.getElementById('cookieSettingsFloat').style.display = 'block';
+            }, 300);
+        }
+        
+        // Initialize Google Analytics (only if consent given)
+        function initializeAnalytics() {
+            // Only initialize if gtag is available and user consented
+            if (typeof gtag !== 'undefined' && localStorage.getItem('analyticsConsent') === 'true') {
+                gtag('consent', 'update', {
+                    'analytics_storage': 'granted'
+                });
+                
+                console.log('✅ Google Analytics initialized with user consent');
+            }
+        }
+        
+        // Update your existing gtag initialization
+        function initializeGoogleAnalytics() {
+            // Set default consent to denied
+            if (typeof gtag !== 'undefined') {
+                gtag('consent', 'default', {
+                    'analytics_storage': 'denied'
+                });
+                
+                gtag('js', new Date());
+                gtag('config', 'G-WSHR39KSXS', {
+                    'anonymize_ip': true,
+                    'cookie_flags': 'SameSite=None;Secure'
+                });
+            }
+        }
+        
+        // Enhanced tracking function that respects consent
+        function trackEvent(action, category = 'User Interaction', label = '') {
+            if (localStorage.getItem('analyticsConsent') === 'true' && typeof gtag !== 'undefined') {
+                gtag('event', action, {
+                    event_category: category,
+                    event_label: label
+                });
+            } else {
+                // Fallback logging for essential tracking
+                console.log(`Event: ${action} | Category: ${category} | Label: ${label}`);
+            }
+        }
+        
+        // Close modal when clicking outside
+        document.addEventListener('click', (e) => {
+            const modal = document.getElementById('cookieSettings');
+            if (e.target === modal) {
+                closeCookieSettings();
+            }
+        });
+        
+        // Initialize cookie consent check when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeGoogleAnalytics(); // Set default consent first
+            checkCookieConsent(); // Then check if user already gave consent
+        });
+        
+        // ================================
+        // KEYBOARD ACCESSIBILITY
+        // ================================
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeCookieSettings();
+            }
+        });
 
         // Enhanced pub search functionality
         function searchPubsForReport(query) {
