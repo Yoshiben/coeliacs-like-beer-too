@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookie Policy - Coeliacs Like Beer Too</title>
+    <style>
+        /* Cookie Banner Styles */
+        .cookie-banner {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(45, 55, 72, 0.98);
+            color: white;
+            padding: 20px;
+            z-index: 10002;
+            backdrop-filter: blur(10px);
+            border-top: 3px solid #667eea;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .cookie-banner.show {
+            transform: translateY(0);
+        }
+        
+        .cookie-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .cookie-text {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .cookie-text h3 {
+            margin: 0 0 8px 0;
+            color: #667eea;
+            font-size: 1.1em;
+        }
+        
+        .cookie-text p {
+            margin: 0;
+            line-height: 1.4;
+            font-size: 14px;
+        }
+        
+        .cookie-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .cookie-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+        
+        .accept-all {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+        
+        .accept-necessary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .manage-cookies {
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        
+        .cookie-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .cookie-link {
+            color: #667eea;
+            text-decoration: underline;
+        }
+        
+        /* Cookie Preferences Modal */
+        .cookie-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 10003;
+            display: none;
+            backdrop-filter: blur(5px);
+        }
+        
+        .cookie-modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80%;
+            overflow-y: auto;
+        }
+        
+        .cookie-category {
+            margin-bottom: 25px;
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+        }
+        
+        .cookie-category.essential {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.05);
+        }
+        
+        .cookie-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: #ccc;
+            border-radius: 24px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .toggle-switch.active {
+            background: #10b981;
+        }
+        
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+        
+        .toggle-switch.active::after {
+            transform: translateX(26px);
+        }
+        
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .cookie-content {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+            }
+            
+            .cookie-text {
+                min-width: unset;
+            }
+            
+            .cookie-buttons {
+                justify-content: center;
+            }
+            
+            .cookie-btn {
+                flex: 1;
+                min-width: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Cookie Consent Banner -->
+<div id="cookieBanner" class="cookie-banner">
+    <div class="cookie-content">
+        <div class="cookie-text">
+            <h3>🍪 We Use Cookies</h3>
+            <p>We use essential cookies for site functionality and Google Analytics to understand how you use our site. This helps us improve the experience for coeliacs finding gluten-free beer. <a href="#cookie-policy" class="cookie-link">Learn more</a></p>
+        </div>
+        <div class="cookie-buttons">
+            <button class="cookie-btn accept-all" onclick="acceptAllCookies()">Accept All</button>
+            <button class="cookie-btn accept-necessary" onclick="acceptNecessaryOnly()">Necessary Only</button>
+            <button class="cookie-btn manage-cookies" onclick="openCookiePreferences()">Manage</button>
+        </div>
+    </div>
+</div>
+
+<!-- Cookie Preferences Modal -->
+<div id="cookieModal" class="cookie-modal">
+    <div class="cookie-modal-content">
+        <h2>Cookie Preferences</h2>
+        <p>Choose which cookies you'd like to accept. You can change these settings at any time.</p>
+        
+        <div class="cookie-category essential">
+            <div class="cookie-toggle">
+                <div>
+                    <h4>Essential Cookies</h4>
+                    <p>Required for basic site functionality. Cannot be disabled.</p>
+                </div>
+                <div class="toggle-switch active"></div>
+            </div>
+        </div>
+        
+        <div class="cookie-category">
+            <div class="cookie-toggle">
+                <div>
+                    <h4>Analytics Cookies (Google Analytics)</h4>
+                    <p>Help us understand how visitors use our site so we can improve it for the coeliac community.</p>
+                </div>
+                <div class="toggle-switch" id="analyticsToggle" onclick="toggleAnalytics()"></div>
+            </div>
+        </div>
+        
+        <div style="display: flex; gap: 15px; justify-content: flex-end; margin-top: 30px;">
+            <button class="cookie-btn accept-necessary" onclick="savePreferences()">Save Preferences</button>
+            <button class="cookie-btn accept-all" onclick="acceptAllCookies()">Accept All</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Cookie Consent Management
+let cookiePreferences = {
+    necessary: true,
+    analytics: false
+};
+
+// Check if user has already made cookie choices
+function checkCookieConsent() {
+    const consent = localStorage.getItem('cookieConsent');
+    if (!consent) {
+        // Show banner after 1 second delay
+        setTimeout(() => {
+            document.getElementById('cookieBanner').classList.add('show');
+        }, 1000);
+    } else {
+        const preferences = JSON.parse(consent);
+        cookiePreferences = preferences;
+        
+        // Initialize analytics if consented
+        if (preferences.analytics) {
+            initializeAnalytics();
+        }
+    }
+}
+
+function acceptAllCookies() {
+    cookiePreferences = {
+        necessary: true,
+        analytics: true
+    };
+    
+    saveCookieConsent();
+    hideCookieBanner();
+    initializeAnalytics();
+}
+
+function acceptNecessaryOnly() {
+    cookiePreferences = {
+        necessary: true,
+        analytics: false
+    };
+    
+    saveCookieConsent();
+    hideCookieBanner();
+}
+
+function openCookiePreferences() {
+    document.getElementById('cookieModal').style.display = 'block';
+    
+    // Update toggle states
+    document.getElementById('analyticsToggle').classList.toggle('active', cookiePreferences.analytics);
+}
+
+function toggleAnalytics() {
+    const toggle = document.getElementById('analyticsToggle');
+    toggle.classList.toggle('active');
+    cookiePreferences.analytics = toggle.classList.contains('active');
+}
+
+function savePreferences() {
+    saveCookieConsent();
+    hideCookieBanner();
+    document.getElementById('cookieModal').style.display = 'none';
+    
+    if (cookiePreferences.analytics) {
+        initializeAnalytics();
+    }
+}
+
+function saveCookieConsent() {
+    localStorage.setItem('cookieConsent', JSON.stringify(cookiePreferences));
+    localStorage.setItem('cookieConsentDate', new Date().toISOString());
+}
+
+function hideCookieBanner() {
+    document.getElementById('cookieBanner').classList.remove('show');
+}
+
+function initializeAnalytics() {
+    // Only initialize if user has consented
+    if (cookiePreferences.analytics) {
+        // Initialize Google Analytics
+        if (typeof gtag !== 'undefined') {
+            gtag('consent', 'update', {
+                'analytics_storage': 'granted'
+            });
+        }
+        console.log('✅ Analytics cookies enabled');
+    }
+}
+
+// Close modal when clicking outside
+document.getElementById('cookieModal').addEventListener('click', function(e) {
+    if (e.target.id === 'cookieModal') {
+        document.getElementById('cookieModal').style.display = 'none';
+    }
+});
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', checkCookieConsent);
+</script>
+
+<!-- Cookie Policy Content -->
+<div style="max-width: 800px; margin: 50px auto; padding: 20px; font-family: 'Segoe UI', sans-serif;">
+
+<h1 id="cookie-policy">Cookie Policy</h1>
+<p><strong>Coeliacs Like Beer Too</strong><br>
+<em>Last updated: [DATE]</em></p>
+
+<h2>What Are Cookies?</h2>
+<p>Cookies are small text files stored on your device when you visit websites. They help us provide you with a better experience and understand how our site is used.</p>
+
+<h2>Cookies We Use</h2>
+
+<h3>🔧 Essential Cookies (Always Active)</h3>
+<p>These cookies are necessary for the website to function properly:</p>
+<ul>
+    <li><strong>cookieConsent</strong> - Remembers your cookie preferences</li>
+    <li><strong>searchState</strong> - Preserves your search results when you navigate</li>
+    <li><strong>mapState</strong> - Remembers map settings during your session</li>
+</ul>
+
+<h3>📊 Analytics Cookies (Optional)</h3>
+<p>These help us understand how visitors use our site:</p>
+<ul>
+    <li><strong>Google Analytics</strong> - Tracks page views, popular searches, user journeys</li>
+    <li><strong>Data collected</strong>: Pages visited, time spent, device type, general location</li>
+    <li><strong>Purpose</strong>: Improve site functionality and user experience</li>
+    <li><strong>Retention</strong>: 26 months (Google's default)</li>
+</ul>
+
+<h2>Why We Use Analytics</h2>
+<p>Understanding how coeliacs use our site helps us:</p>
+<ul>
+    <li>Improve search functionality for finding GF beer</li>
+    <li>Identify which areas lack GF options</li>
+    <li>Optimize the mobile experience</li>
+    <li>Focus development on the most valuable features</li>
+</ul>
+
+<h2>Managing Your Preferences</h2>
+<p>You can change your cookie preferences at any time:</p>
+<ul>
+    <li>Use the cookie banner when you first visit</li>
+    <li>Click "Manage Cookies" in the site footer</li>
+    <li>Clear your browser cookies (will reset preferences)</li>
+</ul>
+
+<h2>Third-Party Cookies</h2>
+<p>We use Google Analytics, which may set its own cookies. Google's privacy policy applies to their data collection.</p>
+
+<h2>Browser Settings</h2>
+<p>You can also control cookies through your browser settings, though this may affect site functionality.</p>
+
+<h2>Contact</h2>
+<p>Questions about our cookie policy? Contact us at [your email].</p>
+
+</div>
+
+</body>
+</html>
