@@ -2466,3 +2466,82 @@ label {
 .leaflet-marker-icon.highlight-marker {
     filter: drop-shadow(0 0 10px rgba(255, 107, 107, 0.8));
 }
+
+/* iOS Safari specific fixes - Add to your mobile CSS section */
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.1em;
+        margin-bottom: 8px;
+        margin-top: 5px;
+        line-height: 1.1;
+        letter-spacing: 0px;
+        
+        /* Remove the problematic properties that cause ellipsis */
+        white-space: normal; /* Changed from nowrap */
+        overflow: visible; /* Changed from hidden */
+        text-overflow: clip; /* Remove ellipsis */
+        
+        /* Alternative approach - allow controlled wrapping */
+        word-break: keep-all; /* Prevent breaking words */
+        hyphens: none; /* No hyphenation */
+        
+        /* Ensure it fits by using viewport width units */
+        max-width: 100%;
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* More aggressive sizing for smaller iPhones */
+@media (max-width: 414px) {
+    .hero-title {
+        font-size: 1.95em; /* Slightly smaller for iPhone Pro Max */
+    }
+}
+
+@media (max-width: 390px) {
+    .hero-title {
+        font-size: 1.85em; /* iPhone 14 Pro size */
+    }
+}
+
+@media (max-width: 375px) {
+    .hero-title {
+        font-size: 1.75em; /* iPhone SE and smaller */
+        letter-spacing: -0.5px;
+    }
+}
+
+@media (max-width: 360px) {
+    .hero-title {
+        font-size: 1.65em; /* Very small screens */
+        letter-spacing: -1px;
+    }
+}
+
+/* iOS Safari specific fix */
+@supports (-webkit-touch-callout: none) {
+    .hero-title {
+        -webkit-text-size-adjust: 100%; /* Prevent iOS text scaling */
+        text-size-adjust: 100%;
+        
+        /* Alternative: Use transform to scale down slightly on iOS */
+        transform: scale(0.95);
+        transform-origin: center;
+    }
+}
+
+/* Alternative solution: Shorter title for very small screens */
+@media (max-width: 320px) {
+    .hero-title {
+        font-size: 1.5em;
+        letter-spacing: -1px;
+    }
+    
+    /* Option: Hide part of title on very small screens */
+    .hero-title::after {
+        content: "";
+        /* You could add JavaScript to dynamically shorten the title */
+    }
+}
