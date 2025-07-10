@@ -755,12 +755,16 @@
             activityContainer.insertBefore(newActivity, activityContainer.firstChild);
         }
 
-        // DYNAMIC STATS LOADING FROM DATABASE
+        // ENHANCED stats loading - Replace your loadDashboardStats function
+
         async function loadDashboardStats() {
             try {
+                console.log('🔄 Loading dashboard stats from database...');
                 const response = await fetch('/api/stats');
+                
                 if (response.ok) {
                     const stats = await response.json();
+                    console.log('✅ Stats loaded:', stats);
                     
                     // Animate the numbers counting up
                     animateNumber('totalPubs', stats.total_pubs);
@@ -770,19 +774,18 @@
                     // Update footer stats too
                     document.getElementById('footerPubCount').textContent = stats.total_pubs.toLocaleString();
                     document.getElementById('footerGFCount').textContent = stats.gf_pubs.toLocaleString();
-                } else {
-                    // Fallback to mock data if API not ready
-                    animateNumber('totalPubs', 52847);
-                    animateNumber('gfPubs', 1249);
-                    animateNumber('monthlyReports', 847);
                     
-                    // Update footer with fallback data
-                    document.getElementById('footerPubCount').textContent = '52,847';
-                    document.getElementById('footerGFCount').textContent = '1,249';
+                    // Log success for debugging
+                    console.log(`📊 Dashboard updated: ${stats.total_pubs} pubs, ${stats.gf_pubs} GF options, ${stats.monthly_reports} reports this month`);
+                    
+                } else {
+                    console.warn('⚠️ Stats API returned error, using fallback data');
+                    throw new Error(`HTTP ${response.status}`);
                 }
             } catch (error) {
-                console.log('Stats API not ready, using mock data');
-                // Fallback numbers for beta
+                console.warn('⚠️ Could not load live stats, using fallback data:', error);
+                
+                // Fallback to mock data if API fails
                 animateNumber('totalPubs', 52847);
                 animateNumber('gfPubs', 1249);
                 animateNumber('monthlyReports', 847);
@@ -790,11 +793,29 @@
                 // Update footer with fallback data
                 document.getElementById('footerPubCount').textContent = '52,847';
                 document.getElementById('footerGFCount').textContent = '1,249';
+                
+                // Show a subtle indicator that stats might not be live
+                setTimeout(() => {
+                    const elements = ['totalPubs', 'gfPubs', 'monthlyReports'];
+                    elements.forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) {
+                            el.style.opacity = '0.9';
+                            el.title = 'Stats may not be current due to connection issue';
+                        }
+                    });
+                }, 2500);
             }
         }
-
+        
+        // Enhanced number animation with better formatting
         function animateNumber(elementId, targetNumber) {
             const element = document.getElementById(elementId);
+            if (!element) {
+                console.warn(`Element ${elementId} not found`);
+                return;
+            }
+            
             const startNumber = 0;
             const duration = 2000; // 2 seconds
             const startTime = performance.now();
@@ -807,15 +828,36 @@
                 const easeOut = 1 - Math.pow(1 - progress, 3);
                 const currentNumber = Math.floor(startNumber + (targetNumber - startNumber) * easeOut);
                 
+                // Format the number with commas
                 element.textContent = currentNumber.toLocaleString();
                 
                 if (progress < 1) {
                     requestAnimationFrame(updateNumber);
+                } else {
+                    // Ensure final number is exactly correct
+                    element.textContent = targetNumber.toLocaleString();
                 }
             }
             
             requestAnimationFrame(updateNumber);
         }
+        
+        // Add stats refresh function for debugging/admin use
+        function refreshStats() {
+            console.log('🔄 Manually refreshing stats...');
+            loadDashboardStats();
+        }
+        
+        // Optional: Auto-refresh stats every 5 minutes
+        function startStatsAutoRefresh() {
+            setInterval(() => {
+                console.log('🔄 Auto-refreshing stats...');
+                loadDashboardStats();
+            }, 5 * 60 * 1000); // 5 minutes
+        }
+        
+        // Call this if you want auto-refresh (optional)
+        startStatsAutoRefresh();
 
         // ================================
         // CORE FUNCTIONALITY
