@@ -154,6 +154,63 @@
         </div>
     </div>
 
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3 class="footer-title">🍺 Coeliacs Like Beer Too</h3>
+                <p class="footer-description">The UK's largest community-driven guide to gluten free beer. Built by coeliacs, for coeliacs.</p>
+                <div class="footer-stats">
+                    <span id="footerPubCount">52,847</span> pubs · 
+                    <span id="footerGFCount">1,249</span> with GF options
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h4 class="footer-subtitle">🔗 Quick Links</h4>
+                <div class="footer-links">
+                    <a href="#" onclick="scrollToSearch()" class="footer-link">Search Pubs</a>
+                    <a href="#" onclick="openReportModal()" class="footer-link">Report GF Beer</a>
+                    <a href="#" onclick="showAboutUs()" class="footer-link">About Us</a>
+                    <a href="#" onclick="showGFInfo()" class="footer-link">What is GF Beer?</a>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h4 class="footer-subtitle">📋 Legal & Privacy</h4>
+                <div class="footer-links">
+                    <a href="privacy.html" class="footer-link" target="_blank">Privacy Policy</a>
+                    <a href="terms.html" class="footer-link" target="_blank">Terms of Service</a>
+                    <a href="cookies.html" class="footer-link" target="_blank">Cookie Policy</a>
+                    <a href="accessibility.html" class="footer-link" target="_blank">Accessibility</a>
+                    <a href="liability.html" class="footer-link" target="_blank">Liability Notice</a>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h4 class="footer-subtitle">💬 Community</h4>
+                <div class="footer-links">
+                    <a href="#" onclick="showComingSoon('Contact Form')" class="footer-link">Contact Us</a>
+                    <a href="#" onclick="showComingSoon('Community Forum')" class="footer-link">Community Forum</a>
+                    <a href="#" onclick="showComingSoon('Newsletter')" class="footer-link">Newsletter</a>
+                    <a href="#" onclick="showComingSoon('Social Media')" class="footer-link">Follow Us</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <div class="footer-bottom-content">
+                <p class="footer-copyright">
+                    © 2025 Coeliacs Like Beer Too. All rights reserved. 
+                    <span class="footer-disclaimer">This site is for informational purposes only. Always verify with venues directly.</span>
+                </p>
+                <div class="footer-version">
+                    <span class="footer-cache-info">v{{ cache_buster }}</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
     <!-- Enhanced Report GF Beer Modal -->
     <div id="reportModal" class="report-modal">
         <div class="modal-content">
@@ -709,11 +766,19 @@
                     animateNumber('totalPubs', stats.total_pubs);
                     animateNumber('gfPubs', stats.gf_pubs);
                     animateNumber('monthlyReports', stats.monthly_reports);
+                    
+                    // Update footer stats too
+                    document.getElementById('footerPubCount').textContent = stats.total_pubs.toLocaleString();
+                    document.getElementById('footerGFCount').textContent = stats.gf_pubs.toLocaleString();
                 } else {
                     // Fallback to mock data if API not ready
                     animateNumber('totalPubs', 52847);
                     animateNumber('gfPubs', 1249);
                     animateNumber('monthlyReports', 847);
+                    
+                    // Update footer with fallback data
+                    document.getElementById('footerPubCount').textContent = '52,847';
+                    document.getElementById('footerGFCount').textContent = '1,249';
                 }
             } catch (error) {
                 console.log('Stats API not ready, using mock data');
@@ -721,6 +786,10 @@
                 animateNumber('totalPubs', 52847);
                 animateNumber('gfPubs', 1249);
                 animateNumber('monthlyReports', 847);
+                
+                // Update footer with fallback data
+                document.getElementById('footerPubCount').textContent = '52,847';
+                document.getElementById('footerGFCount').textContent = '1,249';
             }
         }
 
