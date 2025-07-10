@@ -507,27 +507,27 @@ def internal_error(error):
 @app.route('/privacy')
 def privacy_policy():
     """Privacy Policy page"""
-    return render_template('privacy.html', cache_buster=CACHE_BUSTER)
+    return render_template('privacy.html', cache_buster=version)
 
 @app.route('/terms')
 def terms_of_service():
     """Terms of Service page"""
-    return render_template('terms.html', cache_buster=CACHE_BUSTER)
+    return render_template('terms.html', cache_buster=version)
 
 @app.route('/cookies')
 def cookie_policy():
     """Cookie Policy page"""
-    return render_template('cookies.html', cache_buster=CACHE_BUSTER)
+    return render_template('cookies.html', cache_buster=version)
 
 @app.route('/accessibility')
 def accessibility_statement():
     """Accessibility Statement page"""
-    return render_template('accessibility.html', cache_buster=CACHE_BUSTER)
+    return render_template('accessibility.html', cache_buster=version)
 
 @app.route('/liability')
 def liability_notice():
     """Liability Notice page"""
-    return render_template('liability.html', cache_buster=CACHE_BUSTER)
+    return render_template('liability.html', cache_buster=version)
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
