@@ -504,29 +504,36 @@ def internal_error(error):
 
 # Add these routes to your main Flask app file (app.py or main.py)
 
+# Add these corrected routes to your Flask app file (app.py)
+
 @app.route('/privacy')
 def privacy_policy():
     """Privacy Policy page"""
+    version = str(int(time.time()))  # Generate cache buster
     return render_template('privacy.html', cache_buster=version)
 
 @app.route('/terms')
 def terms_of_service():
     """Terms of Service page"""
+    version = str(int(time.time()))  # Generate cache buster
     return render_template('terms.html', cache_buster=version)
 
 @app.route('/cookies')
 def cookie_policy():
     """Cookie Policy page"""
+    version = str(int(time.time()))  # Generate cache buster
     return render_template('cookies.html', cache_buster=version)
 
 @app.route('/accessibility')
 def accessibility_statement():
     """Accessibility Statement page"""
+    version = str(int(time.time()))  # Generate cache buster
     return render_template('accessibility.html', cache_buster=version)
 
 @app.route('/liability')
 def liability_notice():
     """Liability Notice page"""
+    version = str(int(time.time()))  # Generate cache buster
     return render_template('liability.html', cache_buster=version)
 
 if __name__ == '__main__':
