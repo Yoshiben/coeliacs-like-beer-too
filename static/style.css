@@ -2545,3 +2545,337 @@ label {
         /* You could add JavaScript to dynamically shorten the title */
     }
 }
+
+/* Add this CSS to your style.css for cookie consent styling */
+
+/* ================================
+   COOKIE CONSENT BANNER
+   ================================ */
+.cookie-consent {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(45, 55, 72, 0.98);
+    color: white;
+    padding: 20px;
+    z-index: 10002;
+    backdrop-filter: blur(10px);
+    border-top: 3px solid #667eea;
+    animation: slideInUp 0.3s ease-out;
+}
+
+.cookie-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.cookie-text h4 {
+    margin: 0 0 8px 0;
+    font-size: 1.2em;
+    color: #667eea;
+}
+
+.cookie-text p {
+    margin: 0;
+    font-size: 0.9em;
+    line-height: 1.4;
+    opacity: 0.9;
+}
+
+.cookie-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.cookie-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.cookie-btn.accept-all {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.cookie-btn.accept-all:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+.cookie-btn.essential-only {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.cookie-btn.essential-only:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+}
+
+.cookie-btn.settings {
+    background: transparent;
+    color: #667eea;
+    border: 2px solid #667eea;
+}
+
+.cookie-btn.settings:hover {
+    background: #667eea;
+    color: white;
+}
+
+/* ================================
+   COOKIE SETTINGS MODAL
+   ================================ */
+.cookie-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 10003;
+    backdrop-filter: blur(5px);
+}
+
+.cookie-modal-content {
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.cookie-settings-content {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.cookie-category {
+    background: rgba(248, 250, 252, 0.8);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-left: 4px solid #667eea;
+}
+
+.cookie-category-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.cookie-category-header h3 {
+    margin: 0;
+    color: #2d3748;
+    font-size: 1.1em;
+}
+
+.cookie-toggle {
+    position: relative;
+    width: 50px;
+    height: 24px;
+    cursor: pointer;
+}
+
+.cookie-toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #cbd5e0;
+    border-radius: 24px;
+    transition: 0.3s;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    border-radius: 50%;
+    transition: 0.3s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.cookie-toggle input:checked + .toggle-slider {
+    background-color: #10b981;
+}
+
+.cookie-toggle input:checked + .toggle-slider:before {
+    transform: translateX(26px);
+}
+
+.toggle-slider.essential {
+    background-color: #667eea;
+    opacity: 0.6;
+}
+
+.cookie-details {
+    font-size: 0.85em;
+    color: #4a5568;
+    background: rgba(255, 255, 255, 0.7);
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+.cookie-info {
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.cookie-info h4 {
+    margin: 0 0 15px 0;
+    color: #667eea;
+}
+
+.cookie-info ul {
+    margin: 0;
+    padding-left: 20px;
+    color: #4a5568;
+}
+
+.cookie-info li {
+    margin-bottom: 8px;
+}
+
+.cookie-info a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.cookie-info a:hover {
+    text-decoration: underline;
+}
+
+.cookie-modal-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid #e2e8f0;
+}
+
+.cookie-btn.save-preferences {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.cookie-btn.save-preferences:hover {
+    background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* ================================
+   FLOATING COOKIE BUTTON
+   ================================ */
+.cookie-settings-float {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 1000;
+}
+
+.cookie-float-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(102, 126, 234, 0.9);
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.cookie-float-btn:hover {
+    background: rgba(102, 126, 234, 1);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
+/* ================================
+   MOBILE RESPONSIVE
+   ================================ */
+@media (max-width: 768px) {
+    .cookie-consent {
+        padding: 15px;
+    }
+    
+    .cookie-content {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+    
+    .cookie-buttons {
+        justify-content: stretch;
+        flex-direction: column;
+    }
+    
+    .cookie-btn {
+        width: 100%;
+        padding: 12px 20px;
+        font-size: 15px;
+    }
+    
+    .cookie-modal-content {
+        width: 95%;
+        max-height: 85vh;
+        padding: 20px;
+    }
+    
+    .cookie-category-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .cookie-modal-buttons {
+        flex-direction: column;
+    }
+    
+    .cookie-settings-float {
+        bottom: 15px;
+        left: 15px;
+    }
+    
+    .cookie-float-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 18px;
+    }
+}
