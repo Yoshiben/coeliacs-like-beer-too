@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🏭 GF Breweries - Coeliacs Like Beer Too!</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v={{ cache_buster }}">
+</head>
+<body>
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">🏭 GF Breweries & Brands</h1>
+            <p class="hero-subtitle">Discover amazing gluten free beer makers across the UK and beyond</p>
+            <div class="quick-actions">
+                <a href="/" class="action-btn primary">← Back to Home</a>
+                <a href="#submit-brewery" class="action-btn">Add Your Brewery</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="features-section">
+        <!-- UK Dedicated GF Breweries -->
+        <div class="activity-card" style="margin-bottom: 40px;">
+            <div class="activity-header">
+                <h2 class="activity-title">🇬🇧 UK Dedicated Gluten Free Breweries</h2>
+                <span class="view-all">100% Gluten Free Facilities</span>
+            </div>
+            
+            <div class="beer-types">
+                <div class="beer-type-item">
+                    <strong>🌾 Groundbreaker Brewing (Available in UK)</strong>
+                    <p><strong>Location:</strong> Portland, USA (Imported to UK)<br>
+                    <strong>Specialty:</strong> 100% gluten free facility using alternative grains<br>
+                    <strong>Popular Beers:</strong> Dark Ale, IPA, Pale Ale<br>
+                    <strong>Where to Find:</strong> Specialist bottle shops, some Waitrose stores</p>
+                </div>
+
+                <div class="beer-type-item">
+                    <strong>🍺 Glutenberg (Available in UK)</strong>
+                    <p><strong>Location:</strong> Montreal, Canada (Imported to UK)<br>
+                    <strong>Specialty:</strong> Award-winning certified gluten free beers<br>
+                    <strong>Popular Beers:</strong> Blonde, IPA, Stout<br>
+                    <strong>Where to Find:</strong> Tesco, ASDA, independent health stores</p>
+                </div>
+
+                <div class="beer-type-item">
+                    <strong>🌟 Ghostfish Brewing (Limited UK Import)</strong>
+                    <p><strong>Location:</strong> Seattle, USA<br>
+                    <strong>Specialty:</strong> Dedicated gluten free brewery with innovative styles<br>
+                    <strong>Popular Beers:</strong> Grapefruit IPA, Shrouded Summit Wit<br>
+                    <strong>Where to Find:</strong> Specialist importers, online retailers</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Major UK Breweries with GF Options -->
+        <div class="activity-card" style="margin-bottom: 40px;">
+            <div class="activity-header">
+                <h2 class="activity-title">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Major UK Breweries with GF Lines</h2>
+                <span class="view-all">Established Brands</span>
+            </div>
+            
+            <div class="beer-types">
+                <div class="beer-type-item">
+                    <strong>🐕 BrewDog - Vagabond & Punk AF</strong>
+                    <p><strong>Type:</strong> Gluten removed (under 20ppm)<br>
+                    <strong>Range:</strong> Vagabond Pale Ale, Punk AF (alcohol-free)<br>
+                    <strong>Availability:</strong> Wide UK distribution, pubs, supermarkets<br>
+                    <strong>Note:</strong> Made with barley but gluten removed</p>
+                </div>
+
+                <div class="beer-type-item">
+                    <strong>⭐ Stella Artois - Gluten Free</strong>
+                    <p><strong>Type:</strong> Gluten removed lager<br>
+                    <strong>Style:</strong> Crisp, clean lager<br>
+                    <strong>Availability:</strong> Most UK supermarkets, many pubs<br>
+                    <strong>Note:</strong> Same taste as regular Stella, gluten removed</p>
+                </div>
+
+                <div class="beer-type-item">
+                    <strong>🍻 Omission Brewing (US - UK Import)</strong>
+                    <p><strong>Type:</strong> Gluten removed craft beers<br>
+                    <strong>Range:</strong> Lager, IPA, Pale Ale<br>
+                    <strong>Availability:</strong> Specialist stores, online<br>
+                    <strong>Note:</strong> Pioneer in gluten removed beer technology</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Emerging UK GF Breweries -->
+        <div class="activity-card" style="margin-bottom: 40px;">
+            <div class="activity-header">
+                <h2 class="activity-title">🌱 Emerging UK GF Breweries</h2>
+                <span class="view-all">New & Growing</span>
+            </div>
+            
+            <div class="beer-types">
+                <div class="beer-type-item">
+                    <strong>🔍 Local Craft Breweries</strong>
+                    <p>Many smaller UK breweries are beginning to experiment with gluten free options. Look out for:</p>
+                    <ul class="safety-notes">
+                        <li><strong>Seasonal GF specials</strong> - Many breweries do limited runs</li>
+                        <li><strong>Contract brewing</strong> - Some use dedicated GF facilities</li>
+                        <li><strong>Alternative grain experiments</strong> - Rice, millet, sorghum based</li>
+                        <li><strong>Collaboration brews</strong> - Partnerships with established GF brewers</li>
+                    </ul>
+                </div>
+
+                <div class="beer-type-item">
+                    <strong>📍 Regional Specialists</strong>
+                    <p>Keep an eye on these developing areas:</p>
+                    <ul class="safety-notes">
+                        <li><strong>Scotland:</strong> Growing craft scene with GF experiments</li>
+                        <li><strong>Yorkshire:</strong> Traditional brewers adding GF lines</li>
+                        <li><strong>West Country:</strong> Farm breweries using alternative grains</li>
+                        <li><strong>London:</strong> Innovative urban breweries</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Understanding GF Beer Types -->
+        <div class="activity-card" style="margin-bottom: 40px;">
+            <div class="activity-header">
+                <h2 class="activity-title">🧪 Understanding GF Beer Types</h2>
+            </div>
+            
+            <div class="standards-grid">
+                <div class="standard-item">
+                    <strong>✅ Certified GF</strong>
+                    <p>Made from naturally gluten free grains. Safest option for coeliacs.</p>
+                </div>
+                <div class="standard-item">
+                    <strong>⚗️ Gluten Removed</strong>
+                    <p>Made from barley/wheat but treated to break down gluten. Some coeliacs react.</p>
+                </div>
+                <div class="standard-item">
+                    <strong>🌾 Alternative Grains</strong>
+                    <p>Rice, millet, sorghum, buckwheat - naturally gluten free ingredients.</p>
+                </div>
+                <div class="standard-item">
+                    <strong>🏭 Dedicated Facility</strong>
+                    <p>Brewery only makes GF beer - no cross-contamination risk.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Market Information -->
+        <div class="activity-card" style="margin-bottom: 40px;">
+            <div class="activity-header">
+                <h2 class="activity-title">📊 GF Beer Market Insights</h2>
+            </div>
+            
+            <div class="about-content">
+                <div class="about-section">
+                    <h3>💰 Market Size & Growth</h3>
+                    <p>The global gluten free beer market is experiencing significant growth:</p>
+                    <ul class="safety-notes">
+                        <li><strong>UK Market:</strong> Estimated £45-60 million annually</li>
+                        <li><strong>Growth Rate:</strong> 15-20% year-on-year</li>
+                        <li><strong>Consumer Base:</strong> 1% coeliac + 13% gluten sensitive population</li>
+                        <li><strong>Premium Pricing:</strong> 20-40% higher than regular beer</li>
+                    </ul>
+                </div>
+
+                <div class="about-section">
+                    <h3>🎯 Market Opportunities</h3>
+                    <ul class="safety-notes">
+                        <li><strong>Underserved Market:</strong> Limited options in many areas</li>
+                        <li><strong>Quality Gap:</strong> Demand for better tasting GF beers</li>
+                        <li><strong>Venue Partnerships:</strong> Pubs want GF options for inclusivity</li>
+                        <li><strong>Health Trend:</strong> Growing interest beyond medical necessity</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit Your Brewery -->
+        <div class="activity-card" id="submit-brewery">
+            <div class="activity-header">
+                <h2 class="activity-title">🚀 Add Your Brewery</h2>
+            </div>
+            
+            <div class="contact-info">
+                <h3>📧 Brewery Partnerships</h3>
+                <p>Are you a brewery making gluten free beer? We'd love to feature you!</p>
+                <p><strong>Email us:</strong> breweries@coeliacslikebeer.co.uk</p>
+                
+                <p><strong>Include:</strong></p>
+                <ul class="safety-notes">
+                    <li>Brewery name and location</li>
+                    <li>GF beer styles and names</li>
+                    <li>Production method (certified GF vs gluten removed)</li>
+                    <li>Where your beers are available</li>
+                    <li>Any certifications or testing information</li>
+                </ul>
+                
+                <button onclick="window.location.href='mailto:breweries@coeliacslikebeer.co.uk?subject=Brewery Partnership - Add My GF Beers'" class="btn-contact">
+                    Contact Us About Partnership
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3 class="footer-title">🍺 Coeliacs Like Beer Too</h3>
+                <p class="footer-description">Supporting the UK's gluten free beer community</p>
+            </div>
+            
+            <div class="footer-section">
+                <h4 class="footer-subtitle">🔗 Quick Links</h4>
+                <div class="footer-links">
+                    <a href="/" class="footer-link">Back to Search</a>
+                    <a href="/#search" class="footer-link">Find GF Beer</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <div class="footer-bottom-content">
+                <p class="footer-copyright">
+                    © 2025 Coeliacs Like Beer Too. All rights reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
