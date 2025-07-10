@@ -579,6 +579,11 @@ def liability_notice():
     version = str(int(time.time()))  # Generate cache buster
     return render_template('liability.html', cache_buster=version)
 
+@app.route('/breweries')
+def gf_breweries():
+    version = str(int(time.time()))
+    return render_template('breweries.html', cache_buster=version)
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     debug = os.environ.get('FLASK_ENV') == 'development'
