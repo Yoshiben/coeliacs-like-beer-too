@@ -400,6 +400,23 @@ def update_beers():
     
     return jsonify({'message': 'Beer updates saved successfully'})
 
+@app.route('/api/stats')
+def get_stats():
+    cursor.execute("SELECT COUNT(*) FROM pubs")
+    total_pubs = cursor.fetchone()[0]
+    
+    cursor.execute("SELECT COUNT(*) FROM pubs WHERE bottle=1 OR tap=1 OR cask=1 OR can=1")
+    gf_pubs = cursor.fetchone()[0]
+    
+    cursor.execute("SELECT COUNT(*) FROM pubs_updates WHERE update_time >= DATE_SUB(NOW(), INTERVAL 30 DAY)")
+    monthly_reports = cursor.fetchone()[0]
+    
+    return jsonify({
+        'total_pubs': total_pubs,
+        'gf_pubs': gf_pubs,
+        'monthly_reports': monthly_reports
+    })
+
 @app.route('/update_coordinates', methods=['POST'])
 def update_coordinates():
     try:
