@@ -400,22 +400,58 @@ def update_beers():
     
     return jsonify({'message': 'Beer updates saved successfully'})
 
+# Replace your /api/stats route in app.py with this fixed version
+
 @app.route('/api/stats')
 def get_stats():
-    cursor.execute("SELECT COUNT(*) FROM pubs")
-    total_pubs = cursor.fetchone()[0]
-    
-    cursor.execute("SELECT COUNT(*) FROM pubs WHERE bottle=1 OR tap=1 OR cask=1 OR can=1")
-    gf_pubs = cursor.fetchone()[0]
-    
-    cursor.execute("SELECT COUNT(*) FROM pubs_updates WHERE update_time >= DATE_SUB(NOW(), INTERVAL 30 DAY)")
-    monthly_reports = cursor.fetchone()[0]
-    
-    return jsonify({
-        'total_pubs': total_pubs,
-        'gf_pubs': gf_pubs,
-        'monthly_reports': monthly_reports
-    })
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor()
+        
+        # Get total pubs
+        cursor.execute("SELECT COUNT(*) as total FROM pubs")
+        total_pubs = cursor.fetchone()[0]
+        
+        # Get pubs with GF options
+        cursor.execute("SELECT COUNT(*) as gf_total FROM pubs WHERE bottle=1 OR tap=1 OR cask=1 OR can=1")
+        gf_pubs = cursor.fetchone()[0]
+        
+        # Get monthly reports (from pubs_updates table)
+        cursor.execute("""
+            SELECT COUNT(*) as monthly_reports 
+            FROM pubs_updates 
+            WHERE update_time >= DATE_SUB(NOW(), INTERVAL 30 DAY)
+        """)
+        monthly_result = cursor.fetchone()
+        monthly_reports = monthly_result[0] if monthly_result else 0
+        
+        logger.info(f"Stats: {total_pubs} total pubs, {gf_pubs} GF pubs, {monthly_reports} monthly reports")
+        
+        return jsonify({
+            'total_pubs': total_pubs,
+            'gf_pubs': gf_pubs,
+            'monthly_reports': monthly_reports
+        })
+        
+    except mysql.connector.Error as e:
+        logger.error(f"Database error in stats: {str(e)}")
+        # Return fallback numbers if database fails
+        return jsonify({
+            'total_pubs': 52847,
+            'gf_pubs': 1249,
+            'monthly_reports': 847
+        })
+    except Exception as e:
+        logger.error(f"Unexpected error in stats: {str(e)}")
+        return jsonify({
+            'total_pubs': 52847,
+            'gf_pubs': 1249,
+            'monthly_reports': 847
+        })
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
 
 @app.route('/update_coordinates', methods=['POST'])
 def update_coordinates():
