@@ -2119,5 +2119,85 @@
     </script>
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+        <!-- Add this cookie consent banner to your index.html, just before the closing </body> tag -->
+    
+    <!-- Cookie Consent Banner -->
+    <div id="cookieConsent" class="cookie-consent" style="display: none;">
+        <div class="cookie-content">
+            <div class="cookie-text">
+                <h4>🍪 We use cookies</h4>
+                <p>We use essential cookies to make our site work. With your consent, we may also use analytics cookies to improve your experience.</p>
+            </div>
+            <div class="cookie-buttons">
+                <button onclick="acceptAllCookies()" class="cookie-btn accept-all">Accept All</button>
+                <button onclick="acceptEssentialOnly()" class="cookie-btn essential-only">Essential Only</button>
+                <button onclick="showCookieSettings()" class="cookie-btn settings">Settings</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Cookie Settings Modal -->
+    <div id="cookieSettings" class="cookie-modal" style="display: none;">
+        <div class="modal-content cookie-modal-content">
+            <div class="modal-header">
+                <h2>🍪 Cookie Settings</h2>
+                <button class="close-modal" onclick="closeCookieSettings()">&times;</button>
+            </div>
+            
+            <div class="cookie-settings-content">
+                <div class="cookie-category">
+                    <div class="cookie-category-header">
+                        <h3>Essential Cookies</h3>
+                        <label class="cookie-toggle">
+                            <input type="checkbox" checked disabled>
+                            <span class="toggle-slider essential"></span>
+                        </label>
+                    </div>
+                    <p>These cookies are necessary for the website to function and cannot be switched off. They are usually only set in response to actions made by you which amount to a request for services.</p>
+                    <div class="cookie-details">
+                        <strong>Examples:</strong> Session management, search preferences, location consent
+                    </div>
+                </div>
+                
+                <div class="cookie-category">
+                    <div class="cookie-category-header">
+                        <h3>Analytics Cookies</h3>
+                        <label class="cookie-toggle">
+                            <input type="checkbox" id="analyticsConsent">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <p>These cookies help us understand how visitors interact with our website by collecting and reporting information anonymously. This helps us improve our service.</p>
+                    <div class="cookie-details">
+                        <strong>Provider:</strong> Google Analytics<br>
+                        <strong>Purpose:</strong> Usage statistics, popular features, performance monitoring
+                    </div>
+                </div>
+                
+                <div class="cookie-info">
+                    <h4>📋 Your Rights</h4>
+                    <ul>
+                        <li>You can change your preferences at any time</li>
+                        <li>Withdrawing consent may limit website functionality</li>
+                        <li>Essential cookies cannot be disabled</li>
+                        <li>See our <a href="/cookies" target="_blank">Cookie Policy</a> for full details</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="cookie-modal-buttons">
+                <button onclick="savesCookiePreferences()" class="cookie-btn save-preferences">Save Preferences</button>
+                <button onclick="acceptAllFromSettings()" class="cookie-btn accept-all">Accept All</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Floating Cookie Settings Button (appears after consent given) -->
+    <div id="cookieSettingsFloat" class="cookie-settings-float" style="display: none;">
+        <button onclick="showCookieSettings()" class="cookie-float-btn" title="Cookie Settings">
+            🍪
+        </button>
+    </div>
 </body>
 </html>
