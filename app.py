@@ -502,6 +502,33 @@ def internal_error(error):
     logger.error(f"Internal server error: {str(error)}")
     return jsonify({'error': 'Internal server error'}), 500
 
+# Add these routes to your main Flask app file (app.py or main.py)
+
+@app.route('/privacy')
+def privacy_policy():
+    """Privacy Policy page"""
+    return render_template('privacy.html', cache_buster=CACHE_BUSTER)
+
+@app.route('/terms')
+def terms_of_service():
+    """Terms of Service page"""
+    return render_template('terms.html', cache_buster=CACHE_BUSTER)
+
+@app.route('/cookies')
+def cookie_policy():
+    """Cookie Policy page"""
+    return render_template('cookies.html', cache_buster=CACHE_BUSTER)
+
+@app.route('/accessibility')
+def accessibility_statement():
+    """Accessibility Statement page"""
+    return render_template('accessibility.html', cache_buster=CACHE_BUSTER)
+
+@app.route('/liability')
+def liability_notice():
+    """Liability Notice page"""
+    return render_template('liability.html', cache_buster=CACHE_BUSTER)
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     debug = os.environ.get('FLASK_ENV') == 'development'
