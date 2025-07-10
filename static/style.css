@@ -2341,3 +2341,93 @@ label {
         padding: 3px 6px;
     }
 }
+
+/* Mobile fixes for title and stats - Add to your style.css */
+
+@media (max-width: 768px) {
+    /* Hero Section Mobile - More compact */
+    .hero-section {
+        padding: 15px 15px; /* Reduced from 20px */
+    }
+    
+    .hero-title {
+        font-size: 2.5em; /* Reduced from 2.2em to fit better */
+        margin-bottom: 8px; /* Reduced from 12px */
+        margin-top: 5px; /* Reduced from 8px */
+        line-height: 1.1; /* Tighter line height */
+        letter-spacing: 0.5px; /* Reduced from 1px */
+    }
+    
+    .hero-subtitle {
+        font-size: 1em; /* Reduced from 1.1em */
+        margin-bottom: 15px; /* Reduced from 20px */
+    }
+    
+    /* Stats in horizontal row instead of column */
+    .hero-stats {
+        flex-direction: row; /* Changed from column */
+        gap: 20px; /* Reduced from 25px */
+        margin-bottom: 15px; /* Reduced from 20px */
+        justify-content: space-around; /* Better distribution */
+    }
+    
+    .stat-item {
+        text-align: center;
+        flex: 1; /* Equal width for all stats */
+        min-width: 0; /* Allow shrinking */
+    }
+    
+    .stat-number {
+        font-size: 1.6em; /* Reduced from 2em */
+        line-height: 1;
+    }
+    
+    .stat-label {
+        font-size: 0.8em; /* Reduced from 0.9em */
+        margin-top: 3px; /* Reduced from 5px */
+        white-space: nowrap; /* Prevent wrapping */
+    }
+    
+    /* Quick actions more compact */
+    .quick-actions {
+        margin-top: 20px; /* Reduced from 30px */
+    }
+    
+    .action-btn {
+        padding: 10px 20px; /* Reduced from 12px 24px */
+        font-size: 14px; /* Slightly smaller */
+    }
+}
+
+/* Extra small screens - even more compact */
+@media (max-width: 375px) {
+    .hero-title {
+        font-size: 2.2em; /* Even smaller for very small screens */
+        letter-spacing: 0px;
+    }
+    
+    .hero-stats {
+        gap: 15px;
+    }
+    
+    .stat-number {
+        font-size: 1.4em;
+    }
+    
+    .stat-label {
+        font-size: 0.75em;
+    }
+}
+
+/* Alternative: If you want even more aggressive space saving */
+@media (max-width: 768px) {
+    /* Reduce hero section padding even more */
+    .hero-section {
+        padding: 10px 15px; /* Very compact */
+    }
+    
+    /* Make search section overlap hero more */
+    .search-section {
+        margin: -30px 15px 20px; /* Increased overlap from -15px to -30px */
+    }
+}
