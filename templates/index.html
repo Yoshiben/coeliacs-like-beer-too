@@ -1463,7 +1463,6 @@
 
         // ENHANCED findOnMap with smart map showing
         // ENHANCED findOnMap function - Replace in your JavaScript
-
         // Also update your findOnMap function for better centering:
 
         function findOnMap(lat, lng, pubName, postcode, pubId) {
@@ -1504,27 +1503,25 @@
                         <div style="text-align: center; padding: 8px;">
                             <strong style="color: #2d3748; font-size: 16px;">${pubName}</strong>
                             <br><em style="color: #667eea;">📍 Found on map!</em>
-                            <br><button onclick="scrollToPubDetails('${pubId}')" style="
+                            <br><button onclick="scrollToPubDetailsSplit()" style="
                                 background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                                 color: white; border: none; padding: 6px 12px; 
                                 border-radius: 15px; margin-top: 8px; cursor: pointer;
                                 font-size: 12px; font-weight: 600;
-                            ">View Details Below</button>
+                            ">📋 View Details Below</button>
                         </div>
                     `).openPopup();
                     
-                    // KEEP PUB DETAILS VISIBLE - Don't clear results!
-                    // Instead, highlight the specific pub in the results
-                    highlightPubInResults(pubId);
+                    // CREATE SPLIT SCREEN LAYOUT
+                    createSplitScreenLayout(pubId);
                     
-                    // Smart scrolling to show both map and results
+                    // Scroll to show the split screen perfectly
                     setTimeout(() => {
                         const mapContainer = document.getElementById('mapContainer');
-                        const resultsSection = document.getElementById('results-section');
-                        
-                        // Position so user can see map and know results are below
                         const mapRect = mapContainer.getBoundingClientRect();
-                        const optimalScrollY = window.pageYOffset + mapRect.top - 100;
+                        
+                        // Scroll to show map at top of viewport
+                        const optimalScrollY = window.pageYOffset + mapRect.top - 20;
                         
                         window.scrollTo({ 
                             top: Math.max(0, optimalScrollY), 
@@ -1532,7 +1529,7 @@
                         });
                     }, 200);
                     
-                    showSuccessToast(`📍 Found ${pubName}! Check details below map.`);
+                    showSuccessToast(`📍 Found ${pubName}! Details shown below map.`);
                     
                     setTimeout(() => {
                         if (window.currentHighlightMarker) {
@@ -1543,9 +1540,139 @@
                     
                 }, mapVisible ? 50 : 300);
             } else {
-                // Handle no coordinates case...
                 openCoordinateModal(pubName, postcode, pubId);
             }
+        }
+
+        // ADD: New function - create split screen layout
+        function createSplitScreenLayout(selectedPubId) {
+            const mapContainer = document.getElementById('mapContainer');
+            const resultsSection = document.getElementById('results-section');
+            
+            // Hide the full results section
+            resultsSection.style.display = 'none';
+            
+            // Create split screen container if it doesn't exist
+            let splitContainer = document.getElementById('split-screen-container');
+            if (!splitContainer) {
+                splitContainer = document.createElement('div');
+                splitContainer.id = 'split-screen-container';
+                splitContainer.className = 'split-screen-container';
+                
+                // Insert after map container
+                mapContainer.parentNode.insertBefore(splitContainer, mapContainer.nextSibling);
+            }
+            
+            // Get the specific pub data
+            const selectedPub = getCurrentPubData(selectedPubId);
+            
+            if (selectedPub) {
+                splitContainer.innerHTML = `
+                    <div class="split-screen-header">
+                        <h2 class="section-title">📍 Pub Details</h2>
+                        <button onclick="closeSplitScreen()" class="close-split-btn">✕ Back to All Results</button>
+                    </div>
+                    <div class="split-pub-details">
+                        ${createSinglePubDisplay(selectedPub)}
+                    </div>
+                `;
+                splitContainer.style.display = 'block';
+            }
+        }
+        
+        // ADD: New function - get current pub data from the last search
+        function getCurrentPubData(pubId) {
+            // Search through the current results for the pub
+            const resultItems = document.querySelectorAll('.result-item');
+            for (let item of resultItems) {
+                const updateButton = item.querySelector(`[onclick*="toggleUpdateForm(${pubId})"]`);
+                if (updateButton) {
+                    // Extract pub data from the DOM element
+                    const pubName = item.querySelector('strong').textContent;
+                    const address = item.querySelector('.address').textContent;
+                    const localAuthority = item.querySelector('.local-authority').textContent;
+                    const beerDetails = item.querySelector('.beer-details').innerHTML;
+                    
+                    return {
+                        pub_id: pubId,
+                        name: pubName,
+                        address: address.split(',')[0],
+                        postcode: address.split(',').pop().trim(),
+                        local_authority: localAuthority,
+                        beer_details: beerDetails
+                    };
+                }
+            }
+            return null;
+        }
+        
+        // ADD: New function - create single pub display for split screen
+        function createSinglePubDisplay(pub) {
+            return `
+                <div class="single-pub-card">
+                    <div class="pub-header">
+                        <h3>${pub.name}</h3>
+                        <div class="pub-address">${pub.address}, ${pub.postcode}</div>
+                        <div class="pub-authority">${pub.local_authority}</div>
+                    </div>
+                    
+                    <div class="pub-beer-section">
+                        <h4>🍺 Available Gluten Free Beers</h4>
+                        <div class="pub-beer-details">
+                            ${pub.beer_details}
+                        </div>
+                    </div>
+                    
+                    <div class="pub-actions">
+                        <button onclick="searchForPub('${pub.name.replace(/'/g, "\\'")}', '${pub.postcode}')" 
+                                class="pub-action-btn search-btn">
+                            🔍 Find Online
+                        </button>
+                        <button onclick="openInGoogleMaps(null, null, '${pub.name.replace(/'/g, "\\'")}', '${pub.address}')" 
+                                class="pub-action-btn directions-btn">
+                            🧭 Get Directions
+                        </button>
+                        <button onclick="toggleUpdateForm(${pub.pub_id})" 
+                                class="pub-action-btn update-btn">
+                            📝 Update Info
+                        </button>
+                    </div>
+                    
+                    <div class="update-form" id="form-${pub.pub_id}" style="display: none;">
+                        <!-- Your existing update form will be inserted here -->
+                    </div>
+                </div>
+            `;
+        }
+        
+        // ADD: New function - scroll to pub details in split screen
+        function scrollToPubDetailsSplit() {
+            const splitContainer = document.getElementById('split-screen-container');
+            if (splitContainer) {
+                splitContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+        
+        // ADD: New function - close split screen and return to all results
+        function closeSplitScreen() {
+            const splitContainer = document.getElementById('split-screen-container');
+            const resultsSection = document.getElementById('results-section');
+            
+            if (splitContainer) {
+                splitContainer.style.display = 'none';
+            }
+            
+            if (resultsSection) {
+                resultsSection.style.display = 'block';
+            }
+            
+            // Remove any map highlights
+            if (window.currentHighlightMarker) {
+                map.removeLayer(window.currentHighlightMarker);
+                window.currentHighlightMarker = null;
+            }
+            
+            showSuccessToast('📋 Returned to all results');
         }
 
         // New function to highlight specific pub in results
