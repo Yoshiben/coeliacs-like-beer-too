@@ -3404,3 +3404,158 @@ label {
         font-size: 13px;
     }
 }
+
+/* ========================================
+   IMPLEMENTATION INSTRUCTIONS:
+   
+   ADD: Add this CSS to the bottom of your 
+   existing style.css file to fix the 
+   split screen layout issues
+   ======================================== */
+
+/* ================================
+   IMPROVED SPLIT SCREEN LAYOUT
+   ================================ */
+
+/* Ensure split screen container has proper spacing */
+.split-screen-container {
+    max-width: 1200px;
+    margin: 20px auto 40px; /* Added bottom margin */
+    padding: 0 20px;
+    display: none;
+}
+
+/* Ensure pub details section has enough bottom padding */
+.split-pub-details {
+    background: rgba(255,255,255,0.95);
+    padding: 30px 30px 50px; /* Increased bottom padding */
+    border-radius: 0 0 20px 20px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    min-height: 300px; /* Ensure minimum height */
+}
+
+/* Better action buttons spacing */
+.pub-actions {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 30px; /* Increased margin */
+    padding-bottom: 10px;
+}
+
+/* Ensure update form has proper spacing */
+.split-pub-details .update-form {
+    margin-top: 20px;
+    padding: 25px;
+    background: rgba(248, 250, 252, 0.95);
+    border-radius: 15px;
+    border: 2px solid #e2e8f0;
+    margin-bottom: 20px; /* Added bottom margin */
+}
+
+/* Better save button positioning */
+.split-pub-details .save-button-container {
+    text-align: center;
+    margin-top: 25px;
+    padding-top: 20px;
+    padding-bottom: 20px; /* Added bottom padding */
+    border-top: 2px solid #e2e8f0;
+}
+
+/* Ensure proper spacing for map container */
+#mapContainer {
+    margin-bottom: 0; /* Remove any bottom margin that might interfere */
+}
+
+/* Better map popup styling */
+.leaflet-popup-content {
+    margin: 10px 15px !important;
+    line-height: 1.5 !important;
+    text-align: center !important;
+}
+
+.leaflet-popup-content small {
+    display: block;
+    margin-top: 5px;
+    opacity: 0.8;
+}
+
+/* ================================
+   MOBILE RESPONSIVE FIXES
+   ================================ */
+@media (max-width: 768px) {
+    .split-screen-container {
+        padding: 0 15px;
+        margin: 15px auto 30px;
+    }
+    
+    .split-pub-details {
+        padding: 25px 20px 40px;
+        min-height: 250px;
+    }
+    
+    .pub-actions {
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 25px;
+    }
+    
+    .pub-action-btn {
+        width: 100%;
+        min-width: unset;
+        padding: 16px 24px;
+        font-size: 16px;
+    }
+    
+    .split-pub-details .update-form {
+        padding: 20px;
+        margin-bottom: 15px;
+    }
+    
+    .split-pub-details .save-button-container {
+        padding-bottom: 25px;
+    }
+}
+
+/* ================================
+   IMPROVED SCROLLING BEHAVIOR
+   ================================ */
+
+/* Ensure smooth scrolling for all elements */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Add padding to body to ensure content doesn't get cut off */
+body {
+    padding-bottom: 50px;
+}
+
+/* Better viewport handling */
+.split-screen-container,
+#mapContainer {
+    scroll-margin-top: 20px;
+}
+
+/* ================================
+   ENHANCED MAP STYLING
+   ================================ */
+
+/* Better map border radius to match design */
+#map {
+    border-radius: 0 0 20px 20px;
+    border: none;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Ensure map controls are accessible */
+.leaflet-control-container {
+    z-index: 1000;
+}
+
+/* Better popup positioning */
+.leaflet-popup {
+    margin-bottom: 20px;
+}
