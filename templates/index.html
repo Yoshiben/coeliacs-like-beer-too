@@ -546,6 +546,12 @@
             document.getElementById('search').scrollIntoView({ behavior: 'smooth' });
         }
 
+        // ADD: New function for home navigation
+        function goHome() {
+            window.location.href = '/';
+            trackEvent('go_home', 'Navigation', 'home_button');
+        }
+
         // SMART MAP TOGGLE - Auto-show when needed
         function toggleMap() {
             mapVisible = !mapVisible;
@@ -1565,10 +1571,13 @@
             
             // Get the specific pub data
             const selectedPub = getCurrentPubData(selectedPubId);
-            
+    
             if (selectedPub) {
                 splitContainer.innerHTML = `
                     <div class="split-screen-header">
+                        <button onclick="goHome()" class="home-btn" title="Back to Home">
+                            🏠 Home
+                        </button>
                         <h2 class="section-title">📍 Pub Details</h2>
                         <button onclick="closeSplitScreen()" class="close-split-btn">✕ Back to All Results</button>
                     </div>
