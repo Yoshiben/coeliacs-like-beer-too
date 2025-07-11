@@ -1733,11 +1733,14 @@
             window.open(googleUrl, '_blank');
         }
 
-        function formatBeerDetails(beerDetails) {
+        function formatBeerDetails(beerDetails, pub) {
+            // Check if we have specific beer data
             if (!beerDetails || beerDetails === 'None' || beerDetails.trim() === '') {
-                return '<div style="color: #9ca3af; font-style: italic;">No beers recorded yet</div>';
+                // Show generic GF availability instead
+                return formatGenericGFAvailability(pub);
             }
             
+            // Show specific beers if we have them
             return beerDetails.split(', ').map(beer => {
                 const parts = beer.split(' - ');
                 if (parts.length >= 2) {
@@ -1747,6 +1750,130 @@
                 }
                 return `<div class="beer-item">${beer}</div>`;
             }).join('');
+        }
+
+        // ADD: New function for showing generic GF availability
+        function formatGenericGFAvailability(pub) {
+            let gfOptions = [];
+            let rotatingTap = false;
+            
+            // Check what formats are available
+            if (pub.bottle) gfOptions.push('bottle');
+            if (pub.tap) {
+                gfOptions.push('tap');
+                rotatingTap = true; // Assume tap might rotate
+            }
+            if (pub.cask) gfOptions.push('cask');
+            if (pub.can) gfOptions.push('can');
+            
+            if (gfOptions.length === 0) {
+                return '<div style="color: #9ca3af; font-style: italic;">❓ GF availability needs verification</div>';
+            }
+            
+            let display = '<div class="gf-availability">';
+            
+            // Show confirmed formats
+            display += '<div class="confirmed-formats">';
+            display += '<strong style="color: #10b981;">✅ Confirmed GF Options:</strong><br>';
+            
+            gfOptions.forEach(format => {
+                const icons = {
+                    bottle: '🍺',
+                    tap: '🚰',
+                    cask: '🛢️',
+                    can: '🥫'
+                };
+                
+                if (format === 'tap') {
+                    display += `<div class="gf-format">${icons[format]} ${format.charAt(0).toUpperCase() + format.slice(1)} <span class="rotating-note">(selection may vary)</span></div>`;
+                } else {
+                    display += `<div class="gf-format">${icons[format]} ${format.charAt(0).toUpperCase() + format.slice(1)}</div>`;
+                }
+            });
+            display += '</div>';
+            
+            // Add helpful note
+            display += '<div class="gf-note">💡 <em>Call ahead to confirm current selection</em></div>';
+            display += '</div>';
+            
+            return display;
+        }
+        
+        // ADD: Enhanced update form with better options
+        function createEnhancedUpdateForm(pubId) {
+            return `
+                <div class="update-form" id="form-${pubId}" style="display: none;">
+                    <!-- Availability Mode Selection -->
+                    <div class="availability-mode">
+                        <h4>📋 What type of update?</h4>
+                        <div style="display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap;">
+                            <label style="display: flex; align-items: center; gap: 8px;">
+                                <input type="radio" name="updateType-${pubId}" value="specific" checked onchange="handleUpdateTypeChange(${pubId})">
+                                <span>🍺 Add specific beers</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px;">
+                                <input type="radio" name="updateType-${pubId}" value="generic" onchange="handleUpdateTypeChange(${pubId})">
+                                <span>✅ Just confirm GF available</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px;">
+                                <input type="radio" name="updateType-${pubId}" value="none" onchange="handleUpdateTypeChange(${pubId})">
+                                <span>❌ No GF options</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Generic GF Confirmation (shown when "generic" selected) -->
+                    <div id="generic-options-${pubId}" class="generic-gf-options" style="display: none;">
+                        <h4>🍺 Which formats have GF beer?</h4>
+                        <div class="gf-format-grid">
+                            <label><input type="checkbox" id="generic-bottle-${pubId}"> 🍺 Bottles</label>
+                            <label><input type="checkbox" id="generic-tap-${pubId}"> 🚰 Tap (rotating)</label>
+                            <label><input type="checkbox" id="generic-cask-${pubId}"> 🛢️ Cask</label>
+                            <label><input type="checkbox" id="generic-can-${pubId}"> 🥫 Cans</label>
+                        </div>
+                        <div class="helpful-note">
+                            <small>💡 This tells coeliacs you have GF options, even if the specific beers change regularly</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Specific Beer Entry (shown when "specific" selected) -->
+                    <div id="specific-options-${pubId}" class="specific-beer-options">
+                        <div class="update-mode">
+                            <label><input type="radio" name="updateMode-${pubId}" value="add" checked> Add to existing</label>
+                            <label><input type="radio" name="updateMode-${pubId}" value="replace"> Replace all</label>
+                        </div>
+                        
+                        <!-- Your existing beer entry grid would go here -->
+                        <div class="beer-options-grid">
+                            <!-- NOTE: You'd replace this comment with your existing beer input grid -->
+                        </div>
+                    </div>
+                    
+                    <div class="save-button-container">
+                        <button class="save-beer-btn" onclick="submitEnhancedUpdate(${pubId})">
+                            💾 Save Update
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // ADD: Handle update type changes
+        function handleUpdateTypeChange(pubId) {
+            const updateType = document.querySelector(`input[name="updateType-${pubId}"]:checked`).value;
+            const genericOptions = document.getElementById(`generic-options-${pubId}`);
+            const specificOptions = document.getElementById(`specific-options-${pubId}`);
+            
+            if (updateType === 'generic') {
+                genericOptions.style.display = 'block';
+                specificOptions.style.display = 'none';
+            } else if (updateType === 'specific') {
+                genericOptions.style.display = 'none';
+                specificOptions.style.display = 'block';
+            } else { // 'none'
+                genericOptions.style.display = 'none';
+                specificOptions.style.display = 'none';
+            }
         }
 
         // Display search results with pagination
@@ -1815,7 +1942,7 @@
                     <div class="beer-column">
                         <h4>Available Beers</h4>
                         <div class="beer-details">
-                            ${formatBeerDetails(beerDetails)}
+                            ${formatBeerDetails(beerDetails, pub)}
                         </div>
                     </div>
                     <div class="button-column">
