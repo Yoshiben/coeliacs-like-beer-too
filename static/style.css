@@ -3615,16 +3615,25 @@ body {
    ================================ */
 
 /* Add bottom margin to map container when visible */
+/* Map container - consistent spacing above and below */
 .map-container {
     max-width: 1200px;
-    margin: 20px auto 60px; /* Increased bottom margin from 20px to 60px */
+    margin: 60px auto 60px; /* Equal top and bottom margins */
     padding: 0 20px;
 }
 
-/* Ensure features section has proper top margin when map is showing */
+/* Features section - reduce top margin since map now has bottom margin */
 .features-section {
     max-width: 1200px;
-    margin: 60px auto 40px; /* Increased top margin from 0 to 60px */
+    margin: 0 auto 40px; /* Removed top margin to avoid double spacing */
+    padding: 0 20px;
+    transition: margin-top 0.3s ease;
+}
+
+/* Activity section - consistent with features */
+.activity-section {
+    max-width: 1200px;
+    margin: 40px auto 40px;
     padding: 0 20px;
     transition: margin-top 0.3s ease;
 }
@@ -3640,35 +3649,32 @@ body {
    ================================ */
 @media (max-width: 768px) {
     .map-container {
-        margin: 15px auto 40px; /* Smaller margins on mobile */
+        margin: 40px auto 40px; /* Equal spacing on mobile */
         padding: 0 15px;
     }
     
     .features-section {
-        margin: 40px auto 30px; /* Adjusted for mobile */
+        margin: 0 auto 30px; /* No top margin on mobile either */
         padding: 0 15px;
     }
     
-    .features-section.no-map-spacing {
-        margin-top: 30px;
+    .activity-section {
+        margin: 30px auto 30px;
+        padding: 0 15px;
     }
 }
 
 /* ================================
-   ENSURE PROPER SPACING FOR ALL SECTIONS
+   ENSURE CONSISTENT SPACING FOR ALL STATES
    ================================ */
 
-/* Activity section spacing */
-.activity-section {
-    max-width: 1200px;
-    margin: 40px auto 40px; /* Consistent spacing */
-    padding: 0 20px;
-    transition: margin-top 0.3s ease;
+/* When map is hidden, add back some top margin to features */
+.features-section.map-hidden {
+    margin-top: 40px;
 }
 
 @media (max-width: 768px) {
-    .activity-section {
-        margin: 30px auto 30px;
-        padding: 0 15px;
+    .features-section.map-hidden {
+        margin-top: 30px;
     }
 }
