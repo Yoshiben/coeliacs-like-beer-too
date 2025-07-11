@@ -563,9 +563,19 @@
                     }
                 }, 100);
                 
-                // Smooth scroll to show the map
+                // Better centering - scroll to show map optimally in viewport
                 setTimeout(() => {
-                    mapContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    const mapRect = mapContainer.getBoundingClientRect();
+                    const viewportHeight = window.innerHeight;
+                    const headerHeight = 80; // Approximate header/nav height
+                    
+                    // Calculate optimal scroll position
+                    const optimalScrollY = window.pageYOffset + mapRect.top - headerHeight - (viewportHeight - mapRect.height) / 3;
+                    
+                    window.scrollTo({ 
+                        top: Math.max(0, optimalScrollY), 
+                        behavior: 'smooth' 
+                    });
                 }, 150);
             } else {
                 mapContainer.style.display = 'none';
@@ -1454,6 +1464,8 @@
         // ENHANCED findOnMap with smart map showing
         // ENHANCED findOnMap function - Replace in your JavaScript
 
+        // Also update your findOnMap function for better centering:
+
         function findOnMap(lat, lng, pubName, postcode, pubId) {
             trackPubView(pubName);
             
@@ -1466,7 +1478,7 @@
                 // Wait a moment for map to be visible if it was just shown
                 setTimeout(() => {
                     // Zoom to the location
-                    map.setView([parseFloat(lat), parseFloat(lng)], 17); // Closer zoom for individual pubs
+                    map.setView([parseFloat(lat), parseFloat(lng)], 17);
                     
                     // Remove any existing highlight markers
                     if (window.currentHighlightMarker) {
@@ -1497,11 +1509,21 @@
                         </div>
                     `).openPopup();
                     
-                    // Scroll to map section smoothly
-                    document.getElementById('mapContainer').scrollIntoView({ 
-                        behavior: 'smooth', 
-                        block: 'start' 
-                    });
+                    // Better centering for map scroll
+                    const mapContainer = document.getElementById('mapContainer');
+                    const mapRect = mapContainer.getBoundingClientRect();
+                    const viewportHeight = window.innerHeight;
+                    const headerHeight = 80;
+                    
+                    // Only scroll if map is not well-positioned in viewport
+                    if (mapRect.top < headerHeight || mapRect.bottom > viewportHeight) {
+                        const optimalScrollY = window.pageYOffset + mapRect.top - headerHeight - (viewportHeight - mapRect.height) / 3;
+                        
+                        window.scrollTo({ 
+                            top: Math.max(0, optimalScrollY), 
+                            behavior: 'smooth' 
+                        });
+                    }
                     
                     showSuccessToast(`📍 Found ${pubName} on the map!`);
                     
@@ -1513,15 +1535,24 @@
                         }
                     }, 8000);
                     
-                }, mapVisible ? 50 : 300); // Shorter delay if map already visible
+                }, mapVisible ? 50 : 300);
                 
             } else {
                 // If no coordinates, show map anyway and open coordinate modal
                 setTimeout(() => {
-                    document.getElementById('mapContainer').scrollIntoView({ 
-                        behavior: 'smooth', 
-                        block: 'start' 
+                    // Better centering for coordinate modal case too
+                    const mapContainer = document.getElementById('mapContainer');
+                    const mapRect = mapContainer.getBoundingClientRect();
+                    const viewportHeight = window.innerHeight;
+                    const headerHeight = 80;
+                    
+                    const optimalScrollY = window.pageYOffset + mapRect.top - headerHeight - (viewportHeight - mapRect.height) / 3;
+                    
+                    window.scrollTo({ 
+                        top: Math.max(0, optimalScrollY), 
+                        behavior: 'smooth' 
                     });
+                    
                     showSuccessToast(`📍 Help us locate ${pubName} on the map!`);
                     
                     // Small delay before opening coordinate modal
