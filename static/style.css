@@ -2879,3 +2879,243 @@ label {
         font-size: 18px;
     }
 }
+
+/* ========================================
+   IMPLEMENTATION INSTRUCTIONS:
+   
+   ADD: Add all of this CSS to the bottom 
+   of your existing style.css file
+   
+   (Don't replace anything in CSS)
+   ======================================== */
+
+/* ================================
+   SPLIT SCREEN LAYOUT
+   ================================ */
+.split-screen-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 20px;
+    display: none;
+}
+
+.split-screen-header {
+    background: rgba(255,255,255,0.95);
+    padding: 20px 30px;
+    border-radius: 20px 20px 0 0;
+    backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.close-split-btn {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+    border: 2px solid #e2e8f0;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.close-split-btn:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: #667eea;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.split-pub-details {
+    background: rgba(255,255,255,0.95);
+    padding: 30px;
+    border-radius: 0 0 20px 20px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+}
+
+.single-pub-card {
+    max-width: 100%;
+}
+
+.pub-header {
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.pub-header h3 {
+    font-size: 1.5em;
+    color: #2d3748;
+    margin: 0 0 10px 0;
+    font-weight: 700;
+}
+
+.pub-address {
+    color: #4a5568;
+    font-size: 1.1em;
+    margin-bottom: 5px;
+}
+
+.pub-authority {
+    color: #718096;
+    font-size: 0.9em;
+}
+
+.pub-beer-section {
+    margin-bottom: 25px;
+    padding: 20px;
+    background: rgba(248, 250, 252, 0.8);
+    border-radius: 15px;
+    border-left: 4px solid #667eea;
+}
+
+.pub-beer-section h4 {
+    margin: 0 0 15px 0;
+    color: #4a5568;
+    font-size: 1.1em;
+    font-weight: 600;
+}
+
+.pub-beer-details {
+    font-size: 1em;
+    line-height: 1.6;
+}
+
+.pub-beer-details .beer-item {
+    margin-bottom: 8px;
+    color: #2d3748;
+}
+
+.pub-beer-details .beer-type {
+    font-weight: 600;
+    color: #667eea;
+}
+
+.pub-actions {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.pub-action-btn {
+    flex: 1;
+    min-width: 140px;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.search-btn {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+}
+
+.search-btn:hover {
+    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+}
+
+.directions-btn {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+}
+
+.directions-btn:hover {
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+}
+
+.update-btn {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.update-btn:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+/* ================================
+   MOBILE RESPONSIVE SPLIT SCREEN
+   ================================ */
+@media (max-width: 768px) {
+    .split-screen-container {
+        padding: 0 15px;
+        margin: 15px auto;
+    }
+    
+    .split-screen-header {
+        padding: 18px 20px;
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+        text-align: center;
+    }
+    
+    .close-split-btn {
+        width: 100%;
+        padding: 12px 20px;
+        font-size: 15px;
+    }
+    
+    .split-pub-details {
+        padding: 25px 20px;
+    }
+    
+    .pub-header h3 {
+        font-size: 1.3em;
+    }
+    
+    .pub-actions {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .pub-action-btn {
+        width: 100%;
+        min-width: unset;
+        padding: 16px 24px;
+        font-size: 16px;
+    }
+    
+    .pub-beer-section {
+        padding: 18px;
+        margin-bottom: 20px;
+    }
+}
+
+/* ================================
+   ENHANCED MAP POPUP
+   ================================ */
+.leaflet-popup-content {
+    margin: 8px 12px !important;
+    line-height: 1.4 !important;
+}
+
+.leaflet-popup-content button {
+    margin: 0 !important;
+    width: 100% !important;
+}================================
+   ENHANCED MAP POPUP
+   ================================ */
+.leaflet-popup-content {
+    margin: 8px 12px !important;
+    line-height: 1.4 !important;
+}
+
+.leaflet-popup-content button {
+    margin: 0 !important;
+    width: 100% !important;
+}
