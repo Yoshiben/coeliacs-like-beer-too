@@ -412,7 +412,7 @@ def get_stats():
         cursor.execute("SELECT COUNT(*) as total FROM pubs")
         total_pubs = cursor.fetchone()[0]
         
-        # Get DISTINCT pubs with GF options (a pub with multiple formats = 1 GF pub)
+        # Get DISTINCT pubs with GF options
         cursor.execute("""
             SELECT COUNT(DISTINCT pub_id) as gf_total 
             FROM pubs 
@@ -420,40 +420,24 @@ def get_stats():
         """)
         gf_pubs = cursor.fetchone()[0]
         
-        # Get DISTINCT pubs updated this month
-        cursor.execute("""
-            SELECT COUNT(DISTINCT pub_id) as monthly_pubs 
-            FROM pubs_updates 
-            WHERE update_time >= DATE_SUB(NOW(), INTERVAL 30 DAY)
-        """)
-        monthly_result = cursor.fetchone()
-        monthly_pubs = monthly_result[0] if monthly_result else 0
-        
-        # Ensure monthly can't be higher than total GF pubs (safety check)
-        monthly_pubs = min(monthly_pubs, gf_pubs)
-        
-        logger.info(f"Stats: {total_pubs} total pubs, {gf_pubs} distinct GF pubs, {monthly_pubs} distinct pubs updated this month")
+        logger.info(f"Stats: {total_pubs} total pubs, {gf_pubs} distinct GF pubs")
         
         return jsonify({
             'total_pubs': total_pubs,
-            'gf_pubs': gf_pubs,
-            'monthly_pubs': monthly_pubs
+            'gf_pubs': gf_pubs
         })
         
     except mysql.connector.Error as e:
         logger.error(f"Database error in stats: {str(e)}")
-        # Return sensible fallback numbers with proper ratios
         return jsonify({
             'total_pubs': 49841,
-            'gf_pubs': 1249,     # More realistic ratio (2.5% of total)
-            'monthly_pubs': 87   # Realistic monthly activity
+            'gf_pubs': 1249
         })
     except Exception as e:
         logger.error(f"Unexpected error in stats: {str(e)}")
         return jsonify({
             'total_pubs': 49841,
-            'gf_pubs': 1249,
-            'monthly_pubs': 87
+            'gf_pubs': 1249
         })
     finally:
         if 'conn' in locals() and conn.is_connected():
