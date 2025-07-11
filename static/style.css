@@ -3119,3 +3119,182 @@ label {
     margin: 0 !important;
     width: 100% !important;
 }
+
+/* ========================================
+   IMPLEMENTATION INSTRUCTIONS:
+   
+   ADD: Add all of this CSS to the bottom 
+   of your existing style.css file
+   
+   (These are new styles for the enhanced 
+   beer handling functionality)
+   ======================================== */
+
+/* ================================
+   ENHANCED BEER DISPLAY STYLES
+   ================================ */
+.gf-availability {
+    background: rgba(16, 185, 129, 0.05);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 10px;
+    padding: 15px;
+    margin: 10px 0;
+}
+
+.confirmed-formats {
+    margin-bottom: 10px;
+}
+
+.gf-format {
+    margin: 5px 0;
+    padding: 5px 0;
+    font-size: 0.9em;
+    color: #2d3748;
+}
+
+.rotating-note {
+    font-size: 0.8em;
+    color: #718096;
+    font-style: italic;
+}
+
+.gf-note {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 8px;
+    font-size: 0.85em;
+    color: #4a5568;
+}
+
+/* ================================
+   ENHANCED UPDATE FORM STYLES
+   ================================ */
+.availability-mode {
+    background: rgba(102, 126, 234, 0.05);
+    border: 2px solid rgba(102, 126, 234, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.availability-mode h4 {
+    margin: 0 0 15px 0;
+    color: #667eea;
+    font-size: 1.1em;
+}
+
+.availability-mode label {
+    font-weight: 500;
+    color: #4a5568;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.availability-mode label:hover {
+    background: rgba(102, 126, 234, 0.1);
+}
+
+.availability-mode input[type="radio"] {
+    margin-right: 8px;
+    transform: scale(1.2);
+}
+
+.generic-gf-options {
+    background: rgba(16, 185, 129, 0.05);
+    border: 2px solid rgba(16, 185, 129, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.generic-gf-options h4 {
+    margin: 0 0 15px 0;
+    color: #10b981;
+    font-size: 1.1em;
+}
+
+.gf-format-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.gf-format-grid label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.gf-format-grid label:hover {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: #10b981;
+}
+
+.gf-format-grid input[type="checkbox"] {
+    transform: scale(1.2);
+}
+
+.helpful-note {
+    background: rgba(255, 255, 255, 0.7);
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 15px;
+    border-left: 3px solid #10b981;
+}
+
+.helpful-note small {
+    color: #4a5568;
+    font-style: italic;
+}
+
+.specific-beer-options {
+    background: rgba(248, 250, 252, 0.8);
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+/* ================================
+   MOBILE RESPONSIVE
+   ================================ */
+@media (max-width: 768px) {
+    .availability-mode > div {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .availability-mode label {
+        width: 100%;
+        text-align: left;
+        padding: 12px;
+    }
+    
+    .gf-format-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    
+    .gf-format-grid label {
+        padding: 12px;
+        font-size: 15px;
+    }
+    
+    .generic-gf-options,
+    .specific-beer-options,
+    .availability-mode {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+}
