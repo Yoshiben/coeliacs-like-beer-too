@@ -1470,7 +1470,7 @@
         // ENHANCED findOnMap with smart map showing
         // ENHANCED findOnMap function - Replace in your JavaScript
         // Also update your findOnMap function for better centering:
-
+        // REPLACE: Enhanced findOnMap function with better scrolling and no redundant button
         function findOnMap(lat, lng, pubName, postcode, pubId) {
             trackPubView(pubName);
             
@@ -1505,35 +1505,48 @@
                         markerElement.style.animation = 'pulse 2s infinite';
                     }
                     
+                    // OPTION 1: No popup button - details show immediately
                     window.currentHighlightMarker.bindPopup(`
                         <div style="text-align: center; padding: 8px;">
                             <strong style="color: #2d3748; font-size: 16px;">${pubName}</strong>
                             <br><em style="color: #667eea;">📍 Found on map!</em>
-                            <br><button onclick="scrollToPubDetailsSplit()" style="
-                                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                                color: white; border: none; padding: 6px 12px; 
-                                border-radius: 15px; margin-top: 8px; cursor: pointer;
-                                font-size: 12px; font-weight: 600;
-                            ">📋 View Details Below</button>
+                            <br><small style="color: #718096;">Details shown below</small>
                         </div>
                     `).openPopup();
                     
-                    // CREATE SPLIT SCREEN LAYOUT
+                    // CREATE SPLIT SCREEN LAYOUT immediately
                     createSplitScreenLayout(pubId);
                     
-                    // Scroll to show the split screen perfectly
+                    // BETTER SCROLLING: Show both map and pub details properly
                     setTimeout(() => {
                         const mapContainer = document.getElementById('mapContainer');
-                        const mapRect = mapContainer.getBoundingClientRect();
+                        const splitContainer = document.getElementById('split-screen-container');
                         
-                        // Scroll to show map at top of viewport
-                        const optimalScrollY = window.pageYOffset + mapRect.top - 20;
-                        
-                        window.scrollTo({ 
-                            top: Math.max(0, optimalScrollY), 
-                            behavior: 'smooth' 
-                        });
-                    }, 200);
+                        if (mapContainer && splitContainer) {
+                            const mapRect = mapContainer.getBoundingClientRect();
+                            const splitRect = splitContainer.getBoundingClientRect();
+                            const viewportHeight = window.innerHeight;
+                            
+                            // Calculate total content height
+                            const totalContentHeight = mapRect.height + splitRect.height;
+                            
+                            if (totalContentHeight > viewportHeight * 0.9) {
+                                // If content is too tall, scroll to show map top and ensure details are visible
+                                const optimalScrollY = window.pageYOffset + mapRect.top - 80;
+                                window.scrollTo({ 
+                                    top: Math.max(0, optimalScrollY), 
+                                    behavior: 'smooth' 
+                                });
+                            } else {
+                                // If content fits, center it in viewport
+                                const centerScrollY = window.pageYOffset + mapRect.top - (viewportHeight - totalContentHeight) / 3;
+                                window.scrollTo({ 
+                                    top: Math.max(0, centerScrollY), 
+                                    behavior: 'smooth' 
+                                });
+                            }
+                        }
+                    }, 300);
                     
                     showSuccessToast(`📍 Found ${pubName}! Details shown below map.`);
                     
@@ -1615,7 +1628,7 @@
             return null;
         }
         
-        // ADD: New function - create single pub display for split screen
+        // UPDATE: Fixed createSinglePubDisplay function with working update button
         function createSinglePubDisplay(pub) {
             return `
                 <div class="single-pub-card">
@@ -1641,17 +1654,181 @@
                                 class="pub-action-btn directions-btn">
                             🧭 Get Directions
                         </button>
-                        <button onclick="toggleUpdateForm(${pub.pub_id})" 
+                        <button onclick="toggleSplitScreenUpdateForm(${pub.pub_id})" 
                                 class="pub-action-btn update-btn">
                             📝 Update Info
                         </button>
                     </div>
                     
-                    <div class="update-form" id="form-${pub.pub_id}" style="display: none;">
-                        <!-- Your existing update form will be inserted here -->
+                    <div class="update-form" id="split-form-${pub.pub_id}" style="display: none;">
+                        ${createUpdateFormContent(pub.pub_id)}
                     </div>
                 </div>
             `;
+        }
+
+        // ADD: New function for split screen update form toggle
+        function toggleSplitScreenUpdateForm(pubId) {
+            const form = document.getElementById(`split-form-${pubId}`);
+            if (form) {
+                const isVisible = form.style.display === 'block';
+                form.style.display = isVisible ? 'none' : 'block';
+                
+                if (!isVisible) {
+                    // Scroll to show the form
+                    setTimeout(() => {
+                        form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }, 100);
+                    trackEvent('open_split_update_form', 'User Interaction', `pub_${pubId}`);
+                }
+            }
+        }
+        
+        // ADD: Create update form content (reusable)
+        function createUpdateFormContent(pubId) {
+            return `
+                <div class="update-mode">
+                    <label><input type="radio" name="splitUpdateMode-${pubId}" value="add" checked> Add to existing</label>
+                    <label><input type="radio" name="splitUpdateMode-${pubId}" value="replace"> Replace all</label>
+                </div>
+                <div class="beer-options-grid">
+                    <div class="beer-option">
+                        <div class="beer-option-header">
+                            <label class="beer-type-label">
+                                <input type="checkbox" id="split-bottle-${pubId}" onchange="handleSplitCheckboxChange(${pubId}, 'bottle')">
+                                <span class="beer-icon">🍺</span> Bottle
+                            </label>
+                        </div>
+                        <div id="split-beer-input-bottle-${pubId}" class="beer-input-container">
+                            <div class="beer-form-grid">
+                                <input type="text" id="split-brewery-bottle-${pubId}" class="beer-input brewery-input" placeholder="Brewery">
+                                <input type="text" id="split-beer-name-bottle-${pubId}" class="beer-input name-input" placeholder="Name">
+                                <input type="text" id="split-beer-style-bottle-${pubId}" class="beer-input type-input" placeholder="Style (IPA, Lager, etc.)">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="beer-option">
+                        <div class="beer-option-header">
+                            <label class="beer-type-label">
+                                <input type="checkbox" id="split-tap-${pubId}" onchange="handleSplitCheckboxChange(${pubId}, 'tap')">
+                                <span class="beer-icon">🚰</span> Tap
+                            </label>
+                        </div>
+                        <div id="split-beer-input-tap-${pubId}" class="beer-input-container">
+                            <div class="beer-form-grid">
+                                <input type="text" id="split-brewery-tap-${pubId}" class="beer-input brewery-input" placeholder="Brewery">
+                                <input type="text" id="split-beer-name-tap-${pubId}" class="beer-input name-input" placeholder="Name">
+                                <input type="text" id="split-beer-style-tap-${pubId}" class="beer-input type-input" placeholder="Style (IPA, Lager, etc.)">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="beer-option">
+                        <div class="beer-option-header">
+                            <label class="beer-type-label">
+                                <input type="checkbox" id="split-cask-${pubId}" onchange="handleSplitCheckboxChange(${pubId}, 'cask')">
+                                <span class="beer-icon">🛢️</span> Cask
+                            </label>
+                        </div>
+                        <div id="split-beer-input-cask-${pubId}" class="beer-input-container">
+                            <div class="beer-form-grid">
+                                <input type="text" id="split-brewery-cask-${pubId}" class="beer-input brewery-input" placeholder="Brewery">
+                                <input type="text" id="split-beer-name-cask-${pubId}" class="beer-input name-input" placeholder="Name">
+                                <input type="text" id="split-beer-style-cask-${pubId}" class="beer-input type-input" placeholder="Style (IPA, Lager, etc.)">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="beer-option">
+                        <div class="beer-option-header">
+                            <label class="beer-type-label">
+                                <input type="checkbox" id="split-can-${pubId}" onchange="handleSplitCheckboxChange(${pubId}, 'can')">
+                                <span class="beer-icon">🥫</span> Can
+                            </label>
+                        </div>
+                        <div id="split-beer-input-can-${pubId}" class="beer-input-container">
+                            <div class="beer-form-grid">
+                                <input type="text" id="split-brewery-can-${pubId}" class="beer-input brewery-input" placeholder="Brewery">
+                                <input type="text" id="split-beer-name-can-${pubId}" class="beer-input name-input" placeholder="Name">
+                                <input type="text" id="split-beer-style-can-${pubId}" class="beer-input type-input" placeholder="Style (IPA, Lager, etc.)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="save-button-container">
+                    <button class="save-beer-btn" onclick="submitSplitScreenUpdate(${pubId})">
+                        <span class="save-icon">💾</span> Save Beer Updates
+                    </button>
+                </div>
+            `;
+        }
+        
+        // ADD: Handle checkbox changes in split screen
+        function handleSplitCheckboxChange(pubId, type) {
+            const checkbox = document.getElementById(`split-${type}-${pubId}`);
+            const inputContainer = document.getElementById(`split-beer-input-${type}-${pubId}`);
+            inputContainer.style.display = checkbox.checked ? 'block' : 'none';
+            if (checkbox.checked) {
+                inputContainer.querySelector('input').focus();
+            }
+        }
+        
+        // ADD: Submit split screen updates
+        async function submitSplitScreenUpdate(pubId) {
+            const bottle = document.getElementById(`split-bottle-${pubId}`).checked ? 1 : 0;
+            const tap = document.getElementById(`split-tap-${pubId}`).checked ? 1 : 0;
+            const cask = document.getElementById(`split-cask-${pubId}`).checked ? 1 : 0;
+            const can = document.getElementById(`split-can-${pubId}`).checked ? 1 : 0;
+            const updateMode = document.querySelector(`input[name="splitUpdateMode-${pubId}"]:checked`)?.value || 'add';
+        
+            showLoadingToast('Saving beer updates...');
+        
+            const updates = [];
+            ['bottle', 'tap', 'cask', 'can'].forEach(format => {
+                if (document.getElementById(`split-${format}-${pubId}`).checked) {
+                    const brewery = document.getElementById(`split-brewery-${format}-${pubId}`).value || 'Unknown';
+                    const beerName = document.getElementById(`split-beer-name-${format}-${pubId}`).value || 'Unknown';
+                    const beerStyle = document.getElementById(`split-beer-style-${format}-${pubId}`).value || 'Unknown';
+                    updates.push({ 
+                        beer_format: format, 
+                        beer_brewery: brewery,
+                        beer_name: beerName,
+                        beer_style: beerStyle
+                    });
+                }
+            });
+        
+            try {
+                const updateResponse = await fetch('/update', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pub_id: pubId, bottle, tap, cask, can })
+                });
+        
+                if (updates.length > 0) {
+                    await fetch('/update_beers', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ pub_id: pubId, updates, update_mode: updateMode })
+                    });
+                }
+        
+                const result = await updateResponse.json();
+                hideLoadingToast();
+                showSuccessToast(result.message || 'Beer updates saved successfully!');
+                trackEvent('submit_split_beer_update', 'Community Contribution', `pub_${pubId}`);
+                
+                const form = document.getElementById(`split-form-${pubId}`);
+                form.style.display = 'none';
+                
+                // Refresh the split screen with updated data
+                setTimeout(() => {
+                    createSplitScreenLayout(pubId);
+                }, 1000);
+                
+            } catch (error) {
+                console.error('Error submitting split screen update:', error);
+                hideLoadingToast();
+                showSuccessToast('Error saving updates. Please try again.');
+            }
         }
         
         // ADD: New function - scroll to pub details in split screen
