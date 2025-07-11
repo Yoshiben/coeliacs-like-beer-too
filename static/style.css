@@ -3602,3 +3602,73 @@ body {
         order: 999 !important; /* Show last on mobile */
     }
 }
+
+/* ========================================
+   IMPLEMENTATION INSTRUCTIONS:
+   
+   ADD: Add this CSS to your existing style.css 
+   file to create proper spacing between map and boxes
+   ======================================== */
+
+/* ================================
+   MAP CONTAINER SPACING
+   ================================ */
+
+/* Add bottom margin to map container when visible */
+.map-container {
+    max-width: 1200px;
+    margin: 20px auto 60px; /* Increased bottom margin from 20px to 60px */
+    padding: 0 20px;
+}
+
+/* Ensure features section has proper top margin when map is showing */
+.features-section {
+    max-width: 1200px;
+    margin: 60px auto 40px; /* Increased top margin from 0 to 60px */
+    padding: 0 20px;
+    transition: margin-top 0.3s ease;
+}
+
+/* When map is hidden, reduce the features section top margin */
+.map-container[style*="display: none"] + * .features-section,
+.features-section.no-map-spacing {
+    margin-top: 40px; /* Reduced margin when no map */
+}
+
+/* ================================
+   MOBILE RESPONSIVE MAP SPACING
+   ================================ */
+@media (max-width: 768px) {
+    .map-container {
+        margin: 15px auto 40px; /* Smaller margins on mobile */
+        padding: 0 15px;
+    }
+    
+    .features-section {
+        margin: 40px auto 30px; /* Adjusted for mobile */
+        padding: 0 15px;
+    }
+    
+    .features-section.no-map-spacing {
+        margin-top: 30px;
+    }
+}
+
+/* ================================
+   ENSURE PROPER SPACING FOR ALL SECTIONS
+   ================================ */
+
+/* Activity section spacing */
+.activity-section {
+    max-width: 1200px;
+    margin: 40px auto 40px; /* Consistent spacing */
+    padding: 0 20px;
+    transition: margin-top 0.3s ease;
+}
+
+@media (max-width: 768px) {
+    .activity-section {
+        margin: 30px auto 30px;
+        padding: 0 15px;
+    }
+}
