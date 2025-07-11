@@ -579,8 +579,11 @@ def liability_notice():
     version = str(int(time.time()))  # Generate cache buster
     return render_template('liability.html', cache_buster=version)
 
+# Add this route to your app.py
+
 @app.route('/breweries')
 def gf_breweries():
+    """GF Breweries page"""
     version = str(int(time.time()))
     return render_template('breweries.html', cache_buster=version)
 
