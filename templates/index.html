@@ -550,14 +550,28 @@
         }
 
         // SMART MAP TOGGLE - Auto-show when needed
+        /* ========================================
+   IMPLEMENTATION INSTRUCTIONS:
+   
+   UPDATE: Your toggleMap() function to handle
+   proper spacing classes
+   ======================================== */
+
+        // UPDATE: Enhanced toggleMap function with proper spacing
         function toggleMap() {
             mapVisible = !mapVisible;
             const mapContainer = document.getElementById('mapContainer');
             const toggleBtn = document.getElementById('toggleMapBtn');
+            const featuresSection = document.getElementById('featuresSection');
             
             if (mapVisible) {
                 mapContainer.style.display = 'block';
                 toggleBtn.innerHTML = '🗺️ Hide Map';
+                
+                // Remove the map-hidden class to ensure proper spacing
+                if (featuresSection) {
+                    featuresSection.classList.remove('map-hidden');
+                }
                 
                 // Initialize map if not already done, or resize if it exists
                 setTimeout(() => {
@@ -566,23 +580,18 @@
                     }
                 }, 100);
                 
-                // Better centering - scroll to show map optimally in viewport
+                // Smooth scroll to show the map
                 setTimeout(() => {
-                    const mapRect = mapContainer.getBoundingClientRect();
-                    const viewportHeight = window.innerHeight;
-                    const headerHeight = 80; // Approximate header/nav height
-                    
-                    // Calculate optimal scroll position
-                    const optimalScrollY = window.pageYOffset + mapRect.top - headerHeight - (viewportHeight - mapRect.height) / 3;
-                    
-                    window.scrollTo({ 
-                        top: Math.max(0, optimalScrollY), 
-                        behavior: 'smooth' 
-                    });
+                    mapContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }, 150);
             } else {
                 mapContainer.style.display = 'none';
                 toggleBtn.innerHTML = '🗺️ Show Map';
+                
+                // Add the map-hidden class to restore top margin
+                if (featuresSection) {
+                    featuresSection.classList.add('map-hidden');
+                }
             }
             
             AppState.save();
