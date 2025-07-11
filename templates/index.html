@@ -1632,7 +1632,7 @@
             
             // Get the specific pub data
             const selectedPub = getCurrentPubData(selectedPubId);
-    
+        
             if (selectedPub) {
                 splitContainer.innerHTML = `
                     <div class="split-screen-header">
@@ -1885,28 +1885,6 @@
                 splitContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
-        
-        // ADD: New function - close split screen and return to all results
-        function closeSplitScreen() {
-            const splitContainer = document.getElementById('split-screen-container');
-            const resultsSection = document.getElementById('results-section');
-            
-            if (splitContainer) {
-                splitContainer.style.display = 'none';
-            }
-            
-            if (resultsSection) {
-                resultsSection.style.display = 'block';
-            }
-            
-            // Remove any map highlights
-            if (window.currentHighlightMarker) {
-                map.removeLayer(window.currentHighlightMarker);
-                window.currentHighlightMarker = null;
-            }
-            
-            showSuccessToast('📋 Returned to all results');
-        }
 
         // New function to highlight specific pub in results
         function highlightPubInResults(pubId) {
@@ -1927,19 +1905,6 @@
                     item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 }
             });
-        }
-        
-        // New function to scroll from map popup to pub details
-        function scrollToPubDetails(pubId) {
-            const resultsSection = document.getElementById('results-section');
-            if (resultsSection) {
-                resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                
-                // Highlight the pub after scrolling
-                setTimeout(() => {
-                    highlightPubInResults(pubId);
-                }, 500);
-            }
         }
 
         function openInGoogleMaps(lat, lng, pubName, address) {
