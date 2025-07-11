@@ -1475,7 +1475,6 @@
             }
             
             if (lat && lng && lat !== 'null' && lng !== 'null' && !isNaN(parseFloat(lat)) && !isNaN(parseFloat(lng))) {
-                // Wait a moment for map to be visible if it was just shown
                 setTimeout(() => {
                     // Zoom to the location
                     map.setView([parseFloat(lat), parseFloat(lng)], 17);
@@ -1496,38 +1495,45 @@
                         className: 'pulsing-marker'
                     }).addTo(map);
                     
-                    // Add pulsing animation
                     const markerElement = window.currentHighlightMarker.getElement();
                     if (markerElement) {
                         markerElement.style.animation = 'pulse 2s infinite';
                     }
                     
                     window.currentHighlightMarker.bindPopup(`
-                        <div style="text-align: center; padding: 5px;">
+                        <div style="text-align: center; padding: 8px;">
                             <strong style="color: #2d3748; font-size: 16px;">${pubName}</strong>
-                            <br><em style="color: #667eea;">📍 You found this pub!</em>
+                            <br><em style="color: #667eea;">📍 Found on map!</em>
+                            <br><button onclick="scrollToPubDetails('${pubId}')" style="
+                                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                color: white; border: none; padding: 6px 12px; 
+                                border-radius: 15px; margin-top: 8px; cursor: pointer;
+                                font-size: 12px; font-weight: 600;
+                            ">View Details Below</button>
                         </div>
                     `).openPopup();
                     
-                    // Better centering for map scroll
-                    const mapContainer = document.getElementById('mapContainer');
-                    const mapRect = mapContainer.getBoundingClientRect();
-                    const viewportHeight = window.innerHeight;
-                    const headerHeight = 80;
+                    // KEEP PUB DETAILS VISIBLE - Don't clear results!
+                    // Instead, highlight the specific pub in the results
+                    highlightPubInResults(pubId);
                     
-                    // Only scroll if map is not well-positioned in viewport
-                    if (mapRect.top < headerHeight || mapRect.bottom > viewportHeight) {
-                        const optimalScrollY = window.pageYOffset + mapRect.top - headerHeight - (viewportHeight - mapRect.height) / 3;
+                    // Smart scrolling to show both map and results
+                    setTimeout(() => {
+                        const mapContainer = document.getElementById('mapContainer');
+                        const resultsSection = document.getElementById('results-section');
+                        
+                        // Position so user can see map and know results are below
+                        const mapRect = mapContainer.getBoundingClientRect();
+                        const optimalScrollY = window.pageYOffset + mapRect.top - 100;
                         
                         window.scrollTo({ 
                             top: Math.max(0, optimalScrollY), 
                             behavior: 'smooth' 
                         });
-                    }
+                    }, 200);
                     
-                    showSuccessToast(`📍 Found ${pubName} on the map!`);
+                    showSuccessToast(`📍 Found ${pubName}! Check details below map.`);
                     
-                    // Remove the highlight marker after 8 seconds
                     setTimeout(() => {
                         if (window.currentHighlightMarker) {
                             map.removeLayer(window.currentHighlightMarker);
@@ -1536,31 +1542,59 @@
                     }, 8000);
                     
                 }, mapVisible ? 50 : 300);
-                
             } else {
-                // If no coordinates, show map anyway and open coordinate modal
-                setTimeout(() => {
-                    // Better centering for coordinate modal case too
-                    const mapContainer = document.getElementById('mapContainer');
-                    const mapRect = mapContainer.getBoundingClientRect();
-                    const viewportHeight = window.innerHeight;
-                    const headerHeight = 80;
-                    
-                    const optimalScrollY = window.pageYOffset + mapRect.top - headerHeight - (viewportHeight - mapRect.height) / 3;
-                    
-                    window.scrollTo({ 
-                        top: Math.max(0, optimalScrollY), 
-                        behavior: 'smooth' 
-                    });
-                    
-                    showSuccessToast(`📍 Help us locate ${pubName} on the map!`);
-                    
-                    // Small delay before opening coordinate modal
-                    setTimeout(() => {
-                        openCoordinateModal(pubName, postcode, pubId);
-                    }, 500);
-                }, mapVisible ? 50 : 300);
+                // Handle no coordinates case...
+                openCoordinateModal(pubName, postcode, pubId);
             }
+        }
+
+        // New function to highlight specific pub in results
+        function highlightPubInResults(pubId) {
+            // Remove any existing highlights
+            document.querySelectorAll('.result-item').forEach(item => {
+                item.style.background = '';
+                item.style.border = '';
+            });
+            
+            // Find and highlight the specific pub
+            const pubResults = document.querySelectorAll('.result-item');
+            pubResults.forEach(item => {
+                const updateButton = item.querySelector(`[onclick*="toggleUpdateForm(${pubId})"]`);
+                if (updateButton) {
+                    item.style.background = 'rgba(102, 126, 234, 0.1)';
+                    item.style.border = '2px solid #667eea';
+                    item.style.borderRadius = '15px';
+                    item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            });
+        }
+        
+        // New function to scroll from map popup to pub details
+        function scrollToPubDetails(pubId) {
+            const resultsSection = document.getElementById('results-section');
+            if (resultsSection) {
+                resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                
+                // Highlight the pub after scrolling
+                setTimeout(() => {
+                    highlightPubInResults(pubId);
+                }, 500);
+            }
+        }
+
+        function openInGoogleMaps(lat, lng, pubName, address) {
+            const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            if (isMobile) {
+                const googleMapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+                window.open(googleMapsUrl, '_blank');
+            } else {
+                const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+                window.open(googleMapsUrl, '_blank');
+            }
+            
+            trackEvent('open_navigation', 'External Navigation', pubName);
+            showSuccessToast('🧭 Opening directions...');
         }
         
         // Add this CSS for the pulsing animation - add to your style.css
@@ -1644,6 +1678,10 @@
                             <button onclick="findOnMap(${pub.latitude || 'null'}, ${pub.longitude || 'null'}, '${pub.name.replace(/'/g, "\\'")}', '${pub.postcode}', ${pub.pub_id})" 
                                     style="padding: 6px 12px; font-size: 12px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);">
                                 Find on Map
+                            </button>
+                            <button onclick="openInGoogleMaps(${pub.latitude}, ${pub.longitude}, '${pub.name.replace(/'/g, "\\'")}', '${pub.address}')" 
+                                    style="padding: 6px 12px; font-size: 12px; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);">
+                                🧭 Directions
                             </button>
                         </div>
                     </div>
