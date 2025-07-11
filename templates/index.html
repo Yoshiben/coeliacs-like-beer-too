@@ -937,6 +937,7 @@
 
         // ENHANCED stats loading - Replace your loadDashboardStats function
 
+        // REPLACE: Fixed loadDashboardStats function
         async function loadDashboardStats() {
             try {
                 console.log('🔄 Loading dashboard stats from database...');
@@ -954,8 +955,8 @@
                     document.getElementById('footerPubCount').textContent = stats.total_pubs.toLocaleString();
                     document.getElementById('footerGFCount').textContent = stats.gf_pubs.toLocaleString();
                     
-                    // Log success for debugging
-                    console.log(`📊 Dashboard updated: ${stats.total_pubs} pubs, ${stats.gf_pubs} GF pubs);
+                    // FIXED: Added missing closing quote here
+                    console.log(`📊 Dashboard updated: ${stats.total_pubs} pubs, ${stats.gf_pubs} GF pubs`);
                     
                 } else {
                     console.warn('⚠️ Stats API returned error, using fallback data');
@@ -971,18 +972,6 @@
                 // Update footer with fallback data
                 document.getElementById('footerPubCount').textContent = '49,841';
                 document.getElementById('footerGFCount').textContent = '1,249';
-                
-                // Show a subtle indicator that stats might not be live
-                setTimeout(() => {
-                    const elements = ['totalPubs', 'gfPubs', 'monthlyReports'];
-                    elements.forEach(id => {
-                        const el = document.getElementById(id);
-                        if (el) {
-                            el.style.opacity = '0.9';
-                            el.title = 'Stats may not be current due to connection issue';
-                        }
-                    });
-                }, 2500);
             }
         }
         
