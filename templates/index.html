@@ -69,6 +69,7 @@
                 <button class="search-btn secondary" onclick="findNearbyPubs()">Pubs Near Me</button>
                 <button class="map-control-btn" id="toggleMapBtn" onclick="toggleMap()">🗺️ Show Map</button>
                 <button class="map-control-btn" onclick="centerOnLocation()">📍 My Location</button>
+                <button class="map-control-btn reset-btn" onclick="resetToHomepage()" title="Clear everything and start fresh">🏠 Reset</button>
             </div>
         </div>
         <div id="suggestions"></div>
@@ -1524,27 +1525,19 @@
                         
                         if (mapContainer && splitContainer) {
                             const mapRect = mapContainer.getBoundingClientRect();
-                            const splitRect = splitContainer.getBoundingClientRect();
-                            const viewportHeight = window.innerHeight;
                             
-                            // Calculate total content height
-                            const totalContentHeight = mapRect.height + splitRect.height;
+                            // Position map at top of viewport so user can scroll down to see all pub details
+                            const optimalScrollY = window.pageYOffset + mapRect.top - 20;
                             
-                            if (totalContentHeight > viewportHeight * 0.9) {
-                                // If content is too tall, scroll to show map top and ensure details are visible
-                                const optimalScrollY = window.pageYOffset + mapRect.top - 80;
-                                window.scrollTo({ 
-                                    top: Math.max(0, optimalScrollY), 
-                                    behavior: 'smooth' 
-                                });
-                            } else {
-                                // If content fits, center it in viewport
-                                const centerScrollY = window.pageYOffset + mapRect.top - (viewportHeight - totalContentHeight) / 3;
-                                window.scrollTo({ 
-                                    top: Math.max(0, centerScrollY), 
-                                    behavior: 'smooth' 
-                                });
-                            }
+                            window.scrollTo({ 
+                                top: Math.max(0, optimalScrollY), 
+                                behavior: 'smooth' 
+                            });
+                            
+                            // Add visual hint that there's content below
+                            setTimeout(() => {
+                                showSuccessToast('📍 Map shown above - scroll down for full pub details!');
+                            }, 1000);
                         }
                     }, 300);
                     
@@ -1561,6 +1554,69 @@
             } else {
                 openCoordinateModal(pubName, postcode, pubId);
             }
+        }
+
+        // ADD: Homepage reset function
+        function resetToHomepage() {
+            // Clear search inputs
+            document.getElementById('searchInput').value = '';
+            document.getElementById('searchType').value = 'all';
+            document.getElementById('gfOnly').checked = false;
+            
+            // Hide results section
+            hideResultsSection();
+            
+            // Hide map if visible
+            if (mapVisible) {
+                toggleMap();
+            }
+            
+            // Hide split screen if visible
+            const splitContainer = document.getElementById('split-screen-container');
+            if (splitContainer) {
+                splitContainer.style.display = 'none';
+            }
+            
+            // Clear any markers
+            pubMarkers.forEach(marker => map.removeLayer(marker));
+            pubMarkers = [];
+            
+            if (window.currentHighlightMarker) {
+                map.removeLayer(window.currentHighlightMarker);
+                window.currentHighlightMarker = null;
+            }
+            
+            if (window.postcodeMarker) {
+                map.removeLayer(window.postcodeMarker);
+                window.postcodeMarker = null;
+            }
+            
+            // Clear URL hash/state
+            window.location.hash = '';
+            
+            // Reset global variables
+            currentQuery = '';
+            currentSearchType = 'all';
+            currentGfOnly = false;
+            currentPage = 1;
+            mapVisible = false;
+            
+            // Scroll to top smoothly
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // Show clean homepage sections
+            const featuresSection = document.getElementById('featuresSection');
+            const activitySection = document.getElementById('activitySection');
+            if (featuresSection) featuresSection.style.display = 'block';
+            if (activitySection) featuresSection.style.display = 'block';
+            
+            // Update button text
+            const toggleBtn = document.getElementById('toggleMapBtn');
+            if (toggleBtn) toggleBtn.innerHTML = '🗺️ Show Map';
+            
+            // Success feedback
+            showSuccessToast('🏠 Reset to homepage - ready for a fresh search!');
+            trackEvent('reset_homepage', 'Navigation', 'homepage_reset');
         }
 
         // ADD: New function - create split screen layout
