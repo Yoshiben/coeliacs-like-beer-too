@@ -3298,3 +3298,109 @@ label {
         margin-bottom: 15px;
     }
 }
+
+/* ========================================
+   IMPLEMENTATION INSTRUCTIONS:
+   
+   ADD: Add all of this CSS to the bottom 
+   of your existing style.css file
+   ======================================== */
+
+/* ================================
+   HOME BUTTON STYLES
+   ================================ */
+.home-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.home-btn:hover {
+    background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* Update split screen header to accommodate home button */
+.split-screen-header {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 20px;
+}
+
+.split-screen-header .section-title {
+    text-align: center;
+    margin: 0;
+}
+
+/* Floating home button for deep pages (optional) */
+.floating-home-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+    background: rgba(102, 126, 234, 0.9);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.floating-home-btn:hover {
+    background: rgba(102, 126, 234, 1);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+}
+
+/* ================================
+   MOBILE RESPONSIVE HOME BUTTON
+   ================================ */
+@media (max-width: 768px) {
+    .split-screen-header {
+        grid-template-columns: 1fr;
+        gap: 10px;
+        text-align: center;
+    }
+    
+    .home-btn {
+        order: -1;
+        justify-content: center;
+        padding: 12px 20px;
+        font-size: 15px;
+        width: 100%;
+    }
+    
+    .close-split-btn {
+        width: 100%;
+        padding: 12px 20px;
+        font-size: 15px;
+    }
+    
+    .split-screen-header .section-title {
+        order: 0;
+    }
+    
+    .floating-home-btn {
+        top: 15px;
+        left: 15px;
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+}
