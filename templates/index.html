@@ -724,6 +724,7 @@
         // Show cookie settings modal
         function showCookieSettings() {
             document.getElementById('cookieSettings').style.display = 'block';
+            document.body.classList.add('modal-open'); // ADD THIS LINE
             
             // Set current preferences in modal
             const analyticsConsent = localStorage.getItem('analyticsConsent');
@@ -733,6 +734,7 @@
         // Close cookie settings modal
         function closeCookieSettings() {
             document.getElementById('cookieSettings').style.display = 'none';
+            document.body.classList.remove('modal-open'); // ADD THIS LINE
         }
         
         // Save cookie preferences from settings modal
@@ -768,6 +770,7 @@
             setTimeout(() => {
                 banner.style.display = 'none';
                 document.getElementById('cookieSettingsFloat').style.display = 'block';
+                document.body.classList.remove('modal-open'); // ADD THIS LINE
             }, 300);
         }
         
@@ -782,6 +785,18 @@
                 console.log('✅ Google Analytics initialized with user consent');
             }
         }
+
+        // Fix for mobile viewport height issues
+        function fixMobileViewport() {
+            if (window.innerWidth <= 768) {
+                const vh = window.innerHeight * 0.01;
+                document.documentElement.style.setProperty('--vh', `${vh}px`);
+            }
+        }
+        
+        // Call on resize and load
+        window.addEventListener('resize', fixMobileViewport);
+        window.addEventListener('load', fixMobileViewport);
         
         // Update your existing gtag initialization
         function initializeGoogleAnalytics() {
@@ -812,11 +827,25 @@
             }
         }
         
-        // Close modal when clicking outside
+        // NEW VERSION (replace with this):
         document.addEventListener('click', (e) => {
             const modal = document.getElementById('cookieSettings');
-            if (e.target === modal) {
-                closeCookieSettings();
+            const modalContent = modal?.querySelector('.modal-content');
+            
+            if (modal && modal.style.display === 'block') {
+                if (e.target === modal && !modalContent?.contains(e.target)) {
+                    closeCookieSettings();
+                }
+            }
+        });
+        
+        // ADD this NEW event listener after the click listener:
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const modal = document.getElementById('cookieSettings');
+                if (modal && modal.style.display === 'block') {
+                    closeCookieSettings();
+                }
             }
         });
         
