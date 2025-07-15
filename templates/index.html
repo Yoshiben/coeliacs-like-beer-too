@@ -1693,17 +1693,17 @@
                 splitContainer.innerHTML = `
                     <div class="split-screen-header">
                         <h2 class="section-title">📍 Pub Details</h2>
-                        <div class="split-screen-nav">
-                            <button onclick="goBackToResults()" class="back-to-results-btn" title="Back to Search Results">
-                                ← Back to Results
-                            </button>
-                            <button onclick="goHome()" class="home-btn" title="Back to Home">
-                                🏠 Home
-                            </button>
-                        </div>
                     </div>
                     <div class="split-pub-details">
                         ${createSinglePubDisplay(selectedPub)}
+                        <div class="split-action-bar">
+                            <button onclick="goBackToResults()" class="pub-action-btn back-to-results-btn" aria-label="Back to search results">
+                                ← Back to Results
+                            </button>
+                            <button onclick="goHome()" class="pub-action-btn home-btn" aria-label="Return to homepage">
+                                🏠 Home
+                            </button>
+                        </div>
                     </div>
                 `;
                 splitContainer.style.display = 'block';
