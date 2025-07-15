@@ -3743,3 +3743,383 @@ body.modal-open #results-section {
         z-index: 1001 !important;
     }
 }
+
+/* ============================================================================
+   ENHANCED BEER UPDATE FORM STYLES
+   Add these to your existing style.css file
+   ============================================================================ */
+
+/* ================================
+   BREWERY AND BEER DROPDOWN STYLES
+   ================================ */
+.brewery-select,
+.beer-select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    transition: all 0.3s ease;
+    margin-bottom: 10px;
+}
+
+.brewery-select:focus,
+.beer-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    outline: none;
+}
+
+.brewery-select:disabled,
+.beer-select:disabled {
+    background: #f7fafc;
+    color: #a0aec0;
+    cursor: not-allowed;
+}
+
+/* ================================
+   NEW BEER/BREWERY FIELDS
+   ================================ */
+.new-beer-fields,
+.new-brewery-fields {
+    background: rgba(102, 126, 234, 0.05);
+    border: 2px solid rgba(102, 126, 234, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 15px;
+    display: none;
+}
+
+.new-beer-form h5,
+.new-brewery-form h5 {
+    margin: 0 0 15px 0;
+    color: #667eea;
+    font-size: 1.1em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.new-beer-name,
+.new-beer-style,
+.new-beer-abv,
+.new-beer-vegan,
+.new-brewery-name {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.new-beer-name:focus,
+.new-beer-style:focus,
+.new-beer-abv:focus,
+.new-beer-vegan:focus,
+.new-brewery-name:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    outline: none;
+}
+
+.new-beer-fields small,
+.new-brewery-fields small {
+    color: #4a5568;
+    font-style: italic;
+    display: block;
+    margin-top: 10px;
+    background: rgba(255, 255, 255, 0.7);
+    padding: 8px;
+    border-radius: 6px;
+}
+
+/* ================================
+   USER DETAILS SECTION
+   ================================ */
+.user-details-section {
+    background: rgba(16, 185, 129, 0.05);
+    border: 2px solid rgba(16, 185, 129, 0.2);
+    border-radius: 15px;
+    padding: 25px;
+    margin: 20px 0;
+}
+
+.user-details-section h4 {
+    margin: 0 0 15px 0;
+    color: #10b981;
+    font-size: 1.1em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.user-details-form {
+    display: grid;
+    gap: 12px;
+}
+
+.user-details-form input,
+.user-details-form textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+}
+
+.user-details-form input:focus,
+.user-details-form textarea:focus {
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    outline: none;
+}
+
+.user-details-form textarea {
+    resize: vertical;
+    min-height: 80px;
+    font-family: inherit;
+}
+
+.user-details-section small {
+    color: #047857;
+    font-style: italic;
+    display: block;
+    margin-top: 10px;
+    background: rgba(255, 255, 255, 0.7);
+    padding: 8px;
+    border-radius: 6px;
+}
+
+/* ================================
+   ENHANCED BEER OPTION CARDS
+   ================================ */
+.beer-option {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    padding: 20px;
+    border: 2px solid #e2e8f0;
+    transition: all 0.3s ease;
+    margin-bottom: 15px;
+}
+
+.beer-option:hover {
+    border-color: #667eea;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+}
+
+.beer-option.selected {
+    border-color: #10b981;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
+.beer-option-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+.beer-type-label {
+    font-weight: 600;
+    color: #4a5568;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.beer-type-label input[type="checkbox"] {
+    transform: scale(1.3);
+    margin-right: 5px;
+}
+
+.beer-icon {
+    font-size: 20px;
+}
+
+.beer-selection-area {
+    display: none;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 2px solid #e2e8f0;
+}
+
+.beer-selection-area.active {
+    display: block;
+}
+
+/* ================================
+   VALIDATION STATUS INDICATORS
+   ================================ */
+.validation-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-left: 10px;
+}
+
+.validation-status.pending {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+}
+
+.validation-status.approved {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+.validation-status.will-validate {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+}
+
+/* ================================
+   SUBMIT BUTTON ENHANCEMENTS
+   ================================ */
+.save-beer-btn {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border: none;
+    padding: 16px 32px;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0 auto;
+}
+
+.save-beer-btn:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+.save-beer-btn:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* ================================
+   MOBILE RESPONSIVE
+   ================================ */
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .new-beer-fields,
+    .new-brewery-fields {
+        padding: 15px;
+        margin-top: 10px;
+    }
+    
+    .user-details-section {
+        padding: 20px;
+        margin: 15px 0;
+    }
+    
+    .brewery-select,
+    .beer-select {
+        padding: 14px 16px;
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+    
+    .new-beer-name,
+    .new-beer-style,
+    .new-beer-abv,
+    .new-beer-vegan,
+    .new-brewery-name {
+        padding: 12px 14px;
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+    
+    .user-details-form input,
+    .user-details-form textarea {
+        padding: 14px 16px;
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+    
+    .beer-option {
+        padding: 15px;
+        margin-bottom: 12px;
+    }
+    
+    .beer-option-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .save-beer-btn {
+        width: 100%;
+        padding: 16px 20px;
+        font-size: 16px;
+    }
+}
+
+/* ================================
+   ACCESSIBILITY IMPROVEMENTS
+   ================================ */
+@media (prefers-reduced-motion: reduce) {
+    .brewery-select,
+    .beer-select,
+    .new-beer-name,
+    .new-beer-style,
+    .new-beer-abv,
+    .new-beer-vegan,
+    .new-brewery-name,
+    .user-details-form input,
+    .user-details-form textarea,
+    .beer-option,
+    .save-beer-btn {
+        transition: none !important;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .brewery-select,
+    .beer-select,
+    .new-beer-name,
+    .new-beer-style,
+    .new-beer-abv,
+    .new-beer-vegan,
+    .new-brewery-name,
+    .user-details-form input,
+    .user-details-form textarea {
+        border-width: 3px;
+    }
+    
+    .new-beer-fields,
+    .new-brewery-fields,
+    .user-details-section {
+        border-width: 3px;
+    }
+}
