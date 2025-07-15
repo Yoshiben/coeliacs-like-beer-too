@@ -571,6 +571,309 @@ def gf_breweries():
     version = str(int(time.time()))
     return render_template('breweries.html', cache_buster=version)
 
+# ============================================================================
+# OPTIMIZED FLASK ROUTES - CLEAN DATABASE DESIGN
+# ============================================================================
+
+@app.route('/api/submit_beer_update', methods=['POST'])
+def submit_beer_update():
+    """Submit beer update - handles both existing and new beers"""
+    try:
+        data = request.get_json()
+        
+        # Validation
+        required_fields = ['pub_id', 'beer_format']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({'error': f'Missing required field: {field}'}), 400
+        
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor()
+        
+        # Determine if this is existing or new beer
+        existing_beer_id = data.get('beer_id')  # Will be None for new beers
+        
+        if existing_beer_id:
+            # EXISTING BEER - just reference it
+            cursor.execute("""
+                INSERT INTO pending_beer_updates 
+                (pub_id, beer_format, existing_beer_id, submitted_by_email, 
+                 submitted_by_name, user_notes, photo_url)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """, (
+                data['pub_id'],
+                data['beer_format'],
+                existing_beer_id,
+                data.get('email', ''),
+                data.get('name', 'Anonymous'),
+                data.get('notes', ''),
+                data.get('photo_url', '')
+            ))
+        else:
+            # NEW BEER - store details for validation
+            cursor.execute("""
+                INSERT INTO pending_beer_updates 
+                (pub_id, beer_format, new_brewery, new_beer_name, new_style, 
+                 new_abv, new_vegan_status, new_category, submitted_by_email, 
+                 submitted_by_name, user_notes, photo_url)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """, (
+                data['pub_id'],
+                data['beer_format'],
+                data.get('brewery', ''),
+                data.get('beer_name', ''),
+                data.get('style', ''),
+                data.get('abv', 0.0),
+                data.get('vegan_status', 'unknown'),
+                data.get('category', 'gluten_removed'),
+                data.get('email', ''),
+                data.get('name', 'Anonymous'),
+                data.get('notes', ''),
+                data.get('photo_url', '')
+            ))
+        
+        pending_id = cursor.lastrowid
+        conn.commit()
+        
+        # Send email notification
+        send_validation_email(pending_id, data)
+        
+        return jsonify({
+            'message': 'Beer update submitted for validation',
+            'pending_id': pending_id,
+            'will_create_new_beer': not existing_beer_id
+        })
+        
+    except Exception as e:
+        logger.error(f"Error submitting beer update: {str(e)}")
+        return jsonify({'error': 'Submission failed'}), 500
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+@app.route('/admin/approve_update/<int:pending_id>', methods=['POST'])
+def approve_update(pending_id):
+    """Approve pending update - auto-generates beer_id for new beers"""
+    try:
+        data = request.get_json()
+        admin_notes = data.get('admin_notes', '')
+        
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        # Get the pending update
+        cursor.execute("""
+            SELECT * FROM pending_beer_updates WHERE pending_id = %s
+        """, (pending_id,))
+        update = cursor.fetchone()
+        
+        if not update:
+            return jsonify({'error': 'Update not found'}), 404
+        
+        beer_id_to_use = None
+        
+        if update['existing_beer_id']:
+            # EXISTING BEER - just use the existing beer_id
+            beer_id_to_use = update['existing_beer_id']
+            logger.info(f"Using existing beer_id: {beer_id_to_use}")
+            
+        else:
+            # NEW BEER - create it and get auto-generated beer_id
+            cursor.execute("""
+                INSERT INTO beers (brewery, name, style, abv, category, vegan_status)
+                VALUES (%s, %s, %s, %s, %s, %s)
+            """, (
+                update['new_brewery'],
+                update['new_beer_name'], 
+                update['new_style'] or 'Unknown',
+                update['new_abv'] or 0.0,
+                update['new_category'],
+                update['new_vegan_status']
+            ))
+            
+            # Get the auto-generated beer_id
+            beer_id_to_use = cursor.lastrowid
+            
+            # Store the generated beer_id in pending table for reference
+            cursor.execute("""
+                UPDATE pending_beer_updates 
+                SET generated_beer_id = %s 
+                WHERE pending_id = %s
+            """, (beer_id_to_use, pending_id))
+            
+            logger.info(f"Created new beer with auto-generated beer_id: {beer_id_to_use}")
+        
+        # Add to pubs_updates with the beer_id (clean!)
+        cursor.execute("""
+            INSERT INTO pubs_updates (pub_id, beer_id, beer_format, update_time)
+            VALUES (%s, %s, %s, NOW())
+        """, (update['pub_id'], beer_id_to_use, update['beer_format']))
+        
+        # Update pub's format flags
+        format_column = update['beer_format']
+        cursor.execute(f"""
+            UPDATE pubs SET {format_column} = 1 WHERE pub_id = %s
+        """, (update['pub_id'],))
+        
+        # Mark as approved
+        cursor.execute("""
+            UPDATE pending_beer_updates 
+            SET status = 'approved', admin_notes = %s, reviewed_at = NOW(), reviewed_by = %s
+            WHERE pending_id = %s
+        """, (admin_notes, data.get('reviewed_by', 'Admin'), pending_id))
+        
+        conn.commit()
+        
+        return jsonify({
+            'message': 'Update approved successfully',
+            'beer_id': beer_id_to_use,
+            'was_new_beer': not update['existing_beer_id']
+        })
+        
+    except Exception as e:
+        logger.error(f"Error approving update: {str(e)}")
+        conn.rollback()
+        return jsonify({'error': 'Approval failed'}), 500
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+@app.route('/search')
+def search():
+    """Updated search to use clean joins"""
+    # ... existing validation code ...
+    
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        # Handle specific pub ID search
+        if pub_id:
+            sql = """
+                SELECT DISTINCT
+                    p.pub_id, p.name, p.address, p.postcode, p.local_authority, 
+                    p.bottle, p.tap, p.cask, p.can, p.latitude, p.longitude,
+                    GROUP_CONCAT(
+                        DISTINCT CONCAT(pu.beer_format, ' - ', b.brewery, ' ', b.name, ' (', b.style, ')')
+                        SEPARATOR ', '
+                    ) as beer_details
+                FROM pubs p
+                LEFT JOIN pubs_updates pu ON p.pub_id = pu.pub_id
+                LEFT JOIN beers b ON pu.beer_id = b.beer_id
+                WHERE p.pub_id = %s
+                GROUP BY p.pub_id, p.name, p.address, p.postcode, p.local_authority, 
+                         p.bottle, p.tap, p.cask, p.can, p.latitude, p.longitude
+            """
+            cursor.execute(sql, (pub_id,))
+            pubs = cursor.fetchall()
+            return jsonify(pubs)
+        
+        # Regular search with clean joins
+        sql = """
+            SELECT DISTINCT
+                p.pub_id, p.name, p.address, p.postcode, p.local_authority, 
+                p.bottle, p.tap, p.cask, p.can, p.latitude, p.longitude,
+                GROUP_CONCAT(
+                    DISTINCT CONCAT(pu.beer_format, ' - ', b.brewery, ' ', b.name, ' (', b.style, ')')
+                    SEPARATOR ', '
+                ) as beer_details
+            FROM pubs p
+            LEFT JOIN pubs_updates pu ON p.pub_id = pu.pub_id
+            LEFT JOIN beers b ON pu.beer_id = b.beer_id
+        """
+        
+        # ... rest of existing search logic with WHERE clauses ...
+        
+    except Exception as e:
+        logger.error(f"Database error in search: {str(e)}")
+        return jsonify({'error': 'Database error occurred'}), 500
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+@app.route('/api/beer_details/<int:beer_id>', methods=['GET'])
+def get_beer_details(beer_id):
+    """Get full details for a specific beer"""
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        cursor.execute("""
+            SELECT beer_id, brewery, name, style, abv, category, vegan_status, created_at
+            FROM beers 
+            WHERE beer_id = %s
+        """, (beer_id,))
+        
+        beer = cursor.fetchone()
+        
+        if not beer:
+            return jsonify({'error': 'Beer not found'}), 404
+            
+        return jsonify(beer)
+        
+    except Exception as e:
+        logger.error(f"Error fetching beer details: {str(e)}")
+        return jsonify({'error': 'Database error'}), 500
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+def send_validation_email(pending_id, data):
+    """Enhanced email with better new beer handling"""
+    try:
+        # ... existing email config ...
+        
+        if data.get('beer_id'):
+            # Existing beer
+            body = f"""
+🍺 EXISTING BEER REPORT
+
+Pending ID: {pending_id}
+Pub ID: {data['pub_id']}
+Beer ID: {data['beer_id']} (existing in database)
+Format: {data['beer_format']}
+
+Submitted by: {data.get('name', 'Anonymous')} ({data.get('email', 'No email')})
+Notes: {data.get('notes', 'None')}
+
+✅ Quick approve - just creates pub→beer link!
+
+Review: https://coeliacslikebeer.co.uk/admin/pending_updates
+            """
+        else:
+            # New beer - will get auto-generated beer_id
+            body = f"""
+🆕 NEW BEER SUGGESTION
+
+Pending ID: {pending_id}
+Pub ID: {data['pub_id']}
+Format: {data['beer_format']}
+
+NEW BEER (will auto-generate beer_id):
+Brewery: {data.get('brewery', 'Not specified')}
+Beer Name: {data.get('beer_name', 'Not specified')}
+Style: {data.get('style', 'Not specified')}
+ABV: {data.get('abv', 'Not specified')}%
+Vegan: {data.get('vegan_status', 'Unknown')}
+Category: {data.get('category', 'gluten_removed')}
+
+Submitted by: {data.get('name', 'Anonymous')} ({data.get('email', 'No email')})
+Notes: {data.get('notes', 'None')}
+
+📝 Approve to create new beer + pub link!
+
+Review: https://coeliacslikebeer.co.uk/admin/pending_updates
+            """
+        
+        # ... rest of email sending code ...
+        
+    except Exception as e:
+        logger.error(f"Failed to send validation email: {str(e)}")
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     debug = os.environ.get('FLASK_ENV') == 'development'
