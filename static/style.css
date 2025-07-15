@@ -1701,18 +1701,18 @@ button, .btn-base {
     
     .search-actions {
         flex-direction: column;
-        gap: 8px;
+        gap: 12px;
     }
     
     .search-btn,
     .map-control-btn {
         width: 100%;
-        padding: 14px;
-        font-size: 15px;
-        min-height: 48px;
+        padding: 16px;
+        font-size: 16px;
+        min-height: 52px;
         border-radius: 25px !important;
         border: none !important;
-        margin-bottom: 8px;
+        margin-bottom: 12px;
         box-sizing: border-box;
     }
 
