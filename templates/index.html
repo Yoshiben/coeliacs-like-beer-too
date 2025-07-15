@@ -2350,8 +2350,13 @@
                     if (pub.latitude && pub.longitude) {
                         smartShowMap();
                         map.setView([pub.latitude, pub.longitude], 15);
+                        
+                        // Add split screen layout
+                        setTimeout(() => {
+                            createSplitScreenLayout(pub.pub_id);
+                        }, 500);
                     }
-                    
+                                        
                     currentQuery = '';
                     currentSearchType = 'all';
                     currentGfOnly = false;
@@ -3699,6 +3704,10 @@
                         div.textContent = `${pub.name}, ${pub.address} (${pub.postcode})`;
                         div.addEventListener('click', () => {
                             clearSearch();
+                            
+                            // Show results section first
+                            showResultsSection();
+                            
                             searchSpecificPub(pub.pub_id);
                             suggestions.style.display = 'none';
                         });
