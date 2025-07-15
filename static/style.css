@@ -2092,15 +2092,13 @@ button, .btn-base {
     min-height: 40px; /* Smaller minimum height */
 }
 
-@media (max-width: 768px) {
-    .split-action-bar {
-        padding: 10px 15px;
-        gap: 8px;
-    }
-    
-    .split-action-bar .pub-action-btn {
-        padding: 12px 15px;
-        font-size: 14px;
-        min-height: 45px;
-    }
+.find-on-map-btn {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: white;
+}
+
+.find-on-map-btn:hover {
+    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
 }
