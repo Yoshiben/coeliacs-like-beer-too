@@ -3133,66 +3133,91 @@
             console.log(`✅ Converted beer name to dropdown with ${beers.length} options`);
         }
         
-        // NEW - Handle beer name selection and auto-populate style
         function handleBeerNameSelection(selectElement) {
             const selectedOption = selectElement.options[selectElement.selectedIndex];
             const beerStyleInput = document.getElementById('reportBeerStyle');
             
             if (!selectedOption || !beerStyleInput) return;
             
+            // Clear all previous classes
+            beerStyleInput.classList.remove('beer-style-locked', 'beer-style-editable', 'beer-style-disabled');
+            
             if (selectedOption.value === 'NEW_BEER') {
-                // Clear style and allow manual entry
+                // NEW BEER - Allow manual entry
                 beerStyleInput.value = '';
                 beerStyleInput.placeholder = 'Enter beer style (IPA, Lager, etc.)';
                 beerStyleInput.disabled = false;
+                beerStyleInput.readOnly = false;
+                beerStyleInput.classList.add('beer-style-editable');
+                
+                // Add visual indicator
+                addStyleIndicator('🆕 New beer - enter style manually', 'new');
                 
                 console.log('🆕 New beer selected - manual style entry enabled');
                 
             } else if (selectedOption.value && selectedOption.value !== '') {
-                // Auto-populate with selected beer's style
-                const style = selectedOption.dataset.style || '';
+                // EXISTING BEER - Lock the style field
+                const style = selectedOption.getAttribute('data-style') || '';
                 beerStyleInput.value = style;
-                beerStyleInput.placeholder = 'Style auto-populated';
-                
-                // Make style field read-only but allow editing if needed
+                beerStyleInput.placeholder = 'Style locked for existing beer';
                 beerStyleInput.disabled = false;
-                beerStyleInput.style.backgroundColor = '#f0f8ff'; // Light blue to show it's auto-filled
+                beerStyleInput.readOnly = true;
+                beerStyleInput.classList.add('beer-style-locked');
                 
-                console.log(`✅ Auto-populated style: ${style}`);
+                // Add visual indicator
+                addStyleIndicator('🔒 Style locked for existing beer', 'locked');
                 
-                // Optional: Show additional beer info
+                console.log(`🔒 Style locked: ${style} (existing beer)`);
+                
+                // Show beer info
                 showBeerInfo(selectedOption);
                 
             } else {
-                // No selection - clear style
+                // NO SELECTION - Clear and disable
                 beerStyleInput.value = '';
                 beerStyleInput.placeholder = 'Select a beer first';
-                beerStyleInput.style.backgroundColor = '';
                 beerStyleInput.disabled = true;
+                beerStyleInput.readOnly = false;
+                beerStyleInput.classList.add('beer-style-disabled');
+                
+                // Remove indicator
+                removeStyleIndicator();
             }
         }
         
-        // NEW - Show additional beer information
-        function showBeerInfo(selectedOption) {
-            const beerName = selectedOption.dataset.beerName;
-            const abv = selectedOption.dataset.abv;
-            const veganStatus = selectedOption.dataset.veganStatus;
-            const glutenStatus = selectedOption.dataset.glutenStatus;
+        // REPLACE - Clean visual indicator function
+        function addStyleIndicator(message, type) {
+            // Remove existing indicator
+            removeStyleIndicator();
             
-            // Find a place to show this info (maybe near the beer name)
+            const beerStyleInput = document.getElementById('reportBeerStyle');
+            if (!beerStyleInput) return;
+            
+            // Create indicator element with CSS classes
+            const indicator = document.createElement('div');
+            indicator.id = 'beer-style-indicator';
+            indicator.className = `beer-style-indicator ${type}`;
+            indicator.textContent = message;
+            
+            // Insert after beer style input
+            beerStyleInput.parentNode.insertBefore(indicator, beerStyleInput.nextSibling);
+        }
+        
+        // REPLACE - Clean beer info display
+        function showBeerInfo(selectedOption) {
+            const beerName = selectedOption.getAttribute('data-beer-name') || selectedOption.textContent.split(' (')[0];
+            const abv = selectedOption.getAttribute('data-abv') || 'Unknown';
+            const veganStatus = selectedOption.getAttribute('data-vegan') || 'Unknown';
+            const glutenStatus = selectedOption.getAttribute('data-gluten') || 'Unknown';
+            const style = selectedOption.getAttribute('data-style') || 'Unknown';
+            
+            // Find or create info div
             let infoDiv = document.getElementById('selected-beer-info');
             
             if (!infoDiv) {
                 infoDiv = document.createElement('div');
                 infoDiv.id = 'selected-beer-info';
-                infoDiv.style.cssText = `
-                    margin-top: 8px;
-                    padding: 10px;
-                    background: rgba(102, 126, 234, 0.1);
-                    border-radius: 8px;
-                    font-size: 13px;
-                    border-left: 3px solid #667eea;
-                `;
+                infoDiv.className = 'selected-beer-info';
                 
                 // Insert after beer name select
                 const beerNameSelect = document.getElementById('reportBeerName');
@@ -3200,16 +3225,20 @@
             }
             
             infoDiv.innerHTML = `
-                <strong>📊 Selected Beer Info:</strong><br>
-                🍺 ABV: ${abv}%<br>
+                <div class="beer-info-header">
+                    <strong>📊 Selected Beer Info:</strong>
+                    <span class="style-locked-badge">STYLE LOCKED</span>
+                </div>
+                🍺 Style: <strong>${style}</strong> (cannot be changed)<br>
+                📊 ABV: ${abv}%<br>
                 🌱 Vegan: ${veganStatus}<br>
                 ⚗️ Gluten Status: ${glutenStatus.replace('_', ' ')}
             `;
             
-            console.log(`📊 Showing info for: ${beerName}`);
+            console.log(`📊 Showing locked info for: ${beerName}`);
         }
         
-        // NEW - Clear beer name dropdown and revert to input
+        // REPLACE - Clean clear function
         function clearBeerNameDropdown() {
             const beerNameSelect = document.getElementById('reportBeerName');
             if (!beerNameSelect || beerNameSelect.tagName !== 'SELECT') return;
@@ -3220,7 +3249,6 @@
             beerNameInput.id = 'reportBeerName';
             beerNameInput.name = beerNameSelect.name;
             beerNameInput.className = beerNameSelect.className.replace('beer-name-select-report', '');
-            beerNameInput.style.cssText = beerNameSelect.style.cssText;
             beerNameInput.placeholder = 'Beer name';
             
             // Replace select with input
@@ -3232,17 +3260,31 @@
                 infoDiv.remove();
             }
             
-            // Reset beer style
+            // Remove style indicator
+            removeStyleIndicator();
+            
+            // Reset beer style to clean state
             const beerStyleInput = document.getElementById('reportBeerStyle');
             if (beerStyleInput) {
                 beerStyleInput.value = '';
                 beerStyleInput.placeholder = 'Beer style';
-                beerStyleInput.style.backgroundColor = '';
                 beerStyleInput.disabled = false;
+                beerStyleInput.readOnly = false;
+                beerStyleInput.classList.remove('beer-style-locked', 'beer-style-editable', 'beer-style-disabled');
             }
             
-            console.log('🧹 Cleared beer name dropdown');
+            console.log('🧹 Cleared beer name dropdown and unlocked style');
         }
+
+        // UNCHANGED - Simple remove function
+        function removeStyleIndicator() {
+            const existing = document.getElementById('beer-style-indicator');
+            if (existing) {
+                existing.remove();
+            }
+        }
+        
+            console.log('🎨 Clean beer style system loaded (CSS classes, no inline styles)!');
         
         // Setup beer name auto-suggestions
         function setupBeerNameSuggestions(beers) {
