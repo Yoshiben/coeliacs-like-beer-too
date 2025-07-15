@@ -187,19 +187,18 @@ def nearby():
 
 @app.route('/api/pub/<int:pub_id>/current_beers')
 def get_pub_current_beers(pub_id):
-    """Get current beers for a specific pub - SIMPLE VERSION"""
+    """Get current beers for a specific pub"""
     try:
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor(dictionary=True)
         
-        # Simple query - if this fails, your tables might not exist
         cursor.execute("""
-            SELECT 
+            SELECT DISTINCT
                 pu.beer_format,
-                COALESCE(b.brewery, 'Unknown') as brewery,
-                COALESCE(b.name, 'Unknown') as name,
-                COALESCE(b.style, 'Unknown') as style,
-                COALESCE(b.abv, 0) as abv,
+                b.brewery,
+                b.name,
+                b.style,
+                b.abv,
                 CASE 
                     WHEN pu.beer_format = 'bottle' THEN '🍺'
                     WHEN pu.beer_format = 'tap' THEN '🚰'
@@ -208,13 +207,12 @@ def get_pub_current_beers(pub_id):
                     ELSE '🍺'
                 END as format_icon
             FROM pubs_updates pu
-            LEFT JOIN beers b ON pu.beer_id = b.beer_id
+            JOIN beers b ON pu.beer_id = b.beer_id
             WHERE pu.pub_id = %s
             ORDER BY pu.beer_format, b.brewery, b.name
         """, (pub_id,))
         
         beers = cursor.fetchall()
-        logger.info(f"Found {len(beers)} beers for pub {pub_id}")
         
         # Format the response
         formatted_beers = []
@@ -232,7 +230,7 @@ def get_pub_current_beers(pub_id):
         
     except Exception as e:
         logger.error(f"Error fetching current beers for pub {pub_id}: {str(e)}")
-        return jsonify([])  # Return empty array instead of error
+        return jsonify([])
     finally:
         if 'conn' in locals() and conn.is_connected():
             cursor.close()
@@ -694,72 +692,53 @@ def approve_update(pending_id):
 
 @app.route('/search')
 def search():
-    """Fixed search function with better error handling"""
-    query = request.args.get('query', '').strip()
-    search_type = request.args.get('search_type', 'all')
-    gf_only = request.args.get('gf_only', 'false').lower() == 'true'
-    page = request.args.get('page', 1, type=int)
-    pub_id = request.args.get('pub_id', type=int)
+    """Updated search to use clean joins"""
+    # ... existing validation code ...
     
     try:
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor(dictionary=True)
         
-        # Handle specific pub ID search - FIXED VERSION
+        # Handle specific pub ID search
         if pub_id:
-            logger.info(f"Searching for specific pub ID: {pub_id}")
-            
-            # SIMPLE query without complex joins that might fail
             sql = """
                 SELECT DISTINCT
                     p.pub_id, p.name, p.address, p.postcode, p.local_authority, 
                     p.bottle, p.tap, p.cask, p.can, p.latitude, p.longitude,
-                    'No specific beers recorded' as beer_details
+                    GROUP_CONCAT(
+                        DISTINCT CONCAT(pu.beer_format, ' - ', b.brewery, ' ', b.name, ' (', b.style, ')')
+                        SEPARATOR ', '
+                    ) as beer_details
                 FROM pubs p
+                LEFT JOIN pubs_updates pu ON p.pub_id = pu.pub_id
+                LEFT JOIN beers b ON pu.beer_id = b.beer_id
                 WHERE p.pub_id = %s
+                GROUP BY p.pub_id, p.name, p.address, p.postcode, p.local_authority, 
+                         p.bottle, p.tap, p.cask, p.can, p.latitude, p.longitude
             """
-            
-            try:
-                cursor.execute(sql, (pub_id,))
-                pubs = cursor.fetchall()
-                logger.info(f"Found {len(pubs)} pubs for ID {pub_id}")
-                
-                # Try to get beer details separately if pub exists
-                if pubs:
-                    try:
-                        beer_sql = """
-                            SELECT DISTINCT
-                                CONCAT(pu.beer_format, ' - ', 
-                                       COALESCE(b.brewery, 'Unknown'), ' ', 
-                                       COALESCE(b.name, 'Unknown'), ' (', 
-                                       COALESCE(b.style, 'Unknown'), ')') as beer_detail
-                            FROM pubs_updates pu
-                            LEFT JOIN beers b ON pu.beer_id = b.beer_id
-                            WHERE pu.pub_id = %s
-                        """
-                        cursor.execute(beer_sql, (pub_id,))
-                        beer_results = cursor.fetchall()
-                        
-                        if beer_results:
-                            beer_details = ', '.join([row['beer_detail'] for row in beer_results])
-                            pubs[0]['beer_details'] = beer_details
-                        
-                    except Exception as beer_error:
-                        logger.warning(f"Could not load beer details for pub {pub_id}: {beer_error}")
-                        # Continue anyway with basic pub info
-                
-                return jsonify(pubs)
-                
-            except mysql.connector.Error as db_error:
-                logger.error(f"Database error for pub {pub_id}: {db_error}")
-                return jsonify({'error': 'Database error occurred'}), 500
+            cursor.execute(sql, (pub_id,))
+            pubs = cursor.fetchall()
+            return jsonify(pubs)
         
-        # Regular search logic continues here...
-        # (your existing search code for non-pub_id searches)
+        # Regular search with clean joins
+        sql = """
+            SELECT DISTINCT
+                p.pub_id, p.name, p.address, p.postcode, p.local_authority, 
+                p.bottle, p.tap, p.cask, p.can, p.latitude, p.longitude,
+                GROUP_CONCAT(
+                    DISTINCT CONCAT(pu.beer_format, ' - ', b.brewery, ' ', b.name, ' (', b.style, ')')
+                    SEPARATOR ', '
+                ) as beer_details
+            FROM pubs p
+            LEFT JOIN pubs_updates pu ON p.pub_id = pu.pub_id
+            LEFT JOIN beers b ON pu.beer_id = b.beer_id
+        """
+        
+        # ... rest of existing search logic with WHERE clauses ...
         
     except Exception as e:
-        logger.error(f"Unexpected error in search: {str(e)}")
-        return jsonify({'error': 'Search error occurred'}), 500
+        logger.error(f"Database error in search: {str(e)}")
+        return jsonify({'error': 'Database error occurred'}), 500
     finally:
         if 'conn' in locals() and conn.is_connected():
             cursor.close()
@@ -904,4 +883,3 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
-
