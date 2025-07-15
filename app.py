@@ -736,29 +736,6 @@ def get_brewery_beers(brewery_name):
             cursor.close()
             conn.close()
 
-@app.route('/api/submit_beer_update', methods=['POST'])
-def submit_beer_update():
-    """Submit beer update for validation"""
-    try:
-        data = request.get_json()
-        
-        # Validation
-        required_fields = ['beer_format']
-        for field in required_fields:
-            if field not in data:
-                return jsonify({'error': f'Missing required field: {field}'}), 400
-        
-        # For now, just return success (you can implement full validation later)
-        return jsonify({
-            'message': 'Beer update received successfully',
-            'pending_id': 'temp_123',
-            'will_create_new_beer': True
-        })
-        
-    except Exception as e:
-        logger.error(f"Error submitting beer update: {str(e)}")
-        return jsonify({'error': 'Submission failed'}), 500
-
 @app.route('/api/beer_details/<int:beer_id>', methods=['GET'])
 def get_beer_details(beer_id):
     """Get full details for a specific beer"""
