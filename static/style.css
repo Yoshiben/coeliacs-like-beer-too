@@ -4767,28 +4767,36 @@ body.modal-open #results-section {
     overflow: visible; /* Allow dropdown to show outside */
 }
 
-/* Fix mobile specific z-index issues */
+/* Remove the old mobile CSS and replace with this: */
 @media (max-width: 768px) {
     #suggestions {
         left: 15px;
         right: 15px;
-        z-index: 10005; /* Even higher on mobile */
+        z-index: 10005; /* High z-index */
         max-height: 280px;
         box-shadow: 0 12px 40px rgba(0,0,0,0.2);
-        position: fixed; /* Use fixed positioning on mobile */
-        top: auto; /* Let it calculate position */
+        position: absolute; /* CHANGED: back to absolute, not fixed */
+        top: 100%; /* Position right below input */
+        margin-top: 5px;
     }
     
-    /* Ensure input container has relative positioning */
+    /* Ensure the search input container has relative positioning */
     .search-row {
         position: relative;
-        z-index: 1;
+        z-index: 100; /* Higher than buttons */
     }
     
-    /* Lower z-index for buttons so dropdown appears above */
+    /* Make sure the search section allows overflow */
+    .search-section {
+        position: relative;
+        overflow: visible !important; /* Force visible overflow */
+        z-index: 100;
+    }
+    
+    /* Lower z-index for buttons */
     .search-actions {
         position: relative;
-        z-index: 1; /* Lower than suggestions */
+        z-index: 1; /* Much lower than suggestions */
     }
     
     .search-btn,
@@ -4797,30 +4805,38 @@ body.modal-open #results-section {
         z-index: 1; /* Lower than suggestions */
     }
     
-    /* Fix any conflicting z-index from other elements */
-    .hero-section,
-    .features-section,
-    .activity-section {
-        z-index: 1;
+    /* Make dropdown items have larger touch targets */
+    #suggestions div {
+        padding: 16px 18px;
+        font-size: 15px;
+        line-height: 1.4;
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        background: white;
+        position: relative;
+        z-index: 10006; /* Higher than container */
+    }
+    
+    /* Ensure input field doesn't interfere */
+    .search-input,
+    #searchInput {
+        position: relative;
+        z-index: 50; /* Between buttons and suggestions */
     }
 }
 
-/* Specific fix for the input field container */
-.search-input,
-#searchInput {
+/* ================================
+   ADDITIONAL FIX: Ensure parent containers don't clip
+   ================================ */
+.search-grid {
     position: relative;
-    z-index: 2; /* Higher than buttons, lower than suggestions */
+    overflow: visible !important;
 }
 
-/* Make sure dropdown items are clickable */
-#suggestions div {
+/* Make sure hero section doesn't interfere */
+.hero-section {
     position: relative;
-    z-index: 10001;
-    padding: 16px 18px; /* Larger touch targets on mobile */
-    cursor: pointer;
-    border-bottom: 1px solid #f0f0f0;
-    background: white;
-    min-height: 48px; /* Minimum touch target size */
-    display: flex;
-    align-items: center;
+    z-index: 1;
+    overflow: visible;
 }
