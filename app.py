@@ -180,6 +180,67 @@ def nearby():
             cursor.close()
             conn.close()
 
+# ====================================
+# ADD THIS TO YOUR app.py FILE
+# NEW ROUTE FOR CURRENT PUB BEERS
+# ====================================
+
+@app.route('/api/pub/<int:pub_id>/current_beers')
+def get_pub_current_beers(pub_id):
+    """Get current beers for a specific pub"""
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        cursor.execute("""
+            SELECT DISTINCT
+                pu.beer_format,
+                b.brewery,
+                b.name,
+                b.style,
+                b.abv,
+                CASE 
+                    WHEN pu.beer_format = 'bottle' THEN '🍺'
+                    WHEN pu.beer_format = 'tap' THEN '🚰'
+                    WHEN pu.beer_format = 'cask' THEN '🛢️'
+                    WHEN pu.beer_format = 'can' THEN '🥫'
+                    ELSE '🍺'
+                END as format_icon
+            FROM pubs_updates pu
+            JOIN beers b ON pu.beer_id = b.beer_id
+            WHERE pu.pub_id = %s
+            ORDER BY pu.beer_format, b.brewery, b.name
+        """, (pub_id,))
+        
+        beers = cursor.fetchall()
+        
+        # Format the response
+        formatted_beers = []
+        for beer in beers:
+            formatted_beers.append({
+                'format': beer['beer_format'].title(),
+                'format_icon': beer['format_icon'],
+                'brewery': beer['brewery'],
+                'name': beer['name'],
+                'style': beer['style'],
+                'abv': beer['abv']
+            })
+        
+        return jsonify(formatted_beers)
+        
+    except Exception as e:
+        logger.error(f"Error fetching current beers for pub {pub_id}: {str(e)}")
+        return jsonify([])
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+# ====================================
+# PASTE THIS ROUTE ANYWHERE IN YOUR app.py
+# (BEFORE the if __name__ == '__main__': line)
+# ====================================
+
 @app.route('/update', methods=['POST'])
 def update():
     try:
