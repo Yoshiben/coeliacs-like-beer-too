@@ -1530,6 +1530,13 @@
         // ENHANCED findOnMap function - Replace in your JavaScript
         // Also update your findOnMap function for better centering:
         // REPLACE: Enhanced findOnMap function with better scrolling and no redundant button
+        // ====================================
+        // FIX THE UX - Make it beautiful again
+        // ====================================
+        
+        // The issue is probably in your findOnMap function
+        // REPLACE your existing findOnMap function with this:
+        
         function findOnMap(lat, lng, pubName, postcode, pubId) {
             trackPubView(pubName);
             
@@ -1564,7 +1571,7 @@
                         markerElement.style.animation = 'pulse 2s infinite';
                     }
                     
-                    // OPTION 1: No popup button - details show immediately
+                    // Clean popup without extra button
                     window.currentHighlightMarker.bindPopup(`
                         <div style="text-align: center; padding: 8px;">
                             <strong style="color: #2d3748; font-size: 16px;">${pubName}</strong>
@@ -1573,18 +1580,15 @@
                         </div>
                     `).openPopup();
                     
-                    // CREATE SPLIT SCREEN LAYOUT immediately
+                    // CREATE BEAUTIFUL SPLIT SCREEN immediately
                     createSplitScreenLayout(pubId);
                     
-                    // BETTER SCROLLING: Show both map and pub details properly
+                    // PERFECT SCROLLING: Show map at top, details below
                     setTimeout(() => {
                         const mapContainer = document.getElementById('mapContainer');
-                        const splitContainer = document.getElementById('split-screen-container');
                         
-                        if (mapContainer && splitContainer) {
+                        if (mapContainer) {
                             const mapRect = mapContainer.getBoundingClientRect();
-                            
-                            // Position map at top of viewport so user can scroll down to see all pub details
                             const optimalScrollY = window.pageYOffset + mapRect.top - 20;
                             
                             window.scrollTo({ 
@@ -1592,15 +1596,11 @@
                                 behavior: 'smooth' 
                             });
                             
-                            // Add visual hint that there's content below
-                            setTimeout(() => {
-                                showSuccessToast('📍 Map shown above - scroll down for full pub details!');
-                            }, 1000);
+                            showSuccessToast('📍 Map and pub details loaded!');
                         }
                     }, 300);
                     
-                    showSuccessToast(`📍 Found ${pubName}! Details shown below map.`);
-                    
+                    // Clean up highlight after 8 seconds
                     setTimeout(() => {
                         if (window.currentHighlightMarker) {
                             map.removeLayer(window.currentHighlightMarker);
@@ -1614,6 +1614,8 @@
             }
         }
 
+// Make sure your createSplitScreenLayout function is working
+// This should create the beautiful layout below the map
         // ADD: Homepage reset function
         function resetToHomepage() {
             // Clear search inputs
