@@ -1322,7 +1322,7 @@
             // Clear existing markers
             pubMarkers.forEach(marker => map.removeLayer(marker));
             pubMarkers = [];
-
+        
             pubs.forEach(pub => {
                 if (pub.latitude && pub.longitude) {
                     const hasGF = pub.bottle || pub.tap || pub.cask || pub.can;
@@ -1336,7 +1336,7 @@
                         opacity: 1,
                         fillOpacity: 0.8
                     }).addTo(map);
-
+        
                     let popupContent = `<strong>${pub.name}</strong><br>`;
                     popupContent += `${pub.address}<br>`;
                     if (pub.distance !== undefined) {
@@ -1349,15 +1349,23 @@
                         if (pub.tap) gfOptions.push('Tap');
                         if (pub.cask) gfOptions.push('Cask');
                         if (pub.can) gfOptions.push('Can');
-                        popupContent += `<br><strong>GF Options:</strong> ${gfOptions.join(', ')}`;
+                        popupContent += `<br><strong>GF Options:</strong> ${gfOptions.join(', ')}<br>`;
+                        popupContent += `<button onclick="showPubDetailsFromMap(${pub.pub_id})" style="margin-top: 8px; padding: 6px 12px; background: var(--primary-gradient); color: white; border: none; border-radius: 15px; cursor: pointer; font-size: 12px;">View Details</button>`;
                     } else {
                         popupContent += '<br><em>No GF options recorded</em>';
                     }
-
+        
                     marker.bindPopup(popupContent);
                     pubMarkers.push(marker);
                 }
             });
+        }
+        
+        // NEW: Function to show pub details from map popup
+        function showPubDetailsFromMap(pubId) {
+            // First, we need to get the pub data
+            searchSpecificPub(pubId);
+            trackEvent('view_pub_from_map', 'Map Interaction', `pub_${pubId}`);
         }
 
         // Smart coordinate modal functions
@@ -1658,7 +1666,7 @@
             trackEvent('reset_homepage', 'Navigation', 'homepage_reset');
         }
 
-        // ADD: New function - create split screen layout
+        // UPDATE: Enhanced createSplitScreenLayout function with better navigation
         function createSplitScreenLayout(selectedPubId) {
             const mapContainer = document.getElementById('mapContainer');
             const resultsSection = document.getElementById('results-section');
@@ -1683,10 +1691,15 @@
             if (selectedPub) {
                 splitContainer.innerHTML = `
                     <div class="split-screen-header">
-                        <button onclick="goHome()" class="home-btn" title="Back to Home">
-                            🏠 Home
-                        </button>
                         <h2 class="section-title">📍 Pub Details</h2>
+                        <div class="split-screen-nav">
+                            <button onclick="goBackToResults()" class="back-to-results-btn" title="Back to Search Results">
+                                ← Back to Results
+                            </button>
+                            <button onclick="goHome()" class="home-btn" title="Back to Home">
+                                🏠 Home
+                            </button>
+                        </div>
                     </div>
                     <div class="split-pub-details">
                         ${createSinglePubDisplay(selectedPub)}
@@ -1694,6 +1707,89 @@
                 `;
                 splitContainer.style.display = 'block';
             }
+        }
+        
+        // NEW: Function to go back to results
+        function goBackToResults() {
+            const splitContainer = document.getElementById('split-screen-container');
+            const resultsSection = document.getElementById('results-section');
+            
+            if (splitContainer) {
+                splitContainer.style.display = 'none';
+            }
+            
+            if (resultsSection) {
+                resultsSection.style.display = 'block';
+                resultsSection.scrollIntoView({ behavior: 'smooth' });
+            }
+            
+            trackEvent('back_to_results', 'Navigation', 'split_screen');
+        }
+        
+        // UPDATE: Enhanced createSinglePubDisplay function
+        function createSinglePubDisplay(pub) {
+            return `
+                <div class="single-pub-card">
+                    <div class="pub-header">
+                        <div class="pub-title-section">
+                            <h3>${pub.name}</h3>
+                            <div class="pub-address">${pub.address}, ${pub.postcode}</div>
+                            <div class="pub-authority">${pub.local_authority}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="pub-beer-section">
+                        <h4>🍺 Available Gluten Free Beers</h4>
+                        <div class="pub-beer-details">
+                            ${pub.beer_details}
+                        </div>
+                    </div>
+                    
+                    <div class="pub-actions">
+                        <button onclick="searchForPub('${pub.name.replace(/'/g, "\\'")}', '${pub.postcode}')" 
+                                class="pub-action-btn search-btn">
+                            🔍 Find Online
+                        </button>
+                        <button onclick="openInGoogleMaps(null, null, '${pub.name.replace(/'/g, "\\'")}', '${pub.address}')" 
+                                class="pub-action-btn directions-btn">
+                            🧭 Get Directions
+                        </button>
+                        <button onclick="openReportModalWithPub('${pub.name.replace(/'/g, "\\'")}', '${pub.address}', '${pub.postcode}', ${pub.pub_id})" 
+                                class="pub-action-btn update-btn">
+                            📝 Report GF Beer
+                        </button>
+                    </div>
+                    
+                    <div class="update-form" id="split-form-${pub.pub_id}" style="display: none;">
+                        ${createUpdateFormContent(pub.pub_id)}
+                    </div>
+                </div>
+            `;
+        }
+
+        // NEW: Function to open report modal with pre-populated pub data
+        function openReportModalWithPub(pubName, address, postcode, pubId) {
+            // Set the selected pub data
+            selectedPubData = {
+                pub_id: pubId,
+                name: pubName,
+                address: address,
+                postcode: postcode
+            };
+            
+            // Open the modal
+            document.getElementById('reportModal').style.display = 'block';
+            trackEvent('open_report_modal_prepopulated', 'Modal', pubName);
+            
+            // Pre-populate the pub search field and show selected pub
+            setTimeout(() => {
+                initializeReportModalDropdowns();
+                document.getElementById('reportPubSearch').value = pubName;
+                selectExistingPub(selectedPubData);
+                
+                // Focus on the beer format field instead
+                document.getElementById('reportFormat').focus();
+            }, 100);
         }
         
         // ADD: New function - get current pub data from the last search
@@ -1722,44 +1818,7 @@
             return null;
         }
         
-        // UPDATE: Fixed createSinglePubDisplay function with working update button
-        function createSinglePubDisplay(pub) {
-            return `
-                <div class="single-pub-card">
-                    <div class="pub-header">
-                        <h3>${pub.name}</h3>
-                        <div class="pub-address">${pub.address}, ${pub.postcode}</div>
-                        <div class="pub-authority">${pub.local_authority}</div>
-                    </div>
-                    
-                    <div class="pub-beer-section">
-                        <h4>🍺 Available Gluten Free Beers</h4>
-                        <div class="pub-beer-details">
-                            ${pub.beer_details}
-                        </div>
-                    </div>
-                    
-                    <div class="pub-actions">
-                        <button onclick="searchForPub('${pub.name.replace(/'/g, "\\'")}', '${pub.postcode}')" 
-                                class="pub-action-btn search-btn">
-                            🔍 Find Online
-                        </button>
-                        <button onclick="openInGoogleMaps(null, null, '${pub.name.replace(/'/g, "\\'")}', '${pub.address}')" 
-                                class="pub-action-btn directions-btn">
-                            🧭 Get Directions
-                        </button>
-                        <button onclick="toggleSplitScreenUpdateForm(${pub.pub_id})" 
-                                class="pub-action-btn update-btn">
-                            📝 Update Info
-                        </button>
-                    </div>
-                    
-                    <div class="update-form" id="split-form-${pub.pub_id}" style="display: none;">
-                        ${createUpdateFormContent(pub.pub_id)}
-                    </div>
-                </div>
-            `;
-        }
+        
 
         // ADD: New function for split screen update form toggle
         function toggleSplitScreenUpdateForm(pubId) {
