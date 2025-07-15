@@ -4349,3 +4349,105 @@ body.modal-open #results-section {
 .report-modal .form-actions {
     position: relative !important;
 }
+
+/* ============================================================================
+   BEER STYLE LOCKING CSS CLASSES
+   ADD - Add these classes to your style.css
+   ============================================================================ */
+
+/* Beer style field states */
+.beer-style-locked {
+    background-color: #f8f9fa !important;
+    cursor: not-allowed !important;
+    border-color: #dc2626 !important;
+    border-width: 2px !important;
+}
+
+.beer-style-editable {
+    background-color: white !important;
+    cursor: text !important;
+    border-color: #10b981 !important;
+    border-width: 2px !important;
+}
+
+.beer-style-disabled {
+    background-color: #f3f4f6 !important;
+    cursor: not-allowed !important;
+    border-color: #9ca3af !important;
+}
+
+/* Style indicators */
+.beer-style-indicator {
+    margin-top: 4px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.beer-style-indicator.locked {
+    background: rgba(220, 38, 38, 0.1);
+    color: #dc2626;
+    border: 1px solid rgba(220, 38, 38, 0.2);
+}
+
+.beer-style-indicator.new {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+/* Selected beer info styling */
+.selected-beer-info {
+    margin: 8px 0;
+    padding: 12px;
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 8px;
+    font-size: 13px;
+    border-left: 3px solid #667eea;
+    position: relative;
+    z-index: 1;
+}
+
+.beer-info-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.style-locked-badge {
+    background: rgba(220, 38, 38, 0.1);
+    color: #dc2626;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .beer-style-indicator {
+        font-size: 11px;
+        padding: 5px 8px;
+    }
+    
+    .selected-beer-info {
+        font-size: 12px;
+        padding: 10px;
+    }
+    
+    .beer-info-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+    
+    .style-locked-badge {
+        font-size: 10px;
+        padding: 1px 4px;
+    }
+}
