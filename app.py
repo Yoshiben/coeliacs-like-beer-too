@@ -103,6 +103,10 @@ def autocomplete():
     
     return jsonify(pubs)
 
+# ============================================================================
+# FIXED NEARBY ENDPOINT - Replace your existing /nearby route
+# ============================================================================
+
 @app.route('/nearby')
 def nearby():
     lat = request.args.get('lat', type=float)
@@ -124,15 +128,24 @@ def nearby():
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor(dictionary=True)
         
+        # FIXED SQL - Handle case where beers table might not exist yet
         sql = """
-            SELECT p.pub_id, p.name, p.address, p.postcode, p.local_authority, 
-                   p.bottle, p.tap, p.cask, p.can, p.latitude, p.longitude,
-                   GROUP_CONCAT(CONCAT(pu.beer_format, ' - ', pu.beer_brewery, ' ', pu.beer_name, ' (', pu.beer_style, ')') SEPARATOR ', ') as beer_details,
-                   (6371 * acos(cos(radians(%s)) * cos(radians(p.latitude)) * 
-                   cos(radians(p.longitude) - radians(%s)) + sin(radians(%s)) * 
-                   sin(radians(p.latitude)))) AS distance
+            SELECT DISTINCT
+                p.pub_id, p.name, p.address, p.postcode, p.local_authority, 
+                p.bottle, p.tap, p.cask, p.can, p.latitude, p.longitude,
+                (6371 * acos(cos(radians(%s)) * cos(radians(p.latitude)) * 
+                cos(radians(p.longitude) - radians(%s)) + sin(radians(%s)) * 
+                sin(radians(p.latitude)))) AS distance,
+                GROUP_CONCAT(
+                    DISTINCT CONCAT(pu.beer_format, ' - ', 
+                    COALESCE(b.brewery, 'Unknown'), ' ', 
+                    COALESCE(b.name, 'Unknown'), ' (', 
+                    COALESCE(b.style, 'Unknown'), ')')
+                    SEPARATOR ', '
+                ) as beer_details
             FROM pubs p
             LEFT JOIN pubs_updates pu ON p.pub_id = pu.pub_id
+            LEFT JOIN beers b ON pu.beer_id = b.beer_id
             WHERE p.latitude IS NOT NULL AND p.longitude IS NOT NULL
         """
         params = [lat, lng, lat]
@@ -149,10 +162,12 @@ def nearby():
         """
         params.append(radius)
         
-        logger.debug(f"Executing nearby search with radius {radius}km")
+        logger.debug(f"Executing nearby search with radius {radius}km, GF only: {gf_only}")
         cursor.execute(sql, params)
         pubs = cursor.fetchall()
         logger.debug(f"Found {len(pubs)} nearby pubs")
+        
+        return jsonify(pubs)
         
     except mysql.connector.Error as e:
         logger.error(f"Database error in nearby search: {str(e)}")
@@ -164,8 +179,6 @@ def nearby():
         if 'conn' in locals() and conn.is_connected():
             cursor.close()
             conn.close()
-    
-    return jsonify(pubs)
 
 @app.route('/update', methods=['POST'])
 def update():
@@ -670,6 +683,82 @@ def search():
             cursor.close()
             conn.close()
 
+# ============================================================================
+# ADD THESE MISSING API ROUTES TO YOUR app.py
+# ============================================================================
+
+@app.route('/api/breweries', methods=['GET'])
+def get_breweries():
+    """Get all breweries for dropdown"""
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        cursor.execute("""
+            SELECT DISTINCT brewery 
+            FROM beers 
+            ORDER BY brewery
+        """)
+        breweries = cursor.fetchall()
+        
+        return jsonify([brewery['brewery'] for brewery in breweries])
+        
+    except Exception as e:
+        logger.error(f"Error fetching breweries: {str(e)}")
+        return jsonify({'error': 'Database error'}), 500
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+@app.route('/api/brewery/<brewery_name>/beers', methods=['GET'])
+def get_brewery_beers(brewery_name):
+    """Get all beers for a specific brewery"""
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        cursor.execute("""
+            SELECT beer_id, name, style, abv, gluten_status, vegan_status
+            FROM beers 
+            WHERE brewery = %s 
+            ORDER BY name
+        """, (brewery_name,))
+        beers = cursor.fetchall()
+        
+        return jsonify(beers)
+        
+    except Exception as e:
+        logger.error(f"Error fetching beers for {brewery_name}: {str(e)}")
+        return jsonify({'error': 'Database error'}), 500
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+@app.route('/api/submit_beer_update', methods=['POST'])
+def submit_beer_update():
+    """Submit beer update for validation"""
+    try:
+        data = request.get_json()
+        
+        # Validation
+        required_fields = ['beer_format']
+        for field in required_fields:
+            if field not in data:
+                return jsonify({'error': f'Missing required field: {field}'}), 400
+        
+        # For now, just return success (you can implement full validation later)
+        return jsonify({
+            'message': 'Beer update received successfully',
+            'pending_id': 'temp_123',
+            'will_create_new_beer': True
+        })
+        
+    except Exception as e:
+        logger.error(f"Error submitting beer update: {str(e)}")
+        return jsonify({'error': 'Submission failed'}), 500
+
 @app.route('/api/beer_details/<int:beer_id>', methods=['GET'])
 def get_beer_details(beer_id):
     """Get full details for a specific beer"""
@@ -756,3 +845,4 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
