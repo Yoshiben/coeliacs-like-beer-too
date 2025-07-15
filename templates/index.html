@@ -47,25 +47,26 @@
     </div>
 
     <!-- Search Section -->
+    <!-- Search Section -->
     <div class="search-section" id="search">
         <h2 class="section-title">🔍 Find Gluten Free Beer Near You</h2>
         <div class="search-grid">
             <div class="search-row">
-                <select id="searchType" class="search-type-dropdown">
+                <select id="searchType" class="search-type-dropdown" aria-label="Select search type: all, pub name, postcode, or local authority">
                     <option value="all">Search All</option>
                     <option value="name">Pub Name</option>
                     <option value="postcode">Postcode</option>
                     <option value="area">Local Authority</option>
                 </select>
-                <input type="text" id="searchInput" class="search-input" placeholder="Enter pub name, postcode, or local authority" onkeydown="if (event.key === 'Enter') searchPubs()">
-                <label class="gf-checkbox"><input type="checkbox" id="gfOnly"> Gluten Free Only</label>
+                <input type="text" id="searchInput" class="search-input" placeholder="Enter pub name, postcode, or local authority" onkeydown="if (event.key === 'Enter') searchPubs()" aria-label="Search input for pubs">
+                <label class="gf-checkbox"><input type="checkbox" id="gfOnly" aria-label="Filter to show only gluten-free pubs"> Gluten Free Only</label>
             </div>
             <div class="search-actions">
-                <button onclick="searchPubs()" class="search-btn">Search Pubs</button>
-                <button class="search-btn secondary" onclick="findNearbyPubs()">Pubs Near Me</button>
-                <button class="map-control-btn" id="toggleMapBtn" onclick="toggleMap()">🗺️ Show Map</button>
-                <button class="map-control-btn" onclick="centerOnLocation()">📍 My Location</button>
-                <button class="map-control-btn reset-btn" onclick="resetToHomepage()" title="Clear everything and start fresh">🏠 Reset</button>
+                <button onclick="searchPubs()" class="search-btn" aria-label="Search for pubs">Search Pubs</button>
+                <button class="search-btn secondary" onclick="findNearbyPubs()" aria-label="Find pubs near my current location">Pubs Near Me</button>
+                <button class="map-control-btn" id="toggleMapBtn" onclick="toggleMap()" aria-label="Toggle map visibility">🗺️ Show Map</button>
+                <button class="map-control-btn" onclick="centerOnLocation()" aria-label="Center map on my location">📍 My Location</button>
+                <button class="map-control-btn reset-btn" onclick="resetToHomepage()" title="Clear everything and start fresh" aria-label="Reset to homepage">🏠 Reset</button>
             </div>
         </div>
         <div id="suggestions"></div>
