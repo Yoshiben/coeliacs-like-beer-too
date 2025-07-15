@@ -3044,37 +3044,204 @@
             }
         }
 
-        // Handle brewery selection in report modal
+        // REPLACE - Enhanced brewery selection handler
         async function handleReportBreweryChange(selectedBrewery) {
             const beerNameInput = document.getElementById('reportBeerName');
             const beerStyleInput = document.getElementById('reportBeerStyle');
             
+            // Clear existing beer data
+            clearBeerNameDropdown();
+            clearBeerSuggestions();
+            
             if (!selectedBrewery) {
-                // Clear beer suggestions
-                clearBeerSuggestions();
                 return;
             }
             
             if (selectedBrewery === 'NEW_BREWERY') {
-                // Show new brewery fields (if you want to implement this)
                 console.log('🆕 New brewery selected');
-                clearBeerSuggestions();
                 return;
             }
             
-            // Load beers for selected brewery
+            // Load beers for selected brewery and convert to dropdown
             try {
+                showLoadingToast('Loading beers...');
+                
                 const response = await fetch(`/api/brewery/${encodeURIComponent(selectedBrewery)}/beers`);
                 if (response.ok) {
                     const beers = await response.json();
                     console.log(`📚 Loaded ${beers.length} beers for ${selectedBrewery}`);
                     
-                    // Enable beer name suggestions
-                    setupBeerNameSuggestions(beers);
+                    // Convert beer name input to dropdown
+                    convertBeerNameToDropdown(beers);
+                    
+                    hideLoadingToast();
+                } else {
+                    throw new Error('Failed to load beers');
                 }
             } catch (error) {
                 console.error('Error loading beers:', error);
+                hideLoadingToast();
+                showSuccessToast('Error loading beers for this brewery');
             }
+        }
+        
+        // NEW - Convert beer name input to dropdown
+        function convertBeerNameToDropdown(beers) {
+            const beerNameInput = document.getElementById('reportBeerName');
+            if (!beerNameInput) return;
+            
+            // Create new select element
+            const beerNameSelect = document.createElement('select');
+            beerNameSelect.id = 'reportBeerName';
+            beerNameSelect.name = beerNameInput.name;
+            beerNameSelect.className = 'beer-name-select-report';
+            beerNameSelect.style.cssText = beerNameInput.style.cssText;
+            
+            // Add default option
+            beerNameSelect.innerHTML = '<option value="">Select beer...</option>';
+            
+            // Add beer options
+            beers.forEach(beer => {
+                const option = document.createElement('option');
+                option.value = beer.beer_id;
+                option.textContent = `${beer.name} (${beer.style}, ${beer.abv}%)`;
+                
+                // Store beer data in option for later use
+                option.dataset.beerName = beer.name;
+                option.dataset.style = beer.style;
+                option.dataset.abv = beer.abv;
+                option.dataset.veganStatus = beer.vegan_status;
+                option.dataset.glutenStatus = beer.gluten_status;
+                
+                beerNameSelect.appendChild(option);
+            });
+            
+            // Add "New beer" option
+            const newOption = document.createElement('option');
+            newOption.value = 'NEW_BEER';
+            newOption.textContent = '🆕 Add new beer not listed';
+            beerNameSelect.appendChild(newOption);
+            
+            // Replace input with select
+            beerNameInput.parentNode.replaceChild(beerNameSelect, beerNameInput);
+            
+            // Add change event listener for auto-population
+            beerNameSelect.addEventListener('change', function() {
+                handleBeerNameSelection(this);
+            });
+            
+            console.log(`✅ Converted beer name to dropdown with ${beers.length} options`);
+        }
+        
+        // NEW - Handle beer name selection and auto-populate style
+        function handleBeerNameSelection(selectElement) {
+            const selectedOption = selectElement.options[selectElement.selectedIndex];
+            const beerStyleInput = document.getElementById('reportBeerStyle');
+            
+            if (!selectedOption || !beerStyleInput) return;
+            
+            if (selectedOption.value === 'NEW_BEER') {
+                // Clear style and allow manual entry
+                beerStyleInput.value = '';
+                beerStyleInput.placeholder = 'Enter beer style (IPA, Lager, etc.)';
+                beerStyleInput.disabled = false;
+                
+                console.log('🆕 New beer selected - manual style entry enabled');
+                
+            } else if (selectedOption.value && selectedOption.value !== '') {
+                // Auto-populate with selected beer's style
+                const style = selectedOption.dataset.style || '';
+                beerStyleInput.value = style;
+                beerStyleInput.placeholder = 'Style auto-populated';
+                
+                // Make style field read-only but allow editing if needed
+                beerStyleInput.disabled = false;
+                beerStyleInput.style.backgroundColor = '#f0f8ff'; // Light blue to show it's auto-filled
+                
+                console.log(`✅ Auto-populated style: ${style}`);
+                
+                // Optional: Show additional beer info
+                showBeerInfo(selectedOption);
+                
+            } else {
+                // No selection - clear style
+                beerStyleInput.value = '';
+                beerStyleInput.placeholder = 'Select a beer first';
+                beerStyleInput.style.backgroundColor = '';
+                beerStyleInput.disabled = true;
+            }
+        }
+        
+        // NEW - Show additional beer information
+        function showBeerInfo(selectedOption) {
+            const beerName = selectedOption.dataset.beerName;
+            const abv = selectedOption.dataset.abv;
+            const veganStatus = selectedOption.dataset.veganStatus;
+            const glutenStatus = selectedOption.dataset.glutenStatus;
+            
+            // Find a place to show this info (maybe near the beer name)
+            let infoDiv = document.getElementById('selected-beer-info');
+            
+            if (!infoDiv) {
+                infoDiv = document.createElement('div');
+                infoDiv.id = 'selected-beer-info';
+                infoDiv.style.cssText = `
+                    margin-top: 8px;
+                    padding: 10px;
+                    background: rgba(102, 126, 234, 0.1);
+                    border-radius: 8px;
+                    font-size: 13px;
+                    border-left: 3px solid #667eea;
+                `;
+                
+                // Insert after beer name select
+                const beerNameSelect = document.getElementById('reportBeerName');
+                beerNameSelect.parentNode.insertBefore(infoDiv, beerNameSelect.nextSibling);
+            }
+            
+            infoDiv.innerHTML = `
+                <strong>📊 Selected Beer Info:</strong><br>
+                🍺 ABV: ${abv}%<br>
+                🌱 Vegan: ${veganStatus}<br>
+                ⚗️ Gluten Status: ${glutenStatus.replace('_', ' ')}
+            `;
+            
+            console.log(`📊 Showing info for: ${beerName}`);
+        }
+        
+        // NEW - Clear beer name dropdown and revert to input
+        function clearBeerNameDropdown() {
+            const beerNameSelect = document.getElementById('reportBeerName');
+            if (!beerNameSelect || beerNameSelect.tagName !== 'SELECT') return;
+            
+            // Create new input element
+            const beerNameInput = document.createElement('input');
+            beerNameInput.type = 'text';
+            beerNameInput.id = 'reportBeerName';
+            beerNameInput.name = beerNameSelect.name;
+            beerNameInput.className = beerNameSelect.className.replace('beer-name-select-report', '');
+            beerNameInput.style.cssText = beerNameSelect.style.cssText;
+            beerNameInput.placeholder = 'Beer name';
+            
+            // Replace select with input
+            beerNameSelect.parentNode.replaceChild(beerNameInput, beerNameSelect);
+            
+            // Clear beer info
+            const infoDiv = document.getElementById('selected-beer-info');
+            if (infoDiv) {
+                infoDiv.remove();
+            }
+            
+            // Reset beer style
+            const beerStyleInput = document.getElementById('reportBeerStyle');
+            if (beerStyleInput) {
+                beerStyleInput.value = '';
+                beerStyleInput.placeholder = 'Beer style';
+                beerStyleInput.style.backgroundColor = '';
+                beerStyleInput.disabled = false;
+            }
+            
+            console.log('🧹 Cleared beer name dropdown');
         }
         
         // Setup beer name auto-suggestions
@@ -3219,76 +3386,110 @@
             AppState.save();
         }
 
-        // Enhanced form submission for report modal
-        document.getElementById('reportForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            showLoadingToast('Submitting report...');
-            
-            // Get form data
-            const brewerySelect = document.getElementById('reportBrewery');
-            const brewery = brewerySelect ? brewerySelect.value : '';
-            
-            const formData = {
-                // Pub data handled by existing code
-                existingPub: selectedPubData,
-                pubName: selectedPubData ? selectedPubData.name : document.getElementById('reportPubName')?.value,
-                address: selectedPubData ? selectedPubData.address : document.getElementById('reportAddress')?.value,
-                postcode: selectedPubData ? selectedPubData.postcode : document.getElementById('reportPostcode')?.value,
-                
-                // Beer data
-                format: document.getElementById('reportFormat').value,
-                brewery: brewery,
-                beerName: document.getElementById('reportBeerName').value || 'Unknown',
-                beerStyle: document.getElementById('reportBeerStyle').value || 'Unknown'
-            };
-            
-            // Validation
-            if (!formData.format) {
-                hideLoadingToast();
-                showSuccessToast('Please select a beer format.');
-                return;
-            }
-            
-            if (!formData.brewery) {
-                hideLoadingToast();
-                showSuccessToast('Please select a brewery.');
-                return;
-            }
-            
-            try {
-                // Submit using the new validation system
-                const response = await fetch('/api/submit_beer_update', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        pub_id: selectedPubData ? selectedPubData.pub_id : null,
-                        beer_format: formData.format,
-                        brewery: formData.brewery,
-                        beer_name: formData.beerName,
-                        style: formData.beerStyle,
-                        email: '',
-                        name: 'Anonymous Report'
-                    })
-                });
-                
-                if (response.ok) {
-                    const result = await response.json();
-                    hideLoadingToast();
-                    showSuccessToast('🎉 Beer report submitted for validation! We\'ll review it soon.');
-                    closeReportModal();
-                } else {
-                    throw new Error('Submission failed');
-                }
-                
-            } catch (error) {
-                hideLoadingToast();
-                showSuccessToast('Error submitting report. Please try again.');
-                console.error('Report submission error:', error);
-            }
+        / UPDATE - Enhanced form submission to handle beer selection
+document.getElementById('reportForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    showLoadingToast('Submitting report...');
+    
+    // Get form data
+    const brewerySelect = document.getElementById('reportBrewery');
+    const beerNameElement = document.getElementById('reportBeerName');
+    
+    // Determine if beer name is a select or input
+    const isDropdown = beerNameElement.tagName === 'SELECT';
+    
+    let beerData = {};
+    
+    if (isDropdown && beerNameElement.value && beerNameElement.value !== 'NEW_BEER') {
+        // Selected existing beer
+        const selectedOption = beerNameElement.options[beerNameElement.selectedIndex];
+        beerData = {
+            beer_id: parseInt(beerNameElement.value),
+            beer_name: selectedOption.dataset.beerName,
+            style: selectedOption.dataset.style,
+            is_existing_beer: true
+        };
+    } else {
+        // New beer or manual entry
+        beerData = {
+            beer_name: isDropdown ? '' : beerNameElement.value,
+            style: document.getElementById('reportBeerStyle').value,
+            is_existing_beer: false
+        };
+    }
+    
+    const formData = {
+        // Pub data
+        existingPub: selectedPubData,
+        pubName: selectedPubData ? selectedPubData.name : document.getElementById('reportPubName')?.value,
+        address: selectedPubData ? selectedPubData.address : document.getElementById('reportAddress')?.value,
+        postcode: selectedPubData ? selectedPubData.postcode : document.getElementById('reportPostcode')?.value,
+        
+        // Beer data
+        format: document.getElementById('reportFormat').value,
+        brewery: brewerySelect ? brewerySelect.value : '',
+        ...beerData
+    };
+    
+    // Validation
+    if (!formData.format) {
+        hideLoadingToast();
+        showSuccessToast('Please select a beer format.');
+        return;
+    }
+    
+    if (!formData.brewery) {
+        hideLoadingToast();
+        showSuccessToast('Please select a brewery.');
+        return;
+    }
+    
+    if (!formData.beer_name) {
+        hideLoadingToast();
+        showSuccessToast('Please select or enter a beer name.');
+        return;
+    }
+    
+    try {
+        // Submit data
+        const response = await fetch('/api/submit_beer_update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                pub_id: selectedPubData ? selectedPubData.pub_id : null,
+                beer_format: formData.format,
+                brewery: formData.brewery,
+                beer_name: formData.beer_name,
+                style: formData.style,
+                beer_id: formData.beer_id || null,
+                email: '',
+                name: 'Anonymous Report'
+            })
         });
         
-        console.log('🍺 Enhanced report modal brewery dropdown system loaded!');
+        if (response.ok) {
+            const result = await response.json();
+            hideLoadingToast();
+            
+            const message = formData.is_existing_beer 
+                ? '🎉 Existing beer report submitted for validation!'
+                : '🎉 New beer report submitted for validation!';
+            
+            showSuccessToast(message);
+            closeReportModal();
+        } else {
+            throw new Error('Submission failed');
+        }
+        
+    } catch (error) {
+        hideLoadingToast();
+        showSuccessToast('Error submitting report. Please try again.');
+        console.error('Report submission error:', error);
+    }
+});
+
+console.log('🍺 Enhanced beer name dropdown with auto-style population loaded!');
 
         // Add pub search listener
         document.getElementById('reportPubSearch').addEventListener('input', function(e) {
