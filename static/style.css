@@ -4222,3 +4222,130 @@ body.modal-open #results-section {
 .modal-content {
     z-index: 9999; /* Modal content below dropdown */
 }
+
+/* ============================================================================
+   MODAL SCROLL FIX - ADD THIS TO YOUR style.css
+   ============================================================================ */
+
+/* Fix modal content overflow and scrolling */
+.report-modal .modal-content {
+    max-height: 90vh; /* Ensure modal doesn't exceed viewport */
+    overflow-y: auto; /* Enable scrolling */
+    position: relative; /* For proper positioning */
+    padding-bottom: 80px; /* Extra space at bottom */
+}
+
+/* Fix beer info box positioning */
+#selected-beer-info {
+    position: relative !important; /* Not absolute */
+    z-index: 1 !important; /* Low z-index */
+    margin: 8px 0 !important; /* Proper margins */
+    padding: 10px !important;
+    background: rgba(102, 126, 234, 0.1) !important;
+    border-radius: 8px !important;
+    font-size: 13px !important;
+    border-left: 3px solid #667eea !important;
+    display: block !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* Ensure form elements don't interfere with scrolling */
+.form-group {
+    position: relative;
+    margin-bottom: 20px; /* Consistent spacing */
+    z-index: 1; /* Low z-index */
+}
+
+/* Fix dropdown z-index issues */
+.beer-name-select-report,
+.brewery-select-report {
+    position: relative;
+    z-index: 2; /* Slightly higher than info box */
+}
+
+/* Ensure submit buttons are accessible */
+.form-actions {
+    margin-top: 30px !important;
+    padding-top: 20px !important;
+    position: relative;
+    z-index: 1;
+}
+
+/* Fix modal backdrop interference */
+.report-modal {
+    z-index: 9998;
+    overflow-y: auto; /* Allow backdrop scrolling */
+}
+
+/* Ensure modal content container allows scrolling */
+.modal-content {
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+}
+
+.report-form {
+    flex: 1;
+    overflow-y: auto; /* Form itself can scroll */
+    padding-right: 10px; /* Space for scrollbar */
+}
+
+/* Mobile specific fixes */
+@media (max-width: 768px) {
+    .report-modal .modal-content {
+        max-height: 95vh; /* More space on mobile */
+        margin: 2.5vh auto; /* Center vertically */
+        overflow-y: auto;
+    }
+    
+    #selected-beer-info {
+        font-size: 12px !important;
+        padding: 8px !important;
+        margin: 6px 0 !important;
+    }
+    
+    .form-group {
+        margin-bottom: 15px; /* Tighter spacing on mobile */
+    }
+    
+    .form-actions {
+        margin-top: 20px !important;
+        padding-bottom: 20px !important; /* Extra bottom padding */
+    }
+}
+
+/* Scrollbar styling for better UX */
+.report-form::-webkit-scrollbar {
+    width: 8px;
+}
+
+.report-form::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.report-form::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.report-form::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Ensure no element blocks scroll interaction */
+* {
+    pointer-events: auto; /* Reset any blocked pointer events */
+}
+
+/* Fix any absolute positioning that might interfere */
+.report-modal * {
+    position: relative;
+}
+
+.report-modal .modal-content,
+.report-modal .modal-header,
+.report-modal .form-actions {
+    position: relative !important;
+}
