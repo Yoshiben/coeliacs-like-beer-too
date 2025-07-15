@@ -2057,3 +2057,41 @@ button, .btn-base {
         height: 45px;
         font-size: 18px;
     }
+}
+/* Add to end of style.css */
+.split-action-bar {
+    position: sticky; /* Sticks to bottom while scrolling content */
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg-white);
+    padding: 15px 30px;
+    border-top: 2px solid #e2e8f0;
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    z-index: 10; /* Above content but below modals */
+    backdrop-filter: blur(10px);
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+}
+
+.split-action-bar .pub-action-btn {
+    flex: 1;
+    max-width: 200px; /* Prevent stretching too wide */
+    padding: 12px 20px;
+    font-size: 14px;
+}
+
+@media (max-width: 768px) {
+    .split-action-bar {
+        padding: 12px 20px;
+        gap: 10px;
+    }
+    
+    .split-action-bar .pub-action-btn {
+        padding: 14px 20px;
+        font-size: 15px;
+        min-height: 50px;
+    }
+}
