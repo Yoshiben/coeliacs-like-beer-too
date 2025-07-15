@@ -277,12 +277,28 @@
                     <label>Beer Name</label>
                     <input type="text" id="reportBeerName" placeholder="Punk AF">
                 </div>
-                
-                <div class="form-group">
-                    <label>Beer Style</label>
-                    <input type="text" id="reportBeerStyle" placeholder="IPA">
+
+                <div id="currentPubBeers" class="current-pub-beers" style="display: none;">
+                    <h4>📍 Current GF Beers at This Pub</h4>
+                    <div id="pubBeersList"></div>
+                    <div class="action-choice">
+                        <label>
+                            <input type="radio" name="updateAction" value="update" checked> 
+                            Update existing beer
+                        </label>
+                        <label>
+                            <input type="radio" name="updateAction" value="add"> 
+                            Add new beer to this pub
+                        </label>
+                    </div>
                 </div>
                 
+                <div class="form-group" id="beerStyleGroup">
+                    <label>Beer Style</label>
+                    <input type="text" id="reportBeerStyle" placeholder="Beer style">
+                    <small>Style information</small>
+                </div>
+
                 <div class="form-group">
                     <label>Photo (Optional)</label>
                     <input type="file" id="reportPhoto" accept="image/*">
@@ -3151,29 +3167,42 @@
         
         function handleBeerNameSelection(selectElement) {
             const selectedOption = selectElement.options[selectElement.selectedIndex];
+            const beerStyleInput = document.getElementById('reportBeerStyle');
             const beerStyleGroup = document.getElementById('beerStyleGroup');
-            const selectedBeerInfo = document.getElementById('selectedBeerInfo');
             
-            if (!selectedOption || !beerStyleGroup) return;
+            if (!selectedOption || !beerStyleInput) return;
+            
+            // Clear all previous classes
+            beerStyleInput.classList.remove('beer-style-locked', 'beer-style-editable', 'beer-style-disabled');
             
             if (selectedOption.value === 'NEW_BEER') {
-                // NEW BEER - Show style field
-                beerStyleGroup.style.display = 'block';
-                selectedBeerInfo.style.display = 'none';
+                // NEW BEER - Show style field and allow editing
+                if (beerStyleGroup) beerStyleGroup.style.display = 'block';
+                beerStyleInput.value = '';
+                beerStyleInput.placeholder = 'Enter beer style (IPA, Lager, etc.)';
+                beerStyleInput.disabled = false;
+                beerStyleInput.readOnly = false;
+                beerStyleInput.classList.add('beer-style-editable');
                 
-                console.log('🆕 New beer selected - showing style field');
+                // Add clean indicator (no "new beer" text)
+                addCleanStyleIndicator('🆕 Enter style for new beer', 'new');
+                
+                console.log('🆕 New beer selected - style field editable');
                 
             } else if (selectedOption.value && selectedOption.value !== '') {
-                // EXISTING BEER - Hide style field, show clean info
-                beerStyleGroup.style.display = 'none';
-                showCleanBeerInfo(selectedOption);
+                // EXISTING BEER - HIDE style field entirely, show beer info
+                if (beerStyleGroup) beerStyleGroup.style.display = 'none';
                 
-                console.log('✅ Existing beer selected - hiding style field');
+                // KEEP the existing beer info display
+                showBeerInfo(selectedOption);
+                
+                console.log('🔒 Existing beer selected - style field hidden');
                 
             } else {
-                // NO SELECTION - Hide everything
-                beerStyleGroup.style.display = 'none';
-                selectedBeerInfo.style.display = 'none';
+                // NO SELECTION - Hide style field
+                if (beerStyleGroup) beerStyleGroup.style.display = 'none';
+                removeStyleIndicator();
+                clearBeerInfo();
             }
         }
 
@@ -3263,18 +3292,74 @@
                 beerNameSelect.parentNode.insertBefore(infoDiv, beerNameSelect.nextSibling);
             }
             
+            // CLEAN beer info display - remove "STYLE LOCKED" badge
             infoDiv.innerHTML = `
                 <div class="beer-info-header">
-                    <strong>📊 Selected Beer Info:</strong>
-                    <span class="style-locked-badge">STYLE LOCKED</span>
+                    <strong>📊 Selected Beer Details</strong>
                 </div>
-                🍺 Style: <strong>${style}</strong> (cannot be changed)<br>
-                📊 ABV: ${abv}%<br>
-                🌱 Vegan: ${veganStatus}<br>
-                ⚗️ Gluten Status: ${glutenStatus.replace('_', ' ')}
+                <div class="beer-info-grid">
+                    <div class="beer-info-item">
+                        <span class="beer-info-label">🍺 Style:</span>
+                        <span class="beer-info-value">${style}</span>
+                    </div>
+                    <div class="beer-info-item">
+                        <span class="beer-info-label">📊 ABV:</span>
+                        <span class="beer-info-value">${abv}%</span>
+                    </div>
+                    <div class="beer-info-item">
+                        <span class="beer-info-label">🌱 Vegan:</span>
+                        <span class="beer-info-value">${veganStatus}</span>
+                    </div>
+                    <div class="beer-info-item">
+                        <span class="beer-info-label">⚗️ Gluten:</span>
+                        <span class="beer-info-value">${glutenStatus.replace('_', ' ')}</span>
+                    </div>
+                </div>
             `;
             
-            console.log(`📊 Showing locked info for: ${beerName}`);
+            console.log(`📊 Showing clean info for: ${beerName}`);
+        }
+
+        // 4. ADD function to clear beer info
+        function clearBeerInfo() {
+            const infoDiv = document.getElementById('selected-beer-info');
+            if (infoDiv) {
+                infoDiv.remove();
+            }
+        }
+        
+        // 5. ADD the pub beer history feature
+        async function showCurrentPubBeers(pubData) {
+            const currentPubBeers = document.getElementById('currentPubBeers');
+            const pubBeersList = document.getElementById('pubBeersList');
+            
+            if (!pubData || !pubData.pub_id) {
+                if (currentPubBeers) currentPubBeers.style.display = 'none';
+                return;
+            }
+            
+            try {
+                // Fetch current beers for this pub
+                const response = await fetch(`/api/pub/${pubData.pub_id}/current_beers`);
+                if (response.ok) {
+                    const beers = await response.json();
+                    
+                    if (beers.length > 0) {
+                        pubBeersList.innerHTML = beers.map(beer => `
+                            <div class="pub-beer-item">
+                                ${beer.format_icon} ${beer.format}: <strong>${beer.brewery} ${beer.name}</strong> (${beer.style})
+                            </div>
+                        `).join('');
+                        
+                        currentPubBeers.style.display = 'block';
+                    } else {
+                        currentPubBeers.style.display = 'none';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading current pub beers:', error);
+                if (currentPubBeers) currentPubBeers.style.display = 'none';
+            }
         }
         
         // REPLACE - Clean clear function
