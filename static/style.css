@@ -4570,3 +4570,170 @@ body.modal-open #results-section {
         font-size: 0.95em;
     }
 }
+
+
+/* ================================
+   IMPROVED CSS - ADD TO style.css
+   KEEPS GOOD FEATURES, IMPROVES STYLING
+   ================================ */
+
+/* Enhanced Selected Beer Info Box */
+.selected-beer-info {
+    margin: 8px 0;
+    padding: 15px;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);
+    border-radius: 12px;
+    border: 2px solid #667eea;
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+}
+
+.beer-info-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    color: #667eea;
+    font-weight: 600;
+    font-size: 1.05em;
+}
+
+.beer-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.beer-info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.7);
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+.beer-info-label {
+    font-weight: 500;
+    color: #4a5568;
+}
+
+.beer-info-value {
+    font-weight: 600;
+    color: #2d3748;
+}
+
+/* Clean Style Indicators */
+.beer-style-indicator.new {
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Current Pub Beers Section */
+.current-pub-beers {
+    background: rgba(102, 126, 234, 0.05);
+    border: 2px solid rgba(102, 126, 234, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 15px 0;
+}
+
+.current-pub-beers h4 {
+    margin: 0 0 15px 0;
+    color: #667eea;
+    font-size: 1.1em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#pubBeersList {
+    margin-bottom: 15px;
+}
+
+.pub-beer-item {
+    background: rgba(255, 255, 255, 0.8);
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    border-left: 4px solid #10b981;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.action-choice {
+    display: flex;
+    gap: 20px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 8px;
+    border-top: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.action-choice label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    color: #4a5568;
+    font-size: 14px;
+}
+
+.action-choice input[type="radio"] {
+    transform: scale(1.2);
+    accent-color: #667eea;
+}
+
+/* Ensure Beer Style Group can be hidden smoothly */
+#beerStyleGroup {
+    transition: all 0.3s ease;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .beer-info-grid {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+    
+    .beer-info-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+        padding: 10px;
+    }
+    
+    .action-choice {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .current-pub-beers {
+        padding: 15px;
+    }
+    
+    .selected-beer-info {
+        padding: 12px;
+    }
+    
+    .beer-info-header {
+        font-size: 1em;
+    }
+    
+    .pub-beer-item {
+        padding: 10px;
+        font-size: 13px;
+    }
+}
