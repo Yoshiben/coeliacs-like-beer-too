@@ -4737,3 +4737,90 @@ body.modal-open #results-section {
         font-size: 13px;
     }
 }
+
+/* ================================
+   FIX MOBILE DROPDOWN Z-INDEX
+   ADD TO YOUR style.css
+   ================================ */
+
+/* Fix autocomplete suggestions z-index on mobile */
+#suggestions {
+    position: absolute;
+    top: 100%;
+    left: 30px;
+    right: 30px;
+    max-height: 400px;
+    overflow-y: auto;
+    border: none;
+    border-radius: 15px;
+    background: white;
+    display: none;
+    z-index: 10000; /* High z-index to appear above everything */
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    margin-top: 5px;
+}
+
+/* Ensure search section container allows overflow */
+.search-section {
+    position: relative;
+    z-index: 100; /* Lower than suggestions */
+    overflow: visible; /* Allow dropdown to show outside */
+}
+
+/* Fix mobile specific z-index issues */
+@media (max-width: 768px) {
+    #suggestions {
+        left: 15px;
+        right: 15px;
+        z-index: 10005; /* Even higher on mobile */
+        max-height: 280px;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+        position: fixed; /* Use fixed positioning on mobile */
+        top: auto; /* Let it calculate position */
+    }
+    
+    /* Ensure input container has relative positioning */
+    .search-row {
+        position: relative;
+        z-index: 1;
+    }
+    
+    /* Lower z-index for buttons so dropdown appears above */
+    .search-actions {
+        position: relative;
+        z-index: 1; /* Lower than suggestions */
+    }
+    
+    .search-btn,
+    .map-control-btn {
+        position: relative;
+        z-index: 1; /* Lower than suggestions */
+    }
+    
+    /* Fix any conflicting z-index from other elements */
+    .hero-section,
+    .features-section,
+    .activity-section {
+        z-index: 1;
+    }
+}
+
+/* Specific fix for the input field container */
+.search-input,
+#searchInput {
+    position: relative;
+    z-index: 2; /* Higher than buttons, lower than suggestions */
+}
+
+/* Make sure dropdown items are clickable */
+#suggestions div {
+    position: relative;
+    z-index: 10001;
+    padding: 16px 18px; /* Larger touch targets on mobile */
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+    background: white;
+    min-height: 48px; /* Minimum touch target size */
+    display: flex;
+    align-items: center;
+}
