@@ -2470,6 +2470,341 @@
             }
         }
 
+        // ============================================================================
+        // OPTIMIZED FRONTEND - HANDLES AUTO BEER ID GENERATION
+        // ============================================================================
+        
+        // Enhanced submit function with clear new beer handling
+        async function submitValidatedBeerUpdate(pubId) {
+            try {
+                const beerUpdates = [];
+                const beerOptions = document.querySelectorAll(`#form-${pubId} .beer-option`);
+                
+                beerOptions.forEach(option => {
+                    const checkbox = option.querySelector('input[type="checkbox"]');
+                    if (!checkbox.checked) return;
+                    
+                    const format = option.dataset.format;
+                    const brewerySelect = option.querySelector('.brewery-select');
+                    const beerSelect = option.querySelector('.beer-select');
+                    
+                    const updateData = {
+                        pub_id: pubId,
+                        beer_format: format
+                    };
+                    
+                    // CASE 1: Existing beer from database
+                    if (beerSelect.value && beerSelect.value !== 'NEW_BEER' && beerSelect.value !== '') {
+                        updateData.beer_id = parseInt(beerSelect.value);
+                        updateData.is_new_beer = false;
+                        
+                        console.log(`📋 Existing beer selected: beer_id ${updateData.beer_id}`);
+                    }
+                    // CASE 2: New beer (will get auto-generated beer_id)
+                    else if (beerSelect.value === 'NEW_BEER' || brewerySelect.value === 'NEW_BREWERY') {
+                        updateData.is_new_beer = true;
+                        
+                        // Get brewery name
+                        if (brewerySelect.value === 'NEW_BREWERY') {
+                            const newBreweryField = option.querySelector('.new-brewery-name');
+                            updateData.brewery = newBreweryField?.value || '';
+                        } else {
+                            updateData.brewery = brewerySelect.value;
+                        }
+                        
+                        // Get new beer details
+                        const newBeerFields = option.querySelector('.new-beer-fields');
+                        if (newBeerFields) {
+                            updateData.beer_name = newBeerFields.querySelector('.new-beer-name')?.value || '';
+                            updateData.style = newBeerFields.querySelector('.new-beer-style')?.value || '';
+                            updateData.abv = parseFloat(newBeerFields.querySelector('.new-beer-abv')?.value) || 0;
+                            updateData.vegan_status = newBeerFields.querySelector('.new-beer-vegan')?.value || 'unknown';
+                            updateData.category = 'gluten_removed'; // Default
+                        }
+                        
+                        console.log(`🆕 New beer will be created: ${updateData.brewery} - ${updateData.beer_name}`);
+                    }
+                    
+                    // Add user details
+                    updateData.email = document.getElementById(`user-email-${pubId}`)?.value || '';
+                    updateData.name = document.getElementById(`user-name-${pubId}`)?.value || '';
+                    updateData.notes = document.getElementById(`user-notes-${pubId}`)?.value || '';
+                    
+                    beerUpdates.push(updateData);
+                });
+                
+                if (beerUpdates.length === 0) {
+                    showSuccessToast('Please select at least one beer format to update.');
+                    return;
+                }
+                
+                // Submit updates
+                showLoadingToast('Submitting for validation...');
+                
+                let successCount = 0;
+                let newBeerCount = 0;
+                let existingBeerCount = 0;
+                
+                for (const update of beerUpdates) {
+                    try {
+                        const response = await fetch('/api/submit_beer_update', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(update)
+                        });
+                        
+                        if (response.ok) {
+                            const result = await response.json();
+                            successCount++;
+                            
+                            if (result.will_create_new_beer) {
+                                newBeerCount++;
+                            } else {
+                                existingBeerCount++;
+                            }
+                            
+                            console.log(`✅ Update submitted: pending_id ${result.pending_id}`);
+                        } else {
+                            const error = await response.json();
+                            console.error('Update failed:', error);
+                        }
+                    } catch (error) {
+                        console.error('Error submitting update:', error);
+                    }
+                }
+                
+                hideLoadingToast();
+                
+                if (successCount === beerUpdates.length) {
+                    let message = `🎉 ${successCount} beer update(s) submitted!`;
+                    
+                    if (newBeerCount > 0 && existingBeerCount > 0) {
+                        message += ` ${newBeerCount} new beers will be created, ${existingBeerCount} existing beers linked.`;
+                    } else if (newBeerCount > 0) {
+                        message += ` ${newBeerCount} new beer(s) will be created with auto-generated IDs.`;
+                    } else {
+                        message += ` ${existingBeerCount} existing beer(s) will be linked.`;
+                    }
+                    
+                    message += ' We\'ll review and approve them soon!';
+                    
+                    showSuccessToast(message);
+                    closeUpdateForm(pubId);
+                } else {
+                    showSuccessToast(`⚠️ ${successCount}/${beerUpdates.length} updates submitted. Some failed - please try again.`);
+                }
+                
+            } catch (error) {
+                console.error('Error submitting beer updates:', error);
+                hideLoadingToast();
+                showSuccessToast('Error submitting updates. Please try again.');
+            }
+        }
+        
+        // Enhanced brewery dropdown population
+        function populateBreweryDropdown() {
+            const brewerySelects = document.querySelectorAll('.brewery-select');
+            
+            brewerySelects.forEach(select => {
+                if (select.children.length > 1) return; // Already populated
+                
+                select.innerHTML = '<option value="">Select brewery...</option>';
+                
+                currentBreweries.forEach(brewery => {
+                    const option = document.createElement('option');
+                    option.value = brewery;
+                    option.textContent = brewery;
+                    select.appendChild(option);
+                });
+                
+                // Add "New brewery" option
+                const newOption = document.createElement('option');
+                newOption.value = 'NEW_BREWERY';
+                newOption.textContent = '🆕 Add new brewery (will auto-generate beer ID)';
+                select.appendChild(newOption);
+            });
+        }
+        
+        // Enhanced beer dropdown population
+        async function loadBeersByBrewery(breweryName, targetSelectId) {
+            try {
+                showLoadingToast('Loading beers...');
+                
+                const response = await fetch(`/api/brewery/${encodeURIComponent(breweryName)}/beers`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const beers = await response.json();
+                
+                const beerSelect = document.getElementById(targetSelectId);
+                beerSelect.innerHTML = '<option value="">Select beer...</option>';
+                
+                beers.forEach(beer => {
+                    const option = document.createElement('option');
+                    option.value = beer.beer_id; // This is the existing beer_id
+                    option.textContent = `${beer.name} (${beer.style}, ${beer.abv}%)`;
+                    option.dataset.beerId = beer.beer_id;
+                    option.dataset.brewery = breweryName;
+                    option.dataset.name = beer.name;
+                    option.dataset.style = beer.style;
+                    option.dataset.abv = beer.abv;
+                    option.dataset.vegan = beer.vegan_status;
+                    beerSelect.appendChild(option);
+                });
+                
+                // Add "New beer" option (will get auto-generated beer_id)
+                const newOption = document.createElement('option');
+                newOption.value = 'NEW_BEER';
+                newOption.textContent = '🆕 Add new beer (will auto-generate beer ID)';
+                beerSelect.appendChild(newOption);
+                
+                beerSelect.disabled = false;
+                hideLoadingToast();
+                
+            } catch (error) {
+                console.error('Error loading beers:', error);
+                hideLoadingToast();
+                showSuccessToast('Error loading beers. Please try again.');
+            }
+        }
+
+        // Enhanced new beer fields with clearer messaging
+        function showNewBeerFields(container) {
+            let newBeerFields = container.querySelector('.new-beer-fields');
+            
+            if (!newBeerFields) {
+                newBeerFields = document.createElement('div');
+                newBeerFields.className = 'new-beer-fields';
+                newBeerFields.innerHTML = `
+                    <div class="new-beer-form">
+                        <h5>🆕 New Beer Details</h5>
+                        <div class="auto-id-notice">
+                            <small>💡 A new beer_id will be auto-generated when approved</small>
+                        </div>
+                        <div class="form-row">
+                            <input type="text" class="new-beer-name" placeholder="Beer name *" required>
+                            <input type="text" class="new-beer-style" placeholder="Style (IPA, Lager, etc.)">
+                        </div>
+                        <div class="form-row">
+                            <input type="number" class="new-beer-abv" placeholder="ABV %" step="0.1" min="0" max="15">
+                            <select class="new-beer-vegan">
+                                <option value="unknown">Vegan status unknown</option>
+                                <option value="vegan">Vegan friendly</option>
+                                <option value="not_vegan">Not vegan</option>
+                            </select>
+                        </div>
+                        <div class="category-selection">
+                            <label>
+                                <input type="radio" name="category-${Date.now()}" value="gluten_removed" checked>
+                                ⚗️ Gluten Removed (most common)
+                            </label>
+                            <label>
+                                <input type="radio" name="category-${Date.now()}" value="no_gluten_ingredients">
+                                🌾 No Gluten Ingredients (dedicated GF brewery)
+                            </label>
+                        </div>
+                        <small>✅ Will be added to beers table with auto-generated beer_id when approved</small>
+                    </div>
+                `;
+                container.appendChild(newBeerFields);
+            }
+            
+            newBeerFields.style.display = 'block';
+        }
+        
+        // Enhanced validation status display
+        function updateValidationStatus(container, isNewBeer) {
+            const statusElement = container.querySelector('.validation-status');
+            if (statusElement) {
+                if (isNewBeer) {
+                    statusElement.textContent = 'Will create new beer_id';
+                    statusElement.className = 'validation-status new-beer';
+                } else {
+                    statusElement.textContent = 'Will link existing beer';
+                    statusElement.className = 'validation-status existing-beer';
+                }
+            }
+        }
+        
+        // Update change handlers to show status
+        function setupBeerEventListener() {
+            document.addEventListener('change', function(e) {
+                if (e.target.classList.contains('beer-select')) {
+                    const beerValue = e.target.value;
+                    const formContainer = e.target.closest('.beer-option');
+                    
+                    if (beerValue === 'NEW_BEER') {
+                        showNewBeerFields(formContainer);
+                        updateValidationStatus(formContainer, true);
+                    } else if (beerValue) {
+                        hideNewBeerFields(formContainer);
+                        updateValidationStatus(formContainer, false);
+                    } else {
+                        hideNewBeerFields(formContainer);
+                        updateValidationStatus(formContainer, false);
+                    }
+                }
+            });
+        }
+        
+        function setupBreweryEventListener() {
+            document.addEventListener('change', function(e) {
+                if (e.target.classList.contains('brewery-select')) {
+                    const breweryName = e.target.value;
+                    const formContainer = e.target.closest('.beer-option');
+                    const beerSelect = formContainer.querySelector('.beer-select');
+                    
+                    if (breweryName && breweryName !== 'NEW_BREWERY') {
+                        loadBeersByBrewery(breweryName, beerSelect.id);
+                        hideNewBeerFields(formContainer);
+                        hideNewBreweryFields(formContainer);
+                    } else if (breweryName === 'NEW_BREWERY') {
+                        showNewBreweryFields(formContainer);
+                        showNewBeerFields(formContainer);
+                        beerSelect.disabled = true;
+                        beerSelect.innerHTML = '<option value="">Will create new beer</option>';
+                        updateValidationStatus(formContainer, true);
+                    } else {
+                        beerSelect.disabled = true;
+                        beerSelect.innerHTML = '<option value="">Select beer...</option>';
+                        hideNewBeerFields(formContainer);
+                        hideNewBreweryFields(formContainer);
+                    }
+                }
+            });
+        }
+        
+        // Helper function to close update form
+        function closeUpdateForm(pubId) {
+            const form = document.getElementById(`form-${pubId}`);
+            if (form) {
+                form.style.display = 'none';
+                
+                // Reset form
+                const checkboxes = form.querySelectorAll('input[type="checkbox"]');
+                checkboxes.forEach(cb => cb.checked = false);
+                
+                const selects = form.querySelectorAll('select');
+                selects.forEach(select => {
+                    select.selectedIndex = 0;
+                    if (select.classList.contains('beer-select')) {
+                        select.disabled = true;
+                    }
+                });
+                
+                // Hide all selection areas
+                const selectionAreas = form.querySelectorAll('.beer-selection-area');
+                selectionAreas.forEach(area => area.classList.remove('active'));
+                
+                // Clear user inputs
+                const inputs = form.querySelectorAll('input[type="text"], input[type="email"], textarea');
+                inputs.forEach(input => input.value = '');
+            }
+        }
+        
+        console.log('🍺 Optimized beer update system loaded - auto beer_id generation enabled!');
+
         // ENHANCED SEARCH FUNCTION WITH POSTCODE DETECTION
         async function searchPubs() {
             const query = document.getElementById('searchInput').value.trim();
