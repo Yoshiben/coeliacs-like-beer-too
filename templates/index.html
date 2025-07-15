@@ -931,7 +931,23 @@
             document.getElementById('newPubFields').style.display = 'none';
             document.getElementById('pubSuggestions').style.display = 'none';
             document.getElementById('reportPubSearch').value = pub.name;
+            showCurrentPubBeers(pub);
             trackEvent('select_existing_pub', 'Report Flow', pub.name);
+        }
+
+        function clearSelectedBeer() {
+            const beerNameSelect = document.getElementById('reportBeerName');
+            const selectedBeerInfo = document.getElementById('selectedBeerInfo');
+            const beerStyleGroup = document.getElementById('beerStyleGroup');
+            
+            if (beerNameSelect) {
+                beerNameSelect.selectedIndex = 0;
+            }
+            
+            selectedBeerInfo.style.display = 'none';
+            beerStyleGroup.style.display = 'none';
+            
+            console.log('🧹 Cleared beer selection');
         }
 
         function clearSelectedPub() {
@@ -3135,53 +3151,76 @@
         
         function handleBeerNameSelection(selectElement) {
             const selectedOption = selectElement.options[selectElement.selectedIndex];
-            const beerStyleInput = document.getElementById('reportBeerStyle');
+            const beerStyleGroup = document.getElementById('beerStyleGroup');
+            const selectedBeerInfo = document.getElementById('selectedBeerInfo');
             
-            if (!selectedOption || !beerStyleInput) return;
-            
-            // Clear all previous classes
-            beerStyleInput.classList.remove('beer-style-locked', 'beer-style-editable', 'beer-style-disabled');
+            if (!selectedOption || !beerStyleGroup) return;
             
             if (selectedOption.value === 'NEW_BEER') {
-                // NEW BEER - Allow manual entry
-                beerStyleInput.value = '';
-                beerStyleInput.placeholder = 'Enter beer style (IPA, Lager, etc.)';
-                beerStyleInput.disabled = false;
-                beerStyleInput.readOnly = false;
-                beerStyleInput.classList.add('beer-style-editable');
+                // NEW BEER - Show style field
+                beerStyleGroup.style.display = 'block';
+                selectedBeerInfo.style.display = 'none';
                 
-                // Add visual indicator
-                addStyleIndicator('🆕 New beer - enter style manually', 'new');
-                
-                console.log('🆕 New beer selected - manual style entry enabled');
+                console.log('🆕 New beer selected - showing style field');
                 
             } else if (selectedOption.value && selectedOption.value !== '') {
-                // EXISTING BEER - Lock the style field
-                const style = selectedOption.getAttribute('data-style') || '';
-                beerStyleInput.value = style;
-                beerStyleInput.placeholder = 'Style locked for existing beer';
-                beerStyleInput.disabled = false;
-                beerStyleInput.readOnly = true;
-                beerStyleInput.classList.add('beer-style-locked');
+                // EXISTING BEER - Hide style field, show clean info
+                beerStyleGroup.style.display = 'none';
+                showCleanBeerInfo(selectedOption);
                 
-                // Add visual indicator
-                addStyleIndicator('🔒 Style locked for existing beer', 'locked');
-                
-                console.log(`🔒 Style locked: ${style} (existing beer)`);
-                
-                // Show beer info
-                showBeerInfo(selectedOption);
+                console.log('✅ Existing beer selected - hiding style field');
                 
             } else {
-                // NO SELECTION - Clear and disable
-                beerStyleInput.value = '';
-                beerStyleInput.placeholder = 'Select a beer first';
-                beerStyleInput.disabled = true;
-                beerStyleInput.readOnly = false;
-                beerStyleInput.classList.add('beer-style-disabled');
-                
-                // Remove indicator
-                removeStyleIndicator();
+                // NO SELECTION - Hide everything
+                beerStyleGroup.style.display = 'none';
+                selectedBeerInfo.style.display = 'none';
+            }
+        }
+
+        // 2. ADD this NEW function:
+        function showCleanBeerInfo(selectedOption) {
+            const selectedBeerInfo = document.getElementById('selectedBeerInfo');
+            const beerName = selectedOption.getAttribute('data-beer-name') || selectedOption.textContent.split(' (')[0];
+            const style = selectedOption.getAttribute('data-style') || 'Unknown';
+            const abv = selectedOption.getAttribute('data-abv') || 'Unknown';
+            
+            document.getElementById('selectedBeerName').textContent = beerName;
+            document.getElementById('selectedBeerDetails').textContent = `${style} • ${abv}% ABV`;
+            
+            selectedBeerInfo.style.display = 'block';
+        }
+        
+        // 3. ADD this NEW function:
+        async function showCurrentPubBeers(pubData) {
+            const currentPubBeers = document.getElementById('currentPubBeers');
+            const pubBeersList = document.getElementById('pubBeersList');
+            
+            if (!pubData || !pubData.pub_id) {
+                currentPubBeers.style.display = 'none';
+                return;
+            }
+            
+            try {
+                // Fetch current beers for this pub
+                const response = await fetch(`/api/pub/${pubData.pub_id}/current_beers`);
+                if (response.ok) {
+                    const beers = await response.json();
+                    
+                    if (beers.length > 0) {
+                        pubBeersList.innerHTML = beers.map(beer => `
+                            <div class="pub-beer-item">
+                                ${beer.format_icon} ${beer.format}: ${beer.brewery} ${beer.name} (${beer.style})
+                            </div>
+                        `).join('');
+                        
+                        currentPubBeers.style.display = 'block';
+                    } else {
+                        currentPubBeers.style.display = 'none';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading current pub beers:', error);
+                currentPubBeers.style.display = 'none';
             }
         }
         
