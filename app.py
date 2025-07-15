@@ -694,90 +694,30 @@ def approve_update(pending_id):
 # REPLACE YOUR BROKEN /search ROUTE WITH THIS COMPLETE VERSION
 # ====================================
 
-    @app.route('/search')
-    def search():
-        """Complete working search function"""
-        query = request.args.get('query', '').strip()
-        search_type = request.args.get('search_type', 'all')
-        gf_only = request.args.get('gf_only', 'false').lower() == 'true'
-        page = request.args.get('page', 1, type=int)
-        pub_id = request.args.get('pub_id', type=int)
-        
-        # Input validation
-        if query and (len(query) < 1 or len(query) > 100):
-            return jsonify({'error': 'Invalid query length'}), 400
-        
-        if page < 1 or page > 1000:
-            return jsonify({'error': 'Invalid page number'}), 400
+@app.route('/search')
+def search():
+    """Complete working search function"""
+    query = request.args.get('query', '').strip()
+    search_type = request.args.get('search_type', 'all')
+    gf_only = request.args.get('gf_only', 'false').lower() == 'true'
+    page = request.args.get('page', 1, type=int)
+    pub_id = request.args.get('pub_id', type=int)
     
-        try:
-            conn = mysql.connector.connect(**db_config)
-            cursor = conn.cursor(dictionary=True)
-            
-            # Handle specific pub ID search
-            if pub_id:
-                logger.info(f"Searching for specific pub ID: {pub_id}")
-                sql = """
-                    SELECT DISTINCT
-                        p.pub_id, p.name, p.address, p.postcode, p.local_authority, 
-                        p.bottle, p.tap, p.cask, p.can, p.latitude, p.longitude,
-                        GROUP_CONCAT(
-                            DISTINCT CONCAT(pu.beer_format, ' - ', 
-                            COALESCE(b.brewery, 'Unknown'), ' ', 
-                            COALESCE(b.name, 'Unknown'), ' (', 
-                            COALESCE(b.style, 'Unknown'), ')')
-                            SEPARATOR ', '
-                        ) as beer_details
-                    FROM pubs p
-                    LEFT JOIN pubs_updates pu ON p.pub_id = pu.pub_id
-                    LEFT JOIN beers b ON pu.beer_id = b.beer_id
-                    WHERE p.pub_id = %s
-                    GROUP BY p.pub_id, p.name, p.address, p.postcode, p.local_authority, 
-                             p.bottle, p.tap, p.cask, p.can, p.latitude, p.longitude
-                """
-                cursor.execute(sql, (pub_id,))
-                pubs = cursor.fetchall()
-                logger.info(f"Found {len(pubs)} pubs for specific ID {pub_id}")
-                return jsonify(pubs)
-            
-            # Regular search logic
-            if not query:
-                return jsonify({'error': 'Query is required for search'}), 400
-            
-            # Build search condition based on search type
-            if search_type == 'name':
-                search_condition = "p.name LIKE %s"
-                params = [f'%{query}%']
-            elif search_type == 'postcode':
-                search_condition = "p.postcode LIKE %s"
-                params = [f'%{query}%']
-            elif search_type == 'area':
-                search_condition = "p.local_authority LIKE %s"
-                params = [f'%{query}%']
-            else:  # search_type == 'all'
-                search_condition = "(p.name LIKE %s OR p.postcode LIKE %s OR p.local_authority LIKE %s OR p.address LIKE %s)"
-                params = [f'%{query}%', f'%{query}%', f'%{query}%', f'%{query}%']
-            
-            # Count total results for pagination
-            count_sql = f"""
-                SELECT COUNT(DISTINCT p.pub_id) as total
-                FROM pubs p
-                WHERE {search_condition}
-            """
-            
-            if gf_only:
-                count_sql += " AND (p.bottle = 1 OR p.tap = 1 OR p.cask = 1 OR p.can = 1)"
-            
-            cursor.execute(count_sql, params)
-            total_results = cursor.fetchone()['total']
-            
-            # Calculate pagination
-            per_page = 20
-            total_pages = (total_results + per_page - 1) // per_page
-            offset = (page - 1) * per_page
-            
-            # Main search query with beer details
-            sql = f"""
+    # Input validation
+    if query and (len(query) < 1 or len(query) > 100):
+        return jsonify({'error': 'Invalid query length'}), 400
+    
+    if page < 1 or page > 1000:
+        return jsonify({'error': 'Invalid page number'}), 400
+
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        # Handle specific pub ID search
+        if pub_id:
+            logger.info(f"Searching for specific pub ID: {pub_id}")
+            sql = """
                 SELECT DISTINCT
                     p.pub_id, p.name, p.address, p.postcode, p.local_authority, 
                     p.bottle, p.tap, p.cask, p.can, p.latitude, p.longitude,
@@ -791,47 +731,107 @@ def approve_update(pending_id):
                 FROM pubs p
                 LEFT JOIN pubs_updates pu ON p.pub_id = pu.pub_id
                 LEFT JOIN beers b ON pu.beer_id = b.beer_id
-                WHERE {search_condition}
-            """
-            
-            if gf_only:
-                sql += " AND (p.bottle = 1 OR p.tap = 1 OR p.cask = 1 OR p.can = 1)"
-            
-            sql += """
+                WHERE p.pub_id = %s
                 GROUP BY p.pub_id, p.name, p.address, p.postcode, p.local_authority, 
                          p.bottle, p.tap, p.cask, p.can, p.latitude, p.longitude
-                ORDER BY p.name
-                LIMIT %s OFFSET %s
             """
-            
-            params.extend([per_page, offset])
-            cursor.execute(sql, params)
+            cursor.execute(sql, (pub_id,))
             pubs = cursor.fetchall()
-            
-            logger.info(f"Found {len(pubs)} pubs on page {page} of {total_pages}")
-            
-            # Return paginated results
-            return jsonify({
-                'pubs': pubs,
-                'pagination': {
-                    'page': page,
-                    'pages': total_pages,
-                    'total': total_results,
-                    'has_prev': page > 1,
-                    'has_next': page < total_pages
-                }
-            })
-            
-        except mysql.connector.Error as e:
-            logger.error(f"Database error in search: {str(e)}")
-            return jsonify({'error': 'Database error occurred'}), 500
-        except Exception as e:
-            logger.error(f"Unexpected error in search: {str(e)}")
-            return jsonify({'error': 'An error occurred'}), 500
-        finally:
-            if 'conn' in locals() and conn.is_connected():
-                cursor.close()
-                conn.close()
+            logger.info(f"Found {len(pubs)} pubs for specific ID {pub_id}")
+            return jsonify(pubs)
+        
+        # Regular search logic
+        if not query:
+            return jsonify({'error': 'Query is required for search'}), 400
+        
+        # Build search condition based on search type
+        if search_type == 'name':
+            search_condition = "p.name LIKE %s"
+            params = [f'%{query}%']
+        elif search_type == 'postcode':
+            search_condition = "p.postcode LIKE %s"
+            params = [f'%{query}%']
+        elif search_type == 'area':
+            search_condition = "p.local_authority LIKE %s"
+            params = [f'%{query}%']
+        else:  # search_type == 'all'
+            search_condition = "(p.name LIKE %s OR p.postcode LIKE %s OR p.local_authority LIKE %s OR p.address LIKE %s)"
+            params = [f'%{query}%', f'%{query}%', f'%{query}%', f'%{query}%']
+        
+        # Count total results for pagination
+        count_sql = f"""
+            SELECT COUNT(DISTINCT p.pub_id) as total
+            FROM pubs p
+            WHERE {search_condition}
+        """
+        
+        if gf_only:
+            count_sql += " AND (p.bottle = 1 OR p.tap = 1 OR p.cask = 1 OR p.can = 1)"
+        
+        cursor.execute(count_sql, params)
+        total_results = cursor.fetchone()['total']
+        
+        # Calculate pagination
+        per_page = 20
+        total_pages = (total_results + per_page - 1) // per_page
+        offset = (page - 1) * per_page
+        
+        # Main search query with beer details
+        sql = f"""
+            SELECT DISTINCT
+                p.pub_id, p.name, p.address, p.postcode, p.local_authority, 
+                p.bottle, p.tap, p.cask, p.can, p.latitude, p.longitude,
+                GROUP_CONCAT(
+                    DISTINCT CONCAT(pu.beer_format, ' - ', 
+                    COALESCE(b.brewery, 'Unknown'), ' ', 
+                    COALESCE(b.name, 'Unknown'), ' (', 
+                    COALESCE(b.style, 'Unknown'), ')')
+                    SEPARATOR ', '
+                ) as beer_details
+            FROM pubs p
+            LEFT JOIN pubs_updates pu ON p.pub_id = pu.pub_id
+            LEFT JOIN beers b ON pu.beer_id = b.beer_id
+            WHERE {search_condition}
+        """
+        
+        if gf_only:
+            sql += " AND (p.bottle = 1 OR p.tap = 1 OR p.cask = 1 OR p.can = 1)"
+        
+        sql += """
+            GROUP BY p.pub_id, p.name, p.address, p.postcode, p.local_authority, 
+                     p.bottle, p.tap, p.cask, p.can, p.latitude, p.longitude
+            ORDER BY p.name
+            LIMIT %s OFFSET %s
+        """
+        
+        params.extend([per_page, offset])
+        cursor.execute(sql, params)
+        pubs = cursor.fetchall()
+        
+        logger.info(f"Found {len(pubs)} pubs on page {page} of {total_pages}")
+        
+        # Return paginated results
+        return jsonify({
+            'pubs': pubs,
+            'pagination': {
+                'page': page,
+                'pages': total_pages,
+                'total': total_results,
+                'has_prev': page > 1,
+                'has_next': page < total_pages
+            }
+        })
+        
+    except mysql.connector.Error as e:
+        logger.error(f"Database error in search: {str(e)}")
+        return jsonify({'error': 'Database error occurred'}), 500
+    except Exception as e:
+        logger.error(f"Unexpected error in search: {str(e)}")
+        return jsonify({'error': 'An error occurred'}), 500
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
 
 # ============================================================================
 # ADD THESE MISSING API ROUTES TO YOUR app.py
