@@ -277,28 +277,12 @@
                     <label>Beer Name</label>
                     <input type="text" id="reportBeerName" placeholder="Punk AF">
                 </div>
-
-                <div id="currentPubBeers" class="current-pub-beers" style="display: none;">
-                    <h4>📍 Current GF Beers at This Pub</h4>
-                    <div id="pubBeersList"></div>
-                    <div class="action-choice">
-                        <label>
-                            <input type="radio" name="updateAction" value="update" checked> 
-                            Update existing beer
-                        </label>
-                        <label>
-                            <input type="radio" name="updateAction" value="add"> 
-                            Add new beer to this pub
-                        </label>
-                    </div>
+                
+                <div class="form-group">
+                    <label>Beer Style</label>
+                    <input type="text" id="reportBeerStyle" placeholder="IPA">
                 </div>
                 
-                <div class="form-group" id="beerStyleGroup">
-                    <label>Beer Style</label>
-                    <input type="text" id="reportBeerStyle" placeholder="Beer style">
-                    <small>Style information</small>
-                </div>
-
                 <div class="form-group">
                     <label>Photo (Optional)</label>
                     <input type="file" id="reportPhoto" accept="image/*">
@@ -947,10 +931,7 @@
             document.getElementById('newPubFields').style.display = 'none';
             document.getElementById('pubSuggestions').style.display = 'none';
             document.getElementById('reportPubSearch').value = pub.name;
-            
-            // ADD THIS LINE - this is probably missing:
             showCurrentPubBeers(pub);
-            
             trackEvent('select_existing_pub', 'Report Flow', pub.name);
         }
 
@@ -1530,13 +1511,6 @@
         // ENHANCED findOnMap function - Replace in your JavaScript
         // Also update your findOnMap function for better centering:
         // REPLACE: Enhanced findOnMap function with better scrolling and no redundant button
-        // ====================================
-        // FIX THE UX - Make it beautiful again
-        // ====================================
-        
-        // The issue is probably in your findOnMap function
-        // REPLACE your existing findOnMap function with this:
-        
         function findOnMap(lat, lng, pubName, postcode, pubId) {
             trackPubView(pubName);
             
@@ -1571,7 +1545,7 @@
                         markerElement.style.animation = 'pulse 2s infinite';
                     }
                     
-                    // Clean popup without extra button
+                    // OPTION 1: No popup button - details show immediately
                     window.currentHighlightMarker.bindPopup(`
                         <div style="text-align: center; padding: 8px;">
                             <strong style="color: #2d3748; font-size: 16px;">${pubName}</strong>
@@ -1580,15 +1554,18 @@
                         </div>
                     `).openPopup();
                     
-                    // CREATE BEAUTIFUL SPLIT SCREEN immediately
+                    // CREATE SPLIT SCREEN LAYOUT immediately
                     createSplitScreenLayout(pubId);
                     
-                    // PERFECT SCROLLING: Show map at top, details below
+                    // BETTER SCROLLING: Show both map and pub details properly
                     setTimeout(() => {
                         const mapContainer = document.getElementById('mapContainer');
+                        const splitContainer = document.getElementById('split-screen-container');
                         
-                        if (mapContainer) {
+                        if (mapContainer && splitContainer) {
                             const mapRect = mapContainer.getBoundingClientRect();
+                            
+                            // Position map at top of viewport so user can scroll down to see all pub details
                             const optimalScrollY = window.pageYOffset + mapRect.top - 20;
                             
                             window.scrollTo({ 
@@ -1596,11 +1573,15 @@
                                 behavior: 'smooth' 
                             });
                             
-                            showSuccessToast('📍 Map and pub details loaded!');
+                            // Add visual hint that there's content below
+                            setTimeout(() => {
+                                showSuccessToast('📍 Map shown above - scroll down for full pub details!');
+                            }, 1000);
                         }
                     }, 300);
                     
-                    // Clean up highlight after 8 seconds
+                    showSuccessToast(`📍 Found ${pubName}! Details shown below map.`);
+                    
                     setTimeout(() => {
                         if (window.currentHighlightMarker) {
                             map.removeLayer(window.currentHighlightMarker);
@@ -1614,8 +1595,6 @@
             }
         }
 
-// Make sure your createSplitScreenLayout function is working
-// This should create the beautiful layout below the map
         // ADD: Homepage reset function
         function resetToHomepage() {
             // Clear search inputs
@@ -3141,7 +3120,7 @@
             beers.forEach(beer => {
                 const option = document.createElement('option');
                 option.value = beer.beer_id;
-                option.textContent = beer.name; // CLEAN - no brackets!
+                option.textContent = `${beer.name} (${beer.style}, ${beer.abv}%)`;
                 
                 // Store beer data in option for later use
                 option.dataset.beerName = beer.name;
@@ -3172,42 +3151,29 @@
         
         function handleBeerNameSelection(selectElement) {
             const selectedOption = selectElement.options[selectElement.selectedIndex];
-            const beerStyleInput = document.getElementById('reportBeerStyle');
             const beerStyleGroup = document.getElementById('beerStyleGroup');
+            const selectedBeerInfo = document.getElementById('selectedBeerInfo');
             
-            if (!selectedOption || !beerStyleInput) return;
-            
-            // Clear all previous classes
-            beerStyleInput.classList.remove('beer-style-locked', 'beer-style-editable', 'beer-style-disabled');
+            if (!selectedOption || !beerStyleGroup) return;
             
             if (selectedOption.value === 'NEW_BEER') {
-                // NEW BEER - Show style field and allow editing
-                if (beerStyleGroup) beerStyleGroup.style.display = 'block';
-                beerStyleInput.value = '';
-                beerStyleInput.placeholder = 'Enter beer style (IPA, Lager, etc.)';
-                beerStyleInput.disabled = false;
-                beerStyleInput.readOnly = false;
-                beerStyleInput.classList.add('beer-style-editable');
+                // NEW BEER - Show style field
+                beerStyleGroup.style.display = 'block';
+                selectedBeerInfo.style.display = 'none';
                 
-                // Add clean indicator (no "new beer" text)
-                addCleanStyleIndicator('🆕 Enter style for new beer', 'new');
-                
-                console.log('🆕 New beer selected - style field editable');
+                console.log('🆕 New beer selected - showing style field');
                 
             } else if (selectedOption.value && selectedOption.value !== '') {
-                // EXISTING BEER - HIDE style field entirely, show beer info
-                if (beerStyleGroup) beerStyleGroup.style.display = 'none';
+                // EXISTING BEER - Hide style field, show clean info
+                beerStyleGroup.style.display = 'none';
+                showCleanBeerInfo(selectedOption);
                 
-                // KEEP the existing beer info display
-                showBeerInfo(selectedOption);
-                
-                console.log('🔒 Existing beer selected - style field hidden');
+                console.log('✅ Existing beer selected - hiding style field');
                 
             } else {
-                // NO SELECTION - Hide style field
-                if (beerStyleGroup) beerStyleGroup.style.display = 'none';
-                removeStyleIndicator();
-                clearBeerInfo();
+                // NO SELECTION - Hide everything
+                beerStyleGroup.style.display = 'none';
+                selectedBeerInfo.style.display = 'none';
             }
         }
 
@@ -3297,74 +3263,18 @@
                 beerNameSelect.parentNode.insertBefore(infoDiv, beerNameSelect.nextSibling);
             }
             
-            // CLEAN beer info display - remove "STYLE LOCKED" badge
             infoDiv.innerHTML = `
                 <div class="beer-info-header">
-                    <strong>📊 Selected Beer Details</strong>
+                    <strong>📊 Selected Beer Info:</strong>
+                    <span class="style-locked-badge">STYLE LOCKED</span>
                 </div>
-                <div class="beer-info-grid">
-                    <div class="beer-info-item">
-                        <span class="beer-info-label">🍺 Style:</span>
-                        <span class="beer-info-value">${style}</span>
-                    </div>
-                    <div class="beer-info-item">
-                        <span class="beer-info-label">📊 ABV:</span>
-                        <span class="beer-info-value">${abv}%</span>
-                    </div>
-                    <div class="beer-info-item">
-                        <span class="beer-info-label">🌱 Vegan:</span>
-                        <span class="beer-info-value">${veganStatus}</span>
-                    </div>
-                    <div class="beer-info-item">
-                        <span class="beer-info-label">⚗️ Gluten:</span>
-                        <span class="beer-info-value">${glutenStatus.replace('_', ' ')}</span>
-                    </div>
-                </div>
+                🍺 Style: <strong>${style}</strong> (cannot be changed)<br>
+                📊 ABV: ${abv}%<br>
+                🌱 Vegan: ${veganStatus}<br>
+                ⚗️ Gluten Status: ${glutenStatus.replace('_', ' ')}
             `;
             
-            console.log(`📊 Showing clean info for: ${beerName}`);
-        }
-
-        // 4. ADD function to clear beer info
-        function clearBeerInfo() {
-            const infoDiv = document.getElementById('selected-beer-info');
-            if (infoDiv) {
-                infoDiv.remove();
-            }
-        }
-        
-        // 5. ADD the pub beer history feature
-        async function showCurrentPubBeers(pubData) {
-            const currentPubBeers = document.getElementById('currentPubBeers');
-            const pubBeersList = document.getElementById('pubBeersList');
-            
-            if (!pubData || !pubData.pub_id) {
-                if (currentPubBeers) currentPubBeers.style.display = 'none';
-                return;
-            }
-            
-            try {
-                // Fetch current beers for this pub
-                const response = await fetch(`/api/pub/${pubData.pub_id}/current_beers`);
-                if (response.ok) {
-                    const beers = await response.json();
-                    
-                    if (beers.length > 0) {
-                        pubBeersList.innerHTML = beers.map(beer => `
-                            <div class="pub-beer-item">
-                                ${beer.format_icon} ${beer.format}: <strong>${beer.brewery} ${beer.name}</strong> (${beer.style})
-                            </div>
-                        `).join('');
-                        
-                        currentPubBeers.style.display = 'block';
-                    } else {
-                        currentPubBeers.style.display = 'none';
-                    }
-                }
-            } catch (error) {
-                console.error('Error loading current pub beers:', error);
-                if (currentPubBeers) currentPubBeers.style.display = 'none';
-            }
+            console.log(`📊 Showing locked info for: ${beerName}`);
         }
         
         // REPLACE - Clean clear function
