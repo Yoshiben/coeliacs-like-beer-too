@@ -1103,7 +1103,10 @@ button, .btn-base {
     max-width: 1200px;
     margin: 20px auto 40px;
     padding: 0 20px;
-    display: none;
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 100px); /* Adjust based on header/footer height */
+    justify-content: center; /* Center vertically */
     scroll-margin-top: 20px;
 }
 
@@ -1152,12 +1155,16 @@ button, .btn-base {
 }
 
 .split-pub-details {
+    flex: 1; /* Allows it to grow and center */
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Center content inside */
+    padding: 30px 30px 80px; /* Keep bottom padding for action bar */
     background: var(--bg-white);
-    padding: 30px 30px 80px; /* Increased bottom padding to prevent button cutoff */
     border-radius: 0 0 var(--border-radius) var(--border-radius);
     backdrop-filter: blur(10px);
     box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-    min-height: 300px;
+    position: relative; /* Ensure content stays above sticky bar */
 }
 
 .pub-header {
@@ -1932,8 +1939,8 @@ button, .btn-base {
 
     /* Split Screen Mobile */
     .split-screen-container {
+        min-height: calc(100vh - 80px); /* Adjust for mobile */
         padding: 0 15px;
-        margin: 15px auto 30px;
     }
     
     .split-screen-header {
@@ -1960,8 +1967,7 @@ button, .btn-base {
     }
     
     .split-pub-details {
-        padding: 25px 20px 60px; /* Extra bottom padding for mobile */
-        min-height: 250px;
+        padding: 25px 20px 70px;
     }
     
     .pub-header {
@@ -2058,40 +2064,43 @@ button, .btn-base {
         font-size: 18px;
     }
 }
-/* Add to end of style.css */
+
+/* Adjust action bar to not interfere with centering */
 .split-action-bar {
-    position: sticky; /* Sticks to bottom while scrolling content */
+    position: sticky;
     bottom: 0;
     left: 0;
     right: 0;
     background: var(--bg-white);
     padding: 15px 30px;
     border-top: 2px solid #e2e8f0;
-    display: flex;
-    gap: 15px;
+    display: grid; /* Change to grid for 2x2 */
+    grid-template-columns: repeat(2, 1fr); /* 2 columns */
+    gap: 10px; /* Smaller gap */
     justify-content: center;
     box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-    z-index: 10; /* Above content but below modals */
+    z-index: 10;
     backdrop-filter: blur(10px);
     border-radius: 0 0 var(--border-radius) var(--border-radius);
 }
 
 .split-action-bar .pub-action-btn {
     flex: 1;
-    max-width: 200px; /* Prevent stretching too wide */
-    padding: 12px 20px;
-    font-size: 14px;
+    max-width: 150px; /* Smaller max width */
+    padding: 10px 15px; /* Reduced padding */
+    font-size: 13px; /* Smaller text */
+    min-height: 40px; /* Smaller minimum height */
 }
 
 @media (max-width: 768px) {
     .split-action-bar {
-        padding: 12px 20px;
-        gap: 10px;
+        padding: 10px 15px;
+        gap: 8px;
     }
     
     .split-action-bar .pub-action-btn {
-        padding: 14px 20px;
-        font-size: 15px;
-        min-height: 50px;
+        padding: 12px 15px;
+        font-size: 14px;
+        min-height: 45px;
     }
 }
