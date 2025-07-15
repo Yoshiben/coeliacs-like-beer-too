@@ -4451,3 +4451,122 @@ body.modal-open #results-section {
         padding: 1px 4px;
     }
 }
+
+/* ================================
+   ADD TO BOTTOM OF style.css
+   CLEAN BEER FORM STYLES
+   ================================ */
+
+/* Selected Beer Info - Clean Design */
+.selected-beer-info {
+    background: rgba(16, 185, 129, 0.1);
+    border: 2px solid #10b981;
+    border-radius: 12px;
+    padding: 15px;
+    margin: 10px 0;
+}
+
+.selected-beer-card {
+    text-align: left;
+}
+
+.beer-info-header {
+    color: #059669;
+    font-weight: 600;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.beer-name {
+    font-size: 1.1em;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 4px;
+}
+
+.beer-details {
+    font-size: 0.9em;
+    color: #4a5568;
+    margin-bottom: 10px;
+}
+
+.btn-change {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-change:hover {
+    background: rgba(102, 126, 234, 0.2);
+    border-color: #667eea;
+}
+
+/* Current Pub Beers Section */
+.current-pub-beers {
+    background: rgba(102, 126, 234, 0.05);
+    border: 2px solid rgba(102, 126, 234, 0.2);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 15px 0;
+}
+
+.current-pub-beers h4 {
+    margin: 0 0 15px 0;
+    color: #667eea;
+    font-size: 1.1em;
+}
+
+#pubBeersList {
+    margin-bottom: 15px;
+}
+
+.pub-beer-item {
+    background: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    border-left: 3px solid #10b981;
+}
+
+.action-choice {
+    display: flex;
+    gap: 20px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 8px;
+}
+
+.action-choice label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .action-choice {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .current-pub-beers {
+        padding: 15px;
+    }
+    
+    .selected-beer-info {
+        padding: 12px;
+    }
+    
+    .beer-info-header {
+        font-size: 0.95em;
+    }
+}
