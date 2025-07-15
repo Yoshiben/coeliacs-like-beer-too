@@ -1698,11 +1698,15 @@
                         ${createSinglePubDisplay(selectedPub)}
                         <div class="split-action-bar">
                             <button onclick="goBackToResults()" class="pub-action-btn back-to-results-btn" aria-label="Back to search results">
-                                ← Back to Results
+                                ← Back
                             </button>
                             <button onclick="goHome()" class="pub-action-btn home-btn" aria-label="Return to homepage">
                                 🏠 Home
                             </button>
+                            <button onclick="findOnMap(${selectedPub.latitude || 'null'}, ${selectedPub.longitude || 'null'}, '${selectedPub.name.replace(/'/g, "\\'")}', '${selectedPub.postcode}', ${selectedPub.pub_id})" class="pub-action-btn find-on-map-btn" aria-label="Find this pub on map">
+                                🗺️ Find on Map
+                            </button>
+                            <div class="pub-action-btn" style="visibility: hidden;">&nbsp;</div> <!-- Placeholder for 2x2 grid -->
                         </div>
                     </div>
                 `;
