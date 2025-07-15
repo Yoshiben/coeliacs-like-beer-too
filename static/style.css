@@ -1112,21 +1112,48 @@ button, .btn-base {
     padding: 20px 30px;
     border-radius: var(--border-radius) var(--border-radius) 0 0;
     backdrop-filter: blur(10px);
-    display: grid;
-    grid-template-columns: auto 1fr auto;
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 20px;
     border-bottom: 2px solid #e2e8f0;
 }
 
 .split-screen-header .section-title {
+    flex: 1;
     text-align: center;
     margin: 0;
 }
 
+.split-screen-nav {
+    display: flex;
+    gap: 10px;
+}
+
+.back-to-results-btn {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-normal);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+.back-to-results-btn:hover {
+    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+}
+
 .split-pub-details {
     background: var(--bg-white);
-    padding: 30px 30px 50px;
+    padding: 30px 30px 80px; /* Increased bottom padding to prevent button cutoff */
     border-radius: 0 0 var(--border-radius) var(--border-radius);
     backdrop-filter: blur(10px);
     box-shadow: 0 8px 32px rgba(0,0,0,0.15);
@@ -1134,12 +1161,15 @@ button, .btn-base {
 }
 
 .pub-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
     margin-bottom: 25px;
     padding-bottom: 20px;
     border-bottom: 2px solid #e2e8f0;
 }
 
-.pub-header h3 {
+.pub-title-section h3 {
     font-size: 1.5em;
     color: var(--text-primary);
     margin: 0 0 10px 0;
@@ -1908,22 +1938,36 @@ button, .btn-base {
     
     .split-screen-header {
         padding: 18px 20px;
-        grid-template-columns: 1fr;
-        gap: 10px;
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
         text-align: center;
     }
     
-    .home-btn {
+    .split-screen-nav {
         order: -1;
+        justify-content: center;
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .home-btn,
+    .back-to-results-btn {
+        width: 100%;
         justify-content: center;
         padding: 12px 20px;
         font-size: 15px;
-        width: 100%;
     }
     
     .split-pub-details {
-        padding: 25px 20px 40px;
+        padding: 25px 20px 60px; /* Extra bottom padding for mobile */
         min-height: 250px;
+    }
+    
+    .pub-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
     }
     
     .pub-header h3 {
@@ -2013,5 +2057,3 @@ button, .btn-base {
         height: 45px;
         font-size: 18px;
     }
-
-    /*
