@@ -947,7 +947,10 @@
             document.getElementById('newPubFields').style.display = 'none';
             document.getElementById('pubSuggestions').style.display = 'none';
             document.getElementById('reportPubSearch').value = pub.name;
+            
+            // ADD THIS LINE - this is probably missing:
             showCurrentPubBeers(pub);
+            
             trackEvent('select_existing_pub', 'Report Flow', pub.name);
         }
 
@@ -3136,7 +3139,7 @@
             beers.forEach(beer => {
                 const option = document.createElement('option');
                 option.value = beer.beer_id;
-                option.textContent = `${beer.name} (${beer.style}, ${beer.abv}%)`;
+                option.textContent = beer.name; // CLEAN - no brackets!
                 
                 // Store beer data in option for later use
                 option.dataset.beerName = beer.name;
