@@ -4123,3 +4123,102 @@ body.modal-open #results-section {
         border-width: 3px;
     }
 }
+
+/* ============================================================================
+   DROPDOWN Z-INDEX FIX - Add this to your style.css
+   ============================================================================ */
+
+/* Fix pub search dropdown positioning */
+.pub-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-top: none;
+    border-radius: 0 0 10px 10px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 10000; /* HIGH Z-INDEX to appear above everything */
+    display: none;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+}
+
+/* Ensure parent container has relative positioning */
+.form-group {
+    position: relative;
+}
+
+/* Make sure modal content allows overflow for dropdowns */
+.report-modal .modal-content {
+    overflow: visible; /* Allow dropdowns to show outside modal bounds */
+}
+
+/* Fix for any other dropdowns in forms */
+.brewery-select,
+.beer-select {
+    z-index: 9999;
+}
+
+/* Ensure dropdown items are clickable */
+.pub-suggestion-item {
+    position: relative;
+    z-index: 10001;
+    padding: 12px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background-color 0.2s ease;
+    background: white;
+}
+
+.pub-suggestion-item:hover {
+    background: rgba(102, 126, 234, 0.1);
+}
+
+.pub-suggestion-item:last-child {
+    border-bottom: none;
+    border-radius: 0 0 10px 10px;
+}
+
+/* Fix for "Add New Pub" option */
+.pub-suggestion-item.add-new {
+    background: rgba(102, 126, 234, 0.05);
+    border-top: 2px solid #e2e8f0;
+    font-style: italic;
+}
+
+.no-pub-found {
+    padding: 15px;
+    text-align: center;
+    background: rgba(239, 68, 68, 0.05);
+    border: none;
+    position: relative;
+    z-index: 10001;
+}
+
+/* Mobile specific fixes */
+@media (max-width: 768px) {
+    .pub-suggestions {
+        z-index: 10005; /* Even higher on mobile */
+        max-height: 250px; /* Slightly taller on mobile */
+        box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+    }
+    
+    .pub-suggestion-item {
+        padding: 16px 18px; /* Larger touch targets */
+        font-size: 15px;
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+    }
+}
+
+/* Fix modal overlay conflicts */
+.report-modal {
+    z-index: 9998; /* Modal below dropdown */
+}
+
+.modal-content {
+    z-index: 9999; /* Modal content below dropdown */
+}
