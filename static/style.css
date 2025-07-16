@@ -3175,3 +3175,139 @@ console.log('📱 Mobile-enhanced CSS loaded!');
         background: rgba(102, 126, 234, 0.1);
     }
 }
+
+/* ===========================================
+   MOBILE CSS ADDITIONS
+   ===========================================
+   INSTRUCTION: Add this CSS to the END of your style.css file
+   (after all your existing CSS)
+*/
+
+/* Enhanced mobile location button */
+@media (max-width: 768px) {
+    .mobile-enhanced .mobile-location-btn-enhanced {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+        color: white !important;
+        font-weight: 700 !important;
+        font-size: 17px !important;
+        padding: 18px 24px !important;
+        width: 100% !important;
+        margin-bottom: 15px !important;
+        border-radius: 25px !important;
+        border: none !important;
+        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4) !important;
+        letter-spacing: 0.5px !important;
+        order: -1 !important; /* Put it first */
+    }
+    
+    .mobile-enhanced .mobile-location-btn-enhanced:active {
+        transform: translateY(1px) !important;
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3) !important;
+    }
+    
+    /* Mobile result cards */
+    .mobile-enhanced .result-item {
+        background: white !important;
+        border-radius: 15px !important;
+        margin-bottom: 15px !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+        padding: 20px !important;
+        display: block !important; /* Override grid layout */
+    }
+    
+    .mobile-enhanced .result-item:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    /* Mobile action buttons */
+    .mobile-button-row {
+        display: flex !important;
+        gap: 8px !important;
+        margin-top: 15px !important;
+        padding-top: 15px !important;
+        border-top: 1px solid #e2e8f0 !important;
+    }
+    
+    .mobile-action-btn {
+        flex: 1 !important;
+        padding: 12px 8px !important;
+        border: none !important;
+        border-radius: 15px !important;
+        font-weight: 600 !important;
+        font-size: 13px !important;
+        cursor: pointer !important;
+        transition: all 0.3s ease !important;
+        color: white !important;
+        min-height: 44px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    .mobile-action-btn.directions {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
+    }
+    
+    .mobile-action-btn.map {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    }
+    
+    .mobile-action-btn.update {
+        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
+    }
+    
+    .mobile-action-btn:active {
+        transform: translateY(1px) !important;
+    }
+    
+    /* Hide original buttons on mobile to avoid clutter */
+    .mobile-enhanced .result-details button {
+        display: none !important;
+    }
+    
+    .mobile-enhanced .update-button {
+        display: none !important;
+    }
+    
+    /* Better mobile typography */
+    .mobile-enhanced .result-details strong {
+        font-size: 18px !important;
+        display: block !important;
+        margin-bottom: 8px !important;
+        color: #2d3748 !important;
+    }
+    
+    .mobile-enhanced .result-details .address {
+        font-size: 14px !important;
+        color: #4a5568 !important;
+        margin-bottom: 6px !important;
+    }
+    
+    .mobile-enhanced .result-details .local-authority {
+        font-size: 13px !important;
+        color: #718096 !important;
+    }
+    
+    /* Make beer details more readable on mobile */
+    .mobile-enhanced .beer-details {
+        background: #f8fafc !important;
+        padding: 15px !important;
+        border-radius: 10px !important;
+        margin-top: 10px !important;
+        margin-bottom: 10px !important;
+    }
+    
+    .mobile-enhanced .beer-item {
+        background: white !important;
+        padding: 10px 12px !important;
+        border-radius: 8px !important;
+        margin-bottom: 8px !important;
+        border-left: 3px solid #667eea !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+    }
+    
+    .mobile-enhanced .beer-item:last-child {
+        margin-bottom: 0 !important;
+    }
+}
