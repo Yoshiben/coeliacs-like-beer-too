@@ -10,6 +10,309 @@
     
     <!-- Google Analytics with GDPR compliance -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-WSHR39KSXS"></script>
+        <!-- ADD this mobile detection and enhancement to your existing index.html -->
+        <!-- Place this script in the <head> section, before your existing scripts -->
+        
+    <script>
+        // Mobile Detection and Enhancement
+        const isMobile = () => window.innerWidth <= 768 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        
+        // Apply mobile enhancements when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            if (isMobile()) {
+                console.log('🍺 Mobile device detected - applying enhancements');
+                document.body.classList.add('mobile-enhanced');
+                setupMobileEnhancements();
+            }
+        });
+        
+        function setupMobileEnhancements() {
+            // 1. Make search section sticky on mobile
+            const searchSection = document.getElementById('search');
+            if (searchSection) {
+                searchSection.classList.add('mobile-sticky');
+            }
+            
+            // 2. Add quick location button prominently
+            addMobileLocationButton();
+            
+            // 3. Enhance result display for mobile
+            enhanceMobileResults();
+            
+            // 4. Add mobile-specific event listeners
+            setupMobileGestures();
+            
+            // 5. Auto-focus location finding
+            prioritizeLocationSearch();
+        }
+        
+        function addMobileLocationButton() {
+            const searchActions = document.querySelector('.search-actions');
+            if (!searchActions) return;
+            
+            // Create prominent location button
+            const locationBtn = document.createElement('button');
+            locationBtn.className = 'mobile-location-btn';
+            locationBtn.innerHTML = '📍 Find Beer Near Me Now';
+            locationBtn.onclick = findNearbyPubsMobile;
+            
+            // Insert at the beginning for prominence
+            searchActions.insertBefore(locationBtn, searchActions.firstChild);
+        }
+        
+        function enhanceMobileResults() {
+            // This will be called after search results load
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.target.id === 'results') {
+                        convertResultsToMobileCards();
+                    }
+                });
+            });
+            
+            const resultsContainer = document.getElementById('results');
+            if (resultsContainer) {
+                observer.observe(resultsContainer, { childList: true });
+            }
+        }
+        
+        function convertResultsToMobileCards() {
+            if (!isMobile()) return;
+            
+            const resultItems = document.querySelectorAll('.result-item');
+            resultItems.forEach(item => {
+                if (!item.classList.contains('mobile-enhanced')) {
+                    item.classList.add('mobile-enhanced');
+                    enhanceResultCard(item);
+                }
+            });
+        }
+        
+        function enhanceResultCard(resultItem) {
+            // Add mobile-specific quick actions
+            const buttonColumn = resultItem.querySelector('.button-column');
+            if (buttonColumn) {
+                const quickActions = document.createElement('div');
+                quickActions.className = 'mobile-quick-actions';
+                quickActions.innerHTML = `
+                    <button class="mobile-action-btn directions" onclick="getDirectionsToThisPub(this)">
+                        🧭 Directions
+                    </button>
+                    <button class="mobile-action-btn call" onclick="callPub(this)">
+                        📞 Call Pub
+                    </button>
+                `;
+                buttonColumn.appendChild(quickActions);
+            }
+            
+            // Enhance beer details for mobile scanning
+            const beerDetails = resultItem.querySelector('.beer-details');
+            if (beerDetails) {
+                beerDetails.classList.add('mobile-beer-display');
+            }
+        }
+        
+        function setupMobileGestures() {
+            // Prevent zoom on double-tap for iOS
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', function (event) {
+                const now = Date.now();
+                if (now - lastTouchEnd <= 300) {
+                    event.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+            
+            // Enhanced keyboard handling for search
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        searchPubs();
+                    }
+                });
+                
+                // Auto-expand search on focus for mobile
+                searchInput.addEventListener('focus', function() {
+                    if (isMobile()) {
+                        this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                });
+            }
+        }
+        
+        function prioritizeLocationSearch() {
+            // Auto-request location permission on mobile for faster "near me" searches
+            if ('geolocation' in navigator && isMobile()) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        userLocation = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        console.log('📍 Mobile location ready for instant nearby search');
+                        updateLocationStatus('✅ Location ready - tap "Near Me" for instant results');
+                    },
+                    (error) => {
+                        console.log('📍 Location permission denied or unavailable');
+                    },
+                    { enableHighAccuracy: false, timeout: 5000, maximumAge: 300000 }
+                );
+            }
+        }
+        
+        // Enhanced mobile-specific functions
+        function findNearbyPubsMobile() {
+            trackEvent('mobile_nearby_search', 'Mobile UX', 'prominent_button');
+            
+            if (!userLocation) {
+                showMobileLocationPrompt();
+                return;
+            }
+            
+            // Use existing function but with mobile optimizations
+            findNearbyPubs();
+            
+            // Auto-show map on mobile for context
+            setTimeout(() => {
+                if (!mapVisible) {
+                    toggleMap();
+                }
+            }, 1000);
+        }
+        
+        function showMobileLocationPrompt() {
+            const prompt = document.createElement('div');
+            prompt.className = 'mobile-location-prompt';
+            prompt.innerHTML = `
+                <div class="prompt-content">
+                    <h3>📍 Enable Location</h3>
+                    <p>Let us find gluten free beer near you!</p>
+                    <button onclick="requestLocationMobile()" class="btn-enable-location">
+                        Enable Location
+                    </button>
+                    <button onclick="closeMobilePrompt(this)" class="btn-cancel-location">
+                        Maybe Later
+                    </button>
+                </div>
+            `;
+            document.body.appendChild(prompt);
+        }
+        
+        function requestLocationMobile() {
+            if ('geolocation' in navigator) {
+                showLoadingToast('Getting your location...');
+                
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        userLocation = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        hideLoadingToast();
+                        closeMobilePrompt(document.querySelector('.mobile-location-prompt'));
+                        findNearbyPubs();
+                        showSuccessToast('📍 Found your location! Searching nearby...');
+                    },
+                    (error) => {
+                        hideLoadingToast();
+                        let errorMessage = 'Unable to get location';
+                        switch(error.code) {
+                            case error.PERMISSION_DENIED:
+                                errorMessage = 'Location permission denied. Please enable in browser settings.';
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                errorMessage = 'Location temporarily unavailable.';
+                                break;
+                            case error.TIMEOUT:
+                                errorMessage = 'Location request timed out.';
+                                break;
+                        }
+                        showSuccessToast(errorMessage);
+                    },
+                    { enableHighAccuracy: true, timeout: 10000 }
+                );
+            } else {
+                showSuccessToast('Location services not supported by your browser');
+            }
+        }
+        
+        function closeMobilePrompt(prompt) {
+            if (prompt) {
+                prompt.remove();
+            }
+        }
+        
+        function getDirectionsToThisPub(button) {
+            const resultItem = button.closest('.result-item');
+            const pubName = resultItem.querySelector('strong').textContent;
+            const address = resultItem.querySelector('.address').textContent;
+            
+            // Try to find coordinates from existing data
+            const mapButton = resultItem.querySelector('[onclick*="findOnMap"]');
+            if (mapButton) {
+                const onclick = mapButton.getAttribute('onclick');
+                const coords = onclick.match(/findOnMap\(([^,]+),\s*([^,]+)/);
+                if (coords && coords[1] !== 'null' && coords[2] !== 'null') {
+                    const lat = parseFloat(coords[1]);
+                    const lng = parseFloat(coords[2]);
+                    openDirectionsApp(lat, lng, pubName);
+                    return;
+                }
+            }
+            
+            // Fallback to address-based directions
+            openDirectionsApp(null, null, pubName, address);
+        }
+        
+        function openDirectionsApp(lat, lng, pubName, address) {
+            const isMobileDevice = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            let directionsUrl;
+            
+            if (lat && lng) {
+                if (isMobileDevice) {
+                    // Try native apps first
+                    if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                        directionsUrl = `maps://maps.google.com/maps?daddr=${lat},${lng}`;
+                    } else {
+                        directionsUrl = `geo:${lat},${lng}?q=${lat},${lng}(${encodeURIComponent(pubName)})`;
+                    }
+                } else {
+                    directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+                }
+            } else {
+                const searchQuery = encodeURIComponent(`${pubName} ${address}`);
+                directionsUrl = `https://www.google.com/maps/search/${searchQuery}`;
+            }
+            
+            window.open(directionsUrl, '_blank');
+            trackEvent('mobile_directions', 'Mobile UX', pubName);
+            showSuccessToast('🧭 Opening directions...');
+        }
+        
+        function callPub(button) {
+            // This would need pub phone numbers in your database
+            showSuccessToast('📞 Pub phone numbers coming soon! For now, search online or check their website.');
+            trackEvent('mobile_call_request', 'Mobile UX', 'feature_request');
+        }
+        
+        function updateLocationStatus(message) {
+            const locationStatus = document.getElementById('locationStatus');
+            if (locationStatus) {
+                locationStatus.textContent = message;
+                locationStatus.style.display = 'block';
+                locationStatus.className = 'location-status location-success';
+                
+                setTimeout(() => {
+                    locationStatus.style.display = 'none';
+                }, 3000);
+            }
+        }
+        
+        console.log('📱 Mobile enhancements loaded!');
+    </script>
     <script>
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
