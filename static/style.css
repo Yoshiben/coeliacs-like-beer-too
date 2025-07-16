@@ -184,16 +184,21 @@ html {
     z-index: 100; /* Default z-index */
 }
 
-/* Raise z-index when map is visible to prevent overlap */
-.map-container:not([style*="display: none"]) ~ .search-section {
+/* Raise z-index and add margin when map is visible to prevent overlap */
+.map-container:not([style*="display: none"]) + .search-section {
     z-index: 200; /* Above map */
-    margin-top: 20px; /* Extra space to avoid touching map */
+    margin-top: 40px; /* Increased space to avoid touching map */
+    padding-top: 30px; /* Extra padding */
 }
 
-/* Suggestions Dropdown Fix */
+/* Suggestions Dropdown Fix - Ensure it sticks to input */
+.search-row {
+    position: relative; /* Anchor for suggestions */
+}
+
 #suggestions {
     position: absolute;
-    top: calc(100% + 5px); /* Directly below search row */
+    top: calc(100% + 5px); /* Directly below search input */
     left: 0;
     right: 0;
     max-height: 400px;
@@ -1122,26 +1127,42 @@ button, .btn-base {
    ================================ */
 .split-screen-container {
     max-width: 1200px;
-    margin: 20px auto 40px;
-    padding: 0 20px;
+    margin: 0 auto; /* Remove top/bottom margins for full screen */
+    padding: 0;
     display: flex;
     flex-direction: column;
-    min-height: calc(100vh - 100px); /* Adjust based on header/footer height for centering */
-    justify-content: center; /* Center vertically */
-    scroll-margin-top: 20px;
+    height: 100vh; /* Full viewport height */
+    justify-content: flex-start; /* Start from top */
+    scroll-margin-top: 0;
+    overflow: hidden; /* Prevent outer scroll */
+}
+
+.split-screen-header {
+    background: var(--bg-white);
+    padding: 20px 30px;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    backdrop-filter: blur(10px);
+    z-index: 150; /* Above content */
+    position: sticky;
+    top: 0;
+}
+
+.split-screen-header .section-title {
+    flex: 1;
+    text-align: center;
+    margin: 0;
 }
 
 .split-pub-details {
-    flex: 1; /* Allows it to grow and center */
-    display: flex;
-    flex-direction: column;
-    justify-content: center; /* Center content inside */
-    padding: 30px 30px 80px; /* Bottom padding for action bars */
+    flex: 1; /* Take all available space */
+    overflow-y: auto; /* Allow scrolling if content is long */
+    padding: 30px 30px 100px; /* Increased bottom padding for bars */
     background: var(--bg-white);
     border-radius: 0 0 var(--border-radius) var(--border-radius);
     backdrop-filter: blur(10px);
     box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-    position: relative; /* Ensure content stays above sticky bars */
+    position: relative;
+    min-height: calc(100% - 60px); /* Full height minus header */
 }
 
 /* Pub Actions Grid (2x2 for Find Online, Get Directions, Find on Map, Report GF Beer) */
@@ -1178,7 +1199,7 @@ button, .btn-base {
 /* Navigation Bar (Back and Home in 2 columns) */
 /* Navigation Bar (Swapped order in HTML, uniform sizes, better colors) */
 .split-action-bar {
-    position: sticky;
+    position: fixed; /* Fixed to bottom for full screen feel */
     bottom: 0;
     left: 0;
     right: 0;
@@ -1190,13 +1211,13 @@ button, .btn-base {
     gap: 15px;
     justify-content: center;
     box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-    z-index: 10;
+    z-index: 200;
     backdrop-filter: blur(10px);
-    border-radius: 0 0 var(--border-radius) var(--border-radius);
+    border-radius: 0;
 }
 
 .split-action-bar .pub-action-btn {
-    min-width: 140px; /* Match pub-actions */
+    min-width: 140px;
     min-height: 50px;
     padding: 12px 20px;
     font-size: 14px;
@@ -1219,23 +1240,6 @@ button, .btn-base {
     background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
-}
-
-.split-screen-header {
-    background: var(--bg-white);
-    padding: 20px 30px;
-    border-radius: var(--border-radius) var(--border-radius) 0 0;
-    backdrop-filter: blur(10px);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 2px solid #e2e8f0;
-}
-
-.split-screen-header .section-title {
-    flex: 1;
-    text-align: center;
-    margin: 0;
 }
 
 .split-screen-nav {
@@ -1690,11 +1694,12 @@ button, .btn-base {
     }
 
    #suggestions {
-        left: 15px;
-        right: 15px;
+        left: 0;
+        right: 0;
         max-height: 280px;
-        top: calc(100% + 5px); /* Stick below input */
+        top: calc(100% + 5px); /* Stick below input on mobile */
     }
+    
 
     /* Hero Section Mobile */
     .hero-section {
@@ -1753,6 +1758,7 @@ button, .btn-base {
     /* Search Section Mobile */
     .search-section {
         margin: 10px 15px 25px;
+        margin-top: 0; /* Reset top margin on mobile for full coverage */
         padding: 18px;
         overflow: visible;
     }
@@ -2022,12 +2028,13 @@ button, .btn-base {
 
     /* Split Screen Mobile */
     .split-screen-container {
-        min-height: calc(100vh - 80px); /* Adjust for mobile */
-        padding: 0 15px;
+        height: 100vh;
+        margin: 0;
+        padding: 0;
     }
 
     .split-pub-details {
-        padding: 25px 20px 70px;
+        padding: 25px 20px 100px;
     }
 
     .pub-actions {
@@ -2045,6 +2052,7 @@ button, .btn-base {
     .split-action-bar {
         padding: 10px 15px;
         gap: 10px;
+        border-radius: 0;
     }
 
     .split-action-bar .pub-action-btn {
