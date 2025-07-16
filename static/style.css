@@ -180,9 +180,30 @@ html {
     border-radius: var(--border-radius);
     backdrop-filter: blur(10px);
     box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-    position: relative;
-    z-index: 100;
-    overflow: visible;
+    position: relative; /* Base for absolute children */
+    z-index: 100; /* Default z-index */
+}
+
+/* Raise z-index when map is visible to prevent overlap */
+.map-container:not([style*="display: none"]) ~ .search-section {
+    z-index: 200; /* Above map */
+    margin-top: 20px; /* Extra space to avoid touching map */
+}
+
+/* Suggestions Dropdown Fix */
+#suggestions {
+    position: absolute;
+    top: calc(100% + 5px); /* Directly below search row */
+    left: 0;
+    right: 0;
+    max-height: 400px;
+    overflow-y: auto;
+    border-radius: 15px;
+    background: white;
+    display: none;
+    z-index: var(--z-dropdown); /* High z-index */
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    margin: 0; /* No extra margin */
 }
 
 .section-title {
@@ -1126,25 +1147,36 @@ button, .btn-base {
 /* Pub Actions Grid (2x2 for Find Online, Get Directions, Find on Map, Report GF Beer) */
 .pub-actions {
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 2 columns */
-    gap: 15px; /* Space between buttons */
-    flex-wrap: nowrap; /* Prevent wrapping */
-    margin-bottom: 20px; /* Space before navigation bar */
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    flex-wrap: nowrap;
+    margin-bottom: 20px;
     padding: 0;
 }
 
 .pub-actions .pub-action-btn {
-    flex: 1;
-    padding: 12px 20px; /* Slightly smaller for grid */
+    min-width: 140px; /* Fixed min-width for uniformity */
+    min-height: 50px; /* Fixed height */
+    padding: 12px 20px;
     font-size: 14px;
-    min-height: 45px; /* Consistent height */
     border-radius: 25px;
     color: white;
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     transition: var(--transition-normal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+/* Hover States (Uniform) */
+.pub-actions .pub-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
 }
 
 /* Navigation Bar (Back and Home in 2 columns) */
+/* Navigation Bar (Swapped order in HTML, uniform sizes, better colors) */
 .split-action-bar {
     position: sticky;
     bottom: 0;
@@ -1154,7 +1186,7 @@ button, .btn-base {
     padding: 15px 30px;
     border-top: 2px solid #e2e8f0;
     display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 2 columns for Back and Home */
+    grid-template-columns: repeat(2, 1fr);
     gap: 15px;
     justify-content: center;
     box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
@@ -1164,14 +1196,18 @@ button, .btn-base {
 }
 
 .split-action-bar .pub-action-btn {
-    flex: 1;
+    min-width: 140px; /* Match pub-actions */
+    min-height: 50px;
     padding: 12px 20px;
     font-size: 14px;
-    min-height: 45px;
     border-radius: 25px;
     color: white;
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     transition: var(--transition-normal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
 /* Specific Button Styles (unchanged, but ensure they exist) */
@@ -1184,8 +1220,6 @@ button, .btn-base {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
 }
-
-
 
 .split-screen-header {
     background: var(--bg-white);
@@ -1231,8 +1265,6 @@ button, .btn-base {
     box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
 }
 
-
-
 .pub-header {
     display: flex;
     justify-content: space-between;
@@ -1275,9 +1307,7 @@ button, .btn-base {
     font-weight: 600;
 }
 
-
-
-.search-btn {
+.search-btn { /* Find Online */
     background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
 }
 
@@ -1287,7 +1317,7 @@ button, .btn-base {
     box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
 }
 
-.directions-btn {
+.directions-btn { /* Get Directions */
     background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
 }
 
@@ -1297,7 +1327,7 @@ button, .btn-base {
     box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
 }
 
-.update-btn {
+.update-btn { /* Report GF Beer */
     background: var(--success-gradient);
 }
 
@@ -1308,7 +1338,7 @@ button, .btn-base {
 }
 
 .home-btn {
-    background: var(--primary-gradient);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     border: none;
     padding: 8px 16px;
@@ -1659,6 +1689,13 @@ button, .btn-base {
         --border-radius: 15px;
     }
 
+   #suggestions {
+        left: 15px;
+        right: 15px;
+        max-height: 280px;
+        top: calc(100% + 5px); /* Stick below input */
+    }
+
     /* Hero Section Mobile */
     .hero-section {
         padding: 15px 15px 25px;
@@ -1994,14 +2031,15 @@ button, .btn-base {
     }
 
     .pub-actions {
-        gap: 10px; /* Smaller gap on mobile */
+        gap: 10px;
         margin-bottom: 15px;
     }
 
     .pub-actions .pub-action-btn {
-        padding: 14px 15px; /* Adjusted for touch */
-        font-size: 14px;
-        min-height: 50px;
+        min-width: 120px; /* Slightly smaller on mobile */
+        min-height: 48px;
+        padding: 10px 15px;
+        font-size: 13px;
     }
 
     .split-action-bar {
@@ -2010,9 +2048,10 @@ button, .btn-base {
     }
 
     .split-action-bar .pub-action-btn {
-        padding: 14px 15px;
-        font-size: 14px;
-        min-height: 50px;
+        min-width: 120px;
+        min-height: 48px;
+        padding: 10px 15px;
+        font-size: 13px;
     }
    
     .split-screen-header {
