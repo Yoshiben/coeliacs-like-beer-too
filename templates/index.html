@@ -1579,66 +1579,91 @@
             );
         }
 
-        // ENHANCED Find nearby pubs with smart map showing
+        // REPLACE your existing findNearbyPubs() function with this mobile-enhanced version
         async function findNearbyPubs() {
             if (!userLocation) {
-                showSuccessToast('Getting your location first...');
-                getUserLocation();
+                if (isMobile()) {
+                    showMobileLocationPrompt();
+                } else {
+                    showSuccessToast('Getting your location first...');
+                    getUserLocation();
+                }
                 return;
             }
-
+        
             trackEvent('find_nearby_pubs', 'Location Search');
             smartShowMap(); // Auto-show map
             
-            const gfOnly = document.getElementById('gfOnly').checked;
-            const radius = 5;
+            const gfOnly = document.getElementById('gfOnly')?.checked ?? true; // Default to GF on mobile
+            const radius = isMobile() ? 3 : 5; // Smaller radius on mobile for faster results
             
             showResultsSection();
-            showLoadingToast('Finding nearby pubs...');
+            showLoadingToast('Finding nearby GF beer...');
             const results = document.getElementById('results');
             results.innerHTML = '<li class="loading">Finding nearby pubs...</li>';
             
-            map.setView([userLocation.lat, userLocation.lng], 14);
+            // Center map on user location
+            if (map) {
+                map.setView([userLocation.lat, userLocation.lng], 15);
+            }
             
             try {
-                const url = `/nearby?lat=${userLocation.lat}&lng=${userLocation.lng}&radius=${radius}&gf_only=${gfOnly}`;
+                // Use mobile-optimized endpoint if on mobile
+                const endpoint = isMobile() ? '/api/mobile_nearby' : '/nearby';
+                const url = `${endpoint}?lat=${userLocation.lat}&lng=${userLocation.lng}&radius=${radius}&gf_only=${gfOnly}`;
+                
                 const response = await fetch(url);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
-                const nearbyPubs = await response.json();
+                const data = await response.json();
                 
-                if (nearbyPubs.error) {
-                    throw new Error(nearbyPubs.error);
+                if (data.error) {
+                    throw new Error(data.error);
                 }
                 
+                const nearbyPubs = data.pubs || data;
+                
                 hideLoadingToast();
-                displaySearchResults(nearbyPubs);
+                
+                if (isMobile()) {
+                    displayMobileResults(nearbyPubs);
+                } else {
+                    displaySearchResults(nearbyPubs);
+                }
+                
                 addPubMarkersToMap(nearbyPubs);
                 
-                showSuccessToast(`Found ${nearbyPubs.length} pubs near you!`);
-                trackSearch('nearby', 'location', nearbyPubs.length);
+                const resultCount = nearbyPubs.length;
+                const message = isMobile() ? 
+                    `📍 Found ${resultCount} pubs with GF beer nearby!` :
+                    `Found ${resultCount} pubs near you!`;
+                showSuccessToast(message);
                 
-                if (nearbyPubs.length > 0) {
-                    const allPoints = [];
-                    allPoints.push([userLocation.lat, userLocation.lng]);
+                trackSearch('nearby', 'location', resultCount);
+                
+                // Mobile-specific optimizations
+                if (isMobile() && nearbyPubs.length > 0) {
+                    // Auto-zoom to show all nearby pubs
+                    const bounds = L.latLngBounds();
+                    bounds.extend([userLocation.lat, userLocation.lng]);
                     
                     nearbyPubs.forEach(pub => {
                         if (pub.latitude && pub.longitude) {
-                            allPoints.push([parseFloat(pub.latitude), parseFloat(pub.longitude)]);
+                            bounds.extend([pub.latitude, pub.longitude]);
                         }
                     });
                     
-                    if (allPoints.length > 1) {
-                        const group = new L.featureGroup(allPoints.map(point => L.marker(point)));
-                        map.fitBounds(group.getBounds().pad(0.1));
+                    if (map && bounds.isValid()) {
+                        map.fitBounds(bounds, { padding: [20, 20] });
                     }
                 }
                 
+                // Save state
                 currentQuery = '';
-                currentSearchType = 'all';
+                currentSearchType = 'nearby';
                 currentGfOnly = gfOnly;
                 currentPage = 1;
                 AppState.save();
@@ -1648,6 +1673,343 @@
                 hideLoadingToast();
                 results.innerHTML = '<li class="no-results">Error finding nearby pubs. Please try again.</li>';
                 showSuccessToast('Error finding nearby pubs. Please try again.');
+            }
+        }
+        
+        // NEW: Mobile-optimized result display
+        function displayMobileResults(pubs) {
+            const results = document.getElementById('results');
+            
+            if (pubs.length === 0) {
+                results.innerHTML = `
+                    <li class="no-results mobile-no-results">
+                        <div class="no-results-content">
+                            <div class="no-results-icon">🔍</div>
+                            <h3>No GF beer found nearby</h3>
+                            <p>Try expanding your search area or checking a different location</p>
+                            <button onclick="expandMobileSearch()" class="btn-expand-search">
+                                🗺️ Search Wider Area
+                            </button>
+                        </div>
+                    </li>
+                `;
+                return;
+            }
+            
+            results.innerHTML = '';
+            
+            pubs.forEach(pub => {
+                const li = document.createElement('li');
+                li.className = 'result-item mobile-result-card';
+                
+                // Format beer list for mobile
+                const beerDisplay = formatMobileBeerList(pub.beers || []);
+                const verificationBadge = getVerificationBadge(pub.verification_level);
+                
+                li.innerHTML = `
+                    <div class="mobile-result-header">
+                        <div class="pub-info">
+                            <h3 class="mobile-pub-name">${pub.name}</h3>
+                            <div class="mobile-pub-address">${pub.address}, ${pub.postcode}</div>
+                            <div class="mobile-pub-meta">
+                                ${pub.distance ? `<span class="distance-badge">📍 ${pub.distance}km away</span>` : ''}
+                                ${verificationBadge}
+                                ${pub.beer_count ? `<span class="beer-count-badge">${pub.beer_count} GF beers</span>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mobile-beer-section">
+                        ${beerDisplay}
+                    </div>
+                    
+                    <div class="mobile-action-bar">
+                        <button onclick="openDirectionsToMobile(${pub.latitude}, ${pub.longitude}, '${pub.name.replace(/'/g, "\\'")}', '${pub.address.replace(/'/g, "\\'")}')" 
+                                class="mobile-action-btn directions">
+                            🧭 Directions
+                        </button>
+                        <button onclick="findOnMap(${pub.latitude || 'null'}, ${pub.longitude || 'null'}, '${pub.name.replace(/'/g, "\\'")}', '${pub.postcode}', ${pub.pub_id})" 
+                                class="mobile-action-btn map">
+                            🗺️ Show on Map
+                        </button>
+                        <button onclick="quickMobileBeerReport(${pub.pub_id}, '${pub.name.replace(/'/g, "\\'")}', '${pub.postcode}')" 
+                                class="mobile-action-btn report">
+                            📝 Update
+                        </button>
+                    </div>
+                `;
+                
+                results.appendChild(li);
+            });
+        }
+        
+        // NEW: Format beer list for mobile scanning
+        function formatMobileBeerList(beers) {
+            if (!beers || beers.length === 0) {
+                return `
+                    <div class="mobile-beer-placeholder">
+                        <div class="placeholder-text">GF options available - specific beers not yet recorded</div>
+                        <div class="placeholder-action">Help us by reporting what's available!</div>
+                    </div>
+                `;
+            }
+            
+            // Group beers by format for mobile display
+            const beersByFormat = {};
+            beers.forEach(beer => {
+                if (!beersByFormat[beer.format]) {
+                    beersByFormat[beer.format] = [];
+                }
+                beersByFormat[beer.format].push(beer);
+            });
+            
+            let html = '<div class="mobile-beer-list">';
+            
+            Object.entries(beersByFormat).forEach(([format, formatBeers]) => {
+                const icon = {
+                    'bottle': '🍺',
+                    'tap': '🚰',
+                    'cask': '🛢️',
+                    'can': '🥫'
+                }[format] || '🍺';
+                
+                html += `
+                    <div class="mobile-format-group">
+                        <div class="mobile-format-header">${icon} ${format.charAt(0).toUpperCase() + format.slice(1)}</div>
+                        <div class="mobile-beer-items">
+                `;
+                
+                formatBeers.forEach(beer => {
+                    const abvDisplay = beer.abv && beer.abv > 0 ? ` • ${beer.abv}%` : '';
+                    const glutenBadge = beer.gluten_status === 'no_gluten_ingredients' ? 
+                        '<span class="gluten-badge no-gluten">No Gluten</span>' : 
+                        '<span class="gluten-badge removed">Gluten Removed</span>';
+                    
+                    html += `
+                        <div class="mobile-beer-item">
+                            <div class="beer-main">
+                                <strong class="beer-brewery">${beer.brewery}</strong>
+                                <span class="beer-name">${beer.name}</span>
+                            </div>
+                            <div class="beer-details">
+                                <span class="beer-style">${beer.style}</span>${abvDisplay}
+                                ${glutenBadge}
+                                ${beer.vegan_status === 'vegan' ? '<span class="vegan-badge">🌱</span>' : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += '</div></div>';
+            });
+            
+            html += '</div>';
+            return html;
+        }
+        
+        // NEW: Mobile-optimized directions
+        function openDirectionsToMobile(lat, lng, pubName, address) {
+            trackEvent('mobile_directions', 'Mobile UX', pubName);
+            
+            if (!lat || !lng || lat === 'null' || lng === 'null') {
+                // Fallback to address-based directions
+                const searchQuery = encodeURIComponent(`${pubName} ${address}`);
+                window.open(`https://www.google.com/maps/search/${searchQuery}`, '_blank');
+                showSuccessToast('🧭 Opening address-based directions...');
+                return;
+            }
+            
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+            const isAndroid = /Android/.test(navigator.userAgent);
+            
+            let directionsUrl;
+            
+            if (isIOS) {
+                // Try Apple Maps first, fallback to Google Maps
+                directionsUrl = `maps://maps.google.com/maps?daddr=${lat},${lng}&dirflg=w`;
+                
+                // Fallback to Google Maps if Apple Maps not available
+                setTimeout(() => {
+                    window.open(`https://maps.google.com/maps?daddr=${lat},${lng}`, '_blank');
+                }, 3000);
+                
+            } else if (isAndroid) {
+                // Use geo: URI for Android
+                directionsUrl = `geo:${lat},${lng}?q=${lat},${lng}(${encodeURIComponent(pubName)})`;
+                
+            } else {
+                // Desktop/other - use Google Maps web
+                directionsUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+            }
+            
+            try {
+                window.open(directionsUrl, '_blank');
+                showSuccessToast('🧭 Opening directions...');
+            } catch (error) {
+                // Final fallback
+                window.open(`https://maps.google.com/maps?daddr=${lat},${lng}`, '_blank');
+                showSuccessToast('🧭 Opening backup directions...');
+            }
+        }
+        
+        // NEW: Quick mobile beer report
+        function quickMobileBeerReport(pubId, pubName, postcode) {
+            trackEvent('mobile_quick_report', 'Mobile UX', pubName);
+            
+            // Show simplified mobile report modal
+            const modal = document.createElement('div');
+            modal.className = 'mobile-report-modal';
+            modal.innerHTML = `
+                <div class="mobile-modal-content">
+                    <div class="mobile-modal-header">
+                        <h3>📝 Quick Beer Report</h3>
+                        <button onclick="closeMobileModal(this)" class="mobile-close-btn">×</button>
+                    </div>
+                    
+                    <div class="mobile-report-form">
+                        <div class="selected-pub-info">
+                            <strong>${pubName}</strong>
+                            <div>${postcode}</div>
+                        </div>
+                        
+                        <div class="mobile-form-group">
+                            <label>Beer Format</label>
+                            <select id="mobileReportFormat" class="mobile-select">
+                                <option value="">Select format...</option>
+                                <option value="bottle">🍺 Bottle</option>
+                                <option value="tap">🚰 Tap</option>
+                                <option value="cask">🛢️ Cask</option>
+                                <option value="can">🥫 Can</option>
+                            </select>
+                        </div>
+                        
+                        <div class="mobile-form-group">
+                            <label>Brewery</label>
+                            <input type="text" id="mobileReportBrewery" class="mobile-input" placeholder="e.g. Brewdog">
+                        </div>
+                        
+                        <div class="mobile-form-group">
+                            <label>Beer Name</label>
+                            <input type="text" id="mobileReportBeerName" class="mobile-input" placeholder="e.g. Punk AF">
+                        </div>
+                        
+                        <div class="mobile-form-group">
+                            <label>Style (optional)</label>
+                            <input type="text" id="mobileReportStyle" class="mobile-input" placeholder="e.g. IPA, Lager">
+                        </div>
+                        
+                        <div class="mobile-form-actions">
+                            <button onclick="submitMobileBeerReport(${pubId})" class="mobile-submit-btn">
+                                📝 Submit Report
+                            </button>
+                            <button onclick="closeMobileModal(this)" class="mobile-cancel-btn">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // Focus on format selector
+            setTimeout(() => {
+                document.getElementById('mobileReportFormat').focus();
+            }, 100);
+        }
+        
+        // NEW: Submit mobile beer report
+        async function submitMobileBeerReport(pubId) {
+            const format = document.getElementById('mobileReportFormat').value;
+            const brewery = document.getElementById('mobileReportBrewery').value.trim();
+            const beerName = document.getElementById('mobileReportBeerName').value.trim();
+            const style = document.getElementById('mobileReportStyle').value.trim();
+            
+            // Validation
+            if (!format) {
+                showSuccessToast('Please select a beer format');
+                return;
+            }
+            
+            if (!brewery) {
+                showSuccessToast('Please enter the brewery name');
+                return;
+            }
+            
+            if (!beerName) {
+                showSuccessToast('Please enter the beer name');
+                return;
+            }
+            
+            showLoadingToast('Submitting beer report...');
+            
+            try {
+                const response = await fetch('/api/mobile_report', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        pub_id: pubId,
+                        beer_format: format,
+                        brewery: brewery,
+                        beer_name: beerName,
+                        style: style || 'Unknown',
+                        reporter_name: 'Mobile User'
+                    })
+                });
+                
+                const result = await response.json();
+                
+                hideLoadingToast();
+                
+                if (response.ok) {
+                    showSuccessToast('🎉 Beer report submitted! Thanks for helping the community!');
+                    closeMobileModal(document.querySelector('.mobile-report-modal'));
+                    trackEvent('mobile_report_submitted', 'Community Contribution', `${brewery} ${beerName}`);
+                } else {
+                    throw new Error(result.error || 'Failed to submit report');
+                }
+                
+            } catch (error) {
+                hideLoadingToast();
+                showSuccessToast('Error submitting report. Please try again.');
+                console.error('Mobile report error:', error);
+            }
+        }
+        
+        // NEW: Close mobile modal
+        function closeMobileModal(element) {
+            const modal = element.closest('.mobile-report-modal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+        
+        // NEW: Expand mobile search area
+        function expandMobileSearch() {
+            if (userLocation) {
+                // Search with larger radius
+                const expandedRadius = 10; // km
+                const gfOnly = true;
+                
+                showLoadingToast('Searching wider area...');
+                
+                fetch(`/api/mobile_nearby?lat=${userLocation.lat}&lng=${userLocation.lng}&radius=${expandedRadius}&gf_only=${gfOnly}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        hideLoadingToast();
+                        if (data.pubs && data.pubs.length > 0) {
+                            displayMobileResults(data.pubs);
+                            showSuccessToast(`🗺️ Found ${data.pubs.length} pubs in wider area!`);
+                        } else {
+                            showSuccessToast('No GF beer found in wider area. Try a different location?');
+                        }
+                    })
+                    .catch(error => {
+                        hideLoadingToast();
+                        showSuccessToast('Error expanding search. Please try again.');
+                    });
+            } else {
+                showSuccessToast('Please enable location services to expand search');
             }
         }
 
@@ -3266,199 +3628,472 @@
         
         console.log('🍺 Optimized beer update system loaded - auto beer_id generation enabled!');
 
-        // ENHANCED SEARCH FUNCTION WITH POSTCODE DETECTION
-        // Enhanced search with advanced filtering
-async function searchPubsAdvanced() {
-    const query = document.getElementById('searchInput').value.trim();
-    const searchType = document.getElementById('searchType').value;
-    const gfOnly = document.getElementById('gfOnly').checked;
-    
-    // NEW: Advanced filters
-    const beerFormat = document.getElementById('beerFormat')?.value || 'all';
-    const beerStyle = document.getElementById('beerStyle')?.value || 'all';
-    const breweryFilter = document.getElementById('breweryFilter')?.value || 'all';
-    const maxDistance = document.getElementById('maxDistance')?.value || 10;
-    
-    if (!query && searchType !== 'nearby') {
-        showToast('Please enter a search term or use "Pubs Near Me"');
-        return;
-    }
-    
-    currentQuery = query;
-    currentSearchType = searchType;
-    currentPage = 1;
-    
-    showResultsSection();
-    showLoadingToast('Searching with filters...');
-    
-    try {
-        let url;
-        let searchResults;
-        
-        if (searchType === 'nearby' && userLocation) {
-            // Enhanced nearby search with filters
-            url = `/nearby_advanced?lat=${userLocation.lat}&lng=${userLocation.lng}` +
-                  `&radius=${maxDistance}&gf_only=${gfOnly}` +
-                  `&format=${beerFormat}&style=${beerStyle}&brewery=${breweryFilter}`;
-        } else {
-            // Regular search with advanced filters
-            url = `/search_advanced?query=${encodeURIComponent(query)}` +
-                  `&search_type=${searchType}&page=1&gf_only=${gfOnly}` +
-                  `&format=${beerFormat}&style=${beerStyle}&brewery=${breweryFilter}`;
-        }
-        
-        const response = await fetch(url);
-        const data = await response.json();
-        
-        if (data.error) {
-            throw new Error(data.error);
-        }
-        
-        hideLoadingToast();
-        displayAdvancedSearchResults(data);
-        
-        // Enhanced map showing with filter-based markers
-        if (map && data.pubs?.length > 0) {
-            addAdvancedPubMarkers(data.pubs);
-            smartShowMap();
-        }
-        
-        const resultCount = Array.isArray(data) ? data.length : data.total || 0;
-        showSuccessToast(`Found ${resultCount} pubs matching your filters`);
-        
-        // Analytics with filter tracking
-        trackEvent('advanced_search', 'Search', 
-            `${query} | ${beerFormat} | ${beerStyle} | ${breweryFilter}`);
-        
-    } catch (error) {
-        console.error('Advanced search error:', error);
-        hideLoadingToast();
-        showToast('Search failed. Please try again.');
-    }
-}
-
-// Enhanced result display with rich beer information
-function displayAdvancedSearchResults(data) {
-    const results = document.getElementById('results');
-    const pubs = Array.isArray(data) ? data : data.pubs;
-    
-    if (pubs.length === 0) {
-        results.innerHTML = `
-            <li class="no-results">
-                <div class="no-results-content">
-                    <h3>🔍 No pubs found</h3>
-                    <p>Try adjusting your filters or expanding your search area</p>
-                    <button onclick="clearAllFilters()" class="btn-secondary">Clear Filters</button>
-                </div>
-            </li>
-        `;
-        return;
-    }
-    
-    results.innerHTML = '';
-    
-    pubs.forEach(pub => {
-        const li = document.createElement('li');
-        li.className = 'result-item enhanced';
-        
-        // Enhanced pub display with structured beer data
-        li.innerHTML = `
-            <div class="pub-header">
-                <div class="pub-info">
-                    <h3 class="pub-name">${pub.name}</h3>
-                    <div class="pub-address">${pub.address}, ${pub.postcode}</div>
-                    <div class="pub-location">${pub.local_authority}</div>
-                    ${pub.distance ? `<div class="pub-distance">📍 ${pub.distance.toFixed(1)}km away</div>` : ''}
-                </div>
-                <div class="pub-actions">
-                    <button onclick="viewPubDetails(${pub.pub_id})" class="btn-primary">
-                        📋 Details
-                    </button>
-                    <button onclick="findOnMap(${pub.latitude}, ${pub.longitude}, '${pub.name.replace(/'/g, "\\'")}', '${pub.postcode}', ${pub.pub_id})" class="btn-secondary">
-                        🗺️ Map
-                    </button>
-                </div>
-            </div>
+// UPDATE: Enhanced search function for mobile
+        // REPLACE your existing searchPubs function with this enhanced version
+        async function searchPubs() {
+            const query = document.getElementById('searchInput').value.trim();
+            const searchType = document.getElementById('searchType').value;
+            const gfOnly = document.getElementById('gfOnly')?.checked ?? (isMobile() ? true : false); // Default GF on mobile
+            const results = document.getElementById('results');
             
-            <div class="beer-section">
-                <h4>🍺 Available Gluten Free Beers</h4>
-                <div class="beer-list">
-                    ${formatStructuredBeerList(pub.beers || [])}
-                </div>
-                <div class="last-updated">
-                    Last updated: ${pub.last_updated || 'Unknown'}
-                </div>
-            </div>
+            if (!query) {
+                results.innerHTML = '<li class="no-results">Please enter a search term.</li>';
+                return;
+            }
             
-            <div class="pub-footer">
-                <div class="verification-status">
-                    ${getVerificationBadge(pub.verification_level)}
-                </div>
-                <div class="action-buttons">
-                    <button onclick="reportBeerUpdate(${pub.pub_id})" class="btn-report">
-                        📝 Update Beers
-                    </button>
-                    <button onclick="sharePub(${pub.pub_id})" class="btn-share">
-                        📤 Share
-                    </button>
-                </div>
-            </div>
-        `;
+            currentQuery = query;
+            currentSearchType = searchType;
+            currentGfOnly = gfOnly;
+            currentPage = 1;
+            
+            showResultsSection();
+            showLoadingToast(isMobile() ? 'Finding GF beer...' : 'Searching...');
+            results.innerHTML = '<li class="loading">Searching...</li>';
+            
+            // Check if query looks like a postcode
+            const isPostcode = /^[A-Z]{1,2}[0-9R][0-9A-Z]?\s?[0-9][A-Z]{2}$/i.test(query.replace(/\s/g, ''));
+            
+            try {
+                let url;
+                let searchResults;
+                
+                if (isPostcode && (searchType === 'postcode' || searchType === 'all')) {
+                    // Handle postcode search - geocode then find nearby
+                    console.log('Detected postcode search:', query);
+                    showLoadingToast('Finding location...');
+                    
+                    // First geocode the postcode
+                    const geocodeResponse = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=gb&limit=1`);
+                    const geocodeData = await geocodeResponse.json();
+                    
+                    if (geocodeData && geocodeData.length > 0) {
+                        const lat = parseFloat(geocodeData[0].lat);
+                        const lng = parseFloat(geocodeData[0].lon);
+                        
+                        showLoadingToast(isMobile() ? 'Finding GF beer nearby...' : 'Finding nearby pubs...');
+                        
+                        // Use mobile or regular nearby endpoint
+                        const endpoint = isMobile() ? '/api/mobile_nearby' : '/nearby';
+                        url = `${endpoint}?lat=${lat}&lng=${lng}&radius=5&gf_only=${gfOnly}`;
+                        
+                        // Auto-show map and update to show the postcode area
+                        smartShowMap();
+                        if (map) {
+                            map.setView([lat, lng], 14);
+                            
+                            // Add postcode marker
+                            if (window.postcodeMarker) {
+                                map.removeLayer(window.postcodeMarker);
+                            }
+                            window.postcodeMarker = L.marker([lat, lng], {
+                                icon: L.divIcon({
+                                    className: 'postcode-marker',
+                                    html: `<div style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); width: 30px; height: 30px; border-radius: 50%; border: 3px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px;">📍</div>`,
+                                    iconSize: [36, 36],
+                                    iconAnchor: [18, 18]
+                                })
+                            }).addTo(map);
+                            
+                            window.postcodeMarker.bindPopup(`<strong>${query}</strong><br>Searching nearby pubs...`).openPopup();
+                        }
+                    } else {
+                        throw new Error('Postcode not found');
+                    }
+                } else {
+                    // Regular text search - use mobile or regular endpoint
+                    const endpoint = isMobile() ? '/api/mobile_search' : '/search';
+                    url = `${endpoint}?query=${encodeURIComponent(query)}&search_type=${searchType}&page=1&gf_only=${gfOnly}`;
+                    
+                    // Add user location for distance-aware results on mobile
+                    if (isMobile() && userLocation) {
+                        url += `&user_lat=${userLocation.lat}&user_lng=${userLocation.lng}`;
+                    }
+                }
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                const pubs = Array.isArray(data) ? data : data.pubs;
+                
+                hideLoadingToast();
+                
+                if (pubs.length === 0) {
+                    if (isPostcode) {
+                        results.innerHTML = `<li class="no-results">No pubs found within 5km of ${query}. Try expanding your search area.</li>`;
+                        showSuccessToast(`No pubs found near ${query}`);
+                    } else {
+                        results.innerHTML = '<li class="no-results">No pubs found.</li>';
+                        showSuccessToast('No pubs found for your search');
+                    }
+                    return;
+                }
+                
+                // Use mobile or regular display
+                if (isMobile()) {
+                    displayMobileResults(pubs);
+                } else {
+                    displaySearchResults(data);
+                }
+                
+                addPubMarkersToMap(pubs);
+                
+                AppState.save();
+                trackSearch(query, searchType, pubs.length);
+                
+                // Show success message
+                const message = isPostcode && pubs.length > 0 ? 
+                    `✅ Found ${pubs.length} pubs within 5km of ${query}` :
+                    `Found ${pubs.length} pubs matching "${query}"`;
+                showSuccessToast(message);
+                
+            } catch (error) {
+                console.error('Error searching pubs:', error);
+                hideLoadingToast();
+                
+                if (isPostcode) {
+                    results.innerHTML = `<li class="no-results">Could not find location for "${query}". Please check the postcode and try again.</li>`;
+                    showSuccessToast(`Could not find location for "${query}"`);
+                } else {
+                    results.innerHTML = '<li class="no-results">Error searching pubs. Please try again.</li>';
+                    showSuccessToast('Error searching pubs. Please try again.');
+                }
+            }
+        }
         
-        results.appendChild(li);
-    });
-    
-    // Add pagination if needed
-    if (data.pagination) {
-        addEnhancedPagination(data.pagination);
-    }
-}
-
-// Format structured beer information
-function formatStructuredBeerList(beers) {
-    if (!beers || beers.length === 0) {
-        return '<div class="no-beers">No specific beers recorded - check with venue</div>';
-    }
-    
-    const beersByFormat = groupBy(beers, 'format');
-    let html = '';
-    
-    Object.entries(beersByFormat).forEach(([format, formatBeers]) => {
-        const icon = {
-            'bottle': '🍺',
-            'tap': '🚰', 
-            'cask': '🛢️',
-            'can': '🥫'
-        }[format] || '🍺';
+        // NEW: Enhanced mobile-specific autocomplete
+        function setupMobileAutocomplete() {
+            const input = document.getElementById('searchInput');
+            const suggestions = document.getElementById('suggestions');
+            
+            if (!input || !suggestions) return;
+            
+            let autocompleteTimeout;
+            
+            input.addEventListener('input', function() {
+                const query = this.value.trim();
+                
+                clearTimeout(autocompleteTimeout);
+                
+                if (query.length < 2) {
+                    suggestions.style.display = 'none';
+                    return;
+                }
+                
+                autocompleteTimeout = setTimeout(async () => {
+                    try {
+                        let url = `/api/mobile_autocomplete?q=${encodeURIComponent(query)}&search_type=${document.getElementById('searchType').value}`;
+                        
+                        // Add location context for mobile
+                        if (userLocation) {
+                            url += `&user_lat=${userLocation.lat}&user_lng=${userLocation.lng}`;
+                        }
+                        
+                        const response = await fetch(url);
+                        const data = await response.json();
+                        
+                        if (data.length === 0) {
+                            suggestions.style.display = 'none';
+                            return;
+                        }
+                        
+                        suggestions.innerHTML = '';
+                        
+                        // Show quick "search all" option for mobile
+                        if (data.length >= 5) {
+                            const searchAllDiv = document.createElement('div');
+                            searchAllDiv.className = 'suggestion-item search-all';
+                            searchAllDiv.innerHTML = `<strong>🔍 Search all results for "${query}"</strong>`;
+                            searchAllDiv.addEventListener('click', () => {
+                                input.value = query;
+                                searchPubs();
+                                suggestions.style.display = 'none';
+                            });
+                            suggestions.appendChild(searchAllDiv);
+                        }
+                        
+                        // Add individual suggestions
+                        data.forEach(pub => {
+                            const div = document.createElement('div');
+                            div.className = `suggestion-item ${pub.has_gf ? 'has-gf' : 'no-gf'}`;
+                            
+                            let displayText = `${pub.name}, ${pub.address} (${pub.postcode})`;
+                            if (pub.distance !== undefined) {
+                                displayText += ` - ${pub.distance}km`;
+                            }
+                            
+                            div.innerHTML = `
+                                <div class="suggestion-main">${displayText}</div>
+                                <div class="suggestion-meta">
+                                    ${pub.has_gf ? 
+                                        `<span class="gf-badge">🍺 ${pub.gf_formats} GF options</span>` :
+                                        '<span class="no-gf-badge">No GF recorded</span>'
+                                    }
+                                </div>
+                            `;
+                            
+                            div.addEventListener('click', () => {
+                                clearSearch();
+                                showResultsSection();
+                                searchSpecificPub(pub.pub_id);
+                                suggestions.style.display = 'none';
+                            });
+                            
+                            suggestions.appendChild(div);
+                        });
+                        
+                        suggestions.style.display = 'block';
+                        
+                    } catch (error) {
+                        console.error('Autocomplete error:', error);
+                        suggestions.style.display = 'none';
+                    }
+                }, 200); // Faster response on mobile
+            });
+        }
         
-        html += `
-            <div class="format-group">
-                <h5 class="format-header">${icon} ${format.charAt(0).toUpperCase() + format.slice(1)}</h5>
-                <div class="beer-items">
-        `;
-        
-        formatBeers.forEach(beer => {
-            html += `
-                <div class="beer-item enhanced">
-                    <div class="beer-main">
-                        <strong class="brewery">${beer.brewery}</strong>
-                        <span class="beer-name">${beer.name}</span>
-                    </div>
-                    <div class="beer-details">
-                        <span class="beer-style">${beer.style}</span>
-                        ${beer.abv ? `<span class="beer-abv">${beer.abv}%</span>` : ''}
-                        ${beer.gluten_status ? `<span class="gluten-badge ${beer.gluten_status}">${formatGlutenStatus(beer.gluten_status)}</span>` : ''}
-                        ${beer.vegan_status === 'vegan' ? '<span class="vegan-badge">🌱 Vegan</span>' : ''}
-                    </div>
-                </div>
-            `;
+        // Initialize mobile enhancements when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            if (isMobile()) {
+                console.log('🍺 Mobile device detected - applying enhancements');
+                document.body.classList.add('mobile-enhanced');
+                setupMobileEnhancements();
+                setupMobileAutocomplete();
+                
+                // Load quick stats for mobile header
+                loadMobileStats();
+                
+                // Pre-request location permission for faster searches
+                setTimeout(() => {
+                    prioritizeLocationSearch();
+                }, 1000);
+            }
         });
         
-        html += '</div></div>';
-    });
-    
-    return html;
-}
+        // NEW: Load mobile stats
+        async function loadMobileStats() {
+            try {
+                const response = await fetch('/api/quick_stats');
+                if (response.ok) {
+                    const stats = await response.json();
+                    
+                    // Update mobile stats display if elements exist
+                    const totalElement = document.getElementById('totalPubs');
+                    const gfElement = document.getElementById('gfPubs');
+                    
+                    if (totalElement) {
+                        animateNumber('totalPubs', stats.total_pubs);
+                    }
+                    if (gfElement) {
+                        animateNumber('gfPubs', stats.gf_pubs);
+                    }
+                    
+                    console.log(`📊 Mobile stats: ${stats.total_pubs} pubs, ${stats.gf_pubs} GF (${stats.gf_percentage}%)`);
+                }
+            } catch (error) {
+                console.warn('Could not load mobile stats:', error);
+            }
+        }
+        
+        // NEW: Track mobile analytics events
+        function trackMobileEvent(event, label = '') {
+            if (isMobile()) {
+                // Send to your analytics endpoint
+                fetch('/api/mobile_analytics', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        event: event,
+                        category: 'Mobile',
+                        label: label,
+                        timestamp: Date.now(),
+                        user_agent: navigator.userAgent
+                    })
+                }).catch(error => {
+                    console.warn('Analytics tracking failed:', error);
+                });
+                
+                // Also use existing trackEvent function
+                trackEvent(event, 'Mobile', label);
+            }
+        }
+        
+        // Enhanced utility functions for mobile
+        function getVerificationBadge(level) {
+            const badges = {
+                'high': '<span class="verification-badge high">✅ Verified</span>',
+                'medium': '<span class="verification-badge medium">⚠️ Partial</span>',
+                'low': '<span class="verification-badge low">❓ Unverified</span>',
+                'none': '<span class="verification-badge none">No Data</span>'
+            };
+            return badges[level] || badges['none'];
+        }
+        
+        // NEW: Mobile-specific map handling
+        function handleMobileMapInteraction() {
+            if (isMobile() && map) {
+                // Prevent map from interfering with page scrolling on mobile
+                map.scrollWheelZoom.disable();
+                
+                // Enable zoom only when user taps the map
+                map.on('focus', () => {
+                    map.scrollWheelZoom.enable();
+                });
+                
+                map.on('blur', () => {
+                    map.scrollWheelZoom.disable();
+                });
+                
+                // Better mobile popup behavior
+                map.on('popupopen', (e) => {
+                    // Center the popup in view on mobile
+                    if (isMobile()) {
+                        setTimeout(() => {
+                            map.panTo(e.popup.getLatLng());
+                        }, 100);
+                    }
+                });
+            }
+        }
+        
+        // Initialize mobile map handling
+        document.addEventListener('DOMContentLoaded', function() {
+            if (isMobile()) {
+                // Wait for map to be initialized
+                setTimeout(() => {
+                    if (map) {
+                        handleMobileMapInteraction();
+                    }
+                }, 1000);
+            }
+        });
+        
+        console.log('📱 Mobile-enhanced JavaScript loaded!');
+        // Enhanced result display with rich beer information
+        function displayAdvancedSearchResults(data) {
+            const results = document.getElementById('results');
+            const pubs = Array.isArray(data) ? data : data.pubs;
+            
+            if (pubs.length === 0) {
+                results.innerHTML = `
+                    <li class="no-results">
+                        <div class="no-results-content">
+                            <h3>🔍 No pubs found</h3>
+                            <p>Try adjusting your filters or expanding your search area</p>
+                            <button onclick="clearAllFilters()" class="btn-secondary">Clear Filters</button>
+                        </div>
+                    </li>
+                `;
+                return;
+            }
+            
+            results.innerHTML = '';
+            
+            pubs.forEach(pub => {
+                const li = document.createElement('li');
+                li.className = 'result-item enhanced';
+                
+                // Enhanced pub display with structured beer data
+                li.innerHTML = `
+                    <div class="pub-header">
+                        <div class="pub-info">
+                            <h3 class="pub-name">${pub.name}</h3>
+                            <div class="pub-address">${pub.address}, ${pub.postcode}</div>
+                            <div class="pub-location">${pub.local_authority}</div>
+                            ${pub.distance ? `<div class="pub-distance">📍 ${pub.distance.toFixed(1)}km away</div>` : ''}
+                        </div>
+                        <div class="pub-actions">
+                            <button onclick="viewPubDetails(${pub.pub_id})" class="btn-primary">
+                                📋 Details
+                            </button>
+                            <button onclick="findOnMap(${pub.latitude}, ${pub.longitude}, '${pub.name.replace(/'/g, "\\'")}', '${pub.postcode}', ${pub.pub_id})" class="btn-secondary">
+                                🗺️ Map
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="beer-section">
+                        <h4>🍺 Available Gluten Free Beers</h4>
+                        <div class="beer-list">
+                            ${formatStructuredBeerList(pub.beers || [])}
+                        </div>
+                        <div class="last-updated">
+                            Last updated: ${pub.last_updated || 'Unknown'}
+                        </div>
+                    </div>
+                    
+                    <div class="pub-footer">
+                        <div class="verification-status">
+                            ${getVerificationBadge(pub.verification_level)}
+                        </div>
+                        <div class="action-buttons">
+                            <button onclick="reportBeerUpdate(${pub.pub_id})" class="btn-report">
+                                📝 Update Beers
+                            </button>
+                            <button onclick="sharePub(${pub.pub_id})" class="btn-share">
+                                📤 Share
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                results.appendChild(li);
+            });
+            
+            // Add pagination if needed
+            if (data.pagination) {
+                addEnhancedPagination(data.pagination);
+            }
+        }
+        
+        // Format structured beer information
+        function formatStructuredBeerList(beers) {
+            if (!beers || beers.length === 0) {
+                return '<div class="no-beers">No specific beers recorded - check with venue</div>';
+            }
+            
+            const beersByFormat = groupBy(beers, 'format');
+            let html = '';
+            
+            Object.entries(beersByFormat).forEach(([format, formatBeers]) => {
+                const icon = {
+                    'bottle': '🍺',
+                    'tap': '🚰', 
+                    'cask': '🛢️',
+                    'can': '🥫'
+                }[format] || '🍺';
+                
+                html += `
+                    <div class="format-group">
+                        <h5 class="format-header">${icon} ${format.charAt(0).toUpperCase() + format.slice(1)}</h5>
+                        <div class="beer-items">
+                `;
+                
+                formatBeers.forEach(beer => {
+                    html += `
+                        <div class="beer-item enhanced">
+                            <div class="beer-main">
+                                <strong class="brewery">${beer.brewery}</strong>
+                                <span class="beer-name">${beer.name}</span>
+                            </div>
+                            <div class="beer-details">
+                                <span class="beer-style">${beer.style}</span>
+                                ${beer.abv ? `<span class="beer-abv">${beer.abv}%</span>` : ''}
+                                ${beer.gluten_status ? `<span class="gluten-badge ${beer.gluten_status}">${formatGlutenStatus(beer.gluten_status)}</span>` : ''}
+                                ${beer.vegan_status === 'vegan' ? '<span class="vegan-badge">🌱 Vegan</span>' : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += '</div></div>';
+            });
+            
+            return html;
+        }
 
         // Enhanced map markers with beer information
         function addAdvancedPubMarkers(pubs) {
