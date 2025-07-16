@@ -2219,4 +2219,216 @@ button, .btn-base {
     }
 }
 
+/* Mobile-specific search enhancements */
+.mobile-enhanced .search-section {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    margin: 10px 15px 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    border-radius: 20px;
+}
 
+.mobile-location-btn {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border: none;
+    padding: 16px 24px;
+    font-size: 16px;
+    font-weight: 700;
+    border-radius: 25px;
+    width: 100%;
+    margin-bottom: 15px;
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    order: -1; /* Put it first */
+}
+
+.mobile-location-btn:active {
+    transform: translateY(1px);
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+}
+
+/* Enhanced result cards for mobile */
+.mobile-enhanced .result-item {
+    background: white;
+    border-radius: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+}
+
+.mobile-enhanced .result-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+}
+
+.mobile-quick-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    padding: 10px 0;
+    border-top: 1px solid #e2e8f0;
+}
+
+.mobile-action-btn {
+    flex: 1;
+    padding: 10px 12px;
+    border: none;
+    border-radius: 15px;
+    font-weight: 600;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.mobile-action-btn.directions {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: white;
+}
+
+.mobile-action-btn.call {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+}
+
+.mobile-action-btn:active {
+    transform: translateY(1px);
+}
+
+/* Mobile beer display enhancements */
+.mobile-beer-display {
+    background: #f8fafc;
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+
+.mobile-beer-display .beer-item {
+    background: white;
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    border-left: 3px solid #667eea;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.mobile-beer-display .beer-item:last-child {
+    margin-bottom: 0;
+}
+
+.mobile-beer-display .beer-type {
+    font-size: 12px;
+    font-weight: 700;
+    color: #667eea;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Location prompt modal */
+.mobile-location-prompt {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 3000;
+    padding: 20px;
+}
+
+.prompt-content {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+    max-width: 300px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+}
+
+.prompt-content h3 {
+    margin: 0 0 10px 0;
+    color: #2d3748;
+    font-size: 20px;
+}
+
+.prompt-content p {
+    margin: 0 0 20px 0;
+    color: #4a5568;
+    line-height: 1.5;
+}
+
+.btn-enable-location {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    margin-bottom: 10px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.btn-enable-location:active {
+    transform: translateY(1px);
+}
+
+.btn-cancel-location {
+    background: transparent;
+    color: #718096;
+    border: none;
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+/* Mobile search input enhancements */
+@media (max-width: 768px) {
+    #searchInput {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 16px 20px;
+        border-radius: 25px;
+    }
+    
+    /* Make all buttons more touch-friendly */
+    .search-btn, .map-control-btn {
+        min-height: 48px;
+        padding: 14px 20px;
+        font-size: 15px;
+    }
+    
+    /* Better spacing for mobile */
+    .search-actions {
+        gap: 10px;
+    }
+    
+    /* Optimize results for mobile scrolling */
+    .mobile-enhanced #results {
+        padding: 0 15px;
+    }
+    
+    /* Make update buttons more prominent on mobile */
+    .mobile-enhanced .update-button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 12px 20px;
+        font-size: 14px;
+        border-radius: 20px;
+        min-height: 44px;
+    }
+}
+
+/* iOS safe area support */
+@supports (padding-top: env(safe-area-inset-top)) {
+    .mobile-enhanced .search-section.mobile-sticky {
+        padding-top: calc(20px + env(safe-area-inset-top));
+    }
+}
