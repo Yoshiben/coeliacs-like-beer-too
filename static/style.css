@@ -1682,6 +1682,58 @@ button, .btn-base {
     background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
 }
 
+/* ADD these new styles to your style.css: */
+
+.advanced-filters {
+    background: rgba(248, 250, 252, 0.9);
+    padding: 20px;
+    border-radius: 15px;
+    margin-top: 20px;
+    border: 2px solid #e2e8f0;
+}
+
+.filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.filter-select {
+    padding: 10px 15px;
+    border: 2px solid #e2e8f0;
+    border-radius: 20px;
+    background: white;
+    font-size: 14px;
+}
+
+.btn-advanced-filters {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.format-group {
+    margin-bottom: 15px;
+    padding: 10px;
+    background: rgba(102, 126, 234, 0.05);
+    border-radius: 10px;
+}
+
+.beer-item {
+    padding: 5px 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.beer-item:last-child {
+    border-bottom: none;
+}
+
 /* ================================
    MOBILE RESPONSIVE
    ================================ */
