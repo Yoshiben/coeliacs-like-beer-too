@@ -564,24 +564,25 @@
             const mapContainer = document.getElementById('mapContainer');
             const toggleBtn = document.getElementById('toggleMapBtn');
             const featuresSection = document.getElementById('featuresSection');
+            const searchSection = document.getElementById('search');
             
             if (mapVisible) {
                 mapContainer.style.display = 'block';
                 toggleBtn.innerHTML = '🗺️ Hide Map';
                 
-                // Remove the map-hidden class to ensure proper spacing
                 if (featuresSection) {
                     featuresSection.classList.remove('map-hidden');
                 }
                 
-                // Initialize map if not already done, or resize if it exists
+                // Fix overlap: Add space below map for search
+                searchSection.style.marginTop = '40px';
+                
                 setTimeout(() => {
                     if (map) {
                         map.invalidateSize();
                     }
                 }, 100);
                 
-                // Smooth scroll to show the map
                 setTimeout(() => {
                     mapContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }, 150);
@@ -589,10 +590,12 @@
                 mapContainer.style.display = 'none';
                 toggleBtn.innerHTML = '🗺️ Show Map';
                 
-                // Add the map-hidden class to restore top margin
                 if (featuresSection) {
                     featuresSection.classList.add('map-hidden');
                 }
+                
+                // Reset margin
+                searchSection.style.marginTop = '-20px';
             }
             
             AppState.save();
