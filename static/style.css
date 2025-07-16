@@ -2058,3 +2058,12 @@ button, .btn-base {
         font-size: 18px;
     }
 }
+
+/* Add this ONE rule to the end of your style.css */
+.search-row {
+    position: relative;
+}
+
+#suggestions {
+    z-index: 10000;
+}
