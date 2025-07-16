@@ -29,6 +29,7 @@
     </script>
 </head>
 <body>
+    
     <!-- Hero Section -->
     <div class="hero-section">
         <div class="hero-content">
@@ -48,29 +49,40 @@
         </div>
     </div>
 
-    <!-- Search Section -->
+    <!-- Search Section - UPDATED VERSION -->
     <div class="search-section" id="search">
-        <h2 class="section-title">🔍 Find Gluten Free Beer Near You</h2>
-        <div class="search-grid">
-            <div class="search-row">
-                <select id="searchType" class="search-type-dropdown" aria-label="Select search type: all, pub name, postcode, or local authority">
-                    <option value="all">Search All</option>
-                    <option value="name">Pub Name</option>
-                    <option value="postcode">Postcode</option>
-                    <option value="area">Local Authority</option>
-                </select>
-                <input type="text" id="searchInput" class="search-input" placeholder="Enter pub name, postcode, or local authority" onkeydown="if (event.key === 'Enter') searchPubs()" aria-label="Search input for pubs">
-                <label class="gf-checkbox"><input type="checkbox" id="gfOnly" aria-label="Filter to show only gluten-free pubs"> Gluten Free Only</label>
-            </div>
-            <div class="search-actions">
-                <button onclick="searchPubs()" class="search-btn" aria-label="Search for pubs">Search Pubs</button>
-                <button class="search-btn secondary" onclick="findNearbyPubs()" aria-label="Find pubs near my current location">Pubs Near Me</button>
-                <button class="map-control-btn" id="toggleMapBtn" onclick="toggleMap()" aria-label="Toggle map visibility">🗺️ Show Map</button>
-                <button class="map-control-btn" onclick="centerOnLocation()" aria-label="Center map on my location">📍 My Location</button>
-                <button class="map-control-btn reset-btn" onclick="resetToHomepage()" title="Clear everything and start fresh" aria-label="Reset to homepage">🏠 Reset</button>
+        <div class="container">
+            <div class="search-card">
+                <div class="search-header">
+                    <h2 class="section-title">🔍 Find Gluten Free Beer Near You</h2>
+                </div>
+                <div class="search-body">
+                    <div class="search-grid">
+                        <div class="search-row">
+                            <select id="searchType" class="form-select" aria-label="Select search type: all, pub name, postcode, or local authority">
+                                <option value="all">Search All</option>
+                                <option value="name">Pub Name</option>
+                                <option value="postcode">Postcode</option>
+                                <option value="area">Local Authority</option>
+                            </select>
+                            <input type="text" id="searchInput" class="form-input" placeholder="Enter pub name, postcode, or local authority" onkeydown="if (event.key === 'Enter') searchPubs()" aria-label="Search input for pubs" autocomplete="off">
+                            <label class="form-checkbox">
+                                <input type="checkbox" id="gfOnly" aria-label="Filter to show only gluten-free pubs"> 
+                                Gluten Free Only
+                            </label>
+                        </div>
+                        <div class="search-actions">
+                            <button onclick="searchPubs()" class="btn btn-primary" aria-label="Search for pubs">Search Pubs</button>
+                            <button class="btn btn-success" onclick="findNearbyPubs()" aria-label="Find pubs near my current location">Pubs Near Me</button>
+                            <button class="btn btn-secondary" id="toggleMapBtn" onclick="toggleMap()" aria-label="Toggle map visibility">🗺️ Show Map</button>
+                            <button class="btn btn-secondary" onclick="centerOnLocation()" aria-label="Center map on my location">📍 My Location</button>
+                            <button class="btn btn-danger" onclick="resetToHomepage()" title="Clear everything and start fresh" aria-label="Reset to homepage">🏠 Reset</button>
+                        </div>
+                    </div>
+                    <div id="suggestions" class="suggestions"></div>
+                </div>
             </div>
         </div>
-        <div id="suggestions"></div>
     </div>
 
     <div class="advanced-filters" id="advancedFilters" style="display: none;">
@@ -119,7 +131,7 @@
         <div class="results-header">
             <h2 class="section-title">📍 Search Results</h2>
         </div>
-        <ul id="results"></ul>
+        <ul id="results" class="results-list"></ul>
     </div>
 
     <!-- Map Section (Hidden by Default, Smart Show) -->
@@ -142,7 +154,7 @@
                 <span class="feature-icon">ℹ️</span>
                 <h3 class="feature-title">About Us</h3>
                 <p class="feature-description">Learn about our mission to help coeliacs find great beer across the UK.</p>
-                <button class="feature-action" onclick="showAboutUs()">Learn More</button>
+                <button class="btn btn-primary" onclick="showAboutUs()">Learn More</button>
             </div>
             
             <!-- SWAPPED: What is GF Beer now comes before Report -->
@@ -150,35 +162,35 @@
                 <span class="feature-icon">🔬</span>
                 <h3 class="feature-title">What is GF Beer?</h3>
                 <p class="feature-description">Everything you need to know about gluten free beer standards and safety.</p>
-                <button class="feature-action" onclick="showGFInfo()">Learn More</button>
+                <button class="btn btn-primary" onclick="showGFInfo()">Learn More</button>
             </div>
             
             <div class="feature-card">
                 <span class="feature-icon">📸</span>
                 <h3 class="feature-title">Report GF Beer</h3>
                 <p class="feature-description">Found gluten free beer somewhere? Share it with the community and help others!</p>
-                <button class="feature-action" onclick="openReportModal()">Add Report</button>
+                <button class="btn btn-primary" onclick="openReportModal()">Add Report</button>
             </div>
             
             <div class="feature-card">
                 <span class="feature-icon">🏭</span>
                 <h3 class="feature-title">GF Breweries</h3>
                 <p class="feature-description">Discover breweries making amazing gluten free beers and where to find them.</p>
-                <button class="feature-action" onclick="window.location.href='/breweries'">Discover Breweries</button>
+                <button class="btn btn-primary" onclick="window.location.href='/breweries'">Discover Breweries</button>
             </div>
             
             <div class="feature-card">
                 <span class="feature-icon">📧</span>
                 <h3 class="feature-title">Weekly Updates</h3>
                 <p class="feature-description">Get notified about new GF beer finds, pub additions, and brewery news.</p>
-                <button class="feature-action" onclick="showComingSoon('Newsletter')">Coming Soon</button>
+                <button class="btn btn-primary" onclick="showComingSoon('Newsletter')">Coming Soon</button>
             </div>
             
             <div class="feature-card">
                 <span class="feature-icon">⭐</span>
                 <h3 class="feature-title">GF Beer Reviews</h3>
                 <p class="feature-description">Real reviews from coeliacs - discover which beers are worth trying and which to avoid.</p>
-                <button class="feature-action" onclick="showComingSoon('Beer Reviews')">Coming Soon</button>
+                <button class="btn btn-primary" onclick="showComingSoon('Beer Reviews')">Coming Soon</button>
             </div>
         </div>
     </div>
@@ -260,238 +272,248 @@
         </div>
     </footer>
 
-    <!-- Enhanced Report GF Beer Modal -->
-    <div id="reportModal" class="report-modal">
+    <!-- Enhanced Report GF Beer Modal - UPDATED -->
+    <div id="reportModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>📸 Report GF Beer Find</h2>
-                <button class="close-modal" onclick="closeReportModal()">&times;</button>
+                <h2 class="modal-title">📸 Report GF Beer Find</h2>
+                <button class="modal-close" onclick="closeModal('reportModal')" aria-label="Close report modal">&times;</button>
             </div>
             
-            <form id="reportForm" class="report-form">
-                <div class="form-group">
-                    <label>Find Your Pub *</label>
-                    <input type="text" id="reportPubSearch" required placeholder="Start typing pub name..." autocomplete="off">
-                    <div id="pubSuggestions" class="pub-suggestions"></div>
-                    <small>Search for an existing pub first - we'll check our database!</small>
-                </div>
-                
-                <div id="selectedPubInfo" class="selected-pub-info" style="display: none;">
-                    <div class="selected-pub-card">
-                        <strong id="selectedPubName"></strong>
-                        <div id="selectedPubAddress"></div>
-                        <button type="button" onclick="clearSelectedPub()" class="btn-clear">Choose Different Pub</button>
-                    </div>
-                </div>
-                
-                <div id="newPubFields" class="new-pub-fields" style="display: none;">
-                    <h4>📍 Add New Pub</h4>
+            <div class="modal-body">
+                <form id="reportForm" class="modal-form">
                     <div class="form-group">
-                        <label>Pub Name *</label>
-                        <input type="text" id="reportPubName" placeholder="The Red Lion">
+                        <label class="form-label">Find Your Pub *</label>
+                        <input type="text" id="reportPubSearch" class="form-input" required placeholder="Start typing pub name..." autocomplete="off">
+                        <div id="pubSuggestions" class="suggestions"></div>
+                        <small>Search for an existing pub first - we'll check our database!</small>
                     </div>
+                    
+                    <div id="selectedPubInfo" class="selected-pub-info" style="display: none;">
+                        <div class="selected-pub-card">
+                            <strong id="selectedPubName"></strong>
+                            <div id="selectedPubAddress"></div>
+                            <button type="button" onclick="clearSelectedPub()" class="btn btn-secondary btn-sm">Choose Different Pub</button>
+                        </div>
+                    </div>
+                    
+                    <div id="newPubFields" class="new-pub-fields" style="display: none;">
+                        <h4>📍 Add New Pub</h4>
+                        <div class="form-group">
+                            <label class="form-label">Pub Name *</label>
+                            <input type="text" id="reportPubName" class="form-input" placeholder="The Red Lion">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Address *</label>
+                            <input type="text" id="reportAddress" class="form-input" placeholder="123 High Street">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Postcode *</label>
+                            <input type="text" id="reportPostcode" class="form-input" placeholder="SW1A 1AA">
+                        </div>
+                    </div>
+                    
                     <div class="form-group">
-                        <label>Address *</label>
-                        <input type="text" id="reportAddress" placeholder="123 High Street">
+                        <label class="form-label">Beer Format *</label>
+                        <select id="reportFormat" class="form-select" required>
+                            <option value="">Select format...</option>
+                            <option value="bottle">🍺 Bottle</option>
+                            <option value="tap">🚰 Tap</option>
+                            <option value="cask">🛢️ Cask</option>
+                            <option value="can">🥫 Can</option>
+                        </select>
                     </div>
+                    
                     <div class="form-group">
-                        <label>Postcode *</label>
-                        <input type="text" id="reportPostcode" placeholder="SW1A 1AA">
+                        <label class="form-label">Brewery</label>
+                        <input type="text" id="reportBrewery" class="form-input" placeholder="Brewdog">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Beer Name</label>
+                        <input type="text" id="reportBeerName" class="form-input" placeholder="Punk AF">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Beer Style</label>
+                        <input type="text" id="reportBeerStyle" class="form-input" placeholder="IPA">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Photo (Optional)</label>
+                        <input type="file" id="reportPhoto" class="form-input" accept="image/*">
+                        <small>Share a photo of the beer or menu</small>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" onclick="closeModal('reportModal')" class="btn btn-secondary">Cancel</button>
+                        <button type="submit" class="btn btn-success">Submit Report</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- About Us Modal - UPDATED -->
+    <div id="aboutModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">ℹ️ About Coeliacs Like Beer Too</h2>
+                <button class="modal-close" onclick="closeModal('aboutModal')" aria-label="Close about modal">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="about-content">
+                    <div class="about-section">
+                        <h3>🍺 Our Mission</h3>
+                        <p>We believe that being coeliac shouldn't mean missing out on great beer experiences. Our mission is to create the UK's most comprehensive, community-driven guide to gluten free beer options across the country.</p>
+                    </div>
+                    
+                    <div class="about-section">
+                        <h3>👥 Our Story</h3>
+                        <p>Started by coeliacs, for coeliacs. We understand the frustration of walking into a pub and not knowing if they have any safe options. That's why we built this platform - to help our community find amazing gluten free beer wherever they are in the UK.</p>
+                    </div>
+                    
+                    <div class="about-section">
+                        <h3>🤝 Community Driven</h3>
+                        <p>Every beer report, every pub update, every photo comes from real people in the coeliac community. Together, we're building something that helps everyone discover new places and feel confident about their choices.</p>
+                    </div>
+                    
+                    <div class="about-section">
+                        <h3>📈 Growing Together</h3>
+                        <p>With thousands of pubs in our database and growing reports every day, we're becoming the go-to resource for gluten free beer discovery. Join us in making the UK more accessible for coeliacs!</p>
+                    </div>
+                    
+                    <div class="contact-info">
+                        <h3>💬 Get in Touch</h3>
+                        <p>Questions, suggestions, or partnership opportunities? We'd love to hear from you!</p>
+                        <button onclick="showComingSoon('Contact Form')" class="btn btn-primary">Contact Us</button>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- GF Info Modal - UPDATED -->
+    <div id="gfInfoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">🔬 What is Gluten Free Beer?</h2>
+                <button class="modal-close" onclick="closeModal('gfInfoModal')" aria-label="Close GF info modal">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="gf-content">
+                    <div class="gf-section">
+                        <h3>🧪 Official Standards</h3>
+                        <div class="standards-grid">
+                            <div class="standard-item">
+                                <strong>🇬🇧 UK & EU</strong>
+                                <p>Less than 20ppm gluten</p>
+                            </div>
+                            <div class="standard-item">
+                                <strong>🇺🇸 USA</strong>
+                                <p>Less than 20ppm gluten</p>
+                            </div>
+                            <div class="standard-item">
+                                <strong>🇦🇺 Australia</strong>
+                                <p>Less than 5ppm gluten (stricter!)</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="gf-section">
+                        <h3>🏷️ Types of GF Beer</h3>
+                        <div class="beer-types">
+                            <div class="beer-type-item">
+                                <strong>✅ Certified Gluten Free</strong>
+                                <p>Made from naturally gluten free grains (rice, sorghum, millet). Safest option.</p>
+                            </div>
+                            <div class="beer-type-item">
+                                <strong>⚗️ Gluten Removed/Reduced</strong>
+                                <p>Made from barley/wheat but treated with enzymes to break down gluten. Some coeliacs react.</p>
+                            </div>
+                            <div class="beer-type-item">
+                                <strong>🌾 "Made Without Gluten"</strong>
+                                <p>No gluten ingredients added, but may have cross-contamination. Check carefully!</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="gf-section">
+                        <h3>⚠️ Important Notes</h3>
+                        <ul class="safety-notes">
+                            <li><strong>Cross-contamination</strong> can happen in breweries that also make regular beer</li>
+                            <li><strong>Always check labels</strong> and ask staff about preparation methods</li>
+                            <li><strong>Coeliacs vs Gluten Intolerant</strong> - Coeliac disease is an autoimmune condition requiring strict gluten avoidance, while gluten intolerance is a separate digestive sensitivity</li>
+                            <li><strong>When in doubt</strong>, choose certified gluten free options</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="gf-section">
+                        <h3>🍺 Popular GF Beer Brands in UK</h3>
+                        <div class="brand-grid">
+                            <span class="brand-tag">Brewdog (GF Range)</span>
+                            <span class="brand-tag">Glutenberg</span>
+                            <span class="brand-tag">Omission</span>
+                            <span class="brand-tag">Stella Artois (GF)</span>
+                            <span class="brand-tag">Ghostfish</span>
+                            <span class="brand-tag">Ground Breaker</span>
+                        </div>
+                    </div>
+                    
+                    <div class="disclaimer">
+                        <p><strong>Disclaimer:</strong> This information is for guidance only. Always consult with healthcare professionals and verify product safety for your individual needs.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Smart Coordinate Modal - UPDATED -->
+    <div id="coordinateModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalPubName">Help us locate this pub!</h2>
+                <button class="modal-close" onclick="closeModal('coordinateModal')" aria-label="Close coordinate modal">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <p>We'll search near the postcode and you can click to pinpoint the exact location.</p>
                 
-                <div class="form-group">
-                    <label>Beer Format *</label>
-                    <select id="reportFormat" required>
-                        <option value="">Select format...</option>
-                        <option value="bottle">🍺 Bottle</option>
-                        <option value="tap">🚰 Tap</option>
-                        <option value="cask">🛢️ Cask</option>
-                        <option value="can">🥫 Can</option>
-                    </select>
+                <div class="modal-instructions">
+                    <span id="modalInstructions">🗺️ Searching for the pub area...</span>
                 </div>
                 
-                <div class="form-group">
-                    <label>Brewery</label>
-                    <input type="text" id="reportBrewery" placeholder="Brewdog">
-                </div>
+                <div id="coordinateMap" class="modal-map"></div>
                 
-                <div class="form-group">
-                    <label>Beer Name</label>
-                    <input type="text" id="reportBeerName" placeholder="Punk AF">
-                </div>
-                
-                <div class="form-group">
-                    <label>Beer Style</label>
-                    <input type="text" id="reportBeerStyle" placeholder="IPA">
-                </div>
-                
-                <div class="form-group">
-                    <label>Photo (Optional)</label>
-                    <input type="file" id="reportPhoto" accept="image/*">
-                    <small>Share a photo of the beer or menu</small>
+                <div id="selectedLocationInfo" class="selected-location" style="display: none;">
+                    <div>📍 Selected location:</div>
+                    <div class="coordinates" id="selectedCoordinates"></div>
                 </div>
                 
                 <div class="form-actions">
-                    <button type="button" onclick="closeReportModal()" class="btn-cancel">Cancel</button>
-                    <button type="submit" class="btn-submit">Submit Report</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- About Us Modal -->
-    <div id="aboutModal" class="report-modal">
-        <div class="modal-content about-modal-content">
-            <div class="modal-header">
-                <h2>ℹ️ About Coeliacs Like Beer Too</h2>
-                <button class="close-modal" onclick="closeAboutModal()">&times;</button>
-            </div>
-            
-            <div class="about-content">
-                <div class="about-section">
-                    <h3>🍺 Our Mission</h3>
-                    <p>We believe that being coeliac shouldn't mean missing out on great beer experiences. Our mission is to create the UK's most comprehensive, community-driven guide to gluten free beer options across the country.</p>
-                </div>
-                
-                <div class="about-section">
-                    <h3>👥 Our Story</h3>
-                    <p>Started by coeliacs, for coeliacs. We understand the frustration of walking into a pub and not knowing if they have any safe options. That's why we built this platform - to help our community find amazing gluten free beer wherever they are in the UK.</p>
-                </div>
-                
-                <div class="about-section">
-                    <h3>🤝 Community Driven</h3>
-                    <p>Every beer report, every pub update, every photo comes from real people in the coeliac community. Together, we're building something that helps everyone discover new places and feel confident about their choices.</p>
-                </div>
-                
-                <div class="about-section">
-                    <h3>📈 Growing Together</h3>
-                    <p>With thousands of pubs in our database and growing reports every day, we're becoming the go-to resource for gluten free beer discovery. Join us in making the UK more accessible for coeliacs!</p>
-                </div>
-                
-                <div class="contact-info">
-                    <h3>💬 Get in Touch</h3>
-                    <p>Questions, suggestions, or partnership opportunities? We'd love to hear from you!</p>
-                    <button onclick="showComingSoon('Contact Form')" class="btn-contact">Contact Us</button>
+                    <button id="confirmLocation" class="btn btn-success">
+                        ✅ Confirm Location
+                    </button>
+                    <button id="cancelModal" class="btn btn-secondary" onclick="closeModal('coordinateModal')">
+                        ❌ Cancel
+                    </button>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- GF Info Modal -->
-    <div id="gfInfoModal" class="report-modal">
-        <div class="modal-content gf-modal-content">
-            <div class="modal-header">
-                <h2>🔬 What is Gluten Free Beer?</h2>
-                <button class="close-modal" onclick="closeGFInfoModal()">&times;</button>
-            </div>
-            
-            <div class="gf-content">
-                <div class="gf-section">
-                    <h3>🧪 Official Standards</h3>
-                    <div class="standards-grid">
-                        <div class="standard-item">
-                            <strong>🇬🇧 UK & EU</strong>
-                            <p>Less than 20ppm gluten</p>
-                        </div>
-                        <div class="standard-item">
-                            <strong>🇺🇸 USA</strong>
-                            <p>Less than 20ppm gluten</p>
-                        </div>
-                        <div class="standard-item">
-                            <strong>🇦🇺 Australia</strong>
-                            <p>Less than 5ppm gluten (stricter!)</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="gf-section">
-                    <h3>🏷️ Types of GF Beer</h3>
-                    <div class="beer-types">
-                        <div class="beer-type-item">
-                            <strong>✅ Certified Gluten Free</strong>
-                            <p>Made from naturally gluten free grains (rice, sorghum, millet). Safest option.</p>
-                        </div>
-                        <div class="beer-type-item">
-                            <strong>⚗️ Gluten Removed/Reduced</strong>
-                            <p>Made from barley/wheat but treated with enzymes to break down gluten. Some coeliacs react.</p>
-                        </div>
-                        <div class="beer-type-item">
-                            <strong>🌾 "Made Without Gluten"</strong>
-                            <p>No gluten ingredients added, but may have cross-contamination. Check carefully!</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="gf-section">
-                    <h3>⚠️ Important Notes</h3>
-                    <ul class="safety-notes">
-                        <li><strong>Cross-contamination</strong> can happen in breweries that also make regular beer</li>
-                        <li><strong>Always check labels</strong> and ask staff about preparation methods</li>
-                        <li><strong>Coeliacs vs Gluten Intolerant</strong> - Coeliac disease is an autoimmune condition requiring strict gluten avoidance, while gluten intolerance is a separate digestive sensitivity</li>
-                        <li><strong>When in doubt</strong>, choose certified gluten free options</li>
-                    </ul>
-                </div>
-                
-                <div class="gf-section">
-                    <h3>🍺 Popular GF Beer Brands in UK</h3>
-                    <div class="brand-grid">
-                        <span class="brand-tag">Brewdog (GF Range)</span>
-                        <span class="brand-tag">Glutenberg</span>
-                        <span class="brand-tag">Omission</span>
-                        <span class="brand-tag">Stella Artois (GF)</span>
-                        <span class="brand-tag">Ghostfish</span>
-                        <span class="brand-tag">Ground Breaker</span>
-                    </div>
-                </div>
-                
-                <div class="disclaimer">
-                    <p><strong>Disclaimer:</strong> This information is for guidance only. Always consult with healthcare professionals and verify product safety for your individual needs.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Smart Coordinate Modal -->
-    <div id="coordinateModal" class="coordinate-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modalPubName">Help us locate this pub!</h2>
-                <p>We'll search near the postcode and you can click to pinpoint the exact location.</p>
-            </div>
-            
-            <div class="modal-instructions">
-                <span id="modalInstructions">🗺️ Searching for the pub area...</span>
-            </div>
-            
-            <div id="coordinateMap" class="modal-map"></div>
-            
-            <div id="selectedLocationInfo" class="selected-location" style="display: none;">
-                <div>📍 Selected location:</div>
-                <div class="coordinates" id="selectedCoordinates"></div>
-            </div>
-            
-            <div class="modal-buttons">
-                <button id="confirmLocation" class="modal-button confirm-button">
-                    ✅ Confirm Location
-                </button>
-                <button id="cancelModal" class="modal-button cancel-button">
-                    ❌ Cancel
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Loading Toast -->
-    <div id="loadingToast" class="toast loading-toast" style="display: none;">
+    
+    <!-- Loading Toast - UPDATED -->
+    <div id="loadingToast" class="toast toast-loading" style="display: none;">
         <div class="toast-content">
             <div class="spinner"></div>
             <span id="loadingMessage">Loading...</span>
         </div>
     </div>
-
-    <!-- Success Toast -->
-    <div id="successToast" class="toast success-toast" style="display: none;">
+    
+    <!-- Success Toast - UPDATED -->
+    <div id="successToast" class="toast toast-success" style="display: none;">
         <div class="toast-content">
             <span class="toast-icon">✅</span>
             <span id="successMessage">Success!</span>
@@ -2118,7 +2140,7 @@
                         
                         <div class="pub-actions">
                             <button onclick="searchForPub('${selectedPub.name.replace(/'/g, "\\'")}', '${selectedPub.postcode}')" 
-                                    class="pub-action-btn search-btn">
+                                    class="pub-action-btn btn btn-primary">
                                 🔍 Find Online
                             </button>
                             <button onclick="openInGoogleMaps(${selectedPub.latitude}, ${selectedPub.longitude}, '${selectedPub.name.replace(/'/g, "\\'")}', '${selectedPub.address}')" 
@@ -2187,7 +2209,7 @@
                     
                     <div class="pub-actions">
                         <button onclick="searchForPub('${pub.name.replace(/'/g, "\\'")}', '${pub.postcode}')" 
-                                class="pub-action-btn search-btn">
+                                class="pub-action-btn btn btn-primary">
                             🔍 Find Online
                         </button>
                         <button onclick="openInGoogleMaps(null, null, '${pub.name.replace(/'/g, "\\'")}', '${pub.address}')" 
