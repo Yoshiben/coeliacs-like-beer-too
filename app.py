@@ -966,6 +966,115 @@ Review: https://coeliacslikebeer.co.uk/admin/pending_updates
     except Exception as e:
         logger.error(f"Failed to send validation email: {str(e)}")
 
+# ADD these new routes to your app.py:
+
+@app.route('/search_advanced')
+def search_advanced():
+    """Enhanced search with beer filtering"""
+    query = request.args.get('query', '').strip()
+    search_type = request.args.get('search_type', 'all')
+    gf_only = request.args.get('gf_only', 'false').lower() == 'true'
+    page = request.args.get('page', 1, type=int)
+    
+    # NEW filter parameters
+    beer_format = request.args.get('format', 'all')
+    beer_style = request.args.get('style', 'all')
+    brewery_filter = request.args.get('brewery', 'all')
+    
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        # Build enhanced query with beer filtering
+        sql = """
+            SELECT DISTINCT
+                p.pub_id, p.name, p.address, p.postcode, p.local_authority, 
+                p.bottle, p.tap, p.cask, p.can, p.latitude, p.longitude,
+                JSON_ARRAYAGG(
+                    JSON_OBJECT(
+                        'format', pu.beer_format,
+                        'brewery', b.brewery,
+                        'name', b.name,
+                        'style', b.style,
+                        'abv', b.abv,
+                        'gluten_status', b.gluten_status,
+                        'vegan_status', b.vegan_status
+                    )
+                ) as beers
+            FROM pubs p
+            LEFT JOIN pubs_updates pu ON p.pub_id = pu.pub_id
+            LEFT JOIN beers b ON pu.beer_id = b.beer_id
+            WHERE 1=1
+        """
+        
+        params = []
+        
+        # Add search conditions
+        if search_type == 'name':
+            sql += " AND p.name LIKE %s"
+            params.append(f'%{query}%')
+        elif search_type == 'postcode':
+            sql += " AND p.postcode LIKE %s"
+            params.append(f'%{query}%')
+        # ... etc for other search types
+        
+        # Add beer filters
+        if beer_format != 'all':
+            sql += " AND pu.beer_format = %s"
+            params.append(beer_format)
+            
+        if beer_style != 'all':
+            sql += " AND b.style LIKE %s"
+            params.append(f'%{beer_style}%')
+            
+        if brewery_filter != 'all':
+            sql += " AND b.brewery = %s"
+            params.append(brewery_filter)
+        
+        sql += """
+            GROUP BY p.pub_id
+            ORDER BY p.name
+            LIMIT 20 OFFSET %s
+        """
+        params.append((page - 1) * 20)
+        
+        cursor.execute(sql, params)
+        pubs = cursor.fetchall()
+        
+        return jsonify({'pubs': pubs})
+        
+    except Exception as e:
+        logger.error(f"Advanced search error: {str(e)}")
+        return jsonify({'error': 'Search failed'}), 500
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+@app.route('/api/breweries_for_filter')
+def get_breweries_for_filter():
+    """Get brewery list for filter dropdown"""
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        cursor.execute("""
+            SELECT DISTINCT brewery, COUNT(*) as beer_count
+            FROM beers 
+            ORDER BY beer_count DESC, brewery
+            LIMIT 50
+        """)
+        breweries = cursor.fetchall()
+        
+        return jsonify(breweries)
+        
+    except Exception as e:
+        return jsonify({'error': 'Failed to load breweries'}), 500
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     debug = os.environ.get('FLASK_ENV') == 'development'
