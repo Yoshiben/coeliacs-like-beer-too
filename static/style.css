@@ -173,21 +173,16 @@ html {
    SEARCH SECTION
    ================================ */
 .search-section {
-    border: 3px solid blue !important; /* Show the search section boundary */
-    overflow: visible !important;
-}
-
-/* Raise z-index and add margin when map is visible to prevent overlap */
-.map-container:not([style*="display: none"]) + .search-section {
-    z-index: 200; /* Above map */
-    margin-top: 40px; /* Increased space to avoid touching map */
-    padding-top: 30px; /* Extra padding */
-}
-
-/* Suggestions Dropdown Fix - Ensure it sticks to input */
-.search-row {
-    border: 3px solid green !important; /* Show the search row boundary */
-    position: relative !important;
+    max-width: 1200px;
+    margin: -20px auto var(--section-margin);
+    background: var(--bg-white);
+    padding: 20px 30px;
+    border-radius: var(--border-radius);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    position: relative;
+    z-index: 100;
+    overflow: visible;
 }
 
 .section-title {
@@ -349,21 +344,19 @@ button, .btn-base {
 /* ================================
    AUTOCOMPLETE SUGGESTIONS
    ================================ */
-
 #suggestions {
     position: absolute;
-    top: calc(100% + 5px); /* Right below the search input */
-    left: 0;
-    right: 0;
+    top: 100%;
+    left: 30px;
+    right: 30px;
     max-height: 400px;
     overflow-y: auto;
     border-radius: 15px;
     background: white;
-    display: none; /* Hidden by default */
-    z-index: 10000; /* Above everything */
+    display: none;
+    z-index: var(--z-dropdown);
     box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-    margin: 0;
-    border: 2px solid #e2e8f0;
+    margin-top: 5px;
 }
 
 #suggestions div {
@@ -372,7 +365,8 @@ button, .btn-base {
     font-size: 14px;
     border-bottom: 1px solid #f0f0f0;
     background: white;
-    transition: background-color 0.2s ease;
+    position: relative;
+    z-index: calc(var(--z-dropdown) + 1);
 }
 
 #suggestions div:hover {
@@ -382,11 +376,6 @@ button, .btn-base {
 
 #suggestions div:last-child {
     border-bottom: none;
-    border-radius: 0 0 13px 13px;
-}
-
-#suggestions div:first-child {
-    border-radius: 13px 13px 0 0;
 }
 
 .show-all-option {
@@ -1112,14 +1101,10 @@ button, .btn-base {
    ================================ */
 .split-screen-container {
     max-width: 1200px;
-    margin: 0 auto; /* Remove top/bottom margins for full screen */
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    height: 100vh; /* Full viewport height */
-    justify-content: flex-start; /* Start from top */
-    scroll-margin-top: 0;
-    overflow: hidden; /* Prevent outer scroll */
+    margin: 20px auto 40px;
+    padding: 0 20px;
+    display: none;
+    scroll-margin-top: 20px;
 }
 
 .split-screen-header {
@@ -1127,104 +1112,16 @@ button, .btn-base {
     padding: 20px 30px;
     border-radius: var(--border-radius) var(--border-radius) 0 0;
     backdrop-filter: blur(10px);
-    z-index: 150; /* Above content */
-    position: sticky;
-    top: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #e2e8f0;
 }
 
 .split-screen-header .section-title {
     flex: 1;
     text-align: center;
     margin: 0;
-}
-
-.split-pub-details {
-    flex: 1; /* Take all available space */
-    overflow-y: auto; /* Allow scrolling if content is long */
-    padding: 30px 30px 100px; /* Increased bottom padding for bars */
-    background: var(--bg-white);
-    border-radius: 0 0 var(--border-radius) var(--border-radius);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-    position: relative;
-    min-height: calc(100% - 60px); /* Full height minus header */
-}
-
-/* Pub Actions Grid (2x2 for Find Online, Get Directions, Find on Map, Report GF Beer) */
-.pub-actions {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-    flex-wrap: nowrap;
-    margin-bottom: 20px;
-    padding: 0;
-}
-
-.pub-actions .pub-action-btn {
-    min-width: 140px; /* Fixed min-width for uniformity */
-    min-height: 50px; /* Fixed height */
-    padding: 12px 20px;
-    font-size: 14px;
-    border-radius: 25px;
-    color: white;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    transition: var(--transition-normal);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
-
-/* Hover States (Uniform) */
-.pub-actions .pub-action-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-}
-
-/* Navigation Bar (Back and Home in 2 columns) */
-/* Navigation Bar (Swapped order in HTML, uniform sizes, better colors) */
-.split-action-bar {
-    position: fixed; /* Fixed to bottom for full screen feel */
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: var(--bg-white);
-    padding: 15px 30px;
-    border-top: 2px solid #e2e8f0;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-    justify-content: center;
-    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-    z-index: 200;
-    backdrop-filter: blur(10px);
-    border-radius: 0;
-}
-
-.split-action-bar .pub-action-btn {
-    min-width: 140px;
-    min-height: 50px;
-    padding: 12px 20px;
-    font-size: 14px;
-    border-radius: 25px;
-    color: white;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    transition: var(--transition-normal);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
-
-/* Specific Button Styles (unchanged, but ensure they exist) */
-.find-on-map-btn {
-    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-}
-
-.find-on-map-btn:hover {
-    background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
 }
 
 .split-screen-nav {
@@ -1252,6 +1149,15 @@ button, .btn-base {
     background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+}
+
+.split-pub-details {
+    background: var(--bg-white);
+    padding: 30px 30px 80px; /* Increased bottom padding to prevent button cutoff */
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    min-height: 300px;
 }
 
 .pub-header {
@@ -1296,7 +1202,29 @@ button, .btn-base {
     font-weight: 600;
 }
 
-.search-btn { /* Find Online */
+.pub-actions {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+    padding-bottom: 10px;
+}
+
+.pub-action-btn {
+    flex: 1;
+    min-width: 140px;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 25px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition-normal);
+    color: white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.search-btn {
     background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
 }
 
@@ -1306,7 +1234,7 @@ button, .btn-base {
     box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
 }
 
-.directions-btn { /* Get Directions */
+.directions-btn {
     background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
 }
 
@@ -1316,7 +1244,7 @@ button, .btn-base {
     box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
 }
 
-.update-btn { /* Report GF Beer */
+.update-btn {
     background: var(--success-gradient);
 }
 
@@ -1327,7 +1255,7 @@ button, .btn-base {
 }
 
 .home-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--primary-gradient);
     color: white;
     border: none;
     padding: 8px 16px;
@@ -1667,58 +1595,6 @@ button, .btn-base {
     background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
 }
 
-/* ADD these new styles to your style.css: */
-
-.advanced-filters {
-    background: rgba(248, 250, 252, 0.9);
-    padding: 20px;
-    border-radius: 15px;
-    margin-top: 20px;
-    border: 2px solid #e2e8f0;
-}
-
-.filter-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
-    margin-bottom: 15px;
-}
-
-.filter-select {
-    padding: 10px 15px;
-    border: 2px solid #e2e8f0;
-    border-radius: 20px;
-    background: white;
-    font-size: 14px;
-}
-
-.btn-advanced-filters {
-    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 20px;
-    font-size: 14px;
-    cursor: pointer;
-    margin-top: 10px;
-}
-
-.format-group {
-    margin-bottom: 15px;
-    padding: 10px;
-    background: rgba(102, 126, 234, 0.05);
-    border-radius: 10px;
-}
-
-.beer-item {
-    padding: 5px 0;
-    border-bottom: 1px solid #e2e8f0;
-}
-
-.beer-item:last-child {
-    border-bottom: none;
-}
-
 /* ================================
    MOBILE RESPONSIVE
    ================================ */
@@ -1728,16 +1604,6 @@ button, .btn-base {
         --section-padding: 20px;
         --section-margin: 30px;
         --border-radius: 15px;
-    }
-
-   #suggestions {
-        max-height: 280px;
-        font-size: 15px; /* Bigger for mobile */
-    }
-
-   #suggestions div {
-        padding: 15px 18px; /* Bigger touch targets */
-        font-size: 15px;
     }
 
     /* Hero Section Mobile */
@@ -1797,7 +1663,6 @@ button, .btn-base {
     /* Search Section Mobile */
     .search-section {
         margin: 10px 15px 25px;
-        margin-top: 0; /* Reset top margin on mobile for full coverage */
         padding: 18px;
         overflow: visible;
     }
@@ -1836,18 +1701,18 @@ button, .btn-base {
     
     .search-actions {
         flex-direction: column;
-        gap: 12px;
+        gap: 8px;
     }
     
     .search-btn,
     .map-control-btn {
         width: 100%;
-        padding: 16px;
-        font-size: 16px;
-        min-height: 52px;
+        padding: 14px;
+        font-size: 15px;
+        min-height: 48px;
         border-radius: 25px !important;
         border: none !important;
-        margin-bottom: 12px;
+        margin-bottom: 8px;
         box-sizing: border-box;
     }
 
@@ -1861,6 +1726,29 @@ button, .btn-base {
         margin-bottom: 8px !important;
         order: 999 !important;
         box-sizing: border-box !important;
+    }
+
+    /* Autocomplete Mobile */
+    #suggestions {
+        left: 15px;
+        right: 15px;
+        z-index: calc(var(--z-dropdown) + 5);
+        max-height: 280px;
+        box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+        position: absolute;
+        top: 100%;
+        margin-top: 5px;
+    }
+    
+    #suggestions div {
+        padding: 16px 18px;
+        font-size: 15px;
+        line-height: 1.4;
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        position: relative;
+        z-index: calc(var(--z-dropdown) + 6);
     }
 
     /* Results Mobile */
@@ -2044,40 +1932,10 @@ button, .btn-base {
 
     /* Split Screen Mobile */
     .split-screen-container {
-        height: 100vh;
-        margin: 0;
-        padding: 0;
+        padding: 0 15px;
+        margin: 15px auto 30px;
     }
-
-    .split-pub-details {
-        padding: 25px 20px 100px;
-    }
-
-    .pub-actions {
-        gap: 10px;
-        margin-bottom: 15px;
-    }
-
-    .pub-actions .pub-action-btn {
-        min-width: 120px; /* Slightly smaller on mobile */
-        min-height: 48px;
-        padding: 10px 15px;
-        font-size: 13px;
-    }
-
-    .split-action-bar {
-        padding: 10px 15px;
-        gap: 10px;
-        border-radius: 0;
-    }
-
-    .split-action-bar .pub-action-btn {
-        min-width: 120px;
-        min-height: 48px;
-        padding: 10px 15px;
-        font-size: 13px;
-    }
-   
+    
     .split-screen-header {
         padding: 18px 20px;
         flex-direction: column;
@@ -2101,6 +1959,11 @@ button, .btn-base {
         font-size: 15px;
     }
     
+    .split-pub-details {
+        padding: 25px 20px 60px; /* Extra bottom padding for mobile */
+        min-height: 250px;
+    }
+    
     .pub-header {
         flex-direction: column;
         align-items: flex-start;
@@ -2109,6 +1972,19 @@ button, .btn-base {
     
     .pub-header h3 {
         font-size: 1.3em;
+    }
+    
+    .pub-actions {
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 25px;
+    }
+    
+    .pub-action-btn {
+        width: 100%;
+        min-width: unset;
+        padding: 16px 24px;
+        font-size: 16px;
     }
 
     /* Modals Mobile */
@@ -2180,1047 +2056,5 @@ button, .btn-base {
         width: 45px;
         height: 45px;
         font-size: 18px;
-    }
-}
-
-/* Mobile-specific search enhancements */
-.mobile-enhanced .search-section {
-    position: sticky;
-    top: 0;
-    z-index: 200;
-    margin: 10px 15px 20px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    border-radius: 20px;
-}
-
-.mobile-location-btn {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: white;
-    border: none;
-    padding: 16px 24px;
-    font-size: 16px;
-    font-weight: 700;
-    border-radius: 25px;
-    width: 100%;
-    margin-bottom: 15px;
-    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    order: -1; /* Put it first */
-}
-
-.mobile-location-btn:active {
-    transform: translateY(1px);
-    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
-}
-
-/* Enhanced result cards for mobile */
-.mobile-enhanced .result-item {
-    background: white;
-    border-radius: 15px;
-    margin-bottom: 15px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-}
-
-.mobile-enhanced .result-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
-}
-
-.mobile-quick-actions {
-    display: flex;
-    gap: 8px;
-    margin-top: 10px;
-    padding: 10px 0;
-    border-top: 1px solid #e2e8f0;
-}
-
-.mobile-action-btn {
-    flex: 1;
-    padding: 10px 12px;
-    border: none;
-    border-radius: 15px;
-    font-weight: 600;
-    font-size: 12px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.mobile-action-btn.directions {
-    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-    color: white;
-}
-
-.mobile-action-btn.call {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: white;
-}
-
-.mobile-action-btn:active {
-    transform: translateY(1px);
-}
-
-/* Mobile beer display enhancements */
-.mobile-beer-display {
-    background: #f8fafc;
-    padding: 15px;
-    border-radius: 10px;
-    margin-top: 10px;
-}
-
-.mobile-beer-display .beer-item {
-    background: white;
-    padding: 10px 12px;
-    border-radius: 8px;
-    margin-bottom: 8px;
-    border-left: 3px solid #667eea;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.mobile-beer-display .beer-item:last-child {
-    margin-bottom: 0;
-}
-
-.mobile-beer-display .beer-type {
-    font-size: 12px;
-    font-weight: 700;
-    color: #667eea;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-/* Location prompt modal */
-.mobile-location-prompt {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 3000;
-    padding: 20px;
-}
-
-.prompt-content {
-    background: white;
-    padding: 30px;
-    border-radius: 20px;
-    text-align: center;
-    max-width: 300px;
-    width: 100%;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-}
-
-.prompt-content h3 {
-    margin: 0 0 10px 0;
-    color: #2d3748;
-    font-size: 20px;
-}
-
-.prompt-content p {
-    margin: 0 0 20px 0;
-    color: #4a5568;
-    line-height: 1.5;
-}
-
-.btn-enable-location {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 25px;
-    font-weight: 600;
-    cursor: pointer;
-    width: 100%;
-    margin-bottom: 10px;
-    font-size: 16px;
-    transition: all 0.3s ease;
-}
-
-.btn-enable-location:active {
-    transform: translateY(1px);
-}
-
-.btn-cancel-location {
-    background: transparent;
-    color: #718096;
-    border: none;
-    padding: 8px 16px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-/* Mobile search input enhancements */
-@media (max-width: 768px) {
-    #searchInput {
-        font-size: 16px; /* Prevents zoom on iOS */
-        padding: 16px 20px;
-        border-radius: 25px;
-    }
-    
-    /* Make all buttons more touch-friendly */
-    .search-btn, .map-control-btn {
-        min-height: 48px;
-        padding: 14px 20px;
-        font-size: 15px;
-    }
-    
-    /* Better spacing for mobile */
-    .search-actions {
-        gap: 10px;
-    }
-    
-    /* Optimize results for mobile scrolling */
-    .mobile-enhanced #results {
-        padding: 0 15px;
-    }
-    
-    /* Make update buttons more prominent on mobile */
-    .mobile-enhanced .update-button {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 12px 20px;
-        font-size: 14px;
-        border-radius: 20px;
-        min-height: 44px;
-    }
-}
-
-/* iOS safe area support */
-@supports (padding-top: env(safe-area-inset-top)) {
-    .mobile-enhanced .search-section.mobile-sticky {
-        padding-top: calc(20px + env(safe-area-inset-top));
-    }
-}
-
-/* Mobile Enhancement CSS - ADD to your existing style.css */
-
-/* ================================
-   MOBILE-SPECIFIC ENHANCEMENTS
-   ================================ */
-
-/* Mobile Result Cards */
-.mobile-enhanced .result-item.mobile-result-card {
-    background: white;
-    border-radius: 15px;
-    margin-bottom: 15px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-    border: none;
-    display: block; /* Override grid layout */
-    padding: 0;
-}
-
-.mobile-result-header {
-    padding: 15px 20px;
-    border-bottom: 1px solid #f0f0f0;
-}
-
-.mobile-pub-name {
-    font-size: 18px;
-    font-weight: 700;
-    color: #2d3748;
-    margin: 0 0 5px 0;
-    line-height: 1.2;
-}
-
-.mobile-pub-address {
-    font-size: 14px;
-    color: #4a5568;
-    margin-bottom: 8px;
-    line-height: 1.3;
-}
-
-.mobile-pub-meta {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    align-items: center;
-}
-
-.distance-badge {
-    background: rgba(102, 126, 234, 0.1);
-    color: #667eea;
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.beer-count-badge {
-    background: rgba(16, 185, 129, 0.1);
-    color: #10b981;
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.verification-badge {
-    padding: 3px 8px;
-    border-radius: 10px;
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.verification-badge.high {
-    background: rgba(16, 185, 129, 0.1);
-    color: #10b981;
-}
-
-.verification-badge.medium {
-    background: rgba(245, 158, 11, 0.1);
-    color: #f59e0b;
-}
-
-.verification-badge.low {
-    background: rgba(107, 114, 128, 0.1);
-    color: #6b7280;
-}
-
-.verification-badge.none {
-    background: rgba(239, 68, 68, 0.1);
-    color: #ef4444;
-}
-
-/* Mobile Beer Display */
-.mobile-beer-section {
-    padding: 15px 20px;
-    background: #f8fafc;
-}
-
-.mobile-beer-list {
-    space-y: 12px;
-}
-
-.mobile-format-group {
-    margin-bottom: 15px;
-}
-
-.mobile-format-header {
-    font-size: 13px;
-    font-weight: 700;
-    color: #667eea;
-    margin-bottom: 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.mobile-beer-items {
-    space-y: 6px;
-}
-
-.mobile-beer-item {
-    background: white;
-    padding: 12px;
-    border-radius: 10px;
-    border-left: 3px solid #667eea;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    margin-bottom: 8px;
-}
-
-.mobile-beer-item:last-child {
-    margin-bottom: 0;
-}
-
-.beer-main {
-    margin-bottom: 4px;
-}
-
-.beer-brewery {
-    color: #2d3748;
-    font-weight: 600;
-    margin-right: 6px;
-}
-
-.beer-name {
-    color: #4a5568;
-    font-weight: 500;
-}
-
-.beer-details {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-    font-size: 12px;
-}
-
-.beer-style {
-    color: #718096;
-    font-style: italic;
-}
-
-.gluten-badge {
-    padding: 2px 6px;
-    border-radius: 8px;
-    font-size: 10px;
-    font-weight: 600;
-    text-transform: uppercase;
-}
-
-.gluten-badge.no-gluten {
-    background: rgba(16, 185, 129, 0.1);
-    color: #10b981;
-}
-
-.gluten-badge.removed {
-    background: rgba(245, 158, 11, 0.1);
-    color: #f59e0b;
-}
-
-.vegan-badge {
-    font-size: 12px;
-}
-
-/* Mobile Beer Placeholder */
-.mobile-beer-placeholder {
-    text-align: center;
-    padding: 20px;
-    color: #718096;
-    background: rgba(102, 126, 234, 0.05);
-    border-radius: 10px;
-    border: 2px dashed #cbd5e0;
-}
-
-.placeholder-text {
-    font-weight: 600;
-    margin-bottom: 4px;
-    color: #4a5568;
-}
-
-.placeholder-action {
-    font-size: 12px;
-    color: #667eea;
-    font-style: italic;
-}
-
-/* Mobile Action Bar */
-.mobile-action-bar {
-    display: flex;
-    padding: 12px 15px;
-    gap: 8px;
-    background: #f8fafc;
-    border-top: 1px solid #e2e8f0;
-}
-
-.mobile-action-btn {
-    flex: 1;
-    padding: 12px 8px;
-    border: none;
-    border-radius: 15px;
-    font-weight: 600;
-    font-size: 13px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-align: center;
-    line-height: 1.2;
-    min-height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.mobile-action-btn.directions {
-    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-    color: white;
-    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
-}
-
-.mobile-action-btn.map {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: white;
-    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
-}
-
-.mobile-action-btn.report {
-    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-    color: white;
-    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
-}
-
-.mobile-action-btn:active {
-    transform: translateY(1px);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
-}
-
-/* Mobile No Results */
-.mobile-enhanced .no-results.mobile-no-results {
-    background: white;
-    border-radius: 15px;
-    padding: 40px 20px;
-    text-align: center;
-    margin: 15px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
-
-.no-results-icon {
-    font-size: 48px;
-    margin-bottom: 15px;
-}
-
-.no-results-content h3 {
-    font-size: 20px;
-    font-weight: 700;
-    color: #2d3748;
-    margin-bottom: 8px;
-}
-
-.no-results-content p {
-    color: #718096;
-    margin-bottom: 20px;
-    line-height: 1.5;
-}
-
-.btn-expand-search {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 25px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-}
-
-.btn-expand-search:active {
-    transform: translateY(1px);
-}
-
-/* Mobile Report Modal */
-.mobile-report-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 3000;
-    padding: 20px;
-}
-
-.mobile-modal-content {
-    background: white;
-    border-radius: 20px;
-    width: 100%;
-    max-width: 400px;
-    max-height: 90vh;
-    overflow-y: auto;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-}
-
-.mobile-modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px;
-    border-bottom: 1px solid #e2e8f0;
-}
-
-.mobile-modal-header h3 {
-    margin: 0;
-    color: #2d3748;
-    font-size: 18px;
-}
-
-.mobile-close-btn {
-    background: none;
-    border: none;
-    font-size: 24px;
-    color: #718096;
-    cursor: pointer;
-    padding: 0;
-    width: 30px;
-    height: 30px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    transition: all 0.3s ease;
-}
-
-.mobile-close-btn:hover {
-    background: #f7fafc;
-    color: #2d3748;
-}
-
-.mobile-report-form {
-    padding: 20px;
-}
-
-.mobile-form-group {
-    margin-bottom: 20px;
-}
-
-.mobile-form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-    color: #4a5568;
-    font-size: 14px;
-}
-
-.mobile-select,
-.mobile-input {
-    width: 100%;
-    padding: 14px 16px;
-    border: 2px solid #e2e8f0;
-    border-radius: 12px;
-    font-size: 16px; /* Prevent zoom on iOS */
-    background: white;
-    transition: all 0.3s ease;
-    box-sizing: border-box;
-}
-
-.mobile-select:focus,
-.mobile-input:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    outline: none;
-}
-
-.mobile-form-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 25px;
-}
-
-.mobile-submit-btn {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: white;
-    border: none;
-    padding: 16px 24px;
-    border-radius: 25px;
-    font-weight: 600;
-    font-size: 16px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-}
-
-.mobile-submit-btn:active {
-    transform: translateY(1px);
-}
-
-.mobile-cancel-btn {
-    background: transparent;
-    color: #718096;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 25px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.mobile-cancel-btn:hover {
-    background: #f7fafc;
-    color: #4a5568;
-}
-
-.gf-badge {
-    background: rgba(16, 185, 129, 0.1);
-    color: #10b981;
-    padding: 2px 8px;
-    border-radius: 10px;
-    font-weight: 600;
-}
-
-.no-gf-badge {
-    background: rgba(107, 114, 128, 0.1);
-    color: #6b7280;
-    padding: 2px 8px;
-    border-radius: 10px;
-    font-weight: 600;
-}
-
-/* Mobile Location Button Enhancement */
-.mobile-enhanced .mobile-location-btn {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: white;
-    border: none;
-    padding: 18px 24px;
-    font-size: 17px;
-    font-weight: 700;
-    border-radius: 25px;
-    width: 100%;
-    margin-bottom: 15px;
-    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
-    cursor: pointer;
-    transition: all 0.3s ease;
-    order: -1;
-    letter-spacing: 0.5px;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-.mobile-enhanced .mobile-location-btn:active {
-    transform: translateY(2px);
-    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
-}
-
-/* iOS Safe Area Support */
-@supports (padding-top: env(safe-area-inset-top)) {
-    .mobile-enhanced .search-section.mobile-sticky {
-        padding-top: calc(20px + env(safe-area-inset-top));
-    }
-    
-    .mobile-report-modal {
-        padding-top: calc(20px + env(safe-area-inset-top));
-        padding-bottom: calc(20px + env(safe-area-inset-bottom));
-    }
-}
-
-/* Dark Mode Support for Mobile */
-@media (prefers-color-scheme: dark) {
-    .mobile-enhanced .mobile-result-card {
-        background: #1a202c;
-        color: #e2e8f0;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    }
-    
-    .mobile-enhanced .mobile-pub-name {
-        color: #e2e8f0;
-    }
-    
-    .mobile-enhanced .mobile-pub-address {
-        color: #a0aec0;
-    }
-    
-    .mobile-enhanced .mobile-beer-section {
-        background: #2d3748;
-    }
-    
-    .mobile-enhanced .mobile-beer-item {
-        background: #4a5568;
-        color: #e2e8f0;
-    }
-    
-    .mobile-enhanced .mobile-action-bar {
-        background: #2d3748;
-        border-top-color: #4a5568;
-    }
-}
-
-/* Accessibility Improvements */
-@media (prefers-reduced-motion: reduce) {
-    .mobile-enhanced * {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-    }
-}
-
-/* High Contrast Mode */
-@media (prefers-contrast: high) {
-    .mobile-enhanced .mobile-action-btn {
-        border: 2px solid currentColor;
-    }
-    
-    .mobile-enhanced .verification-badge {
-        border: 1px solid currentColor;
-    }
-}
-
-console.log('📱 Mobile-enhanced CSS loaded!');
-
-/* ADD these styles to the END of your style.css file */
-
-/* Mobile button enhancements */
-@media (max-width: 768px) {
-    
-    /* Make the "Find Beer Near Me" button bigger and more prominent */
-    .mobile-enhanced .search-btn.secondary.mobile-location-btn {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        color: white;
-        border: none !important;
-        padding: 18px 24px;
-        font-size: 17px;
-        font-weight: 700;
-        border-radius: 25px;
-        width: 100%;
-        margin-bottom: 15px;
-        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
-        letter-spacing: 0.5px;
-        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-    }
-    
-    .mobile-enhanced .search-btn.secondary.mobile-location-btn:active {
-        transform: translateY(1px);
-        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
-    }
-    
-    /* Ensure all mobile buttons are touch-friendly */
-    .mobile-enhanced .search-btn,
-    .mobile-enhanced .map-control-btn {
-        min-height: 48px;
-        padding: 14px 20px;
-        font-size: 15px;
-        width: 100%;
-        margin-bottom: 10px;
-        border-radius: 25px;
-        border: none !important;
-    }
-    
-    /* Fix search input to prevent zoom on iOS */
-    .mobile-enhanced #searchInput {
-        font-size: 16px !important;
-        padding: 16px 20px;
-        border-radius: 25px;
-        background: white;
-        border: 2px solid #e2e8f0;
-        width: 100%;
-        box-sizing: border-box;
-    }
-    
-    .mobile-enhanced #searchInput:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        outline: none;
-    }
-    
-    /* Mobile result enhancements */
-    .mobile-enhanced .result-item {
-        border-radius: 15px;
-        margin-bottom: 15px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        background: white;
-        padding: 20px;
-    }
-    
-    .mobile-enhanced .result-details strong {
-        font-size: 18px;
-        display: block;
-        margin-bottom: 8px;
-        color: #2d3748;
-    }
-    
-    .mobile-enhanced .result-details .address {
-        font-size: 14px;
-        color: #4a5568;
-        margin-bottom: 6px;
-    }
-    
-    /* Mobile quick action buttons */
-    .mobile-enhanced .mobile-quick-actions {
-        display: flex;
-        gap: 8px;
-        margin-top: 12px;
-        padding: 10px 0;
-        border-top: 1px solid #e2e8f0;
-    }
-    
-    .mobile-enhanced .mobile-action-btn {
-        flex: 1;
-        padding: 12px 8px;
-        border: none;
-        border-radius: 15px;
-        font-weight: 600;
-        font-size: 13px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        color: white;
-        min-height: 44px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    .mobile-enhanced .mobile-action-btn.directions {
-        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
-    }
-    
-    .mobile-enhanced .mobile-action-btn.update {
-        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-        box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
-    }
-    
-    .mobile-enhanced .mobile-action-btn:active {
-        transform: translateY(1px);
-    }
-    
-    /* Make existing update button more mobile-friendly */
-    .mobile-enhanced .update-button {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 12px 20px;
-        font-size: 14px;
-        border-radius: 20px;
-        min-height: 44px;
-        width: 100%;
-        margin-top: 10px;
-        border: none !important;
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-    }
-}
-
-/* ===========================================
-   MOBILE CSS ADDITIONS
-   ===========================================
-   INSTRUCTION: Add this CSS to the END of your style.css file
-   (after all your existing CSS)
-*/
-
-/* Enhanced mobile location button */
-@media (max-width: 768px) {
-    .mobile-enhanced .mobile-location-btn-enhanced {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
-        color: white !important;
-        font-weight: 700 !important;
-        font-size: 17px !important;
-        padding: 18px 24px !important;
-        width: 100% !important;
-        margin-bottom: 15px !important;
-        border-radius: 25px !important;
-        border: none !important;
-        box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4) !important;
-        letter-spacing: 0.5px !important;
-        order: -1 !important; /* Put it first */
-    }
-    
-    .mobile-enhanced .mobile-location-btn-enhanced:active {
-        transform: translateY(1px) !important;
-        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3) !important;
-    }
-    
-    /* Mobile result cards */
-    .mobile-enhanced .result-item {
-        background: white !important;
-        border-radius: 15px !important;
-        margin-bottom: 15px !important;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
-        padding: 20px !important;
-        display: block !important; /* Override grid layout */
-    }
-    
-    .mobile-enhanced .result-item:hover {
-        transform: translateY(-2px) !important;
-        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15) !important;
-    }
-    
-    /* Mobile action buttons */
-    .mobile-button-row {
-        display: flex !important;
-        gap: 8px !important;
-        margin-top: 15px !important;
-        padding-top: 15px !important;
-        border-top: 1px solid #e2e8f0 !important;
-    }
-    
-    .mobile-action-btn {
-        flex: 1 !important;
-        padding: 12px 8px !important;
-        border: none !important;
-        border-radius: 15px !important;
-        font-weight: 600 !important;
-        font-size: 13px !important;
-        cursor: pointer !important;
-        transition: all 0.3s ease !important;
-        color: white !important;
-        min-height: 44px !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-    }
-    
-    .mobile-action-btn.directions {
-        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
-    }
-    
-    .mobile-action-btn.map {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
-    }
-    
-    .mobile-action-btn.update {
-        background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%) !important;
-    }
-    
-    .mobile-action-btn:active {
-        transform: translateY(1px) !important;
-    }
-    
-    /* Hide original buttons on mobile to avoid clutter */
-    .mobile-enhanced .result-details button {
-        display: none !important;
-    }
-    
-    .mobile-enhanced .update-button {
-        display: none !important;
-    }
-    
-    /* Better mobile typography */
-    .mobile-enhanced .result-details strong {
-        font-size: 18px !important;
-        display: block !important;
-        margin-bottom: 8px !important;
-        color: #2d3748 !important;
-    }
-    
-    .mobile-enhanced .result-details .address {
-        font-size: 14px !important;
-        color: #4a5568 !important;
-        margin-bottom: 6px !important;
-    }
-    
-    .mobile-enhanced .result-details .local-authority {
-        font-size: 13px !important;
-        color: #718096 !important;
-    }
-    
-    /* Make beer details more readable on mobile */
-    .mobile-enhanced .beer-details {
-        background: #f8fafc !important;
-        padding: 15px !important;
-        border-radius: 10px !important;
-        margin-top: 10px !important;
-        margin-bottom: 10px !important;
-    }
-    
-    .mobile-enhanced .beer-item {
-        background: white !important;
-        padding: 10px 12px !important;
-        border-radius: 8px !important;
-        margin-bottom: 8px !important;
-        border-left: 3px solid #667eea !important;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05) !important;
-    }
-    
-    .mobile-enhanced .beer-item:last-child {
-        margin-bottom: 0 !important;
-    }
-}
-/* DROPDOWN FIX - Add this to the END of your style.css file */
-
-/* Fix autocomplete dropdown positioning */
-@media (max-width: 768px) {
-    /* Make search row relative for positioning */
-    .search-row {
-        position: relative !important;
-        z-index: 100 !important;
-    }
-    
-    /* Make sure search section doesn't interfere */
-    .search-section {
-        position: relative !important;
-        z-index: 50 !important;
-        overflow: visible !important;
-    }
-    
-    /* Make sure features section is below */
-    .features-section {
-        position: relative !important;
-        z-index: 10 !important;
-        margin-top: 40px !important;
     }
 }
