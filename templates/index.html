@@ -1667,7 +1667,6 @@
             trackEvent('reset_homepage', 'Navigation', 'homepage_reset');
         }
 
-        // UPDATE: Enhanced createSplitScreenLayout function with better navigation
         function createSplitScreenLayout(selectedPubId) {
             const mapContainer = document.getElementById('mapContainer');
             const resultsSection = document.getElementById('results-section');
@@ -1695,18 +1694,47 @@
                         <h2 class="section-title">📍 Pub Details</h2>
                     </div>
                     <div class="split-pub-details">
-                        ${createSinglePubDisplay(selectedPub)}
+                        <div class="pub-header">
+                            <div class="pub-title-section">
+                                <h3>${selectedPub.name}</h3>
+                                <div class="pub-address">${selectedPub.address}, ${selectedPub.postcode}</div>
+                                <div class="pub-authority">${selectedPub.local_authority}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="pub-beer-section">
+                            <h4>🍺 Available Gluten Free Beers</h4>
+                            <div class="pub-beer-details">
+                                ${selectedPub.beer_details}
+                            </div>
+                        </div>
+                        
+                        <div class="pub-actions">
+                            <button onclick="searchForPub('${selectedPub.name.replace(/'/g, "\\'")}', '${selectedPub.postcode}')" 
+                                    class="pub-action-btn search-btn">
+                                🔍 Find Online
+                            </button>
+                            <button onclick="openInGoogleMaps(${selectedPub.latitude}, ${selectedPub.longitude}, '${selectedPub.name.replace(/'/g, "\\'")}', '${selectedPub.address}')" 
+                                    class="pub-action-btn directions-btn">
+                                🧭 Get Directions
+                            </button>
+                            <button onclick="findOnMap(${selectedPub.latitude || 'null'}, ${selectedPub.longitude || 'null'}, '${selectedPub.name.replace(/'/g, "\\'")}', '${selectedPub.postcode}', ${selectedPub.pub_id})" 
+                                    class="pub-action-btn find-on-map-btn">
+                                🗺️ Find on Map
+                            </button>
+                            <button onclick="openReportModalWithPub('${selectedPub.name.replace(/'/g, "\\'")}', '${selectedPub.address}', '${selectedPub.postcode}', ${selectedPub.pub_id})" 
+                                    class="pub-action-btn update-btn">
+                                📝 Report GF Beer
+                            </button>
+                        </div>
+                        
                         <div class="split-action-bar">
                             <button onclick="goBackToResults()" class="pub-action-btn back-to-results-btn" aria-label="Back to search results">
-                                ← Back
+                                ← Back to Results
                             </button>
                             <button onclick="goHome()" class="pub-action-btn home-btn" aria-label="Return to homepage">
                                 🏠 Home
                             </button>
-                            <button onclick="findOnMap(${selectedPub.latitude || 'null'}, ${selectedPub.longitude || 'null'}, '${selectedPub.name.replace(/'/g, "\\'")}', '${selectedPub.postcode}', ${selectedPub.pub_id})" class="pub-action-btn find-on-map-btn" aria-label="Find this pub on map">
-                                🗺️ Find on Map
-                            </button>
-                            <div class="pub-action-btn" style="visibility: hidden;">&nbsp;</div> <!-- Placeholder for 2x2 grid -->
                         </div>
                     </div>
                 `;
