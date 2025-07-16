@@ -173,15 +173,8 @@ html {
    SEARCH SECTION
    ================================ */
 .search-section {
-    max-width: 1200px;
-    margin: -20px auto var(--section-margin);
-    background: var(--bg-white);
-    padding: 20px 30px;
-    border-radius: var(--border-radius);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-    position: relative; /* Base for absolute children */
-    z-index: 100; /* Default z-index */
+    border: 3px solid blue !important; /* Show the search section boundary */
+    overflow: visible !important;
 }
 
 /* Raise z-index and add margin when map is visible to prevent overlap */
@@ -193,22 +186,8 @@ html {
 
 /* Suggestions Dropdown Fix - Ensure it sticks to input */
 .search-row {
-    position: relative; /* Anchor for suggestions */
-}
-
-#suggestions {
-    position: absolute;
-    top: calc(100% + 5px); /* Directly below search input */
-    left: 0;
-    right: 0;
-    max-height: 400px;
-    overflow-y: auto;
-    border-radius: 15px;
-    background: white;
-    display: none;
-    z-index: var(--z-dropdown); /* High z-index */
-    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-    margin: 0; /* No extra margin */
+    border: 3px solid green !important; /* Show the search row boundary */
+    position: relative !important;
 }
 
 .section-title {
@@ -370,19 +349,21 @@ button, .btn-base {
 /* ================================
    AUTOCOMPLETE SUGGESTIONS
    ================================ */
+
 #suggestions {
     position: absolute;
-    top: 100%;
-    left: 30px;
-    right: 30px;
+    top: calc(100% + 5px); /* Right below the search input */
+    left: 0;
+    right: 0;
     max-height: 400px;
     overflow-y: auto;
     border-radius: 15px;
     background: white;
-    display: none;
-    z-index: var(--z-dropdown);
+    display: none; /* Hidden by default */
+    z-index: 10000; /* Above everything */
     box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-    margin-top: 5px;
+    margin: 0;
+    border: 2px solid #e2e8f0;
 }
 
 #suggestions div {
@@ -391,8 +372,7 @@ button, .btn-base {
     font-size: 14px;
     border-bottom: 1px solid #f0f0f0;
     background: white;
-    position: relative;
-    z-index: calc(var(--z-dropdown) + 1);
+    transition: background-color 0.2s ease;
 }
 
 #suggestions div:hover {
@@ -402,6 +382,11 @@ button, .btn-base {
 
 #suggestions div:last-child {
     border-bottom: none;
+    border-radius: 0 0 13px 13px;
+}
+
+#suggestions div:first-child {
+    border-radius: 13px 13px 0 0;
 }
 
 .show-all-option {
@@ -1746,12 +1731,14 @@ button, .btn-base {
     }
 
    #suggestions {
-        left: 0;
-        right: 0;
         max-height: 280px;
-        top: calc(100% + 5px); /* Stick below input on mobile */
+        font-size: 15px; /* Bigger for mobile */
     }
-    
+
+   #suggestions div {
+        padding: 15px 18px; /* Bigger touch targets */
+        font-size: 15px;
+    }
 
     /* Hero Section Mobile */
     .hero-section {
@@ -1874,29 +1861,6 @@ button, .btn-base {
         margin-bottom: 8px !important;
         order: 999 !important;
         box-sizing: border-box !important;
-    }
-
-    /* Autocomplete Mobile */
-    #suggestions {
-        left: 15px;
-        right: 15px;
-        z-index: calc(var(--z-dropdown) + 5);
-        max-height: 280px;
-        box-shadow: 0 12px 40px rgba(0,0,0,0.2);
-        position: absolute;
-        top: 100%;
-        margin-top: 5px;
-    }
-    
-    #suggestions div {
-        padding: 16px 18px;
-        font-size: 15px;
-        line-height: 1.4;
-        min-height: 48px;
-        display: flex;
-        align-items: center;
-        position: relative;
-        z-index: calc(var(--z-dropdown) + 6);
     }
 
     /* Results Mobile */
@@ -2865,59 +2829,6 @@ button, .btn-base {
     color: #4a5568;
 }
 
-/* Enhanced Mobile Autocomplete */
-.mobile-enhanced #suggestions {
-    background: white;
-    border-radius: 15px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-    border: none;
-    overflow: hidden;
-    margin-top: 8px;
-}
-
-.mobile-enhanced .suggestion-item {
-    padding: 15px 18px;
-    border-bottom: 1px solid #f0f0f0;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    background: white;
-}
-
-.mobile-enhanced .suggestion-item:hover {
-    background: rgba(102, 126, 234, 0.05);
-}
-
-.mobile-enhanced .suggestion-item:last-child {
-    border-bottom: none;
-}
-
-.mobile-enhanced .suggestion-item.search-all {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    font-weight: 600;
-    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
-}
-
-.mobile-enhanced .suggestion-item.has-gf {
-    border-left: 4px solid #10b981;
-}
-
-.mobile-enhanced .suggestion-item.no-gf {
-    border-left: 4px solid #e2e8f0;
-}
-
-.suggestion-main {
-    font-weight: 600;
-    color: #2d3748;
-    margin-bottom: 4px;
-    line-height: 1.3;
-}
-
-.suggestion-meta {
-    font-size: 12px;
-    color: #718096;
-}
-
 .gf-badge {
     background: rgba(16, 185, 129, 0.1);
     color: #10b981;
@@ -3152,28 +3063,6 @@ console.log('📱 Mobile-enhanced CSS loaded!');
         border: none !important;
         box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
     }
-    
-    /* Better mobile autocomplete */
-    .mobile-enhanced #suggestions {
-        margin-top: 8px;
-        border-radius: 15px;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
-        border: none;
-        background: white;
-    }
-    
-    .mobile-enhanced #suggestions div {
-        padding: 16px 18px;
-        font-size: 15px;
-        min-height: 48px;
-        display: flex;
-        align-items: center;
-        border-bottom: 1px solid #f0f0f0;
-    }
-    
-    .mobile-enhanced #suggestions div:hover {
-        background: rgba(102, 126, 234, 0.1);
-    }
 }
 
 /* ===========================================
@@ -3311,7 +3200,6 @@ console.log('📱 Mobile-enhanced CSS loaded!');
         margin-bottom: 0 !important;
     }
 }
-
 /* DROPDOWN FIX - Add this to the END of your style.css file */
 
 /* Fix autocomplete dropdown positioning */
@@ -3320,46 +3208,6 @@ console.log('📱 Mobile-enhanced CSS loaded!');
     .search-row {
         position: relative !important;
         z-index: 100 !important;
-    }
-    
-    /* Fix suggestions dropdown */
-    #suggestions {
-        position: absolute !important;
-        top: 100% !important; /* Right below the search input */
-        left: 0 !important;
-        right: 0 !important;
-        z-index: 9999 !important; /* Way above everything */
-        background: white !important;
-        border-radius: 15px !important;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
-        margin-top: 5px !important;
-        max-height: 300px !important;
-        overflow-y: auto !important;
-        border: 2px solid #e2e8f0 !important;
-    }
-    
-    /* Style individual suggestion items */
-    #suggestions div {
-        padding: 15px 18px !important;
-        font-size: 15px !important;
-        border-bottom: 1px solid #f0f0f0 !important;
-        background: white !important;
-        color: #2d3748 !important;
-        cursor: pointer !important;
-        transition: background-color 0.2s ease !important;
-    }
-    
-    #suggestions div:hover {
-        background: rgba(102, 126, 234, 0.1) !important;
-    }
-    
-    #suggestions div:last-child {
-        border-bottom: none !important;
-        border-radius: 0 0 15px 15px !important;
-    }
-    
-    #suggestions div:first-child {
-        border-radius: 15px 15px 0 0 !important;
     }
     
     /* Make sure search section doesn't interfere */
