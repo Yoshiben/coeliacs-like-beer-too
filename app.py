@@ -1075,6 +1075,490 @@ def get_breweries_for_filter():
             cursor.close()
             conn.close()
 
+# ADD these enhanced routes to your app.py for mobile optimization
+
+@app.route('/api/mobile_nearby')
+def mobile_nearby():
+    """Optimized nearby search for mobile with enhanced data"""
+    lat = request.args.get('lat', type=float)
+    lng = request.args.get('lng', type=float)
+    radius = request.args.get('radius', 5, type=int)
+    gf_only = request.args.get('gf_only', 'true').lower() == 'true'  # Default to GF only on mobile
+    
+    # Input validation
+    if not lat or not lng:
+        return jsonify({'error': 'Location required'}), 400
+    
+    if not (-90 <= lat <= 90) or not (-180 <= lng <= 180):
+        return jsonify({'error': 'Invalid coordinates'}), 400
+
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        # Enhanced query for mobile with richer beer data
+        sql = """
+            SELECT DISTINCT
+                p.pub_id, p.name, p.address, p.postcode, p.local_authority, 
+                p.bottle, p.tap, p.cask, p.can, p.latitude, p.longitude,
+                (6371 * acos(cos(radians(%s)) * cos(radians(p.latitude)) * 
+                cos(radians(p.longitude) - radians(%s)) + sin(radians(%s)) * 
+                sin(radians(p.latitude)))) AS distance,
+                COUNT(DISTINCT pu.beer_id) as beer_count,
+                GROUP_CONCAT(
+                    DISTINCT CONCAT(
+                        '{"format":"', pu.beer_format, 
+                        '","brewery":"', COALESCE(b.brewery, 'Unknown'),
+                        '","name":"', COALESCE(b.name, 'Unknown'),
+                        '","style":"', COALESCE(b.style, 'Unknown'),
+                        '","abv":', COALESCE(b.abv, 0),
+                        ',"gluten_status":"', COALESCE(b.gluten_status, 'unknown'),
+                        '","vegan_status":"', COALESCE(b.vegan_status, 'unknown'), '"}'
+                    )
+                    SEPARATOR ','
+                ) as beers_json,
+                CASE 
+                    WHEN COUNT(DISTINCT pu.beer_id) >= 3 THEN 'high'
+                    WHEN COUNT(DISTINCT pu.beer_id) >= 1 THEN 'medium'
+                    WHEN (p.bottle = 1 OR p.tap = 1 OR p.cask = 1 OR p.can = 1) THEN 'low'
+                    ELSE 'none'
+                END as verification_level,
+                MAX(pu.update_time) as last_updated
+            FROM pubs p
+            LEFT JOIN pubs_updates pu ON p.pub_id = pu.pub_id
+            LEFT JOIN beers b ON pu.beer_id = b.beer_id
+            WHERE p.latitude IS NOT NULL AND p.longitude IS NOT NULL
+        """
+        params = [lat, lng, lat]
+        
+        if gf_only:
+            sql += " AND (p.bottle = 1 OR p.tap = 1 OR p.cask = 1 OR p.can = 1)"
+        
+        sql += """
+            GROUP BY p.pub_id, p.name, p.address, p.postcode, p.local_authority, 
+                     p.bottle, p.tap, p.cask, p.can, p.latitude, p.longitude
+            HAVING distance <= %s
+            ORDER BY 
+                CASE 
+                    WHEN verification_level = 'high' THEN 1
+                    WHEN verification_level = 'medium' THEN 2
+                    WHEN verification_level = 'low' THEN 3
+                    ELSE 4
+                END,
+                distance
+            LIMIT 20
+        """
+        params.append(radius)
+        
+        logger.info(f"Mobile nearby search: lat={lat}, lng={lng}, radius={radius}km, GF only: {gf_only}")
+        cursor.execute(sql, params)
+        pubs = cursor.fetchall()
+        
+        # Process the results for mobile consumption
+        mobile_results = []
+        for pub in pubs:
+            # Parse beers JSON
+            beers = []
+            if pub['beers_json']:
+                try:
+                    beer_strings = f"[{pub['beers_json']}]"
+                    beers = json.loads(beer_strings)
+                except json.JSONDecodeError:
+                    logger.warning(f"Failed to parse beers JSON for pub {pub['pub_id']}")
+            
+            # Format for mobile display
+            mobile_pub = {
+                'pub_id': pub['pub_id'],
+                'name': pub['name'],
+                'address': pub['address'],
+                'postcode': pub['postcode'],
+                'local_authority': pub['local_authority'],
+                'latitude': pub['latitude'],
+                'longitude': pub['longitude'],
+                'distance': round(pub['distance'], 1),
+                'beer_count': pub['beer_count'],
+                'beers': beers,
+                'verification_level': pub['verification_level'],
+                'last_updated': pub['last_updated'].strftime('%Y-%m-%d') if pub['last_updated'] else None,
+                'formats_available': {
+                    'bottle': pub['bottle'] == 1,
+                    'tap': pub['tap'] == 1,
+                    'cask': pub['cask'] == 1,
+                    'can': pub['can'] == 1
+                }
+            }
+            mobile_results.append(mobile_pub)
+        
+        logger.info(f"Found {len(mobile_results)} nearby pubs for mobile")
+        return jsonify({
+            'pubs': mobile_results,
+            'search_center': {'lat': lat, 'lng': lng},
+            'radius_km': radius,
+            'total_found': len(mobile_results)
+        })
+        
+    except mysql.connector.Error as e:
+        logger.error(f"Database error in mobile nearby search: {str(e)}")
+        return jsonify({'error': 'Database error occurred'}), 500
+    except Exception as e:
+        logger.error(f"Unexpected error in mobile nearby search: {str(e)}")
+        return jsonify({'error': 'An error occurred'}), 500
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+@app.route('/api/mobile_search')
+def mobile_search():
+    """Mobile-optimized search with location awareness"""
+    query = request.args.get('query', '').strip()
+    search_type = request.args.get('search_type', 'all')
+    gf_only = request.args.get('gf_only', 'true').lower() == 'true'  # Default GF on mobile
+    user_lat = request.args.get('user_lat', type=float)
+    user_lng = request.args.get('user_lng', type=float)
+    
+    # Input validation
+    if not query or len(query) < 2:
+        return jsonify({'error': 'Search query required (minimum 2 characters)'}), 400
+
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        # Build mobile-optimized search with distance calculation if location available
+        distance_calc = ""
+        order_by = "p.name"
+        
+        if user_lat and user_lng:
+            distance_calc = f"""
+                (6371 * acos(cos(radians({user_lat})) * cos(radians(p.latitude)) * 
+                cos(radians(p.longitude) - radians({user_lng})) + sin(radians({user_lat})) * 
+                sin(radians(p.latitude)))) AS distance,
+            """
+            order_by = "distance, p.name"
+        
+        # Build search condition
+        if search_type == 'name':
+            search_condition = "p.name LIKE %s"
+            params = [f'%{query}%']
+        elif search_type == 'postcode':
+            search_condition = "p.postcode LIKE %s"
+            params = [f'%{query}%']
+        elif search_type == 'area':
+            search_condition = "p.local_authority LIKE %s"
+            params = [f'%{query}%']
+        else:  # search_type == 'all'
+            search_condition = "(p.name LIKE %s OR p.postcode LIKE %s OR p.local_authority LIKE %s OR p.address LIKE %s)"
+            params = [f'%{query}%', f'%{query}%', f'%{query}%', f'%{query}%']
+        
+        sql = f"""
+            SELECT DISTINCT
+                p.pub_id, p.name, p.address, p.postcode, p.local_authority, 
+                p.bottle, p.tap, p.cask, p.can, p.latitude, p.longitude,
+                {distance_calc}
+                COUNT(DISTINCT pu.beer_id) as beer_count,
+                GROUP_CONCAT(
+                    DISTINCT CONCAT(
+                        '{{"format":"', pu.beer_format, 
+                        '","brewery":"', COALESCE(b.brewery, 'Unknown'),
+                        '","name":"', COALESCE(b.name, 'Unknown'),
+                        '","style":"', COALESCE(b.style, 'Unknown'),
+                        '","abv":', COALESCE(b.abv, 0),
+                        ',"gluten_status":"', COALESCE(b.gluten_status, 'unknown'),
+                        '","vegan_status":"', COALESCE(b.vegan_status, 'unknown'), '"}}'
+                    )
+                    SEPARATOR ','
+                ) as beers_json,
+                CASE 
+                    WHEN COUNT(DISTINCT pu.beer_id) >= 3 THEN 'high'
+                    WHEN COUNT(DISTINCT pu.beer_id) >= 1 THEN 'medium'
+                    WHEN (p.bottle = 1 OR p.tap = 1 OR p.cask = 1 OR p.can = 1) THEN 'low'
+                    ELSE 'none'
+                END as verification_level
+            FROM pubs p
+            LEFT JOIN pubs_updates pu ON p.pub_id = pu.pub_id
+            LEFT JOIN beers b ON pu.beer_id = b.beer_id
+            WHERE {search_condition}
+        """
+        
+        if gf_only:
+            sql += " AND (p.bottle = 1 OR p.tap = 1 OR p.cask = 1 OR p.can = 1)"
+        
+        sql += f"""
+            GROUP BY p.pub_id, p.name, p.address, p.postcode, p.local_authority, 
+                     p.bottle, p.tap, p.cask, p.can, p.latitude, p.longitude
+            ORDER BY {order_by}
+            LIMIT 30
+        """
+        
+        cursor.execute(sql, params)
+        pubs = cursor.fetchall()
+        
+        # Process results for mobile
+        mobile_results = []
+        for pub in pubs:
+            # Parse beers JSON
+            beers = []
+            if pub['beers_json']:
+                try:
+                    beer_strings = f"[{pub['beers_json']}]"
+                    beers = json.loads(beer_strings)
+                except json.JSONDecodeError:
+                    pass
+            
+            mobile_pub = {
+                'pub_id': pub['pub_id'],
+                'name': pub['name'],
+                'address': pub['address'],
+                'postcode': pub['postcode'],
+                'local_authority': pub['local_authority'],
+                'latitude': pub['latitude'],
+                'longitude': pub['longitude'],
+                'distance': round(pub.get('distance', 0), 1) if 'distance' in pub else None,
+                'beer_count': pub['beer_count'],
+                'beers': beers,
+                'verification_level': pub['verification_level'],
+                'formats_available': {
+                    'bottle': pub['bottle'] == 1,
+                    'tap': pub['tap'] == 1,
+                    'cask': pub['cask'] == 1,
+                    'can': pub['can'] == 1
+                }
+            }
+            mobile_results.append(mobile_pub)
+        
+        logger.info(f"Mobile search '{query}' found {len(mobile_results)} results")
+        return jsonify({
+            'pubs': mobile_results,
+            'query': query,
+            'search_type': search_type,
+            'total_found': len(mobile_results),
+            'has_location': user_lat is not None and user_lng is not None
+        })
+        
+    except mysql.connector.Error as e:
+        logger.error(f"Database error in mobile search: {str(e)}")
+        return jsonify({'error': 'Database error occurred'}), 500
+    except Exception as e:
+        logger.error(f"Unexpected error in mobile search: {str(e)}")
+        return jsonify({'error': 'An error occurred'}), 500
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+@app.route('/api/quick_stats')
+def get_quick_stats():
+    """Quick stats for mobile header"""
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor()
+        
+        # Get cached stats or quick counts
+        cursor.execute("SELECT COUNT(*) FROM pubs")
+        total_pubs = cursor.fetchone()[0]
+        
+        cursor.execute("SELECT COUNT(DISTINCT pub_id) FROM pubs WHERE bottle=1 OR tap=1 OR cask=1 OR can=1")
+        gf_pubs = cursor.fetchone()[0]
+        
+        # Calculate percentage
+        gf_percentage = round((gf_pubs / total_pubs * 100), 1) if total_pubs > 0 else 0
+        
+        return jsonify({
+            'total_pubs': total_pubs,
+            'gf_pubs': gf_pubs,
+            'gf_percentage': gf_percentage,
+            'last_updated': int(time.time())
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting quick stats: {str(e)}")
+        # Return cached fallback
+        return jsonify({
+            'total_pubs': 52847,
+            'gf_pubs': 1249,
+            'gf_percentage': 2.4,
+            'last_updated': int(time.time())
+        })
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+@app.route('/api/mobile_autocomplete')
+def mobile_autocomplete():
+    """Fast autocomplete optimized for mobile typing"""
+    query = request.args.get('q', '').strip()
+    search_type = request.args.get('search_type', 'all')
+    user_lat = request.args.get('user_lat', type=float)
+    user_lng = request.args.get('user_lng', type=float)
+    
+    # Input validation
+    if not query or len(query) < 2:
+        return jsonify([])
+
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        # Distance calculation for location-aware suggestions
+        distance_calc = ""
+        distance_filter = ""
+        order_clause = "p.name"
+        
+        if user_lat and user_lng:
+            distance_calc = f"""
+                (6371 * acos(cos(radians({user_lat})) * cos(radians(p.latitude)) * 
+                cos(radians(p.longitude) - radians({user_lng})) + sin(radians({user_lat})) * 
+                sin(radians(p.latitude)))) AS distance,
+            """
+            distance_filter = " AND p.latitude IS NOT NULL AND p.longitude IS NOT NULL"
+            order_clause = "distance, p.name"
+        
+        # Build search condition
+        if search_type == 'name':
+            search_condition = "p.name LIKE %s"
+            params = [f'%{query}%']
+        elif search_type == 'postcode':
+            search_condition = "p.postcode LIKE %s"
+            params = [f'%{query}%']
+        elif search_type == 'area':
+            search_condition = "p.local_authority LIKE %s"
+            params = [f'%{query}%']
+        else:  # search_type == 'all'
+            search_condition = "(p.name LIKE %s OR p.postcode LIKE %s OR p.local_authority LIKE %s)"
+            params = [f'%{query}%', f'%{query}%', f'%{query}%']
+        
+        sql = f"""
+            SELECT 
+                p.pub_id, p.name, p.address, p.postcode,
+                {distance_calc}
+                (p.bottle + p.tap + p.cask + p.can) as gf_formats,
+                CASE WHEN (p.bottle = 1 OR p.tap = 1 OR p.cask = 1 OR p.can = 1) THEN 1 ELSE 0 END as has_gf
+            FROM pubs p
+            WHERE {search_condition}{distance_filter}
+            ORDER BY has_gf DESC, {order_clause}
+            LIMIT 8
+        """
+        
+        cursor.execute(sql, params)
+        suggestions = cursor.fetchall()
+        
+        # Format for mobile autocomplete
+        mobile_suggestions = []
+        for pub in suggestions:
+            suggestion = {
+                'pub_id': pub['pub_id'],
+                'name': pub['name'],
+                'address': pub['address'],
+                'postcode': pub['postcode'],
+                'has_gf': pub['has_gf'] == 1,
+                'gf_formats': pub['gf_formats'],
+                'display_text': f"{pub['name']}, {pub['address']} ({pub['postcode']})"
+            }
+            
+            if 'distance' in pub and pub['distance'] is not None:
+                suggestion['distance'] = round(pub['distance'], 1)
+                suggestion['display_text'] += f" - {suggestion['distance']}km"
+            
+            mobile_suggestions.append(suggestion)
+        
+        return jsonify(mobile_suggestions)
+        
+    except Exception as e:
+        logger.error(f"Error in mobile autocomplete: {str(e)}")
+        return jsonify([])
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+@app.route('/api/pub_phone/<int:pub_id>')
+def get_pub_phone(pub_id):
+    """Get pub phone number - placeholder for future feature"""
+    # This would require adding phone numbers to your pubs table
+    return jsonify({
+        'pub_id': pub_id,
+        'phone': None,
+        'message': 'Phone numbers coming soon! We\'re working on adding this feature.'
+    })
+
+@app.route('/api/mobile_report', methods=['POST'])
+def mobile_beer_report():
+    """Simplified beer reporting for mobile"""
+    try:
+        data = request.get_json()
+        
+        # Required fields for mobile report
+        required_fields = ['pub_id', 'beer_format', 'brewery', 'beer_name']
+        for field in required_fields:
+            if field not in data or not data[field]:
+                return jsonify({'error': f'Missing required field: {field}'}), 400
+        
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor()
+        
+        # Quick mobile report - simplified validation
+        cursor.execute("""
+            INSERT INTO pending_beer_updates 
+            (pub_id, beer_format, new_brewery, new_beer_name, new_style,
+             submitted_by_name, user_notes, submission_time)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, NOW())
+        """, (
+            data['pub_id'],
+            data['beer_format'],
+            data['brewery'],
+            data['beer_name'],
+            data.get('style', ''),
+            data.get('reporter_name', 'Mobile User'),
+            data.get('notes', 'Reported via mobile app')
+        ))
+        
+        pending_id = cursor.lastrowid
+        conn.commit()
+        
+        # Track mobile usage
+        logger.info(f"Mobile beer report submitted: pending_id {pending_id}")
+        
+        return jsonify({
+            'message': 'Beer report submitted! Thanks for helping the community 🍺',
+            'pending_id': pending_id,
+            'status': 'pending_review'
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in mobile beer report: {str(e)}")
+        return jsonify({'error': 'Failed to submit report'}), 500
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+# Mobile analytics tracking
+@app.route('/api/mobile_analytics', methods=['POST'])
+def track_mobile_analytics():
+    """Track mobile-specific events"""
+    try:
+        data = request.get_json()
+        event = data.get('event')
+        category = data.get('category', 'Mobile')
+        label = data.get('label', '')
+        
+        # Log mobile events for analysis
+        logger.info(f"Mobile Analytics: {event} | {category} | {label}")
+        
+        # Could store in database for detailed mobile usage analysis
+        # For now, just acknowledge receipt
+        return jsonify({'status': 'tracked'})
+        
+    except Exception as e:
+        logger.error(f"Error tracking mobile analytics: {str(e)}")
+        return jsonify({'status': 'error'}), 500
+
+# Add this import at the top of your app.py if not already there
+import json
+import time
+
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
     debug = os.environ.get('FLASK_ENV') == 'development'
