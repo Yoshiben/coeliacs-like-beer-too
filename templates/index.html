@@ -11,108 +11,22 @@
     <!-- Google Analytics with GDPR compliance -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-WSHR39KSXS"></script>
     
-    <!-- Mobile Enhancement Script -->
+    <!-- Basic Analytics Setup -->
     <script>
-        // Simple mobile detection
-        const isMobile = () => window.innerWidth <= 768 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
         
-        // Simple mobile enhancements
-        document.addEventListener('DOMContentLoaded', function() {
-            if (isMobile()) {
-                console.log('🍺 Mobile device detected');
-                document.body.classList.add('mobile-enhanced');
-                
-                // Just enhance the existing button - nothing fancy
-                const existingNearMeBtn = document.querySelector('button[onclick="findNearbyPubs()"]');
-                if (existingNearMeBtn) {
-                    existingNearMeBtn.innerHTML = '📍 Find GF Beer Near Me';
-                    existingNearMeBtn.className = 'search-btn mobile-location-btn-enhanced';
-                    
-                    // Move it to the top
-                    const searchActions = document.querySelector('.search-actions');
-                    if (searchActions) {
-                        searchActions.insertBefore(existingNearMeBtn, searchActions.firstChild);
-                    }
-                    
-                    console.log('✅ Enhanced location button for mobile');
-                }
-                
-                // Add mobile result buttons when results appear
-                setupMobileResultWatcher();
-            }
+        // Set default consent to denied (GDPR compliant)
+        gtag('consent', 'default', {
+            'analytics_storage': 'denied'
         });
         
-        // Watch for search results and add mobile buttons
-        function setupMobileResultWatcher() {
-            const resultsContainer = document.getElementById('results');
-            if (resultsContainer) {
-                const observer = new MutationObserver(() => {
-                    setTimeout(addMobileActionButtons, 100);
-                });
-                observer.observe(resultsContainer, { childList: true });
-            }
-        }
-        
-        // Add mobile-friendly action buttons to results
-        function addMobileActionButtons() {
-            if (!isMobile()) return;
-            
-            const resultItems = document.querySelectorAll('.result-item:not(.mobile-enhanced)');
-            resultItems.forEach(item => {
-                item.classList.add('mobile-enhanced');
-                
-                const buttonColumn = item.querySelector('.button-column');
-                if (buttonColumn && !buttonColumn.querySelector('.mobile-actions')) {
-                    const mobileActions = document.createElement('div');
-                    mobileActions.className = 'mobile-actions';
-                    mobileActions.innerHTML = `
-                        <div class="mobile-button-row">
-                            <button onclick="getMobileDirections(this)" class="mobile-action-btn directions">
-                                🧭 Directions
-                            </button>
-                            <button onclick="showOnMapMobile(this)" class="mobile-action-btn map">
-                                🗺️ Map
-                            </button>
-                            <button onclick="quickUpdateMobile(this)" class="mobile-action-btn update">
-                                📝 Update
-                            </button>
-                        </div>
-                    `;
-                    buttonColumn.appendChild(mobileActions);
-                }
-            });
-        }
-        
-        // Mobile action functions - SIMPLE versions
-        function getMobileDirections(button) {
-            const resultItem = button.closest('.result-item');
-            const pubName = resultItem.querySelector('strong').textContent;
-            const address = resultItem.querySelector('.address').textContent;
-            
-            const searchQuery = encodeURIComponent(`${pubName} ${address}`);
-            window.open(`https://www.google.com/maps/search/${searchQuery}`, '_blank');
-        }
-        
-        function showOnMapMobile(button) {
-            const resultItem = button.closest('.result-item');
-            const mapButton = resultItem.querySelector('[onclick*="findOnMap"]');
-            
-            if (mapButton) {
-                mapButton.click(); // Use existing functionality
-            }
-        }
-        
-        function quickUpdateMobile(button) {
-            const resultItem = button.closest('.result-item');
-            const updateButton = resultItem.querySelector('.update-button');
-            
-            if (updateButton) {
-                updateButton.click(); // Use existing functionality
-            }
-        }
-
-console.log('📱 Simple mobile enhancements loaded!');
-</script>
+        gtag('js', new Date());
+        gtag('config', 'G-WSHR39KSXS', {
+            'anonymize_ip': true,
+            'cookie_flags': 'SameSite=None;Secure'
+        });
+    </script>
 </head>
 <body>
     <!-- Hero Section -->
