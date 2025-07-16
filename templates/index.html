@@ -25,6 +25,8 @@
             }
         });
         
+        // REPLACE your existing setupMobileEnhancements() function with this updated version:
+
         function setupMobileEnhancements() {
             // Make the existing "Pubs Near Me" button prominent on mobile
             const existingNearMeBtn = document.querySelector('button[onclick="findNearbyPubs()"]');
@@ -40,11 +42,167 @@
                     searchActions.insertBefore(existingNearMeBtn, searchActions.firstChild);
                 }
                 
+                // Override the click handler to include mobile search hiding
+                const originalOnclick = existingNearMeBtn.onclick;
+                existingNearMeBtn.onclick = function() {
+                    // Call original function
+                    if (typeof findNearbyPubs === 'function') {
+                        findNearbyPubs();
+                    }
+                    
+                    // Hide search section after results load
+                    setTimeout(() => {
+                        hideMobileSearchOnResults();
+                    }, 1000);
+                };
+                
                 console.log('✅ Enhanced location button for mobile');
             }
             
             // Add mobile result enhancements
             setupMobileResultWatcher();
+            
+            // Watch for results section appearing
+            watchForResultsSection();
+        }
+        
+        // NEW: Watch for when results section appears
+        function watchForResultsSection() {
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+                        const target = mutation.target;
+                        if (target.id === 'results-section' && target.style.display !== 'none') {
+                            // Results section is now visible, hide search
+                            setTimeout(() => {
+                                hideMobileSearchOnResults();
+                            }, 500);
+                        }
+                    }
+                });
+            });
+            
+            const resultsSection = document.getElementById('results-section');
+            if (resultsSection) {
+                observer.observe(resultsSection, { 
+                    attributes: true, 
+                    attributeFilter: ['style'] 
+                });
+            }
+        }
+
+        // ADD this function to your existing mobile JavaScript in the <head> section
+        // (Add it after the setupMobileEnhancements() function)
+        
+        function hideMobileSearchOnResults() {
+            if (!isMobile()) return;
+            
+            const searchSection = document.getElementById('search');
+            const resultsSection = document.getElementById('results-section');
+            
+            if (searchSection && resultsSection) {
+                // When results appear, make search section smaller and scrollable
+                searchSection.style.cssText = `
+                    position: fixed !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                    right: 0 !important;
+                    z-index: 1000 !important;
+                    max-height: 40vh !important;
+                    overflow-y: auto !important;
+                    transition: all 0.3s ease !important;
+                `;
+                
+                // Add padding to results so they show below the search
+                resultsSection.style.marginTop = '45vh';
+                
+                // Add a "minimize search" button
+                addMinimizeButton(searchSection);
+                
+                // Scroll to results
+                setTimeout(() => {
+                    resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 300);
+            }
+        }
+        
+        function addMinimizeButton(searchSection) {
+            // Don't add if already exists
+            if (searchSection.querySelector('.mobile-minimize-btn')) return;
+            
+            const minimizeBtn = document.createElement('button');
+            minimizeBtn.className = 'mobile-minimize-btn';
+            minimizeBtn.innerHTML = '🔽 Show Results';
+            minimizeBtn.style.cssText = `
+                position: absolute;
+                bottom: 10px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(16, 185, 129, 0.9);
+                color: white;
+                border: none;
+                padding: 8px 16px;
+                border-radius: 20px;
+                font-weight: 600;
+                font-size: 12px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                z-index: 1001;
+            `;
+            
+            minimizeBtn.onclick = function() {
+                // Minimize search section
+                searchSection.style.maxHeight = '60px';
+                searchSection.style.overflow = 'hidden';
+                this.innerHTML = '🔼 Show Search';
+                this.style.bottom = '5px';
+                
+                // Update results margin
+                const resultsSection = document.getElementById('results-section');
+                if (resultsSection) {
+                    resultsSection.style.marginTop = '70px';
+                }
+                
+                // Change click handler to expand
+                this.onclick = function() {
+                    expandMobileSearch();
+                };
+            };
+            
+            searchSection.appendChild(minimizeBtn);
+        }
+        
+        function expandMobileSearch() {
+            const searchSection = document.getElementById('search');
+            const minimizeBtn = searchSection.querySelector('.mobile-minimize-btn');
+            const resultsSection = document.getElementById('results-section');
+            
+            if (searchSection) {
+                searchSection.style.maxHeight = '40vh';
+                searchSection.style.overflow = 'auto';
+                
+                if (minimizeBtn) {
+                    minimizeBtn.innerHTML = '🔽 Show Results';
+                    minimizeBtn.style.bottom = '10px';
+                    minimizeBtn.onclick = function() {
+                        searchSection.style.maxHeight = '60px';
+                        searchSection.style.overflow = 'hidden';
+                        this.innerHTML = '🔼 Show Search';
+                        this.style.bottom = '5px';
+                        
+                        if (resultsSection) {
+                            resultsSection.style.marginTop = '70px';
+                        }
+                        
+                        this.onclick = function() {
+                            expandMobileSearch();
+                        };
+                    };
+                }
+                
+                if (resultsSection) {
+                    resultsSection.style.marginTop = '45vh';
+                }
+            }
         }
         
         // Watch for search results and add mobile buttons
