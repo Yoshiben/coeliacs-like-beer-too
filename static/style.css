@@ -3311,3 +3311,68 @@ console.log('📱 Mobile-enhanced CSS loaded!');
         margin-bottom: 0 !important;
     }
 }
+
+/* DROPDOWN FIX - Add this to the END of your style.css file */
+
+/* Fix autocomplete dropdown positioning */
+@media (max-width: 768px) {
+    /* Make search row relative for positioning */
+    .search-row {
+        position: relative !important;
+        z-index: 100 !important;
+    }
+    
+    /* Fix suggestions dropdown */
+    #suggestions {
+        position: absolute !important;
+        top: 100% !important; /* Right below the search input */
+        left: 0 !important;
+        right: 0 !important;
+        z-index: 9999 !important; /* Way above everything */
+        background: white !important;
+        border-radius: 15px !important;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+        margin-top: 5px !important;
+        max-height: 300px !important;
+        overflow-y: auto !important;
+        border: 2px solid #e2e8f0 !important;
+    }
+    
+    /* Style individual suggestion items */
+    #suggestions div {
+        padding: 15px 18px !important;
+        font-size: 15px !important;
+        border-bottom: 1px solid #f0f0f0 !important;
+        background: white !important;
+        color: #2d3748 !important;
+        cursor: pointer !important;
+        transition: background-color 0.2s ease !important;
+    }
+    
+    #suggestions div:hover {
+        background: rgba(102, 126, 234, 0.1) !important;
+    }
+    
+    #suggestions div:last-child {
+        border-bottom: none !important;
+        border-radius: 0 0 15px 15px !important;
+    }
+    
+    #suggestions div:first-child {
+        border-radius: 15px 15px 0 0 !important;
+    }
+    
+    /* Make sure search section doesn't interfere */
+    .search-section {
+        position: relative !important;
+        z-index: 50 !important;
+        overflow: visible !important;
+    }
+    
+    /* Make sure features section is below */
+    .features-section {
+        position: relative !important;
+        z-index: 10 !important;
+        margin-top: 40px !important;
+    }
+}
