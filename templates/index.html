@@ -328,6 +328,133 @@
             'cookie_flags': 'SameSite=None;Secure'
         });
     </script>
+
+    <script>
+    // Simple mobile detection
+    const isMobile = () => window.innerWidth <= 768;
+    
+    // Fix the duplicate button issue
+    function setupMobileEnhancements() {
+        console.log('🔧 Setting up mobile enhancements...');
+        
+        // Find your existing "Pubs Near Me" button and improve it for mobile
+        const existingNearMeButton = document.querySelector('button[onclick="findNearbyPubs()"]');
+        if (existingNearMeButton) {
+            // Change the text (remove "Now")
+            existingNearMeButton.innerHTML = '📍 Find Beer Near Me';
+            // Add mobile styling class
+            existingNearMeButton.classList.add('mobile-location-btn');
+            console.log('✅ Updated existing location button for mobile');
+        }
+        
+        // Add mobile result enhancements
+        addMobileResultWatcher();
+    }
+    
+    // Watch for new search results and enhance them for mobile
+    function addMobileResultWatcher() {
+        if (!isMobile()) return;
+        
+        const resultsContainer = document.getElementById('results');
+        if (resultsContainer) {
+            const observer = new MutationObserver(() => {
+                setTimeout(addMobileButtonsToResults, 100);
+            });
+            observer.observe(resultsContainer, { childList: true });
+        }
+    }
+    
+    // Add mobile action buttons to search results
+    function addMobileButtonsToResults() {
+        if (!isMobile()) return;
+        
+        const resultItems = document.querySelectorAll('.result-item:not(.mobile-enhanced)');
+        resultItems.forEach(item => {
+            item.classList.add('mobile-enhanced');
+            
+            const buttonColumn = item.querySelector('.button-column');
+            if (buttonColumn && !buttonColumn.querySelector('.mobile-quick-actions')) {
+                const quickActions = document.createElement('div');
+                quickActions.className = 'mobile-quick-actions';
+                quickActions.innerHTML = `
+                    <button class="mobile-action-btn directions" onclick="getMobileDirections(this)">
+                        🧭 Directions
+                    </button>
+                    <button class="mobile-action-btn update" onclick="quickMobileUpdate(this)">
+                        📝 Update
+                    </button>
+                `;
+                buttonColumn.appendChild(quickActions);
+            }
+        });
+    }
+    
+    // Handle mobile directions
+    function getMobileDirections(button) {
+        const resultItem = button.closest('.result-item');
+        const pubName = resultItem.querySelector('strong').textContent;
+        const address = resultItem.querySelector('.address').textContent;
+        
+        // Try to get coordinates from the existing "Find on Map" button
+        const mapButton = resultItem.querySelector('[onclick*="findOnMap"]');
+        if (mapButton) {
+            const onclick = mapButton.getAttribute('onclick');
+            const coords = onclick.match(/findOnMap\(([^,]+),\s*([^,]+)/);
+            if (coords && coords[1] !== 'null' && coords[2] !== 'null') {
+                const lat = parseFloat(coords[1]);
+                const lng = parseFloat(coords[2]);
+                
+                // Open directions based on device
+                const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+                const directionsUrl = isIOS ? 
+                    `maps://maps.google.com/maps?daddr=${lat},${lng}` :
+                    `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
+                    
+                window.open(directionsUrl, '_blank');
+                showSuccessToast('🧭 Opening directions...');
+                return;
+            }
+        }
+        
+        // Fallback: search by name and address
+        const searchQuery = encodeURIComponent(`${pubName} ${address}`);
+        window.open(`https://www.google.com/maps/search/${searchQuery}`, '_blank');
+        showSuccessToast('🧭 Opening directions...');
+    }
+    
+    // Handle mobile update button
+    function quickMobileUpdate(button) {
+        const resultItem = button.closest('.result-item');
+        const updateButton = resultItem.querySelector('.update-button');
+        
+        if (updateButton) {
+            // Click your existing update button
+            updateButton.click();
+            
+            // Scroll the form into view
+            setTimeout(() => {
+                const form = resultItem.querySelector('.update-form[style*="block"]');
+                if (form) {
+                    form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }, 100);
+        }
+    }
+    
+    // Initialize mobile enhancements when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        if (isMobile()) {
+            console.log('📱 Mobile device detected');
+            document.body.classList.add('mobile-enhanced');
+            
+            // Wait a bit to avoid conflicts with your existing code
+            setTimeout(setupMobileEnhancements, 500);
+        }
+    });
+    
+    console.log('📱 Mobile fixes loaded!');
+    </script>
+    
 </head>
 <body>
     <!-- Hero Section -->
