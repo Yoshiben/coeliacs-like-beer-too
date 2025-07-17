@@ -522,6 +522,7 @@ p {
     z-index: var(--z-search-suggestions);
     box-shadow: var(--shadow-lg);
     margin-top: var(--space-xs);
+    border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .suggestion-item {
@@ -531,11 +532,11 @@ p {
     border-bottom: 1px solid #f0f0f0;
     background: var(--text-white);
     transition: background-color var(--transition-fast);
+    color: var(--text-primary);
 }
 
 .suggestion-item:hover {
-    background: var(--primary-gradient);
-    color: var(--text-white);
+    background: rgba(102, 126, 234, 0.05);
 }
 
 .suggestion-item:last-child {
