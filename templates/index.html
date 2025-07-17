@@ -1852,13 +1852,91 @@
             }
         }
         
+        // REPLACE the initializePubMap function with this cleaner version:
+
         function initializePubMap(pub) {
-            // This would integrate with your existing Leaflet map
-            const placeholder = document.querySelector('.pub-map-placeholder');
-            placeholder.innerHTML = `🗺️ ${pub.name}<br><small style="opacity: 0.7;">Lat: ${pub.latitude}, Lng: ${pub.longitude}</small>`;
+            const mapContainer = document.querySelector('.pub-map-placeholder');
             
-            // TODO: Integrate with actual Leaflet map
-            console.log('Would initialize map for:', pub);
+            if (!pub.latitude || !pub.longitude) {
+                mapContainer.innerHTML = '📍 Location coordinates not available<br><small style="opacity: 0.7;">Help us by reporting the exact location!</small>';
+                return;
+            }
+            
+            // Clear the placeholder and create a map container
+            mapContainer.innerHTML = '<div id="pubMapLeaflet" style="width: 100%; height: 100%; border-radius: 0 0 var(--radius-xl) var(--radius-xl);"></div>';
+            
+            // Get CSS variables for consistent styling
+            const rootStyles = getComputedStyle(document.documentElement);
+            const pubFillColor = rootStyles.getPropertyValue('--marker-pub-fill').trim() || '#4CAF50';
+            const pubStrokeColor = rootStyles.getPropertyValue('--marker-pub-stroke').trim() || '#ffffff';
+            const userFillColor = rootStyles.getPropertyValue('--marker-user-fill').trim() || '#667eea';
+            const userStrokeColor = rootStyles.getPropertyValue('--marker-user-stroke').trim() || '#ffffff';
+            
+            // Initialize Leaflet map for the pub
+            const pubMap = L.map('pubMapLeaflet').setView([pub.latitude, pub.longitude], 16);
+            
+            // Add tile layer
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(pubMap);
+            
+            // Add marker for the pub using CSS variables
+            const pubMarker = L.circleMarker([pub.latitude, pub.longitude], {
+                radius: 12,
+                fillColor: pubFillColor,
+                color: pubStrokeColor,
+                weight: 3,
+                opacity: 1,
+                fillOpacity: 0.9
+            }).addTo(pubMap);
+            
+            // Add popup to the marker
+            let popupContent = `<div style="text-align: center; padding: 8px;">`;
+            popupContent += `<strong style="color: var(--text-primary); font-size: 14px;">${pub.name}</strong><br>`;
+            popupContent += `<small style="color: var(--text-muted);">${pub.address}</small><br>`;
+            
+            // Add GF options if available
+            if (pub.bottle || pub.tap || pub.cask || pub.can) {
+                let gfOptions = [];
+                if (pub.bottle) gfOptions.push('🍺');
+                if (pub.tap) gfOptions.push('🚰');
+                if (pub.cask) gfOptions.push('🛢️');
+                if (pub.can) gfOptions.push('🥫');
+                popupContent += `<div style="margin-top: 8px; color: var(--success-color, #10b981);"><strong>GF: ${gfOptions.join(' ')}</strong></div>`;
+            }
+            popupContent += `</div>`;
+            
+            pubMarker.bindPopup(popupContent).openPopup();
+            
+            // Add user location if available
+            if (userLocation) {
+                L.circleMarker([userLocation.lat, userLocation.lng], {
+                    radius: 8,
+                    fillColor: userFillColor,
+                    color: userStrokeColor,
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 0.8
+                }).addTo(pubMap).bindPopup('Your location');
+                
+                // Calculate and show distance
+                const distance = calculateDistance(
+                    userLocation.lat, userLocation.lng,
+                    pub.latitude, pub.longitude
+                );
+                
+                // Update popup with distance
+                popupContent = popupContent.replace('</div>', `<div style="color: var(--primary-color, #667eea); font-size: 12px; margin-top: 4px;">${distance.toFixed(2)} km away</div></div>`);
+                pubMarker.bindPopup(popupContent).openPopup();
+            }
+            
+            // Ensure map renders properly
+            setTimeout(() => {
+                pubMap.invalidateSize();
+            }, 100);
+            
+            console.log('✅ Pub map initialized for:', pub.name);
         }
 
         function checkCookieConsent() {
