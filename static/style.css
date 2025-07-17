@@ -325,7 +325,8 @@ p {
 
 .hero-subtitle {
     font-size: clamp(0.9rem, 2.5vw, 1.1rem);
-    white-space: nowrap; /* Forces single line */
+/*     white-space: nowrap; /* Forces single line */
+    margin-top: var(--space-sm); /* Add this - pulls it closer to title */
     margin-bottom: var(--space-2xl);
     opacity: 0.9;
     font-weight: 300;
