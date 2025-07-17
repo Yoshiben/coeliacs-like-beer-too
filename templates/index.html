@@ -128,7 +128,7 @@
     <div id="locationModal" class="search-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">📍 Search by Location</h3>
+                <h3 class="modal-title">📍 Search by Postcode</h3>
                 <p class="modal-subtitle">Enter all or part of a postcode to find pubs nearby</p>
             </div>
             <input type="text" class="form-input" placeholder="e.g. SW1A 1AA, HX6" id="locationInput">
@@ -1079,66 +1079,6 @@
         }
 
         // Fixed Search Functions
-        
-// REPLACE your openSearchModal function with this safe version:
-
-        function openSearchModal(searchType) {
-            console.log('Opening search modal for:', searchType);
-            
-            const modal = document.getElementById('searchModal');
-            const title = document.getElementById('searchModalTitle');
-            const input = document.getElementById('searchInput');
-            
-            // Check if modal elements exist
-            if (!modal || !title || !input) {
-                console.log('Modal elements not found - using simple search instead');
-                
-                // Fallback: just do a simple prompt for now
-                const query = prompt(`Enter search term for ${searchType}:`);
-                if (query) {
-                    performSearch(query, searchType);
-                }
-                return;
-            }
-            
-            // Set modal title and placeholder based on search type
-            switch(searchType) {
-                case 'name':
-                    title.textContent = 'Search Pubs by Name';
-                    input.placeholder = 'Enter pub name (e.g., "The Red Lion", "Wetherspoons")';
-                    break;
-                case 'postcode':
-                    title.textContent = 'Search Pubs by Postcode';
-                    input.placeholder = 'Enter postcode (e.g., "SW1A 1AA", "M1 1AA")';
-                    break;
-                case 'area':
-                    title.textContent = 'Search Pubs by Area';
-                    input.placeholder = 'Enter area (e.g., "London", "Manchester")';
-                    break;
-                case 'beer':
-                    title.textContent = 'Search Pubs by Beer';
-                    input.placeholder = 'Enter beer name (e.g., "Stella Artois", "Peroni")';
-                    break;
-                default:
-                    title.textContent = 'Search Pubs';
-                    input.placeholder = 'Enter search term';
-            }
-            
-            modal.style.display = 'flex';
-            input.focus();
-            modal.dataset.searchType = searchType;
-        }
-        
-        // function closeSearchModal() {
-        //     document.querySelectorAll('.search-modal').forEach(modal => {
-        //         modal.style.display = 'none';
-        //     });
-            
-        //     // Unlock body scroll
-        //     document.body.style.overflow = '';
-            
-        //     trackEvent('close_search_modal', 'Search Interface');
-        // }
         
         function searchByLocation() {
             const query = document.getElementById('locationInput').value.trim();
