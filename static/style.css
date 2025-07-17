@@ -4062,79 +4062,9 @@ body.pub-details-open {
     width: 100%;
 }
 
-* Better text centering - add more internal spacing */
-.search-option {
-    background: var(--text-white);
-    border: 3px solid var(--border-light);
-    border-radius: var(--radius-lg);
-    padding: var(--space-lg) var(--space-xl);
-    cursor: pointer;
-    transition: all var(--transition);
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-    min-height: 120px;
-    max-height: 140px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
 .search-option:hover {
     transform: translateY(-3px);
     box-shadow: var(--shadow);
-}
-
-/* Updated color scheme for new layout */
-
-/* Top Left: Pubs by Name - Blue */
-.search-option.name {
-    background: linear-gradient(135deg, var(--search-name-bg) 0%, var(--search-name-bg-light) 100%);
-    border-color: var(--search-name-border);
-}
-
-.search-option.name:hover {
-    border-color: var(--search-name-border-hover);
-}
-
-/* Top Right: Pubs by Postcode - Green */
-.search-option.location {
-    background: linear-gradient(135deg, var(--search-location-bg) 0%, var(--search-location-bg-light) 100%);
-    border-color: var(--search-location-border);
-}
-
-.search-option.location:hover {
-    border-color: var(--search-location-border-hover);
-}
-
-/* Bottom Left: Pubs by Area - Purple */
-.search-option.area {
-    background: linear-gradient(135deg, var(--search-area-bg) 0%, var(--search-area-bg-light) 100%);
-    border-color: var(--search-area-border);
-}
-
-.search-option.area:hover {
-    border-color: var(--search-area-border-hover);
-}
-
-/* Bottom Right: Pubs by Beer - Orange */
-.search-option.beer {
-    background: linear-gradient(135deg, var(--search-beer-bg) 0%, var(--search-beer-bg-light) 100%);
-    border-color: var(--search-beer-border);
-}
-
-.search-option.beer:hover {
-    border-color: var(--search-beer-border-hover);
-}
-
-.search-option.area {
-    background: linear-gradient(135deg, var(--search-area-bg) 0%, var(--search-area-bg-light) 100%);
-    border-color: var(--search-area-border);
-}
-
-.search-option.area:hover {
-    border-color: var(--search-area-border-hover);
 }
 
 .search-icon {
@@ -4358,7 +4288,7 @@ body {
     text-align: center;
     position: relative;
     overflow: hidden;
-    min-height: 140px;
+    min-height: 160px; /* INCREASED from 140px to 160px */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -4469,9 +4399,8 @@ body {
     }
     
     .search-option {
-        padding: var(--space-md);
-        min-height: 100px;
-        max-height: 120px;
+        padding: var(--space-lg);
+        min-height: 140px; /* INCREASED from 120px to 140px */
     }
     
     .search-icon {
