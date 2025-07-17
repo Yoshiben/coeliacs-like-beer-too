@@ -73,11 +73,11 @@
                         <!-- Bottom Left: Pubs by Area -->
                         <div class="search-option area" onclick="openSearchModal('area')">
                             <span class="search-icon">🗺️</span>
-                            <h3 class="search-title">Browse by Area</h3>
+                            <h3 class="search-title">Pubs by Area</h3>
                             <p class="search-description">Explore pubs in specific regions, cities, or local authorities</p>
                         </div>
                         <!-- Bottom Right: Pubs by Beer -->
-                        <div class="search-option.beer" onclick="openSearchModal('beer')">
+                        <div class="search-option beer" onclick="openSearchModal('beer')">
                             <span class="search-icon">🍺</span>
                             <h3 class="search-title">Pubs by Beer</h3>
                             <p class="search-description">Find pubs serving specific GF beers - "Vocation", "Zapato", "IPA", "Lager", etc.</p>
@@ -86,9 +86,9 @@
                     </div>
                     
                     <div class="quick-actions">
-                        <div class="quick-actions-title">Quick Start</div>
+<!--                         <div class="quick-actions-title">Quick Start</div> -->
                         <button class="quick-action-btn" onclick="findNearbyPubs()">
-                            📍 Find Pubs Near Me Now
+                            Find Pubs Near Me
                         </button>
                     </div>
                 </div>
@@ -103,7 +103,7 @@
                 <h3 class="modal-title">🏠 Search by Pub Name</h3>
                 <p class="modal-subtitle">Enter the name of the pub you're looking for</p>
             </div>
-            <input type="text" class="form-input" placeholder="e.g. The Red Lion, Wetherspoons, The George..." id="nameInput">
+            <input type="text" class="form-input" placeholder="e.g. The Red Lion, Wetherspoons" id="nameInput">
             <div class="modal-actions">
                 <button class="btn btn-secondary" onclick="closeSearchModal()">Cancel</button>
                 <button class="btn btn-primary" onclick="searchByName()">Search</button>
@@ -115,9 +115,9 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title">📍 Search by Location</h3>
-                <p class="modal-subtitle">Enter a postcode, city, or use your current location</p>
+                <p class="modal-subtitle">Enter all or part of a postcode to find pubs nearby</p>
             </div>
-            <input type="text" class="form-input" placeholder="e.g. SW1A 1AA, London, Manchester..." id="locationInput">
+            <input type="text" class="form-input" placeholder="e.g. SW1A 1AA, HX6" id="locationInput">
             <div class="modal-actions">
                 <button class="btn btn-secondary" onclick="closeSearchModal()">Cancel</button>
                 <button class="btn btn-primary" onclick="searchByLocation()">Search</button>
@@ -125,15 +125,13 @@
         </div>
     </div>
     
-    
-    
     <div id="beerModal" class="search-modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title">🍺 Search by Beer</h3>
                 <p class="modal-subtitle">Find pubs serving specific gluten-free beers</p>
             </div>
-            <input type="text" class="form-input" placeholder="e.g. Brewdog Punk AF, IPA, Lager, Stella Artois GF..." id="beerInput">
+            <input type="text" class="form-input" placeholder="e.g. Vocation, IPA, Lager, Stella Artois GF..." id="beerInput">
             <div class="modal-actions">
                 <button class="btn btn-secondary" onclick="closeSearchModal()">Cancel</button>
                 <button class="btn btn-primary" onclick="searchByBeer()">Search</button>
@@ -144,13 +142,13 @@
     <div id="areaModal" class="search-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">🗺️ Browse by Area</h3>
-                <p class="modal-subtitle">Explore pubs in specific regions or local authorities</p>
+                <h3 class="modal-title">🗺️ Search by Area</h3>
+                <p class="modal-subtitle">Explore pubs in cities, specific regions or local authorities</p>
             </div>
             <input type="text" class="form-input" placeholder="e.g. Greater London, West Yorkshire, Camden..." id="areaInput">
             <div class="modal-actions">
                 <button class="btn btn-secondary" onclick="closeSearchModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="searchByArea()">Browse</button>
+                <button class="btn btn-primary" onclick="searchByArea()">Search</button>
             </div>
         </div>
     </div>
@@ -198,12 +196,6 @@
                         📝 Report GF Beer
                     </button>
                 </div>
-    
-                <!-- REMOVE: Delete both of these duplicate nav sections -->
-                <!-- 
-                <div class="pub-nav-buttons">...</div>
-                <div class="pub-nav-buttons">...</div>
-                -->
             </div>
     
             <div class="pub-map-container" id="pubMapContainer">
@@ -232,7 +224,7 @@
 
     <!-- Location Status -->
     <div id="locationStatus" class="location-status location-loading" style="display: none;">
-        Getting your location...
+        Finding your location...
     </div>
 
     <!-- Features Grid -->
@@ -501,11 +493,11 @@
                             </div>
                             <div class="standard-item">
                                 <strong>🇺🇸 USA</strong>
-                                <p>Less than 20ppm gluten</p>
+                                <p>Made only with gluten free ingredients</p>
                             </div>
                             <div class="standard-item">
                                 <strong>🇦🇺 Australia</strong>
-                                <p>Less than 5ppm gluten (stricter!)</p>
+                                <p>Made only with gluten free ingredients</p>
                             </div>
                         </div>
                     </div>
@@ -538,7 +530,7 @@
                         </ul>
                     </div>
                     
-                    <div class="gf-section">
+<!--                     <div class="gf-section">
                         <h3>🍺 Popular GF Beer Brands in UK</h3>
                         <div class="brand-grid">
                             <span class="brand-tag">Brewdog (GF Range)</span>
@@ -548,7 +540,7 @@
                             <span class="brand-tag">Ghostfish</span>
                             <span class="brand-tag">Ground Breaker</span>
                         </div>
-                    </div>
+                    </div> -->
                     
                     <div class="disclaimer">
                         <p><strong>Disclaimer:</strong> This information is for guidance only. Always consult with healthcare professionals and verify product safety for your individual needs.</p>
@@ -606,9 +598,7 @@
             <span class="toast-icon">✅</span>
             <span id="successMessage">Success!</span>
         </div>
-    </div>
-
-    <!-- Add this cookie consent banner to your index.html, just before the closing </body> tag -->
+    </div>>
     
     <!-- Cookie Consent Banner -->
     <div id="cookieConsent" class="cookie-consent" style="display: none;">
@@ -689,6 +679,34 @@
             🍪
         </button>
     </div>
+
+    <!-- Bottom Navigation Bar -->
+    <nav class="bottom-nav">
+        <a href="/" class="nav-item active">
+            <div class="nav-icon">🏠</div>
+            <div class="nav-label">Home</div>
+        </a>
+        
+        <a href="/map" class="nav-item">
+            <div class="nav-icon">🗺️</div>
+            <div class="nav-label">Map</div>
+        </a>
+        
+        <a href="/breweries" class="nav-item">
+            <div class="nav-icon">🍺</div>
+            <div class="nav-label">Breweries</div>
+        </a>
+        
+        <a href="/about" class="nav-item">
+            <div class="nav-icon">ℹ️</div>
+            <div class="nav-label">About</div>
+        </a>
+        
+        <a href="/more" class="nav-item">
+            <div class="nav-icon">⋯</div>
+            <div class="nav-label">More</div>
+        </a>
+    </nav>
 
     <script>
         // Cache-busting timestamp
