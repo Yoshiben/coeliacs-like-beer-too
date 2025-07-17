@@ -1614,7 +1614,7 @@ p {
     overflow: hidden;
     box-sizing: border-box;
 }
-/* Ensure nav buttons always have space */
+
 .pub-details-card {
     background: var(--bg-white);
     border-radius: var(--radius-xl);
@@ -1627,15 +1627,14 @@ p {
     overflow: hidden;
     min-height: 0;
     box-sizing: border-box;
-    /* REMOVED: padding-bottom - we don't need it anymore */
 }
 
+/* Split view - KEEP the working ratios */
 .split-view .pub-details-card {
     flex: 0 0 45%;
     margin-bottom: var(--space-sm);
     border-radius: var(--radius-xl) var(--radius-xl) 0 0;
     padding: var(--space-md);
-    /* REMOVED: padding-bottom - we don't need it anymore */
 }
 
 /* NEW: Top navigation bar */
@@ -1687,12 +1686,12 @@ p {
 /* Adjust header spacing since we have top nav now */
 .pub-header {
     text-align: center;
-    margin-bottom: var(--space-xl);
+    margin-bottom: var(--space-lg);
     flex-shrink: 0;
 }
 
 .split-view .pub-header {
-    margin-bottom: var(--space-lg);
+    margin-bottom: var(--space-md);
 }
 
 .pub-title {
@@ -1743,8 +1742,9 @@ p {
 .split-view .beer-section {
     padding: var(--space-sm);
     margin: var(--space-sm) 0;
-    flex: 0 1 auto; /* Don't take up too much space */
+    flex: 0 1 auto; /* Don't take up too much space in split view */
 }
+
 
 .beer-section-title {
     display: flex;
@@ -1778,13 +1778,13 @@ p {
 .pub-action-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--space-md);
+    gap: var(--space-sm);
     margin-top: auto;
     flex-shrink: 0;
 }
 
 .split-view .pub-action-grid {
-    gap: var(--space-sm);
+    gap: var(--space-xs);
     margin-top: var(--space-sm);
 }
 
@@ -1860,9 +1860,9 @@ p {
 }
 
 .split-view .btn {
-    min-height: 36px;
+    min-height: 32px;
     padding: var(--space-sm) var(--space-md);
-    font-size: 0.8rem;
+    font-size: 0.75rem;
 }
 
 .split-view .btn:hover {
@@ -1911,13 +1911,11 @@ p {
     .pub-details-card {
         padding: var(--space-md);
         border-radius: var(--radius-lg); /* Smaller radius on mobile */
-        padding-bottom: calc(var(--space-md) + 70px);
     }
 
     .split-view .pub-details-card {
         padding: var(--space-sm);
         flex: 0 0 40%; /* Even smaller in split view on mobile */
-        padding-bottom: calc(var(--space-sm) + 50px);
     }
 
     .pub-title {
@@ -1946,13 +1944,14 @@ p {
     }
 
     .pub-details-card .btn {
-        min-height: 40px;
-        font-size: 0.85rem;
+        min-height: 36px;
+        font-size: 0.8rem;
     }
 
     .split-view .btn {
-        min-height: 32px;
-        font-size: 0.75rem;
+        min-height: 28px;
+        font-size: 0.7rem;
+        padding: 4px 8px;
     }
 
    .pub-nav-buttons {
