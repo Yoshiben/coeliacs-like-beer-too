@@ -1000,20 +1000,37 @@
         }
 
         // Fixed Search Functions
+        
+// REPLACE your openSearchModal function with this safe version:
+
         function openSearchModal(searchType) {
+            console.log('Opening search modal for:', searchType);
+            
             const modal = document.getElementById('searchModal');
             const title = document.getElementById('searchModalTitle');
             const input = document.getElementById('searchInput');
+            
+            // Check if modal elements exist
+            if (!modal || !title || !input) {
+                console.log('Modal elements not found - using simple search instead');
+                
+                // Fallback: just do a simple prompt for now
+                const query = prompt(`Enter search term for ${searchType}:`);
+                if (query) {
+                    performSearch(query, searchType);
+                }
+                return;
+            }
             
             // Set modal title and placeholder based on search type
             switch(searchType) {
                 case 'name':
                     title.textContent = 'Search Pubs by Name';
-                    input.placeholder = 'Enter pub name (e.g., "The Red Lion")';
+                    input.placeholder = 'Enter pub name (e.g., "The Red Lion", "Wetherspoons")';
                     break;
                 case 'postcode':
                     title.textContent = 'Search Pubs by Postcode';
-                    input.placeholder = 'Enter postcode (e.g., "SW1A 1AA")';
+                    input.placeholder = 'Enter postcode (e.g., "SW1A 1AA", "M1 1AA")';
                     break;
                 case 'area':
                     title.textContent = 'Search Pubs by Area';
@@ -1021,14 +1038,15 @@
                     break;
                 case 'beer':
                     title.textContent = 'Search Pubs by Beer';
-                    input.placeholder = 'Enter beer name (e.g., "Stella Artois")';
+                    input.placeholder = 'Enter beer name (e.g., "Stella Artois", "Peroni")';
                     break;
+                default:
+                    title.textContent = 'Search Pubs';
+                    input.placeholder = 'Enter search term';
             }
             
             modal.style.display = 'flex';
             input.focus();
-            
-            // Store search type for when user searches
             modal.dataset.searchType = searchType;
         }
         
