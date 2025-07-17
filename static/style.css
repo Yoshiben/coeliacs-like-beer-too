@@ -1589,11 +1589,12 @@ p {
     left: 0;
     width: 100%;
     height: 100vh;
+    height: 100dvh; /* Use dynamic viewport height when supported */
     background: var(--primary-gradient);
     z-index: var(--z-modal-backdrop);
     display: none;
     overflow: hidden;
-    padding: var(--space-xs); /* Add padding around the whole overlay */
+    padding: var(--space-xs);
     box-sizing: border-box;
 }
 
@@ -1607,10 +1608,12 @@ p {
     flex: 1;
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    height: calc(100vh - 16px); /* Account for URL bar + padding */
+    height: calc(100dvh - 16px); /* Use dynamic viewport when supported */
+    max-height: calc(100vh - 16px);
+    max-height: calc(100dvh - 16px);
     padding: var(--space-sm);
     transition: all 0.3s ease;
-    max-height: 100vh;
     overflow: hidden;
     box-sizing: border-box;
 }
@@ -1904,8 +1907,18 @@ p {
 
 /* Better mobile responsiveness */
 @media (max-width: 480px) {
+   .pub-details-overlay {
+        height: calc(100vh - 8px); /* Less aggressive on mobile */
+        height: calc(100dvh - 8px);
+        padding: 4px;
+    }
+   
     .pub-details-container {
-        padding: 4px; /* Very minimal padding on mobile */
+        height: calc(100vh - 20px); /* Account for mobile URL bar */
+        height: calc(100dvh - 20px);
+        max-height: calc(100vh - 20px);
+        max-height: calc(100dvh - 20px);
+        padding: 4px;
     }
 
     .pub-details-card {
