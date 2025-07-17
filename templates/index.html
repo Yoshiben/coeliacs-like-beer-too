@@ -49,35 +49,104 @@
         </div>
     </div>
 
-    <!-- Search Section - UPDATED VERSION -->
+    <!-- New Search Section -->
     <div class="search-section" id="search">
         <div class="container">
             <div class="search-card">
                 <div class="search-header">
-                    <h2 class="section-title">🔍 Find Gluten Free Beer Near You 🍺</h2>
+                    <h2 class="section-title">🔍 How would you like to search? 🍺</h2>
                 </div>
                 <div class="search-body">
-                    <div class="search-grid">
-                        <div class="search-row">
-                            <select id="searchType" class="form-select" aria-label="Select search type above: all, pub name, postcode, or local authority">
-                                <option value="all">Search All</option>
-                                <option value="name">Pub Name</option>
-                                <option value="postcode">Postcode</option>
-                                <option value="area">Local Authority</option>
-                            </select>
-                            <input type="text" id="searchInput" class="form-input" placeholder="Enter pub name, postcode, or local authority" onkeydown="if (event.key === 'Enter') searchPubs()" aria-label="Search input for pubs" autocomplete="off">
-                            <div id="suggestions" class="suggestions"></div>
+                    <div class="search-options">
+                        <div class="search-option location" onclick="openSearchModal('location')">
+                            <span class="search-icon">📍</span>
+                            <h3 class="search-title">Pubs Near Me</h3>
+                            <p class="search-description">Find GF-friendly pubs using your current location or enter a postcode/city</p>
                         </div>
-                        <div class="search-actions">
-                            <button onclick="searchPubs()" class="btn btn-primary" aria-label="Search for pubs">Search Pubs</button>
-                            <button class="btn btn-success" onclick="findNearbyPubs()" aria-label="Find pubs near my current location">Pubs Near Me</button>
-                            <button class="btn btn-secondary" id="toggleMapBtn" onclick="toggleMap()" aria-label="Toggle map visibility">🗺️ Show Map</button>
-                            <button class="btn btn-secondary" onclick="centerOnLocation()" aria-label="Center map on my location">📍 My Location</button>
-                            <button class="btn btn-danger" onclick="resetToHomepage()" title="Clear everything and start fresh" aria-label="Reset to homepage">🏠 Reset</button>
+                        
+                        <div class="search-option name" onclick="openSearchModal('name')">
+                            <span class="search-icon">🏠</span>
+                            <h3 class="search-title">Pubs by Name</h3>
+                            <p class="search-description">Search for a specific pub by name - "The Red Lion", "Wetherspoons", etc.</p>
+                        </div>
+                        
+                        <div class="search-option beer" onclick="openSearchModal('beer')">
+                            <span class="search-icon">🍺</span>
+                            <h3 class="search-title">Pubs by Beer</h3>
+                            <p class="search-description">Find pubs serving specific GF beers - "Vocation", "Zapato", "IPA", "Lager", etc.</p>
+                        </div>
+                        
+                        <div class="search-option area" onclick="openSearchModal('area')">
+                            <span class="search-icon">🗺️</span>
+                            <h3 class="search-title">Browse by Area</h3>
+                            <p class="search-description">Explore pubs in specific regions, cities, or local authorities</p>
                         </div>
                     </div>
-                    <div id="suggestions" class="suggestions"></div>
+                    
+                    <div class="quick-actions">
+                        <div class="quick-actions-title">Quick Start</div>
+                        <button class="quick-action-btn" onclick="findNearbyPubs()">
+                            📍 Find Pubs Near Me Now
+                        </button>
+                    </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Modals - ADD these before your closing </body> tag -->
+    <div id="locationModal" class="search-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">📍 Search by Location</h3>
+                <p class="modal-subtitle">Enter a postcode, city, or use your current location</p>
+            </div>
+            <input type="text" class="form-input" placeholder="e.g. SW1A 1AA, London, Manchester..." id="locationInput">
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeSearchModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="searchByLocation()">Search</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="nameModal" class="search-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">🏠 Search by Pub Name</h3>
+                <p class="modal-subtitle">Enter the name of the pub you're looking for</p>
+            </div>
+            <input type="text" class="form-input" placeholder="e.g. The Red Lion, Wetherspoons, The George..." id="nameInput">
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeSearchModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="searchByName()">Search</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="beerModal" class="search-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">🍺 Search by Beer</h3>
+                <p class="modal-subtitle">Find pubs serving specific gluten-free beers</p>
+            </div>
+            <input type="text" class="form-input" placeholder="e.g. Brewdog Punk AF, IPA, Lager, Stella Artois GF..." id="beerInput">
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeSearchModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="searchByBeer()">Search</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="areaModal" class="search-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">🗺️ Browse by Area</h3>
+                <p class="modal-subtitle">Explore pubs in specific regions or local authorities</p>
+            </div>
+            <input type="text" class="form-input" placeholder="e.g. Greater London, West Yorkshire, Camden..." id="areaInput">
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeSearchModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="searchByArea()">Browse</button>
             </div>
         </div>
     </div>
@@ -140,46 +209,6 @@
             </div>
         </div>
     </div>
-
-<!--     <div class="advanced-filters" id="advancedFilters" style="display: none;">
-    <h4>🔍 Advanced Filters</h4>
-    <div class="filter-grid">
-        <select id="beerFormat" class="filter-select">
-            <option value="all">Any Format</option>
-            <option value="bottle">🍺 Bottles Only</option>
-            <option value="tap">🚰 Tap Only</option>
-            <option value="cask">🛢️ Cask Only</option>
-            <option value="can">🥫 Cans Only</option>
-        </select>
-        
-        <select id="beerStyle" class="filter-select">
-            <option value="all">Any Style</option>
-            <option value="ipa">IPA</option>
-            <option value="lager">Lager</option>
-            <option value="ale">Ale</option>
-            <option value="stout">Stout</option>
-            <option value="wheat">Wheat Beer</option>
-        </select>
-        
-        <select id="breweryFilter" class="filter-select">
-            <option value="all">Any Brewery</option>
-        </select>
-        
-        <select id="maxDistance" class="filter-select">
-            <option value="5">Within 5km</option>
-            <option value="10">Within 10km</option>
-            <option value="25">Within 25km</option>
-            <option value="50">Within 50km</option>
-        </select>
-    </div>
-    
-    <button onclick="clearAllFilters()" class="btn-clear-filters">Clear Filters</button>
-</div> -->
-
-<!-- ADD THIS: Toggle button for filters -->
-<!-- <button onclick="toggleAdvancedFilters()" class="btn-advanced-filters">
-    🔧 Advanced Filters
-</button> -->
 
     <!-- Dynamic Results Section - Pushed down when visible -->
     <div id="results-section" style="display: none;">
@@ -947,6 +976,237 @@
                 debounceTimeout = setTimeout(() => func.apply(this, args), wait);
             };
         }
+
+        // ADD THESE NEW SEARCH FUNCTIONS TO YOUR JAVASCRIPT SECTION (before the closing script tag)
+
+        // New search modal functions
+        function openSearchModal(type) {
+            const modal = document.getElementById(type + 'Modal');
+            if (modal) {
+                modal.style.display = 'flex';
+                // Focus the input
+                const input = modal.querySelector('.form-input');
+                if (input) {
+                    setTimeout(() => input.focus(), 100);
+                }
+                
+                // Lock body scroll
+                document.body.style.overflow = 'hidden';
+                
+                trackEvent('open_search_modal', 'Search Interface', type);
+            }
+        }
+        
+        function closeSearchModal() {
+            document.querySelectorAll('.search-modal').forEach(modal => {
+                modal.style.display = 'none';
+            });
+            
+            // Unlock body scroll
+            document.body.style.overflow = '';
+            
+            trackEvent('close_search_modal', 'Search Interface');
+        }
+        
+        function searchByLocation() {
+            const query = document.getElementById('locationInput').value.trim();
+            if (!query) {
+                showSuccessToast('Please enter a location to search');
+                return;
+            }
+            
+            closeSearchModal();
+            
+            // Use your existing search logic but with location type
+            performSearch(query, 'location');
+            
+            trackEvent('search_by_location', 'Search', query);
+        }
+        
+        function searchByName() {
+            const query = document.getElementById('nameInput').value.trim();
+            if (!query) {
+                showSuccessToast('Please enter a pub name to search');
+                return;
+            }
+            
+            closeSearchModal();
+            
+            // Use your existing search logic but with name type  
+            performSearch(query, 'name');
+            
+            trackEvent('search_by_name', 'Search', query);
+        }
+        
+        function searchByBeer() {
+            const query = document.getElementById('beerInput').value.trim();
+            if (!query) {
+                showSuccessToast('Please enter a beer name to search');
+                return;
+            }
+            
+            closeSearchModal();
+            
+            // Use your existing search logic but with beer type
+            performSearch(query, 'beer');
+            
+            trackEvent('search_by_beer', 'Search', query);
+        }
+        
+        function searchByArea() {
+            const query = document.getElementById('areaInput').value.trim();
+            if (!query) {
+                showSuccessToast('Please enter an area to browse');
+                return;
+            }
+            
+            closeSearchModal();
+            
+            // Use your existing search logic but with area type
+            performSearch(query, 'area');
+            
+            trackEvent('search_by_area', 'Search', query);
+        }
+        
+        // Updated unified search function that works with your existing backend
+        async function performSearch(query, searchType) {
+            currentQuery = query;
+            currentSearchType = searchType;
+            currentPage = 1;
+            
+            showResultsSection();
+            showLoadingToast('Searching...');
+            const results = document.getElementById('results');
+            results.innerHTML = '<li class="loading">Searching...</li>';
+            
+            // Check if query looks like a postcode (for location searches)
+            const isPostcode = /^[A-Z]{1,2}[0-9R][0-9A-Z]?\s?[0-9][A-Z]{2}$/i.test(query.replace(/\s/g, ''));
+            
+            try {
+                let url;
+                
+                if ((searchType === 'location' && isPostcode) || searchType === 'postcode') {
+                    // Handle postcode search - geocode then find nearby
+                    console.log('Detected postcode search:', query);
+                    showLoadingToast('Finding location...');
+                    
+                    // First geocode the postcode
+                    const geocodeResponse = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=gb&limit=1`);
+                    const geocodeData = await geocodeResponse.json();
+                    
+                    if (geocodeData && geocodeData.length > 0) {
+                        const lat = parseFloat(geocodeData[0].lat);
+                        const lng = parseFloat(geocodeData[0].lon);
+                        
+                        showLoadingToast('Finding nearby pubs...');
+                        
+                        url = `/nearby?lat=${lat}&lng=${lng}&radius=5`;
+                        
+                        // Auto-show map and update to show the postcode area
+                        smartShowMap();
+                        if (map) {
+                            map.setView([lat, lng], 14);
+                            
+                            // Add postcode marker
+                            if (window.postcodeMarker) {
+                                map.removeLayer(window.postcodeMarker);
+                            }
+                            window.postcodeMarker = L.marker([lat, lng], {
+                                icon: L.divIcon({
+                                    className: 'postcode-marker',
+                                    html: `<div style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); width: 30px; height: 30px; border-radius: 50%; border: 3px solid white; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px;">📍</div>`,
+                                    iconSize: [36, 36],
+                                    iconAnchor: [18, 18]
+                                })
+                            }).addTo(map);
+                            
+                            window.postcodeMarker.bindPopup(`<strong>${query}</strong><br>Searching nearby pubs...`).openPopup();
+                        }
+                    } else {
+                        throw new Error('Location not found');
+                    }
+                } else {
+                    // Regular text search - map search types to your existing backend
+                    const backendSearchType = mapSearchType(searchType);
+                    url = `/search?query=${encodeURIComponent(query)}&search_type=${backendSearchType}&page=1`;
+                }
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                const pubs = Array.isArray(data) ? data : data.pubs;
+                
+                hideLoadingToast();
+                
+                if (pubs.length === 0) {
+                    results.innerHTML = `<li class="no-results">No pubs found for "${query}". Try a different search term.</li>`;
+                    showSuccessToast(`No pubs found for "${query}"`);
+                    return;
+                }
+                
+                displaySearchResults(data);
+                addPubMarkersToMap(pubs);
+                
+                AppState.save();
+                trackSearch(query, searchType, pubs.length);
+                
+                // Show success message
+                const message = `Found ${pubs.length} pubs for "${query}"`;
+                showSuccessToast(message);
+                
+            } catch (error) {
+                console.error('Error searching pubs:', error);
+                hideLoadingToast();
+                
+                results.innerHTML = `<li class="no-results">Error searching for "${query}". Please try again.</li>`;
+                showSuccessToast(`Error searching for "${query}"`);
+            }
+        }
+        
+        // Map new search types to your existing backend search types
+        function mapSearchType(newType) {
+            const mapping = {
+                'location': 'all',  // Location searches can be postcodes or areas
+                'name': 'name',     // Direct mapping
+                'beer': 'all',      // Beer searches will search in beer details
+                'area': 'area'      // Direct mapping
+            };
+            
+            return mapping[newType] || 'all';
+        }
+        
+        // Add event listeners for Enter key in modals
+        document.addEventListener('DOMContentLoaded', () => {
+            // Enter key handlers for search modals
+            document.getElementById('locationInput')?.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') searchByLocation();
+            });
+            
+            document.getElementById('nameInput')?.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') searchByName();
+            });
+            
+            document.getElementById('beerInput')?.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') searchByBeer();
+            });
+            
+            document.getElementById('areaInput')?.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') searchByArea();
+            });
+            
+            // Close modal when clicking outside
+            document.querySelectorAll('.search-modal').forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        closeSearchModal();
+                    }
+                });
+            });
+        });
 
         // Calculate distance between two points
         function calculateDistance(lat1, lon1, lat2, lon2) {
