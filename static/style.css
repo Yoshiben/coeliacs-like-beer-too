@@ -1941,15 +1941,20 @@ body.pub-details-open {
    ================================ */
 
 .search-section {
-    margin: -20px var(--space-lg) var(--space-4xl);
+    margin: -20px 0 var(--space-4xl) 0; /* Remove left/right margins */
     position: relative;
     z-index: var(--z-sticky);
+    width: 100vw; /* Full viewport width */
+    left: 50%; /* Move to center */
+    right: 50%;
+    margin-left: -50vw; /* Pull back to center */
+    margin-right: -50vw;
+    padding: 0 var(--space-lg); /* Add padding for mobile */
 }
 
 @media (min-width: 768px) {
     .search-section {
-        margin: -20px auto var(--space-4xl);
-        max-width: 800px;
+        padding: 0 var(--space-xl); /* More padding on larger screens */
     }
 }
 
@@ -1960,6 +1965,8 @@ body.pub-details-open {
     backdrop-filter: blur(10px);
     overflow: hidden;
     width: 100%;
+    max-width: 800px; /* Maximum width for the card */
+    margin: 0 auto; /* Center the card within the full-width section */
 }
 
 .search-header {
