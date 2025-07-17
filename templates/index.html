@@ -102,17 +102,26 @@
                 </div>
     
                 <div class="pub-action-grid">
-                    <button class="btn btn-primary" id="pubFindOnline">
+                    <button class="btn btn-external" id="pubFindOnline">
                         🔍 Find Online
                     </button>
-                    <button class="btn btn-success" id="pubGetDirections">
+                    <button class="btn btn-external" id="pubGetDirections">
                         🧭 Get Directions
                     </button>
-                    <button class="btn btn-secondary" id="pubToggleMap" onclick="togglePubMap()">
+                    <button class="btn btn-toggle" id="pubToggleMap" onclick="togglePubMap()">
                         🗺️ <span id="pubMapBtnText">Show on Map</span>
                     </button>
-                    <button class="btn btn-success" onclick="openReportModal()">
+                    <button class="btn btn-positive" onclick="openReportModal()">
                         📝 Report GF Beer
+                    </button>
+                </div>
+                
+                <div class="pub-nav-buttons">
+                    <button class="btn btn-nav" onclick="closePubDetails()">
+                        🏠 Home
+                    </button>
+                    <button class="btn btn-nav" onclick="closePubDetails()">
+                        ← Back to Results
                     </button>
                 </div>
     
@@ -1825,12 +1834,14 @@
         function togglePubMap() {
             const container = document.getElementById('pubContainer');
             const mapBtnText = document.getElementById('pubMapBtnText');
+            const mapBtn = document.getElementById('pubToggleMap');
             
             pubMapVisible = !pubMapVisible;
             
             if (pubMapVisible) {
                 container.classList.add('split-view');
                 mapBtnText.textContent = 'Hide Map';
+                mapBtn.classList.add('active'); // Add active class
                 
                 // Initialize map if we have coordinates
                 if (currentPubData && currentPubData.latitude && currentPubData.longitude) {
@@ -1848,6 +1859,7 @@
             } else {
                 container.classList.remove('split-view');
                 mapBtnText.textContent = 'Show on Map';
+                mapBtn.classList.remove('active'); // Remove active class
                 trackEvent('pub_map_toggle', 'Map Interaction', 'hide');
             }
         }
