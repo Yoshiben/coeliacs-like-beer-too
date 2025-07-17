@@ -2341,41 +2341,41 @@
             checkCookieConsent();
 
             // ENHANCED AUTOCOMPLETE WITH POSTCODE DETECTION
-            input.addEventListener('input', debounce(async () => {
-                const query = input.value.trim();
-                const searchType = document.getElementById('searchType').value;
-                // const gfOnly = document.getElementById('gfOnly').checked;
+            // input.addEventListener('input', debounce(async () => {
+            //     const query = input.value.trim();
+            //     const searchType = document.getElementById('searchType').value;
+            //     // const gfOnly = document.getElementById('gfOnly').checked;
 
-                console.log('🔍 Autocomplete triggered for:', query);
-                console.log('🔍 Search type:', searchType);
+            //     console.log('🔍 Autocomplete triggered for:', query);
+            //     console.log('🔍 Search type:', searchType);
                 
-                if (query.length < 2) {
-                    suggestions.style.display = 'none';
-                    return;
-                }
+            //     if (query.length < 2) {
+            //         suggestions.style.display = 'none';
+            //         return;
+            //     }
 
-                // Check if it looks like a postcode
-                const isPostcode = /^[A-Z]{1,2}[0-9R][0-9A-Z]?\s?[0-9][A-Z]{2}$/i.test(query.replace(/\s/g, ''));
+            //     // Check if it looks like a postcode
+            //     const isPostcode = /^[A-Z]{1,2}[0-9R][0-9A-Z]?\s?[0-9][A-Z]{2}$/i.test(query.replace(/\s/g, ''));
                 
-                if (isPostcode) {
-                    // Show postcode search option
-                    suggestions.innerHTML = `
-                        <div class="postcode-suggestion">
-                            <strong>📍 Search for pubs near "${query}"</strong>
-                            <div class="postcode-suggestion-subtitle">
-                                Find pubs within 5km of this postcode
-                            </div>
-                        </div>
-                    `;
-                    suggestions.style.display = 'block';
+            //     if (isPostcode) {
+            //         // Show postcode search option
+            //         suggestions.innerHTML = `
+            //             <div class="postcode-suggestion">
+            //                 <strong>📍 Search for pubs near "${query}"</strong>
+            //                 <div class="postcode-suggestion-subtitle">
+            //                     Find pubs within 5km of this postcode
+            //                 </div>
+            //             </div>
+            //         `;
+            //         suggestions.style.display = 'block';
                     
-                    // Add click handler
-                    suggestions.querySelector('.postcode-suggestion').addEventListener('click', () => {
-                        searchPubs();
-                        suggestions.style.display = 'none';
-                    });
-                    return;
-                }
+            //         // Add click handler
+            //         suggestions.querySelector('.postcode-suggestion').addEventListener('click', () => {
+            //             searchPubs();
+            //             suggestions.style.display = 'none';
+            //         });
+            //         return;
+            //     }
 
                 // Regular autocomplete for non-postcodes
                 try {
