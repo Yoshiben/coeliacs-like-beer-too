@@ -1627,7 +1627,7 @@ p {
     overflow: hidden;
     min-height: 0;
     box-sizing: border-box;
-    padding-bottom: calc(var(--space-lg) + 80px); /* Reserve space for nav buttons */
+    /* REMOVED: padding-bottom - we don't need it anymore */
 }
 
 .split-view .pub-details-card {
@@ -1635,13 +1635,64 @@ p {
     margin-bottom: var(--space-sm);
     border-radius: var(--radius-xl) var(--radius-xl) 0 0;
     padding: var(--space-md);
-    padding-bottom: calc(var(--space-md) + 60px); /* Reserve space for smaller nav buttons */
+    /* REMOVED: padding-bottom - we don't need it anymore */
 }
 
+/* NEW: Top navigation bar */
+.pub-nav-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-lg);
+    flex-shrink: 0;
+}
+
+.split-view .pub-nav-top {
+    margin-bottom: var(--space-md);
+}
+
+/* Small nav buttons for top */
+.btn-nav-small {
+    min-height: 32px;
+    padding: var(--space-xs) var(--space-md);
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
+    background: rgba(102, 126, 234, 0.1);
+    color: var(--text-secondary);
+    border: 2px solid rgba(102, 126, 234, 0.2);
+}
+
+.btn-nav-small:hover {
+    background: var(--primary-gradient);
+    color: var(--text-white);
+    border-color: transparent;
+    transform: translateY(-1px);
+}
+
+/* Even smaller in split view */
+.split-view .btn-nav-small {
+    min-height: 28px;
+    padding: 4px var(--space-sm);
+    font-size: 0.7rem;
+}
+
+/* Adjust header spacing since we have top nav now */
 .pub-header {
     text-align: center;
+    margin-bottom: var(--space-xl);
+    flex-shrink: 0;
+}
+
+.split-view .pub-header {
     margin-bottom: var(--space-lg);
-    flex-shrink: 0; /* Don't shrink the header */
 }
 
 .pub-title {
@@ -1723,30 +1774,22 @@ p {
     font-size: 0.75rem;
 }
 
-/* Better button grid - smaller buttons */
+/* Keep action buttons the same size but ensure they fit */
 .pub-action-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--space-sm);
+    gap: var(--space-md);
     margin-top: auto;
     flex-shrink: 0;
 }
 
-/* Split view - much smaller buttons */
 .split-view .pub-action-grid {
-    gap: var(--space-xs);
+    gap: var(--space-sm);
     margin-top: var(--space-sm);
 }
 
-/* Fix nav button positioning */
 .pub-nav-buttons {
-    position: absolute;
-    bottom: var(--space-lg);
-    left: var(--space-lg);
-    right: var(--space-lg);
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-sm);
+    display: none; /* Hide the old bottom nav */
 }
 
 .split-view .pub-nav-buttons {
@@ -1795,7 +1838,7 @@ p {
     color: var(--text-white);
 }
 
-/* Smaller button sizes for better proportions */
+/* Normal sized action buttons */
 .pub-details-card .btn {
     min-height: 44px;
     padding: var(--space-md) var(--space-lg);
@@ -1890,6 +1933,18 @@ p {
         gap: var(--space-xs);
     }
 
+   .btn-nav-small {
+        min-height: 30px;
+        padding: 6px var(--space-sm);
+        font-size: 0.7rem;
+    }
+
+    .split-view .btn-nav-small {
+        min-height: 26px;
+        padding: 4px var(--space-xs);
+        font-size: 0.65rem;
+    }
+
     .pub-details-card .btn {
         min-height: 40px;
         font-size: 0.85rem;
@@ -1898,7 +1953,6 @@ p {
     .split-view .btn {
         min-height: 32px;
         font-size: 0.75rem;
-        padding: 4px 8px;
     }
 
    .pub-nav-buttons {
