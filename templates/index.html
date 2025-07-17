@@ -819,7 +819,7 @@
             // Clear search inputs
             document.getElementById('searchInput').value = '';
             document.getElementById('searchType').value = 'all';
-            document.getElementById('gfOnly').checked = false;
+            // document.getElementById('gfOnly').checked = false;
             
             // Hide results section
             hideResultsSection();
@@ -849,7 +849,7 @@
             // Reset global variables
             currentQuery = '';
             currentSearchType = 'all';
-            currentGfOnly = false;
+            // currentGfOnly = false;
             currentPage = 1;
             mapVisible = false;
             
@@ -881,7 +881,7 @@
                 const state = {
                     query: currentQuery,
                     searchType: currentSearchType,
-                    gfOnly: currentGfOnly,
+                    // gfOnly: currentGfOnly,
                     page: currentPage,
                     mapVisible: mapVisible,
                     specificPubId: pubId || null,
@@ -911,11 +911,11 @@
                     
                     document.getElementById('searchInput').value = state.query || '';
                     document.getElementById('searchType').value = state.searchType || 'all';
-                    document.getElementById('gfOnly').checked = state.gfOnly || false;
+                    // document.getElementById('gfOnly').checked = state.gfOnly || false;
                     
                     currentQuery = state.query || '';
                     currentSearchType = state.searchType || 'all';
-                    currentGfOnly = state.gfOnly || false;
+                    // currentGfOnly = state.gfOnly || false;
                     currentPage = state.page || 1;
                     mapVisible = state.mapVisible || false;
                     
