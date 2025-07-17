@@ -86,6 +86,11 @@
     --container-md: 768px;
     --container-lg: 1024px;
     --container-xl: 1200px;
+
+   /* Autocomplete/Dropdown Colors */
+    --dropdown-border: rgba(0, 0, 0, 0.1);
+    --dropdown-divider: #f0f0f0;
+    --dropdown-hover: rgba(102, 126, 234, 0.05)
 }
 
 /* Desktop Adjustments */
@@ -522,21 +527,21 @@ p {
     z-index: var(--z-search-suggestions);
     box-shadow: var(--shadow-lg);
     margin-top: var(--space-xs);
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-light);
 }
 
 .suggestion-item {
     padding: var(--space-lg);
     cursor: pointer;
     font-size: var(--text-sm);
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid var(--divider-color);
     background: var(--text-white);
     transition: background-color var(--transition-fast);
     color: var(--text-primary);
 }
 
 .suggestion-item:hover {
-    background: rgba(102, 126, 234, 0.05);
+    background: var(--hover-subtle);
 }
 
 .suggestion-item:last-child {
