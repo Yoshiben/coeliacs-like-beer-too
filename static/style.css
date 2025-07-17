@@ -3943,8 +3943,8 @@ body.pub-details-open {
     margin-left: -50vw;
     margin-right: -50vw;
     padding: 0 var(--space-lg);
-    height: calc(100vh - 100px); /* Changes height of search box */
-    height: calc(100dvh - 100px); /* Make sure you change both this and above */
+    height: calc(100vh - 120px); /* Changes height of search box */
+    height: calc(100dvh - 120px); /* Make sure you change both this and above */
     display: flex;
     align-items: center;
     overflow: hidden;
