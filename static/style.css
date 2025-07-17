@@ -1593,54 +1593,58 @@ p {
     z-index: var(--z-modal-backdrop);
     display: none;
     overflow: hidden;
+    padding: var(--space-xs); /* Add padding around the whole overlay */
+    box-sizing: border-box;
 }
 
 .pub-details-overlay.active {
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
-/* Update the existing .pub-details-container CSS with these changes: */
 .pub-details-container {
     flex: 1;
     display: flex;
     flex-direction: column;
     height: 100vh;
-    padding: var(--space-sm); /* Reduced padding */
+    padding: var(--space-sm);
     transition: all 0.3s ease;
-    max-height: 100vh; /* Ensure it doesn't exceed viewport */
-    overflow: hidden; /* Prevent overflow */
+    max-height: 100vh;
+    overflow: hidden;
+    box-sizing: border-box;
 }
 
-/* Update the existing .pub-details-card CSS: */
 .pub-details-card {
     background: var(--bg-white);
     border-radius: var(--radius-xl);
     backdrop-filter: blur(10px);
     box-shadow: var(--shadow-lg);
-    padding: var(--space-xl); /* Reduced padding */
+    padding: var(--space-lg);
     flex: 1;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    min-height: 0; /* Allow flex shrinking */
+    min-height: 0;
+    box-sizing: border-box;
 }
 
-/* Split view when map is shown */
+/* Split view adjustments - much more compact */
 .split-view .pub-details-card {
-    flex: 0 0 50%;
-    margin-bottom: var(--space-lg);
+    flex: 0 0 45%; /* Smaller percentage to leave more room */
+    margin-bottom: var(--space-sm);
     border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    padding: var(--space-md); /* Much smaller padding in split view */
 }
 
-/* Better spacing for mobile */
 .pub-header {
     text-align: center;
-    margin-bottom: var(--space-xl); /* Reduced margin */
+    margin-bottom: var(--space-lg);
+    flex-shrink: 0; /* Don't shrink the header */
 }
 
 .pub-title {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     font-weight: 700;
     color: var(--text-primary);
     margin-bottom: var(--space-sm);
@@ -1658,47 +1662,109 @@ p {
     font-size: 0.85rem;
 }
 
+/* Split view - smaller title */
+.split-view .pub-title {
+    font-size: 1.1rem;
+    margin-bottom: var(--space-xs);
+}
+
+/* Split view - even smaller text */
+.split-view .pub-address,
+.split-view .pub-location {
+    font-size: 0.75rem;
+}
+
 .beer-section {
     background: rgba(102, 126, 234, 0.1);
     border-radius: var(--radius-lg);
-    padding: var(--space-lg); /* Reduced padding */
-    margin: var(--space-lg) 0; /* Reduced margin */
+    padding: var(--space-lg);
+    margin: var(--space-lg) 0;
     border-left: 4px solid #667eea;
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    min-height: 0; /* Allow flex shrinking */
+    min-height: 0;
+}
+
+/* Split view - much more compact beer section */
+.split-view .beer-section {
+    padding: var(--space-sm);
+    margin: var(--space-sm) 0;
+    flex: 0 1 auto; /* Don't take up too much space */
 }
 
 .beer-section-title {
     display: flex;
     align-items: center;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
     color: var(--text-primary);
-    margin-bottom: var(--space-lg);
+    margin-bottom: var(--space-md);
 }
+
+/* Split view - smaller beer title */
+.split-view .beer-section-title {
+    font-size: 0.85rem;
+    margin-bottom: var(--space-xs);
+}
+
 
 .beer-status {
     color: var(--text-muted);
     font-style: italic;
-    font-size: 0.9rem;
-    line-height: 1.5;
+    font-size: 0.85rem;
+    line-height: 1.4;
 }
 
+/* Split view - smaller beer status */
+.split-view .beer-status {
+    font-size: 0.75rem;
+}
+
+/* Better button grid - smaller buttons */
 .pub-action-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--space-md); /* Reduced gap */
+    gap: var(--space-sm);
     margin-top: auto;
+    flex-shrink: 0;
+}
+
+/* Split view - much smaller buttons */
+.split-view .pub-action-grid {
+    gap: var(--space-xs);
+    margin-top: var(--space-sm);
 }
 
 .pub-nav-buttons {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--space-md); /* Reduced gap */
-    margin-top: var(--space-lg); /* Reduced margin */
+    gap: var(--space-sm);
+    margin-top: var(--space-md);
+    flex-shrink: 0;
+}
+
+/* Split view - compact nav buttons */
+.split-view .pub-nav-buttons {
+    gap: var(--space-xs);
+    margin-top: var(--space-xs);
+}
+
+/* Smaller button sizes for pub details */
+.pub-details-card .btn {
+    min-height: 40px;
+    padding: var(--space-sm) var(--space-md);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+/* Much smaller buttons in split view */
+.split-view .btn {
+    min-height: 32px;
+    padding: var(--space-xs) var(--space-sm);
+    font-size: 0.75rem;
+    border-radius: var(--radius-lg); /* Smaller border radius too */
 }
 
 .pub-map-container {
@@ -1708,10 +1774,12 @@ p {
     flex: 1;
     display: none;
     position: relative;
+    min-height: 0;
 }
 
 .split-view .pub-map-container {
     display: block;
+    flex: 1; /* Take up remaining space */
 }
 
 .pub-map-placeholder {
@@ -1732,29 +1800,43 @@ p {
     text-align: center;
 }
 
-/* Mobile optimizations for pub details */
-/* Better mobile button sizing */
+/* Better mobile responsiveness */
 @media (max-width: 480px) {
     .pub-details-container {
-        padding: var(--space-xs); /* Even smaller padding on mobile */
+        padding: 4px; /* Very minimal padding on mobile */
     }
 
     .pub-details-card {
-        padding: var(--space-lg); /* Smaller padding on mobile */
+        padding: var(--space-md);
+        border-radius: var(--radius-lg); /* Smaller radius on mobile */
+    }
+
+    .split-view .pub-details-card {
+        padding: var(--space-sm);
+        flex: 0 0 40%; /* Even smaller in split view on mobile */
     }
 
     .pub-title {
-        font-size: 1.2rem; /* Slightly smaller title */
-        margin-bottom: var(--space-sm);
+        font-size: 1.1rem;
     }
 
-    .beer-section {
-        padding: var(--space-md);
-        margin: var(--space-md) 0;
+    .split-view .pub-title {
+        font-size: 1rem;
     }
 
     .pub-action-grid,
     .pub-nav-buttons {
-        gap: var(--space-sm);
+        gap: var(--space-xs);
+    }
+
+    .pub-details-card .btn {
+        min-height: 36px;
+        font-size: 0.8rem;
+    }
+
+    .split-view .btn {
+        min-height: 28px;
+        font-size: 0.7rem;
+        padding: 4px 8px;
     }
 }
