@@ -1345,7 +1345,7 @@
 
         async function loadPage(page) {
             currentPage = page;
-            // const url = `/search?query=${encodeURIComponent(currentQuery)}&search_type=${currentSearchType}&page=${page}` + (currentGfOnly ? '&gf_only=true' : '');
+            const url = `/search?query=${encodeURIComponent(currentQuery)}&search_type=${currentSearchType}&page=${page}`;
             
             showLoadingToast('Loading page...');
             const results = document.getElementById('results');
