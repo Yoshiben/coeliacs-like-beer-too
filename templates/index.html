@@ -1374,12 +1374,15 @@
                         smartShowMap();
                         map.setView([pub.latitude, pub.longitude], 15);
                     }
-                                        
+                                            
                     currentQuery = '';
                     currentSearchType = 'all';
                     currentGfOnly = false;
                     currentPage = 1;
                     AppState.save(pubId);
+                } else {
+                    results.innerHTML = '<li class="no-results">Pub not found.</li>';
+                }  // ← This closing brace was missing!
             } catch (error) {
                 console.error('Error searching for specific pub:', error);
                 hideLoadingToast();
