@@ -2342,21 +2342,21 @@
         }
 
         // Initialize everything when DOM is ready
-        document.addEventListener('DOMContentLoaded', async () => {
-            const input = document.getElementById('searchInput');
-            const suggestions = document.getElementById('suggestions');
+        // document.addEventListener('DOMContentLoaded', async () => {
+        //     const input = document.getElementById('searchInput');
+        //     const suggestions = document.getElementById('suggestions');
 
             // Initialize Leaflet map
-            map = L.map('map').setView([51.505, -0.09], 6);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
+            // map = L.map('map').setView([51.505, -0.09], 6);
+            // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            //     maxZoom: 19,
+            //     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            // }).addTo(map);
 
-            loadDashboardStats();
-            getUserLocation();
-            await AppState.restore();
-            checkCookieConsent();
+            // loadDashboardStats();
+            // getUserLocation();
+            // await AppState.restore();
+            // checkCookieConsent();
 
             // ENHANCED AUTOCOMPLETE WITH POSTCODE DETECTION
             // input.addEventListener('input', debounce(async () => {
@@ -2450,14 +2450,14 @@
             // }, 300));
 
             // Hide suggestions on outside click
-            document.addEventListener('click', (e) => {
-                if (!input.contains(e.target) && !suggestions.contains(e.target)) {
-                    suggestions.style.display = 'none';
-                }
-            });
+            // document.addEventListener('click', (e) => {
+            //     if (!input.contains(e.target) && !suggestions.contains(e.target)) {
+            //         suggestions.style.display = 'none';
+            //     }
+            // });
             // Save state on form changes
-            document.getElementById('searchType').addEventListener('change', () => AppState.save());
-        });
+            // document.getElementById('searchType').addEventListener('change', () => AppState.save());
+        // });
 
         // ADD: Homepage reset function
         function resetToHomepage() {
