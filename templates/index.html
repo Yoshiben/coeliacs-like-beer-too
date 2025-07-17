@@ -1897,7 +1897,7 @@
 
                     if (data.length >= 10) {
                         const showAllDiv = document.createElement('div');
-                        showAllDiv.className = 'show-all-option';
+                        showAllDiv.className = 'suggestion-item highlight'; 
                         showAllDiv.innerHTML = `<strong>🔍 Show all ${data.length}+ results for "${query}"</strong>`;
                         showAllDiv.addEventListener('click', () => {
                             document.getElementById('searchInput').value = query;
@@ -1909,6 +1909,7 @@
 
                     data.forEach(pub => {
                         const div = document.createElement('div');
+                        div.className = 'suggestion-item'; // uses suggestion for drop down autocomplete
                         div.textContent = `${pub.name}, ${pub.address} (${pub.postcode})`;
                         div.addEventListener('click', () => {
                             clearSearch();
