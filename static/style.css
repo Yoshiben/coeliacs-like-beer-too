@@ -1941,15 +1941,18 @@ body.pub-details-open {
    ================================ */
 
 .search-section {
-    margin: -20px 0 var(--space-4xl) 0; /* Remove left/right margins */
+    margin: -20px 0 0 0; /* Remove bottom margin */
     position: relative;
     z-index: var(--z-sticky);
-    width: 100vw; /* Full viewport width */
-    left: 50%; /* Move to center */
+    width: 100vw;
+    left: 50%;
     right: 50%;
-    margin-left: -50vw; /* Pull back to center */
+    margin-left: -50vw;
     margin-right: -50vw;
-    padding: 0 var(--space-lg); /* Add padding for mobile */
+    padding: 0 var(--space-lg);
+    min-height: calc(100vh - 400px); /* Take up remaining screen height */
+    display: flex;
+    align-items: center; /* Center the card vertically */
 }
 
 @media (min-width: 768px) {
@@ -1965,8 +1968,8 @@ body.pub-details-open {
     backdrop-filter: blur(10px);
     overflow: hidden;
     width: 100%;
-    max-width: 800px; /* Maximum width for the card */
-    margin: 0 auto; /* Center the card within the full-width section */
+    max-width: 800px;
+    margin: 0 auto;
 }
 
 .search-header {
@@ -1995,11 +1998,12 @@ body.pub-details-open {
     width: 100%;
 }
 
+* Better text centering - add more internal spacing */
 .search-option {
     background: var(--text-white);
     border: 3px solid var(--border-light);
     border-radius: var(--radius-lg);
-    padding: var(--space-lg);
+    padding: var(--space-lg) var(--space-xl); /* More horizontal padding */
     cursor: pointer;
     transition: all var(--transition);
     text-align: center;
@@ -2018,16 +2022,9 @@ body.pub-details-open {
     box-shadow: var(--shadow);
 }
 
-/* COLORED BORDERS & BACKGROUNDS */
-.search-option.location {
-    background: linear-gradient(135deg, var(--search-location-bg) 0%, var(--search-location-bg-light) 100%);
-    border-color: var(--search-location-border);
-}
+/* Updated color scheme for new layout */
 
-.search-option.location:hover {
-    border-color: var(--search-location-border-hover);
-}
-
+/* Top Left: Pubs by Name - Blue */
 .search-option.name {
     background: linear-gradient(135deg, var(--search-name-bg) 0%, var(--search-name-bg-light) 100%);
     border-color: var(--search-name-border);
@@ -2037,6 +2034,27 @@ body.pub-details-open {
     border-color: var(--search-name-border-hover);
 }
 
+/* Top Right: Pubs by Postcode - Green */
+.search-option.location {
+    background: linear-gradient(135deg, var(--search-location-bg) 0%, var(--search-location-bg-light) 100%);
+    border-color: var(--search-location-border);
+}
+
+.search-option.location:hover {
+    border-color: var(--search-location-border-hover);
+}
+
+/* Bottom Left: Pubs by Area - Purple */
+.search-option.area {
+    background: linear-gradient(135deg, var(--search-area-bg) 0%, var(--search-area-bg-light) 100%);
+    border-color: var(--search-area-border);
+}
+
+.search-option.area:hover {
+    border-color: var(--search-area-border-hover);
+}
+
+/* Bottom Right: Pubs by Beer - Orange */
 .search-option.beer {
     background: linear-gradient(135deg, var(--search-beer-bg) 0%, var(--search-beer-bg-light) 100%);
     border-color: var(--search-beer-border);
@@ -2055,18 +2073,9 @@ body.pub-details-open {
     border-color: var(--search-area-border-hover);
 }
 
-.search-option.area {
-    background: linear-gradient(135deg, var(--search-area-bg) 0%, var(--search-area-bg-light) 100%);
-    border-color: var(--search-area-border);
-}
-
-.search-option.area:hover {
-    border-color: var(--search-area-border-hover);
-}
-
 .search-icon {
     font-size: 1.8rem;
-    margin-bottom: var(--space-sm);
+    margin-bottom: var(--space-md); /* More space below icon */
     display: block;
     line-height: 1;
 }
@@ -2075,7 +2084,7 @@ body.pub-details-open {
     font-size: 0.95rem;
     font-weight: 700;
     color: var(--text-primary);
-    margin-bottom: var(--space-xs);
+    margin-bottom: var(--space-sm); /* More space below title */
     line-height: 1.2;
 }
 
@@ -2084,7 +2093,7 @@ body.pub-details-open {
     color: var(--text-secondary);
     line-height: 1.3;
     text-align: center;
-    padding: 0 var(--space-xs);
+    padding: 0 var(--space-sm); /* More horizontal padding */
 }
 
 .quick-actions {
