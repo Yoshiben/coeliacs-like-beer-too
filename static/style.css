@@ -3934,7 +3934,7 @@ body.pub-details-open {
 
 /* Make sure search section fits perfectly */
 .search-section {
-    margin: -20px 0 0 0; /* Keep same overlap with hero */
+    margin: -100px 0 0 0; /* Keep same overlap with hero */
     position: relative;
     z-index: var(--z-sticky);
     width: 100vw;
