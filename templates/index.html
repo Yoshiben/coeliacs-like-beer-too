@@ -82,6 +82,58 @@
         </div>
     </div>
 
+    <!-- Full-Screen Pub Details Overlay -->
+    <div id="pubDetailsOverlay" class="pub-details-overlay">
+        <div class="pub-details-container" id="pubContainer">
+            <div class="pub-details-card">
+                <div class="pub-header">
+                    <h1 class="pub-title" id="pubDetailsTitle">Pub Name</h1>
+                    <div class="pub-address" id="pubDetailsAddress">Address</div>
+                    <div class="pub-location" id="pubDetailsLocation">Location</div>
+                </div>
+    
+                <div class="beer-section">
+                    <div class="beer-section-title">
+                        🍺 Available Gluten Free Beers
+                    </div>
+                    <div class="beer-status" id="pubDetailsBeer">
+                        Loading beer information...
+                    </div>
+                </div>
+    
+                <div class="pub-action-grid">
+                    <button class="btn btn-primary" id="pubFindOnline">
+                        🔍 Find Online
+                    </button>
+                    <button class="btn btn-success" id="pubGetDirections">
+                        🧭 Get Directions
+                    </button>
+                    <button class="btn btn-secondary" id="pubToggleMap" onclick="togglePubMap()">
+                        🗺️ <span id="pubMapBtnText">Show on Map</span>
+                    </button>
+                    <button class="btn btn-success" onclick="openReportModal()">
+                        📝 Report GF Beer
+                    </button>
+                </div>
+    
+                <div class="pub-nav-buttons">
+                    <button class="btn btn-primary" onclick="closePubDetails()">
+                        🏠 Home<
+                    </button>
+                    <button class="btn btn-primary" onclick="closePubDetails()">
+                        ← Back to Results
+                    </button>
+                </div>
+            </div>
+    
+            <div class="pub-map-container" id="pubMapContainer">
+                <div class="pub-map-placeholder">
+                    🗺️ Interactive Map Loading...
+                </div>
+            </div>
+        </div>
+    </div>
+
 <!--     <div class="advanced-filters" id="advancedFilters" style="display: none;">
     <h4>🔍 Advanced Filters</h4>
     <div class="filter-grid">
@@ -1368,46 +1420,37 @@
             }
         }
 
+        // ==========================================
+        // AFTER: New searchSpecificPub Function
+        // ==========================================
         async function searchSpecificPub(pubId) {
             console.log('searchSpecificPub called with ID:', pubId);
             showLoadingToast('Loading pub details...');
-            const results = document.getElementById('results');
-            results.innerHTML = '<li class="loading">Loading pub details...</li>';
             
             try {
                 const url = `/search?pub_id=${pubId}`;
-                console.log('Fetching URL:', url);
                 const response = await fetch(url);
                 const pubs = await response.json();
                 
-                console.log('Response from server:', pubs);
                 hideLoadingToast();
                 
                 if (pubs.length > 0) {
-                    console.log('Calling displaySearchResults with:', pubs);
-                    displaySearchResults(pubs);
-                    addPubMarkersToMap(pubs);
-                    
                     const pub = pubs[0];
-                    trackPubView(pub.name);
                     
-                    if (pub.latitude && pub.longitude) {
-                        smartShowMap();
-                        map.setView([pub.latitude, pub.longitude], 15);
-                    }
-                                            
+                    // NEW WAY: Shows full-screen pub details page
+                    showPubDetails(pub);
+                    
                     currentQuery = '';
                     currentSearchType = 'all';
-                    // currentGfOnly = false;
                     currentPage = 1;
                     AppState.save(pubId);
                 } else {
-                    results.innerHTML = '<li class="no-results">Pub not found.</li>';
-                }  // ← This closing brace was missing!
+                    showSuccessToast('Pub not found.');
+                }
             } catch (error) {
                 console.error('Error searching for specific pub:', error);
                 hideLoadingToast();
-                results.innerHTML = '<li class="no-results">Error loading pub details.</li>';
+                showSuccessToast('Error loading pub details.');
             }
         }
 
@@ -1777,6 +1820,102 @@
                 console.log('✅ Google Analytics initialized with user consent');
             }
         }
+
+        // Full-screen pub details functionality
+        let pubMapVisible = false;
+        let currentPubData = null;
+        
+        function showPubDetails(pub) {
+            currentPubData = pub;
+            
+            // Update the pub details content
+            document.getElementById('pubDetailsTitle').textContent = pub.name;
+            document.getElementById('pubDetailsAddress').textContent = `${pub.address}, ${pub.postcode}`;
+            document.getElementById('pubDetailsLocation').textContent = pub.local_authority;
+            
+            // Update beer information
+            const beerElement = document.getElementById('pubDetailsBeer');
+            if (pub.bottle || pub.tap || pub.cask || pub.can) {
+                let gfOptions = [];
+                if (pub.bottle) gfOptions.push('🍺 Bottle');
+                if (pub.tap) gfOptions.push('🚰 Tap');
+                if (pub.cask) gfOptions.push('🛢️ Cask');
+                if (pub.can) gfOptions.push('🥫 Can');
+                beerElement.innerHTML = `<strong>✅ Confirmed GF Options:</strong><br>${gfOptions.join(', ')}<br><em>💡 Call ahead to confirm current selection</em>`;
+            } else {
+                beerElement.innerHTML = '❓ GF availability needs verification<br><em>Help the community by reporting what you find!</em>';
+            }
+            
+            // Set up action buttons
+            document.getElementById('pubFindOnline').onclick = () => {
+                const searchQuery = `${pub.name} ${pub.postcode} pub`;
+                const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
+                window.open(googleUrl, '_blank');
+                trackEvent('search_online', 'External Search', pub.name);
+            };
+            
+            document.getElementById('pubGetDirections').onclick = () => {
+                if (pub.latitude && pub.longitude) {
+                    openInGoogleMaps(pub.latitude, pub.longitude, pub.name, pub.address);
+                } else {
+                    showSuccessToast('📍 Location coordinates not available for directions');
+                }
+            };
+            
+            // Show the overlay
+            document.getElementById('pubDetailsOverlay').classList.add('active');
+            
+            // Track the view
+            trackPubView(pub.name);
+            trackEvent('pub_details_view', 'Navigation', pub.name);
+        }
+        
+        function closePubDetails() {
+            document.getElementById('pubDetailsOverlay').classList.remove('active');
+            pubMapVisible = false;
+            document.getElementById('pubContainer').classList.remove('split-view');
+            document.getElementById('pubMapBtnText').textContent = 'Show on Map';
+            
+            trackEvent('pub_details_close', 'Navigation');
+        }
+        
+        function togglePubMap() {
+            const container = document.getElementById('pubContainer');
+            const mapBtnText = document.getElementById('pubMapBtnText');
+            
+            pubMapVisible = !pubMapVisible;
+            
+            if (pubMapVisible) {
+                container.classList.add('split-view');
+                mapBtnText.textContent = 'Hide Map';
+                
+                // Initialize map if we have coordinates
+                if (currentPubData && currentPubData.latitude && currentPubData.longitude) {
+                    setTimeout(() => {
+                        initializePubMap(currentPubData);
+                    }, 300);
+                } else {
+                    setTimeout(() => {
+                        const placeholder = document.querySelector('.pub-map-placeholder');
+                        placeholder.innerHTML = '📍 Location coordinates not available<br><small style="opacity: 0.7;">Help us by reporting the exact location!</small>';
+                    }, 300);
+                }
+                
+                trackEvent('pub_map_toggle', 'Map Interaction', 'show');
+            } else {
+                container.classList.remove('split-view');
+                mapBtnText.textContent = 'Show on Map';
+                trackEvent('pub_map_toggle', 'Map Interaction', 'hide');
+            }
+        }
+        
+        function initializePubMap(pub) {
+            // This would integrate with your existing Leaflet map
+            const placeholder = document.querySelector('.pub-map-placeholder');
+            placeholder.innerHTML = `🗺️ ${pub.name}<br><small style="opacity: 0.7;">Lat: ${pub.latitude}, Lng: ${pub.longitude}</small>`;
+            
+            // TODO: Integrate with actual Leaflet map
+            console.log('Would initialize map for:', pub);
 
         function checkCookieConsent() {
             const consent = localStorage.getItem('cookieConsent');
