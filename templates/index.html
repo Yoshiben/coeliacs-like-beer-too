@@ -364,7 +364,7 @@
                 <form id="reportForm" class="modal-form">
                     <div class="form-group">
                         <label class="form-label">Find Your Pub *</label>
-                        <input type="text" id="reportPubSearch" class="form-input" required placeholder="Start typing pub name..." autocomplete="off">
+                        <input type="text" id="reportPubSearch" class="form-input" required placeholder="Start typing pub name...">
                         <div id="pubSuggestions" class="suggestions"></div>
                         <small>Search for an existing pub first - we'll check our database!</small>
                     </div>
@@ -1412,129 +1412,129 @@
             }
         }
 
-        // 1. CREATE RESULT ITEM - Makes beautiful result cards with GF badges
-        function createResultItem(pub) {
-            const li = document.createElement('li');
-            li.className = 'result-item';
-            li.onclick = () => openPubDetails(pub.pub_id);
+        // // 1. CREATE RESULT ITEM - Makes beautiful result cards with GF badges
+        // function createResultItem(pub) {
+        //     const li = document.createElement('li');
+        //     li.className = 'result-item';
+        //     li.onclick = () => openPubDetails(pub.pub_id);
             
-            // Generate GF badges using your new CSS
-            const badges = [];
-            if (pub.bottle) badges.push('<span class="gf-badge bottle">🍺 Bottle</span>');
-            if (pub.tap) badges.push('<span class="gf-badge tap">🚰 Tap</span>');
-            if (pub.cask) badges.push('<span class="gf-badge cask">🛢️ Cask</span>');
-            if (pub.can) badges.push('<span class="gf-badge can">🥫 Can</span>');
+        //     // Generate GF badges using your new CSS
+        //     const badges = [];
+        //     if (pub.bottle) badges.push('<span class="gf-badge bottle">🍺 Bottle</span>');
+        //     if (pub.tap) badges.push('<span class="gf-badge tap">🚰 Tap</span>');
+        //     if (pub.cask) badges.push('<span class="gf-badge cask">🛢️ Cask</span>');
+        //     if (pub.can) badges.push('<span class="gf-badge can">🥫 Can</span>');
             
-            // Calculate distance if user location available
-            let distanceHtml = '';
-            if (pub.latitude && pub.longitude && window.userLocation) {
-                const distance = calculateDistance(
-                    window.userLocation.lat, window.userLocation.lng,
-                    parseFloat(pub.latitude), parseFloat(pub.longitude)
-                );
-                distanceHtml = `<div class="result-distance">${distance.toFixed(1)}km</div>`;
-            }
+        //     // Calculate distance if user location available
+        //     let distanceHtml = '';
+        //     if (pub.latitude && pub.longitude && window.userLocation) {
+        //         const distance = calculateDistance(
+        //             window.userLocation.lat, window.userLocation.lng,
+        //             parseFloat(pub.latitude), parseFloat(pub.longitude)
+        //         );
+        //         distanceHtml = `<div class="result-distance">${distance.toFixed(1)}km</div>`;
+        //     }
             
-            li.innerHTML = `
-                <div class="result-header">
-                    <div class="result-details">
-                        <h3>${pub.name}</h3>
-                        <div class="result-address">${pub.address}, ${pub.postcode}</div>
-                        <div class="result-authority">${pub.local_authority}</div>
-                    </div>
-                    ${distanceHtml}
-                </div>
+        //     li.innerHTML = `
+        //         <div class="result-header">
+        //             <div class="result-details">
+        //                 <h3>${pub.name}</h3>
+        //                 <div class="result-address">${pub.address}, ${pub.postcode}</div>
+        //                 <div class="result-authority">${pub.local_authority}</div>
+        //             </div>
+        //             ${distanceHtml}
+        //         </div>
                 
-                <div class="gf-badges">
-                    ${badges.join('')}
-                </div>
+        //         <div class="gf-badges">
+        //             ${badges.join('')}
+        //         </div>
                 
-                <div class="result-actions">
-                    <button class="result-btn result-btn-primary" onclick="event.stopPropagation(); openPubDetails(${pub.pub_id})">
-                        <span>📍</span> View Details
-                    </button>
-                    <button class="result-btn result-btn-secondary" onclick="event.stopPropagation(); getDirections('${pub.name}', '${pub.address}')">
-                        <span>🧭</span> Directions
-                    </button>
-                </div>
-            `;
+        //         <div class="result-actions">
+        //             <button class="result-btn result-btn-primary" onclick="event.stopPropagation(); openPubDetails(${pub.pub_id})">
+        //                 <span>📍</span> View Details
+        //             </button>
+        //             <button class="result-btn result-btn-secondary" onclick="event.stopPropagation(); getDirections('${pub.name}', '${pub.address}')">
+        //                 <span>🧭</span> Directions
+        //             </button>
+        //         </div>
+        //     `;
             
-            return li;
-        }
+        //     return li;
+        // }
         
-        // 2. OPEN PUB DETAILS - Opens the split screen view
-        function openPubDetails(pubId) {
-            console.log('Opening pub details for:', pubId);
-            // For now, just log - you can implement the full overlay later
-            showSuccessToast(`Opening details for pub ${pubId}`);
+        // // 2. OPEN PUB DETAILS - Opens the split screen view
+        // function openPubDetails(pubId) {
+        //     console.log('Opening pub details for:', pubId);
+        //     // For now, just log - you can implement the full overlay later
+        //     showSuccessToast(`Opening details for pub ${pubId}`);
             
-            // TODO: Implement the full split-screen overlay from earlier artifacts
-            // loadPubDetails(pubId);
-        }
+        //     // TODO: Implement the full split-screen overlay from earlier artifacts
+        //     // loadPubDetails(pubId);
+        // }
         
-        // 3. GET DIRECTIONS - Opens maps
-        function getDirections(pubName, address) {
-            const encodedAddress = encodeURIComponent(`${pubName}, ${address}`);
-            const mapsUrl = `https://maps.google.com/maps?q=${encodedAddress}`;
-            window.open(mapsUrl, '_blank');
-            trackEvent('get_directions', 'Navigation', pubName);
-        }
+        // // 3. GET DIRECTIONS - Opens maps
+        // function getDirections(pubName, address) {
+        //     const encodedAddress = encodeURIComponent(`${pubName}, ${address}`);
+        //     const mapsUrl = `https://maps.google.com/maps?q=${encodedAddress}`;
+        //     window.open(mapsUrl, '_blank');
+        //     trackEvent('get_directions', 'Navigation', pubName);
+        // }
         
-        // 4. SHOW/HIDE LOADING - Simple versions (you might have better ones)
-        function showLoading() {
-            console.log('Loading...');
-            // Use your existing toast system
-            showLoadingToast('Loading...');
-        }
+        // // 4. SHOW/HIDE LOADING - Simple versions (you might have better ones)
+        // function showLoading() {
+        //     console.log('Loading...');
+        //     // Use your existing toast system
+        //     showLoadingToast('Loading...');
+        // }
         
-        function hideLoading() {
-            console.log('Hiding loading...');
-            hideLoadingToast();
-        }
+        // function hideLoading() {
+        //     console.log('Hiding loading...');
+        //     hideLoadingToast();
+        // }
 
-        // Add pub markers to map
-        function addPubMarkersToMap(pubs) {
-            // Clear existing markers
-            pubMarkers.forEach(marker => map.removeLayer(marker));
-            pubMarkers = [];
+        // // Add pub markers to map
+        // function addPubMarkersToMap(pubs) {
+        //     // Clear existing markers
+        //     pubMarkers.forEach(marker => map.removeLayer(marker));
+        //     pubMarkers = [];
         
-            pubs.forEach(pub => {
-                if (pub.latitude && pub.longitude) {
-                    const hasGF = pub.bottle || pub.tap || pub.cask || pub.can;
-                    const markerColor = hasGF ? '#4CAF50' : '#757575';
+        //     pubs.forEach(pub => {
+        //         if (pub.latitude && pub.longitude) {
+        //             const hasGF = pub.bottle || pub.tap || pub.cask || pub.can;
+        //             const markerColor = hasGF ? '#4CAF50' : '#757575';
                     
-                    const marker = L.circleMarker([pub.latitude, pub.longitude], {
-                        radius: 8,
-                        fillColor: markerColor,
-                        color: '#fff',
-                        weight: 2,
-                        opacity: 1,
-                        fillOpacity: 0.8
-                    }).addTo(map);
+        //             const marker = L.circleMarker([pub.latitude, pub.longitude], {
+        //                 radius: 8,
+        //                 fillColor: markerColor,
+        //                 color: '#fff',
+        //                 weight: 2,
+        //                 opacity: 1,
+        //                 fillOpacity: 0.8
+        //             }).addTo(map);
         
-                    let popupContent = `<strong>${pub.name}</strong><br>`;
-                    popupContent += `${pub.address}<br>`;
-                    if (pub.distance !== undefined) {
-                        popupContent += `<em>${pub.distance.toFixed(2)} km away</em><br>`;
-                    }
+        //             let popupContent = `<strong>${pub.name}</strong><br>`;
+        //             popupContent += `${pub.address}<br>`;
+        //             if (pub.distance !== undefined) {
+        //                 popupContent += `<em>${pub.distance.toFixed(2)} km away</em><br>`;
+        //             }
                     
-                    if (hasGF) {
-                        let gfOptions = [];
-                        if (pub.bottle) gfOptions.push('Bottle');
-                        if (pub.tap) gfOptions.push('Tap');
-                        if (pub.cask) gfOptions.push('Cask');
-                        if (pub.can) gfOptions.push('Can');
-                        popupContent += `<br><strong>GF Options:</strong> ${gfOptions.join(', ')}<br>`;
-                        popupContent += `<button onclick="showPubDetailsFromMap(${pub.pub_id})" style="margin-top: 8px; padding: 6px 12px; background: var(--primary-gradient); color: white; border: none; border-radius: 15px; cursor: pointer; font-size: 12px;">View Details</button>`;
-                    } else {
-                        popupContent += '<br><em>No GF options recorded</em>';
-                    }
+        //             if (hasGF) {
+        //                 let gfOptions = [];
+        //                 if (pub.bottle) gfOptions.push('Bottle');
+        //                 if (pub.tap) gfOptions.push('Tap');
+        //                 if (pub.cask) gfOptions.push('Cask');
+        //                 if (pub.can) gfOptions.push('Can');
+        //                 popupContent += `<br><strong>GF Options:</strong> ${gfOptions.join(', ')}<br>`;
+        //                 popupContent += `<button onclick="showPubDetailsFromMap(${pub.pub_id})" style="margin-top: 8px; padding: 6px 12px; background: var(--primary-gradient); color: white; border: none; border-radius: 15px; cursor: pointer; font-size: 12px;">View Details</button>`;
+        //             } else {
+        //                 popupContent += '<br><em>No GF options recorded</em>';
+        //             }
         
-                    marker.bindPopup(popupContent);
-                    pubMarkers.push(marker);
-                }
-            });
-        }
+        //             marker.bindPopup(popupContent);
+        //             pubMarkers.push(marker);
+        //         }
+        //     });
+        // }
         
         // NEW: Function to show pub details from map popup
         function showPubDetailsFromMap(pubId) {
@@ -1544,49 +1544,49 @@
         }
 
         // Display search results with pagination
-        function displaySearchResults(data, append = false) {
-            console.log('displaySearchResults called with pagination support!');
-            const results = document.getElementById('results');
+        // function displaySearchResults(data, append = false) {
+        //     console.log('displaySearchResults called with pagination support!');
+        //     const results = document.getElementById('results');
             
-            const pubs = Array.isArray(data) ? data : data.pubs;
-            const pagination = data.pagination || null;
+        //     const pubs = Array.isArray(data) ? data : data.pubs;
+        //     const pagination = data.pagination || null;
             
-            if (!append) {
-                results.innerHTML = '';
+        //     if (!append) {
+        //         results.innerHTML = '';
                 
-                // Add GF filter suggestion if there are mixed results
-                if (pubs.length > 0) {
-                    const gfCount = pubs.filter(pub => pub.bottle || pub.tap || pub.cask || pub.can).length;
-                    const totalCount = pubs.length;
+        //         // Add GF filter suggestion if there are mixed results
+        //         if (pubs.length > 0) {
+        //             const gfCount = pubs.filter(pub => pub.bottle || pub.tap || pub.cask || pub.can).length;
+        //             const totalCount = pubs.length;
                     
-                    // Only show filter if there are both GF and non-GF pubs
-                    if (gfCount > 0 && gfCount < totalCount) {
-                        const filterDiv = document.createElement('div');
-                        filterDiv.className = 'filter-suggestion';
-                        filterDiv.innerHTML = `
-                            <button class="btn btn-secondary" onclick="showOnlyGF()">
-                                🍺 Show only pubs with GF beer (${gfCount} of ${totalCount} pubs)
-                            </button>
-                        `;
-                        results.appendChild(filterDiv);
-                    }
-                }
-            }
+        //             // Only show filter if there are both GF and non-GF pubs
+        //             if (gfCount > 0 && gfCount < totalCount) {
+        //                 const filterDiv = document.createElement('div');
+        //                 filterDiv.className = 'filter-suggestion';
+        //                 filterDiv.innerHTML = `
+        //                     <button class="btn btn-secondary" onclick="showOnlyGF()">
+        //                         🍺 Show only pubs with GF beer (${gfCount} of ${totalCount} pubs)
+        //                     </button>
+        //                 `;
+        //                 results.appendChild(filterDiv);
+        //             }
+        //         }
+        //     }
             
-            if (pubs.length === 0 && !append) {
-                results.innerHTML = '<li class="no-results">No pubs found.</li>';
-                return;
-            }
+        //     if (pubs.length === 0 && !append) {
+        //         results.innerHTML = '<li class="no-results">No pubs found.</li>';
+        //         return;
+        //     }
             
-            pubs.forEach(pub => {
-                const resultItem = createResultItem(pub);
-                results.appendChild(resultItem);
-            });
+        //     pubs.forEach(pub => {
+        //         const resultItem = createResultItem(pub);
+        //         results.appendChild(resultItem);
+        //     });
             
-            if (pagination && !append) {
-                addPaginationControls(pagination);
-            }
-        }
+        //     if (pagination && !append) {
+        //         addPaginationControls(pagination);
+        //     }
+        // }
         
         // Add this new function too
         function showOnlyGF() {
