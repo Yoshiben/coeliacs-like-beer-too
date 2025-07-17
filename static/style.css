@@ -4622,7 +4622,7 @@ body {
 }
 
 /* ================================
-   SINGLE PAGE HOME - HIDE EVERYTHING BELOW SEARCH
+   SINGLE PAGE HOME - LOCK SCROLL COMPLETELY
    ================================ */
 
 /* Hide all sections below the search on the home page */
@@ -4633,7 +4633,26 @@ body {
     display: none;
 }
 
-/* Make sure search section takes full remaining height */
+/* Lock scroll completely - no overscroll bouncing */
+html {
+    overflow: hidden;
+    height: 100vh;
+    height: 100dvh; /* Dynamic viewport height for mobile */
+}
+
+body {
+    overflow: hidden;
+    height: 100vh;
+    height: 100dvh;
+    position: fixed;
+    width: 100%;
+    padding-bottom: var(--space-4xl);
+    /* Prevent any scrolling or bouncing */
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: auto;
+}
+
+/* Make sure search section fits perfectly */
 .search-section {
     margin: -60px 0 0 0; /* Overlap hero */
     position: relative;
@@ -4644,13 +4663,9 @@ body {
     margin-left: -50vw;
     margin-right: -50vw;
     padding: 0 var(--space-lg);
-    min-height: calc(100vh - 280px); /* Take remaining screen space */
+    height: calc(100vh - 280px); /* Exact height, no min-height */
+    height: calc(100dvh - 280px); /* Dynamic viewport */
     display: flex;
     align-items: center;
-}
-
-/* Ensure body has bottom padding for nav bar */
-body {
-    padding-bottom: var(--space-4xl);
-    min-height: 100vh;
+    overflow: hidden;
 }
