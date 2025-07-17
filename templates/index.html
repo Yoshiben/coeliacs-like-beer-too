@@ -86,6 +86,16 @@
     <div id="pubDetailsOverlay" class="pub-details-overlay">
         <div class="pub-details-container" id="pubContainer">
             <div class="pub-details-card">
+                <!-- NEW: Top navigation - ADD THIS -->
+                <div class="pub-nav-top">
+                    <button class="btn-nav-small" onclick="closePubDetails()">
+                        🏠 Home
+                    </button>
+                    <button class="btn-nav-small" onclick="closePubDetails()">
+                        ← Back
+                    </button>
+                </div>
+    
                 <div class="pub-header">
                     <h1 class="pub-title" id="pubDetailsTitle">Pub Name</h1>
                     <div class="pub-address" id="pubDetailsAddress">Address</div>
@@ -115,24 +125,12 @@
                         📝 Report GF Beer
                     </button>
                 </div>
-                
-                <div class="pub-nav-buttons">
-                    <button class="btn btn-nav" onclick="closePubDetails()">
-                        🏠 Home
-                    </button>
-                    <button class="btn btn-nav" onclick="closePubDetails()">
-                        ← Back to Results
-                    </button>
-                </div>
     
-                <div class="pub-nav-buttons">
-                    <button class="btn btn-primary" onclick="closePubDetails()">
-                        🏠 Home<
-                    </button>
-                    <button class="btn btn-primary" onclick="closePubDetails()">
-                        ← Back to Results
-                    </button>
-                </div>
+                <!-- REMOVE: Delete both of these duplicate nav sections -->
+                <!-- 
+                <div class="pub-nav-buttons">...</div>
+                <div class="pub-nav-buttons">...</div>
+                -->
             </div>
     
             <div class="pub-map-container" id="pubMapContainer">
