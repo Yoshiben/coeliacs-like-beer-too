@@ -1535,6 +1535,125 @@ def mobile_beer_report():
             cursor.close()
             conn.close()
 
+# Add this route to your Flask app.py file
+
+@app.route('/search_beer')
+def search_beer():
+    """Search for pubs that serve specific beers"""
+    query = request.args.get('query', '').strip()
+    gf_only = request.args.get('gf_only', 'false').lower() == 'true'
+    page = request.args.get('page', 1, type=int)
+    
+    # Input validation
+    if not query or len(query) < 2:
+        return jsonify({'error': 'Beer search query required (minimum 2 characters)'}), 400
+    
+    if page < 1 or page > 1000:
+        return jsonify({'error': 'Invalid page number'}), 400
+
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        # Search for beers first, then find pubs serving them
+        beer_search_sql = """
+            SELECT DISTINCT
+                p.pub_id, p.name, p.address, p.postcode, p.local_authority, 
+                p.bottle, p.tap, p.cask, p.can, p.latitude, p.longitude,
+                GROUP_CONCAT(
+                    DISTINCT CONCAT(pu.beer_format, ' - ', 
+                    COALESCE(b.brewery, 'Unknown'), ' ', 
+                    COALESCE(b.name, 'Unknown'), ' (', 
+                    COALESCE(b.style, 'Unknown'), ')')
+                    SEPARATOR ', '
+                ) as beer_details,
+                COUNT(DISTINCT pu.beer_id) as matching_beers
+            FROM pubs p
+            INNER JOIN pubs_updates pu ON p.pub_id = pu.pub_id
+            INNER JOIN beers b ON pu.beer_id = b.beer_id
+            WHERE (
+                b.name LIKE %s OR 
+                b.brewery LIKE %s OR 
+                b.style LIKE %s OR
+                CONCAT(b.brewery, ' ', b.name) LIKE %s
+            )
+        """
+        
+        params = [f'%{query}%', f'%{query}%', f'%{query}%', f'%{query}%']
+        
+        if gf_only:
+            beer_search_sql += " AND (p.bottle = 1 OR p.tap = 1 OR p.cask = 1 OR p.can = 1)"
+        
+        # Count total results for pagination
+        count_sql = f"""
+            SELECT COUNT(DISTINCT p.pub_id) as total
+            FROM pubs p
+            INNER JOIN pubs_updates pu ON p.pub_id = pu.pub_id
+            INNER JOIN beers b ON pu.beer_id = b.beer_id
+            WHERE (
+                b.name LIKE %s OR 
+                b.brewery LIKE %s OR 
+                b.style LIKE %s OR
+                CONCAT(b.brewery, ' ', b.name) LIKE %s
+            )
+        """
+        
+        if gf_only:
+            count_sql += " AND (p.bottle = 1 OR p.tap = 1 OR p.cask = 1 OR p.can = 1)"
+        
+        cursor.execute(count_sql, params)
+        total_results = cursor.fetchone()['total']
+        
+        # Calculate pagination
+        per_page = 20
+        total_pages = (total_results + per_page - 1) // per_page
+        offset = (page - 1) * per_page
+        
+        # Complete search query with grouping and pagination
+        beer_search_sql += """
+            GROUP BY p.pub_id, p.name, p.address, p.postcode, p.local_authority, 
+                     p.bottle, p.tap, p.cask, p.can, p.latitude, p.longitude
+            ORDER BY matching_beers DESC, p.name
+            LIMIT %s OFFSET %s
+        """
+        
+        params.extend([per_page, offset])
+        cursor.execute(beer_search_sql, params)
+        pubs = cursor.fetchall()
+        
+        logger.info(f"Beer search '{query}' found {len(pubs)} pubs on page {page} of {total_pages}")
+        
+        # Return paginated results
+        return jsonify({
+            'pubs': pubs,
+            'pagination': {
+                'page': page,
+                'pages': total_pages,
+                'total': total_results,
+                'has_prev': page > 1,
+                'has_next': page < total_pages
+            },
+            'search_type': 'beer',
+            'query': query
+        })
+        
+    except mysql.connector.Error as e:
+        logger.error(f"Database error in beer search: {str(e)}")
+        return jsonify({'error': 'Database error occurred'}), 500
+    except Exception as e:
+        logger.error(f"Unexpected error in beer search: {str(e)}")
+        return jsonify({'error': 'An error occurred'}), 500
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+@app.route('/pub/<int:pub_id>')
+def single_pub_view(pub_id):
+    """Single pub view page"""
+    version = str(int(time.time()))
+    return render_template('pub_details.html', pub_id=pub_id, cache_buster=version)
+
 # Mobile analytics tracking
 @app.route('/api/mobile_analytics', methods=['POST'])
 def track_mobile_analytics():
