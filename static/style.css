@@ -1941,7 +1941,7 @@ body.pub-details-open {
    ================================ */
 
 .search-section {
-    margin: -20px 0 0 0; /* Remove bottom margin */
+    margin: -20px 0 0 0; /* Remove bottom margin for full screen */
     position: relative;
     z-index: var(--z-sticky);
     width: 100vw;
@@ -1950,9 +1950,9 @@ body.pub-details-open {
     margin-left: -50vw;
     margin-right: -50vw;
     padding: 0 var(--space-lg);
-    min-height: calc(100vh - 400px); /* Take up remaining screen height */
+    min-height: calc(100vh - 350px); /* Take up remaining screen space */
     display: flex;
-    align-items: center; /* Center the card vertically */
+    align-items: center;
 }
 
 @media (min-width: 768px) {
@@ -2003,7 +2003,7 @@ body.pub-details-open {
     background: var(--text-white);
     border: 3px solid var(--border-light);
     border-radius: var(--radius-lg);
-    padding: var(--space-lg) var(--space-xl); /* More horizontal padding */
+    padding: var(--space-lg) var(--space-xl);
     cursor: pointer;
     transition: all var(--transition);
     text-align: center;
@@ -2136,6 +2136,10 @@ body.pub-details-open {
 
 /* MOBILE RESPONSIVE - KEEP 2x2 GRID */
 @media (max-width: 768px) {
+    .search-section {
+        min-height: calc(100vh - 300px);
+    }
+    
     .search-options {
         gap: var(--space-md);
     }
@@ -2160,6 +2164,10 @@ body.pub-details-open {
 }
 
 @media (max-width: 480px) {
+    .search-section {
+        min-height: calc(100vh - 250px);
+    }
+    
     .search-options {
         gap: var(--space-sm);
     }
