@@ -863,63 +863,6 @@
             activitySection.style.marginTop = '0';
         }
 
-        // ADD: Homepage reset function
-        function resetToHomepage() {
-            // Clear search inputs
-            document.getElementById('searchInput').value = '';
-            document.getElementById('searchType').value = 'all';
-            // document.getElementById('gfOnly').checked = false;
-            
-            // Hide results section
-            hideResultsSection();
-            
-            // Hide map if visible
-            if (mapVisible) {
-                toggleMap();
-            }
-            
-            // Clear any markers
-            pubMarkers.forEach(marker => map.removeLayer(marker));
-            pubMarkers = [];
-            
-            if (window.currentHighlightMarker) {
-                map.removeLayer(window.currentHighlightMarker);
-                window.currentHighlightMarker = null;
-            }
-
-            if (window.postcodeMarker) {
-                map.removeLayer(window.postcodeMarker);
-                window.postcodeMarker = null;
-            }
-            
-            // Clear URL hash/state
-            window.location.hash = '';
-            
-            // Reset global variables
-            currentQuery = '';
-            currentSearchType = 'all';
-            // currentGfOnly = false;
-            currentPage = 1;
-            mapVisible = false;
-            
-            // Scroll to top smoothly
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            
-            // Show clean homepage sections
-            const featuresSection = document.getElementById('featuresSection');
-            const activitySection = document.getElementById('activitySection');
-            if (featuresSection) featuresSection.style.display = 'block';
-            if (activitySection) featuresSection.style.display = 'block';
-            
-            // Update button text
-            const toggleBtn = document.getElementById('toggleMapBtn');
-            if (toggleBtn) toggleBtn.innerHTML = '🗺️ Show Map';
-            
-            // Success feedback
-            showSuccessToast('🏠 Reset to homepage - ready for a fresh search!');
-            trackEvent('reset_homepage', 'Navigation', 'homepage_reset');
-        }
-
         // ================================
         // CORE FUNCTIONALITY
         // ================================
@@ -2077,8 +2020,61 @@
 
             // Save state on form changes
             document.getElementById('searchType').addEventListener('change', () => AppState.save());
-            // document.getElementById('gfOnly').addEventListener('change', () => AppState.save());
         });
+
+        // ADD: Homepage reset function
+        function resetToHomepage() {
+            // Clear search inputs
+            document.getElementById('searchInput').value = '';
+            document.getElementById('searchType').value = 'all';
+            
+            // Hide results section
+            hideResultsSection();
+            
+            // Hide map if visible
+            if (mapVisible) {
+                toggleMap();
+            }
+            
+            // Clear any markers
+            pubMarkers.forEach(marker => map.removeLayer(marker));
+            pubMarkers = [];
+            
+            if (window.currentHighlightMarker) {
+                map.removeLayer(window.currentHighlightMarker);
+                window.currentHighlightMarker = null;
+            }
+            if (window.postcodeMarker) {
+                map.removeLayer(window.postcodeMarker);
+                window.postcodeMarker = null;
+            }
+            
+            // Clear URL hash/state
+            window.location.hash = '';
+            
+            // Reset global variables
+            currentQuery = '';
+            currentSearchType = 'all';
+            currentPage = 1;
+            mapVisible = false;
+            
+            // Scroll to top smoothly
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // Show clean homepage sections
+            const featuresSection = document.getElementById('featuresSection');
+            const activitySection = document.getElementById('activitySection');
+            if (featuresSection) featuresSection.style.display = 'block';
+            if (activitySection) activitySection.style.display = 'block';
+            
+            // Update button text
+            const toggleBtn = document.getElementById('toggleMapBtn');
+            if (toggleBtn) toggleBtn.innerHTML = '🗺️ Show Map';
+            
+            // Success feedback
+            showSuccessToast('🏠 Reset to homepage - ready for a fresh search!');
+            trackEvent('reset_homepage', 'Navigation', 'homepage_reset');
+        }
 
         console.log('🍺 Coeliacs Like Beer Too - JavaScript loaded successfully!');
     </script>
