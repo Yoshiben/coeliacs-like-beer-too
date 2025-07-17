@@ -1589,25 +1589,30 @@ p {
     flex-direction: column;
 }
 
+/* Update the existing .pub-details-container CSS with these changes: */
 .pub-details-container {
     flex: 1;
     display: flex;
     flex-direction: column;
     height: 100vh;
-    padding: var(--space-lg);
+    padding: var(--space-sm); /* Reduced padding */
     transition: all 0.3s ease;
+    max-height: 100vh; /* Ensure it doesn't exceed viewport */
+    overflow: hidden; /* Prevent overflow */
 }
 
+/* Update the existing .pub-details-card CSS: */
 .pub-details-card {
     background: var(--bg-white);
     border-radius: var(--radius-xl);
     backdrop-filter: blur(10px);
     box-shadow: var(--shadow-lg);
-    padding: var(--space-3xl);
+    padding: var(--space-xl); /* Reduced padding */
     flex: 1;
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    min-height: 0; /* Allow flex shrinking */
 }
 
 /* Split view when map is shown */
@@ -1617,9 +1622,10 @@ p {
     border-radius: var(--radius-xl) var(--radius-xl) 0 0;
 }
 
+/* Better spacing for mobile */
 .pub-header {
     text-align: center;
-    margin-bottom: var(--space-3xl);
+    margin-bottom: var(--space-xl); /* Reduced margin */
 }
 
 .pub-title {
@@ -1644,13 +1650,14 @@ p {
 .beer-section {
     background: rgba(102, 126, 234, 0.1);
     border-radius: var(--radius-lg);
-    padding: var(--space-xl);
-    margin: var(--space-xl) 0;
+    padding: var(--space-lg); /* Reduced padding */
+    margin: var(--space-lg) 0; /* Reduced margin */
     border-left: 4px solid #667eea;
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    min-height: 0; /* Allow flex shrinking */
 }
 
 .beer-section-title {
@@ -1672,15 +1679,15 @@ p {
 .pub-action-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--space-lg);
+    gap: var(--space-md); /* Reduced gap */
     margin-top: auto;
 }
 
 .pub-nav-buttons {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--space-lg);
-    margin-top: var(--space-xl);
+    gap: var(--space-md); /* Reduced gap */
+    margin-top: var(--space-lg); /* Reduced margin */
 }
 
 .pub-map-container {
@@ -1715,20 +1722,28 @@ p {
 }
 
 /* Mobile optimizations for pub details */
+/* Better mobile button sizing */
 @media (max-width: 480px) {
     .pub-details-container {
-        padding: var(--space-sm);
+        padding: var(--space-xs); /* Even smaller padding on mobile */
     }
 
     .pub-details-card {
-        padding: var(--space-xl);
+        padding: var(--space-lg); /* Smaller padding on mobile */
     }
 
     .pub-title {
-        font-size: 1.3rem;
+        font-size: 1.2rem; /* Slightly smaller title */
+        margin-bottom: var(--space-sm);
     }
 
-    .pub-action-grid {
-        gap: var(--space-md);
+    .beer-section {
+        padding: var(--space-md);
+        margin: var(--space-md) 0;
+    }
+
+    .pub-action-grid,
+    .pub-nav-buttons {
+        gap: var(--space-sm);
     }
 }
