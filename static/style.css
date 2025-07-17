@@ -1566,3 +1566,169 @@ p {
         border: 1px solid #ccc;
     }
 }
+
+/* ================================
+   FULL-SCREEN PUB DETAILS PAGE
+   ADD THIS TO THE BOTTOM OF YOUR style.css FILE
+   ================================ */
+
+.pub-details-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: var(--primary-gradient);
+    z-index: var(--z-modal-backdrop);
+    display: none;
+    overflow: hidden;
+}
+
+.pub-details-overlay.active {
+    display: flex;
+    flex-direction: column;
+}
+
+.pub-details-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: var(--space-lg);
+    transition: all 0.3s ease;
+}
+
+.pub-details-card {
+    background: var(--bg-white);
+    border-radius: var(--radius-xl);
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-lg);
+    padding: var(--space-3xl);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Split view when map is shown */
+.split-view .pub-details-card {
+    flex: 0 0 50%;
+    margin-bottom: var(--space-lg);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+}
+
+.pub-header {
+    text-align: center;
+    margin-bottom: var(--space-3xl);
+}
+
+.pub-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-sm);
+    line-height: 1.2;
+}
+
+.pub-address {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: var(--space-xs);
+}
+
+.pub-location {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.beer-section {
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    margin: var(--space-xl) 0;
+    border-left: 4px solid #667eea;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.beer-section-title {
+    display: flex;
+    align-items: center;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--space-lg);
+}
+
+.beer-status {
+    color: var(--text-muted);
+    font-style: italic;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.pub-action-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-lg);
+    margin-top: auto;
+}
+
+.pub-nav-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-lg);
+    margin-top: var(--space-xl);
+}
+
+.pub-map-container {
+    background: var(--bg-white);
+    border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+    overflow: hidden;
+    flex: 1;
+    display: none;
+    position: relative;
+}
+
+.split-view .pub-map-container {
+    display: block;
+}
+
+.pub-map-placeholder {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, #e2e8f0 25%, transparent 25%), 
+                linear-gradient(-45deg, #e2e8f0 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, #e2e8f0 75%), 
+                linear-gradient(-45deg, transparent 75%, #e2e8f0 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* Mobile optimizations for pub details */
+@media (max-width: 480px) {
+    .pub-details-container {
+        padding: var(--space-sm);
+    }
+
+    .pub-details-card {
+        padding: var(--space-xl);
+    }
+
+    .pub-title {
+        font-size: 1.3rem;
+    }
+
+    .pub-action-grid {
+        gap: var(--space-md);
+    }
+}
