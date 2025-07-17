@@ -350,6 +350,7 @@ def update_beers():
     
     return jsonify({'message': 'Beer updates saved successfully'})
 
+# Creates BAN stats in hero
 # Updated /api/stats route with DISTINCT counts for both GF stats
 
 @app.route('/api/stats')
