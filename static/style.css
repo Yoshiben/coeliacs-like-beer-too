@@ -394,19 +394,19 @@ p {
 }
 
 .section-title {
-    font-size: var(--text-xl);
+    font-size: var(--text-lg);
     font-weight: 600;
     color: var(--text-primary);
     margin: 0;
 }
 
 .search-body {
-    padding: var(--space-xl);
+    padding: var(--space-lg);
 }
 
 .search-grid {
     display: grid;
-    gap: var(--space-xl);
+    gap: var(--space-lg);
 }
 
 .search-row {
