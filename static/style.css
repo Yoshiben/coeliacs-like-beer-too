@@ -315,7 +315,7 @@ p {
 .hero-title {
     font-size: clamp(1.75rem, 6vw, 2.75rem);
     font-weight: 700;
-    margin-bottom: var(--space-sm);
+    margin-bottom: var(--space-xs);
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
     letter-spacing: 0.5px;
     line-height: 1.1;
@@ -326,8 +326,8 @@ p {
 .hero-subtitle {
     font-size: clamp(0.9rem, 2.5vw, 1.1rem);
 /*     white-space: nowrap; /* Forces single line */
-    margin-top: var(--space-sm); /* Add this - pulls it closer to title */
-    margin-bottom: var(--space-2xl);
+    margin-top: var(--space-xs); /* Add this - pulls it closer to title */
+    margin-bottom: var(--space-md);
     opacity: 0.9;
     font-weight: 300;
 }
