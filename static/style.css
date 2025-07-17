@@ -1986,3 +1986,249 @@ body.pub-details-open {
         right: var(--space-sm);
     }
 }
+
+/* ================================
+   NEW SEARCH INTERFACE STYLES
+   ADD TO THE BOTTOM OF YOUR style.css FILE
+   ================================ */
+
+.search-options {
+    display: grid;
+    gap: var(--space-lg);
+    grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+    .search-options {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.search-option {
+    background: var(--text-white);
+    border: 3px solid rgba(102, 126, 234, 0.1);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.search-option:hover {
+    border-color: rgba(102, 126, 234, 0.3);
+    transform: translateY(-3px);
+    box-shadow: var(--shadow);
+}
+
+.search-option.location {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.05) 100%);
+    border-color: rgba(16, 185, 129, 0.2);
+}
+
+.search-option.location:hover {
+    border-color: rgba(16, 185, 129, 0.4);
+}
+
+.search-option.name {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(29, 78, 216, 0.05) 100%);
+    border-color: rgba(59, 130, 246, 0.2);
+}
+
+.search-option.name:hover {
+    border-color: rgba(59, 130, 246, 0.4);
+}
+
+.search-option.beer {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.05) 100%);
+    border-color: rgba(245, 158, 11, 0.2);
+}
+
+.search-option.beer:hover {
+    border-color: rgba(245, 158, 11, 0.4);
+}
+
+.search-option.area {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(124, 58, 237, 0.05) 100%);
+    border-color: rgba(139, 92, 246, 0.2);
+}
+
+.search-option.area:hover {
+    border-color: rgba(139, 92, 246, 0.4);
+}
+
+.search-icon {
+    font-size: 2.5rem;
+    margin-bottom: var(--space-lg);
+    display: block;
+    line-height: 1;
+}
+
+.search-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-sm);
+}
+
+.search-description {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+}
+
+.quick-actions {
+    margin-top: var(--space-xl);
+    padding-top: var(--space-xl);
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    text-align: center;
+}
+
+.quick-actions-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: var(--space-lg);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.quick-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-md) var(--space-xl);
+    background: var(--success-gradient);
+    color: var(--text-white);
+    border: none;
+    border-radius: var(--radius-pill);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-decoration: none;
+    box-shadow: var(--shadow);
+}
+
+.quick-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Search modal styles */
+.search-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: var(--z-modal-backdrop);
+    padding: var(--space-lg);
+}
+
+.search-modal .modal-content {
+    background: var(--text-white);
+    border-radius: var(--radius-xl);
+    padding: var(--space-3xl);
+    max-width: 500px;
+    width: 100%;
+    box-shadow: var(--shadow-lg);
+}
+
+.search-modal .modal-header {
+    text-align: center;
+    margin-bottom: var(--space-2xl);
+}
+
+.search-modal .modal-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-sm);
+}
+
+.modal-subtitle {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.search-modal .form-input {
+    width: 100%;
+    padding: var(--space-lg);
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    border-radius: var(--radius-lg);
+    font-size: 1rem;
+    margin-bottom: var(--space-xl);
+    transition: border-color 0.25s ease;
+}
+
+.search-modal .form-input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.modal-actions {
+    display: flex;
+    gap: var(--space-lg);
+}
+
+.modal-actions .btn {
+    flex: 1;
+    padding: var(--space-lg);
+    border: none;
+    border-radius: var(--radius-lg);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.modal-actions .btn-secondary {
+    background: rgba(0, 0, 0, 0.1);
+    color: var(--text-secondary);
+}
+
+.modal-actions .btn-secondary:hover {
+    background: rgba(0, 0, 0, 0.15);
+}
+
+/* Mobile optimizations */
+@media (max-width: 480px) {
+    .search-options {
+        grid-template-columns: 1fr;
+        gap: var(--space-md);
+    }
+    
+    .search-option {
+        padding: var(--space-lg);
+    }
+    
+    .search-icon {
+        font-size: 2rem;
+        margin-bottom: var(--space-md);
+    }
+    
+    .search-title {
+        font-size: 1rem;
+    }
+    
+    .search-description {
+        font-size: 0.85rem;
+    }
+    
+    .search-modal .modal-content {
+        padding: var(--space-xl);
+        margin: var(--space-lg);
+    }
+    
+    .modal-actions {
+        flex-direction: column;
+        gap: var(--space-md);
+    }
+}
