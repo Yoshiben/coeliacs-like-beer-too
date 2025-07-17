@@ -1846,6 +1846,9 @@
                 const query = input.value.trim();
                 const searchType = document.getElementById('searchType').value;
                 // const gfOnly = document.getElementById('gfOnly').checked;
+
+                console.log('🔍 Autocomplete triggered for:', query);
+                console.log('🔍 Search type:', searchType);
                 
                 if (query.length < 2) {
                     suggestions.style.display = 'none';
@@ -1858,9 +1861,9 @@
                 if (isPostcode) {
                     // Show postcode search option
                     suggestions.innerHTML = `
-                        <div class="postcode-suggestion" style="padding: 15px; cursor: pointer; background: rgba(102, 126, 234, 0.1); border-radius: 10px; margin: 5px;">
+                        <div class="postcode-suggestion">
                             <strong>📍 Search for pubs near "${query}"</strong>
-                            <div style="font-size: 12px; color: #666; margin-top: 4px;">
+                            <div class="postcode-suggestion-subtitle">
                                 Find pubs within 5km of this postcode
                             </div>
                         </div>
@@ -1877,13 +1880,17 @@
 
                 // Regular autocomplete for non-postcodes
                 try {
-                    // const url = `/autocomplete?q=${encodeURIComponent(query)}&search_type=${searchType}` + (gfOnly ? '&gf_only=true' : '');
+                    const url = `/autocomplete?q=${encodeURIComponent(query)}&search_type=${searchType}`;
+                    console.log('🌐 Autocomplete fetching:', url);
+                    
                     const response = await fetch(url);
+                    console.log('📡 Autocomplete response status:', response.status);
                     if (!response.ok) {
                         suggestions.style.display = 'none';
                         return;
                     }
                     const data = await response.json();
+                    console.log('✅ Autocomplete data received:', data);
 
                     suggestions.innerHTML = '';
                     if (data.length === 0) {
@@ -1919,6 +1926,7 @@
                     });
                     suggestions.style.display = 'block';
                 } catch (error) {
+                    console.error('❌ Autocomplete error:', error);
                     suggestions.style.display = 'none';
                 }
             }, 300));
