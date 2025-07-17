@@ -4662,9 +4662,9 @@ body {
     right: 50%;
     margin-left: -50vw;
     margin-right: -50vw;
-    padding: 0 var(--space-xs);
-    height: calc(100vh - 180px); /* Changed from 280px to 180px - makes it taller */
-    height: calc(100dvh - 280px); /* Dynamic viewport */
+    padding: 0 var(--space-md);
+    height: calc(100vh - 220px); /* Changed from 280px to 180px - makes it taller */
+    height: calc(100dvh - 220px); /* Dynamic viewport */
     display: flex;
     align-items: center;
     overflow: hidden;
