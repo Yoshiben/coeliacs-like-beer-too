@@ -3952,7 +3952,7 @@ body.pub-details-open {
 
 @media (min-width: 768px) {
     .search-section {
-        padding: 0 var(--space-xl); /* More padding on larger screens */
+        padding: 0 var(--space-md); /* More padding on larger screens */
     }
 }
 
