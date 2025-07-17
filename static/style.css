@@ -288,7 +288,7 @@ p {
 .hero-section {
     background: var(--primary-gradient);
     color: var(--text-white);
-    padding: var(--space-lg) /* controls space at top of screen */ var(--space-xl) /* controls padding at side */ var(--space-lg);
+    padding: var(--space-lg) /* controls space at top of screen */ var(--space-xl) /* controls padding at side */ var(--space-md); /* contraols padding at bottom */
     text-align: center;
     position: relative;
     overflow: hidden;
