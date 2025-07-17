@@ -1995,7 +1995,7 @@ body.pub-details-open {
     width: 100%;
 }
 
-search-option {
+.search-option {
     background: var(--text-white);
     border: 3px solid var(--border-light);
     border-radius: var(--radius-lg);
@@ -2018,6 +2018,7 @@ search-option {
     box-shadow: var(--shadow);
 }
 
+/* COLORED BORDERS & BACKGROUNDS */
 .search-option.location {
     background: linear-gradient(135deg, var(--search-location-bg) 0%, var(--search-location-bg-light) 100%);
     border-color: var(--search-location-border);
@@ -2043,6 +2044,15 @@ search-option {
 
 .search-option.beer:hover {
     border-color: var(--search-beer-border-hover);
+}
+
+.search-option.area {
+    background: linear-gradient(135deg, var(--search-area-bg) 0%, var(--search-area-bg-light) 100%);
+    border-color: var(--search-area-border);
+}
+
+.search-option.area:hover {
+    border-color: var(--search-area-border-hover);
 }
 
 .search-option.area {
@@ -2115,7 +2125,7 @@ search-option {
     box-shadow: var(--shadow-lg);
 }
 
-/* Mobile adjustments - KEEPS 2x2 GRID */
+/* MOBILE RESPONSIVE - KEEP 2x2 GRID */
 @media (max-width: 768px) {
     .search-options {
         gap: var(--space-md);
@@ -2140,7 +2150,6 @@ search-option {
     }
 }
 
-/* Small screens - keep 2x2 grid but make more compact */
 @media (max-width: 480px) {
     .search-options {
         gap: var(--space-sm);
@@ -2169,7 +2178,6 @@ search-option {
     }
 }
 
-/* Very small screens - ultra compact 2x2 */
 @media (max-width: 360px) {
     .search-options {
         gap: 6px;
