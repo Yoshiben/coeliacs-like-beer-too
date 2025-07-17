@@ -4004,8 +4004,9 @@ body.pub-details-open {
    SEARCH SECTION
    ================================ */
 
+/* Make sure search section fits perfectly */
 .search-section {
-    margin: -20px 0 0 0; /* Remove bottom margin for full screen */
+    margin: -60px 0 0 0; /* Keep same overlap with hero */
     position: relative;
     z-index: var(--z-sticky);
     width: 100vw;
@@ -4014,9 +4015,11 @@ body.pub-details-open {
     margin-left: -50vw;
     margin-right: -50vw;
     padding: 0 var(--space-lg);
-    min-height: calc(100vh - 350px); /* Take up remaining screen space */
+    height: calc(100vh - 200px); /* CHANGED from 240px to 200px - makes it 40px taller downward */
+    height: calc(100dvh - 200px);
     display: flex;
     align-items: center;
+    overflow: hidden;
 }
 
 @media (min-width: 768px) {
@@ -4279,6 +4282,7 @@ body {
     width: 100%;
 }
 
+/* Reset search option height back to normal */
 .search-option {
     border: 3px solid var(--border-light);
     border-radius: var(--radius-xl);
@@ -4288,7 +4292,7 @@ body {
     text-align: center;
     position: relative;
     overflow: hidden;
-    min-height: 160px; /* INCREASED from 140px to 160px */
+    min-height: 140px; /* Back to original size */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -4478,22 +4482,4 @@ body {
     /* Prevent any scrolling or bouncing */
     overscroll-behavior: none;
     -webkit-overflow-scrolling: auto;
-}
-
-/* Make sure search section fits perfectly */
-.search-section {
-    margin: -60px 0 0 0; /* Overlap hero */
-    position: relative;
-    z-index: var(--z-sticky);
-    width: 100vw;
-    left: 50%;
-    right: 50%;
-    margin-left: -50vw;
-    margin-right: -50vw;
-    padding: 0 var(--space-lg);
-    height: calc(100vh - 220px); /* Changed from 280px to 180px - makes it taller */
-    height: calc(100dvh - 220px); /* Dynamic viewport */
-    display: flex;
-    align-items: center;
-    overflow: hidden;
 }
