@@ -1031,7 +1031,7 @@
             trackEvent('find_nearby_pubs', 'Location Search');
             smartShowMap(); // Auto-show map
             
-            const gfOnly = document.getElementById('gfOnly')?.checked ?? true;
+            // const gfOnly = document.getElementById('gfOnly')?.checked ?? true;
             const radius = 5;
             
             showResultsSection();
@@ -1075,7 +1075,7 @@
                 // Save state
                 currentQuery = '';
                 currentSearchType = 'nearby';
-                currentGfOnly = gfOnly;
+                // currentGfOnly = gfOnly;
                 currentPage = 1;
                 AppState.save();
                 
@@ -1348,7 +1348,7 @@
 
         async function loadPage(page) {
             currentPage = page;
-            const url = `/search?query=${encodeURIComponent(currentQuery)}&search_type=${currentSearchType}&page=${page}` + (currentGfOnly ? '&gf_only=true' : '');
+            // const url = `/search?query=${encodeURIComponent(currentQuery)}&search_type=${currentSearchType}&page=${page}` + (currentGfOnly ? '&gf_only=true' : '');
             
             showLoadingToast('Loading page...');
             const results = document.getElementById('results');
@@ -1401,7 +1401,7 @@
                                             
                     currentQuery = '';
                     currentSearchType = 'all';
-                    currentGfOnly = false;
+                    // currentGfOnly = false;
                     currentPage = 1;
                     AppState.save(pubId);
                 } else {
@@ -1417,7 +1417,7 @@
         async function searchPubs() {
             const query = document.getElementById('searchInput').value.trim();
             const searchType = document.getElementById('searchType').value;
-            const gfOnly = document.getElementById('gfOnly')?.checked ?? false;
+            // const gfOnly = document.getElementById('gfOnly')?.checked ?? false;
             const results = document.getElementById('results');
             
             if (!query) {
@@ -1427,7 +1427,7 @@
             
             currentQuery = query;
             currentSearchType = searchType;
-            currentGfOnly = gfOnly;
+            // currentGfOnly = gfOnly;
             currentPage = 1;
             
             showResultsSection();
@@ -1456,7 +1456,7 @@
                         
                         showLoadingToast('Finding nearby pubs...');
                         
-                        url = `/nearby?lat=${lat}&lng=${lng}&radius=5&gf_only=${gfOnly}`;
+                        // url = `/nearby?lat=${lat}&lng=${lng}&radius=5&gf_only=${gfOnly}`;
                         
                         // Auto-show map and update to show the postcode area
                         smartShowMap();
@@ -1483,7 +1483,7 @@
                     }
                 } else {
                     // Regular text search
-                    url = `/search?query=${encodeURIComponent(query)}&search_type=${searchType}&page=1&gf_only=${gfOnly}`;
+                    // url = `/search?query=${encodeURIComponent(query)}&search_type=${searchType}&page=1&gf_only=${gfOnly}`;
                 }
                 
                 const response = await fetch(url);
@@ -1800,7 +1800,7 @@
 
         function clearSearch() {
             document.getElementById('searchInput').value = '';
-            document.getElementById('gfOnly').checked = false;
+            // document.getElementById('gfOnly').checked = false;
             document.getElementById('results').innerHTML = '';
             document.getElementById('suggestions').style.display = 'none';
             hideResultsSection();
@@ -1814,7 +1814,7 @@
             
             currentQuery = '';
             currentSearchType = 'all';
-            currentGfOnly = false;
+            // currentGfOnly = false;
             currentPage = 1;
             AppState.save();
         }
@@ -1845,7 +1845,7 @@
             input.addEventListener('input', debounce(async () => {
                 const query = input.value.trim();
                 const searchType = document.getElementById('searchType').value;
-                const gfOnly = document.getElementById('gfOnly').checked;
+                // const gfOnly = document.getElementById('gfOnly').checked;
                 
                 if (query.length < 2) {
                     suggestions.style.display = 'none';
@@ -1877,7 +1877,7 @@
 
                 // Regular autocomplete for non-postcodes
                 try {
-                    const url = `/autocomplete?q=${encodeURIComponent(query)}&search_type=${searchType}` + (gfOnly ? '&gf_only=true' : '');
+                    // const url = `/autocomplete?q=${encodeURIComponent(query)}&search_type=${searchType}` + (gfOnly ? '&gf_only=true' : '');
                     const response = await fetch(url);
                     if (!response.ok) {
                         suggestions.style.display = 'none';
