@@ -1594,7 +1594,7 @@ p {
     z-index: var(--z-modal-backdrop);
     display: none;
     overflow: hidden;
-    padding: var(--space-xs);
+    padding: 0;
     box-sizing: border-box;
 }
 
@@ -1612,7 +1612,7 @@ p {
     height: calc(100dvh - 16px); /* Use dynamic viewport when supported */
     max-height: calc(100vh - 16px);
     max-height: calc(100dvh - 16px);
-    padding: var(--space-sm);
+    padding: var(--space-sm); /* Padding here instead of overlay */
     transition: all 0.3s ease;
     overflow: hidden;
     box-sizing: border-box;
@@ -1638,6 +1638,13 @@ p {
     margin-bottom: var(--space-sm);
     border-radius: var(--radius-xl) var(--radius-xl) 0 0;
     padding: var(--space-md);
+}
+
+/* Ensure body doesn't scroll when overlay is open */
+body.pub-details-open {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
 }
 
 /* NEW: Top navigation bar */
