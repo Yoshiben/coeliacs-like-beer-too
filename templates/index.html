@@ -1161,6 +1161,24 @@
             
             if (!append) {
                 results.innerHTML = '';
+                
+                // Add GF filter suggestion if there are mixed results
+                if (pubs.length > 0) {
+                    const gfCount = pubs.filter(pub => pub.bottle || pub.tap || pub.cask || pub.can).length;
+                    const totalCount = pubs.length;
+                    
+                    // Only show filter if there are both GF and non-GF pubs
+                    if (gfCount > 0 && gfCount < totalCount) {
+                        const filterDiv = document.createElement('div');
+                        filterDiv.className = 'filter-suggestion';
+                        filterDiv.innerHTML = `
+                            <button class="btn btn-secondary" onclick="showOnlyGF()">
+                                🍺 Show only pubs with GF beer (${gfCount} of ${totalCount} pubs)
+                            </button>
+                        `;
+                        results.appendChild(filterDiv);
+                    }
+                }
             }
             
             if (pubs.length === 0 && !append) {
@@ -1191,7 +1209,7 @@
                     );
                     detailsDistanceText = `<div style="color: #667eea; font-size: 14px; font-weight: 600; margin: 8px 0;">${distance.toFixed(2)} km from your location</div>`;
                 }
-
+        
                 li.className = 'result-item';
                 li.innerHTML = `
                     <div class="result-details">
@@ -1230,6 +1248,13 @@
             if (pagination && !append) {
                 addPaginationControls(pagination);
             }
+        }
+        
+        // Add this new function too
+        function showOnlyGF() {
+            // For now, just show a coming soon message
+            showSuccessToast('🍺 GF-only filter coming soon!');
+            trackEvent('gf_filter_clicked', 'User Interest', 'filter_suggestion');
         }
 
         function formatBeerDetails(beerDetails, pub) {
