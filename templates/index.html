@@ -54,7 +54,7 @@
         <div class="container">
             <div class="search-card">
                 <div class="search-header">
-                    <h2 class="section-title">🔍 How would you like to search? 🍺</h2>
+                    <h2 class="section-title">🔍 What are you searching for? 🍺</h2>
                 </div>
                 <div class="search-body">
                     <div class="search-options">
@@ -68,7 +68,7 @@
                         <div class="search-option location" onclick="openSearchModal('location')">
                             <span class="search-icon">📍</span>
                             <h3 class="search-title">Pubs by Postcode</h3>
-                            <p class="search-description">Find GF-friendly pubs using your current location or enter a postcode/city</p>
+                            <p class="search-description">Find GF-friendly pubs by entering a postcode</p>
                         </div>
                         <!-- Bottom Left: Pubs by Area -->
                         <div class="search-option area" onclick="openSearchModal('area')">
@@ -77,7 +77,7 @@
                             <p class="search-description">Explore pubs in specific regions, cities, or local authorities</p>
                         </div>
                         <!-- Bottom Right: Pubs by Beer -->
-                        <div class="search-option beer" onclick="openSearchModal('beer')">
+                        <div class="search-option.beer" onclick="openSearchModal('beer')">
                             <span class="search-icon">🍺</span>
                             <h3 class="search-title">Pubs by Beer</h3>
                             <p class="search-description">Find pubs serving specific GF beers - "Vocation", "Zapato", "IPA", "Lager", etc.</p>
@@ -96,7 +96,21 @@
         </div>
     </div>
 
-    <!-- Search Modals - ADD these before your closing </body> tag -->
+    <!-- Search Modals -->
+    <div id="nameModal" class="search-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">🏠 Search by Pub Name</h3>
+                <p class="modal-subtitle">Enter the name of the pub you're looking for</p>
+            </div>
+            <input type="text" class="form-input" placeholder="e.g. The Red Lion, Wetherspoons, The George..." id="nameInput">
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeSearchModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="searchByName()">Search</button>
+            </div>
+        </div>
+    </div>
+    
     <div id="locationModal" class="search-modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -111,19 +125,7 @@
         </div>
     </div>
     
-    <div id="nameModal" class="search-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">🏠 Search by Pub Name</h3>
-                <p class="modal-subtitle">Enter the name of the pub you're looking for</p>
-            </div>
-            <input type="text" class="form-input" placeholder="e.g. The Red Lion, Wetherspoons, The George..." id="nameInput">
-            <div class="modal-actions">
-                <button class="btn btn-secondary" onclick="closeSearchModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="searchByName()">Search</button>
-            </div>
-        </div>
-    </div>
+    
     
     <div id="beerModal" class="search-modal">
         <div class="modal-content">
