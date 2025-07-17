@@ -1456,7 +1456,7 @@
                         
                         showLoadingToast('Finding nearby pubs...');
                         
-                        // url = `/nearby?lat=${lat}&lng=${lng}&radius=5&gf_only=${gfOnly}`;
+                        url = `/nearby?lat=${lat}&lng=${lng}&radius=5`;
                         
                         // Auto-show map and update to show the postcode area
                         smartShowMap();
@@ -1483,7 +1483,7 @@
                     }
                 } else {
                     // Regular text search
-                    // url = `/search?query=${encodeURIComponent(query)}&search_type=${searchType}&page=1&gf_only=${gfOnly}`;
+                    url = `/search?query=${encodeURIComponent(query)}&search_type=${searchType}&page=1`;
                 }
                 
                 const response = await fetch(url);
