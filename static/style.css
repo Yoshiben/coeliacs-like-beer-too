@@ -91,6 +91,17 @@
     --divider-color: rgba(102, 126, 234, 0.1);
     --border-light: rgba(0, 0, 0, 0.1);    
     --hover-subtle: rgba(102, 126, 234, 0.05);
+
+   /* Map marker colors */
+    --marker-pub-fill: #4CAF50;
+    --marker-pub-stroke: #ffffff;
+    --marker-user-fill: #667eea;
+    --marker-user-stroke: #ffffff;
+    
+    /* Map marker sizes */
+    --marker-pub-radius: 12;
+    --marker-user-radius: 8;
+    --marker-stroke-width: 3;
 }
 
 /* Desktop Adjustments */
