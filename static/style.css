@@ -1614,7 +1614,7 @@ p {
     overflow: hidden;
     box-sizing: border-box;
 }
-
+/* Ensure nav buttons always have space */
 .pub-details-card {
     background: var(--bg-white);
     border-radius: var(--radius-xl);
@@ -1627,14 +1627,15 @@ p {
     overflow: hidden;
     min-height: 0;
     box-sizing: border-box;
+    padding-bottom: calc(var(--space-lg) + 80px); /* Reserve space for nav buttons */
 }
 
-/* Split view adjustments - much more compact */
 .split-view .pub-details-card {
-    flex: 0 0 45%; /* Smaller percentage to leave more room */
+    flex: 0 0 45%;
     margin-bottom: var(--space-sm);
     border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-    padding: var(--space-md); /* Much smaller padding in split view */
+    padding: var(--space-md);
+    padding-bottom: calc(var(--space-md) + 60px); /* Reserve space for smaller nav buttons */
 }
 
 .pub-header {
@@ -1737,34 +1738,92 @@ p {
     margin-top: var(--space-sm);
 }
 
+/* Fix nav button positioning */
 .pub-nav-buttons {
+    position: absolute;
+    bottom: var(--space-lg);
+    left: var(--space-lg);
+    right: var(--space-lg);
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--space-sm);
-    margin-top: var(--space-md);
-    flex-shrink: 0;
 }
 
-/* Split view - compact nav buttons */
 .split-view .pub-nav-buttons {
+    bottom: var(--space-md);
+    left: var(--space-md);
+    right: var(--space-md);
     gap: var(--space-xs);
-    margin-top: var(--space-xs);
 }
 
-/* Smaller button sizes for pub details */
+/* CONSISTENT BUTTON COLOR SCHEME */
+
+/* Primary actions - your brand purple */
+.pub-details-card .btn-primary {
+    background: var(--primary-gradient);
+    color: var(--text-white);
+}
+
+/* External actions - blue for external links */
+.pub-details-card .btn-external {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: var(--text-white);
+}
+
+/* Positive actions - green for reporting/contributing */
+.pub-details-card .btn-positive {
+    background: var(--success-gradient);
+    color: var(--text-white);
+}
+
+/* Toggle actions - subtle gray when inactive, brand color when active */
+.pub-details-card .btn-toggle {
+    background: rgba(107, 114, 128, 0.1);
+    color: var(--text-secondary);
+    border: 2px solid rgba(107, 114, 128, 0.2);
+}
+
+.pub-details-card .btn-toggle.active {
+    background: var(--primary-gradient);
+    color: var(--text-white);
+    border: 2px solid transparent;
+}
+
+/* Navigation actions - consistent brand purple */
+.pub-details-card .btn-nav {
+    background: var(--primary-gradient);
+    color: var(--text-white);
+}
+
+/* Smaller button sizes for better proportions */
 .pub-details-card .btn {
-    min-height: 40px;
-    padding: var(--space-sm) var(--space-md);
-    font-size: 0.85rem;
+    min-height: 44px;
+    padding: var(--space-md) var(--space-lg);
+    font-size: 0.9rem;
     font-weight: 600;
+    border: none;
+    border-radius: var(--radius-pill);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
 }
 
-/* Much smaller buttons in split view */
+.pub-details-card .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
 .split-view .btn {
-    min-height: 32px;
-    padding: var(--space-xs) var(--space-sm);
-    font-size: 0.75rem;
-    border-radius: var(--radius-lg); /* Smaller border radius too */
+    min-height: 36px;
+    padding: var(--space-sm) var(--space-md);
+    font-size: 0.8rem;
+}
+
+.split-view .btn:hover {
+    transform: translateY(-1px); /* Smaller hover effect in split view */
 }
 
 .pub-map-container {
@@ -1809,11 +1868,13 @@ p {
     .pub-details-card {
         padding: var(--space-md);
         border-radius: var(--radius-lg); /* Smaller radius on mobile */
+        padding-bottom: calc(var(--space-md) + 70px);
     }
 
     .split-view .pub-details-card {
         padding: var(--space-sm);
         flex: 0 0 40%; /* Even smaller in split view on mobile */
+        padding-bottom: calc(var(--space-sm) + 50px);
     }
 
     .pub-title {
@@ -1830,13 +1891,25 @@ p {
     }
 
     .pub-details-card .btn {
-        min-height: 36px;
-        font-size: 0.8rem;
+        min-height: 40px;
+        font-size: 0.85rem;
     }
 
     .split-view .btn {
-        min-height: 28px;
-        font-size: 0.7rem;
+        min-height: 32px;
+        font-size: 0.75rem;
         padding: 4px 8px;
+    }
+
+   .pub-nav-buttons {
+        bottom: var(--space-md);
+        left: var(--space-md);
+        right: var(--space-md);
+    }
+
+    .split-view .pub-nav-buttons {
+        bottom: var(--space-sm);
+        left: var(--space-sm);
+        right: var(--space-sm);
     }
 }
