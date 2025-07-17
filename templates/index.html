@@ -999,24 +999,37 @@
             };
         }
 
-        // ADD THESE NEW SEARCH FUNCTIONS TO YOUR JAVASCRIPT SECTION (before the closing script tag)
-
-        // New search modal functions
-        function openSearchModal(type) {
-            const modal = document.getElementById(type + 'Modal');
-            if (modal) {
-                modal.style.display = 'flex';
-                // Focus the input
-                const input = modal.querySelector('.form-input');
-                if (input) {
-                    setTimeout(() => input.focus(), 100);
-                }
-                
-                // Lock body scroll
-                document.body.style.overflow = 'hidden';
-                
-                trackEvent('open_search_modal', 'Search Interface', type);
+        // Fixed Search Functions
+        function openSearchModal(searchType) {
+            const modal = document.getElementById('searchModal');
+            const title = document.getElementById('searchModalTitle');
+            const input = document.getElementById('searchInput');
+            
+            // Set modal title and placeholder based on search type
+            switch(searchType) {
+                case 'name':
+                    title.textContent = 'Search Pubs by Name';
+                    input.placeholder = 'Enter pub name (e.g., "The Red Lion")';
+                    break;
+                case 'postcode':
+                    title.textContent = 'Search Pubs by Postcode';
+                    input.placeholder = 'Enter postcode (e.g., "SW1A 1AA")';
+                    break;
+                case 'area':
+                    title.textContent = 'Search Pubs by Area';
+                    input.placeholder = 'Enter area (e.g., "London", "Manchester")';
+                    break;
+                case 'beer':
+                    title.textContent = 'Search Pubs by Beer';
+                    input.placeholder = 'Enter beer name (e.g., "Stella Artois")';
+                    break;
             }
+            
+            modal.style.display = 'flex';
+            input.focus();
+            
+            // Store search type for when user searches
+            modal.dataset.searchType = searchType;
         }
         
         function closeSearchModal() {
@@ -1381,6 +1394,86 @@
             }
         }
 
+        // 1. CREATE RESULT ITEM - Makes beautiful result cards with GF badges
+        function createResultItem(pub) {
+            const li = document.createElement('li');
+            li.className = 'result-item';
+            li.onclick = () => openPubDetails(pub.pub_id);
+            
+            // Generate GF badges using your new CSS
+            const badges = [];
+            if (pub.bottle) badges.push('<span class="gf-badge bottle">🍺 Bottle</span>');
+            if (pub.tap) badges.push('<span class="gf-badge tap">🚰 Tap</span>');
+            if (pub.cask) badges.push('<span class="gf-badge cask">🛢️ Cask</span>');
+            if (pub.can) badges.push('<span class="gf-badge can">🥫 Can</span>');
+            
+            // Calculate distance if user location available
+            let distanceHtml = '';
+            if (pub.latitude && pub.longitude && window.userLocation) {
+                const distance = calculateDistance(
+                    window.userLocation.lat, window.userLocation.lng,
+                    parseFloat(pub.latitude), parseFloat(pub.longitude)
+                );
+                distanceHtml = `<div class="result-distance">${distance.toFixed(1)}km</div>`;
+            }
+            
+            li.innerHTML = `
+                <div class="result-header">
+                    <div class="result-details">
+                        <h3>${pub.name}</h3>
+                        <div class="result-address">${pub.address}, ${pub.postcode}</div>
+                        <div class="result-authority">${pub.local_authority}</div>
+                    </div>
+                    ${distanceHtml}
+                </div>
+                
+                <div class="gf-badges">
+                    ${badges.join('')}
+                </div>
+                
+                <div class="result-actions">
+                    <button class="result-btn result-btn-primary" onclick="event.stopPropagation(); openPubDetails(${pub.pub_id})">
+                        <span>📍</span> View Details
+                    </button>
+                    <button class="result-btn result-btn-secondary" onclick="event.stopPropagation(); getDirections('${pub.name}', '${pub.address}')">
+                        <span>🧭</span> Directions
+                    </button>
+                </div>
+            `;
+            
+            return li;
+        }
+        
+        // 2. OPEN PUB DETAILS - Opens the split screen view
+        function openPubDetails(pubId) {
+            console.log('Opening pub details for:', pubId);
+            // For now, just log - you can implement the full overlay later
+            showSuccessToast(`Opening details for pub ${pubId}`);
+            
+            // TODO: Implement the full split-screen overlay from earlier artifacts
+            // loadPubDetails(pubId);
+        }
+        
+        // 3. GET DIRECTIONS - Opens maps
+        function getDirections(pubName, address) {
+            const encodedAddress = encodeURIComponent(`${pubName}, ${address}`);
+            const mapsUrl = `https://maps.google.com/maps?q=${encodedAddress}`;
+            window.open(mapsUrl, '_blank');
+            trackEvent('get_directions', 'Navigation', pubName);
+        }
+        
+        // 4. SHOW/HIDE LOADING - Simple versions (you might have better ones)
+        function showLoading() {
+            console.log('Loading...');
+            // Use your existing toast system
+            showLoadingToast('Loading...');
+        }
+        
+        function hideLoading() {
+            console.log('Hiding loading...');
+            hideLoadingToast();
+        }
+
         // Add pub markers to map
         function addPubMarkersToMap(pubs) {
             // Clear existing markers
@@ -1468,62 +1561,8 @@
             }
             
             pubs.forEach(pub => {
-                console.log('Processing pub:', pub);
-                const li = document.createElement('li');
-                let gfOptions = [];
-                if (pub.bottle) gfOptions.push('Bottle');
-                if (pub.tap) gfOptions.push('Tap');
-                if (pub.cask) gfOptions.push('Cask');
-                if (pub.can) gfOptions.push('Can');
-                
-                const gfText = gfOptions.length > 0 ? gfOptions.join(', ') : 'None';
-                const beerDetails = pub.beer_details || 'None';
-                
-                let detailsDistanceText = '';
-                const lat = parseFloat(pub.latitude);
-                const lng = parseFloat(pub.longitude);
-                
-                if (userLocation && lat && lng && !isNaN(lat) && !isNaN(lng)) {
-                    const distance = calculateDistance(
-                        userLocation.lat, userLocation.lng,
-                        lat, lng
-                    );
-                    detailsDistanceText = `<div style="color: #667eea; font-size: 14px; font-weight: 600; margin: 8px 0;">${distance.toFixed(2)} km from your location</div>`;
-                }
-        
-                li.className = 'result-item';
-                li.innerHTML = `
-                    <div class="result-details">
-                        <strong>${pub.name}</strong>
-                        <div class="address">${pub.address}, ${pub.postcode}</div>
-                        <div class="local-authority">${pub.local_authority}</div>
-                        ${detailsDistanceText}
-                        <div style="margin-top: 10px;">
-                            <button onclick="searchForPub('${pub.name.replace(/'/g, "\\'")}', '${pub.postcode}')" 
-                                    style="margin-right: 8px; padding: 6px 12px; font-size: 12px; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);">
-                                Find Online
-                            </button>
-                            <button onclick="findOnMap(${pub.latitude || 'null'}, ${pub.longitude || 'null'}, '${pub.name.replace(/'/g, "\\'")}', '${pub.postcode}', ${pub.pub_id})" 
-                                    style="padding: 6px 12px; font-size: 12px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);">
-                                Find on Map
-                            </button>
-                            <button onclick="openInGoogleMaps(${pub.latitude}, ${pub.longitude}, '${pub.name.replace(/'/g, "\\'")}', '${pub.address}')" 
-                                    style="padding: 6px 12px; font-size: 12px; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);">
-                                🧭 Directions
-                            </button>
-                        </div>
-                    </div>
-                    <div class="beer-column">
-                        <h4>Available Beers</h4>
-                        <div class="beer-details">
-                            ${formatBeerDetails(beerDetails, pub)}
-                        </div>
-                    </div>
-                    <div class="button-column">
-                        <button class="update-button" onclick="toggleUpdateForm(${pub.pub_id})">Update</button>
-                    </div>
-                `;
-                results.appendChild(li);
+                const resultItem = createResultItem(pub);
+                results.appendChild(resultItem);
             });
             
             if (pagination && !append) {
