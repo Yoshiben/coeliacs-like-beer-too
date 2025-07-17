@@ -59,17 +59,14 @@
                 <div class="search-body">
                     <div class="search-grid">
                         <div class="search-row">
-                            <select id="searchType" class="form-select" aria-label="Select search type: all, pub name, postcode, or local authority">
+                            <select id="searchType" class="form-select" aria-label="Select search type above: all, pub name, postcode, or local authority">
                                 <option value="all">Search All</option>
                                 <option value="name">Pub Name</option>
                                 <option value="postcode">Postcode</option>
                                 <option value="area">Local Authority</option>
                             </select>
                             <input type="text" id="searchInput" class="form-input" placeholder="Enter pub name, postcode, or local authority" onkeydown="if (event.key === 'Enter') searchPubs()" aria-label="Search input for pubs" autocomplete="off">
-<!--                             <label class="form-checkbox">
-                                <input type="checkbox" id="gfOnly" aria-label="Filter to show only gluten-free pubs"> 
-                                Gluten Free Only
-                            </label> -->
+                            <div id="suggestions" class="suggestions"></div>
                         </div>
                         <div class="search-actions">
                             <button onclick="searchPubs()" class="btn btn-primary" aria-label="Search for pubs">Search Pubs</button>
