@@ -1775,6 +1775,9 @@
         let pubMapVisible = false;
         let currentPubData = null;
         
+        
+        // UPDATE the showPubDetails function to prevent background scrolling:
+        
         function showPubDetails(pub) {
             currentPubData = pub;
             
@@ -1812,6 +1815,9 @@
                 }
             };
             
+            // ADDED: Lock body scroll to prevent background scrolling
+            document.body.classList.add('pub-details-open');
+            
             // Show the overlay
             document.getElementById('pubDetailsOverlay').classList.add('active');
             
@@ -1822,6 +1828,10 @@
         
         function closePubDetails() {
             document.getElementById('pubDetailsOverlay').classList.remove('active');
+            
+            // ADDED: Unlock body scroll
+            document.body.classList.remove('pub-details-open');
+            
             pubMapVisible = false;
             document.getElementById('pubContainer').classList.remove('split-view');
             document.getElementById('pubMapBtnText').textContent = 'Show on Map';
