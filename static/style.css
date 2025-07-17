@@ -87,10 +87,10 @@
     --container-lg: 1024px;
     --container-xl: 1200px;
 
-   /* Autocomplete/Dropdown Colors */
-    --dropdown-border: rgba(0, 0, 0, 0.1);
-    --dropdown-divider: #f0f0f0;
-    --dropdown-hover: rgba(102, 126, 234, 0.05)
+   /* Dividers, borders & hovers */
+    --divider-color: rgba(102, 126, 234, 0.1);
+    --border-light: rgba(0, 0, 0, 0.1);    
+    --hover-subtle: rgba(102, 126, 234, 0.05);
 }
 
 /* Desktop Adjustments */
