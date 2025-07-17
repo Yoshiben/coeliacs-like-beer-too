@@ -71,25 +71,25 @@
                 <div class="search-body">
                     <div class="search-options">
                         <!-- Top Left: Pubs by Name -->
-                        <div class="search-option name" onclick="openSearchModal('name')">
+                        <div class="search-option name" onclick="openSearchModal('nameModal')">
                             <span class="search-icon">🏠</span>
                             <h3 class="search-title">Pubs by Name</h3>
                             <p class="search-description">Search for a specific pub by name - "The Milestone", etc.</p>
                         </div>
                         <!-- Top Right: Pubs by Postcode -->      
-                        <div class="search-option location" onclick="openSearchModal('location')">
+                        <div class="search-option location" onclick="openSearchModal('locationModal')">
                             <span class="search-icon">📍</span>
                             <h3 class="search-title">Pubs by Postcode</h3>
                             <p class="search-description">Find GF-friendly pubs by entering all/part of a postcode</p>
                         </div>
                         <!-- Bottom Left: Pubs by Area -->
-                        <div class="search-option area" onclick="openSearchModal('area')">
+                        <div class="search-option area" onclick="openSearchModal('areaModal')">
                             <span class="search-icon">🗺️</span>
                             <h3 class="search-title">Pubs by Area</h3>
                             <p class="search-description">Explore pubs in specific regions, cities, or local authorities</p>
                         </div>
                         <!-- Bottom Right: Pubs by Beer -->
-                        <div class="search-option beer" onclick="openSearchModal('beer')">
+                        <div class="search-option beer" onclick="openSearchModal('beerModal')">
                             <span class="search-icon">🍺</span>
                             <h3 class="search-title">Pubs by Beer</h3>
                             <p class="search-description">Find pubs serving specific GF beers - "Zapato", "IPA" etc.</p>
@@ -854,7 +854,7 @@
                 console.log('Using fallback numbers');
             }
         }
-        
+
         // Call the function when page loads
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 Page loaded, calling loadStats...');
@@ -865,6 +865,21 @@
         if (document.readyState !== 'loading') {
             loadStats();
         }
+
+        // ================================
+        // OPEN AND CLOSE SEARCH MODALS
+        // ================================
+
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+        
+        function closeSearchModal() {
+            const modals = ['nameModal', 'locationModal', 'beerModal', 'areaModal'];
+            modals.forEach(modal => {
+                document.getElementById(modal).style.display = 'none';
+            });
+        }     
 
         // SMART MAP TOGGLE - Auto-show when needed
         function toggleMap() {
@@ -1114,16 +1129,16 @@
             modal.dataset.searchType = searchType;
         }
         
-        function closeSearchModal() {
-            document.querySelectorAll('.search-modal').forEach(modal => {
-                modal.style.display = 'none';
-            });
+        // function closeSearchModal() {
+        //     document.querySelectorAll('.search-modal').forEach(modal => {
+        //         modal.style.display = 'none';
+        //     });
             
-            // Unlock body scroll
-            document.body.style.overflow = '';
+        //     // Unlock body scroll
+        //     document.body.style.overflow = '';
             
-            trackEvent('close_search_modal', 'Search Interface');
-        }
+        //     trackEvent('close_search_modal', 'Search Interface');
+        // }
         
         function searchByLocation() {
             const query = document.getElementById('locationInput').value.trim();
