@@ -802,6 +802,56 @@
             trackEvent('go_home', 'Navigation', 'home_button');
         }
 
+        // ================================
+        // LOAD STATS IN HERO SECTION
+        // ================================
+
+        async function loadStats() {
+            try {
+                console.log('📊 Loading stats...');
+                const response = await fetch('/api/stats');
+                const data = await response.json();
+                
+                console.log('📊 Stats loaded:', data);
+                
+                // Update the numbers using your HTML IDs
+                const totalPubsElement = document.getElementById('totalPubs');
+                const gfPubsElement = document.getElementById('gfPubs');
+                
+                if (totalPubsElement && data.total_pubs) {
+                    totalPubsElement.textContent = data.total_pubs.toLocaleString();
+                    console.log('✅ Updated total pubs:', data.total_pubs);
+                }
+                
+                if (gfPubsElement && data.gf_pubs) {
+                    gfPubsElement.textContent = data.gf_pubs.toLocaleString();
+                    console.log('✅ Updated GF pubs:', data.gf_pubs);
+                }
+                
+            } catch (error) {
+                console.error('❌ Error loading stats:', error);
+                // Fallback to default values if API fails
+                const totalPubsElement = document.getElementById('totalPubs');
+                const gfPubsElement = document.getElementById('gfPubs');
+                
+                if (totalPubsElement) totalPubsElement.textContent = '49,841';
+                if (gfPubsElement) gfPubsElement.textContent = '9,971';
+                
+                console.log('Using fallback numbers');
+            }
+        }
+        
+        // Call the function when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Page loaded, calling loadStats...');
+            loadStats();
+        });
+        
+        // Also call immediately if page already loaded
+        if (document.readyState !== 'loading') {
+            loadStats();
+        }
+
         // SMART MAP TOGGLE - Auto-show when needed
         function toggleMap() {
             mapVisible = !mapVisible;
