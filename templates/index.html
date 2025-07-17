@@ -2016,7 +2016,7 @@
                 if (!input.contains(e.target) && !suggestions.contains(e.target)) {
                     suggestions.style.display = 'none';
                 }
-
+            });
             // Save state on form changes
             document.getElementById('searchType').addEventListener('change', () => AppState.save());
         });
