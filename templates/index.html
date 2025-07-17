@@ -2396,58 +2396,58 @@
             //     }
 
                 // Regular autocomplete for non-postcodes
-                try {
-                    const url = `/autocomplete?q=${encodeURIComponent(query)}&search_type=${searchType}`;
-                    console.log('🌐 Autocomplete fetching:', url);
+            //     try {
+            //         const url = `/autocomplete?q=${encodeURIComponent(query)}&search_type=${searchType}`;
+            //         console.log('🌐 Autocomplete fetching:', url);
                     
-                    const response = await fetch(url);
-                    console.log('📡 Autocomplete response status:', response.status);
-                    if (!response.ok) {
-                        suggestions.style.display = 'none';
-                        return;
-                    }
-                    const data = await response.json();
-                    console.log('✅ Autocomplete data received:', data);
+            //         const response = await fetch(url);
+            //         console.log('📡 Autocomplete response status:', response.status);
+            //         if (!response.ok) {
+            //             suggestions.style.display = 'none';
+            //             return;
+            //         }
+            //         const data = await response.json();
+            //         console.log('✅ Autocomplete data received:', data);
 
-                    suggestions.innerHTML = '';
-                    if (data.length === 0) {
-                        suggestions.style.display = 'none';
-                        return;
-                    }
+            //         suggestions.innerHTML = '';
+            //         if (data.length === 0) {
+            //             suggestions.style.display = 'none';
+            //             return;
+            //         }
 
-                    if (data.length >= 10) {
-                        const showAllDiv = document.createElement('div');
-                        showAllDiv.className = 'suggestion-item highlight'; 
-                        showAllDiv.innerHTML = `<strong>🔍 Show all ${data.length}+ results for "${query}"</strong>`;
-                        showAllDiv.addEventListener('click', () => {
-                            document.getElementById('searchInput').value = query;
-                            searchPubs();
-                            suggestions.style.display = 'none';
-                        });
-                        suggestions.appendChild(showAllDiv);
-                    }
+            //         if (data.length >= 10) {
+            //             const showAllDiv = document.createElement('div');
+            //             showAllDiv.className = 'suggestion-item highlight'; 
+            //             showAllDiv.innerHTML = `<strong>🔍 Show all ${data.length}+ results for "${query}"</strong>`;
+            //             showAllDiv.addEventListener('click', () => {
+            //                 document.getElementById('searchInput').value = query;
+            //                 searchPubs();
+            //                 suggestions.style.display = 'none';
+            //             });
+            //             suggestions.appendChild(showAllDiv);
+            //         }
 
-                    data.forEach(pub => {
-                        const div = document.createElement('div');
-                        div.className = 'suggestion-item'; // uses suggestion for drop down autocomplete
-                        div.textContent = `${pub.name}, ${pub.address} (${pub.postcode})`;
-                        div.addEventListener('click', () => {
-                            clearSearch();
+            //         data.forEach(pub => {
+            //             const div = document.createElement('div');
+            //             div.className = 'suggestion-item'; // uses suggestion for drop down autocomplete
+            //             div.textContent = `${pub.name}, ${pub.address} (${pub.postcode})`;
+            //             div.addEventListener('click', () => {
+            //                 clearSearch();
                             
-                            // Show results section first
-                            showResultsSection();
+            //                 // Show results section first
+            //                 showResultsSection();
                             
-                            searchSpecificPub(pub.pub_id);
-                            suggestions.style.display = 'none';
-                        });
-                        suggestions.appendChild(div);
-                    });
-                    suggestions.style.display = 'block';
-                } catch (error) {
-                    console.error('❌ Autocomplete error:', error);
-                    suggestions.style.display = 'none';
-                }
-            }, 300));
+            //                 searchSpecificPub(pub.pub_id);
+            //                 suggestions.style.display = 'none';
+            //             });
+            //             suggestions.appendChild(div);
+            //         });
+            //         suggestions.style.display = 'block';
+            //     } catch (error) {
+            //         console.error('❌ Autocomplete error:', error);
+            //         suggestions.style.display = 'none';
+            //     }
+            // }, 300));
 
             // Hide suggestions on outside click
             document.addEventListener('click', (e) => {
