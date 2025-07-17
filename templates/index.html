@@ -70,38 +70,37 @@
                 </div>
                 <div class="search-body">
                     <div class="search-options">
-                        <!-- Top Left: Pubs by Name -->
-                        <div class="search-option name" onclick="openModal('nameModal')">
+                        <!-- Top Left: Pubs Near Me -->
+                        <div class="search-option name" onclick="openModal('locationModal')">
+                            <span class="search-icon">📍</span>
+                            <h3 class="search-title">Pubs Near Me</h3>
+                            <p class="search-description">Find pubs close to you, control the search distance.</p>
+                        </div>
+                        <!-- Top Right: Pubs by Name -->      
+                        <div class="search-option location" onclick="openModal('nameModal')">
                             <span class="search-icon">🏠</span>
                             <h3 class="search-title">Pubs by Name</h3>
-                            <p class="search-description">Search for a specific pub by name - "The Milestone", etc.</p>
-                        </div>
-                        <!-- Top Right: Pubs by Postcode -->      
-                        <div class="search-option location" onclick="openModal('locationModal')">
-                            <span class="search-icon">📍</span>
-                            <h3 class="search-title">Pubs by Postcode</h3>
-                            <p class="search-description">Find GF-friendly pubs by entering all/part of a postcode</p>
+                            <p class="search-description">Search for a specific pub by name - "The Milestone" etc</p>
                         </div>
                         <!-- Bottom Left: Pubs by Area -->
                         <div class="search-option area" onclick="openModal('areaModal')">
                             <span class="search-icon">🗺️</span>
                             <h3 class="search-title">Pubs by Area</h3>
-                            <p class="search-description">Explore pubs in specific regions, cities, or local authorities</p>
+                            <p class="search-description">Explore pubs in specific regions, cities, or postcodes</p>
                         </div>
                         <!-- Bottom Right: Pubs by Beer -->
                         <div class="search-option beer" onclick="openModal('beerModal')">
                             <span class="search-icon">🍺</span>
                             <h3 class="search-title">Pubs by Beer</h3>
                             <p class="search-description">Find pubs serving specific GF beers - "Zapato", "IPA" etc.</p>
-                        </div>
-                        
+                        </div>            
                     </div>
                     
-                    <div class="quick-actions">
+<!--                     <div class="quick-actions">
                         <button class="quick-action-btn" onclick="findNearbyPubs()">
                             Find Pubs Near Me
                         </button>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>
@@ -110,6 +109,20 @@
     <!------------------------------->
     <!-- HTML search modal section -->
     <!------------------------------->
+    
+    <div id="locationModal" class="search-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">📍 Find Pubs Near Me</h3>
+                <p class="modal-subtitle">Find pubs near me</p>
+            </div>
+            <input type="text" class="form-input" placeholder="e.g. SW1A 1AA, HX6" id="locationInput">
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeSearchModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="searchByLocation()">Search</button>
+            </div>
+        </div>
+    </div>
     
     <div id="nameModal" class="search-modal">
         <div class="modal-content">
@@ -128,10 +141,10 @@
     <div id="locationModal" class="search-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">📍 Search by Postcode</h3>
-                <p class="modal-subtitle">Enter all or part of a postcode to find pubs nearby</p>
+                <h3 class="modal-title">🗺️ Search by Area</h3>
+                <p class="modal-subtitle">Enter city or postcode to find pubs in the region</p>
             </div>
-            <input type="text" class="form-input" placeholder="e.g. SW1A 1AA, HX6" id="locationInput">
+            <input type="text" class="form-input" placeholder="e.g. Leeds, SW1A 1AA, HX6" id="locationInput">
             <div class="modal-actions">
                 <button class="btn btn-secondary" onclick="closeSearchModal()">Cancel</button>
                 <button class="btn btn-primary" onclick="searchByLocation()">Search</button>
