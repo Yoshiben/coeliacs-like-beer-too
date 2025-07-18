@@ -2276,7 +2276,7 @@ body.pub-details-open {
 
 /* Make sure search section fits perfectly */
 .search-section {
-    margin: -20px 0 0 0; /* Keep same overlap with hero */
+    margin: -20px 0 0 0; /* Controls upper level of box */
     position: relative;
     z-index: var(--z-sticky);
     width: 100vw;
@@ -2285,8 +2285,8 @@ body.pub-details-open {
     margin-left: -50vw;
     margin-right: -50vw;
     padding: 0 var(--space-lg);
-    height: calc(100vh - 200px); /* Changes height of search box */
-    height: calc(100dvh - 200px); /* Make sure you change both this and above */
+    height: calc(100vh - 160px); /* Changes lower level of search box */
+    height: calc(100dvh - 160px); /* Make sure you change both this and above */
     display: flex;
     align-items: stretch; /* if this is center, the box won't stretch. Set to stretch to get it to do so */
     overflow: hidden;
