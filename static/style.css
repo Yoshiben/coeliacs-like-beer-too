@@ -2486,6 +2486,7 @@ body.pub-details-open {
     line-height: 1;
 }
 
+/* controls the titles in the search boxes on the home page */
 .search-title {
     font-size: 1.2rem !important; /* Increased from 1.1rem */
     font-weight: 700 !important;
@@ -2494,6 +2495,7 @@ body.pub-details-open {
     line-height: 1.2 !important;
 }
 
+/* controls the descriptions in the search boxes on the home page */
 .search-description {
     font-size: 0.95rem !important; /* Increased from 0.85rem */
     color: var(--text-secondary) !important;
