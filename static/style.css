@@ -2415,26 +2415,116 @@ body.pub-details-open {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
-    gap: var(--space-lg);
+    gap: var(--space-lg) !important; /* More breathing room */
     width: 100%;
 }
 
 /* Reset search option height back to normal */
 .search-option {
-    border: 3px solid var(--border-light);
-    border-radius: var(--radius-xl);
-    padding: var(--space-xl);
-    cursor: pointer;
-    transition: all var(--transition);
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    min-height: auto; /* LET buttons fill available space */
-    height: 100%; /* FILL grid cell height */
+    min-height: 140px !important; /* Ensure good touch target */
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+    cursor: pointer !important;
+    -webkit-tap-highlight-color: transparent !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+/* Satisfying press animation for mobile */
+@media (hover: none) and (pointer: coarse) {
+    .search-option:active {
+        transform: scale(0.95) !important;
+        transition: transform 0.1s ease-out !important;
+    }
+    
+    /* Add ripple effect on tap */
+    .search-option::after {
+        content: '' !important;
+        position: absolute !important;
+        top: 50% !important;
+        left: 50% !important;
+        width: 0 !important;
+        height: 0 !important;
+        border-radius: 50% !important;
+        background: rgba(255, 255, 255, 0.3) !important;
+        transform: translate(-50%, -50%) !important;
+        transition: width 0.3s ease, height 0.3s ease, opacity 0.3s ease !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+    
+    .search-option:active::after {
+        width: 100px !important;
+        height: 100px !important;
+        opacity: 1 !important;
+    }
+}
+
+/* Loading state with bounce */
+.search-option.loading {
+    animation: loadingBounce 0.6s ease-in-out !important;
+    pointer-events: none !important;
+}
+
+.search-option.loading .search-icon {
+    animation: iconPulse 1s infinite ease-in-out !important;
+}
+
+/* Quick success feedback */
+.search-option.tapped {
+    background: rgba(102, 126, 234, 0.1) !important;
+    border-color: rgba(102, 126, 234, 0.4) !important;
+    transform: scale(1.02) !important;
+}
+
+/* Animations */
+@keyframes loadingBounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(0.98); }
+}
+
+@keyframes iconPulse {
+    0%, 100% { 
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% { 
+        transform: scale(1.1);
+        opacity: 0.7;
+    }
+}
+
+/* Better visual feedback for each button type */
+.search-option.name:active {
+    background: rgba(59, 130, 246, 0.2) !important;
+    border-color: rgba(59, 130, 246, 0.6) !important;
+}
+
+.search-option.location:active {
+    background: rgba(16, 185, 129, 0.2) !important;
+    border-color: rgba(16, 185, 129, 0.6) !important;
+}
+
+.search-option.area:active {
+    background: rgba(139, 92, 246, 0.2) !important;
+    border-color: rgba(139, 92, 246, 0.6) !important;
+}
+
+.search-option.beer:active {
+    background: rgba(245, 158, 11, 0.2) !important;
+    border-color: rgba(245, 158, 11, 0.6) !important;
+}
+
+/* Accessibility improvements */
+.search-option[tabindex]:focus-visible {
+    outline: 3px solid rgba(102, 126, 234, 0.6) !important;
+    outline-offset: 2px !important;
+}
+
+/* Better header proportions for mobile */
+.search-header .section-title {
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+    line-height: 1.3 !important;
 }
 
 .search-option:hover {
