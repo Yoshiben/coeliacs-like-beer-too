@@ -1743,26 +1743,28 @@ body.pub-details-open {
 .pub-action-grid {
     display: grid !important;
     grid-template-columns: 1fr 1fr !important;
-    grid-template-rows: auto auto !important;
-    gap: 12px !important; /* Fixed pixel value to ensure consistency */
-    margin-top: auto !important;
-    padding: 16px 0 0 0 !important; /* Explicit padding */
+    grid-template-rows: 1fr 1fr !important; /* Equal height rows */
+    gap: 12px !important;
     width: 100% !important;
+    margin-top: auto !important;
+    padding: 16px 0 16px 0 !important; /* Bottom padding to prevent overlap */
     box-sizing: border-box !important;
 }
 
-/* Make sure all buttons have consistent spacing */
+/* 3. Perfect button sizing and alignment */
 .pub-action-grid .btn {
-    /* Reset all spacing */
+    /* Reset everything that could interfere */
     margin: 0 !important;
-    padding: 12px 16px !important;
+    padding: 0 !important;
+    border: none !important;
     
-    /* Explicit sizing */
-    min-height: 48px !important;
+    /* Perfect sizing */
     width: 100% !important;
-    box-sizing: border-box !important;
+    height: 48px !important; /* Fixed height for perfect alignment */
+    min-height: 48px !important;
+    max-height: 48px !important;
     
-    /* Layout */
+    /* Perfect centering */
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -1771,12 +1773,17 @@ body.pub-details-open {
     /* Styling */
     font-size: 0.9rem !important;
     font-weight: 700 !important;
-    border: none !important;
-    border-radius: 20px !important;
+    border-radius: 24px !important; /* Half of height for perfect pill shape */
     cursor: pointer !important;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     position: relative !important;
     overflow: hidden !important;
+    box-sizing: border-box !important;
+    
+    /* Text styling */
+    text-decoration: none !important;
+    white-space: nowrap !important;
+    line-height: 1 !important;
 }
 
 /* Button hover effects */
@@ -2854,12 +2861,12 @@ body {
 
 /* Split view adjustments */
 .split-view .pub-details-card {
-    /* Ensure the card has proper flex behavior */
-    flex: 0 0 50% !important;
-    max-height: 50vh !important; /* Prevent it from growing too tall */
-    display: flex !important;
-    flex-direction: column !important;
-    overflow: hidden !important;
+    flex: 0 0 auto !important; /* Don't grow or shrink */
+    height: auto !important; /* Let content determine height */
+    max-height: calc(100vh - 100px) !important; /* Prevent overflow */
+    max-height: calc(100dvh - 100px) !important;
+    margin-bottom: 4px !important; /* Small gap before map */
+    border-radius: var(--radius-xl) var(--radius-xl) var(--radius-sm) var(--radius-sm) !important;
 }
 
 /* Compact header in split view */
@@ -2894,17 +2901,16 @@ body {
 
 /* Split view adjustments - maintain gaps */
 .split-view .pub-action-grid {
-    gap: 8px !important; /* Smaller gap in split view */
-    padding: 8px 0 0 0 !important;
-    margin-top: 8px !important;
-    flex-shrink: 0 !important; /* Prevent shrinking */
+    gap: 8px !important;
+    padding: 8px 0 12px 0 !important; /* Extra bottom padding in split view */
 }
 
 .split-view .pub-action-grid .btn {
+    height: 36px !important;
     min-height: 36px !important;
-    padding: 8px 12px !important;
+    max-height: 36px !important;
+    border-radius: 18px !important; /* Half of height */
     font-size: 0.8rem !important;
-    border-radius: 16px !important;
 }
 
 /* Tighter spacing in split view */
@@ -2972,11 +2978,9 @@ body {
     overflow: hidden !important;
 }
 
-/* Ensure map gets remaining space without overlap */
 .split-view .pub-map-container {
     flex: 1 !important;
-    min-height: 0 !important; /* Allow shrinking */
-    max-height: 50vh !important; /* Prevent growing too much */
+    min-height: 200px !important; /* Ensure minimum map height */
 }
 
 /* Tighter spacing overall in split view */
@@ -3035,12 +3039,14 @@ body {
 
    .pub-action-grid {
         gap: 10px !important;
-        padding: 12px 0 0 0 !important;
+        padding: 12px 0 16px 0 !important;
     }
     
     .pub-action-grid .btn {
+        height: 44px !important;
         min-height: 44px !important;
-        padding: 10px 14px !important;
+        max-height: 44px !important;
+        border-radius: 22px !important;
         font-size: 0.85rem !important;
     }
 
@@ -3177,7 +3183,9 @@ body {
       ==================== */
 
    .split-view .pub-details-card {
-        max-height: 45vh !important;
+        max-height: calc(100vh - 80px) !important;
+        max-height: calc(100dvh - 80px) !important;
+        margin-bottom: 2px !important;
     }
     
     .split-view .pub-title {
@@ -3195,12 +3203,14 @@ body {
     
     .split-view .pub-action-grid {
         gap: 6px !important;
-        padding: 6px 0 0 0 !important;
+        padding: 6px 0 10px 0 !important;
     }
     
     .split-view .pub-action-grid .btn {
+        height: 32px !important;
         min-height: 32px !important;
-        padding: 6px 10px !important;
+        max-height: 32px !important;
+        border-radius: 16px !important;
         font-size: 0.75rem !important;
     }
 
