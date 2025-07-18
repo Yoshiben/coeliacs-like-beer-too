@@ -2273,6 +2273,8 @@ body.pub-details-open {
 /* ================================
    SEARCH SECTION
    ================================ */
+/*In order to change the height of the search section on the main page, margin controls the upper limit, height controls the lower
+ Ensure you change the height of all search sections, mobile etc included, by the same px */
 
 .search-section {
     /* Keep your existing height but make sure we use ALL of it */
