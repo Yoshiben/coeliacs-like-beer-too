@@ -1698,6 +1698,7 @@ body.pub-details-open {
     border-left: 6px solid var(--success-gradient) !important;
     position: relative !important;
     overflow: hidden !important;
+    min-height: auto !important; /* Don't force a minimum height */
 }
 
 .beer-section::before {
@@ -1718,6 +1719,7 @@ body.pub-details-open {
     color: var(--text-primary) !important;
     margin-bottom: var(--space-lg) !important;
     gap: var(--space-sm) !important;
+    line-height: 1.2 !important;
 }
 
 .beer-status {
@@ -1819,15 +1821,6 @@ body.pub-details-open {
 .pub-nav-buttons {
     display: none; /* Hide the old bottom nav */
 }
-
-.split-view .pub-nav-buttons {
-    bottom: var(--space-md);
-    left: var(--space-md);
-    right: var(--space-md);
-    gap: var(--space-xs);
-}
-
-/* CONSISTENT BUTTON COLOR SCHEME */
 
 /* Primary actions - your brand purple */
 .pub-details-card .btn-primary {
@@ -2893,26 +2886,41 @@ body {
 
 /* Compact beer section in split view */
 .split-view .beer-section {
-    padding: var(--space-lg) !important;
-    margin: var(--space-md) 0 !important;
-    flex: 0 1 auto !important; /* Don't let it grow too much */
-    border-left: 4px solid var(--success-gradient) !important; /* Thinner left border */
+    padding: var(--space-md) !important; /* Smaller padding */
+    margin: var(--space-md) 0 !important; /* Smaller margins */
+    border-left: 4px solid var(--success-gradient) !important; /* Thinner accent */
+    border-radius: var(--radius-lg) !important; /* Smaller radius */
+    min-height: auto !important;
+    flex-shrink: 0 !important; /* Don't let it shrink too much */
 }
 
 .split-view .beer-section::before {
-    font-size: 2.5rem !important; /* Smaller beer emoji */
+    font-size: 2rem !important; /* Much smaller emoji */
     top: -5px !important;
     right: -5px !important;
+    opacity: 0.08 !important; /* Even more subtle */
 }
 
 .split-view .beer-section-title {
-    font-size: 1rem !important;
+    font-size: 0.9rem !important;
     margin-bottom: var(--space-sm) !important;
+    line-height: 1.1 !important;
+    gap: var(--space-xs) !important;
 }
 
 .split-view .beer-status {
-    font-size: 0.85rem !important;
+    font-size: 0.8rem !important;
     line-height: 1.4 !important;
+}
+
+.split-view .beer-status strong {
+    font-size: 0.85rem !important;
+}
+
+.split-view .beer-status em {
+    font-size: 0.75rem !important;
+    display: block !important; /* Put on new line to save space */
+    margin-top: var(--space-xs) !important;
 }
 
 /* Compact nav buttons in split view */
@@ -2932,6 +2940,13 @@ body {
 /* Tighter spacing overall in split view */
 .split-view .pub-nav-top {
     margin-bottom: var(--space-sm) !important;
+}
+
+.split-view .pub-nav-buttons {
+    bottom: var(--space-md);
+    left: var(--space-md);
+    right: var(--space-md);
+    gap: var(--space-xs);
 }
 
 /* ====================
