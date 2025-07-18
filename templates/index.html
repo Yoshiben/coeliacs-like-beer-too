@@ -1999,48 +1999,104 @@ function addSwipeGestures() {
         // Replace the entire function with this enhanced version
         // ================================
 
+        // ================================
+        // 🔍 DEBUG - REPORT MODAL FIX
+        // ✏️ UPDATE - Replace your openReportModal function with this debug version
+        // ================================
+        
         function openReportModal(pubData = null) {
+            console.log('🔍 Debug: openReportModal called with:', pubData);
+            
+            // Debug: Check if modal exists
             const modal = document.getElementById('reportModal');
+            console.log('🔍 Debug: modal element found:', modal);
+            
+            if (!modal) {
+                console.error('❌ ERROR: reportModal not found in DOM!');
+                console.log('🔍 Available modals:', document.querySelectorAll('[id*="modal"]'));
+                showSuccessToast('❌ Report modal not found - please refresh the page');
+                return;
+            }
+            
+            // Debug: Check modal structure
             const modalTitle = modal.querySelector('.modal-title');
+            console.log('🔍 Debug: modal title found:', modalTitle);
+            
+            if (!modalTitle) {
+                console.error('❌ ERROR: .modal-title not found in reportModal!');
+                console.log('🔍 Modal innerHTML:', modal.innerHTML.substring(0, 200) + '...');
+                showSuccessToast('❌ Modal structure error - please refresh the page');
+                return;
+            }
+            
             const pubSearchField = document.getElementById('reportPubSearch');
             const selectedPubInfo = document.getElementById('selectedPubInfo');
             const newPubFields = document.getElementById('newPubFields');
             
+            console.log('🔍 Debug: form elements found:', {
+                pubSearchField: !!pubSearchField,
+                selectedPubInfo: !!selectedPubInfo,
+                newPubFields: !!newPubFields
+            });
+            
             // If coming from a specific pub, handle differently
             if (pubData) {
+                console.log('🍺 Debug: Pre-populating with pub data');
+                
                 // Hide pub search entirely
-                document.getElementById('pubSearchGroup').style.display = 'none';
+                const pubSearchGroup = document.getElementById('pubSearchGroup');
+                if (pubSearchGroup) {
+                    pubSearchGroup.style.display = 'none';
+                } else {
+                    console.warn('⚠️ Warning: pubSearchGroup not found');
+                }
                 
                 // Show the pub info at top
                 modalTitle.innerHTML = `📸 Report GF Beer Find<br><small style="color: var(--text-secondary); font-weight: 400;">at ${pubData.name}</small>`;
                 
                 // Store the pub data globally
-                selectedPubData = {
+                window.selectedPubData = {
                     pub_id: pubData.pub_id || pubData.id,
                     name: pubData.name,
                     address: pubData.address,
                     postcode: pubData.postcode
                 };
                 
-                console.log('🍺 Pre-populated pub data:', selectedPubData);
+                console.log('✅ Debug: Pre-populated pub data:', window.selectedPubData);
                 
             } else {
+                console.log('🔍 Debug: Normal flow - show pub search');
+                
                 // Normal flow - show pub search
-                document.getElementById('pubSearchGroup').style.display = 'block';
+                const pubSearchGroup = document.getElementById('pubSearchGroup');
+                if (pubSearchGroup) {
+                    pubSearchGroup.style.display = 'block';
+                }
                 modalTitle.innerHTML = '📸 Report GF Beer Find';
-                selectedPubData = null;
+                window.selectedPubData = null;
             }
             
             // Reset form
-            document.getElementById('reportForm').reset();
-            selectedPubInfo.style.display = 'none';
-            newPubFields.style.display = 'none';
+            const reportForm = document.getElementById('reportForm');
+            if (reportForm) {
+                reportForm.reset();
+                console.log('✅ Debug: Form reset');
+            } else {
+                console.error('❌ ERROR: reportForm not found!');
+            }
+            
+            if (selectedPubInfo) selectedPubInfo.style.display = 'none';
+            if (newPubFields) newPubFields.style.display = 'none';
             
             // Hide all dropdowns
             const dropdowns = ['breweryDropdown', 'beerNameDropdown', 'beerStyleDropdown'];
             dropdowns.forEach(id => {
                 const dropdown = document.getElementById(id);
-                if (dropdown) dropdown.style.display = 'none';
+                if (dropdown) {
+                    dropdown.style.display = 'none';
+                } else {
+                    console.warn(`⚠️ Warning: ${id} not found`);
+                }
             });
             
             // Reset photo upload styling
@@ -2055,25 +2111,47 @@ function addSwipeGestures() {
                         <small>Beer menu, bottle, or tap</small>
                     `;
                 }
+                console.log('✅ Debug: Photo upload reset');
+            } else {
+                console.warn('⚠️ Warning: photo-upload-compact not found');
             }
             
             // Show modal
             modal.style.display = 'block';
-            trackEvent('open_report_modal', 'Modal', pubData ? 'from_pub_page' : 'general');
+            console.log('✅ Debug: Modal displayed');
             
-            // Initialize dropdowns and event handlers
-            initializeReportModalDropdowns();
+            // Track event
+            if (typeof trackEvent === 'function') {
+                trackEvent('open_report_modal', 'Modal', pubData ? 'from_pub_page' : 'general');
+            }
+            
+            // Initialize dropdowns
+            try {
+                initializeReportModalDropdowns();
+                console.log('✅ Debug: Dropdowns initialized');
+            } catch (error) {
+                console.error('❌ ERROR: initializeReportModalDropdowns failed:', error);
+            }
             
             // Focus appropriate field
             setTimeout(() => {
                 if (pubData) {
                     // Focus beer format since pub is pre-filled
-                    document.getElementById('reportFormat').focus();
+                    const formatField = document.getElementById('reportFormat');
+                    if (formatField) {
+                        formatField.focus();
+                        console.log('✅ Debug: Focused format field');
+                    }
                 } else {
                     // Focus pub search
-                    pubSearchField.focus();
+                    if (pubSearchField) {
+                        pubSearchField.focus();
+                        console.log('✅ Debug: Focused pub search field');
+                    }
                 }
             }, 100);
+            
+            console.log('🎉 Debug: openReportModal completed successfully');
         }
 
         function closeModal(modalId) {
