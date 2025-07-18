@@ -1046,15 +1046,35 @@ function addSwipeGestures() {
         // ================================
 
         function openModal(modalId) {
-            document.getElementById(modalId).style.display = 'flex';
+            // Small delay to let button animation finish cleanly
+            setTimeout(() => {
+                document.getElementById(modalId).style.display = 'flex';
+                
+                // Focus the input after modal opens for better UX
+                setTimeout(() => {
+                    const input = document.querySelector(`#${modalId} .form-input`);
+                    if (input) {
+                        input.focus();
+                    }
+                }, 100);
+            }, 150); // Just enough to let highlight animation complete
         }
-        
+
+        // Also add smooth modal close animation
         function closeSearchModal() {
             const modals = ['nameModal', 'locationModal', 'beerModal', 'areaModal'];
             modals.forEach(modal => {
-                document.getElementById(modal).style.display = 'none';
+                const modalEl = document.getElementById(modal);
+                if (modalEl && modalEl.style.display !== 'none') {
+                    // Add fade out effect
+                    modalEl.style.opacity = '0';
+                    setTimeout(() => {
+                        modalEl.style.display = 'none';
+                        modalEl.style.opacity = '1'; // Reset for next time
+                    }, 200);
+                }
             });
-        }     
+        }
 
         // SMART MAP TOGGLE - Auto-show when needed
         function toggleMap() {
