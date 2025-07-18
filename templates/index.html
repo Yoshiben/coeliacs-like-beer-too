@@ -104,20 +104,6 @@
     <!-- HTML search modal section -->
     <!------------------------------->
     
-<!--     <div id="locationModal" class="search-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">📍 Find Pubs Near Me</h3>
-                <p class="modal-subtitle">Find pubs near me</p>
-            </div>
-            <input type="text" class="form-input" placeholder="e.g. SW1A 1AA, HX6" id="locationInput">
-            <div class="modal-actions">
-                <button class="btn btn-secondary" onclick="closeSearchModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="searchByLocation()">Search</button>
-            </div>
-        </div>
-    </div> -->
-    
     <div id="nameModal" class="search-modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -132,7 +118,7 @@
         </div>
     </div>
     
-    <div id="locationModal" class="search-modal">
+    <div id="areaModal" class="search-modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title">🗺️ Search by Area</h3>
@@ -156,20 +142,6 @@
             <div class="modal-actions">
                 <button class="btn btn-secondary" onclick="closeSearchModal()">Cancel</button>
                 <button class="btn btn-primary" onclick="searchByBeer()">Search</button>
-            </div>
-        </div>
-    </div>
-    
-    <div id="areaModal" class="search-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">🗺️ Search by Area</h3>
-                <p class="modal-subtitle">Explore pubs in cities, specific regions or local authorities</p>
-            </div>
-            <input type="text" class="form-input" placeholder="e.g. Greater London, West Yorkshire, Camden..." id="areaInput">
-            <div class="modal-actions">
-                <button class="btn btn-secondary" onclick="closeSearchModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="searchByArea()">Search</button>
             </div>
         </div>
     </div>
@@ -820,7 +792,7 @@
                     // Fallback: offer manual location entry
                     setTimeout(() => {
                         if (confirm('Would you like to enter your location manually instead?')) {
-                            openModal('locationModal');
+                            openModal('areaModal');
                         }
                     }, 2000);
                 },
@@ -1067,7 +1039,7 @@ function addSwipeGestures() {
                 option.classList.remove('tapped', 'loading');
             });
             
-            const modals = ['nameModal', 'locationModal', 'beerModal', 'areaModal'];
+            const modals = ['nameModal', 'beerModal', 'areaModal'];
             modals.forEach(modal => {
                 const modalEl = document.getElementById(modal);
                 if (modalEl && modalEl.style.display !== 'none') {
