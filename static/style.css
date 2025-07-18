@@ -1812,11 +1812,6 @@ body.pub-details-open {
     box-shadow: 0 4px 15px var(--purple-shadow-strong) !important;
 }
 
-.split-view .pub-action-grid {
-    gap: var(--space-xs);
-    margin-top: var(--space-sm);
-}
-
 .pub-nav-buttons {
     display: none; /* Hide the old bottom nav */
 }
@@ -2883,13 +2878,28 @@ body {
     transform: translateY(-1px); /* Smaller hover effect in split view */
 }
 
-/* Compact beer section in split view */
+/* Move action buttons up */
+.split-view .pub-action-grid {
+    margin-top: var(--space-xs) !important; /* Reduced from var(--space-md) */
+    padding-top: var(--space-xs) !important; /* Reduced from var(--space-md) */
+    gap: var(--space-xs) !important;
+}
+
+/* Slightly smaller buttons to help them fit */
+.split-view .pub-action-grid .btn {
+    min-height: 34px !important; /* Reduced from 36px */
+    padding: var(--space-xs) var(--space-sm) !important;
+    font-size: 0.8rem !important;
+    border-radius: var(--radius-lg) !important;
+}
+
+/* Tighter spacing in split view */
 .split-view .beer-section {
-    padding: var(--space-sm) var(--space-md) !important; /* Minimal padding */
-    margin: var(--space-sm) 0 !important; /* Minimal margins */
-    border-left: 3px solid var(--success-gradient) !important; /* Thinner accent */
-    border-radius: var(--radius) !important; /* Smaller radius */
-    border-width: 1px !important; /* Thinner border */
+    padding: var(--space-sm) var(--space-md) !important;
+    margin: var(--space-sm) 0 var(--space-xs) 0 !important; /* Smaller bottom margin */
+    border-left: 3px solid var(--success-gradient) !important;
+    border-radius: var(--radius) !important;
+    border-width: 1px !important;
     min-height: auto !important;
     flex-shrink: 0 !important;
 }
