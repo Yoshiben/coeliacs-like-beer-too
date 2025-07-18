@@ -978,44 +978,132 @@
             });
         }
         
+        // ================================
+        // ENHANCED PUB CARDS WITH BETTER BEER DISPLAY
+        // ================================
+        
         function createResultItemForOverlay(pub) {
             const div = document.createElement('div');
             div.className = 'result-item';
             
-            // Calculate distance if available
+            // Calculate distance
             let distanceText = '';
             if (pub.distance !== undefined) {
                 distanceText = `<div class="result-distance">${pub.distance.toFixed(1)}km away</div>`;
             }
             
-            // GF badges
-            const badges = [];
-            if (pub.bottle) badges.push('🍺 Bottle');
-            if (pub.tap) badges.push('🚰 Tap');
-            if (pub.cask) badges.push('🛢️ Cask');
-            if (pub.can) badges.push('🥫 Can');
+            // Enhanced GF availability display
+            const gfInfo = createGFAvailabilityDisplay(pub);
             
             div.innerHTML = `
                 <div class="result-header">
-                    <h3 class="result-title">${pub.name}</h3>
-                    ${distanceText}
+                    <div class="result-main-info">
+                        <h3 class="result-title">${pub.name}</h3>
+                        ${distanceText}
+                    </div>
+                    ${gfInfo.hasGF ? '<div class="gf-indicator">✅ GF Available</div>' : '<div class="gf-indicator unknown">❓ GF Unknown</div>'}
                 </div>
-                <div class="result-address">${pub.address}, ${pub.postcode}</div>
-                <div class="result-authority">${pub.local_authority}</div>
-                <div class="result-badges">
-                    ${badges.map(badge => `<span class="gf-badge">${badge}</span>`).join('')}
+                
+                <div class="result-location">
+                    <div class="result-address">${pub.address}</div>
+                    <div class="result-postcode">${pub.postcode}</div>
+                    <div class="result-authority">${pub.local_authority}</div>
                 </div>
+                
+                <div class="gf-availability-section">
+                    ${gfInfo.display}
+                </div>
+                
                 <div class="result-actions">
-                    <button class="btn btn-primary" onclick="openPubDetails(${pub.pub_id})">
-                        View Details
+                    <button class="btn btn-primary" onclick="showPubDetails(${pub.pub_id})">
+                        📍 View Details
                     </button>
-                    <button class="btn btn-secondary" onclick="getDirections('${pub.name}', '${pub.address}')">
-                        Directions
+                    <button class="btn btn-secondary" onclick="viewPubOnline('${pub.name}', '${pub.postcode}')">
+                        🔍 View Online
+                    </button>
+                    <button class="btn btn-secondary" onclick="getDirectionsToPub('${pub.name}', '${pub.address}', '${pub.postcode}')">
+                        🧭 Directions
                     </button>
                 </div>
             `;
             
             return div;
+        }
+
+        function createGFAvailabilityDisplay(pub) {
+            const hasBottle = pub.bottle === 1;
+            const hasTap = pub.tap === 1;
+            const hasCask = pub.cask === 1;
+            const hasCan = pub.can === 1;
+            const hasAnyGF = hasBottle || hasTap || hasCask || hasCan;
+            
+            if (!hasAnyGF) {
+                return {
+                    hasGF: false,
+                    display: `
+                        <div class="gf-status unknown">
+                            <div class="gf-status-title">❓ GF Status Unknown</div>
+                            <div class="gf-status-text">Help the community by reporting what you find!</div>
+                        </div>
+                    `
+                };
+            }
+            
+            // Build format list
+            const formats = [];
+            if (hasBottle) formats.push({ icon: '🍺', name: 'Bottle' });
+            if (hasTap) formats.push({ icon: '🚰', name: 'Tap' });
+            if (hasCask) formats.push({ icon: '🛢️', name: 'Cask' });
+            if (hasCan) formats.push({ icon: '🥫', name: 'Can' });
+            
+            return {
+                hasGF: true,
+                display: `
+                    <div class="gf-status confirmed">
+                        <div class="gf-status-title">✅ Gluten Free Options Confirmed</div>
+                        <div class="gf-formats">
+                            ${formats.map(format => `
+                                <span class="gf-format-tag">
+                                    ${format.icon} ${format.name}
+                                </span>
+                            `).join('')}
+                        </div>
+                        <div class="gf-note">💡 Call ahead to confirm current selection</div>
+                    </div>
+                `
+            };
+        }
+
+        function viewPubOnline(pubName, postcode) {
+            const searchQuery = `${pubName} ${postcode} pub`;
+            const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
+            
+            window.open(googleUrl, '_blank');
+            trackEvent('view_pub_online', 'External Navigation', pubName);
+            
+            showSuccessToast(`🔍 Searching for ${pubName} online...`);
+        }
+        
+        function getDirectionsToPub(pubName, address, postcode) {
+            const fullAddress = `${pubName}, ${address}, ${postcode}`;
+            const encodedAddress = encodeURIComponent(fullAddress);
+            
+            // Check if mobile for better maps experience
+            const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            
+            let mapsUrl;
+            if (isMobile) {
+                // Mobile - try to open in native maps app
+                mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${encodedAddress}`;
+            } else {
+                // Desktop - open in browser
+                mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodedAddress}`;
+            }
+            
+            window.open(mapsUrl, '_blank');
+            trackEvent('get_directions', 'External Navigation', pubName);
+            
+            showSuccessToast(`🧭 Opening directions to ${pubName}...`);
         }
         
         function toggleResultsMap() {
@@ -2450,7 +2538,19 @@ function addSwipeGestures() {
         
         // UPDATE the showPubDetails function to prevent background scrolling:
         
-        function showPubDetails(pub) {
+        function showPubDetails(pubId) {
+            console.log('Loading pub details for ID:', pubId);
+            
+            // Close results overlay first  
+            closeResults();
+            
+            // Use your existing searchSpecificPub function to get full pub data
+            // This will handle the API call and then call the original showPubDetails
+            searchSpecificPub(pubId);
+        }
+
+        // Keep your original function but rename it
+        function displayPubDetailsOverlay(pub) {
             currentPubData = pub;
             
             // Update the pub details content
@@ -2487,7 +2587,7 @@ function addSwipeGestures() {
                 }
             };
             
-            // ADDED: Lock body scroll to prevent background scrolling
+            // Lock body scroll to prevent background scrolling
             document.body.classList.add('pub-details-open');
             
             // Show the overlay
