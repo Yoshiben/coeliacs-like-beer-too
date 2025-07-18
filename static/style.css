@@ -1799,17 +1799,6 @@ body.pub-details-open {
    REPLACE your search section with this:
    ================================ */
 
-.search-card {
-    background: var(--bg-white);
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-lg);
-    backdrop-filter: blur(10px);
-    overflow: hidden;
-    width: 100%;
-    max-width: 800px;
-    margin: 0 auto;
-}
-
 .search-header {
     padding: var(--space-xl) var(--space-xl) var(--space-lg);
     text-align: center;
@@ -1821,11 +1810,6 @@ body.pub-details-open {
     font-weight: 600;
     color: var(--text-primary);
     margin: 0;
-}
-
-.search-body {
-    padding: var(--space-xl);
-    position: relative;
 }
 
 .quick-actions {
@@ -3928,136 +3912,7 @@ body.pub-details-open {
     }
 }
 
-/* ================================
-   SEARCH SECTION
-   ================================ */
 
-/* Make sure search section fits perfectly */
-.search-section {
-    margin: -120px 0 0 0; /* Keep same overlap with hero */
-    position: relative;
-    z-index: var(--z-sticky);
-    width: 100vw;
-    left: 50%;
-    right: 50%;
-    margin-left: -50vw;
-    margin-right: -50vw;
-    padding: 0 var(--space-lg);
-    height: calc(100vh - 100px); /* Changes height of search box */
-    height: calc(100dvh - 100px); /* Make sure you change both this and above */
-    display: flex;
-    align-items: center;
-    overflow: hidden;
-}
-
-@media (min-width: 768px) {
-    .search-section {
-        padding: 0 var(--space-md); /* More padding on larger screens */
-    }
-}
-
-.search-card {
-    background: var(--bg-white);
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-lg);
-    backdrop-filter: blur(10px);
-    overflow: hidden;
-    width: 100%;
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.search-header {
-    padding: var(--space-xl) var(--space-xl) var(--space-lg);
-    text-align: center;
-    border-bottom: 1px solid var(--border-light);
-}
-
-.section-title {
-    font-size: var(--text-lg);
-    font-weight: 600;
-    color: var(--text-primary);
-    margin: 0;
-}
-
-.search-body {
-    padding: var(--space-xl);
-    position: relative;
-}
-
-.search-options {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    gap: var(--space-lg);
-    width: 100%;
-}
-
-.search-option:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow);
-}
-
-.search-icon {
-    font-size: 1.8rem;
-    margin-bottom: var(--space-md); /* More space below icon */
-    display: block;
-    line-height: 1;
-}
-
-.search-title {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: var(--space-sm); /* More space below title */
-    line-height: 1.2;
-}
-
-.search-description {
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-    line-height: 1.3;
-    text-align: center;
-    padding: 0 var(--space-sm); /* More horizontal padding */
-}
-
-.quick-actions {
-    margin-top: var(--space-xl);
-    padding-top: var(--space-xl);
-    border-top: 1px solid var(--border-light);
-    text-align: center;
-}
-
-.quick-actions-title {
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    margin-bottom: var(--space-lg);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.quick-action-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-sm);
-    padding: var(--space-md) var(--space-xl);
-    background: var(--success-gradient);
-    color: var(--text-white);
-    border: none;
-    border-radius: var(--radius-pill);
-    font-weight: 600;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all var(--transition);
-    text-decoration: none;
-    box-shadow: var(--shadow);
-}
-
-.quick-action-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
-}
 
 /* ================================
    MODAL STYLES
@@ -4146,8 +4001,137 @@ body.pub-details-open {
 }
 
 /* ================================
-   BEAUTIFUL SEARCH BUTTONS - IMAGE 2 STYLE
+   SEARCH SECTION
    ================================ */
+
+/* Make sure search section fits perfectly */
+.search-section {
+    margin: -120px 0 0 0; /* Keep same overlap with hero */
+    position: relative;
+    z-index: var(--z-sticky);
+    width: 100vw;
+    left: 50%;
+    right: 50%;
+    margin-left: -50vw;
+    margin-right: -50vw;
+    padding: 0 var(--space-lg);
+    height: calc(100vh - 100px); /* Changes height of search box */
+    height: calc(100dvh - 100px); /* Make sure you change both this and above */
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+
+@media (min-width: 768px) {
+    .search-section {
+        padding: 0 var(--space-md); /* More padding on larger screens */
+    }
+}
+
+.search-card {
+    background: var(--bg-white);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    backdrop-filter: blur(10px);
+    overflow: hidden;
+    width: 100%;
+    max-width: none; /* REMOVE the width restriction */
+    margin: 0 auto;
+    height: 100%; /* FILL available height */
+}
+
+.search-header {
+    padding: var(--space-xl) var(--space-xl) var(--space-lg);
+    text-align: center;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.section-title {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.search-body {
+    padding: var(--space-2xl); /* INCREASE internal padding */
+    position: relative;
+    height: 100%; /* FILL the card height */
+    display: flex;
+    flex-direction: column;
+}
+
+.search-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: var(--space-xl); /* INCREASE gap between buttons */
+    width: 100%;
+    flex: 1; /* TAKE up remaining space */
+}
+
+
+
+.search-icon {
+    font-size: 1.8rem;
+    margin-bottom: var(--space-md); /* More space below icon */
+    display: block;
+    line-height: 1;
+}
+
+.search-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-sm); /* More space below title */
+    line-height: 1.2;
+}
+
+.search-description {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    line-height: 1.3;
+    text-align: center;
+    padding: 0 var(--space-sm); /* More horizontal padding */
+}
+
+.quick-actions {
+    margin-top: var(--space-xl);
+    padding-top: var(--space-xl);
+    border-top: 1px solid var(--border-light);
+    text-align: center;
+}
+
+.quick-actions-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: var(--space-lg);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.quick-action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-md) var(--space-xl);
+    background: var(--success-gradient);
+    color: var(--text-white);
+    border: none;
+    border-radius: var(--radius-pill);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all var(--transition);
+    text-decoration: none;
+    box-shadow: var(--shadow);
+}
+
+.quick-action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
 
 .search-options {
     display: grid;
@@ -4167,11 +4151,12 @@ body.pub-details-open {
     text-align: center;
     position: relative;
     overflow: hidden;
-    min-height: 140px; /* Back to original size */
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    min-height: auto; /* LET buttons fill available space */
+    height: 100%; /* FILL grid cell height */
 }
 
 .search-option:hover {
