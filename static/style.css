@@ -172,6 +172,33 @@
     /* Text Colors Enhanced */
     --success-text: #10b981;
     --purple-text: #8b5cf6;
+
+   /* Report Modal Colors */
+   --report-modal-bg: rgba(255, 255, 255, 0.98);
+   --report-modal-border: rgba(102, 126, 234, 0.1);
+   --report-form-bg: rgba(248, 250, 252, 0.5);
+   --report-input-focus: rgba(102, 126, 234, 0.1);
+   
+   /* Selected Pub Card */
+   --selected-pub-bg: rgba(16, 185, 129, 0.1);
+   --selected-pub-border: rgba(16, 185, 129, 0.2);
+   --selected-pub-text: var(--success-text);
+   
+   /* New Pub Fields */
+   --new-pub-bg: rgba(59, 130, 246, 0.05);
+   --new-pub-border: rgba(59, 130, 246, 0.1);
+   
+   /* Photo Upload */
+   --photo-upload-bg: var(--bg-section);
+   --photo-upload-border: var(--border-light);
+   --photo-upload-hover: rgba(102, 126, 234, 0.05);
+   --photo-upload-active: var(--success-bg);
+   --photo-upload-active-border: var(--success-border);
+   
+   /* Dropdown Suggestions */
+   --suggestion-bg: var(--bg-white);
+   --suggestion-hover: var(--hover-subtle);
+   --suggestion-border: var(--border-light);
 }
 
 /* Desktop Adjustments */
@@ -3427,3 +3454,450 @@ body {
     }
 }
 
+/* ================================
+   REPORT MODAL BASE STYLES
+   🔧 ACTION: ADD this entire section to style.css
+   📍 LOCATION: Add after your existing modal styles (around line 800)
+   ================================ */
+
+/* ================================
+   REPORT MODAL CONTAINER
+   ================================ */
+#reportModal .modal-content {
+    background: var(--report-modal-bg);
+    border: 1px solid var(--report-modal-border);
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+#reportModal .modal-header {
+    border-bottom: 2px solid var(--divider-color);
+    padding: var(--space-xl) var(--space-xl) var(--space-lg);
+}
+
+#reportModal .modal-body {
+    padding: var(--space-lg) var(--space-xl) var(--space-xl);
+}
+
+/* ================================
+   FORM LAYOUT
+   ================================ */
+.modal-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    position: relative;
+}
+
+.form-label {
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-xs);
+}
+
+/* ================================
+   FORM INPUTS
+   ================================ */
+.modal-form .form-input,
+.modal-form .form-select {
+    min-height: 44px;
+    padding: var(--space-md) var(--space-lg);
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    font-size: var(--text-base);
+    background: var(--bg-white);
+    transition: all var(--transition);
+    outline: none;
+}
+
+.modal-form .form-input:focus,
+.modal-form .form-select:focus {
+    border-color: var(--primary-color, #667eea);
+    box-shadow: 0 0 0 3px var(--report-input-focus);
+    background: var(--bg-white);
+}
+
+.modal-form .form-select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right var(--space-md) center;
+    background-repeat: no-repeat;
+    background-size: 16px 16px;
+    padding-right: var(--space-4xl);
+}
+
+/* ================================
+   SELECTED PUB CARD
+   ================================ */
+.selected-pub-info {
+    margin: var(--space-lg) 0;
+}
+
+.selected-pub-card {
+    background: var(--selected-pub-bg);
+    border: 2px solid var(--selected-pub-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    position: relative;
+}
+
+.selected-pub-card strong {
+    color: var(--selected-pub-text);
+    font-size: var(--text-lg);
+    font-weight: 700;
+    display: block;
+    margin-bottom: var(--space-xs);
+}
+
+.selected-pub-card div {
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-md);
+}
+
+.selected-pub-card .btn {
+    margin-top: var(--space-sm);
+}
+
+/* ================================
+   NEW PUB FIELDS
+   ================================ */
+.new-pub-fields {
+    background: var(--new-pub-bg);
+    border: 2px solid var(--new-pub-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    margin: var(--space-lg) 0;
+}
+
+.new-pub-fields h4 {
+    color: var(--text-primary);
+    font-size: var(--text-lg);
+    font-weight: 700;
+    margin-bottom: var(--space-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+/* ================================
+   PHOTO UPLOAD
+   ================================ */
+.photo-upload-compact {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    padding: var(--space-lg);
+    border: 2px dashed var(--photo-upload-border);
+    border-radius: var(--radius-lg);
+    background: var(--photo-upload-bg);
+    cursor: pointer;
+    transition: all var(--transition);
+    min-height: 60px;
+}
+
+.photo-upload-compact:hover {
+    border-color: var(--primary-color, #667eea);
+    background: var(--photo-upload-hover);
+    transform: translateY(-1px);
+}
+
+.photo-upload-compact.active {
+    border-color: var(--photo-upload-active-border);
+    background: var(--photo-upload-active);
+}
+
+.photo-upload-icon {
+    font-size: 1.5rem;
+    color: var(--text-muted);
+    min-width: 24px;
+}
+
+.photo-upload-text {
+    flex: 1;
+    color: var(--text-secondary);
+}
+
+.photo-upload-text strong {
+    color: var(--text-primary);
+    font-weight: 600;
+    display: block;
+    margin-bottom: var(--space-xs);
+}
+
+.photo-upload-text small {
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+}
+
+/* ================================
+   DROPDOWN SUGGESTIONS
+   ================================ */
+.brewery-suggestions,
+.beer-suggestions,
+.style-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--suggestion-bg);
+    border: 1px solid var(--suggestion-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    z-index: var(--z-dropdown);
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: var(--space-xs);
+}
+
+.brewery-suggestions .suggestion-item,
+.beer-suggestions .suggestion-item,
+.style-suggestions .suggestion-item {
+    padding: var(--space-md) var(--space-lg);
+    border-bottom: 1px solid var(--divider-color);
+    cursor: pointer;
+    transition: background-color var(--transition-fast);
+    font-size: var(--text-sm);
+}
+
+.brewery-suggestions .suggestion-item:hover,
+.beer-suggestions .suggestion-item:hover,
+.style-suggestions .suggestion-item:hover {
+    background: var(--suggestion-hover);
+}
+
+.brewery-suggestions .suggestion-item:last-child,
+.beer-suggestions .suggestion-item:last-child,
+.style-suggestions .suggestion-item:last-child {
+    border-bottom: none;
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+/* ================================
+   FORM ACTIONS
+   ================================ */
+.modal-form .form-actions {
+    display: flex;
+    gap: var(--space-lg);
+    justify-content: flex-end;
+    padding-top: var(--space-xl);
+    border-top: 1px solid var(--divider-color);
+    margin-top: var(--space-xl);
+}
+
+.modal-form .form-actions .btn {
+    flex: 1;
+    min-height: 48px;
+    font-weight: 600;
+    border-radius: var(--radius-pill);
+}
+
+/* ================================
+   REPORT MODAL MOBILE OPTIMIZATIONS
+   🔧 ACTION: ADD this section to style.css
+   📍 LOCATION: Add after the base report modal styles
+   ================================ */
+
+/* ================================
+   MOBILE RESPONSIVE - TABLETS
+   ================================ */
+@media (max-width: 768px) {
+    #reportModal .modal-content {
+        margin: 2vh auto;
+        max-height: 96vh;
+        max-width: calc(100vw - 32px);
+    }
+    
+    #reportModal .modal-header {
+        padding: var(--space-lg) var(--space-lg) var(--space-md);
+    }
+    
+    #reportModal .modal-body {
+        padding: var(--space-md) var(--space-lg) var(--space-lg);
+    }
+    
+    .modal-form {
+        gap: var(--space-md);
+    }
+    
+    .modal-form .form-input,
+    .modal-form .form-select {
+        min-height: 48px;
+        padding: var(--space-lg);
+        font-size: var(--text-base);
+    }
+    
+    .photo-upload-compact {
+        padding: var(--space-md);
+        gap: var(--space-md);
+        min-height: 56px;
+    }
+    
+    .modal-form .form-actions {
+        flex-direction: column;
+        gap: var(--space-md);
+        padding-top: var(--space-lg);
+        margin-top: var(--space-lg);
+    }
+    
+    .modal-form .form-actions .btn {
+        min-height: 52px;
+        font-size: var(--text-lg);
+    }
+}
+
+/* ================================
+   MOBILE RESPONSIVE - PHONES
+   ================================ */
+@media (max-width: 480px) {
+    #reportModal {
+        padding: var(--space-sm);
+    }
+    
+    #reportModal .modal-content {
+        margin: 1vh auto;
+        max-height: 98vh;
+        border-radius: var(--radius-lg);
+    }
+    
+    #reportModal .modal-header {
+        padding: var(--space-md) var(--space-md) var(--space-sm);
+    }
+    
+    #reportModal .modal-title {
+        font-size: var(--text-xl);
+        line-height: 1.3;
+    }
+    
+    #reportModal .modal-body {
+        padding: var(--space-sm) var(--space-md) var(--space-md);
+    }
+    
+    .modal-form {
+        gap: var(--space-sm);
+    }
+    
+    .form-group {
+        gap: 6px;
+    }
+    
+    .form-label {
+        font-size: var(--text-xs);
+        margin-bottom: 4px;
+    }
+    
+    .modal-form .form-input,
+    .modal-form .form-select {
+        min-height: 44px;
+        padding: var(--space-md);
+        font-size: 16px; /* Prevents zoom on iOS */
+        border-radius: var(--radius);
+    }
+    
+    .selected-pub-card,
+    .new-pub-fields {
+        padding: var(--space-md);
+        margin: var(--space-md) 0;
+    }
+    
+    .photo-upload-compact {
+        padding: var(--space-sm) var(--space-md);
+        gap: var(--space-sm);
+        min-height: 50px;
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .photo-upload-icon {
+        font-size: 1.2rem;
+    }
+    
+    .photo-upload-text {
+        flex: none;
+    }
+    
+    .photo-upload-text strong {
+        font-size: var(--text-sm);
+    }
+    
+    .photo-upload-text small {
+        font-size: 0.7rem;
+    }
+    
+    .modal-form .form-actions {
+        gap: var(--space-sm);
+        padding-top: var(--space-md);
+        margin-top: var(--space-md);
+    }
+    
+    .modal-form .form-actions .btn {
+        min-height: 48px;
+        font-size: var(--text-base);
+        padding: var(--space-md);
+    }
+    
+    /* Dropdown suggestions mobile optimization */
+    .brewery-suggestions,
+    .beer-suggestions,
+    .style-suggestions {
+        max-height: 150px;
+        font-size: var(--text-sm);
+    }
+    
+    .brewery-suggestions .suggestion-item,
+    .beer-suggestions .suggestion-item,
+    .style-suggestions .suggestion-item {
+        padding: var(--space-sm) var(--space-md);
+        font-size: var(--text-xs);
+    }
+}
+
+/* ================================
+   VERY SMALL SCREENS
+   ================================ */
+@media (max-width: 360px) {
+    #reportModal .modal-content {
+        max-height: 99vh;
+        margin: 0.5vh auto;
+    }
+    
+    #reportModal .modal-header {
+        padding: var(--space-sm);
+    }
+    
+    #reportModal .modal-title {
+        font-size: var(--text-lg);
+    }
+    
+    #reportModal .modal-body {
+        padding: var(--space-xs) var(--space-sm) var(--space-sm);
+    }
+    
+    .modal-form .form-input,
+    .modal-form .form-select {
+        min-height: 40px;
+        padding: var(--space-sm);
+        font-size: 16px;
+    }
+    
+    .selected-pub-card,
+    .new-pub-fields {
+        padding: var(--space-sm);
+    }
+    
+    .modal-form .form-actions .btn {
+        min-height: 44px;
+        padding: var(--space-sm);
+    }
+}
