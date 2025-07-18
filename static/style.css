@@ -2276,7 +2276,7 @@ body.pub-details-open {
 
 /* Make sure search section fits perfectly */
 .search-section {
-    margin: -20px 0 0 0; /* Controls upper level of box */
+    margin: -20px 0 0 0; /* Keep your perfect top positioning */
     position: relative;
     z-index: var(--z-sticky);
     width: 100vw;
@@ -2285,21 +2285,32 @@ body.pub-details-open {
     margin-left: -50vw;
     margin-right: -50vw;
     padding: 0 var(--space-lg);
-    height: calc(100vh - 160px); /* Changes lower level of search box */
-    height: calc(100dvh - 160px); /* Make sure you change both this and above */
+    
+    /* REDUCED HEIGHT - try this first */
+    height: calc(100vh - 220px); /* Increased from 160px to 220px */
+    height: calc(100dvh - 220px);
+    
     display: flex;
-    align-items: stretch; /* if this is center, the box won't stretch. Set to stretch to get it to do so */
+    align-items: stretch;
     overflow: hidden;
 }
 
+/* Mobile specific height adjustments */
 @media (max-width: 768px) {
     .search-section {
-        min-height: calc(100vh - 300px);
+        /* Even more conservative on mobile */
+        height: calc(100vh - 240px);
+        height: calc(100dvh - 240px);
+        padding: 0 var(--space-md);
     }
+}
 
-@media (min-width: 768px) {
+@media (max-width: 480px) {
     .search-section {
-        padding: 0 var(--space-md); /* More padding on larger screens */
+        /* Most conservative on small mobile */
+        height: calc(100vh - 260px);
+        height: calc(100dvh - 260px);
+        padding: 0 var(--space-sm);
     }
 }
 
