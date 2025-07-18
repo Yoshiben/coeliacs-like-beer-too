@@ -1618,14 +1618,6 @@ p {
     box-sizing: border-box;
 }
 
-/* Split view - KEEP the working ratios */
-.split-view .pub-details-card {
-    flex: 0 0 45%;
-    margin-bottom: var(--space-sm);
-    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-    padding: var(--space-md);
-}
-
 /* Ensure body doesn't scroll when overlay is open */
 body.pub-details-open {
     overflow: hidden;
@@ -1661,23 +1653,12 @@ body.pub-details-open {
     box-shadow: var(--shadow-primary) !important;
 }
 
-/* Even smaller in split view */
-.split-view .btn-nav-small {
-    min-height: 28px;
-    padding: 4px var(--space-sm);
-    font-size: 0.7rem;
-}
-
 /* Enhanced header area */
 .pub-header {
     text-align: center !important;
     margin-bottom: var(--space-xl) !important;
     padding-bottom: var(--space-lg) !important;
     border-bottom: 2px solid var(--divider-color) !important;
-}
-
-.split-view .pub-header {
-    margin-bottom: var(--space-md);
 }
 
 .pub-title {
@@ -1707,18 +1688,6 @@ body.pub-details-open {
     letter-spacing: 0.5px !important;
 }
 
-/* Split view - smaller title */
-.split-view .pub-title {
-    font-size: 1.1rem;
-    margin-bottom: var(--space-xs);
-}
-
-/* Split view - even smaller text */
-.split-view .pub-address,
-.split-view .pub-location {
-    font-size: 0.75rem;
-}
-
 /* Enhanced beer section */
 .beer-section {
     background: linear-gradient(135deg, var(--success-bg) 0%, var(--success-bg-light) 100%) !important;
@@ -1741,14 +1710,6 @@ body.pub-details-open {
     pointer-events: none !important;
 }
 
-/* Split view - much more compact beer section */
-.split-view .beer-section {
-    padding: var(--space-sm);
-    margin: var(--space-sm) 0;
-    flex: 0 1 auto; /* Don't take up too much space in split view */
-}
-
-
 .beer-section-title {
     display: flex !important;
     align-items: center !important;
@@ -1757,13 +1718,6 @@ body.pub-details-open {
     color: var(--text-primary) !important;
     margin-bottom: var(--space-lg) !important;
     gap: var(--space-sm) !important;
-}
-
-
-/* Split view - smaller beer title */
-.split-view .beer-section-title {
-    font-size: 0.85rem;
-    margin-bottom: var(--space-xs);
 }
 
 .beer-status {
@@ -1782,11 +1736,6 @@ body.pub-details-open {
 .beer-status em {
     color: var(--text-muted) !important;
     font-size: 0.85rem !important;
-}
-
-/* Split view - smaller beer status */
-.split-view .beer-status {
-    font-size: 0.75rem;
 }
 
 .pub-action-grid {
@@ -2744,8 +2693,6 @@ body {
     height: 100%;
 }
 
-
-
 .result-header {
     display: flex !important;
     justify-content: space-between !important;
@@ -2910,6 +2857,84 @@ body {
 }
 
 /* ====================
+   SPLIT VIEW SECTION
+   ==================== */
+
+/* Split view adjustments */
+.split-view .pub-details-card {
+    flex: 0 0 50% !important; /* Give more space - 50% instead of 45% */
+    margin-bottom: var(--space-sm) !important;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0 !important;
+    padding: var(--space-lg) !important; /* More padding */
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+}
+
+/* Compact header in split view */
+.split-view .pub-header {
+    margin-bottom: var(--space-md) !important;
+    padding-bottom: var(--space-sm) !important;
+}
+
+.split-view .pub-title {
+    font-size: 1.2rem !important;
+    margin-bottom: var(--space-xs) !important;
+}
+
+.split-view .pub-address {
+    font-size: 0.9rem !important;
+    margin-bottom: 2px !important;
+}
+
+.split-view .pub-location {
+    font-size: 0.8rem !important;
+}
+
+/* Compact beer section in split view */
+.split-view .beer-section {
+    padding: var(--space-lg) !important;
+    margin: var(--space-md) 0 !important;
+    flex: 0 1 auto !important; /* Don't let it grow too much */
+    border-left: 4px solid var(--success-gradient) !important; /* Thinner left border */
+}
+
+.split-view .beer-section::before {
+    font-size: 2.5rem !important; /* Smaller beer emoji */
+    top: -5px !important;
+    right: -5px !important;
+}
+
+.split-view .beer-section-title {
+    font-size: 1rem !important;
+    margin-bottom: var(--space-sm) !important;
+}
+
+.split-view .beer-status {
+    font-size: 0.85rem !important;
+    line-height: 1.4 !important;
+}
+
+/* Compact nav buttons in split view */
+.split-view .btn-nav-small {
+    min-height: 32px !important;
+    padding: var(--space-xs) var(--space-sm) !important;
+    font-size: 0.75rem !important;
+}
+
+/* Ensure map gets remaining space */
+.split-view .pub-map-container {
+    flex: 1 !important; /* Take remaining space */
+    display: block !important;
+    min-height: 0 !important;
+}
+
+/* Tighter spacing overall in split view */
+.split-view .pub-nav-top {
+    margin-bottom: var(--space-sm) !important;
+}
+
+/* ====================
    MOBILE OPTIMISATIONS
    ==================== */
 
@@ -2986,12 +3011,6 @@ body {
         right: var(--space-md);
     }
 
-    .split-view .pub-nav-buttons {
-        bottom: var(--space-sm);
-        left: var(--space-sm);
-        right: var(--space-sm);
-    }
-
    .search-section {
         height: calc(100vh - 240px) !important;
         height: calc(100dvh - 240px) !important;
@@ -3007,7 +3026,6 @@ body {
    
    .search-option {
         padding: var(--space-lg);
-/*         min-height: 140px; /* INCREASED from 120px to 140px */ */
     }
     
     .search-icon {
@@ -3045,9 +3063,10 @@ body {
     .results-title {
         font-size: 1rem;
     }
-       .result-header {
-        flex-direction: column !important;
-        gap: var(--space-sm) !important;
+   
+    .result-header {
+     flex-direction: column !important;
+     gap: var(--space-sm) !important;
     }
     
     .gf-indicator {
@@ -3095,5 +3114,35 @@ body {
 
    .beer-section-title {
         font-size: 1rem !important;
+    }
+
+   /* ====================
+      SPLIT VIEW MOBILE
+      ==================== */
+
+   .split-view .pub-details-card {
+        flex: 0 0 45% !important; /* Slightly less space on mobile */
+        padding: var(--space-md) !important;
+    }
+    
+    .split-view .pub-title {
+        font-size: 1.1rem !important;
+    }
+    
+    .split-view .beer-section {
+        padding: var(--space-md) !important;
+        margin: var(--space-sm) 0 !important;
+    }
+    
+    .split-view .pub-action-grid .btn {
+        min-height: 32px !important;
+        font-size: 0.75rem !important;
+        padding: 6px !important;
+    }
+
+   .split-view .pub-nav-buttons {
+        bottom: var(--space-sm);
+        left: var(--space-sm);
+        right: var(--space-sm);
     }
 }
