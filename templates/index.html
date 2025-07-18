@@ -71,13 +71,13 @@
                 <div class="search-body">
                     <div class="search-options">
                         <!-- Top Left: Pubs Near Me -->
-                        <div class="search-option name" onclick="openModal('locationModal')">
+                        <div class="search-option name" onclick="startLocationSearch()">
                             <span class="search-icon">📍</span>
                             <h3 class="search-title">Pubs Near Me</h3>
                             <p class="search-description">Find pubs close to you, control the search distance.</p>
                         </div>
                         <!-- Top Right: Pubs by Name -->      
-                        <div class="search-option location" onclick="startLocationSearch()">
+                        <div class="search-option location" onclick="openModal('nameModal')">
                             <span class="search-icon">🏠</span>
                             <h3 class="search-title">Pubs by Name</h3>
                             <p class="search-description">Search for a specific pub name - "Milestone" etc</p>
@@ -95,12 +95,6 @@
                             <p class="search-description">Find pubs serving specific GF beers - "Zapato", "IPA" etc.</p>
                         </div>            
                     </div>
-                    
-<!--                     <div class="quick-actions">
-                        <button class="quick-action-btn" onclick="findNearbyPubs()">
-                            Find Pubs Near Me
-                        </button>
-                    </div> -->
                 </div>
             </div>
         </div>
@@ -110,7 +104,7 @@
     <!-- HTML search modal section -->
     <!------------------------------->
     
-    <div id="locationModal" class="search-modal">
+<!--     <div id="locationModal" class="search-modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title">📍 Find Pubs Near Me</h3>
@@ -122,7 +116,7 @@
                 <button class="btn btn-primary" onclick="searchByLocation()">Search</button>
             </div>
         </div>
-    </div>
+    </div> -->
     
     <div id="nameModal" class="search-modal">
         <div class="modal-content">
