@@ -2336,8 +2336,8 @@ body.pub-details-open {
 /* Mobile adjustments */
 @media (max-width: 768px) {
     .search-section {
-        height: calc(100vh - 240px) !important;
-        height: calc(100dvh - 240px) !important;
+        height: calc(100vh - 220px) !important;
+        height: calc(100dvh - 220px) !important;
     }
     
     .search-body {
@@ -2351,8 +2351,8 @@ body.pub-details-open {
 
 @media (max-width: 480px) {
     .search-section {
-        height: calc(100vh - 260px) !important;
-        height: calc(100dvh - 260px) !important;
+        height: calc(100vh - 240px) !important;
+        height: calc(100dvh - 240px) !important;
     }
     
     .search-body {
