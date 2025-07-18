@@ -1858,83 +1858,6 @@ body.pub-details-open {
     text-align: center;
 }
 
-/* Better mobile responsiveness */
-@media (max-width: 480px) {
-   .pub-details-overlay {
-        height: calc(100vh - 8px); /* Less aggressive on mobile */
-        height: calc(100dvh - 8px);
-        padding: 4px;
-    }
-   
-    .pub-details-container {
-        height: calc(100vh - 20px); /* Account for mobile URL bar */
-        height: calc(100dvh - 20px);
-        max-height: calc(100vh - 20px);
-        max-height: calc(100dvh - 20px);
-        padding: 4px;
-    }
-
-    .pub-details-card {
-        padding: var(--space-md);
-        border-radius: var(--radius-lg); /* Smaller radius on mobile */
-    }
-
-    .split-view .pub-details-card {
-        padding: var(--space-sm);
-        flex: 0 0 40%; /* Even smaller in split view on mobile */
-    }
-
-    .pub-title {
-        font-size: 1.1rem;
-    }
-
-    .split-view .pub-title {
-        font-size: 1rem;
-    }
-
-    .pub-action-grid,
-    .pub-nav-buttons {
-        gap: var(--space-xs);
-    }
-
-   .btn-nav-small {
-        min-height: 30px;
-        padding: 6px var(--space-sm);
-        font-size: 0.7rem;
-    }
-
-    .split-view .btn-nav-small {
-        min-height: 26px;
-        padding: 4px var(--space-xs);
-        font-size: 0.65rem;
-    }
-
-    .pub-details-card .btn {
-        min-height: 36px;
-        font-size: 0.8rem;
-    }
-
-    .split-view .btn {
-        min-height: 28px;
-        font-size: 0.7rem;
-        padding: 4px 8px;
-    }
-
-   .pub-nav-buttons {
-        bottom: var(--space-md);
-        left: var(--space-md);
-        right: var(--space-md);
-    }
-
-    .split-view .pub-nav-buttons {
-        bottom: var(--space-sm);
-        left: var(--space-sm);
-        right: var(--space-sm);
-    }
-}
-
-
-
 /* ================================
    MODAL STYLES
    ================================ */
@@ -1966,58 +1889,32 @@ body.pub-details-open {
     display: none !important;
 }
 
-/* Mobile specific adjustments */
-@media (max-width: 480px) {
-    .search-modal {
-        padding: var(--space-md) !important;
-    }
-    
-    .search-modal .modal-content {
-        padding: var(--space-xl) !important;
-        max-height: 85vh !important;
-        max-height: 85dvh !important;
-    }
-    
-    .distance-options {
-        gap: var(--space-sm) !important;
-        max-height: 50vh !important;
-    }
-    
-    .distance-option {
-        padding: var(--space-lg) !important;
-        min-height: 80px !important; /* Ensure touch-friendly size */
-    }
-}
-
 .search-modal .modal-content {
     background: var(--bg-white) !important;
     border-radius: var(--radius-xl) !important;
-    padding: var(--space-3xl) !important;
+    padding: var(--space-xl) !important; /* Reduced padding */
     max-width: 400px !important;
     width: 100% !important;
     box-shadow: var(--shadow-lg) !important;
-    max-height: 90vh !important; /* Prevent overflow */
-    max-height: 90dvh !important;
-    overflow-y: auto !important; /* Allow scrolling if needed */
-    margin: 0 !important; /* Remove any margin */
+    margin: 0 !important;
+    /* REMOVED: max-height and overflow - let it size naturally */
 }
 
-
 .search-modal .modal-header {
-    text-align: center;
-    margin-bottom: var(--space-2xl);
+    text-align: center !important;
+    margin-bottom: var(--space-lg) !important; /* Reduced from 2xl */
 }
 
 .search-modal .modal-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: var(--space-sm);
+    font-size: 1.2rem !important; /* Slightly smaller */
+    font-weight: 700 !important;
+    color: var(--text-primary) !important;
+    margin-bottom: var(--space-xs) !important;
 }
 
 .search-modal .modal-subtitle {
-    color: var(--text-secondary);
-    font-size: 0.9rem;
+    color: var(--text-secondary) !important;
+    font-size: 0.9rem !important;
 }
 
 .search-modal .form-input {
@@ -2138,21 +2035,6 @@ body.pub-details-open {
     
     .search-options {
         gap: var(--space-md) !important;
-    }
-}
-
-@media (max-width: 480px) {
-    .search-section {
-        height: calc(100vh - 240px) !important;
-        height: calc(100dvh - 240px) !important;
-    }
-    
-    .search-body {
-        padding: var(--space-md) !important;
-    }
-    
-    .search-options {
-        gap: var(--space-sm) !important;
     }
 }
 
@@ -2421,29 +2303,6 @@ body.pub-details-open {
     }
 }
 
-@media (max-width: 480px) {
-   .search-option {
-        padding: var(--space-lg);
-/*         min-height: 140px; /* INCREASED from 120px to 140px */ */
-    }
-    
-    .search-icon {
-        font-size: 1.5rem;
-        margin-bottom: var(--space-xs);
-    }
-    
-    .search-title {
-        font-size: 1.0rem !important; /* Nice and readable */
-        margin-bottom: 4px;
-    }
-    
-    .search-description {
-        font-size: 0.85rem !important; /* Clear but not too big */
-        line-height: 1.2;
-        padding: 0 2px;
-    }
-}
-
 @media (max-width: 360px) {
     .search-option {
         padding: 8px;
@@ -2559,22 +2418,22 @@ body {
 /* Distance Selection Modal */
 .distance-options {
     display: grid !important;
-    grid-template-columns: 1fr !important; /* Single column on mobile */
-    gap: var(--space-md) !important;
-    margin: var(--space-xl) 0 !important;
-    max-height: 60vh !important; /* Limit height */
-    overflow-y: auto !important; /* Scroll if too many options */
+    grid-template-columns: 1fr !important;
+    gap: var(--space-sm) !important; /* Smaller gap */
+    margin: var(--space-lg) 0 !important; /* Smaller margin */
+    /* REMOVED: max-height and overflow */
 }
 
 .distance-option {
-    background: var(--bg-white);
-    border: 2px solid var(--border-light);
-    border-radius: var(--radius-lg);
-    padding: var(--space-lg);
-    text-align: center;
-    cursor: pointer;
-    transition: all var(--transition);
-    position: relative;
+    background: var(--bg-white) !important;
+    border: 2px solid var(--border-light) !important;
+    border-radius: var(--radius-lg) !important;
+    padding: var(--space-md) !important; /* Smaller padding */
+    text-align: center !important;
+    cursor: pointer !important;
+    transition: all var(--transition) !important;
+    position: relative !important;
+    min-height: auto !important; /* Let it size naturally */
 }
 
 .distance-option:hover {
@@ -2605,15 +2464,15 @@ body {
 }
 
 .distance-number {
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: var(--space-xs);
+    font-size: 1.2rem !important; /* Slightly smaller */
+    font-weight: 700 !important;
+    color: var(--text-primary) !important;
+    margin-bottom: 2px !important; /* Tighter spacing */
 }
 
 .distance-label {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
+    font-size: 0.8rem !important; /* Smaller label */
+    color: var(--text-secondary) !important;
 }
 
 /* Results Overlay */
@@ -2762,29 +2621,7 @@ body {
     height: 100%;
 }
 
-/* Mobile optimizations */
-@media (max-width: 480px) {
-    .distance-options {
-        grid-template-columns: 1fr;
-        gap: var(--space-sm);
-    }
-    
-    .distance-option {
-        padding: var(--space-md);
-    }
-    
-    .results-container {
-        padding: 4px;
-    }
-    
-    .results-nav {
-        padding: var(--space-sm);
-    }
-    
-    .results-title {
-        font-size: 1rem;
-    }
-}
+
 
 .result-header {
     display: flex !important;
@@ -2949,9 +2786,137 @@ body {
     color: #667eea !important;
 }
 
-/* ➕ ADD NEW - Mobile responsive adjustments */
+/* ====================
+   MOBILE OPTIMISATIONS
+   ==================== */
+
 @media (max-width: 480px) {
-    .result-header {
+   .pub-details-overlay {
+        height: calc(100vh - 8px); /* Less aggressive on mobile */
+        height: calc(100dvh - 8px);
+        padding: 4px;
+    }
+   
+    .pub-details-container {
+        height: calc(100vh - 20px); /* Account for mobile URL bar */
+        height: calc(100dvh - 20px);
+        max-height: calc(100vh - 20px);
+        max-height: calc(100dvh - 20px);
+        padding: 4px;
+    }
+
+    .pub-details-card {
+        padding: var(--space-md);
+        border-radius: var(--radius-lg); /* Smaller radius on mobile */
+    }
+
+    .split-view .pub-details-card {
+        padding: var(--space-sm);
+        flex: 0 0 40%; /* Even smaller in split view on mobile */
+    }
+
+    .pub-title {
+        font-size: 1.1rem;
+    }
+
+    .split-view .pub-title {
+        font-size: 1rem;
+    }
+
+    .pub-action-grid,
+    .pub-nav-buttons {
+        gap: var(--space-xs);
+    }
+
+   .btn-nav-small {
+        min-height: 30px;
+        padding: 6px var(--space-sm);
+        font-size: 0.7rem;
+    }
+
+    .split-view .btn-nav-small {
+        min-height: 26px;
+        padding: 4px var(--space-xs);
+        font-size: 0.65rem;
+    }
+
+    .pub-details-card .btn {
+        min-height: 36px;
+        font-size: 0.8rem;
+    }
+
+    .split-view .btn {
+        min-height: 28px;
+        font-size: 0.7rem;
+        padding: 4px 8px;
+    }
+
+   .pub-nav-buttons {
+        bottom: var(--space-md);
+        left: var(--space-md);
+        right: var(--space-md);
+    }
+
+    .split-view .pub-nav-buttons {
+        bottom: var(--space-sm);
+        left: var(--space-sm);
+        right: var(--space-sm);
+    }
+
+   .search-section {
+        height: calc(100vh - 240px) !important;
+        height: calc(100dvh - 240px) !important;
+    }
+    
+    .search-body {
+        padding: var(--space-md) !important;
+    }
+    
+    .search-options {
+        gap: var(--space-sm) !important;
+    }
+   
+   .search-option {
+        padding: var(--space-lg);
+/*         min-height: 140px; /* INCREASED from 120px to 140px */ */
+    }
+    
+    .search-icon {
+        font-size: 1.5rem;
+        margin-bottom: var(--space-xs);
+    }
+    
+    .search-title {
+        font-size: 1.0rem !important; /* Nice and readable */
+        margin-bottom: 4px;
+    }
+    
+    .search-description {
+        font-size: 0.85rem !important; /* Clear but not too big */
+        line-height: 1.2;
+        padding: 0 2px;
+    }
+    .distance-options {
+        grid-template-columns: 1fr;
+        gap: var(--space-sm);
+    }
+    
+    .distance-option {
+        padding: var(--space-md);
+    }
+    
+    .results-container {
+        padding: 4px;
+    }
+    
+    .results-nav {
+        padding: var(--space-sm);
+    }
+    
+    .results-title {
+        font-size: 1rem;
+    }
+       .result-header {
         flex-direction: column !important;
         gap: var(--space-sm) !important;
     }
@@ -2968,5 +2933,29 @@ body {
     .result-actions .btn {
         padding: var(--space-lg) !important;
         font-size: 0.9rem !important;
+    }
+   .search-modal {
+        padding: var(--space-md) !important;
+    }
+    
+    .search-modal .modal-content {
+        padding: var(--space-lg) !important;
+    }
+    
+    .distance-options {
+        gap: 6px !important;
+        margin: var(--space-md) 0 !important;
+    }
+    
+    .distance-option {
+        padding: var(--space-sm) var(--space-md) !important;
+    }
+    
+    .distance-number {
+        font-size: 1.1rem !important;
+    }
+    
+    .distance-label {
+        font-size: 0.75rem !important;
     }
 }
