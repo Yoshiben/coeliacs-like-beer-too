@@ -151,9 +151,8 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title">📍 How far will you travel?</h3>
-                <p class="modal-subtitle">Choose your search radius</p>
             </div>
-            
+           
             <div class="distance-options">
                 <div class="distance-option" onclick="searchNearbyWithDistance(1)">
                     <div class="distance-number">1km</div>
@@ -1516,7 +1515,7 @@ function addSwipeGestures() {
                 option.classList.remove('tapped', 'loading');
             });
             
-            const modals = ['nameModal', 'beerModal', 'areaModal'];
+            const modals = ['nameModal', 'beerModal', 'areaModal', 'distanceModal];
             modals.forEach(modal => {
                 const modalEl = document.getElementById(modal);
                 if (modalEl && modalEl.style.display !== 'none') {
