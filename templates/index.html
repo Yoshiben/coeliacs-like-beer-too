@@ -2839,18 +2839,27 @@ function addSwipeGestures() {
             
             // Update beer information
             const beerElement = document.getElementById('pubDetailsBeer');
+            const beerSection = document.querySelector('.beer-section');
+            
             if (pub.bottle || pub.tap || pub.cask || pub.can) {
+                // Full version for full-screen
                 let gfOptions = [];
                 if (pub.bottle) gfOptions.push('🍺 Bottle');
                 if (pub.tap) gfOptions.push('🚰 Tap');
                 if (pub.cask) gfOptions.push('🛢️ Cask');
                 if (pub.can) gfOptions.push('🥫 Can');
+                
                 beerElement.innerHTML = `<strong>✅ Confirmed GF Options:</strong><br>${gfOptions.join(', ')}<br><em>💡 Call ahead to confirm current selection</em>`;
+                
+                // Add data attribute for split-screen display
+                const formatText = gfOptions.length > 1 ? `${gfOptions.length} GF options` : gfOptions[0];
+                beerSection.setAttribute('data-formats', formatText);
             } else {
                 beerElement.innerHTML = '❓ GF availability needs verification<br><em>Help the community by reporting what you find!</em>';
+                beerSection.setAttribute('data-formats', '❓ GF status unknown');
             }
             
-            // Set up action buttons
+            // Set up action buttons (keep existing code)
             document.getElementById('pubFindOnline').onclick = () => {
                 const searchQuery = `${pub.name} ${pub.postcode} pub`;
                 const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
