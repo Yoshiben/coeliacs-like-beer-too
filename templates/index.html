@@ -235,7 +235,7 @@
                     <button class="btn-nav-small" onclick="closePubDetails()">
                         🏠 Home
                     </button>
-                    <button class="btn-nav-small" onclick="closePubDetails()">
+                    <button class="btn-nav-small" onclick="goBackToResults()"
                         ← Back
                     </button>
                 </div>
@@ -823,6 +823,14 @@
         // Called when user selects a distance
         async function searchNearbyWithDistance(radiusKm) {
             console.log(`🎯 Searching within ${radiusKm}km...`);
+
+            // SAVE the search state before starting
+            lastSearchState = {
+                type: 'nearby',
+                radius: radiusKm,
+                userLocation: userLocation,
+                timestamp: Date.now()
+            };
             
             // Close distance modal
             closeSearchModal();
@@ -844,6 +852,130 @@
             // Start the search
             await findNearbyPubsWithRadius(radiusKm);
         }
+
+        // ➕ ADD NEW - Smart back function that restores previous search
+        function goBackToResults() {
+            console.log('🔙 Going back to previous search results...');
+            
+            if (!lastSearchState) {
+                console.log('❌ No previous search state, going home');
+                goHome();
+                return;
+            }
+            
+            // Check if state is recent (within last 30 minutes)
+            const thirtyMinutes = 30 * 60 * 1000;
+            if (Date.now() - lastSearchState.timestamp > thirtyMinutes) {
+                console.log('⏰ Search state too old, going home');
+                goHome();
+                return;
+            }
+            
+            console.log('✅ Restoring search state:', lastSearchState);
+            
+            // Close pub details
+            closePubDetails();
+            
+            // Restore the search based on type
+            if (lastSearchState.type === 'nearby') {
+                restoreNearbySearch(lastSearchState);
+            } else if (lastSearchState.type === 'name') {
+                restoreNameSearch(lastSearchState);
+            } else if (lastSearchState.type === 'area') {
+                restoreAreaSearch(lastSearchState);
+            } else if (lastSearchState.type === 'beer') {
+                restoreBeerSearch(lastSearchState);
+            } else {
+                // Fallback to home
+                goHome();
+            }
+            
+            trackEvent('back_to_results', 'Navigation', lastSearchState.type);
+        }
+        
+        // ➕ ADD NEW - Restore nearby search
+        async function restoreNearbySearch(state) {
+            console.log('🔄 Restoring nearby search...');
+            
+            // Set user location from saved state
+            userLocation = state.userLocation;
+            
+            // Show results overlay
+            showResultsOverlay(`Pubs within ${state.radius}km`);
+            showResultsLoading('Restoring your search...');
+            
+            // Re-run the search
+            try {
+                await findNearbyPubsWithRadius(state.radius);
+                showSuccessToast('📍 Restored your search results!');
+            } catch (error) {
+                console.error('❌ Error restoring search:', error);
+                showNoResults('Could not restore search. Please try again.');
+            }
+        }
+        
+        // ➕ ADD NEW - Functions to save state for other search types
+        function saveNameSearchState(query, results) {
+            lastSearchState = {
+                type: 'name',
+                query: query,
+                results: results,
+                timestamp: Date.now()
+            };
+        }
+        
+        function saveAreaSearchState(query, results) {
+            lastSearchState = {
+                type: 'area',
+                query: query,
+                results: results,
+                timestamp: Date.now()
+            };
+        }
+        
+        function saveBeerSearchState(query, results) {
+            lastSearchState = {
+                type: 'beer',
+                query: query,
+                results: results,
+                timestamp: Date.now()
+            };
+        }
+        
+        // ➕ ADD NEW - Restore functions for other search types
+        function restoreNameSearch(state) {
+            showResultsOverlay(`Pub name: "${state.query}"`);
+            if (state.results && state.results.length > 0) {
+                displayResultsInOverlay(state.results, `Found "${state.query}"`);
+            } else {
+                showResultsLoading('Restoring search...');
+                // Re-run the name search
+                performSearch(state.query, 'name');
+            }
+        }
+        
+        function restoreAreaSearch(state) {
+            showResultsOverlay(`Area: "${state.query}"`);
+            if (state.results && state.results.length > 0) {
+                displayResultsInOverlay(state.results, `Pubs in "${state.query}"`);
+            } else {
+                showResultsLoading('Restoring search...');
+                // Re-run the area search
+                performSearch(state.query, 'area');
+            }
+        }
+        
+        function restoreBeerSearch(state) {
+            showResultsOverlay(`Beer: "${state.query}"`);
+            if (state.results && state.results.length > 0) {
+                displayResultsInOverlay(state.results, `Serving "${state.query}"`);
+            } else {
+                showResultsLoading('Restoring search...');
+                // Re-run the beer search
+                performSearch(state.query, 'beer');
+            }
+        }
+
         
         // Updated location request specifically for search
         function requestUserLocationForSearch() {
@@ -1741,7 +1873,7 @@ function addSwipeGestures() {
             closeSearchModal();
             
             // Use your existing search logic but with location type
-            performSearch(query, 'location');
+            performSearchWithState(query, 'location');
             
             trackEvent('search_by_location', 'Search', query);
         }
@@ -1756,7 +1888,7 @@ function addSwipeGestures() {
             closeSearchModal();
             
             // Use your existing search logic but with name type  
-            performSearch(query, 'name');
+            performSearchWithState(query, 'name');
             
             trackEvent('search_by_name', 'Search', query);
         }
@@ -1771,7 +1903,7 @@ function addSwipeGestures() {
             closeSearchModal();
             
             // Use your existing search logic but with beer type
-            performSearch(query, 'beer');
+            performSearchWithState(query, 'beer');
             
             trackEvent('search_by_beer', 'Search', query);
         }
@@ -1786,9 +1918,70 @@ function addSwipeGestures() {
             closeSearchModal();
             
             // Use your existing search logic but with area type
-            performSearch(query, 'area');
+            performSearchWithState(query, 'area');
             
             trackEvent('search_by_area', 'Search', query);
+        }
+
+        // ➕ ADD NEW - Enhanced performSearch that saves state
+        async function performSearchWithState(query, searchType) {
+            currentQuery = query;
+            currentSearchType = searchType;
+            currentPage = 1;
+            
+            showResultsSection();
+            showLoadingToast('Searching...');
+            const results = document.getElementById('results');
+            results.innerHTML = '<li class="loading">Searching...</li>';
+            
+            try {
+                // Your existing search logic here...
+                const backendSearchType = mapSearchType(searchType);
+                const url = `/search?query=${encodeURIComponent(query)}&search_type=${backendSearchType}&page=1`;
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                const pubs = Array.isArray(data) ? data : data.pubs;
+                
+                hideLoadingToast();
+                
+                if (pubs.length === 0) {
+                    results.innerHTML = `<li class="no-results">No pubs found for "${query}". Try a different search term.</li>`;
+                    showSuccessToast(`No pubs found for "${query}"`);
+                    return;
+                }
+                
+                // SAVE STATE after successful search
+                if (searchType === 'name') {
+                    saveNameSearchState(query, pubs);
+                } else if (searchType === 'area') {
+                    saveAreaSearchState(query, pubs);
+                } else if (searchType === 'beer') {
+                    saveBeerSearchState(query, pubs);
+                }
+                
+                displaySearchResults(data);
+                addPubMarkersToMap(pubs);
+                
+                AppState.save();
+                trackSearch(query, searchType, pubs.length);
+                
+                // Show success message
+                const message = `Found ${pubs.length} pubs for "${query}"`;
+                showSuccessToast(message);
+                
+            } catch (error) {
+                console.error('Error searching pubs:', error);
+                hideLoadingToast();
+                
+                results.innerHTML = `<li class="no-results">Error searching for "${query}". Please try again.</li>`;
+                showSuccessToast(`Error searching for "${query}"`);
+            }
         }
         
         // Updated unified search function that works with your existing backend
@@ -2657,7 +2850,7 @@ function addSwipeGestures() {
             document.getElementById('pubContainer').classList.remove('split-view');
             document.getElementById('pubMapBtnText').textContent = 'Show on Map';
             
-            trackEvent('pub_details_close', 'Navigation');
+            // trackEvent('pub_details_close', 'Navigation');
         }
         
         function togglePubMap() {
