@@ -2288,7 +2288,7 @@ body.pub-details-open {
     height: calc(100vh - 100px); /* Changes height of search box */
     height: calc(100dvh - 100px); /* Make sure you change both this and above */
     display: flex;
-    align-items: center;
+    align-items: stretch; /* if this is center, the box won't stretch. Set to stretch to get it to do so */
     overflow: hidden;
 }
 
