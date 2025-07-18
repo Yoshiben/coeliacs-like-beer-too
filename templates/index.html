@@ -429,123 +429,7 @@
      OPTIMIZED REPORT MODAL HTML
      Single screen, pre-population ready
      ================================ -->
-
-    <!-- ================================
-     CLEAN REPORT FORM HTML STRUCTURE
-     🔄 REPLACING - Replace the modal form content only
-     ================================ -->
-
-    <form id="reportForm" class="modal-form" onsubmit="handleReportSubmission(event)">
-        
-        <!-- Pub Search Field (hidden when pre-populated) -->
-        <div class="form-group" id="pubSearchGroup">
-            <label class="form-label">Find Your Pub *</label>
-            <input type="text" id="reportPubSearch" class="form-input" 
-                   placeholder="Start typing pub name..." autocomplete="off">
-            <div id="pubSuggestions" class="suggestions"></div>
-            <small style="color: var(--text-muted); font-size: 0.8rem;">
-                Search for an existing pub first - we'll check our database!
-            </small>
-        </div>
-        
-        <!-- Selected Pub Info (shown when pub selected) -->
-        <div id="selectedPubInfo" class="selected-pub-info" style="display: none;">
-            <div class="selected-pub-card">
-                <strong id="selectedPubName"></strong>
-                <div id="selectedPubAddress"></div>
-                <button type="button" onclick="clearSelectedPub()" class="btn btn-secondary btn-sm">
-                    Choose Different Pub
-                </button>
-            </div>
-        </div>
-        
-        <!-- New Pub Fields (shown when adding new pub) -->
-        <div id="newPubFields" class="new-pub-fields" style="display: none;">
-            <h4>📍 Add New Pub</h4>
-            <div class="form-group">
-                <label class="form-label">Pub Name *</label>
-                <input type="text" id="reportPubName" class="form-input" placeholder="The Red Lion">
-            </div>
-            <div class="form-group">
-                <label class="form-label">Address *</label>
-                <input type="text" id="reportAddress" class="form-input" placeholder="123 High Street">
-            </div>
-            <div class="form-group">
-                <label class="form-label">Postcode *</label>
-                <input type="text" id="reportPostcode" class="form-input" placeholder="SW1A 1AA">
-            </div>
-        </div>
-        
-        <!-- Beer Format (Required) -->
-        <div class="form-group">
-            <label class="form-label">Beer Format *</label>
-            <select id="reportFormat" name="reportFormat" class="form-select" required>
-                <option value="">Select format...</option>
-                <option value="bottle">🍺 Bottle</option>
-                <option value="tap">🚰 Tap</option>
-                <option value="cask">🛢️ Cask</option>
-                <option value="can">🥫 Can</option>
-            </select>
-        </div>
-        
-        <!-- Brewery (Dropdown with search) -->
-        <div class="form-group">
-            <label class="form-label">Brewery</label>
-            <div class="brewery-dropdown-container">
-                <input type="text" id="reportBrewery" name="reportBrewery" class="form-input" 
-                       placeholder="Start typing brewery name..." 
-                       autocomplete="off" onInput="searchBreweries(this.value)">
-                <div id="breweryDropdown" class="suggestions brewery-suggestions"></div>
-            </div>
-        </div>
-        
-        <!-- Beer Name (Auto-complete based on brewery) -->
-        <div class="form-group">
-            <label class="form-label">Beer Name</label>
-            <div class="beer-name-container">
-                <input type="text" id="reportBeerName" name="reportBeerName" class="form-input" 
-                       placeholder="Start typing beer name..." 
-                       autocomplete="off" onInput="searchBeerNames(this.value)">
-                <div id="beerNameDropdown" class="suggestions beer-suggestions"></div>
-            </div>
-        </div>
-        
-        <!-- Beer Style (Auto-complete based on selected beer) -->
-        <div class="form-group">
-            <label class="form-label">Beer Style</label>
-            <div class="beer-style-container">
-                <input type="text" id="reportBeerStyle" name="reportBeerStyle" class="form-input" 
-                       placeholder="IPA, Lager, Stout..." 
-                       autocomplete="off" onInput="searchBeerStyles(this.value)">
-                <div id="beerStyleDropdown" class="suggestions style-suggestions"></div>
-            </div>
-        </div>
-        
-        <!-- Compact Photo Upload -->
-        <div class="form-group">
-            <label class="form-label">Photo (Optional)</label>
-            <label for="reportPhoto" class="photo-upload-compact">
-                <div class="photo-upload-icon">📷</div>
-                <div class="photo-upload-text">
-                    <strong>Add a photo</strong><br>
-                    <small>Beer menu, bottle, or tap</small>
-                </div>
-                <input type="file" id="reportPhoto" name="reportPhoto" 
-                       accept="image/*" style="display: none;">
-            </label>
-        </div>
-        
-        <!-- Form Actions (Sticky at bottom) -->
-        <div class="form-actions">
-            <button type="button" onclick="closeModal('reportModal')" class="btn btn-secondary">
-                Cancel
-            </button>
-            <button type="submit" class="btn btn-success">
-                Submit Report
-            </button>
-        </div>
-        
-    </form>
+    
     
     <!-- JavaScript to handle file upload preview -->
     <script>
@@ -669,18 +553,6 @@
                         </ul>
                     </div>
                     
-<!--                     <div class="gf-section">
-                        <h3>🍺 Popular GF Beer Brands in UK</h3>
-                        <div class="brand-grid">
-                            <span class="brand-tag">Brewdog (GF Range)</span>
-                            <span class="brand-tag">Glutenberg</span>
-                            <span class="brand-tag">Omission</span>
-                            <span class="brand-tag">Stella Artois (GF)</span>
-                            <span class="brand-tag">Ghostfish</span>
-                            <span class="brand-tag">Ground Breaker</span>
-                        </div>
-                    </div> -->
-                    
                     <div class="disclaimer">
                         <p><strong>Disclaimer:</strong> This information is for guidance only. Always consult with healthcare professionals and verify product safety for your individual needs.</p>
                     </div>
@@ -719,6 +591,136 @@
                         ❌ Cancel
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================================
+     REPORT MODAL HTML
+     🔧 ACTION: ADD this entire modal to templates/index.html
+     📍 LOCATION: Add after your existing modals (after aboutModal, gfInfoModal, etc.)
+     📝 NOTE: This should go BEFORE the bottom navigation bar
+     ================================ -->
+
+    <div id="reportModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">📸 Report GF Beer Find</h2>
+                <button class="modal-close" onclick="closeModal('reportModal')" aria-label="Close report modal">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <form id="reportForm" class="modal-form" onsubmit="handleReportSubmission(event)">
+                    
+                    <!-- Pub Search Field (hidden when pre-populated) -->
+                    <div class="form-group" id="pubSearchGroup">
+                        <label class="form-label">Find Your Pub *</label>
+                        <input type="text" id="reportPubSearch" class="form-input" 
+                               placeholder="Start typing pub name..." autocomplete="off">
+                        <div id="pubSuggestions" class="suggestions"></div>
+                        <small style="color: var(--text-muted); font-size: 0.8rem;">
+                            Search for an existing pub first - we'll check our database!
+                        </small>
+                    </div>
+                    
+                    <!-- Selected Pub Info (shown when pub selected) -->
+                    <div id="selectedPubInfo" class="selected-pub-info" style="display: none;">
+                        <div class="selected-pub-card">
+                            <strong id="selectedPubName"></strong>
+                            <div id="selectedPubAddress"></div>
+                            <button type="button" onclick="clearSelectedPub()" class="btn btn-secondary btn-sm">
+                                Choose Different Pub
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- New Pub Fields (shown when adding new pub) -->
+                    <div id="newPubFields" class="new-pub-fields" style="display: none;">
+                        <h4>📍 Add New Pub</h4>
+                        <div class="form-group">
+                            <label class="form-label">Pub Name *</label>
+                            <input type="text" id="reportPubName" class="form-input" placeholder="The Red Lion">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Address *</label>
+                            <input type="text" id="reportAddress" class="form-input" placeholder="123 High Street">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Postcode *</label>
+                            <input type="text" id="reportPostcode" class="form-input" placeholder="SW1A 1AA">
+                        </div>
+                    </div>
+                    
+                    <!-- Beer Format (Required) -->
+                    <div class="form-group">
+                        <label class="form-label">Beer Format *</label>
+                        <select id="reportFormat" name="reportFormat" class="form-select" required>
+                            <option value="">Select format...</option>
+                            <option value="bottle">🍺 Bottle</option>
+                            <option value="tap">🚰 Tap</option>
+                            <option value="cask">🛢️ Cask</option>
+                            <option value="can">🥫 Can</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Brewery (Dropdown with search) -->
+                    <div class="form-group">
+                        <label class="form-label">Brewery</label>
+                        <div class="brewery-dropdown-container">
+                            <input type="text" id="reportBrewery" name="reportBrewery" class="form-input" 
+                                   placeholder="Start typing brewery name..." 
+                                   autocomplete="off" onInput="searchBreweries(this.value)">
+                            <div id="breweryDropdown" class="suggestions brewery-suggestions"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Beer Name (Auto-complete based on brewery) -->
+                    <div class="form-group">
+                        <label class="form-label">Beer Name</label>
+                        <div class="beer-name-container">
+                            <input type="text" id="reportBeerName" name="reportBeerName" class="form-input" 
+                                   placeholder="Start typing beer name..." 
+                                   autocomplete="off" onInput="searchBeerNames(this.value)">
+                            <div id="beerNameDropdown" class="suggestions beer-suggestions"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Beer Style (Auto-complete based on selected beer) -->
+                    <div class="form-group">
+                        <label class="form-label">Beer Style</label>
+                        <div class="beer-style-container">
+                            <input type="text" id="reportBeerStyle" name="reportBeerStyle" class="form-input" 
+                                   placeholder="IPA, Lager, Stout..." 
+                                   autocomplete="off" onInput="searchBeerStyles(this.value)">
+                            <div id="beerStyleDropdown" class="suggestions style-suggestions"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Compact Photo Upload -->
+                    <div class="form-group">
+                        <label class="form-label">Photo (Optional)</label>
+                        <label for="reportPhoto" class="photo-upload-compact">
+                            <div class="photo-upload-icon">📷</div>
+                            <div class="photo-upload-text">
+                                <strong>Add a photo</strong><br>
+                                <small>Beer menu, bottle, or tap</small>
+                            </div>
+                            <input type="file" id="reportPhoto" name="reportPhoto" 
+                                   accept="image/*" style="display: none;">
+                        </label>
+                    </div>
+                    
+                    <!-- Form Actions (Sticky at bottom) -->
+                    <div class="form-actions">
+                        <button type="button" onclick="closeModal('reportModal')" class="btn btn-secondary">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-success">
+                            Submit Report
+                        </button>
+                    </div>
+                    
+                </form>
             </div>
         </div>
     </div>
