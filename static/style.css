@@ -1698,7 +1698,6 @@ body.pub-details-open {
     border-left: 6px solid var(--success-gradient) !important;
     position: relative !important;
     overflow: hidden !important;
-    min-height: auto !important; /* Don't force a minimum height */
 }
 
 .beer-section::before {
@@ -1878,16 +1877,6 @@ body.pub-details-open {
 .pub-details-card .btn:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-lg);
-}
-
-.split-view .btn {
-    min-height: 32px;
-    padding: var(--space-sm) var(--space-md);
-    font-size: 0.75rem;
-}
-
-.split-view .btn:hover {
-    transform: translateY(-1px); /* Smaller hover effect in split view */
 }
 
 .pub-map-container {
@@ -2884,33 +2873,52 @@ body {
     font-size: 0.8rem !important;
 }
 
+.split-view .btn {
+    min-height: 32px;
+    padding: var(--space-sm) var(--space-md);
+    font-size: 0.75rem;
+}
+
+.split-view .btn:hover {
+    transform: translateY(-1px); /* Smaller hover effect in split view */
+}
+
 /* Compact beer section in split view */
 .split-view .beer-section {
-    padding: var(--space-md) !important; /* Smaller padding */
-    margin: var(--space-md) 0 !important; /* Smaller margins */
-    border-left: 4px solid var(--success-gradient) !important; /* Thinner accent */
-    border-radius: var(--radius-lg) !important; /* Smaller radius */
+    padding: var(--space-sm) var(--space-md) !important; /* Minimal padding */
+    margin: var(--space-sm) 0 !important; /* Minimal margins */
+    border-left: 3px solid var(--success-gradient) !important; /* Thinner accent */
+    border-radius: var(--radius) !important; /* Smaller radius */
+    border-width: 1px !important; /* Thinner border */
     min-height: auto !important;
-    flex-shrink: 0 !important; /* Don't let it shrink too much */
+    flex-shrink: 0 !important;
 }
 
+/* Hide the beer emoji in split view - too much clutter */
 .split-view .beer-section::before {
-    font-size: 2rem !important; /* Much smaller emoji */
-    top: -5px !important;
-    right: -5px !important;
-    opacity: 0.08 !important; /* Even more subtle */
+    display: none !important;
 }
 
+/* Compact title */
 .split-view .beer-section-title {
-    font-size: 0.9rem !important;
-    margin-bottom: var(--space-sm) !important;
+    font-size: 0.85rem !important;
+    margin-bottom: var(--space-xs) !important;
     line-height: 1.1 !important;
-    gap: var(--space-xs) !important;
+    gap: 4px !important;
 }
 
+/* Hide all the detailed status text in split view */
 .split-view .beer-status {
-    font-size: 0.8rem !important;
-    line-height: 1.4 !important;
+    display: none !important;
+}
+
+/* Show just the formats in a compact way */
+.split-view .beer-section::after {
+    content: '🍺 Available' !important;
+    font-size: 0.75rem !important;
+    color: var(--success-text) !important;
+    font-weight: 600 !important;
+    display: block !important;
 }
 
 .split-view .beer-status strong {
