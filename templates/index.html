@@ -807,24 +807,221 @@
         let currentGfOnly = false;
 
         // ================================
-        // CLEAN STARTLOCATIONSEARCH FUNCTION - BA
+        // UPDATED LOCATION FUNCTIONS WITH DISTANCE MODAL
         // ================================
+        
+        // Main function - now opens distance modal first
         function startLocationSearch() {
-            console.log('🎯 Starting location search...');
-            showLoadingToast('Getting your location...');
+            console.log('🎯 Starting location search with distance selection...');
             
             // Track the action
-            trackEvent('direct_location_search', 'Search', 'pubs_near_me');
+            trackEvent('location_search_start', 'Search', 'distance_modal');
             
-            // Check if we already have location
-            if (userLocation) {
-                console.log('✅ Using cached location:', userLocation);
-                findNearbyPubs();
-                return;
+            // Show distance selection modal
+            openModal('distanceModal');
+        }
+        
+        // Called when user selects a distance
+        async function searchNearbyWithDistance(radiusKm) {
+            console.log(`🎯 Searching within ${radiusKm}km...`);
+            
+            // Close distance modal
+            closeSearchModal();
+            
+            // Show results overlay immediately
+            showResultsOverlay(`Pubs within ${radiusKm}km`);
+            
+            // Check if we have location
+            if (!userLocation) {
+                showResultsLoading('Getting your location...');
+                await requestUserLocationForSearch();
+                
+                if (!userLocation) {
+                    showNoResults('Could not get your location');
+                    return;
+                }
             }
             
-            // Get fresh location
-            requestUserLocation();
+            // Start the search
+            await findNearbyPubsWithRadius(radiusKm);
+        }
+        
+        // Updated location request specifically for search
+        function requestUserLocationForSearch() {
+            return new Promise((resolve, reject) => {
+                if (!navigator.geolocation) {
+                    reject(new Error('Location not supported'));
+                    return;
+                }
+        
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        userLocation = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        
+                        console.log('✅ Location obtained:', userLocation);
+                        resolve(userLocation);
+                    },
+                    (error) => {
+                        console.log('❌ Location error:', error);
+                        reject(error);
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 300000
+                    }
+                );
+            });
+        }
+        
+        // Updated nearby search with custom radius
+        async function findNearbyPubsWithRadius(radiusKm) {
+            if (!userLocation) {
+                showNoResults('Location not available');
+                return;
+            }
+        
+            console.log(`🔍 Searching for pubs within ${radiusKm}km...`);
+            showResultsLoading(`Finding pubs within ${radiusKm}km...`);
+            
+            try {
+                const gfOnly = true;
+                const url = `/nearby?lat=${userLocation.lat}&lng=${userLocation.lng}&radius=${radiusKm}&gf_only=${gfOnly}`;
+                
+                console.log('📡 API request:', url);
+                
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                const nearbyPubs = data.pubs || data;
+                
+                console.log(`✅ Found ${nearbyPubs.length} pubs`);
+                
+                if (nearbyPubs.length === 0) {
+                    showNoResults(`No GF pubs found within ${radiusKm}km`);
+                    return;
+                }
+                
+                // Show results
+                displayResultsInOverlay(nearbyPubs, `${nearbyPubs.length} pubs within ${radiusKm}km`);
+                
+                // Track success
+                trackSearch(`nearby_${radiusKm}km`, 'location', nearbyPubs.length);
+                
+            } catch (error) {
+                console.error('❌ Error finding nearby pubs:', error);
+                showNoResults('Error finding pubs. Please try again.');
+            }
+        }
+        
+        // Results overlay management
+        function showResultsOverlay(title) {
+            document.getElementById('resultsTitle').textContent = title;
+            document.getElementById('resultsOverlay').classList.add('active');
+            
+            // Prevent background scrolling
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeResults() {
+            document.getElementById('resultsOverlay').classList.remove('active');
+            
+            // Restore background scrolling
+            document.body.style.overflow = '';
+            
+            trackEvent('close_results', 'Navigation');
+        }
+        
+        function showResultsLoading(message) {
+            document.getElementById('resultsLoading').style.display = 'flex';
+            document.getElementById('resultsList').style.display = 'none';
+            document.getElementById('noResultsFound').style.display = 'none';
+            
+            document.querySelector('.loading-text').textContent = message;
+        }
+        
+        function showNoResults(message) {
+            document.getElementById('resultsLoading').style.display = 'none';
+            document.getElementById('resultsList').style.display = 'none';
+            document.getElementById('noResultsFound').style.display = 'flex';
+            
+            document.querySelector('.no-results-text').textContent = message;
+        }
+        
+        function displayResultsInOverlay(pubs, title) {
+            document.getElementById('resultsLoading').style.display = 'none';
+            document.getElementById('noResultsFound').style.display = 'none';
+            document.getElementById('resultsList').style.display = 'block';
+            
+            // Update title
+            document.getElementById('resultsTitle').textContent = title;
+            
+            // Generate results HTML
+            const resultsList = document.getElementById('resultsList');
+            resultsList.innerHTML = '';
+            
+            pubs.forEach(pub => {
+                const resultItem = createResultItemForOverlay(pub);
+                resultsList.appendChild(resultItem);
+            });
+        }
+        
+        function createResultItemForOverlay(pub) {
+            const div = document.createElement('div');
+            div.className = 'result-item';
+            
+            // Calculate distance if available
+            let distanceText = '';
+            if (pub.distance !== undefined) {
+                distanceText = `<div class="result-distance">${pub.distance.toFixed(1)}km away</div>`;
+            }
+            
+            // GF badges
+            const badges = [];
+            if (pub.bottle) badges.push('🍺 Bottle');
+            if (pub.tap) badges.push('🚰 Tap');
+            if (pub.cask) badges.push('🛢️ Cask');
+            if (pub.can) badges.push('🥫 Can');
+            
+            div.innerHTML = `
+                <div class="result-header">
+                    <h3 class="result-title">${pub.name}</h3>
+                    ${distanceText}
+                </div>
+                <div class="result-address">${pub.address}, ${pub.postcode}</div>
+                <div class="result-authority">${pub.local_authority}</div>
+                <div class="result-badges">
+                    ${badges.map(badge => `<span class="gf-badge">${badge}</span>`).join('')}
+                </div>
+                <div class="result-actions">
+                    <button class="btn btn-primary" onclick="openPubDetails(${pub.pub_id})">
+                        View Details
+                    </button>
+                    <button class="btn btn-secondary" onclick="getDirections('${pub.name}', '${pub.address}')">
+                        Directions
+                    </button>
+                </div>
+            `;
+            
+            return div;
+        }
+        
+        function toggleResultsMap() {
+            // Implement map toggle for results view
+            console.log('Map toggle in results - coming soon!');
+            showSuccessToast('Results map view coming soon! 🗺️');
         }
 
         // ================================
