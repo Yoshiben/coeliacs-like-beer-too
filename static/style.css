@@ -2855,6 +2855,206 @@ body {
     color: #667eea !important;
 }
 
+/* ================================
+   SINGLE SCREEN REPORT MODAL
+   Optimized for mobile no-scroll experience
+   ================================ */
+
+/* ====================
+   MODAL CONTAINER
+   ==================== */
+
+.modal {
+    padding: 8px !important; /* Tighter padding */
+}
+
+.modal-content {
+    max-width: 400px !important;
+    margin: 4vh auto !important; /* Less top margin */
+    max-height: 92vh !important; /* Use more screen space */
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+}
+
+.modal-header {
+    padding: 16px 20px 12px !important; /* Tighter header */
+    flex-shrink: 0 !important;
+}
+
+.modal-title {
+    font-size: 1.1rem !important;
+    line-height: 1.3 !important;
+}
+
+.modal-body {
+    flex: 1 !important;
+    padding: 0 20px 16px !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+}
+
+/* ====================
+   COMPACT FORM LAYOUT
+   ==================== */
+
+.modal-form {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important; /* Reduced from 16px */
+    height: 100% !important;
+}
+
+.form-group {
+    gap: 6px !important; /* Reduced gap */
+}
+
+.form-label {
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+    margin-bottom: 4px !important;
+}
+
+/* Compact form inputs */
+.form-input,
+.form-select {
+    min-height: 42px !important; /* Slightly smaller */
+    padding: 10px 16px !important;
+    font-size: 0.9rem !important;
+    border-radius: 21px !important;
+}
+
+/* ====================
+   TWO-COLUMN LAYOUT FOR BREWERY/BEER
+   ==================== */
+
+.brewery-beer-row {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px !important;
+}
+
+.brewery-beer-row .form-group {
+    margin: 0 !important;
+}
+
+/* ====================
+   COMPACT PHOTO UPLOAD
+   ==================== */
+
+.photo-upload-compact {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 12px 16px !important;
+    border: 2px dashed var(--border-light) !important;
+    border-radius: 12px !important;
+    background: var(--bg-section) !important;
+    cursor: pointer !important;
+    transition: all var(--transition) !important;
+}
+
+.photo-upload-compact:hover {
+    border-color: var(--primary-color) !important;
+    background: rgba(102, 126, 234, 0.05) !important;
+}
+
+.photo-upload-icon {
+    font-size: 1.5rem !important;
+    color: var(--text-muted) !important;
+}
+
+.photo-upload-text {
+    flex: 1 !important;
+    font-size: 0.85rem !important;
+    color: var(--text-secondary) !important;
+}
+
+/* ====================
+   STICKY FORM ACTIONS
+   ==================== */
+
+.form-actions {
+    flex-shrink: 0 !important;
+    display: flex !important;
+    gap: 12px !important;
+    padding: 16px 0 0 !important;
+    border-top: 1px solid var(--border-light) !important;
+    background: white !important;
+    margin-top: auto !important;
+}
+
+.form-actions .btn {
+    flex: 1 !important;
+    min-height: 44px !important;
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+    border-radius: 22px !important;
+}
+
+/* ====================
+   MOBILE OPTIMIZATIONS
+   ==================== */
+
+@media (max-width: 480px) {
+    .modal {
+        padding: 4px !important;
+    }
+    
+    .modal-content {
+        margin: 2vh auto !important;
+        max-height: 96vh !important;
+    }
+    
+    .modal-header {
+        padding: 12px 16px 8px !important;
+    }
+    
+    .modal-body {
+        padding: 0 16px 12px !important;
+    }
+    
+    .modal-form {
+        gap: 10px !important;
+    }
+    
+    .form-input,
+    .form-select {
+        min-height: 40px !important;
+        padding: 8px 14px !important;
+        font-size: 16px !important; /* Prevent zoom on iOS */
+    }
+    
+    .brewery-beer-row {
+        gap: 8px !important;
+    }
+    
+    .form-actions {
+        gap: 8px !important;
+        padding: 12px 0 0 !important;
+    }
+}
+
+/* ====================
+   WHEN PUB IS PRE-POPULATED
+   ==================== */
+
+.pub-pre-populated .modal-title {
+    text-align: center !important;
+}
+
+.pub-pre-populated .modal-title small {
+    display: block !important;
+    margin-top: 4px !important;
+    font-size: 0.8rem !important;
+    opacity: 0.7 !important;
+}
+
+/* Hide pub search when pre-populated */
+.pub-pre-populated .form-group:has(#reportPubSearch) {
+    display: none !important;
+}
+
 /* ====================
    SPLIT VIEW SECTION
    ==================== */
@@ -3226,3 +3426,4 @@ body {
         padding: 4px 8px;
     }
 }
+
