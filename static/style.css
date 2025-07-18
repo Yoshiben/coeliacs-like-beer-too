@@ -2276,8 +2276,8 @@ body.pub-details-open {
 
 .search-section {
     /* Keep your existing height but make sure we use ALL of it */
-    height: calc(100vh - 220px) !important;
-    height: calc(100dvh - 220px) !important;
+    height: calc(100vh - 200px) !important; /*lower the second number, taller the box */
+    height: calc(100dvh - 200px) !important;
     margin: -20px 0 0 0 !important;
     display: flex !important;
     align-items: stretch !important; /* Key: stretch to fill */
