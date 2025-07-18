@@ -823,14 +823,6 @@
         // Called when user selects a distance
         async function searchNearbyWithDistance(radiusKm) {
             console.log(`🎯 Searching within ${radiusKm}km...`);
-
-            // SAVE the search state before starting
-            lastSearchState = {
-                type: 'nearby',
-                radius: radiusKm,
-                userLocation: userLocation,
-                timestamp: Date.now()
-            };
             
             // Close distance modal
             closeSearchModal();
@@ -841,13 +833,23 @@
             // Check if we have location
             if (!userLocation) {
                 showResultsLoading('Getting your location...');
-                await requestUserLocationForSearch();
-                
-                if (!userLocation) {
+                try {
+                    await requestUserLocationForSearch();
+                } catch (error) {
                     showNoResults('Could not get your location');
                     return;
                 }
             }
+            
+            // SAVE the search state AFTER we have confirmed location
+            lastSearchState = {
+                type: 'nearby',
+                radius: radiusKm,
+                userLocation: userLocation, // Save the actual location object
+                timestamp: Date.now()
+            };
+            
+            console.log('💾 Saved search state:', lastSearchState);
             
             // Start the search
             await findNearbyPubsWithRadius(radiusKm);
@@ -895,17 +897,31 @@
         
         // ➕ ADD NEW - Restore nearby search
         async function restoreNearbySearch(state) {
-            console.log('🔄 Restoring nearby search...');
+            console.log('🔄 Restoring nearby search...', state);
             
-            // Set user location from saved state
-            userLocation = state.userLocation;
+            // FIRST: Restore user location from saved state
+            if (state.userLocation) {
+                userLocation = state.userLocation;
+                console.log('✅ Restored user location:', userLocation);
+            } else {
+                console.log('❌ No saved user location, requesting fresh location...');
+                // If no saved location, get fresh location
+                try {
+                    await requestUserLocationForSearch();
+                } catch (error) {
+                    console.error('❌ Could not get location:', error);
+                    showNoResults('Could not get your location');
+                    return;
+                }
+            }
             
             // Show results overlay
             showResultsOverlay(`Pubs within ${state.radius}km`);
             showResultsLoading('Restoring your search...');
             
-            // Re-run the search
+            // Re-run the search with proper location
             try {
+                console.log('🔍 Re-running search with location:', userLocation);
                 await findNearbyPubsWithRadius(state.radius);
                 showSuccessToast('📍 Restored your search results!');
             } catch (error) {
@@ -1066,14 +1082,34 @@
             document.body.style.overflow = 'hidden';
         }
         
+        // 📝 UPDATE - Improve closeResults to go back to home (not try to restore)
         function closeResults() {
+            console.log('🔙 Closing results overlay');
+            
             document.getElementById('resultsOverlay').classList.remove('active');
             
             // Restore background scrolling
             document.body.style.overflow = '';
             
+            // Clear the overlay content to prevent stale data
+            document.getElementById('resultsList').innerHTML = '';
+            document.getElementById('resultsLoading').style.display = 'flex';
+            document.getElementById('noResultsFound').style.display = 'none';
+            
             trackEvent('close_results', 'Navigation');
         }
+
+        // 📝 ADD NEW - Better debugging for the location issue
+        function debugLocationState() {
+            console.log('🔍 Current location state:');
+            console.log('userLocation:', userLocation);
+            console.log('lastSearchState:', lastSearchState);
+            
+            if (lastSearchState && lastSearchState.userLocation) {
+                console.log('Saved location:', lastSearchState.userLocation);
+            } else {
+                console.log('❌ No saved location in state');
+            }
         
         function showResultsLoading(message) {
             document.getElementById('resultsLoading').style.display = 'flex';
