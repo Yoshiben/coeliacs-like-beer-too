@@ -2285,12 +2285,17 @@ body.pub-details-open {
     margin-left: -50vw;
     margin-right: -50vw;
     padding: 0 var(--space-lg);
-    height: calc(100vh - 300px); /* Changes lower level of search box */
-    height: calc(100dvh - 300px); /* Make sure you change both this and above */
+    height: calc(100vh - 160px); /* Changes lower level of search box */
+    height: calc(100dvh - 160px); /* Make sure you change both this and above */
     display: flex;
     align-items: stretch; /* if this is center, the box won't stretch. Set to stretch to get it to do so */
     overflow: hidden;
 }
+
+@media (max-width: 768px) {
+    .search-section {
+        min-height: calc(100vh - 300px);
+    }
 
 @media (min-width: 768px) {
     .search-section {
@@ -2495,7 +2500,8 @@ body.pub-details-open {
 /* MOBILE RESPONSIVE - KEEP 2x2 GRID */
 @media (max-width: 768px) {
     .search-section {
-        min-height: calc(100vh - 300px);
+        height: calc(100vh - 160px); /* CHANGE this number */
+        min-height: auto; /* Remove the min-height */
     }
     
     .search-options {
@@ -2523,7 +2529,8 @@ body.pub-details-open {
 
 @media (max-width: 480px) {
     .search-section {
-        min-height: calc(100vh - 250px);
+        height: calc(100vh - 160px); /* CHANGE this number */
+        min-height: auto; /* Remove the min-height */
     }
     
     .search-options {
