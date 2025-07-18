@@ -701,6 +701,9 @@
         </a>
     </nav>
 
+    <!-- END OF HTML SCRIPT -->
+    <!-- START OF JAVASCRIPT -->
+
     <script>
         // Cache-busting timestamp
         console.log('🚀 CACHE BUSTER:', '{{ cache_buster }}');
@@ -722,90 +725,198 @@
         let currentSearchType = 'all';
         let currentGfOnly = false;
 
+        // ================================
+        // CLEAN STARTLOCATIONSEARCH FUNCTION - BA
+        // ================================
         function startLocationSearch() {
-            // Show immediate feedback
+            console.log('🎯 Starting location search...');
             showLoadingToast('Getting your location...');
             
             // Track the action
             trackEvent('direct_location_search', 'Search', 'pubs_near_me');
             
-            // Check if we already have user location
+            // Check if we already have location
             if (userLocation) {
-                // We have location - search immediately
+                console.log('✅ Using cached location:', userLocation);
                 findNearbyPubs();
-            } else {
-                // Get location first, then search
-                getUserLocationAndSearch();
+                return;
             }
+            
+            // Get fresh location
+            requestUserLocation();
         }
 
         // ================================
-        // GET USER LOCATION AND SEARCH
+        // CLEAN LOCATION REQUEST FUNCTION - BA
         // ================================
-        
-        function getUserLocationAndSearch() {
+        function requestUserLocation() {
             if (!navigator.geolocation) {
                 hideLoadingToast();
-                showSuccessToast('❌ Location services not available');
+                showSuccessToast('❌ Location services not supported');
                 return;
             }
         
+            console.log('📍 Requesting location permission...');
+            
             navigator.geolocation.getCurrentPosition(
+                // SUCCESS
                 (position) => {
-                    // Save location
+                    console.log('✅ Location granted:', position.coords);
+                    
+                    // Store location globally
                     userLocation = {
                         lat: position.coords.latitude,
                         lng: position.coords.longitude
                     };
                     
-                    // Add user marker to map if it exists
-                    if (map && userMarker) {
-                        map.removeLayer(userMarker);
-                    }
-                    if (map) {
+                    // Add marker to map if it exists
+                    if (typeof map !== 'undefined' && map) {
+                        if (userMarker) {
+                            map.removeLayer(userMarker);
+                        }
                         userMarker = L.marker([userLocation.lat, userLocation.lng])
                             .addTo(map)
-                            .bindPopup('You are here!');
+                            .bindPopup('📍 You are here!');
                     }
                     
-                    // Now search for nearby pubs
+                    // Start the search
                     findNearbyPubs();
                 },
+                // ERROR
                 (error) => {
+                    console.log('❌ Location error:', error.code, error.message);
                     hideLoadingToast();
-                    let errorMessage = 'Unable to get your location';
+                    
+                    let message = '';
+                    let shouldShowFallback = false;
                     
                     switch(error.code) {
                         case error.PERMISSION_DENIED:
-                            errorMessage = '📍 Location access denied. Please enable location services and try again.';
+                            message = '📍 Location access denied. Please allow location access and try again.';
+                            shouldShowFallback = true;
                             break;
                         case error.POSITION_UNAVAILABLE:
-                            errorMessage = '📍 Location information unavailable.';
+                            message = '📍 Location unavailable. Please check your GPS settings.';
+                            shouldShowFallback = true;
                             break;
                         case error.TIMEOUT:
-                            errorMessage = '📍 Location request timed out.';
+                            message = '📍 Location request timed out. Please try again.';
                             break;
                     }
                     
-                    showSuccessToast(errorMessage);
+                    showSuccessToast(message);
                     
-                    // Fallback: offer manual location entry
-                    setTimeout(() => {
-                        if (confirm('Would you like to enter your location manually instead?')) {
-                            openModal('areaModal');
-                        }
-                    }, 2000);
+                    // Offer manual entry fallback
+                    if (shouldShowFallback) {
+                        setTimeout(() => {
+                            if (confirm('Would you like to enter your location manually instead?')) {
+                                openModal('locationModal');
+                            }
+                        }, 2000);
+                    }
                 },
+                // OPTIONS
                 {
                     enableHighAccuracy: true,
                     timeout: 10000,
-                    maximumAge: 300000 // 5 minutes
+                    maximumAge: 300000 // Cache for 5 minutes
                 }
             );
         }
 
         // ================================
-        // MOBILE UX FEEDBACK - ADD TO YOUR EXISTING JS
+        // CLEAN FINDNEARBYPUBS FUNCTION - BA
+        // ================================
+        
+        async function findNearbyPubs() {
+            // Validate we have location
+            if (!userLocation) {
+                showSuccessToast('❌ Location not available');
+                return;
+            }
+        
+            console.log('🔍 Searching for nearby pubs...', userLocation);
+            
+            // Show the search is happening
+            showResultsSection();
+            showLoadingToast('Finding nearby GF beer...');
+            
+            // Clear previous results
+            const results = document.getElementById('results');
+            results.innerHTML = '<li class="loading">Finding nearby pubs...</li>';
+            
+            // Auto-show map and center on user location
+            if (!mapVisible) {
+                toggleMap();
+            }
+            
+            // Center map on user location
+            if (typeof map !== 'undefined' && map) {
+                map.setView([userLocation.lat, userLocation.lng], 15);
+            }
+            
+            try {
+                // Build API request
+                const radius = 5; // km
+                const gfOnly = true; // Default to GF pubs only for mobile
+                const url = `/nearby?lat=${userLocation.lat}&lng=${userLocation.lng}&radius=${radius}&gf_only=${gfOnly}`;
+                
+                console.log('📡 API request:', url);
+                
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                const nearbyPubs = data.pubs || data;
+                
+                hideLoadingToast();
+                
+                console.log(`✅ Found ${nearbyPubs.length} nearby pubs`);
+                
+                if (nearbyPubs.length === 0) {
+                    results.innerHTML = '<li class="no-results">No GF-friendly pubs found within 5km. Try expanding your search area.</li>';
+                    showSuccessToast('No GF pubs found nearby');
+                    return;
+                }
+                
+                // Display results
+                displaySearchResults(nearbyPubs);
+                
+                // Add markers to map
+                addPubMarkersToMap(nearbyPubs);
+                
+                // Success feedback
+                const message = `✅ Found ${nearbyPubs.length} GF pubs near you!`;
+                showSuccessToast(message);
+                
+                // Track success
+                trackSearch('nearby', 'location', nearbyPubs.length);
+                
+                // Save state
+                currentQuery = '';
+                currentSearchType = 'nearby';
+                currentPage = 1;
+                AppState.save();
+                
+            } catch (error) {
+                console.error('❌ Error finding nearby pubs:', error);
+                hideLoadingToast();
+                
+                results.innerHTML = '<li class="no-results">Error finding nearby pubs. Please check your connection and try again.</li>';
+                showSuccessToast('Error finding nearby pubs. Please try again.');
+            }
+        }
+
+        // ================================
+        // MOBILE UX FEEDBACK - ADD TO YOUR EXISTING JS - BA
         // ================================
 
         function initMobileFeedback() {
@@ -1467,132 +1578,6 @@ function addSwipeGestures() {
             return R * c;
         }
 
-        // Get user's location
-        function getUserLocation() {
-            const statusEl = document.getElementById('locationStatus');
-            statusEl.style.display = 'block';
-            statusEl.className = 'location-status location-loading';
-            statusEl.textContent = 'Getting your location...';
-
-            if (!navigator.geolocation) {
-                statusEl.className = 'location-status location-error';
-                statusEl.textContent = 'Geolocation not supported by this browser';
-                return;
-            }
-
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    userLocation = {
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude
-                    };
-                    
-                    statusEl.className = 'location-status location-success';
-                    statusEl.textContent = 'Location found! Click "Pubs Near Me" to see what\'s around you.';
-                    
-                    if (userMarker) {
-                        map.removeLayer(userMarker);
-                    }
-                    userMarker = L.marker([userLocation.lat, userLocation.lng])
-                        .addTo(map)
-                        .bindPopup('You are here!')
-                        .openPopup();
-                    
-                    map.setView([userLocation.lat, userLocation.lng], 14);
-                    
-                    setTimeout(() => {
-                        statusEl.style.display = 'none';
-                    }, 3000);
-                },
-                (error) => {
-                    let errorMessage = 'Unable to get your location';
-                    switch(error.code) {
-                        case error.PERMISSION_DENIED:
-                            errorMessage = 'Location access denied. Please enable location services.';
-                            break;
-                        case error.POSITION_UNAVAILABLE:
-                            errorMessage = 'Location information unavailable.';
-                            break;
-                        case error.TIMEOUT:
-                            errorMessage = 'Location request timed out.';
-                            break;
-                    }
-                    statusEl.className = 'location-status location-error';
-                    statusEl.textContent = errorMessage;
-                    
-                    setTimeout(() => {
-                        statusEl.style.display = 'none';
-                    }, 5000);
-                }
-            );
-        }
-
-        async function findNearbyPubs() {
-            if (!userLocation) {
-                showSuccessToast('Getting your location first...');
-                getUserLocation();
-                return;
-            }
-        
-            trackEvent('find_nearby_pubs', 'Location Search');
-            smartShowMap(); // Auto-show map
-            
-            // const gfOnly = document.getElementById('gfOnly')?.checked ?? true;
-            const radius = 5;
-            
-            showResultsSection();
-            showLoadingToast('Finding nearby GF beer...');
-            const results = document.getElementById('results');
-            results.innerHTML = '<li class="loading">Finding nearby pubs...</li>';
-            
-            // Center map on user location
-            if (map) {
-                map.setView([userLocation.lat, userLocation.lng], 15);
-            }
-            
-            try {
-                const url = `/nearby?lat=${userLocation.lat}&lng=${userLocation.lng}&radius=${radius}&gf_only=${gfOnly}`;
-                
-                const response = await fetch(url);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-                
-                const nearbyPubs = data.pubs || data;
-                
-                hideLoadingToast();
-                
-                displaySearchResults(nearbyPubs);
-                addPubMarkersToMap(nearbyPubs);
-                
-                const resultCount = nearbyPubs.length;
-                const message = `Found ${resultCount} pubs near you!`;
-                showSuccessToast(message);
-                
-                trackSearch('nearby', 'location', resultCount);
-                
-                // Save state
-                currentQuery = '';
-                currentSearchType = 'nearby';
-                // currentGfOnly = gfOnly;
-                currentPage = 1;
-                AppState.save();
-                
-            } catch (error) {
-                console.error('Error finding nearby pubs:', error);
-                hideLoadingToast();
-                results.innerHTML = '<li class="no-results">Error finding nearby pubs. Please try again.</li>';
-                showSuccessToast('Error finding nearby pubs. Please try again.');
-            }
-        }
-
         // ENHANCED centerOnLocation with smart map showing
         function centerOnLocation() {
             trackEvent('center_on_location', 'Map Interaction');
@@ -1605,130 +1590,6 @@ function addSwipeGestures() {
                 getUserLocation();
             }
         }
-
-        // // 1. CREATE RESULT ITEM - Makes beautiful result cards with GF badges
-        // function createResultItem(pub) {
-        //     const li = document.createElement('li');
-        //     li.className = 'result-item';
-        //     li.onclick = () => openPubDetails(pub.pub_id);
-            
-        //     // Generate GF badges using your new CSS
-        //     const badges = [];
-        //     if (pub.bottle) badges.push('<span class="gf-badge bottle">🍺 Bottle</span>');
-        //     if (pub.tap) badges.push('<span class="gf-badge tap">🚰 Tap</span>');
-        //     if (pub.cask) badges.push('<span class="gf-badge cask">🛢️ Cask</span>');
-        //     if (pub.can) badges.push('<span class="gf-badge can">🥫 Can</span>');
-            
-        //     // Calculate distance if user location available
-        //     let distanceHtml = '';
-        //     if (pub.latitude && pub.longitude && window.userLocation) {
-        //         const distance = calculateDistance(
-        //             window.userLocation.lat, window.userLocation.lng,
-        //             parseFloat(pub.latitude), parseFloat(pub.longitude)
-        //         );
-        //         distanceHtml = `<div class="result-distance">${distance.toFixed(1)}km</div>`;
-        //     }
-            
-        //     li.innerHTML = `
-        //         <div class="result-header">
-        //             <div class="result-details">
-        //                 <h3>${pub.name}</h3>
-        //                 <div class="result-address">${pub.address}, ${pub.postcode}</div>
-        //                 <div class="result-authority">${pub.local_authority}</div>
-        //             </div>
-        //             ${distanceHtml}
-        //         </div>
-                
-        //         <div class="gf-badges">
-        //             ${badges.join('')}
-        //         </div>
-                
-        //         <div class="result-actions">
-        //             <button class="result-btn result-btn-primary" onclick="event.stopPropagation(); openPubDetails(${pub.pub_id})">
-        //                 <span>📍</span> View Details
-        //             </button>
-        //             <button class="result-btn result-btn-secondary" onclick="event.stopPropagation(); getDirections('${pub.name}', '${pub.address}')">
-        //                 <span>🧭</span> Directions
-        //             </button>
-        //         </div>
-        //     `;
-            
-        //     return li;
-        // }
-        
-        // // 2. OPEN PUB DETAILS - Opens the split screen view
-        // function openPubDetails(pubId) {
-        //     console.log('Opening pub details for:', pubId);
-        //     // For now, just log - you can implement the full overlay later
-        //     showSuccessToast(`Opening details for pub ${pubId}`);
-            
-        //     // TODO: Implement the full split-screen overlay from earlier artifacts
-        //     // loadPubDetails(pubId);
-        // }
-        
-        // // 3. GET DIRECTIONS - Opens maps
-        // function getDirections(pubName, address) {
-        //     const encodedAddress = encodeURIComponent(`${pubName}, ${address}`);
-        //     const mapsUrl = `https://maps.google.com/maps?q=${encodedAddress}`;
-        //     window.open(mapsUrl, '_blank');
-        //     trackEvent('get_directions', 'Navigation', pubName);
-        // }
-        
-        // // 4. SHOW/HIDE LOADING - Simple versions (you might have better ones)
-        // function showLoading() {
-        //     console.log('Loading...');
-        //     // Use your existing toast system
-        //     showLoadingToast('Loading...');
-        // }
-        
-        // function hideLoading() {
-        //     console.log('Hiding loading...');
-        //     hideLoadingToast();
-        // }
-
-        // // Add pub markers to map
-        // function addPubMarkersToMap(pubs) {
-        //     // Clear existing markers
-        //     pubMarkers.forEach(marker => map.removeLayer(marker));
-        //     pubMarkers = [];
-        
-        //     pubs.forEach(pub => {
-        //         if (pub.latitude && pub.longitude) {
-        //             const hasGF = pub.bottle || pub.tap || pub.cask || pub.can;
-        //             const markerColor = hasGF ? '#4CAF50' : '#757575';
-                    
-        //             const marker = L.circleMarker([pub.latitude, pub.longitude], {
-        //                 radius: 8,
-        //                 fillColor: markerColor,
-        //                 color: '#fff',
-        //                 weight: 2,
-        //                 opacity: 1,
-        //                 fillOpacity: 0.8
-        //             }).addTo(map);
-        
-        //             let popupContent = `<strong>${pub.name}</strong><br>`;
-        //             popupContent += `${pub.address}<br>`;
-        //             if (pub.distance !== undefined) {
-        //                 popupContent += `<em>${pub.distance.toFixed(2)} km away</em><br>`;
-        //             }
-                    
-        //             if (hasGF) {
-        //                 let gfOptions = [];
-        //                 if (pub.bottle) gfOptions.push('Bottle');
-        //                 if (pub.tap) gfOptions.push('Tap');
-        //                 if (pub.cask) gfOptions.push('Cask');
-        //                 if (pub.can) gfOptions.push('Can');
-        //                 popupContent += `<br><strong>GF Options:</strong> ${gfOptions.join(', ')}<br>`;
-        //                 popupContent += `<button onclick="showPubDetailsFromMap(${pub.pub_id})" style="margin-top: 8px; padding: 6px 12px; background: var(--primary-gradient); color: white; border: none; border-radius: 15px; cursor: pointer; font-size: 12px;">View Details</button>`;
-        //             } else {
-        //                 popupContent += '<br><em>No GF options recorded</em>';
-        //             }
-        
-        //             marker.bindPopup(popupContent);
-        //             pubMarkers.push(marker);
-        //         }
-        //     });
-        // }
         
         // NEW: Function to show pub details from map popup
         function showPubDetailsFromMap(pubId) {
