@@ -2538,18 +2538,68 @@ function addSwipeGestures() {
         // UPDATE the showPubDetails function to prevent background scrolling:
         
         function showPubDetails(pubId) {
-            console.log('Loading pub details for ID:', pubId);
+            console.log('🎯 showPubDetails called with:', pubId, typeof pubId);
+            
+            // Validate pubId
+            if (!pubId || isNaN(pubId)) {
+                console.error('❌ Invalid pub ID:', pubId);
+                showSuccessToast('❌ Invalid pub ID');
+                return;
+            }
+            
+            console.log('✅ Valid pub ID, closing results and loading details...');
             
             // Close results overlay first  
             closeResults();
             
-            // Use your existing searchSpecificPub function to get full pub data
-            // This will handle the API call and then call the original showPubDetails
-            searchSpecificPub(pubId);
+            // Add loading state
+            showLoadingToast('Loading pub details...');
+            
+            // Use your existing searchSpecificPub function
+            searchSpecificPubForDetails(pubId);
         }
-
-        // Keep your original function but rename it
+        
+        // 📝 ADD NEW - New function to handle the API call specifically for details
+        async function searchSpecificPubForDetails(pubId) {
+            console.log('🔍 Searching for specific pub:', pubId);
+            
+            try {
+                const url = `/search?pub_id=${pubId}`;
+                console.log('📡 API call:', url);
+                
+                const response = await fetch(url);
+                console.log('📡 Response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const pubs = await response.json();
+                console.log('📡 API response:', pubs);
+                
+                hideLoadingToast();
+                
+                if (pubs && pubs.length > 0) {
+                    const pub = pubs[0];
+                    console.log('✅ Pub found:', pub.name);
+                    
+                    // Call your existing function to show the overlay
+                    displayPubDetailsOverlay(pub);
+                } else {
+                    console.error('❌ No pub found in response');
+                    showSuccessToast('❌ Pub not found');
+                }
+            } catch (error) {
+                console.error('❌ Error searching for specific pub:', error);
+                hideLoadingToast();
+                showSuccessToast('❌ Error loading pub details');
+            }
+        }
+        
+        // 📝 RENAME - Your existing showPubDetails function should be renamed to this:
         function displayPubDetailsOverlay(pub) {
+            console.log('🎨 Displaying pub details overlay for:', pub.name);
+            
             currentPubData = pub;
             
             // Update the pub details content
