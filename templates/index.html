@@ -1071,12 +1071,15 @@ function addSwipeGestures() {
             modals.forEach(modal => {
                 const modalEl = document.getElementById(modal);
                 if (modalEl && modalEl.style.display !== 'none') {
-                    // Add fade out effect
+                    // Slower fade out - gives highlight time to disappear
                     modalEl.style.opacity = '0';
+                    modalEl.style.transition = 'opacity 0.3s ease-out'; // Smooth fade
+                    
                     setTimeout(() => {
                         modalEl.style.display = 'none';
                         modalEl.style.opacity = '1'; // Reset for next time
-                    }, 200);
+                        modalEl.style.transition = ''; // Reset transition
+                    }, 350); // Longer delay - 350ms instead of 200ms
                 }
             });
         }
