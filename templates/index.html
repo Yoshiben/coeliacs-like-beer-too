@@ -146,6 +146,87 @@
         </div>
     </div>
 
+    <!-- Distance Selection Modal -->
+    <div id="distanceModal" class="search-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">📍 How far will you travel?</h3>
+                <p class="modal-subtitle">Choose your search radius</p>
+            </div>
+            
+            <div class="distance-options">
+                <div class="distance-option" onclick="searchNearbyWithDistance(1)">
+                    <div class="distance-number">1km</div>
+                    <div class="distance-label">Walking distance</div>
+                </div>
+                <div class="distance-option" onclick="searchNearbyWithDistance(3)">
+                    <div class="distance-number">3km</div>
+                    <div class="distance-label">Short journey</div>
+                </div>
+                <div class="distance-option popular" onclick="searchNearbyWithDistance(5)">
+                    <div class="distance-number">5km</div>
+                    <div class="distance-label">Most popular</div>
+                </div>
+                <div class="distance-option" onclick="searchNearbyWithDistance(10)">
+                    <div class="distance-number">10km</div>
+                    <div class="distance-label">Longer trip</div>
+                </div>
+                <div class="distance-option" onclick="searchNearbyWithDistance(20)">
+                    <div class="distance-number">20km</div>
+                    <div class="distance-label">Day out</div>
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeSearchModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Full-Screen Results Overlay -->
+    <div id="resultsOverlay" class="results-overlay">
+        <div class="results-container">
+            <!-- Results Header -->
+            <div class="results-nav">
+                <button class="btn-nav-small" onclick="closeResults()">
+                    🏠 Home
+                </button>
+                <h2 class="results-title" id="resultsTitle">Search Results</h2>
+                <button class="btn-nav-small" onclick="toggleResultsMap()">
+                    🗺️ <span id="resultsMapBtnText">Map</span>
+                </button>
+            </div>
+            
+            <!-- Results Content -->
+            <div class="results-content">
+                <div class="results-list-container" id="resultsListContainer">
+                    <!-- Loading state -->
+                    <div class="results-loading" id="resultsLoading">
+                        <div class="loading-spinner"></div>
+                        <div class="loading-text">Finding nearby GF beer...</div>
+                    </div>
+                    
+                    <!-- Results list -->
+                    <div class="results-list" id="resultsList" style="display: none;">
+                        <!-- Results will be populated here -->
+                    </div>
+                    
+                    <!-- No results -->
+                    <div class="no-results-found" id="noResultsFound" style="display: none;">
+                        <div class="no-results-icon">🔍</div>
+                        <div class="no-results-title">No pubs found</div>
+                        <div class="no-results-text">Try expanding your search distance or removing filters</div>
+                    </div>
+                </div>
+                
+                <!-- Results Map (hidden by default) -->
+                <div class="results-map-container" id="resultsMapContainer" style="display: none;">
+                    <div id="resultsMap" class="results-map"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Full-Screen Pub Details Overlay -->
     <div id="pubDetailsOverlay" class="pub-details-overlay">
         <div class="pub-details-container" id="pubContainer">
