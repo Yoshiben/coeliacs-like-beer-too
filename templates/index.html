@@ -430,126 +430,122 @@
      Single screen, pre-population ready
      ================================ -->
 
-    <!-- Enhanced Report GF Beer Modal -->
-    <div id="reportModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">📸 Report GF Beer Find</h2>
-                <button class="modal-close" onclick="closeModal('reportModal')" aria-label="Close report modal">&times;</button>
-            </div>
-            
-            <div class="modal-body">
-                <form id="reportForm" class="modal-form" onsubmit="handleReportSubmission(event)">
-                    
-                    <!-- Pub Search Field (hidden when pre-populated) -->
-                    <div class="form-group" id="pubSearchGroup">
-                        <label class="form-label">Find Your Pub *</label>
-                        <input type="text" id="reportPubSearch" class="form-input" 
-                               placeholder="Start typing pub name..." autocomplete="off">
-                        <div id="pubSuggestions" class="suggestions"></div>
-                        <small style="color: var(--text-muted); font-size: 0.8rem;">
-                            Search for an existing pub first - we'll check our database!
-                        </small>
-                    </div>
-                    
-                    <!-- Selected Pub Info (shown when pub selected) -->
-                    <div id="selectedPubInfo" class="selected-pub-info" style="display: none;">
-                        <div class="selected-pub-card">
-                            <strong id="selectedPubName"></strong>
-                            <div id="selectedPubAddress"></div>
-                            <button type="button" onclick="clearSelectedPub()" class="btn btn-secondary btn-sm">
-                                Choose Different Pub
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <!-- New Pub Fields (shown when adding new pub) -->
-                    <div id="newPubFields" class="new-pub-fields" style="display: none;">
-                        <h4>📍 Add New Pub</h4>
-                        <div class="form-group">
-                            <label class="form-label">Pub Name *</label>
-                            <input type="text" id="reportPubName" class="form-input" placeholder="The Red Lion">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Address *</label>
-                            <input type="text" id="reportAddress" class="form-input" placeholder="123 High Street">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Postcode *</label>
-                            <input type="text" id="reportPostcode" class="form-input" placeholder="SW1A 1AA">
-                        </div>
-                    </div>
-                    
-                    <!-- Beer Format (Required) -->
-                    <div class="form-group">
-                        <label class="form-label">Beer Format *</label>
-                        <select id="reportFormat" name="reportFormat" class="form-select" required>
-                            <option value="">Select format...</option>
-                            <option value="bottle">🍺 Bottle</option>
-                            <option value="tap">🚰 Tap</option>
-                            <option value="cask">🛢️ Cask</option>
-                            <option value="can">🥫 Can</option>
-                        </select>
-                    </div>
-                    
-                    <!-- Brewery & Beer Name (Two Column Layout) -->
-                    <div class="brewery-beer-row">
-                        <div class="form-group">
-                            <label class="form-label">Brewery</label>
-                            <input type="text" id="reportBrewery" name="reportBrewery" class="form-input" 
-                                   placeholder="Brewdog" autocomplete="off">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label class="form-label">Beer Name</label>
-                            <input type="text" id="reportBeerName" name="reportBeerName" class="form-input" 
-                                   placeholder="Punk AF" autocomplete="off">
-                        </div>
-                    </div>
-                    
-                    <!-- Beer Style -->
-                    <div class="form-group">
-                        <label class="form-label">Beer Style</label>
-                        <input type="text" id="reportBeerStyle" name="reportBeerStyle" class="form-input" 
-                               placeholder="IPA, Lager, Stout..." autocomplete="off">
-                    </div>
-                    
-                    <!-- Compact Photo Upload -->
-                    <div class="form-group">
-                        <label class="form-label">Photo (Optional)</label>
-                        <label for="reportPhoto" class="photo-upload-compact">
-                            <div class="photo-upload-icon">📷</div>
-                            <div class="photo-upload-text">
-                                <strong>Add a photo</strong><br>
-                                <small>Beer menu, bottle, or tap</small>
-                            </div>
-                            <input type="file" id="reportPhoto" name="reportPhoto" 
-                                   accept="image/*" style="display: none;">
-                        </label>
-                    </div>
-                    
-                    <!-- Optional Notes -->
-                    <div class="form-group">
-                        <label class="form-label">Notes (Optional)</label>
-                        <textarea id="reportNotes" name="reportNotes" class="form-input" 
-                                  placeholder="Any additional details..." 
-                                  rows="2" style="resize: vertical; min-height: 60px; border-radius: 12px;"></textarea>
-                    </div>
-                    
-                    <!-- Form Actions (Sticky at bottom) -->
-                    <div class="form-actions">
-                        <button type="button" onclick="closeModal('reportModal')" class="btn btn-secondary">
-                            Cancel
-                        </button>
-                        <button type="submit" class="btn btn-success">
-                            Submit Report
-                        </button>
-                    </div>
-                    
-                </form>
+    <!-- ================================
+     CLEAN REPORT FORM HTML STRUCTURE
+     🔄 REPLACING - Replace the modal form content only
+     ================================ -->
+
+    <form id="reportForm" class="modal-form" onsubmit="handleReportSubmission(event)">
+        
+        <!-- Pub Search Field (hidden when pre-populated) -->
+        <div class="form-group" id="pubSearchGroup">
+            <label class="form-label">Find Your Pub *</label>
+            <input type="text" id="reportPubSearch" class="form-input" 
+                   placeholder="Start typing pub name..." autocomplete="off">
+            <div id="pubSuggestions" class="suggestions"></div>
+            <small style="color: var(--text-muted); font-size: 0.8rem;">
+                Search for an existing pub first - we'll check our database!
+            </small>
+        </div>
+        
+        <!-- Selected Pub Info (shown when pub selected) -->
+        <div id="selectedPubInfo" class="selected-pub-info" style="display: none;">
+            <div class="selected-pub-card">
+                <strong id="selectedPubName"></strong>
+                <div id="selectedPubAddress"></div>
+                <button type="button" onclick="clearSelectedPub()" class="btn btn-secondary btn-sm">
+                    Choose Different Pub
+                </button>
             </div>
         </div>
-    </div>
+        
+        <!-- New Pub Fields (shown when adding new pub) -->
+        <div id="newPubFields" class="new-pub-fields" style="display: none;">
+            <h4>📍 Add New Pub</h4>
+            <div class="form-group">
+                <label class="form-label">Pub Name *</label>
+                <input type="text" id="reportPubName" class="form-input" placeholder="The Red Lion">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Address *</label>
+                <input type="text" id="reportAddress" class="form-input" placeholder="123 High Street">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Postcode *</label>
+                <input type="text" id="reportPostcode" class="form-input" placeholder="SW1A 1AA">
+            </div>
+        </div>
+        
+        <!-- Beer Format (Required) -->
+        <div class="form-group">
+            <label class="form-label">Beer Format *</label>
+            <select id="reportFormat" name="reportFormat" class="form-select" required>
+                <option value="">Select format...</option>
+                <option value="bottle">🍺 Bottle</option>
+                <option value="tap">🚰 Tap</option>
+                <option value="cask">🛢️ Cask</option>
+                <option value="can">🥫 Can</option>
+            </select>
+        </div>
+        
+        <!-- Brewery (Dropdown with search) -->
+        <div class="form-group">
+            <label class="form-label">Brewery</label>
+            <div class="brewery-dropdown-container">
+                <input type="text" id="reportBrewery" name="reportBrewery" class="form-input" 
+                       placeholder="Start typing brewery name..." 
+                       autocomplete="off" onInput="searchBreweries(this.value)">
+                <div id="breweryDropdown" class="suggestions brewery-suggestions"></div>
+            </div>
+        </div>
+        
+        <!-- Beer Name (Auto-complete based on brewery) -->
+        <div class="form-group">
+            <label class="form-label">Beer Name</label>
+            <div class="beer-name-container">
+                <input type="text" id="reportBeerName" name="reportBeerName" class="form-input" 
+                       placeholder="Start typing beer name..." 
+                       autocomplete="off" onInput="searchBeerNames(this.value)">
+                <div id="beerNameDropdown" class="suggestions beer-suggestions"></div>
+            </div>
+        </div>
+        
+        <!-- Beer Style (Auto-complete based on selected beer) -->
+        <div class="form-group">
+            <label class="form-label">Beer Style</label>
+            <div class="beer-style-container">
+                <input type="text" id="reportBeerStyle" name="reportBeerStyle" class="form-input" 
+                       placeholder="IPA, Lager, Stout..." 
+                       autocomplete="off" onInput="searchBeerStyles(this.value)">
+                <div id="beerStyleDropdown" class="suggestions style-suggestions"></div>
+            </div>
+        </div>
+        
+        <!-- Compact Photo Upload -->
+        <div class="form-group">
+            <label class="form-label">Photo (Optional)</label>
+            <label for="reportPhoto" class="photo-upload-compact">
+                <div class="photo-upload-icon">📷</div>
+                <div class="photo-upload-text">
+                    <strong>Add a photo</strong><br>
+                    <small>Beer menu, bottle, or tap</small>
+                </div>
+                <input type="file" id="reportPhoto" name="reportPhoto" 
+                       accept="image/*" style="display: none;">
+            </label>
+        </div>
+        
+        <!-- Form Actions (Sticky at bottom) -->
+        <div class="form-actions">
+            <button type="button" onclick="closeModal('reportModal')" class="btn btn-secondary">
+                Cancel
+            </button>
+            <button type="submit" class="btn btn-success">
+                Submit Report
+            </button>
+        </div>
+        
+    </form>
     
     <!-- JavaScript to handle file upload preview -->
     <script>
@@ -874,6 +870,182 @@
         let currentQuery = '';
         let currentSearchType = 'all';
         let currentGfOnly = false;
+
+        // Global variables for auto-complete
+        let brewerySearchTimeout;
+        let beerSearchTimeout;
+        let styleSearchTimeout;
+
+        // ================================
+// ➕ ADD - NEW AUTO-COMPLETE FUNCTIONS
+// Add these completely new functions to your JavaScript
+// ================================
+        
+        // ➕ ADD - Brewery search functionality
+        async function searchBreweries(query) {
+            clearTimeout(brewerySearchTimeout);
+            const dropdown = document.getElementById('breweryDropdown');
+            
+            if (query.length < 2) {
+                dropdown.style.display = 'none';
+                return;
+            }
+            
+            brewerySearchTimeout = setTimeout(async () => {
+                try {
+                    const response = await fetch(`/api/breweries?q=${encodeURIComponent(query)}`);
+                    const breweries = await response.json();
+                    
+                    dropdown.innerHTML = '';
+                    if (breweries.length === 0) {
+                        dropdown.style.display = 'none';
+                        return;
+                    }
+                    
+                    breweries.slice(0, 8).forEach(brewery => {
+                        const div = document.createElement('div');
+                        div.className = 'suggestion-item';
+                        div.textContent = brewery;
+                        div.addEventListener('click', () => {
+                            document.getElementById('reportBrewery').value = brewery;
+                            dropdown.style.display = 'none';
+                            // Clear beer name when brewery changes
+                            document.getElementById('reportBeerName').value = '';
+                            document.getElementById('reportBeerStyle').value = '';
+                            
+                            trackEvent('brewery_selected', 'Form Interaction', brewery);
+                        });
+                        dropdown.appendChild(div);
+                    });
+                    dropdown.style.display = 'block';
+                    
+                } catch (error) {
+                    console.error('Error searching breweries:', error);
+                    dropdown.style.display = 'none';
+                }
+            }, 300);
+        }
+        
+        // ➕ ADD - Beer name search functionality
+        async function searchBeerNames(query) {
+            clearTimeout(beerSearchTimeout);
+            const dropdown = document.getElementById('beerNameDropdown');
+            const brewery = document.getElementById('reportBrewery').value;
+            
+            if (query.length < 2) {
+                dropdown.style.display = 'none';
+                return;
+            }
+            
+            beerSearchTimeout = setTimeout(async () => {
+                try {
+                    let url = `/api/brewery/${encodeURIComponent(brewery)}/beers?q=${encodeURIComponent(query)}`;
+                    if (!brewery) {
+                        url = `/api/beers/search?q=${encodeURIComponent(query)}`;
+                    }
+                    
+                    const response = await fetch(url);
+                    const beers = await response.json();
+                    
+                    dropdown.innerHTML = '';
+                    if (beers.length === 0) {
+                        dropdown.style.display = 'none';
+                        return;
+                    }
+                    
+                    beers.slice(0, 8).forEach(beer => {
+                        const div = document.createElement('div');
+                        div.className = 'suggestion-item';
+                        div.innerHTML = `
+                            <strong>${beer.name}</strong><br>
+                            <small style="color: var(--text-muted);">${beer.style || 'Unknown style'}</small>
+                        `;
+                        div.addEventListener('click', () => {
+                            document.getElementById('reportBeerName').value = beer.name;
+                            document.getElementById('reportBeerStyle').value = beer.style || '';
+                            dropdown.style.display = 'none';
+                            
+                            trackEvent('beer_selected', 'Form Interaction', beer.name);
+                        });
+                        dropdown.appendChild(div);
+                    });
+                    dropdown.style.display = 'block';
+                    
+                } catch (error) {
+                    console.error('Error searching beer names:', error);
+                    dropdown.style.display = 'none';
+                }
+            }, 300);
+        }
+        
+        // ➕ ADD - Beer style search functionality
+        async function searchBeerStyles(query) {
+            clearTimeout(styleSearchTimeout);
+            const dropdown = document.getElementById('beerStyleDropdown');
+            
+            if (query.length < 2) {
+                dropdown.style.display = 'none';
+                return;
+            }
+            
+            // Common beer styles for quick selection
+            const commonStyles = [
+                'IPA', 'Pale Ale', 'Lager', 'Pilsner', 'Stout', 'Porter', 
+                'Wheat Beer', 'Saison', 'Amber Ale', 'Brown Ale', 'Bitter',
+                'Session IPA', 'Double IPA', 'Hazy IPA', 'Sour', 'Gose'
+            ];
+            
+            const filtered = commonStyles.filter(style => 
+                style.toLowerCase().includes(query.toLowerCase())
+            );
+            
+            dropdown.innerHTML = '';
+            if (filtered.length === 0) {
+                dropdown.style.display = 'none';
+                return;
+            }
+            
+            filtered.forEach(style => {
+                const div = document.createElement('div');
+                div.className = 'suggestion-item';
+                div.textContent = style;
+                div.addEventListener('click', () => {
+                    document.getElementById('reportBeerStyle').value = style;
+                    dropdown.style.display = 'none';
+                    
+                    trackEvent('style_selected', 'Form Interaction', style);
+                });
+                dropdown.appendChild(div);
+            });
+            dropdown.style.display = 'block';
+        }
+        
+        // ➕ ADD - Enhanced photo upload handler
+        function handlePhotoUpload() {
+            const photoInput = document.getElementById('reportPhoto');
+            const photoLabel = document.querySelector('.photo-upload-compact');
+            
+            if (photoInput && photoLabel) {
+                photoInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const fileName = file.name.length > 20 ? 
+                            file.name.substring(0, 17) + '...' : 
+                            file.name;
+                        
+                        photoLabel.querySelector('.photo-upload-text').innerHTML = `
+                            <strong>📸 ${fileName}</strong><br>
+                            <small>Click to change photo</small>
+                        `;
+                        photoLabel.style.borderColor = 'var(--success-border)';
+                        photoLabel.style.background = 'var(--success-bg)';
+                        
+                        trackEvent('photo_selected', 'Form Interaction', 'photo_upload');
+                    }
+                });
+            }
+        }
+
 
         // ================================
         // UPDATED LOCATION FUNCTIONS WITH DISTANCE MODAL
@@ -1822,6 +1994,11 @@ function addSwipeGestures() {
         }
 
         // Enhanced openReportModal function
+        // ================================
+        // ✏️ UPDATE - REPLACE your existing openReportModal function
+        // Replace the entire function with this enhanced version
+        // ================================
+
         function openReportModal(pubData = null) {
             const modal = document.getElementById('reportModal');
             const modalTitle = modal.querySelector('.modal-title');
@@ -1832,7 +2009,7 @@ function addSwipeGestures() {
             // If coming from a specific pub, handle differently
             if (pubData) {
                 // Hide pub search entirely
-                document.querySelector('.form-group:has(#reportPubSearch)').style.display = 'none';
+                document.getElementById('pubSearchGroup').style.display = 'none';
                 
                 // Show the pub info at top
                 modalTitle.innerHTML = `📸 Report GF Beer Find<br><small style="color: var(--text-secondary); font-weight: 400;">at ${pubData.name}</small>`;
@@ -1849,7 +2026,7 @@ function addSwipeGestures() {
                 
             } else {
                 // Normal flow - show pub search
-                document.querySelector('.form-group:has(#reportPubSearch)').style.display = 'block';
+                document.getElementById('pubSearchGroup').style.display = 'block';
                 modalTitle.innerHTML = '📸 Report GF Beer Find';
                 selectedPubData = null;
             }
@@ -1859,9 +2036,33 @@ function addSwipeGestures() {
             selectedPubInfo.style.display = 'none';
             newPubFields.style.display = 'none';
             
+            // Hide all dropdowns
+            const dropdowns = ['breweryDropdown', 'beerNameDropdown', 'beerStyleDropdown'];
+            dropdowns.forEach(id => {
+                const dropdown = document.getElementById(id);
+                if (dropdown) dropdown.style.display = 'none';
+            });
+            
+            // Reset photo upload styling
+            const photoLabel = document.querySelector('.photo-upload-compact');
+            if (photoLabel) {
+                photoLabel.style.borderColor = 'var(--border-light)';
+                photoLabel.style.background = 'var(--bg-section)';
+                const textEl = photoLabel.querySelector('.photo-upload-text');
+                if (textEl) {
+                    textEl.innerHTML = `
+                        <strong>Add a photo</strong><br>
+                        <small>Beer menu, bottle, or tap</small>
+                    `;
+                }
+            }
+            
             // Show modal
             modal.style.display = 'block';
             trackEvent('open_report_modal', 'Modal', pubData ? 'from_pub_page' : 'general');
+            
+            // Initialize dropdowns and event handlers
+            initializeReportModalDropdowns();
             
             // Focus appropriate field
             setTimeout(() => {
@@ -3272,128 +3473,35 @@ function addSwipeGestures() {
             AppState.save();
         }
 
-        // Stub functions for features not fully implemented
+        // ================================
+        // ✏️ UPDATE - REPLACE your existing initializeReportModalDropdowns function
+        // Replace the entire function with this enhanced version  
+        // ================================
+
         function initializeReportModalDropdowns() {
-            showComingSoon('Report Modal Dropdowns');
+            console.log('🔧 Initializing report modal auto-complete...');
+            
+            // Initialize photo upload handler
+            handlePhotoUpload();
+            
+            // Hide dropdowns when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.brewery-dropdown-container')) {
+                    const dropdown = document.getElementById('breweryDropdown');
+                    if (dropdown) dropdown.style.display = 'none';
+                }
+                if (!e.target.closest('.beer-name-container')) {
+                    const dropdown = document.getElementById('beerNameDropdown');
+                    if (dropdown) dropdown.style.display = 'none';
+                }
+                if (!e.target.closest('.beer-style-container')) {
+                    const dropdown = document.getElementById('beerStyleDropdown');
+                    if (dropdown) dropdown.style.display = 'none';
+                }
+            });
+            
+            console.log('✅ Report modal auto-complete initialized');
         }
-
-        // Initialize everything when DOM is ready
-        // document.addEventListener('DOMContentLoaded', async () => {
-        //     const input = document.getElementById('searchInput');
-        //     const suggestions = document.getElementById('suggestions');
-
-            // Initialize Leaflet map
-            // map = L.map('map').setView([51.505, -0.09], 6);
-            // L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            //     maxZoom: 19,
-            //     attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            // }).addTo(map);
-
-            // loadDashboardStats();
-            // getUserLocation();
-            // await AppState.restore();
-            // checkCookieConsent();
-
-            // ENHANCED AUTOCOMPLETE WITH POSTCODE DETECTION
-            // input.addEventListener('input', debounce(async () => {
-            //     const query = input.value.trim();
-            //     const searchType = document.getElementById('searchType').value;
-            //     // const gfOnly = document.getElementById('gfOnly').checked;
-
-            //     console.log('🔍 Autocomplete triggered for:', query);
-            //     console.log('🔍 Search type:', searchType);
-                
-            //     if (query.length < 2) {
-            //         suggestions.style.display = 'none';
-            //         return;
-            //     }
-
-            //     // Check if it looks like a postcode
-            //     const isPostcode = /^[A-Z]{1,2}[0-9R][0-9A-Z]?\s?[0-9][A-Z]{2}$/i.test(query.replace(/\s/g, ''));
-                
-            //     if (isPostcode) {
-            //         // Show postcode search option
-            //         suggestions.innerHTML = `
-            //             <div class="postcode-suggestion">
-            //                 <strong>📍 Search for pubs near "${query}"</strong>
-            //                 <div class="postcode-suggestion-subtitle">
-            //                     Find pubs within 5km of this postcode
-            //                 </div>
-            //             </div>
-            //         `;
-            //         suggestions.style.display = 'block';
-                    
-            //         // Add click handler
-            //         suggestions.querySelector('.postcode-suggestion').addEventListener('click', () => {
-            //             searchPubs();
-            //             suggestions.style.display = 'none';
-            //         });
-            //         return;
-            //     }
-
-                // Regular autocomplete for non-postcodes
-            //     try {
-            //         const url = `/autocomplete?q=${encodeURIComponent(query)}&search_type=${searchType}`;
-            //         console.log('🌐 Autocomplete fetching:', url);
-                    
-            //         const response = await fetch(url);
-            //         console.log('📡 Autocomplete response status:', response.status);
-            //         if (!response.ok) {
-            //             suggestions.style.display = 'none';
-            //             return;
-            //         }
-            //         const data = await response.json();
-            //         console.log('✅ Autocomplete data received:', data);
-
-            //         suggestions.innerHTML = '';
-            //         if (data.length === 0) {
-            //             suggestions.style.display = 'none';
-            //             return;
-            //         }
-
-            //         if (data.length >= 10) {
-            //             const showAllDiv = document.createElement('div');
-            //             showAllDiv.className = 'suggestion-item highlight'; 
-            //             showAllDiv.innerHTML = `<strong>🔍 Show all ${data.length}+ results for "${query}"</strong>`;
-            //             showAllDiv.addEventListener('click', () => {
-            //                 document.getElementById('searchInput').value = query;
-            //                 searchPubs();
-            //                 suggestions.style.display = 'none';
-            //             });
-            //             suggestions.appendChild(showAllDiv);
-            //         }
-
-            //         data.forEach(pub => {
-            //             const div = document.createElement('div');
-            //             div.className = 'suggestion-item'; // uses suggestion for drop down autocomplete
-            //             div.textContent = `${pub.name}, ${pub.address} (${pub.postcode})`;
-            //             div.addEventListener('click', () => {
-            //                 clearSearch();
-                            
-            //                 // Show results section first
-            //                 showResultsSection();
-                            
-            //                 searchSpecificPub(pub.pub_id);
-            //                 suggestions.style.display = 'none';
-            //             });
-            //             suggestions.appendChild(div);
-            //         });
-            //         suggestions.style.display = 'block';
-            //     } catch (error) {
-            //         console.error('❌ Autocomplete error:', error);
-            //         suggestions.style.display = 'none';
-            //     }
-            // }, 300));
-
-            // Hide suggestions on outside click
-            // document.addEventListener('click', (e) => {
-            //     if (!input.contains(e.target) && !suggestions.contains(e.target)) {
-            //         suggestions.style.display = 'none';
-            //     }
-            // });
-            // Save state on form changes
-            // document.getElementById('searchType').addEventListener('change', () => AppState.save());
-        // });
 
         // ADD: Homepage reset function
         function resetToHomepage() {
