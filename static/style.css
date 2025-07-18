@@ -1948,12 +1948,22 @@ body.pub-details-open {
     height: 100dvh !important;
     background: var(--modal-backdrop) !important;
     backdrop-filter: var(--modal-blur) !important;
-    display: none !important;
+/*     display: none !important; */
     align-items: center !important; /* Center vertically */
     justify-content: center !important; /* Center horizontally */
     z-index: var(--z-modal-backdrop) !important;
     padding: var(--space-lg) !important;
     box-sizing: border-box !important;
+}
+
+/* When modal is shown */
+.search-modal[style*="flex"] {
+    display: flex !important;
+}
+
+/* When modal is hidden */
+.search-modal:not([style*="flex"]) {
+    display: none !important;
 }
 
 /* Mobile specific adjustments */
