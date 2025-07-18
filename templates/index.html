@@ -1062,6 +1062,11 @@ function addSwipeGestures() {
 
         // Also add smooth modal close animation
         function closeSearchModal() {
+            // IMMEDIATELY remove any button highlights
+            document.querySelectorAll('.search-option.tapped, .search-option.loading').forEach(option => {
+                option.classList.remove('tapped', 'loading');
+            });
+            
             const modals = ['nameModal', 'locationModal', 'beerModal', 'areaModal'];
             modals.forEach(modal => {
                 const modalEl = document.getElementById(modal);
