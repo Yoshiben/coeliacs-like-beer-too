@@ -1739,36 +1739,45 @@ body.pub-details-open {
     font-size: 0.85rem !important;
 }
 
-/* Update the pub action grid to ensure consistent gaps */
+/* Force consistent grid behavior with explicit sizing */
 .pub-action-grid {
     display: grid !important;
     grid-template-columns: 1fr 1fr !important;
-    gap: var(--space-md) !important; /* This should create gaps everywhere */
+    grid-template-rows: auto auto !important;
+    gap: 12px !important; /* Fixed pixel value to ensure consistency */
     margin-top: auto !important;
-    padding-top: var(--space-xl) !important;
+    padding: 16px 0 0 0 !important; /* Explicit padding */
+    width: 100% !important;
+    box-sizing: border-box !important;
 }
 
 /* Make sure all buttons have consistent spacing */
 .pub-action-grid .btn {
+    /* Reset all spacing */
+    margin: 0 !important;
+    padding: 12px 16px !important;
+    
+    /* Explicit sizing */
     min-height: 48px !important;
-    padding: var(--space-lg) !important;
-    font-size: 0.9rem !important;
-    font-weight: 700 !important;
-    border: none !important;
-    border-radius: var(--radius-xl) !important;
-    cursor: pointer !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    
+    /* Layout */
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    gap: var(--space-sm) !important;
+    gap: 8px !important;
+    
+    /* Styling */
+    font-size: 0.9rem !important;
+    font-weight: 700 !important;
+    border: none !important;
+    border-radius: 20px !important;
+    cursor: pointer !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     position: relative !important;
     overflow: hidden !important;
-    
-    /* Reset any potential margin/padding conflicts */
-    margin: 0 !important; /* This might be the culprit! */
 }
-
 
 /* Button hover effects */
 .pub-action-grid .btn::before {
@@ -2845,13 +2854,12 @@ body {
 
 /* Split view adjustments */
 .split-view .pub-details-card {
-    flex: 0 0 50% !important; /* Give more space - 50% instead of 45% */
-    margin-bottom: var(--space-sm) !important;
-    border-radius: var(--radius-xl) var(--radius-xl) 0 0 !important;
-    padding: var(--space-lg) !important; /* More padding */
+    /* Ensure the card has proper flex behavior */
+    flex: 0 0 50% !important;
+    max-height: 50vh !important; /* Prevent it from growing too tall */
     display: flex !important;
     flex-direction: column !important;
-    min-height: 0 !important;
+    overflow: hidden !important;
 }
 
 /* Compact header in split view */
@@ -2886,17 +2894,17 @@ body {
 
 /* Split view adjustments - maintain gaps */
 .split-view .pub-action-grid {
-    gap: var(--space-xs) !important; /* Smaller but still consistent gaps in split view */
-    margin-top: var(--space-xs) !important;
-    padding-top: var(--space-xs) !important;
+    gap: 8px !important; /* Smaller gap in split view */
+    padding: 8px 0 0 0 !important;
+    margin-top: 8px !important;
+    flex-shrink: 0 !important; /* Prevent shrinking */
 }
 
 .split-view .pub-action-grid .btn {
-    min-height: 34px !important;
-    padding: var(--space-xs) var(--space-sm) !important;
+    min-height: 36px !important;
+    padding: 8px 12px !important;
     font-size: 0.8rem !important;
-    border-radius: var(--radius-lg) !important;
-    margin: 0 !important; /* Critical - no margins in split view */
+    border-radius: 16px !important;
 }
 
 /* Tighter spacing in split view */
@@ -2954,11 +2962,21 @@ body {
     font-size: 0.75rem !important;
 }
 
-/* Ensure map gets remaining space */
+/* Fix the container sizing to prevent overlap */
+.split-view .pub-details-container {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+    max-height: 100vh !important;
+    max-height: 100dvh !important;
+    overflow: hidden !important;
+}
+
+/* Ensure map gets remaining space without overlap */
 .split-view .pub-map-container {
-    flex: 1 !important; /* Take remaining space */
-    display: block !important;
-    min-height: 0 !important;
+    flex: 1 !important;
+    min-height: 0 !important; /* Allow shrinking */
+    max-height: 50vh !important; /* Prevent growing too much */
 }
 
 /* Tighter spacing overall in split view */
@@ -3016,14 +3034,14 @@ body {
     }
 
    .pub-action-grid {
-        gap: var(--space-sm) !important; /* Slightly smaller gap on mobile but still consistent */
+        gap: 10px !important;
+        padding: 12px 0 0 0 !important;
     }
     
     .pub-action-grid .btn {
         min-height: 44px !important;
+        padding: 10px 14px !important;
         font-size: 0.85rem !important;
-        padding: var(--space-md) !important;
-        margin: 0 !important; /* Ensure no margins on mobile either */
     }
 
    .btn-nav-small {
@@ -3041,12 +3059,6 @@ body {
     .pub-details-card .btn {
         min-height: 36px;
         font-size: 0.8rem;
-    }
-
-    .split-view .btn {
-        min-height: 28px;
-        font-size: 0.7rem;
-        padding: 4px 8px;
     }
 
    .pub-nav-buttons {
@@ -3165,8 +3177,7 @@ body {
       ==================== */
 
    .split-view .pub-details-card {
-        flex: 0 0 45% !important; /* Slightly less space on mobile */
-        padding: var(--space-md) !important;
+        max-height: 45vh !important;
     }
     
     .split-view .pub-title {
@@ -3178,15 +3189,30 @@ body {
         margin: var(--space-sm) 0 !important;
     }
     
+    .split-view .pub-map-container {
+        max-height: 55vh !important;
+    }
+    
+    .split-view .pub-action-grid {
+        gap: 6px !important;
+        padding: 6px 0 0 0 !important;
+    }
+    
     .split-view .pub-action-grid .btn {
         min-height: 32px !important;
+        padding: 6px 10px !important;
         font-size: 0.75rem !important;
-        padding: 6px !important;
     }
 
    .split-view .pub-nav-buttons {
         bottom: var(--space-sm);
         left: var(--space-sm);
         right: var(--space-sm);
+    }
+
+   .split-view .btn {
+        min-height: 28px;
+        font-size: 0.7rem;
+        padding: 4px 8px;
     }
 }
