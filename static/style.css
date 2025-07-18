@@ -2373,22 +2373,6 @@ body.pub-details-open {
     line-height: 1;
 }
 
-.search-title {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: var(--space-sm); /* More space below title */
-    line-height: 1.2;
-}
-
-.search-description {
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-    line-height: 1.3;
-    text-align: center;
-    padding: 0 var(--space-sm); /* More horizontal padding */
-}
-
 .quick-actions {
     margin-top: var(--space-xl);
     padding-top: var(--space-xl);
@@ -2503,19 +2487,19 @@ body.pub-details-open {
 }
 
 .search-title {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: var(--space-sm);
-    line-height: 1.2;
+    font-size: 1.2rem !important; /* Increased from 1.1rem */
+    font-weight: 700 !important;
+    color: var(--text-primary) !important;
+    margin-bottom: var(--space-sm) !important;
+    line-height: 1.2 !important;
 }
 
 .search-description {
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    line-height: 1.4;
-    text-align: center;
-    padding: 0 var(--space-sm);
+    font-size: 0.95rem !important; /* Increased from 0.85rem */
+    color: var(--text-secondary) !important;
+    line-height: 1.4 !important;
+    text-align: center !important;
+    padding: 0 var(--space-sm) !important;
 }
 
 /* MOBILE RESPONSIVE - KEEP 2x2 GRID */
@@ -2531,11 +2515,11 @@ body.pub-details-open {
     }
     
     .search-title {
-        font-size: 0.9rem;
+        font-size: 1.1rem !important;
     }
     
     .search-description {
-        font-size: 0.75rem;
+        font-size: 0.9rem !important;
     }
 }
 
@@ -2551,12 +2535,12 @@ body.pub-details-open {
     }
     
     .search-title {
-        font-size: 0.85rem;
+        font-size: 1.0rem !important; /* Nice and readable */
         margin-bottom: 4px;
     }
     
     .search-description {
-        font-size: 0.7rem;
+        font-size: 0.85rem !important; /* Clear but not too big */
         line-height: 1.2;
         padding: 0 2px;
     }
