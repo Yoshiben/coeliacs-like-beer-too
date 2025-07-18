@@ -132,6 +132,46 @@
     --modal-padding-mobile: var(--space-lg);
     --modal-padding-top: 15vh;
     --modal-border-radius: var(--radius-xl);
+
+   /* Enhanced Success Colors */
+    --success-bg: rgba(16, 185, 129, 0.1);
+    --success-bg-light: rgba(5, 150, 105, 0.05);
+    --success-border: rgba(16, 185, 129, 0.2);
+    --success-border-strong: rgba(16, 185, 129, 0.6);
+    --success-shadow: rgba(16, 185, 129, 0.3);
+    
+    /* Enhanced Primary Colors */
+    --primary-bg: rgba(102, 126, 234, 0.1);
+    --primary-border: rgba(102, 126, 234, 0.2);
+    --primary-border-strong: rgba(102, 126, 234, 0.3);
+    --primary-shadow: rgba(102, 126, 234, 0.3);
+    
+    /* Enhanced Purple Colors */
+    --purple-bg: rgba(139, 92, 246, 0.1);
+    --purple-border: rgba(139, 92, 246, 0.3);
+    --purple-shadow: rgba(139, 92, 246, 0.1);
+    --purple-shadow-strong: rgba(139, 92, 246, 0.4);
+    
+    /* Enhanced Blue Colors */
+    --blue-shadow: rgba(59, 130, 246, 0.3);
+    
+    /* Enhanced Gray Colors */
+    --gray-bg: rgba(156, 163, 175, 0.1);
+    --gray-border: rgba(156, 163, 175, 0.2);
+    
+    /* Glass/Backdrop Effects */
+    --glass-white: rgba(255, 255, 255, 0.9);
+    --glass-overlay: rgba(255, 255, 255, 0.2);
+    
+    /* Enhanced Shadows */
+    --shadow-primary: 0 4px 15px var(--primary-shadow);
+    --shadow-success: 0 4px 15px var(--success-shadow);
+    --shadow-purple: 0 4px 15px var(--purple-shadow);
+    --shadow-blue: 0 4px 15px var(--blue-shadow);
+    
+    /* Text Colors Enhanced */
+    --success-text: #10b981;
+    --purple-text: #8b5cf6;
 }
 
 /* Desktop Adjustments */
@@ -1606,30 +1646,19 @@ body.pub-details-open {
     margin-bottom: var(--space-md);
 }
 
-/* Small nav buttons for top */
 .btn-nav-small {
-    min-height: 32px;
-    padding: var(--space-xs) var(--space-md);
-    font-size: 0.75rem;
-    font-weight: 600;
-    border: none;
-    border-radius: var(--radius-lg);
-    cursor: pointer;
-    transition: all 0.25s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-xs);
-    background: rgba(102, 126, 234, 0.1);
-    color: var(--text-secondary);
-    border: 2px solid rgba(102, 126, 234, 0.2);
+    background: var(--glass-white) !important;
+    backdrop-filter: blur(10px) !important;
+    border: 2px solid var(--primary-border) !important;
+    box-shadow: var(--shadow-sm) !important;
 }
 
 .btn-nav-small:hover {
-    background: var(--primary-gradient);
-    color: var(--text-white);
-    border-color: transparent;
-    transform: translateY(-1px);
+    background: var(--primary-gradient) !important;
+    color: var(--text-white) !important;
+    border-color: transparent !important;
+    transform: translateY(-2px) !important;
+    box-shadow: var(--shadow-primary) !important;
 }
 
 /* Even smaller in split view */
@@ -1639,11 +1668,12 @@ body.pub-details-open {
     font-size: 0.7rem;
 }
 
-/* Adjust header spacing since we have top nav now */
+/* Enhanced header area */
 .pub-header {
-    text-align: center;
-    margin-bottom: var(--space-lg);
-    flex-shrink: 0;
+    text-align: center !important;
+    margin-bottom: var(--space-xl) !important;
+    padding-bottom: var(--space-lg) !important;
+    border-bottom: 2px solid var(--divider-color) !important;
 }
 
 .split-view .pub-header {
@@ -1651,22 +1681,30 @@ body.pub-details-open {
 }
 
 .pub-title {
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: var(--space-sm);
-    line-height: 1.2;
+    font-size: 1.5rem !important;
+    font-weight: 800 !important;
+    color: var(--text-primary) !important;
+    margin-bottom: var(--space-sm) !important;
+    line-height: 1.2 !important;
+    background: var(--primary-gradient) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    background-clip: text !important;
 }
 
 .pub-address {
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-    margin-bottom: var(--space-xs);
+    color: var(--text-secondary) !important;
+    font-size: 1rem !important;
+    margin-bottom: var(--space-xs) !important;
+    font-weight: 500 !important;
 }
 
 .pub-location {
-    color: var(--text-muted);
-    font-size: 0.85rem;
+    color: var(--text-muted) !important;
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
 }
 
 /* Split view - smaller title */
@@ -1681,17 +1719,26 @@ body.pub-details-open {
     font-size: 0.75rem;
 }
 
+/* Enhanced beer section */
 .beer-section {
-    background: rgba(102, 126, 234, 0.1);
-    border-radius: var(--radius-lg);
-    padding: var(--space-lg);
-    margin: var(--space-lg) 0;
-    border-left: 4px solid #667eea;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    min-height: 0;
+    background: linear-gradient(135deg, var(--success-bg) 0%, var(--success-bg-light) 100%) !important;
+    border: 2px solid var(--success-border) !important;
+    border-radius: var(--radius-xl) !important;
+    padding: var(--space-xl) !important;
+    margin: var(--space-xl) 0 !important;
+    border-left: 6px solid var(--success-gradient) !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+.beer-section::before {
+    content: '🍺' !important;
+    position: absolute !important;
+    top: -10px !important;
+    right: -10px !important;
+    font-size: 4rem !important;
+    opacity: 0.1 !important;
+    pointer-events: none !important;
 }
 
 /* Split view - much more compact beer section */
@@ -1703,13 +1750,15 @@ body.pub-details-open {
 
 
 .beer-section-title {
-    display: flex;
-    align-items: center;
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: var(--space-md);
+    display: flex !important;
+    align-items: center !important;
+    font-size: 1.1rem !important;
+    font-weight: 700 !important;
+    color: var(--text-primary) !important;
+    margin-bottom: var(--space-lg) !important;
+    gap: var(--space-sm) !important;
 }
+
 
 /* Split view - smaller beer title */
 .split-view .beer-section-title {
@@ -1717,12 +1766,22 @@ body.pub-details-open {
     margin-bottom: var(--space-xs);
 }
 
-
 .beer-status {
-    color: var(--text-muted);
-    font-style: italic;
-    font-size: 0.85rem;
-    line-height: 1.4;
+    color: var(--text-secondary) !important;
+    font-size: 0.95rem !important;
+    line-height: 1.6 !important;
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+.beer-status strong {
+    color: var(--success-text) !important;
+    font-weight: 700 !important;
+}
+
+.beer-status em {
+    color: var(--text-muted) !important;
+    font-size: 0.85rem !important;
 }
 
 /* Split view - smaller beer status */
@@ -1730,13 +1789,77 @@ body.pub-details-open {
     font-size: 0.75rem;
 }
 
-/* Keep action buttons the same size but ensure they fit */
 .pub-action-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-sm);
-    margin-top: auto;
-    flex-shrink: 0;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: var(--space-md) !important;
+    margin-top: auto !important;
+    padding-top: var(--space-xl) !important;
+}
+
+.pub-action-grid .btn {
+    min-height: 48px !important;
+    padding: var(--space-lg) !important;
+    font-size: 0.9rem !important;
+    font-weight: 700 !important;
+    border: none !important;
+    border-radius: var(--radius-xl) !important;
+    cursor: pointer !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: var(--space-sm) !important;
+    position: relative !important;
+    overflow: hidden !important;
+}
+
+/* Button hover effects */
+.pub-action-grid .btn::before {
+    content: '' !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: -100% !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: linear-gradient(90deg, transparent, var(--glass-overlay), transparent) !important;
+    transition: left 0.5s !important;
+}
+
+.pub-action-grid .btn:hover::before {
+    left: 100% !important;
+}
+
+.pub-action-grid .btn:hover {
+    transform: translateY(-3px) scale(1.02) !important;
+    box-shadow: var(--shadow-lg) !important;
+}
+
+/* Specific button colors using design system */
+.pub-action-grid .btn-external {
+    background: var(--info-gradient) !important;
+    color: var(--text-white) !important;
+    box-shadow: var(--shadow-blue) !important;
+}
+
+.pub-action-grid .btn-positive {
+    background: var(--success-gradient) !important;
+    color: var(--text-white) !important;
+    box-shadow: var(--shadow-success) !important;
+}
+
+.pub-action-grid .btn-toggle {
+    background: var(--purple-bg) !important;
+    color: var(--purple-text) !important;
+    border: 2px solid var(--purple-border) !important;
+    box-shadow: var(--shadow-purple) !important;
+}
+
+.pub-action-grid .btn-toggle.active {
+    background: var(--purple-gradient) !important;
+    color: var(--text-white) !important;
+    border-color: transparent !important;
+    box-shadow: 0 4px 15px var(--purple-shadow-strong) !important;
 }
 
 .split-view .pub-action-grid {
@@ -2816,7 +2939,7 @@ body {
     }
 
     .pub-title {
-        font-size: 1.1rem;
+        font-size: 1.3rem !important;
     }
 
     .split-view .pub-title {
@@ -2826,6 +2949,12 @@ body {
     .pub-action-grid,
     .pub-nav-buttons {
         gap: var(--space-xs);
+    }
+
+   .pub-action-grid .btn {
+        min-height: 44px !important;
+        font-size: 0.85rem !important;
+        padding: var(--space-md) !important;
     }
 
    .btn-nav-small {
@@ -2957,5 +3086,14 @@ body {
     
     .distance-label {
         font-size: 0.75rem !important;
+    }
+
+   .beer-section {
+        padding: var(--space-lg) !important;
+        margin: var(--space-lg) 0 !important;
+    }
+
+   .beer-section-title {
+        font-size: 1rem !important;
     }
 }
