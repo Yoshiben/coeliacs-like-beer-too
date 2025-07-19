@@ -404,7 +404,7 @@ def get_brewery_beers(brewery_name):
         
         if query:
             cursor.execute("""
-                SELECT beer_id, name, style, abv, category, vegan_status
+                SELECT beer_id, name, style, abv, gluten_status, vegan_status
                 FROM beers 
                 WHERE brewery = %s AND name LIKE %s
                 ORDER BY name
@@ -412,7 +412,7 @@ def get_brewery_beers(brewery_name):
             """, (brewery_name, f'%{query}%'))
         else:
             cursor.execute("""
-                SELECT beer_id, name, style, abv, category, vegan_status
+                SELECT beer_id, name, style, abv, gluten_status, vegan_status
                 FROM beers 
                 WHERE brewery = %s 
                 ORDER BY name
