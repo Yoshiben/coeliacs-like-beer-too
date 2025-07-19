@@ -2970,31 +2970,51 @@ body {
    ==================== */
 
 .photo-upload-compact {
-    display: flex !important;
-    align-items: center !important;
-    gap: 12px !important;
-    padding: 12px 16px !important;
-    border: 2px dashed var(--border-light) !important;
-    border-radius: 12px !important;
-    background: var(--bg-section) !important;
-    cursor: pointer !important;
-    transition: all var(--transition) !important;
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    border: 1px solid var(--photo-upload-border);
+    border-radius: var(--radius);
+    background: var(--photo-upload-bg);
+    cursor: pointer;
+    transition: all var(--transition);
+    min-height: 44px;
+    max-height: 44px;
 }
 
 .photo-upload-compact:hover {
-    border-color: var(--primary-color) !important;
-    background: rgba(102, 126, 234, 0.05) !important;
+    border-color: var(--primary-color, #667eea);
+    background: var(--photo-upload-hover);
+}
+
+.photo-upload-compact.active {
+    border-color: var(--photo-upload-active-border);
+    background: var(--photo-upload-active);
 }
 
 .photo-upload-icon {
-    font-size: 1.5rem !important;
-    color: var(--text-muted) !important;
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    min-width: 20px;
 }
 
 .photo-upload-text {
-    flex: 1 !important;
-    font-size: 0.85rem !important;
-    color: var(--text-secondary) !important;
+    flex: 1;
+    color: var(--text-secondary);
+    text-align: left;
+}
+
+.photo-upload-text strong {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: var(--text-sm);
+}
+
+.photo-upload-text small {
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+    margin-left: var(--space-xs);
 }
 
 /* ====================
@@ -3019,48 +3039,7 @@ body {
     border-radius: 22px !important;
 }
 
-/* ====================
-   MOBILE OPTIMIZATIONS
-   ==================== */
 
-@media (max-width: 480px) {
-    .modal {
-        padding: 4px !important;
-    }
-    
-    .modal-content {
-        margin: 2vh auto !important;
-        max-height: 96vh !important;
-    }
-    
-    .modal-header {
-        padding: 12px 16px 8px !important;
-    }
-    
-    .modal-body {
-        padding: 0 16px 12px !important;
-    }
-    
-    .modal-form {
-        gap: 10px !important;
-    }
-    
-    .form-input,
-    .form-select {
-        min-height: 40px !important;
-        padding: 8px 14px !important;
-        font-size: 16px !important; /* Prevent zoom on iOS */
-    }
-    
-    .brewery-beer-row {
-        gap: 8px !important;
-    }
-    
-    .form-actions {
-        gap: 8px !important;
-        padding: 12px 0 0 !important;
-    }
-}
 
 /* ====================
    WHEN PUB IS PRE-POPULATED
@@ -3792,12 +3771,49 @@ body {
     }
 }
 
-/* ================================
-   MOBILE RESPONSIVE - PHONES
-   ================================ */
+ /* ====================
+   MOBILE OPTIMIZATIONS
+   ==================== */
 @media (max-width: 480px) {
     #reportModal {
         padding: var(--space-sm);
+    }
+   
+    .modal {
+        padding: 4px !important;
+    }
+    
+    .modal-content {
+        margin: 2vh auto !important;
+        max-height: 96vh !important;
+    }
+    
+    .modal-header {
+        padding: 12px 16px 8px !important;
+    }
+    
+    .modal-body {
+        padding: 0 16px 12px !important;
+    }
+    
+    .modal-form {
+        gap: 10px !important;
+    }
+    
+    .form-input,
+    .form-select {
+        min-height: 40px !important;
+        padding: 8px 14px !important;
+        font-size: 16px !important; /* Prevent zoom on iOS */
+    }
+    
+    .brewery-beer-row {
+        gap: 8px !important;
+    }
+    
+    .form-actions {
+        gap: 8px !important;
+        padding: 12px 0 0 !important;
     }
     
     #reportModal .modal-content {
@@ -3847,15 +3863,15 @@ body {
     }
     
     .photo-upload-compact {
-        padding: var(--space-sm) var(--space-md);
-        gap: var(--space-sm);
-        min-height: 50px;
-        flex-direction: column;
-        text-align: center;
+        padding: var(--space-xs) var(--space-sm);
+        gap: var(--space-xs);
+        min-height: 40px;
+        max-height: 40px;
     }
     
     .photo-upload-icon {
-        font-size: 1.2rem;
+        font-size: 1rem;
+        min-width: 16px;
     }
     
     .photo-upload-text {
@@ -3863,11 +3879,11 @@ body {
     }
     
     .photo-upload-text strong {
-        font-size: var(--text-sm);
+        font-size: var(--text-xs);
     }
     
     .photo-upload-text small {
-        font-size: 0.7rem;
+        font-size: 0.65rem;
     }
     
     .modal-form .form-actions {
@@ -3881,6 +3897,8 @@ body {
         font-size: var(--text-base);
         padding: var(--space-md);
     }
+
+   
     
     /* Dropdown suggestions mobile optimization */
     .brewery-suggestions,
