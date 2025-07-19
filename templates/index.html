@@ -967,10 +967,8 @@
             }, 200); // Faster response time too
         }
 
-        // ➕ ADD: New function to handle brewery selection
         // ================================
-        // 🔄 REPLACE: Your selectBrewery function with this super simple test version
-        // This will help us debug what's happening
+        // 🔄 REPLACE: Your selectBrewery function to never auto-fill
         // ================================
         
         function selectBrewery(brewery) {
@@ -981,10 +979,10 @@
             breweryInput.value = brewery;
             console.log('✅ Set brewery to:', breweryInput.value);
             
-            // Hide dropdown
+            // Hide brewery dropdown
             document.getElementById('breweryDropdown').style.display = 'none';
             
-            // Clear dependent fields
+            // Clear dependent fields completely
             const beerNameInput = document.getElementById('reportBeerName');
             const beerStyleInput = document.getElementById('reportBeerStyle');
             const beerABVInput = document.getElementById('reportBeerABV');
@@ -993,52 +991,143 @@
             beerStyleInput.value = '';
             beerABVInput.value = '';
             
-            console.log('✅ Cleared beer fields');
+            console.log('✅ Cleared all beer fields');
             
-            // Test API call directly
-            console.log('🔍 Testing API call...');
-            fetch(`/api/brewery/${encodeURIComponent(brewery)}/beers`)
-                .then(response => {
-                    console.log('📡 API Response status:', response.status);
-                    return response.json();
-                })
-                .then(beers => {
-                    console.log('📊 API returned beers:', beers);
-                    console.log('📊 Number of beers:', beers.length);
-                    
-                    if (beers.length > 0) {
-                        const firstBeer = beers[0];
-                        console.log('🍺 First beer object:', firstBeer);
-                        
-                        // Try to set fields manually
-                        console.log('🔧 Trying to set beer name to:', firstBeer.name);
-                        beerNameInput.value = firstBeer.name || 'TEST NAME';
-                        
-                        console.log('🔧 Trying to set beer style to:', firstBeer.style);
-                        beerStyleInput.value = firstBeer.style || 'TEST STYLE';
-                        
-                        console.log('🔧 Trying to set beer ABV to:', firstBeer.abv);
-                        beerABVInput.value = firstBeer.abv || '5.0';
-                        
-                        // Force trigger input events
-                        beerNameInput.dispatchEvent(new Event('input'));
-                        beerStyleInput.dispatchEvent(new Event('input'));
-                        beerABVInput.dispatchEvent(new Event('input'));
-                        
-                        console.log('✅ Finished setting fields');
-                        
-                        showSuccessToast(`🔍 Test: Found ${beers.length} beers for ${brewery}`);
-                    } else {
-                        console.log('❌ No beers found');
-                        showSuccessToast(`❌ No beers found for ${brewery}`);
-                    }
-                })
-                .catch(error => {
-                    console.error('❌ API Error:', error);
-                    showSuccessToast(`❌ API Error: ${error.message}`);
-                });
+            // Load beers and show dropdown immediately
+            loadBeersAndShowDropdown(brewery);
             
             trackEvent('brewery_selected', 'Form Interaction', brewery);
+        }
+        
+        // ================================
+        // ➕ ADD: New function to load beers and immediately show dropdown
+        // ================================
+        
+        async function loadBeersAndShowDropdown(brewery) {
+            const beerNameInput = document.getElementById('reportBeerName');
+            const beerDropdown = document.getElementById('beerNameDropdown');
+            
+            console.log(`🍺 Loading beers for ${brewery} and showing dropdown...`);
+            
+            try {
+                const response = await fetch(`/api/brewery/${encodeURIComponent(brewery)}/beers`);
+                const beers = await response.json();
+                
+                console.log('🔍 API response:', beers);
+                console.log('🔍 Number of beers:', beers.length);
+                
+                if (beers.length === 0) {
+                    // No beers - show "add new" option
+                    beerNameInput.placeholder = `Add new beer for ${brewery}`;
+                    showSuccessToast(`📝 No existing beers for ${brewery}. Add a new one!`);
+                    
+                    // Show "add new" dropdown
+                    showAddNewBeerDropdown(brewery);
+                    
+                } else {
+                    // ALWAYS show dropdown, never auto-fill
+                    beerNameInput.placeholder = `Choose from ${beers.length} ${brewery} beers...`;
+                    showSuccessToast(`🍺 Found ${beers.length} beers from ${brewery}! Click below to choose.`);
+                    
+                    // Populate and show dropdown immediately
+                    populateBeerDropdownWithAddNew(beers, brewery);
+                }
+                
+                // Focus the beer name field to show dropdown
+                setTimeout(() => {
+                    beerNameInput.focus();
+                }, 200);
+                
+            } catch (error) {
+                console.error('❌ Error loading beers:', error);
+                beerNameInput.placeholder = 'Enter beer name...';
+                showSuccessToast(`❌ Error loading ${brewery} beers. You can still add manually!`);
+            }
+        }
+        
+        // ================================
+        // ➕ ADD: Enhanced dropdown with "Add New Beer" option
+        // ================================
+        
+        function populateBeerDropdownWithAddNew(beers, brewery) {
+            const dropdown = document.getElementById('beerNameDropdown');
+            
+            dropdown.innerHTML = '';
+            
+            // Header showing count
+            const header = document.createElement('div');
+            header.className = 'dropdown-header';
+            header.innerHTML = `🍺 ${beers.length} ${brewery} Beers`;
+            dropdown.appendChild(header);
+            
+            // Add "Add New Beer" option at the top
+            const addNewDiv = document.createElement('div');
+            addNewDiv.className = 'suggestion-item add-new-item';
+            addNewDiv.innerHTML = `
+                <strong>➕ Add New Beer for ${brewery}</strong><br>
+                <small style="color: var(--text-muted);">Add a beer not in our database</small>
+            `;
+            addNewDiv.addEventListener('click', () => {
+                document.getElementById('reportBeerName').value = '';
+                document.getElementById('reportBeerStyle').value = '';
+                document.getElementById('reportBeerABV').value = '';
+                dropdown.style.display = 'none';
+                document.getElementById('reportBeerName').placeholder = `Enter new beer name for ${brewery}`;
+                document.getElementById('reportBeerName').focus();
+                showSuccessToast(`📝 Ready to add new beer for ${brewery}!`);
+            });
+            dropdown.appendChild(addNewDiv);
+            
+            // Add all existing beers
+            beers.forEach(beer => {
+                const div = document.createElement('div');
+                div.className = 'suggestion-item beer-item';
+                div.innerHTML = `
+                    <strong>${beer.name}</strong><br>
+                    <small style="color: var(--text-muted);">
+                        ${beer.style || 'Unknown style'} • ${beer.abv || '?'}% ABV
+                        ${beer.gluten_status ? ' • ' + beer.gluten_status.replace('_', ' ') : ''}
+                    </small>
+                `;
+                div.addEventListener('click', () => selectBeer(beer));
+                dropdown.appendChild(div);
+            });
+            
+            dropdown.style.display = 'block';
+            console.log(`✅ Populated dropdown with ${beers.length} beers + add new option`);
+        }
+        
+        // ================================
+        // ➕ ADD: Show "Add New Beer" dropdown when no beers exist
+        // ================================
+        
+        function showAddNewBeerDropdown(brewery) {
+            const dropdown = document.getElementById('beerNameDropdown');
+            
+            dropdown.innerHTML = '';
+            
+            // Header
+            const header = document.createElement('div');
+            header.className = 'dropdown-header';
+            header.innerHTML = `📝 No ${brewery} Beers in Database`;
+            dropdown.appendChild(header);
+            
+            // Add new beer option
+            const addNewDiv = document.createElement('div');
+            addNewDiv.className = 'suggestion-item add-new-item';
+            addNewDiv.innerHTML = `
+                <strong>➕ Add First Beer for ${brewery}</strong><br>
+                <small style="color: var(--text-muted);">Be the first to add a ${brewery} beer!</small>
+            `;
+            addNewDiv.addEventListener('click', () => {
+                dropdown.style.display = 'none';
+                document.getElementById('reportBeerName').placeholder = `Enter new beer name for ${brewery}`;
+                document.getElementById('reportBeerName').focus();
+                showSuccessToast(`🎉 Adding first beer for ${brewery}!`);
+            });
+            dropdown.appendChild(addNewDiv);
+            
+            dropdown.style.display = 'block';
         }
                 
         // ================================
