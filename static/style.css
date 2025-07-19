@@ -3912,6 +3912,41 @@ body {
 }
 
 /* ================================
+   ➕ ADD: Purple glow for Beer Format select dropdown
+   Add this to your CSS with the other form styling
+   ================================ */
+
+/* Beer Format dropdown with purple glow */
+#reportFormat:focus {
+    border-color: var(--primary-color, #667eea);
+    box-shadow: 
+        0 0 0 3px rgba(102, 126, 234, 0.1),
+        0 0 20px rgba(102, 126, 234, 0.3),
+        inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    background: var(--bg-white);
+    transform: translateY(-1px);
+}
+
+#reportFormat:hover {
+    border-color: rgba(102, 126, 234, 0.5);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+    cursor: pointer;
+}
+
+/* Enhanced select dropdown arrow */
+#reportFormat {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23667eea' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 12px center;
+    background-repeat: no-repeat;
+    background-size: 16px 16px;
+    transition: all var(--transition);
+}
+
+#reportFormat:focus {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23667eea' stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+}
+
+/* ================================
    REPORT MODAL MOBILE OPTIMIZATIONS
    🔧 ACTION: ADD this section to style.css
    📍 LOCATION: Add after the base report modal styles
