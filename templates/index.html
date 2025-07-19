@@ -890,11 +890,15 @@
         // SEARCH & SELECT BREWERIES
         // ================================
         
+        // ================================
+        // 🔄 REPLACE: Your searchBreweries function to show ALL breweries
+        // ================================
+        
         async function searchBreweries(query) {
             clearTimeout(brewerySearchTimeout);
             const dropdown = document.getElementById('breweryDropdown');
             
-            // Show dropdown on click/focus even with empty query
+            // Show ALL breweries on click/focus (increased limits)
             if (query.length < 1) {
                 try {
                     const response = await fetch('/api/breweries');
@@ -906,10 +910,17 @@
                         return;
                     }
                     
-                    breweries.slice(0, 20).forEach(brewery => {
+                    // Add header showing total count
+                    const header = document.createElement('div');
+                    header.className = 'dropdown-header';
+                    header.innerHTML = `🍺 ${breweries.length} Breweries Available`;
+                    dropdown.appendChild(header);
+                    
+                    // Show ALL breweries (increased from 20 to 100)
+                    breweries.slice(0, 100).forEach(brewery => {
                         const div = document.createElement('div');
-                        div.className = 'suggestion-item';
-                        div.textContent = brewery;
+                        div.className = 'suggestion-item brewery-item';
+                        div.innerHTML = `<strong>${brewery}</strong>`;
                         div.addEventListener('click', () => selectBrewery(brewery));
                         dropdown.appendChild(div);
                     });
@@ -933,10 +944,17 @@
                         return;
                     }
                     
-                    breweries.slice(0, 8).forEach(brewery => {
+                    // Add search header
+                    const header = document.createElement('div');
+                    header.className = 'dropdown-header';
+                    header.innerHTML = `🔍 ${breweries.length} matches for "${query}"`;
+                    dropdown.appendChild(header);
+                    
+                    // Show ALL search results (increased from 8 to 50)
+                    breweries.slice(0, 50).forEach(brewery => {
                         const div = document.createElement('div');
-                        div.className = 'suggestion-item';
-                        div.textContent = brewery;
+                        div.className = 'suggestion-item brewery-item';
+                        div.innerHTML = `<strong>${brewery}</strong>`;
                         div.addEventListener('click', () => selectBrewery(brewery));
                         dropdown.appendChild(div);
                     });
@@ -946,7 +964,7 @@
                     console.error('Error searching breweries:', error);
                     dropdown.style.display = 'none';
                 }
-            }, 300);
+            }, 200); // Faster response time too
         }
 
         // ➕ ADD: New function to handle brewery selection
@@ -1158,6 +1176,10 @@
         // This handles the smart auto-fill when brewery is selected
         // ================================
         
+        // ================================
+        // 🔄 REPLACE: Your loadBeersForBrewery function to always show dropdown
+        // ================================
+        
         async function loadBeersForBrewery(brewery) {
             const beerNameInput = document.getElementById('reportBeerName');
             const beerStyleInput = document.getElementById('reportBeerStyle');
@@ -1172,50 +1194,40 @@
                 console.log('🔍 DEBUG - API response:', beers);
                 console.log('🔍 DEBUG - Number of beers:', beers.length);
                 
-                if (beers.length === 1) {
-                    const beer = beers[0];
-                    console.log('🔍 DEBUG - Single beer found:', beer);
+                if (beers.length === 0) {
+                    // No beers found - let user add new one
+                    console.log('📝 No existing beers found - ready for new beer entry');
+                    beerNameInput.placeholder = `Add new beer for ${brewery}`;
+                    beerStyleInput.placeholder = 'Enter beer style (IPA, Lager, etc.)';
+                    beerABVInput.placeholder = '4.5';
                     
-                    // More explicit field setting with debug logs
-                    console.log('🔍 DEBUG - Setting beer name to:', beer.name);
-                    beerNameInput.value = beer.name || '';
+                    showSuccessToast(`📝 No existing beers for ${brewery}. Add a new one!`);
                     
-                    console.log('🔍 DEBUG - Setting beer style to:', beer.style);
-                    beerStyleInput.value = beer.style || '';
-                    
-                    console.log('🔍 DEBUG - Setting beer ABV to:', beer.abv);
-                    beerABVInput.value = beer.abv || '';
-                    
-                    // Change placeholder to show it worked
-                    beerNameInput.placeholder = `Auto-filled: ${beer.name}`;
-                    beerStyleInput.placeholder = `Auto-filled: ${beer.style}`;
-                    
-                    showSuccessToast(`✅ Auto-filled: ${beer.name} (${beer.abv}% ${beer.style})!`);
-                    
-                    // Focus format field since beer details are complete
+                    // Focus beer name field for user to start typing
                     setTimeout(() => {
-                        const formatField = document.getElementById('reportFormat');
-                        if (formatField && !formatField.value) {
-                            formatField.focus();
-                        }
-                    }, 1000);
+                        beerNameInput.focus();
+                    }, 500);
                     
-                } else if (beers.length > 1) {
-                    console.log('🔍 DEBUG - Multiple beers found:', beers.length);
-                    showSuccessToast(`Found ${beers.length} beers from ${brewery}!`);
+                } else {
+                    // CHANGED: Always show dropdown, even for single beer
+                    console.log(`🔍 DEBUG - Found ${beers.length} beers, showing dropdown`);
                     beerNameInput.placeholder = `Choose from ${beers.length} ${brewery} beers...`;
                     
-                    // Pre-populate beer dropdown for selection
+                    showSuccessToast(`Found ${beers.length} beers from ${brewery}! Choose one below.`);
+                    
+                    // Always show dropdown - let user choose
                     populateBeerDropdown(beers);
-                } else {
-                    console.log('🔍 DEBUG - No beers found for brewery');
-                    beerNameInput.placeholder = 'Enter new beer name...';
-                    showSuccessToast(`No existing beers found for ${brewery}. Add a new one!`);
+                    
+                    // Focus the beer name field to show dropdown
+                    setTimeout(() => {
+                        beerNameInput.focus();
+                    }, 300);
                 }
                 
             } catch (error) {
                 console.error('❌ Error loading beers for brewery:', error);
                 beerNameInput.placeholder = 'Enter beer name...';
+                showSuccessToast(`❌ Error loading ${brewery} beers. You can still add manually!`);
             }
         }
         
