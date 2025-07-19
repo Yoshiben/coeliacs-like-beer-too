@@ -2552,46 +2552,110 @@ function addSwipeGestures() {
         function handleReportSubmission(event) {
             event.preventDefault();
             
+            console.log('🚀 Submit button clicked!');
+            
             const formData = new FormData(event.target);
             const reportData = {
-                beer_format: formData.get('reportFormat'),
-                brewery: formData.get('reportBrewery') || '',
-                beer_name: formData.get('reportBeerName') || '',
-                beer_style: formData.get('reportBeerStyle') || '',
+                beer_format: formData.get('reportFormat') || document.getElementById('reportFormat').value,
+                brewery: formData.get('reportBrewery') || document.getElementById('reportBrewery').value,
+                beer_name: formData.get('reportBeerName') || document.getElementById('reportBeerName').value,
+                beer_style: formData.get('reportBeerStyle') || document.getElementById('reportBeerStyle').value,
+                beer_abv: formData.get('reportBeerABV') || document.getElementById('reportBeerABV').value,
                 notes: formData.get('reportNotes') || ''
             };
             
+            console.log('📋 Form data collected:', reportData);
+            
             // Add pub data
-            if (selectedPubData) {
-                // Use pre-populated pub
-                reportData.pub_id = selectedPubData.pub_id;
-                reportData.pub_name = selectedPubData.name;
-                console.log('✅ Using pre-populated pub:', selectedPubData.name);
+            if (window.selectedPubData) {
+                reportData.pub_id = window.selectedPubData.pub_id;
+                reportData.pub_name = window.selectedPubData.name;
+                console.log('🏠 Using pre-populated pub:', window.selectedPubData.name);
             } else {
                 // Use searched/entered pub data
-                if (selectedPubData) {
-                    reportData.pub_id = selectedPubData.pub_id;
-                } else {
-                    // New pub data
-                    reportData.pub_name = formData.get('reportPubName');
-                    reportData.address = formData.get('reportAddress');
-                    reportData.postcode = formData.get('reportPostcode');
-                }
+                reportData.pub_name = formData.get('reportPubName') || 'Unknown Pub';
+                reportData.address = formData.get('reportAddress') || '';
+                reportData.postcode = formData.get('reportPostcode') || '';
+                console.log('🏠 Using manual pub data');
             }
+            
+            console.log('📋 Complete report data:', reportData);
             
             // Validate required fields
-            if (!reportData.beer_format) {
-                showSuccessToast('❌ Please select a beer format');
+            const requiredFields = [];
+            if (!reportData.beer_format) requiredFields.push('Beer Format');
+            if (!reportData.brewery) requiredFields.push('Brewery');
+            if (!reportData.beer_name) requiredFields.push('Beer Name');
+            if (!reportData.pub_id && !reportData.pub_name) requiredFields.push('Pub Name');
+            
+            if (requiredFields.length > 0) {
+                const missingFields = requiredFields.join(', ');
+                console.log('❌ Missing required fields:', missingFields);
+                showSuccessToast(`❌ Please fill in: ${missingFields}`);
                 return;
             }
             
-            if (!reportData.pub_id && !reportData.pub_name) {
-                showSuccessToast('❌ Please select or enter a pub');
-                return;
-            }
+            console.log('✅ All required fields present, submitting...');
             
             // Submit the report
             submitBeerReport(reportData);
+        }
+
+        async function submitBeerReport(reportData) {
+            console.log('📡 Submitting beer report:', reportData);
+            
+            showLoadingToast('Submitting your beer report...');
+            
+            try {
+                const response = await fetch('/api/submit_beer_update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        pub_id: reportData.pub_id || null,
+                        beer_format: reportData.beer_format,
+                        new_brewery: reportData.brewery,
+                        new_beer_name: reportData.beer_name,
+                        new_style: reportData.beer_style,
+                        new_abv: reportData.beer_abv,
+                        submitted_by_name: 'Anonymous', // You can add a name field later
+                        submitted_by_email: '', // You can add an email field later
+                        user_notes: reportData.notes || `${reportData.beer_format} - ${reportData.brewery} ${reportData.beer_name}`,
+                        photo_url: '', // Handle photo upload later
+                        // New pub data if needed
+                        new_pub_name: reportData.pub_name,
+                        new_address: reportData.address,
+                        new_postcode: reportData.postcode
+                    })
+                });
+                
+                console.log('📡 API Response status:', response.status);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.log('❌ API Error response:', errorText);
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+                
+                const result = await response.json();
+                console.log('✅ API Success response:', result);
+                
+                hideLoadingToast();
+                showSuccessToast('🎉 Beer report submitted successfully! Thanks for contributing!');
+                
+                // Close modal and reset form
+                closeModal('reportModal');
+                document.getElementById('reportForm').reset();
+                
+                // Track success
+                trackEvent('beer_report_submitted', 'User Contribution', reportData.brewery + ' - ' + reportData.beer_name);
+                
+            } catch (error) {
+                console.error('❌ Error submitting beer report:', error);
+                hideLoadingToast();
+                showSuccessToast(`❌ Error submitting report: ${error.message}`);
+            }
         }
         
         // Function to call from pub page buttons
