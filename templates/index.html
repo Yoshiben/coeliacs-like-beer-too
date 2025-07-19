@@ -879,11 +879,14 @@
         let styleSearchTimeout;
 
         // ================================
-// ➕ ADD - NEW AUTO-COMPLETE FUNCTIONS
-// Add these completely new functions to your JavaScript
-// ================================
+        // ➕ ADD - NEW AUTO-COMPLETE FUNCTIONS
+        // Add these completely new functions to your JavaScript
+        // ================================
         
-        // ➕ ADD - Brewery search functionality
+        // ================================
+        // SEARCH BREWERIES
+        // ================================
+        
         async function searchBreweries(query) {
             clearTimeout(brewerySearchTimeout);
             const dropdown = document.getElementById('breweryDropdown');
@@ -911,9 +914,13 @@
                         div.addEventListener('click', () => {
                             document.getElementById('reportBrewery').value = brewery;
                             dropdown.style.display = 'none';
-                            // Clear beer name when brewery changes
+                            
+                            // Clear beer fields when brewery changes
                             document.getElementById('reportBeerName').value = '';
                             document.getElementById('reportBeerStyle').value = '';
+                            
+                            // Auto-load beers for this brewery
+                            loadBeersForBrewery(brewery);
                             
                             trackEvent('brewery_selected', 'Form Interaction', brewery);
                         });
@@ -928,7 +935,10 @@
             }, 300);
         }
         
-        // ➕ ADD - Beer name search functionality
+        // ================================
+        // SEARCH BEER NAMES
+        // ================================
+        
         async function searchBeerNames(query) {
             clearTimeout(beerSearchTimeout);
             const dropdown = document.getElementById('beerNameDropdown');
@@ -967,6 +977,7 @@
                             document.getElementById('reportBeerStyle').value = beer.style || '';
                             dropdown.style.display = 'none';
                             
+                            showSuccessToast(`✅ Selected: ${beer.name}!`);
                             trackEvent('beer_selected', 'Form Interaction', beer.name);
                         });
                         dropdown.appendChild(div);
@@ -1020,6 +1031,48 @@
                 dropdown.appendChild(div);
             });
             dropdown.style.display = 'block';
+        }
+
+        // ================================
+        // ➕ ADD: New function - add this anywhere in your JavaScript section
+        // This handles the smart auto-fill when brewery is selected
+        // ================================
+        
+        async function loadBeersForBrewery(brewery) {
+            const beerNameInput = document.getElementById('reportBeerName');
+            const beerStyleInput = document.getElementById('reportBeerStyle');
+            
+            console.log(`🍺 Loading beers for ${brewery}...`);
+            
+            try {
+                const response = await fetch(`/api/brewery/${encodeURIComponent(brewery)}/beers`);
+                const beers = await response.json();
+                
+                if (beers.length === 1) {
+                    // Auto-fill if only one beer!
+                    const beer = beers[0];
+                    beerNameInput.value = beer.name;
+                    beerStyleInput.value = beer.style || '';
+                    
+                    showSuccessToast(`✅ Auto-filled: ${beer.name}!`);
+                    
+                    // Focus format field since beer details are complete
+                    setTimeout(() => {
+                        const formatField = document.getElementById('reportFormat');
+                        formatField.focus();
+                    }, 500);
+                    
+                } else if (beers.length > 1) {
+                    showSuccessToast(`Found ${beers.length} beers from ${brewery}!`);
+                    beerNameInput.placeholder = `Choose from ${beers.length} ${brewery} beers...`;
+                } else {
+                    beerNameInput.placeholder = 'Enter new beer name...';
+                }
+                
+            } catch (error) {
+                console.error('Error loading beers for brewery:', error);
+                beerNameInput.placeholder = 'Enter beer name...';
+            }
         }
         
         // ➕ ADD - Enhanced photo upload handler
