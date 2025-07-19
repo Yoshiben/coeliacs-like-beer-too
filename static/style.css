@@ -3685,6 +3685,41 @@ body {
 }
 
 /* ================================
+   ➕ ADD: Enhanced dropdown styles
+   Add this to your style.css after your existing dropdown styles
+   ================================ */
+
+/* Better suggestion items with more info */
+.suggestions .suggestion-item strong {
+    color: var(--text-primary);
+    font-weight: 600;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.suggestions .suggestion-item small {
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+}
+
+.suggestions .suggestion-item:hover {
+    background: var(--primary-bg);
+    border-left: 3px solid var(--primary-color, #667eea);
+    padding-left: calc(var(--space-lg) - 3px);
+}
+
+/* Mobile dropdown improvements */
+@media (max-width: 480px) {
+    .suggestions .suggestion-item {
+        padding: var(--space-sm) var(--space-md);
+    }
+    
+    .suggestions .suggestion-item:hover {
+        padding-left: calc(var(--space-md) - 3px);
+    }
+}
+
+/* ================================
    FORM ACTIONS
    ================================ */
 .modal-form .form-actions {
