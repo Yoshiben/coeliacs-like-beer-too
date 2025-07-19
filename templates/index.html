@@ -129,8 +129,8 @@
             <div class="form-group">
                 <label class="form-label">Search by:</label>
                 <select id="areaSearchType" class="form-select" onchange="updateAreaPlaceholder()">
-                    <option value="postcode">📮 Postcode (e.g. SW1A 1AA, M1 1AA)</option>
-                    <option value="city">🏙️ City/Region (e.g. Manchester, Yorkshire)</option>
+                    <option value="postcode">📮 Postcode</option>
+                    <option value="city">🏙️ City/Region</option>
                 </select>
             </div>
             
@@ -3029,11 +3029,11 @@ function addSwipeGestures() {
             const input = document.getElementById('areaInput');
             
             if (searchType === 'postcode') {
-                input.placeholder = 'Enter postcode (e.g. SW1A 1AA, M1 1AA, HX6...)';
+                input.placeholder = 'Enter a postcode...';
                 input.setAttribute('pattern', '[A-Za-z]{1,2}[0-9Rr][0-9A-Za-z]? ?[0-9][ABD-HJLNP-UW-Zabd-hjlnp-uw-z]{2}');
                 console.log('📮 Switched to postcode mode');
             } else {
-                input.placeholder = 'Enter city or region (e.g. Manchester, Yorkshire, Leeds)';
+                input.placeholder = 'Enter a city or region...';
                 input.removeAttribute('pattern');
                 console.log('🏙️ Switched to city mode');
             }
