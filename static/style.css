@@ -3893,6 +3893,24 @@ body {
     border-radius: var(--radius-pill);
 }
 
+/* Auto-filled state for form inputs */
+.form-input.auto-filled {
+    background: var(--success-bg);
+    border-color: var(--success-border);
+    color: var(--success-text);
+    font-weight: 600;
+    transform: scale(1.02);
+    box-shadow: var(--shadow-success);
+    transition: all var(--transition);
+}
+
+.form-input.auto-filled:focus {
+    background: var(--bg-white);
+    border-color: var(--success-border-strong);
+    box-shadow: var(--shadow-success);
+    transform: scale(1);
+}
+
 /* ================================
    REPORT MODAL MOBILE OPTIMIZATIONS
    🔧 ACTION: ADD this section to style.css
