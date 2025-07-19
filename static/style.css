@@ -4017,6 +4017,90 @@ body {
 }
 
 /* ================================
+   ➕ ADD: Beer modal styling to match area modal
+   Add this to your CSS after the area modal styles
+   ================================ */
+
+/* Enhanced beer modal spacing (matching area modal) */
+#beerModal .form-group {
+    margin-bottom: var(--space-xl); /* More space between dropdown and input */
+}
+
+#beerModal .form-select {
+    background: linear-gradient(135deg, var(--bg-white) 0%, var(--bg-section) 100%);
+    border: 2px solid var(--primary-border);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition);
+}
+
+#beerModal .form-select:focus {
+    border-color: var(--primary-color, #667eea);
+    box-shadow: 
+        0 0 0 3px rgba(102, 126, 234, 0.1),
+        0 0 20px rgba(102, 126, 234, 0.2);
+    transform: translateY(-1px);
+}
+
+#beerModal .form-input {
+    margin-top: var(--space-lg); /* Extra space above input */
+    background: var(--bg-white);
+    border: 2px solid var(--border-light);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition);
+}
+
+#beerModal .form-input:focus {
+    border-color: var(--primary-color, #667eea);
+    box-shadow: 
+        0 0 0 3px rgba(102, 126, 234, 0.1),
+        0 0 20px rgba(102, 126, 234, 0.3),
+        inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+/* Enhanced modal header spacing */
+#beerModal .modal-header {
+    padding-bottom: var(--space-2xl);
+    border-bottom: 2px solid var(--divider-color);
+}
+
+#beerModal .modal-subtitle {
+    margin-top: var(--space-sm);
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    opacity: 0.8;
+}
+
+/* Beautiful button spacing */
+#beerModal .modal-actions {
+    margin-top: var(--space-2xl);
+    padding-top: var(--space-xl);
+    border-top: 1px solid var(--divider-color);
+}
+
+/* Select dropdown arrow styling */
+#beerSearchType {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23667eea' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 12px center;
+    background-repeat: no-repeat;
+    background-size: 16px 16px;
+}
+
+/* Beer autocomplete suggestions */
+.beer-search-suggestions {
+    background: var(--bg-white);
+    border: 2px solid var(--primary-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg), 0 0 20px rgba(102, 126, 234, 0.2);
+    backdrop-filter: blur(10px);
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: var(--z-search-suggestions);
+    margin-top: var(--space-sm);
+    animation: dropdownSlideIn 0.3s ease-out;
+}
+
+/* ================================
    MOBILE RESPONSIVE - TABLETS
    ================================ */
 @media (max-width: 768px) {
@@ -4250,6 +4334,28 @@ body {
     .brewery-item:hover {
         padding-left: calc(var(--space-md) - 3px);
         border-left: 3px solid var(--primary-gradient);
+    }
+
+   beerModal .form-group {
+        margin-bottom: var(--space-lg);
+    }
+    
+    #beerModal .form-input {
+        margin-top: var(--space-md);
+    }
+    
+    #beerModal .modal-header {
+        padding-bottom: var(--space-lg);
+    }
+    
+    #beerModal .modal-actions {
+        margin-top: var(--space-lg);
+        padding-top: var(--space-md);
+    }
+    
+    .beer-search-suggestions {
+        max-height: 250px;
+        border-radius: var(--radius-lg);
     }
 }
 
