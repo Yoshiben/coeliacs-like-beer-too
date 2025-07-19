@@ -1733,9 +1733,14 @@
         }
         
         // 📝 UPDATE - Improve closeResults to go back to home (not try to restore)
+        // ================================
+        // 🔄 REPLACE: Your closeResults function to properly reset home view
+        // ================================
+        
         function closeResults() {
-            console.log('🔙 Closing results overlay');
+            console.log('🏠 Closing results and returning to homepage');
             
+            // Close results overlay
             document.getElementById('resultsOverlay').classList.remove('active');
             
             // Restore background scrolling
@@ -1746,7 +1751,69 @@
             document.getElementById('resultsLoading').style.display = 'flex';
             document.getElementById('noResultsFound').style.display = 'none';
             
+            // IMPORTANT: Reset homepage to clean state
+            resetHomepageToCleanState();
+            
             trackEvent('close_results', 'Navigation');
+        }
+        
+        // ================================
+        // ➕ ADD: Function to reset homepage to clean search state
+        // ================================
+        
+        function resetHomepageToCleanState() {
+            console.log('🧹 Resetting homepage to clean state');
+            
+            // Hide map if visible
+            const mapContainer = document.getElementById('mapContainer');
+            if (mapVisible && mapContainer) {
+                mapContainer.style.display = 'none';
+                mapVisible = false;
+                
+                // Update toggle button text if it exists
+                const toggleBtn = document.getElementById('toggleMapBtn');
+                if (toggleBtn) {
+                    toggleBtn.innerHTML = '🗺️ Show Map';
+                }
+            }
+            
+            // Show features and activity sections
+            const featuresSection = document.getElementById('featuresSection');
+            const activitySection = document.getElementById('activitySection');
+            
+            if (featuresSection) {
+                featuresSection.style.display = 'block';
+                featuresSection.style.marginTop = '0';
+            }
+            
+            if (activitySection) {
+                activitySection.style.display = 'block';
+                activitySection.style.marginTop = '0';
+            }
+            
+            // Hide results section if visible
+            const resultsSection = document.getElementById('results-section');
+            if (resultsSection) {
+                resultsSection.style.display = 'none';
+            }
+            
+            // Reset search section margin
+            const searchSection = document.getElementById('search');
+            if (searchSection) {
+                searchSection.style.marginTop = '-20px';
+            }
+            
+            // Clear any search state
+            currentQuery = '';
+            currentSearchType = 'all';
+            currentPage = 1;
+            
+            // Clear URL hash
+            if (window.location.hash) {
+                window.location.hash = '';
+            }
+            
+            console.log('✅ Homepage reset to clean search state');
         }
 
         // 📝 ADD NEW - Better debugging for the location issue
@@ -2012,44 +2079,157 @@
         // ➕ ADD: Add current search results to map
         // ================================
         
+        // ================================
+        // 🔄 REPLACE: Your addResultsToMap function to actually use pub data
+        // ================================
+        
+        let currentSearchPubs = []; // Store search results globally
+        
         function addResultsToMap(mapInstance) {
-            // Get current results from the list
-            const resultItems = document.querySelectorAll('.result-item');
-            let markersAdded = 0;
+            console.log('📍 Adding pub data to map...', currentSearchPubs);
             
-            resultItems.forEach((item, index) => {
-                // Extract pub data from the result item
-                const pubName = item.querySelector('.result-title')?.textContent || 'Unknown Pub';
-                const pubAddress = item.querySelector('.result-address')?.textContent || '';
-                const pubPostcode = item.querySelector('.result-postcode')?.textContent || '';
-                
-                // For now, we'll add a note that coordinates are needed
-                // In a real implementation, you'd get lat/lng from your search results
-                console.log(`📍 Pub found: ${pubName}, ${pubAddress}, ${pubPostcode}`);
+            if (!currentSearchPubs || currentSearchPubs.length === 0) {
+                console.log('❌ No pub data available for map');
+                showMapMessage(mapInstance, '🗺️ Map View', 'No pub location data available for current search');
+                return;
+            }
+            
+            let markersAdded = 0;
+            const mapBounds = [];
+            
+            currentSearchPubs.forEach((pub, index) => {
+                if (pub.latitude && pub.longitude && !isNaN(parseFloat(pub.latitude)) && !isNaN(parseFloat(pub.longitude))) {
+                    const lat = parseFloat(pub.latitude);
+                    const lng = parseFloat(pub.longitude);
+                    
+                    // Create marker
+                    const marker = L.circleMarker([lat, lng], {
+                        radius: 10,
+                        fillColor: '#4CAF50',
+                        color: '#ffffff',
+                        weight: 2,
+                        opacity: 1,
+                        fillOpacity: 0.9
+                    }).addTo(mapInstance);
+                    
+                    // Create popup content
+                    let popupContent = `<div style="text-align: center; padding: 8px; min-width: 200px;">`;
+                    popupContent += `<strong style="color: var(--text-primary); font-size: 14px;">${pub.name}</strong><br>`;
+                    popupContent += `<small style="color: var(--text-secondary);">${pub.address}</small><br>`;
+                    popupContent += `<small style="color: var(--text-muted);">${pub.postcode}</small>`;
+                    
+                    // Add distance if available
+                    if (pub.distance !== undefined) {
+                        popupContent += `<br><small style="color: var(--primary-color, #667eea); font-weight: 600;">${pub.distance.toFixed(1)}km away</small>`;
+                    }
+                    
+                    // Add GF status
+                    if (pub.bottle || pub.tap || pub.cask || pub.can) {
+                        let gfOptions = [];
+                        if (pub.bottle) gfOptions.push('🍺');
+                        if (pub.tap) gfOptions.push('🚰');
+                        if (pub.cask) gfOptions.push('🛢️');
+                        if (pub.can) gfOptions.push('🥫');
+                        popupContent += `<div style="margin-top: 8px; color: var(--success-color, #10b981);"><strong>GF: ${gfOptions.join(' ')}</strong></div>`;
+                    }
+                    
+                    // Add click action
+                    popupContent += `<div style="margin-top: 8px;"><button onclick="showPubDetails(${pub.pub_id})" style="background: var(--primary-gradient); color: white; border: none; padding: 4px 8px; border-radius: 12px; font-size: 12px; cursor: pointer;">View Details</button></div>`;
+                    popupContent += `</div>`;
+                    
+                    marker.bindPopup(popupContent);
+                    
+                    // Add to bounds for auto-zoom
+                    mapBounds.push([lat, lng]);
+                    markersAdded++;
+                    
+                    console.log(`✅ Added marker for ${pub.name} at ${lat}, ${lng}`);
+                } else {
+                    console.log(`❌ Missing coordinates for ${pub.name}`);
+                }
             });
             
             if (markersAdded === 0) {
-                // Show message on map that coordinates are needed
-                const mapElement = document.getElementById('resultsMap');
-                const overlay = document.createElement('div');
-                overlay.style.cssText = `
-                    position: absolute;
-                    top: 50%;
-                    left: 50%;
-                    transform: translate(-50%, -50%);
-                    background: rgba(255, 255, 255, 0.9);
-                    padding: 20px;
-                    border-radius: 10px;
-                    text-align: center;
-                    z-index: 1000;
-                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-                `;
-                overlay.innerHTML = `
-                    <div style="font-size: 1.2rem; margin-bottom: 8px;">🗺️ Map View</div>
-                    <div style="color: #666; font-size: 0.9rem;">Pub locations will appear here<br>once coordinate data is added</div>
-                `;
-                mapElement.appendChild(overlay);
+                showMapMessage(mapInstance, '📍 Pubs Found', 'Pub locations will appear here once coordinate data is added');
+            } else {
+                console.log(`✅ Added ${markersAdded} pub markers to map`);
+                
+                // Auto-zoom to show all markers
+                if (mapBounds.length > 0) {
+                    if (mapBounds.length === 1) {
+                        // Single marker - center on it
+                        mapInstance.setView(mapBounds[0], 15);
+                    } else {
+                        // Multiple markers - fit bounds
+                        mapInstance.fitBounds(mapBounds, { padding: [20, 20] });
+                    }
+                }
             }
+        }
+        
+        // ================================
+        // ➕ ADD: Function to show message overlay on map
+        // ================================
+        
+        function showMapMessage(mapInstance, title, message) {
+            const mapElement = document.getElementById('resultsMap');
+            if (!mapElement) return;
+            
+            // Remove any existing overlay
+            const existingOverlay = mapElement.querySelector('.map-message-overlay');
+            if (existingOverlay) {
+                existingOverlay.remove();
+            }
+            
+            const overlay = document.createElement('div');
+            overlay.className = 'map-message-overlay';
+            overlay.style.cssText = `
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(255, 255, 255, 0.95);
+                padding: 20px;
+                border-radius: 12px;
+                text-align: center;
+                z-index: 1000;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                backdrop-filter: blur(10px);
+                max-width: 80%;
+            `;
+            overlay.innerHTML = `
+                <div style="font-size: 1.2rem; margin-bottom: 8px; font-weight: 600;">${title}</div>
+                <div style="color: #666; font-size: 0.9rem; line-height: 1.4;">${message}</div>
+            `;
+            mapElement.appendChild(overlay);
+        }
+        
+        // ================================
+        // 🔄 UPDATE: Store search results when displaying them
+        // ================================
+        
+        function displayResultsInOverlay(pubs, title) {
+            // Store pubs globally for map access
+            currentSearchPubs = pubs;
+            console.log('💾 Stored search results for map:', pubs.length, 'pubs');
+            
+            document.getElementById('resultsLoading').style.display = 'none';
+            document.getElementById('noResultsFound').style.display = 'none';
+            document.getElementById('resultsList').style.display = 'block';
+            
+            // Update title
+            document.getElementById('resultsTitle').textContent = title;
+            
+            // Generate results HTML
+            const resultsList = document.getElementById('resultsList');
+            resultsList.innerHTML = '';
+            
+            pubs.forEach(pub => {
+                const resultItem = createResultItemForOverlay(pub);
+                resultsList.appendChild(resultItem);
+            });
+            
+            console.log(`✅ Displayed ${pubs.length} results in overlay`);
         }
 
         
