@@ -859,7 +859,7 @@
             <div class="nav-label">Home</div>
         </a>
         
-        <a href="/map" class="nav-item">
+        <a href="#" onclick="goToMap(); return false;" class="nav-item">
             <div class="nav-icon">🗺️</div>
             <div class="nav-label">Map</div>
         </a>
@@ -1921,10 +1921,167 @@
             showSuccessToast(`🧭 Opening directions to ${pubName}...`);
         }
         
+        // ================================
+        // 🔄 REPLACE: Your toggleResultsMap function with working version
+        // ================================
+        
         function toggleResultsMap() {
-            // Implement map toggle for results view
-            console.log('Map toggle in results - coming soon!');
-            showSuccessToast('Results map view coming soon! 🗺️');
+            const listContainer = document.getElementById('resultsListContainer');
+            const mapContainer = document.getElementById('resultsMapContainer');
+            const mapBtnText = document.getElementById('resultsMapBtnText');
+            
+            if (mapContainer.style.display === 'none' || !mapContainer.style.display) {
+                // Show map
+                listContainer.style.display = 'none';
+                mapContainer.style.display = 'block';
+                mapBtnText.textContent = 'List';
+                
+                // Initialize the results map
+                setTimeout(() => {
+                    initializeResultsMap();
+                }, 100);
+                
+                trackEvent('results_map_toggle', 'Map Interaction', 'show');
+            } else {
+                // Show list
+                listContainer.style.display = 'block';
+                mapContainer.style.display = 'none';
+                mapBtnText.textContent = 'Map';
+                
+                trackEvent('results_map_toggle', 'Map Interaction', 'hide');
+            }
+        }
+        
+        // ================================
+        // ➕ ADD: Initialize results map with current search results
+        // ================================
+        
+        function initializeResultsMap() {
+            const mapElement = document.getElementById('resultsMap');
+            if (!mapElement) {
+                console.error('Results map element not found');
+                return;
+            }
+            
+            // Clear any existing map
+            mapElement.innerHTML = '';
+            
+            // Create new Leaflet map
+            const resultsMap = L.map('resultsMap').setView([54.5, -3], 6); // Center on UK
+            
+            // Add tile layer
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(resultsMap);
+            
+            // Add user location if available
+            if (userLocation) {
+                const userMarker = L.circleMarker([userLocation.lat, userLocation.lng], {
+                    radius: 8,
+                    fillColor: '#667eea',
+                    color: '#ffffff',
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 0.8
+                }).addTo(resultsMap);
+                
+                userMarker.bindPopup('📍 Your location');
+                
+                // Center on user location
+                resultsMap.setView([userLocation.lat, userLocation.lng], 10);
+            }
+            
+            // Add markers for current search results
+            addResultsToMap(resultsMap);
+            
+            // Invalidate size to ensure proper rendering
+            setTimeout(() => {
+                resultsMap.invalidateSize();
+            }, 100);
+            
+            console.log('✅ Results map initialized');
+        }
+        
+        // ================================
+        // ➕ ADD: Add current search results to map
+        // ================================
+        
+        function addResultsToMap(mapInstance) {
+            // Get current results from the list
+            const resultItems = document.querySelectorAll('.result-item');
+            let markersAdded = 0;
+            
+            resultItems.forEach((item, index) => {
+                // Extract pub data from the result item
+                const pubName = item.querySelector('.result-title')?.textContent || 'Unknown Pub';
+                const pubAddress = item.querySelector('.result-address')?.textContent || '';
+                const pubPostcode = item.querySelector('.result-postcode')?.textContent || '';
+                
+                // For now, we'll add a note that coordinates are needed
+                // In a real implementation, you'd get lat/lng from your search results
+                console.log(`📍 Pub found: ${pubName}, ${pubAddress}, ${pubPostcode}`);
+            });
+            
+            if (markersAdded === 0) {
+                // Show message on map that coordinates are needed
+                const mapElement = document.getElementById('resultsMap');
+                const overlay = document.createElement('div');
+                overlay.style.cssText = `
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: rgba(255, 255, 255, 0.9);
+                    padding: 20px;
+                    border-radius: 10px;
+                    text-align: center;
+                    z-index: 1000;
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+                `;
+                overlay.innerHTML = `
+                    <div style="font-size: 1.2rem; margin-bottom: 8px;">🗺️ Map View</div>
+                    <div style="color: #666; font-size: 0.9rem;">Pub locations will appear here<br>once coordinate data is added</div>
+                `;
+                mapElement.appendChild(overlay);
+            }
+        }
+
+        
+        // ================================
+        // ➕ ADD: Navigation function for map
+        // ================================
+        
+        function goToMap() {
+            console.log('🗺️ Navigating to map view');
+            
+            // Close any open modals or overlays
+            closeResults();
+            closePubDetails();
+            
+            // Close any search modals
+            closeSearchModal();
+            
+            // Show the homepage map if it exists
+            const mapContainer = document.getElementById('mapContainer');
+            if (mapContainer) {
+                // Show map section
+                if (!mapVisible) {
+                    toggleMap();
+                }
+                
+                // Scroll to map
+                setTimeout(() => {
+                    mapContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 100);
+                
+                showSuccessToast('🗺️ Showing interactive map');
+            } else {
+                // Fallback - show coming soon message
+                showSuccessToast('🗺️ Full map view coming soon! Use "Pubs Near Me" to see local results on map.');
+            }
+            
+            trackEvent('navigation_map', 'Navigation', 'bottom_nav');
         }
 
         // ================================
