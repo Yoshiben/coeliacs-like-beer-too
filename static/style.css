@@ -3663,6 +3663,194 @@ body {
 }
 
 /* ================================
+   🎨 ADD: Gorgeous dropdown styling with purple glows
+   Add this to your CSS after existing dropdown styles
+   ================================ */
+
+/* ================================
+   DROPDOWN HEADERS WITH GRADIENTS
+   ================================ */
+.dropdown-header {
+    padding: var(--space-sm) var(--space-lg);
+    background: var(--primary-gradient);
+    color: var(--text-white);
+    font-weight: 700;
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--divider-color);
+    position: sticky;
+    top: 0;
+    z-index: var(--z-dropdown);
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+/* ================================
+   ENHANCED SUGGESTION DROPDOWNS
+   ================================ */
+#breweryDropdown,
+#beerNameDropdown,
+#beerStyleDropdown {
+    background: var(--bg-white);
+    border: 2px solid var(--primary-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg), 0 0 20px rgba(102, 126, 234, 0.2);
+    backdrop-filter: blur(10px);
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: var(--z-search-suggestions);
+    margin-top: var(--space-sm);
+    animation: dropdownSlideIn 0.3s ease-out;
+}
+
+/* ================================
+   SCROLLABLE BEER ITEMS
+   ================================ */
+.beer-item,
+.brewery-item {
+    padding: var(--space-lg);
+    cursor: pointer;
+    transition: all var(--transition);
+    border-bottom: 1px solid var(--divider-color);
+    position: relative;
+    overflow: hidden;
+}
+
+.beer-item:hover,
+.brewery-item:hover {
+    background: linear-gradient(135deg, var(--primary-bg) 0%, rgba(102, 126, 234, 0.05) 100%);
+    border-left: 4px solid var(--primary-gradient);
+    padding-left: calc(var(--space-lg) - 4px);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
+.beer-item:last-child,
+.brewery-item:last-child {
+    border-bottom: none;
+    border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+}
+
+.beer-item strong,
+.brewery-item strong {
+    color: var(--text-primary);
+    font-weight: 700;
+    display: block;
+    margin-bottom: var(--space-xs);
+    font-size: var(--text-base);
+}
+
+.beer-item small,
+.brewery-item small {
+    color: var(--text-secondary);
+    font-size: var(--text-xs);
+    display: block;
+    line-height: 1.4;
+}
+
+/* ================================
+   ADD NEW ITEM WITH GRADIENT
+   ================================ */
+.add-new-item {
+    background: linear-gradient(135deg, var(--success-bg) 0%, rgba(16, 185, 129, 0.05) 100%);
+    border: 2px solid var(--success-border);
+    border-radius: var(--radius-lg);
+    margin: var(--space-sm);
+    position: relative;
+    overflow: hidden;
+}
+
+.add-new-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--success-gradient);
+}
+
+.add-new-item:hover {
+    background: var(--success-gradient);
+    color: var(--text-white);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-success);
+    border-color: transparent;
+}
+
+.add-new-item:hover strong,
+.add-new-item:hover small {
+    color: var(--text-white);
+}
+
+/* ================================
+   FORM INPUTS WITH PURPLE GLOW
+   ================================ */
+#reportModal .form-input:focus,
+#reportModal .form-select:focus {
+    border-color: var(--primary-color, #667eea);
+    box-shadow: 
+        0 0 0 3px rgba(102, 126, 234, 0.1),
+        0 0 20px rgba(102, 126, 234, 0.3),
+        inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    background: var(--bg-white);
+    transform: translateY(-1px);
+}
+
+#reportModal .form-input:hover,
+#reportModal .form-select:hover {
+    border-color: rgba(102, 126, 234, 0.5);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+}
+
+/* ================================
+   PERFECT SCROLLBAR
+   ================================ */
+#breweryDropdown::-webkit-scrollbar,
+#beerNameDropdown::-webkit-scrollbar,
+#beerStyleDropdown::-webkit-scrollbar {
+    width: 8px;
+}
+
+#breweryDropdown::-webkit-scrollbar-track,
+#beerNameDropdown::-webkit-scrollbar-track,
+#beerStyleDropdown::-webkit-scrollbar-track {
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 4px;
+}
+
+#breweryDropdown::-webkit-scrollbar-thumb,
+#beerNameDropdown::-webkit-scrollbar-thumb,
+#beerStyleDropdown::-webkit-scrollbar-thumb {
+    background: var(--primary-gradient);
+    border-radius: 4px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+}
+
+#breweryDropdown::-webkit-scrollbar-thumb:hover,
+#beerNameDropdown::-webkit-scrollbar-thumb:hover,
+#beerStyleDropdown::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+    background-clip: content-box;
+}
+
+/* ================================
+   DROPDOWN ANIMATIONS
+   ================================ */
+@keyframes dropdownSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ================================
    ➕ ADD: Enhanced dropdown styles
    Add this to your style.css after your existing dropdown styles
    ================================ */
@@ -3684,17 +3872,6 @@ body {
     background: var(--primary-bg);
     border-left: 3px solid var(--primary-color, #667eea);
     padding-left: calc(var(--space-lg) - 3px);
-}
-
-/* Mobile dropdown improvements */
-@media (max-width: 480px) {
-    .suggestions .suggestion-item {
-        padding: var(--space-sm) var(--space-md);
-    }
-    
-    .suggestions .suggestion-item:hover {
-        padding-left: calc(var(--space-md) - 3px);
-    }
 }
 
 /* ================================
@@ -3776,6 +3953,14 @@ body {
 @media (max-width: 480px) {
     #reportModal {
         padding: var(--space-sm);
+    }
+
+   .suggestions .suggestion-item {
+        padding: var(--space-sm) var(--space-md);
+    }
+    
+    .suggestions .suggestion-item:hover {
+        padding-left: calc(var(--space-md) - 3px);
     }
    
     .modal {
@@ -3910,6 +4095,29 @@ body {
     .style-suggestions .suggestion-item {
         padding: var(--space-sm) var(--space-md);
         font-size: var(--text-xs);
+    }
+
+   #breweryDropdown,
+    #beerNameDropdown,
+    #beerStyleDropdown {
+        max-height: 250px;
+        border-radius: var(--radius-lg);
+    }
+    
+    .dropdown-header {
+        padding: var(--space-xs) var(--space-md);
+        font-size: 0.7rem;
+    }
+    
+    .beer-item,
+    .brewery-item {
+        padding: var(--space-md);
+    }
+    
+    .beer-item:hover,
+    .brewery-item:hover {
+        padding-left: calc(var(--space-md) - 3px);
+        border-left: 3px solid var(--primary-gradient);
     }
 }
 
