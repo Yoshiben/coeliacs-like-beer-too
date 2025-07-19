@@ -144,6 +144,11 @@
         </div>
     </div>
     
+    <!-- ================================
+     🔄 REPLACE: Your existing beerModal HTML with this enhanced version
+     Find your beerModal div and replace the entire modal-content
+     ================================ -->
+
     <div id="beerModal" class="search-modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -155,9 +160,9 @@
             <div class="form-group">
                 <label class="form-label">Search by:</label>
                 <select id="beerSearchType" class="form-select" onchange="updateBeerPlaceholder()">
-                    <option value="brewery">🏭 Brewery Name (e.g. Abbeydale, Brass Castle)</option>
-                    <option value="beer">🍺 Specific Beer (e.g. Heathen, Autumn Porter)</option>
-                    <option value="style">🎨 Beer Style (e.g. IPA, Pale Ale, Stout)</option>
+                    <option value="brewery">🏭 Brewery Name</option>
+                    <option value="beer">🍺 Specific Beer</option>
+                    <option value="style">🎨 Beer Style</option>
                 </select>
             </div>
             
@@ -2471,11 +2476,16 @@ function addSwipeGestures() {
             setTimeout(() => {
                 document.getElementById(modalId).style.display = 'flex';
                 
-                // Handle area modal specially
+                // Handle specific modals
                 if (modalId === 'areaModal') {
                     // Initialize area modal with proper placeholder
                     setTimeout(() => {
                         initializeAreaModal();
+                    }, 100);
+                } else if (modalId === 'beerModal') {
+                    // Initialize beer modal with proper placeholder
+                    setTimeout(() => {
+                        initializeBeerModal();
                     }, 100);
                 } else {
                     // Focus other modal inputs normally
@@ -3173,15 +3183,31 @@ function addSwipeGestures() {
             const input = document.getElementById('beerInput');
             
             if (searchType === 'brewery') {
-                input.placeholder = 'Start typing brewery name...';
+                input.placeholder = 'Enter brewery name';
                 console.log('🏭 Switched to brewery search mode');
             } else if (searchType === 'beer') {
-                input.placeholder = 'Start typing beer name...';
+                input.placeholder = 'Enter specific beer name';
                 console.log('🍺 Switched to beer name search mode');
             } else {
-                input.placeholder = 'Start typing beer style...';
+                input.placeholder = 'Enter beer style';
                 console.log('🎨 Switched to beer style search mode');
             }
+        }
+
+        function initializeBeerModal() {
+            // Set default placeholder
+            updateBeerPlaceholder();
+            
+            // Clear any previous input
+            document.getElementById('beerInput').value = '';
+            
+            // Initialize autocomplete
+            initializeBeerAutocomplete();
+            
+            // Focus the input field
+            setTimeout(() => {
+                document.getElementById('beerInput').focus();
+            }, 200);
         }
         
         // ================================
