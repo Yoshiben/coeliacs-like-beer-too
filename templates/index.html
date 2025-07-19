@@ -150,7 +150,23 @@
                 <h3 class="modal-title">🍺 Search by Beer</h3>
                 <p class="modal-subtitle">Find pubs serving specific gluten-free beers</p>
             </div>
-            <input type="text" class="form-input" placeholder="e.g. Vocation, IPA, Lager, Stella Artois GF..." id="beerInput">
+            
+            <!-- Search Type Selector -->
+            <div class="form-group">
+                <label class="form-label">Search by:</label>
+                <select id="beerSearchType" class="form-select" onchange="updateBeerPlaceholder()">
+                    <option value="brewery">🏭 Brewery Name (e.g. Abbeydale, Brass Castle)</option>
+                    <option value="beer">🍺 Specific Beer (e.g. Heathen, Autumn Porter)</option>
+                    <option value="style">🎨 Beer Style (e.g. IPA, Pale Ale, Stout)</option>
+                </select>
+            </div>
+            
+            <!-- Search Input with Autocomplete -->
+            <div class="beer-search-container">
+                <input type="text" class="form-input" placeholder="Start typing brewery name..." id="beerInput">
+                <div id="beerSuggestions" class="suggestions beer-search-suggestions"></div>
+            </div>
+            
             <div class="modal-actions">
                 <button class="btn btn-secondary" onclick="closeSearchModal()">Cancel</button>
                 <button class="btn btn-primary" onclick="searchByBeer()">Search</button>
@@ -2991,33 +3007,234 @@ function addSwipeGestures() {
             });
         }
         
+        // ================================
+        // ➕ ADD: Beer search placeholder function
+        // ================================
+        
+        function updateBeerPlaceholder() {
+            const searchType = document.getElementById('beerSearchType').value;
+            const input = document.getElementById('beerInput');
+            
+            if (searchType === 'brewery') {
+                input.placeholder = 'Start typing brewery name...';
+                console.log('🏭 Switched to brewery search mode');
+            } else if (searchType === 'beer') {
+                input.placeholder = 'Start typing beer name...';
+                console.log('🍺 Switched to beer name search mode');
+            } else {
+                input.placeholder = 'Start typing beer style...';
+                console.log('🎨 Switched to beer style search mode');
+            }
+        }
+        
+        // ================================
+        // 🔄 REPLACE: Your searchByBeer function with this working version
+        // ================================
+        
         function searchByBeer() {
             const query = document.getElementById('beerInput').value.trim();
+            const searchType = document.getElementById('beerSearchType').value;
+            
             if (!query) {
-                showSuccessToast('Please enter a beer name to search');
+                showSuccessToast('Please enter something to search for');
                 return;
             }
             
+            console.log(`🍺 Searching by ${searchType}:`, query);
+            
             closeSearchModal();
             
-            // Use your existing search logic but with beer type
-            performSearchWithState(query, 'beer');
+            // Show results overlay immediately
+            const searchTypeText = searchType === 'brewery' ? 'brewery' : searchType === 'beer' ? 'beer' : 'style';
+            showResultsOverlay(`${searchTypeText}: "${query}"`);
+            showResultsLoading('Finding pubs with this beer...');
             
-            trackEvent('search_by_beer', 'Search', query);
+            // Perform the search
+            performBeerSearch(query, searchType);
+            
+            trackEvent('search_by_beer', 'Search', `${searchType}:${query}`);
         }
-
-        // Initialize the area modal when it opens
-        function initializeAreaModal() {
-            // Set default placeholder
-            updateAreaPlaceholder();
+        
+        // ================================
+        // ➕ ADD: Beer search with proximity sorting
+        // ================================
+        
+        async function performBeerSearch(query, searchType) {
+            console.log(`🍺 Performing ${searchType} search for:`, query);
             
-            // Clear any previous input
-            document.getElementById('areaInput').value = '';
+            try {
+                // Try to get user location first for better sorting
+                if (!userLocation) {
+                    await tryToGetUserLocation();
+                }
+                
+                // Use your existing search API 
+                let url = `/search?query=${encodeURIComponent(query)}&search_type=all&page=1`;
+                
+                // Add user location if available for proximity sorting
+                if (userLocation) {
+                    url += `&lat=${userLocation.lat}&lng=${userLocation.lng}`;
+                    console.log('📍 Including user location for proximity sorting');
+                }
+                
+                console.log('📡 API call:', url);
+                
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('📡 API response:', data);
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                let pubs = Array.isArray(data) ? data : data.pubs;
+                
+                // Filter results based on search type and query
+                pubs = pubs.filter(pub => {
+                    if (!pub.beer_details) return false;
+                    
+                    const beerDetails = pub.beer_details.toLowerCase();
+                    const searchQuery = query.toLowerCase();
+                    
+                    if (searchType === 'brewery') {
+                        return beerDetails.includes(searchQuery);
+                    } else if (searchType === 'beer') {
+                        return beerDetails.includes(searchQuery);
+                    } else { // style
+                        return beerDetails.includes(searchQuery);
+                    }
+                });
+                
+                if (pubs.length === 0) {
+                    showNoResults(`No pubs found serving "${query}"`);
+                    return;
+                }
+                
+                // Sort by proximity if we have user location
+                if (userLocation) {
+                    pubs = pubs.map(pub => {
+                        if (pub.latitude && pub.longitude) {
+                            pub.distance = calculateDistance(
+                                userLocation.lat, userLocation.lng,
+                                parseFloat(pub.latitude), parseFloat(pub.longitude)
+                            );
+                        } else {
+                            pub.distance = 999;
+                        }
+                        return pub;
+                    });
+                    
+                    pubs.sort((a, b) => a.distance - b.distance);
+                    console.log('📍 Sorted results by proximity to user');
+                }
+                
+                console.log(`✅ Found ${pubs.length} pubs serving ${query}`);
+                
+                // Save state for back button
+                saveBeerSearchState(`${query} (${searchType})`, pubs);
+                
+                // Display results
+                const titleText = userLocation ? 
+                    `${pubs.length} pubs serving "${query}" (nearest first)` :
+                    `${pubs.length} pubs serving "${query}"`;
+                    
+                displayResultsInOverlay(pubs, titleText);
+                
+                // Success feedback
+                const successText = userLocation ?
+                    `✅ Found ${pubs.length} pubs serving "${query}" - sorted by distance` :
+                    `✅ Found ${pubs.length} pubs serving "${query}"`;
+                showSuccessToast(successText);
+                
+                // Track success
+                trackSearch(query, searchType, pubs.length);
+                
+            } catch (error) {
+                console.error('❌ Error searching by beer:', error);
+                showNoResults(`Error searching for "${query}". Please try again.`);
+                showSuccessToast(`❌ Error searching for "${query}"`);
+            }
+        }
+        
+        // ================================
+        // ➕ ADD: Beer autocomplete (basic version for MVP)
+        // ================================
+        
+        let beerAutocompleteTimeout;
+        
+        function initializeBeerAutocomplete() {
+            const input = document.getElementById('beerInput');
+            const suggestions = document.getElementById('beerSuggestions');
             
-            // Focus the input field
-            setTimeout(() => {
-                document.getElementById('areaInput').focus();
-            }, 200);
+            if (!input || !suggestions) return;
+            
+            input.addEventListener('input', (e) => {
+                const query = e.target.value.trim();
+                const searchType = document.getElementById('beerSearchType').value;
+                
+                if (query.length < 2) {
+                    suggestions.style.display = 'none';
+                    return;
+                }
+                
+                clearTimeout(beerAutocompleteTimeout);
+                beerAutocompleteTimeout = setTimeout(() => {
+                    fetchBeerSuggestions(query, searchType);
+                }, 300);
+            });
+            
+            // Hide suggestions when clicking outside
+            document.addEventListener('click', (e) => {
+                if (!e.target.closest('.beer-search-container')) {
+                    suggestions.style.display = 'none';
+                }
+            });
+        }
+        
+        async function fetchBeerSuggestions(query, searchType) {
+            const suggestions = document.getElementById('beerSuggestions');
+            
+            try {
+                let endpoint;
+                if (searchType === 'brewery') {
+                    endpoint = `/api/breweries?q=${encodeURIComponent(query)}`;
+                } else {
+                    // For beer names and styles, we'll use a simple approach for MVP
+                    endpoint = `/api/breweries?q=${encodeURIComponent(query)}`;
+                }
+                
+                const response = await fetch(endpoint);
+                const data = await response.json();
+                
+                suggestions.innerHTML = '';
+                
+                if (data.length === 0) {
+                    suggestions.style.display = 'none';
+                    return;
+                }
+                
+                data.slice(0, 8).forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'suggestion-item';
+                    div.textContent = item;
+                    div.addEventListener('click', () => {
+                        document.getElementById('beerInput').value = item;
+                        suggestions.style.display = 'none';
+                    });
+                    suggestions.appendChild(div);
+                });
+                
+                suggestions.style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error fetching beer suggestions:', error);
+                suggestions.style.display = 'none';
+            }
         }
         
         // ================================
@@ -3142,12 +3359,28 @@ function addSwipeGestures() {
         // ➕ ADD: City/region search using your database
         // ================================
         
+        // ================================
+        // 🔄 REPLACE: Your performCitySearch function with proximity sorting
+        // ================================
+        
         async function performCitySearch(city) {
             console.log('🏙️ Performing city search for:', city);
             
             try {
+                // Try to get user location first for better sorting
+                if (!userLocation) {
+                    await tryToGetUserLocation();
+                }
+                
                 // Use your existing search API with area filter
-                const url = `/search?query=${encodeURIComponent(city)}&search_type=area&page=1`;
+                let url = `/search?query=${encodeURIComponent(city)}&search_type=area&page=1`;
+                
+                // Add user location if available for proximity sorting
+                if (userLocation) {
+                    url += `&lat=${userLocation.lat}&lng=${userLocation.lng}`;
+                    console.log('📍 Including user location for proximity sorting');
+                }
+                
                 console.log('📡 API call:', url);
                 
                 const response = await fetch(url);
@@ -3201,7 +3434,10 @@ function addSwipeGestures() {
                 displayResultsInOverlay(pubs, titleText);
                 
                 // Success feedback
-                showSuccessToast(`✅ Found ${pubs.length} pubs in ${city}`);
+                const successText = userLocation ?
+                    `✅ Found ${pubs.length} pubs in ${city} - sorted by distance` :
+                    `✅ Found ${pubs.length} pubs in ${city}`;
+                showSuccessToast(successText);
                 
                 // Track success
                 trackSearch(city, 'city', pubs.length);
