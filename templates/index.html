@@ -709,8 +709,8 @@
                         <label for="reportPhoto" class="photo-upload-compact">
                             <div class="photo-upload-icon">📷</div>
                             <div class="photo-upload-text">
-                                <strong>Add a photo</strong><br>
-                                <small>Beer menu, bottle, or tap</small>
+                                <strong>Add photo</strong>
+                                <small>• menu, bottle, tap</small>
                             </div>
                             <input type="file" id="reportPhoto" name="reportPhoto" 
                                    accept="image/*" style="display: none;">
@@ -1082,36 +1082,52 @@
                 const response = await fetch(`/api/brewery/${encodeURIComponent(brewery)}/beers`);
                 const beers = await response.json();
                 
-                console.log('API response:', beers); // Debug log
+                console.log('🔍 DEBUG - API response:', beers);
+                console.log('🔍 DEBUG - Number of beers:', beers.length);
                 
                 if (beers.length === 1) {
-                    // Auto-fill if only one beer!
                     const beer = beers[0];
-                    beerNameInput.value = beer.name;
+                    console.log('🔍 DEBUG - Single beer found:', beer);
+                    
+                    // More explicit field setting with debug logs
+                    console.log('🔍 DEBUG - Setting beer name to:', beer.name);
+                    beerNameInput.value = beer.name || '';
+                    
+                    console.log('🔍 DEBUG - Setting beer style to:', beer.style);
                     beerStyleInput.value = beer.style || '';
+                    
+                    console.log('🔍 DEBUG - Setting beer ABV to:', beer.abv);
                     beerABVInput.value = beer.abv || '';
+                    
+                    // Change placeholder to show it worked
+                    beerNameInput.placeholder = `Auto-filled: ${beer.name}`;
+                    beerStyleInput.placeholder = `Auto-filled: ${beer.style}`;
                     
                     showSuccessToast(`✅ Auto-filled: ${beer.name} (${beer.abv}% ${beer.style})!`);
                     
                     // Focus format field since beer details are complete
                     setTimeout(() => {
                         const formatField = document.getElementById('reportFormat');
-                        formatField.focus();
-                    }, 500);
+                        if (formatField && !formatField.value) {
+                            formatField.focus();
+                        }
+                    }, 1000);
                     
                 } else if (beers.length > 1) {
+                    console.log('🔍 DEBUG - Multiple beers found:', beers.length);
                     showSuccessToast(`Found ${beers.length} beers from ${brewery}!`);
                     beerNameInput.placeholder = `Choose from ${beers.length} ${brewery} beers...`;
                     
                     // Pre-populate beer dropdown for selection
                     populateBeerDropdown(beers);
                 } else {
+                    console.log('🔍 DEBUG - No beers found for brewery');
                     beerNameInput.placeholder = 'Enter new beer name...';
                     showSuccessToast(`No existing beers found for ${brewery}. Add a new one!`);
                 }
                 
             } catch (error) {
-                console.error('Error loading beers for brewery:', error);
+                console.error('❌ Error loading beers for brewery:', error);
                 beerNameInput.placeholder = 'Enter beer name...';
             }
         }
