@@ -1032,15 +1032,32 @@
             const dropdown = document.getElementById('beerNameDropdown');
             const brewery = document.getElementById('reportBrewery').value;
             
-            if (query.length < 2) {
-                dropdown.style.display = 'none';
+            if (query.length < 1) {
+                // If we have a brewery selected, show its beers
+                if (brewery) {
+                    try {
+                        const response = await fetch(`/api/brewery/${encodeURIComponent(brewery)}/beers`);
+                        const beers = await response.json();
+                        if (beers.length > 0) {
+                            populateBeerDropdown(beers);
+                        } else {
+                            dropdown.style.display = 'none';
+                        }
+                    } catch (error) {
+                        dropdown.style.display = 'none';
+                    }
+                } else {
+                    dropdown.style.display = 'none';
+                }
                 return;
             }
             
             beerSearchTimeout = setTimeout(async () => {
                 try {
-                    let url = `/api/brewery/${encodeURIComponent(brewery)}/beers?q=${encodeURIComponent(query)}`;
-                    if (!brewery) {
+                    let url;
+                    if (brewery) {
+                        url = `/api/brewery/${encodeURIComponent(brewery)}/beers?q=${encodeURIComponent(query)}`;
+                    } else {
                         url = `/api/beers/search?q=${encodeURIComponent(query)}`;
                     }
                     
@@ -1048,26 +1065,41 @@
                     const beers = await response.json();
                     
                     dropdown.innerHTML = '';
+                    
                     if (beers.length === 0) {
-                        dropdown.style.display = 'none';
+                        // Show "Add new beer" option
+                        const div = document.createElement('div');
+                        div.className = 'suggestion-item add-new-item';
+                        div.innerHTML = `
+                            <strong>➕ Add "${query}" as new beer</strong>
+                            <small style="color: var(--text-muted);">${brewery ? 'for ' + brewery : 'We\'ll add this to our database'}</small>
+                        `;
+                        div.addEventListener('click', () => {
+                            document.getElementById('reportBeerName').value = query;
+                            dropdown.style.display = 'none';
+                            document.getElementById('reportBeerStyle').focus();
+                        });
+                        dropdown.appendChild(div);
+                        dropdown.style.display = 'block';
                         return;
                     }
                     
-                    beers.slice(0, 8).forEach(beer => {
+                    // Add header for search results
+                    const header = document.createElement('div');
+                    header.className = 'dropdown-header';
+                    header.innerHTML = `🔍 ${beers.length} matches for "${query}"`;
+                    dropdown.appendChild(header);
+                    
+                    beers.forEach(beer => {
                         const div = document.createElement('div');
-                        div.className = 'suggestion-item';
+                        div.className = 'suggestion-item beer-item';
                         div.innerHTML = `
                             <strong>${beer.name}</strong><br>
-                            <small style="color: var(--text-muted);">${beer.style || 'Unknown style'}</small>
+                            <small style="color: var(--text-muted);">
+                                ${beer.style || 'Unknown style'} • ${beer.abv || '?'}% ABV
+                            </small>
                         `;
-                        div.addEventListener('click', () => {
-                            document.getElementById('reportBeerName').value = beer.name;
-                            document.getElementById('reportBeerStyle').value = beer.style || '';
-                            dropdown.style.display = 'none';
-                            
-                            showSuccessToast(`✅ Selected: ${beer.name}!`);
-                            trackEvent('beer_selected', 'Form Interaction', beer.name);
-                        });
+                        div.addEventListener('click', () => selectBeer(beer));
                         dropdown.appendChild(div);
                     });
                     dropdown.style.display = 'block';
@@ -1076,8 +1108,9 @@
                     console.error('Error searching beer names:', error);
                     dropdown.style.display = 'none';
                 }
-            }, 300);
+            }, 200);
         }
+
         
         // ➕ ADD - Beer style search functionality
         async function searchBeerStyles(query) {
@@ -1191,32 +1224,70 @@
             const dropdown = document.getElementById('beerNameDropdown');
             
             dropdown.innerHTML = '';
+            
+            // Add a header showing count
+            const header = document.createElement('div');
+            header.className = 'dropdown-header';
+            header.innerHTML = `🍺 ${beers.length} Beers Available`;
+            dropdown.appendChild(header);
+            
             beers.forEach(beer => {
                 const div = document.createElement('div');
-                div.className = 'suggestion-item';
+                div.className = 'suggestion-item beer-item';
                 div.innerHTML = `
                     <strong>${beer.name}</strong><br>
-                    <small style="color: var(--text-muted);">${beer.style || 'Unknown style'} • ${beer.abv || '?'}% ABV</small>
+                    <small style="color: var(--text-muted);">
+                        ${beer.style || 'Unknown style'} • ${beer.abv || '?'}% ABV
+                        ${beer.gluten_status ? ' • ' + beer.gluten_status.replace('_', ' ') : ''}
+                    </small>
                 `;
                 div.addEventListener('click', () => selectBeer(beer));
                 dropdown.appendChild(div);
             });
+            
             dropdown.style.display = 'block';
+            console.log(`✅ Populated dropdown with ${beers.length} beers`);
         }
         
         // ➕ ADD: Function to handle beer selection
+        // ================================
+        // 🔄 REPLACE: selectBeer function - clean JavaScript only
+        // ================================
+        
         function selectBeer(beer) {
-            document.getElementById('reportBeerName').value = beer.name;
-            document.getElementById('reportBeerStyle').value = beer.style || '';
-            document.getElementById('reportBeerABV').value = beer.abv || '';
-            document.getElementById('beerNameDropdown').style.display = 'none';
+            const beerNameInput = document.getElementById('reportBeerName');
+            const beerStyleInput = document.getElementById('reportBeerStyle');
+            const beerABVInput = document.getElementById('reportBeerABV');
+            const dropdown = document.getElementById('beerNameDropdown');
+            
+            // Fill all the fields
+            beerNameInput.value = beer.name;
+            beerStyleInput.value = beer.style || '';
+            beerABVInput.value = beer.abv || '';
+            
+            // Hide dropdown
+            dropdown.style.display = 'none';
+            
+            // Add CSS class for visual feedback (proper way)
+            beerNameInput.classList.add('auto-filled');
+            beerStyleInput.classList.add('auto-filled');
+            beerABVInput.classList.add('auto-filled');
+            
+            // Remove the CSS class after 2 seconds
+            setTimeout(() => {
+                beerNameInput.classList.remove('auto-filled');
+                beerStyleInput.classList.remove('auto-filled');
+                beerABVInput.classList.remove('auto-filled');
+            }, 2000);
             
             showSuccessToast(`✅ Selected: ${beer.name} (${beer.abv}% ${beer.style})!`);
             
             // Focus format field since beer details are complete
             setTimeout(() => {
                 const formatField = document.getElementById('reportFormat');
-                formatField.focus();
+                if (formatField && !formatField.value) {
+                    formatField.focus();
+                }
             }, 300);
             
             trackEvent('beer_selected', 'Form Interaction', beer.name);
