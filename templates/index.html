@@ -1760,6 +1760,8 @@
                 const resultItem = createResultItemForOverlay(pub);
                 resultsList.appendChild(resultItem);
             });
+
+            console.log(`✅ Displayed ${pubs.length} results in overlay`);
         }
         
         // ================================
@@ -1770,7 +1772,7 @@
             const div = document.createElement('div');
             div.className = 'result-item';
             
-            // Calculate distance
+            // Calculate distance if available
             let distanceText = '';
             if (pub.distance !== undefined) {
                 distanceText = `<div class="result-distance">${pub.distance.toFixed(1)}km away</div>`;
@@ -2817,12 +2819,71 @@ function addSwipeGestures() {
                 return;
             }
             
+            console.log('🏠 Searching for pub name:', query);
+            
             closeSearchModal();
             
-            // Use your existing search logic but with name type  
-            performSearchWithState(query, 'name');
+            // Show results overlay immediately
+            showResultsOverlay(`Pub name: "${query}"`);
+            showResultsLoading('Searching for pubs...');
+            
+            // Perform the search
+            performNameSearch(query);
             
             trackEvent('search_by_name', 'Search', query);
+        }
+
+        // ================================
+        // ➕ ADD: New function to handle name search with your API
+        // ================================
+        
+        async function performNameSearch(query) {
+            console.log('🔍 Performing name search for:', query);
+            
+            try {
+                // Use your existing search API with name filter
+                const url = `/search?query=${encodeURIComponent(query)}&search_type=name&page=1`;
+                console.log('📡 API call:', url);
+                
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('📡 API response:', data);
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                const pubs = Array.isArray(data) ? data : data.pubs;
+                
+                if (pubs.length === 0) {
+                    showNoResults(`No pubs found matching "${query}"`);
+                    return;
+                }
+                
+                console.log(`✅ Found ${pubs.length} pubs matching "${query}"`);
+                
+                // Save state for back button
+                saveNameSearchState(query, pubs);
+                
+                // Display results
+                displayResultsInOverlay(pubs, `${pubs.length} pubs matching "${query}"`);
+                
+                // Success feedback
+                showSuccessToast(`✅ Found ${pubs.length} pubs matching "${query}"`);
+                
+                // Track success
+                trackSearch(query, 'name', pubs.length);
+                
+            } catch (error) {
+                console.error('❌ Error searching by name:', error);
+                showNoResults(`Error searching for "${query}". Please try again.`);
+                showSuccessToast(`❌ Error searching for "${query}"`);
+            }
         }
         
         function searchByBeer() {
