@@ -954,17 +954,75 @@
         }
 
         // ➕ ADD: New function to handle brewery selection
+        // ================================
+        // 🔄 REPLACE: Your selectBrewery function with this super simple test version
+        // This will help us debug what's happening
+        // ================================
+        
         function selectBrewery(brewery) {
-            document.getElementById('reportBrewery').value = brewery;
+            console.log('🍺 selectBrewery called with:', brewery);
+            
+            // Set brewery field
+            const breweryInput = document.getElementById('reportBrewery');
+            breweryInput.value = brewery;
+            console.log('✅ Set brewery to:', breweryInput.value);
+            
+            // Hide dropdown
             document.getElementById('breweryDropdown').style.display = 'none';
             
             // Clear dependent fields
-            document.getElementById('reportBeerName').value = '';
-            document.getElementById('reportBeerStyle').value = '';
-            document.getElementById('reportBeerABV').value = '';
+            const beerNameInput = document.getElementById('reportBeerName');
+            const beerStyleInput = document.getElementById('reportBeerStyle');
+            const beerABVInput = document.getElementById('reportBeerABV');
             
-            // Load beers for this brewery
-            loadBeersForBrewery(brewery);
+            beerNameInput.value = '';
+            beerStyleInput.value = '';
+            beerABVInput.value = '';
+            
+            console.log('✅ Cleared beer fields');
+            
+            // Test API call directly
+            console.log('🔍 Testing API call...');
+            fetch(`/api/brewery/${encodeURIComponent(brewery)}/beers`)
+                .then(response => {
+                    console.log('📡 API Response status:', response.status);
+                    return response.json();
+                })
+                .then(beers => {
+                    console.log('📊 API returned beers:', beers);
+                    console.log('📊 Number of beers:', beers.length);
+                    
+                    if (beers.length > 0) {
+                        const firstBeer = beers[0];
+                        console.log('🍺 First beer object:', firstBeer);
+                        
+                        // Try to set fields manually
+                        console.log('🔧 Trying to set beer name to:', firstBeer.name);
+                        beerNameInput.value = firstBeer.name || 'TEST NAME';
+                        
+                        console.log('🔧 Trying to set beer style to:', firstBeer.style);
+                        beerStyleInput.value = firstBeer.style || 'TEST STYLE';
+                        
+                        console.log('🔧 Trying to set beer ABV to:', firstBeer.abv);
+                        beerABVInput.value = firstBeer.abv || '5.0';
+                        
+                        // Force trigger input events
+                        beerNameInput.dispatchEvent(new Event('input'));
+                        beerStyleInput.dispatchEvent(new Event('input'));
+                        beerABVInput.dispatchEvent(new Event('input'));
+                        
+                        console.log('✅ Finished setting fields');
+                        
+                        showSuccessToast(`🔍 Test: Found ${beers.length} beers for ${brewery}`);
+                    } else {
+                        console.log('❌ No beers found');
+                        showSuccessToast(`❌ No beers found for ${brewery}`);
+                    }
+                })
+                .catch(error => {
+                    console.error('❌ API Error:', error);
+                    showSuccessToast(`❌ API Error: ${error.message}`);
+                });
             
             trackEvent('brewery_selected', 'Form Interaction', brewery);
         }
