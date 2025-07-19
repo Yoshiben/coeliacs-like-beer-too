@@ -122,12 +122,24 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title">🗺️ Search by Area</h3>
-                <p class="modal-subtitle">Enter city or postcode to find pubs in the region</p>
+                <p class="modal-subtitle">Find pubs in a specific location</p>
             </div>
-            <input type="text" class="form-input" placeholder="e.g. Leeds, SW1A 1AA, HX6" id="locationInput">
+            
+            <!-- Search Type Selector -->
+            <div class="form-group">
+                <label class="form-label">Search by:</label>
+                <select id="areaSearchType" class="form-select" onchange="updateAreaPlaceholder()">
+                    <option value="postcode">📮 Postcode (e.g. SW1A 1AA, M1 1AA)</option>
+                    <option value="city">🏙️ City/Region (e.g. Manchester, Yorkshire)</option>
+                </select>
+            </div>
+            
+            <!-- Search Input -->
+            <input type="text" class="form-input" placeholder="Enter postcode..." id="areaInput">
+            
             <div class="modal-actions">
                 <button class="btn btn-secondary" onclick="closeSearchModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="searchByLocation()">Search</button>
+                <button class="btn btn-primary" onclick="searchByArea()">Search</button>
             </div>
         </div>
     </div>
@@ -880,6 +892,7 @@
         let brewerySearchTimeout;
         let beerSearchTimeout;
         let styleSearchTimeout;
+        
 
         // ================================
         // ➕ ADD - NEW AUTO-COMPLETE FUNCTIONS
@@ -2285,13 +2298,21 @@ function addSwipeGestures() {
             setTimeout(() => {
                 document.getElementById(modalId).style.display = 'flex';
                 
-                // Focus the input after modal opens for better UX
-                setTimeout(() => {
-                    const input = document.querySelector(`#${modalId} .form-input`);
-                    if (input) {
-                        input.focus();
-                    }
-                }, 100);
+                // Handle area modal specially
+                if (modalId === 'areaModal') {
+                    // Initialize area modal with proper placeholder
+                    setTimeout(() => {
+                        initializeAreaModal();
+                    }, 100);
+                } else {
+                    // Focus other modal inputs normally
+                    setTimeout(() => {
+                        const input = document.querySelector(`#${modalId} .form-input`);
+                        if (input) {
+                            input.focus();
+                        }
+                    }, 100);
+                }
             }, 150); // Just enough to let highlight animation complete
         }
 
@@ -2984,20 +3005,212 @@ function addSwipeGestures() {
             
             trackEvent('search_by_beer', 'Search', query);
         }
+
+        // Initialize the area modal when it opens
+        function initializeAreaModal() {
+            // Set default placeholder
+            updateAreaPlaceholder();
+            
+            // Clear any previous input
+            document.getElementById('areaInput').value = '';
+            
+            // Focus the input field
+            setTimeout(() => {
+                document.getElementById('areaInput').focus();
+            }, 200);
+        }
+        
+        // ================================
+        // ➕ ADD: Function to update placeholder based on search type
+        // ================================
+        
+        function updateAreaPlaceholder() {
+            const searchType = document.getElementById('areaSearchType').value;
+            const input = document.getElementById('areaInput');
+            
+            if (searchType === 'postcode') {
+                input.placeholder = 'Enter postcode (e.g. SW1A 1AA, M1 1AA, HX6...)';
+                input.setAttribute('pattern', '[A-Za-z]{1,2}[0-9Rr][0-9A-Za-z]? ?[0-9][ABD-HJLNP-UW-Zabd-hjlnp-uw-z]{2}');
+                console.log('📮 Switched to postcode mode');
+            } else {
+                input.placeholder = 'Enter city or region (e.g. Manchester, Yorkshire, Leeds)';
+                input.removeAttribute('pattern');
+                console.log('🏙️ Switched to city mode');
+            }
+        }
+        
+        // ================================
+        // 🔄 REPLACE: Your searchByArea function with this enhanced version
+        // ================================
         
         function searchByArea() {
             const query = document.getElementById('areaInput').value.trim();
+            const searchType = document.getElementById('areaSearchType').value;
+            
             if (!query) {
-                showSuccessToast('Please enter an area to browse');
+                showSuccessToast('Please enter a location to search');
                 return;
             }
             
+            console.log(`🗺️ Searching by ${searchType}:`, query);
+            
             closeSearchModal();
             
-            // Use your existing search logic but with area type
-            performSearchWithState(query, 'area');
+            // Show results overlay immediately
+            const searchTypeText = searchType === 'postcode' ? 'postcode' : 'area';
+            showResultsOverlay(`${searchTypeText}: "${query}"`);
+            showResultsLoading('Finding pubs in this area...');
             
-            trackEvent('search_by_area', 'Search', query);
+            // Perform the appropriate search
+            if (searchType === 'postcode') {
+                performPostcodeSearch(query);
+            } else {
+                performCitySearch(query);
+            }
+            
+            trackEvent('search_by_area', 'Search', `${searchType}:${query}`);
+        }
+        
+        // ================================
+        // ➕ ADD: Postcode search with geocoding + nearby search
+        // ================================
+        
+        async function performPostcodeSearch(postcode) {
+            console.log('📮 Performing postcode search for:', postcode);
+            
+            try {
+                // First, geocode the postcode
+                showResultsLoading('Finding postcode location...');
+                console.log('🔍 Geocoding postcode...');
+                
+                const geocodeResponse = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(postcode)}&countrycodes=gb&limit=1`);
+                const geocodeData = await geocodeResponse.json();
+                
+                if (!geocodeData || geocodeData.length === 0) {
+                    throw new Error('Postcode not found');
+                }
+                
+                const lat = parseFloat(geocodeData[0].lat);
+                const lng = parseFloat(geocodeData[0].lon);
+                const locationName = geocodeData[0].display_name;
+                
+                console.log(`✅ Postcode geocoded to: ${lat}, ${lng}`);
+                
+                // Now search for nearby pubs
+                showResultsLoading('Finding pubs near this postcode...');
+                
+                const radius = 5; // km - reasonable radius for postcode search
+                const url = `/nearby?lat=${lat}&lng=${lng}&radius=${radius}`;
+                console.log('📡 API call:', url);
+                
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const pubs = await response.json();
+                console.log('📡 API response:', pubs);
+                
+                if (pubs.length === 0) {
+                    showNoResults(`No pubs found within ${radius}km of ${postcode}`);
+                    return;
+                }
+                
+                console.log(`✅ Found ${pubs.length} pubs near ${postcode}`);
+                
+                // Save state for back button
+                saveAreaSearchState(`${postcode} (postcode)`, pubs);
+                
+                // Display results
+                displayResultsInOverlay(pubs, `${pubs.length} pubs near ${postcode} (${radius}km radius)`);
+                
+                // Success feedback
+                showSuccessToast(`✅ Found ${pubs.length} pubs near ${postcode}`);
+                
+                // Track success
+                trackSearch(postcode, 'postcode', pubs.length);
+                
+            } catch (error) {
+                console.error('❌ Error searching by postcode:', error);
+                showNoResults(`Could not find location for "${postcode}". Please check the postcode and try again.`);
+                showSuccessToast(`❌ Could not find postcode "${postcode}"`);
+            }
+        }
+        
+        // ================================
+        // ➕ ADD: City/region search using your database
+        // ================================
+        
+        async function performCitySearch(city) {
+            console.log('🏙️ Performing city search for:', city);
+            
+            try {
+                // Use your existing search API with area filter
+                const url = `/search?query=${encodeURIComponent(city)}&search_type=area&page=1`;
+                console.log('📡 API call:', url);
+                
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('📡 API response:', data);
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                let pubs = Array.isArray(data) ? data : data.pubs;
+                
+                if (pubs.length === 0) {
+                    showNoResults(`No pubs found in "${city}"`);
+                    return;
+                }
+                
+                // Sort by proximity if we have user location
+                if (userLocation) {
+                    pubs = pubs.map(pub => {
+                        if (pub.latitude && pub.longitude) {
+                            pub.distance = calculateDistance(
+                                userLocation.lat, userLocation.lng,
+                                parseFloat(pub.latitude), parseFloat(pub.longitude)
+                            );
+                        } else {
+                            pub.distance = 999;
+                        }
+                        return pub;
+                    });
+                    
+                    pubs.sort((a, b) => a.distance - b.distance);
+                    console.log('📍 Sorted results by proximity to user');
+                }
+                
+                console.log(`✅ Found ${pubs.length} pubs in ${city}`);
+                
+                // Save state for back button
+                saveAreaSearchState(`${city} (city)`, pubs);
+                
+                // Display results
+                const titleText = userLocation ? 
+                    `${pubs.length} pubs in ${city} (nearest first)` :
+                    `${pubs.length} pubs in ${city}`;
+                    
+                displayResultsInOverlay(pubs, titleText);
+                
+                // Success feedback
+                showSuccessToast(`✅ Found ${pubs.length} pubs in ${city}`);
+                
+                // Track success
+                trackSearch(city, 'city', pubs.length);
+                
+            } catch (error) {
+                console.error('❌ Error searching by city:', error);
+                showNoResults(`Error searching for "${city}". Please try again.`);
+                showSuccessToast(`❌ Error searching for "${city}"`);
+            }
         }
 
         // ➕ ADD NEW - Enhanced performSearch that saves state
