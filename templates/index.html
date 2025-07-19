@@ -2837,12 +2837,30 @@ function addSwipeGestures() {
         // ➕ ADD: New function to handle name search with your API
         // ================================
         
+        // ================================
+        // 🔄 REPLACE: Your performNameSearch function with proximity ordering
+        // ================================
+        
         async function performNameSearch(query) {
             console.log('🔍 Performing name search for:', query);
             
             try {
-                // Use your existing search API with name filter
-                const url = `/search?query=${encodeURIComponent(query)}&search_type=name&page=1`;
+                let url = `/search?query=${encodeURIComponent(query)}&search_type=name&page=1`;
+                
+                // Add user location if available for distance calculation
+                if (userLocation) {
+                    url += `&lat=${userLocation.lat}&lng=${userLocation.lng}`;
+                    console.log('📍 Including user location for proximity ordering');
+                } else {
+                    console.log('📍 No user location available - will try to get it');
+                    // Try to get location for better ordering
+                    await tryToGetUserLocation();
+                    if (userLocation) {
+                        url += `&lat=${userLocation.lat}&lng=${userLocation.lng}`;
+                        console.log('📍 Got location and added to search');
+                    }
+                }
+                
                 console.log('📡 API call:', url);
                 
                 const response = await fetch(url);
@@ -2858,11 +2876,32 @@ function addSwipeGestures() {
                     throw new Error(data.error);
                 }
                 
-                const pubs = Array.isArray(data) ? data : data.pubs;
+                let pubs = Array.isArray(data) ? data : data.pubs;
                 
                 if (pubs.length === 0) {
                     showNoResults(`No pubs found matching "${query}"`);
                     return;
+                }
+                
+                // If we have user location, calculate distances and sort
+                if (userLocation) {
+                    pubs = pubs.map(pub => {
+                        if (pub.latitude && pub.longitude) {
+                            pub.distance = calculateDistance(
+                                userLocation.lat, userLocation.lng,
+                                parseFloat(pub.latitude), parseFloat(pub.longitude)
+                            );
+                        } else {
+                            pub.distance = 999; // Put pubs without coordinates at the end
+                        }
+                        return pub;
+                    });
+                    
+                    // Sort by distance (closest first)
+                    pubs.sort((a, b) => a.distance - b.distance);
+                    console.log('📍 Sorted results by proximity');
+                } else {
+                    console.log('📍 No user location - showing results without distance ordering');
                 }
                 
                 console.log(`✅ Found ${pubs.length} pubs matching "${query}"`);
@@ -2871,10 +2910,17 @@ function addSwipeGestures() {
                 saveNameSearchState(query, pubs);
                 
                 // Display results
-                displayResultsInOverlay(pubs, `${pubs.length} pubs matching "${query}"`);
+                const titleText = userLocation ? 
+                    `${pubs.length} pubs matching "${query}" (nearest first)` :
+                    `${pubs.length} pubs matching "${query}"`;
+                    
+                displayResultsInOverlay(pubs, titleText);
                 
                 // Success feedback
-                showSuccessToast(`✅ Found ${pubs.length} pubs matching "${query}"`);
+                const successText = userLocation ?
+                    `✅ Found ${pubs.length} pubs matching "${query}" - sorted by distance` :
+                    `✅ Found ${pubs.length} pubs matching "${query}"`;
+                showSuccessToast(successText);
                 
                 // Track success
                 trackSearch(query, 'name', pubs.length);
@@ -2884,6 +2930,44 @@ function addSwipeGestures() {
                 showNoResults(`Error searching for "${query}". Please try again.`);
                 showSuccessToast(`❌ Error searching for "${query}"`);
             }
+        }
+        
+        // ================================
+        // ➕ ADD: Helper function to try getting user location for better ordering
+        // ================================
+        
+        async function tryToGetUserLocation() {
+            if (userLocation) return; // Already have it
+            
+            return new Promise((resolve) => {
+                if (!navigator.geolocation) {
+                    console.log('📍 Geolocation not supported');
+                    resolve();
+                    return;
+                }
+                
+                console.log('📍 Attempting to get user location for proximity ordering...');
+                
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        userLocation = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude
+                        };
+                        console.log('✅ Got user location for proximity:', userLocation);
+                        resolve();
+                    },
+                    (error) => {
+                        console.log('📍 Could not get location:', error.message);
+                        resolve(); // Don't fail the search, just continue without location
+                    },
+                    {
+                        enableHighAccuracy: false, // Faster, less accurate is fine for ordering
+                        timeout: 3000, // Quick timeout so we don't delay search
+                        maximumAge: 600000 // Use cached location up to 10 minutes old
+                    }
+                );
+            });
         }
         
         function searchByBeer() {
@@ -3119,14 +3203,14 @@ function addSwipeGestures() {
 
         // Calculate distance between two points
         function calculateDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371;
+            const R = 6371; // Earth's radius in kilometers
             const dLat = (lat2 - lat1) * Math.PI / 180;
             const dLon = (lon2 - lon1) * Math.PI / 180;
             const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
                       Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
                       Math.sin(dLon/2) * Math.sin(dLon/2);
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return R * c;
+            return R * c; // Distance in kilometers
         }
 
         // ENHANCED centerOnLocation with smart map showing
