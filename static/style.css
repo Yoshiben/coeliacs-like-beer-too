@@ -2972,11 +2972,11 @@ body {
 .photo-upload-compact {
     display: flex;
     align-items: center;
-    gap: var(--space-sm);
-    padding: var(--space-sm) var(--space-md);
-    border: 1px solid var(--photo-upload-border);
+    justify-content: center;
+    padding: var(--space-md);
+    border: 2px dashed var(--border-light);
     border-radius: var(--radius);
-    background: var(--photo-upload-bg);
+    background: var(--bg-section);
     cursor: pointer;
     transition: all var(--transition);
     min-height: 44px;
@@ -2989,14 +2989,13 @@ body {
 }
 
 .photo-upload-compact.active {
-    border-color: var(--photo-upload-active-border);
-    background: var(--photo-upload-active);
+    border-color: var(--success-border);
+    background: var(--success-bg);
 }
 
 .photo-upload-icon {
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     color: var(--text-muted);
-    min-width: 20px;
 }
 
 .photo-upload-text {
@@ -3863,15 +3862,13 @@ body {
     }
     
     .photo-upload-compact {
-        padding: var(--space-xs) var(--space-sm);
-        gap: var(--space-xs);
         min-height: 40px;
         max-height: 40px;
+        padding: var(--space-sm);
     }
     
     .photo-upload-icon {
-        font-size: 1rem;
-        min-width: 16px;
+        font-size: 1.2rem;
     }
     
     .photo-upload-text {
