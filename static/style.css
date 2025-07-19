@@ -3947,10 +3947,74 @@ body {
 }
 
 /* ================================
-   REPORT MODAL MOBILE OPTIMIZATIONS
-   🔧 ACTION: ADD this section to style.css
-   📍 LOCATION: Add after the base report modal styles
+   ➕ ADD: Beautiful spacing for area search modal
+   Add this to your CSS after your existing modal styles
    ================================ */
+
+/* Enhanced area modal spacing */
+#areaModal .form-group {
+    margin-bottom: var(--space-xl); /* More space between dropdown and input */
+}
+
+#areaModal .form-select {
+    background: linear-gradient(135deg, var(--bg-white) 0%, var(--bg-section) 100%);
+    border: 2px solid var(--primary-border);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition);
+}
+
+#areaModal .form-select:focus {
+    border-color: var(--primary-color, #667eea);
+    box-shadow: 
+        0 0 0 3px rgba(102, 126, 234, 0.1),
+        0 0 20px rgba(102, 126, 234, 0.2);
+    transform: translateY(-1px);
+}
+
+#areaModal .form-input {
+    margin-top: var(--space-lg); /* Extra space above input */
+    background: var(--bg-white);
+    border: 2px solid var(--border-light);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition);
+}
+
+#areaModal .form-input:focus {
+    border-color: var(--primary-color, #667eea);
+    box-shadow: 
+        0 0 0 3px rgba(102, 126, 234, 0.1),
+        0 0 20px rgba(102, 126, 234, 0.3),
+        inset 0 1px 3px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+/* Enhanced modal header spacing */
+#areaModal .modal-header {
+    padding-bottom: var(--space-2xl);
+    border-bottom: 2px solid var(--divider-color);
+}
+
+#areaModal .modal-subtitle {
+    margin-top: var(--space-sm);
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    opacity: 0.8;
+}
+
+/* Beautiful button spacing */
+#areaModal .modal-actions {
+    margin-top: var(--space-2xl);
+    padding-top: var(--space-xl);
+    border-top: 1px solid var(--divider-color);
+}
+
+/* Select dropdown arrow styling */
+#areaSearchType {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23667eea' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 12px center;
+    background-repeat: no-repeat;
+    background-size: 16px 16px;
+}
 
 /* ================================
    MOBILE RESPONSIVE - TABLETS
@@ -4133,8 +4197,23 @@ body {
         padding: var(--space-md);
     }
 
-   
+   #areaModal .form-group {
+        margin-bottom: var(--space-lg);
+    }
     
+    #areaModal .form-input {
+        margin-top: var(--space-md);
+    }
+    
+    #areaModal .modal-header {
+        padding-bottom: var(--space-lg);
+    }
+    
+    #areaModal .modal-actions {
+        margin-top: var(--space-lg);
+        padding-top: var(--space-md);
+    }
+  
     /* Dropdown suggestions mobile optimization */
     .brewery-suggestions,
     .beer-suggestions,
