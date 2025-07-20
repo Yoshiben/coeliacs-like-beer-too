@@ -1779,12 +1779,16 @@
         function resetHomepageToCleanState() {
             console.log('🧹 Resetting homepage to clean state');
             
-            // Force remove any modal/overlay classes from body
+            // CRITICAL: Add homepage class to body and remove problematic ones
+            document.body.classList.add('homepage-active');
             document.body.classList.remove('pub-details-open');
+            
+            // Force remove any overlay styling
             document.body.style.overflow = '';
             document.body.style.position = '';
             document.body.style.width = '';
             document.body.style.height = '';
+            document.body.style.paddingBottom = '0';
             
             // Hide map if visible
             const mapContainer = document.getElementById('mapContainer');
@@ -1792,28 +1796,25 @@
                 mapContainer.style.display = 'none';
                 mapVisible = false;
                 
-                // Update toggle button text if it exists
                 const toggleBtn = document.getElementById('toggleMapBtn');
                 if (toggleBtn) {
                     toggleBtn.innerHTML = '🗺️ Show Map';
                 }
             }
             
-            // Show features and activity sections with clean styling
+            // Show features and activity sections
             const featuresSection = document.getElementById('featuresSection');
             const activitySection = document.getElementById('activitySection');
             
             if (featuresSection) {
                 featuresSection.style.display = 'block';
                 featuresSection.style.marginTop = '0';
-                featuresSection.style.paddingTop = '0';
                 featuresSection.classList.remove('map-hidden');
             }
             
             if (activitySection) {
                 activitySection.style.display = 'block';
                 activitySection.style.marginTop = '0';
-                activitySection.style.paddingTop = '0';
             }
             
             // Hide results section if visible
@@ -1822,14 +1823,15 @@
                 resultsSection.style.display = 'none';
             }
             
-            // Reset search section margin to default
+            // CRITICAL: Reset search section to proper homepage state
             const searchSection = document.getElementById('search');
             if (searchSection) {
                 searchSection.style.marginTop = '-20px';
-                searchSection.style.paddingTop = '0';
+                searchSection.style.marginBottom = 'calc(-1 * var(--space-4xl))';
+                searchSection.classList.add('homepage-search');
             }
             
-            // Clear any search state
+            // Clear search state
             currentQuery = '';
             currentSearchType = 'all';
             currentPage = 1;
@@ -1839,11 +1841,27 @@
                 window.location.hash = '';
             }
             
-            // Force scroll to top
-            window.scrollTo({ top: 0, behavior: 'auto' });
-            
-            console.log('✅ Homepage reset to clean search state');
+            console.log('✅ Homepage reset with body class homepage-active');
         }
+        
+        // ================================
+        // ➕ ADD: Initialize homepage state on page load
+        // Add this to your DOMContentLoaded event listener
+        // ================================
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Page loaded, setting homepage state...');
+            
+            // Set initial homepage state
+            document.body.classList.add('homepage-active');
+            
+            // Your existing DOMContentLoaded code...
+            loadStats();
+            initMobileFeedback();
+            
+            console.log('✅ Homepage state initialized');
+        });
+
 
         // 📝 ADD NEW - Better debugging for the location issue
         function debugLocationState() {
@@ -2627,15 +2645,16 @@ function addSwipeGestures() {
             // Close any open overlays
             closeResults();
             closePubDetails();
-            
-            // Close any search modals
             closeSearchModal();
             
-            // Additional cleanup for navigation from other pages
+            // Close any modals
             const allModals = document.querySelectorAll('.modal');
             allModals.forEach(modal => {
                 modal.style.display = 'none';
             });
+            
+            // Set homepage body class
+            document.body.classList.add('homepage-active');
             
             // Force clean state
             resetHomepageToCleanState();
