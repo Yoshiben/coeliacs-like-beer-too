@@ -4101,6 +4101,37 @@ body {
 }
 
 /* ================================
+   ➕ ADD: Body reset styles to static/style.css
+   Add this to your CSS file after existing body styles
+   ================================ */
+
+/* Force body reset when returning to homepage */
+body.homepage-clean {
+    overflow: auto !important;
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    background: var(--primary-gradient) !important;
+}
+
+/* Ensure no lingering overlay backgrounds */
+body::after {
+    display: none !important;
+}
+
+/* Reset any transform or positioning issues */
+body > * {
+    transform: none !important;
+}
+
+/* Mobile safari viewport fix */
+@supports (-webkit-touch-callout: none) {
+    body.homepage-clean {
+        min-height: -webkit-fill-available !important;
+    }
+}
+
+/* ================================
    MOBILE RESPONSIVE - TABLETS
    ================================ */
 @media (max-width: 768px) {
