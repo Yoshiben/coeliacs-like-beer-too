@@ -130,17 +130,31 @@
         </div>
     </div>
 
-    <!-- Admin Review Modal -->
-    <div id="adminReviewModal" class="modal" style="display: none;">
-        <div class="modal-content" style="max-width: 800px; max-height: 90vh; overflow-y: auto;">
+    !-- Beautiful Admin Review Modal (copied from your working pattern) -->
+    <div id="adminReviewModal" class="modal">
+        <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title" id="adminModalTitle">Manual Reviews</h2>
+                <h2 class="modal-title" id="adminModalTitle">📋 Admin Review</h2>
                 <button class="modal-close" onclick="closeAdminModal()" aria-label="Close modal">&times;</button>
             </div>
             
             <div class="modal-body">
-                <div id="adminModalContent" class="submissions-container">
-                    <div class="loading-state">Loading...</div>
+                <!-- Loading State -->
+                <div id="adminModalLoading" class="loading-state" style="text-align: center; padding: var(--space-4xl);">
+                    <div class="spinner" style="margin: 0 auto var(--space-lg); width: 40px; height: 40px; border: 3px solid var(--primary-bg); border-top: 3px solid var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite;"></div>
+                    <div class="loading-text" style="color: var(--text-secondary); font-size: var(--text-lg);">Loading submissions...</div>
+                </div>
+                
+                <!-- Content Container -->
+                <div id="adminModalContent" class="submissions-container" style="display: none;">
+                    <!-- Submissions will be loaded here -->
+                </div>
+                
+                <!-- Empty State -->
+                <div id="adminModalEmpty" class="empty-state" style="display: none; text-align: center; padding: var(--space-4xl); color: var(--success-color);">
+                    <div style="font-size: 3rem; margin-bottom: var(--space-lg);">🎉</div>
+                    <div style="font-size: var(--text-xl); font-weight: 600; margin-bottom: var(--space-sm);">All caught up!</div>
+                    <div style="color: var(--text-secondary);">No pending submissions to review.</div>
                 </div>
             </div>
         </div>
