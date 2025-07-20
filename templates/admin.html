@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍺 Beer Validation Admin - Coeliacs Like Beer Too</title>
+    
+    <!-- Use your existing design system -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v={{ cache_buster }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}?v={{ cache_buster }}">
+    
+    <!-- Admin-specific meta -->
+    <meta name="robots" content="noindex, nofollow">
+</head>
+<body class="admin-body">
+    
+    <!-- Admin Header -->
+    <div class="admin-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <h1 class="admin-title">🍺 Beer Validation Admin</h1>
+                    <p class="admin-subtitle">Manage beer and pub submissions for Coeliacs Like Beer Too</p>
+                </div>
+                <div class="header-right">
+                    <a href="/" class="btn btn-secondary btn-sm">🏠 Back to Site</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Stats Dashboard -->
+    <div class="admin-section">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card stat-card-danger">
+                    <div class="stat-icon">⚠️</div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="pendingManualCount">-</div>
+                        <div class="stat-label">Pending Manual Review</div>
+                    </div>
+                </div>
+                <div class="stat-card stat-card-warning">
+                    <div class="stat-icon">⏰</div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="pendingSoftCount">-</div>
+                        <div class="stat-label">Soft Validation Queue</div>
+                    </div>
+                </div>
+                <div class="stat-card stat-card-primary">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="todaySubmissions">-</div>
+                        <div class="stat-label">Today's Submissions</div>
+                    </div>
+                </div>
+                <div class="stat-card stat-card-success">
+                    <div class="stat-icon">⚡</div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="autoApprovedToday">-</div>
+                        <div class="stat-label">Auto-Approved Today</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Navigation Tabs -->
+    <div class="admin-section">
+        <div class="container">
+            <div class="admin-tabs">
+                <button class="admin-tab active" onclick="switchTab('manual')" id="manual-tab-btn">
+                    ⚠️ Manual Review (<span id="manual-count">0</span>)
+                </button>
+                <button class="admin-tab" onclick="switchTab('soft')" id="soft-tab-btn">
+                    ⏰ Soft Validation (<span id="soft-count">0</span>)
+                </button>
+                <button class="admin-tab" onclick="switchTab('recent')" id="recent-tab-btn">
+                    📊 Recent Activity
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tab Content -->
+    <div class="admin-section">
+        <div class="container">
+            
+            <!-- Manual Review Tab -->
+            <div id="manual-content" class="tab-content active">
+                <div class="tab-header">
+                    <h2 class="tab-title">⚠️ Manual Review Required</h2>
+                    <p class="tab-description">New pubs, new breweries, or suspicious submissions that need human review.</p>
+                </div>
+                <div id="manualReviewList" class="submissions-container">
+                    <div class="loading-state">Loading manual reviews...</div>
+                </div>
+            </div>
+            
+            <!-- Soft Validation Tab -->
+            <div id="soft-content" class="tab-content">
+                <div class="tab-header">
+                    <h2 class="tab-title">⏰ Soft Validation Queue</h2>
+                    <p class="tab-description">Known pubs with new beers from known breweries. Auto-approved after 24 hours unless flagged.</p>
+                </div>
+                <div id="softValidationList" class="submissions-container">
+                    <div class="loading-state">Loading soft validation queue...</div>
+                </div>
+            </div>
+            
+            <!-- Recent Activity Tab -->
+            <div id="recent-content" class="tab-content">
+                <div class="tab-header">
+                    <h2 class="tab-title">📊 Recent Activity</h2>
+                    <p class="tab-description">All submissions from the last 7 days across all validation tiers.</p>
+                </div>
+                <div id="recentActivityList" class="submissions-container">
+                    <div class="loading-state">Loading recent activity...</div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    
+    <!-- Success/Error Toast -->
+    <div id="adminToast" class="admin-toast" style="display: none;">
+        <div class="toast-content">
+            <span class="toast-icon" id="toastIcon">✅</span>
+            <span class="toast-message" id="toastMessage">Success!</span>
+        </div>
+    </div>
+    
+    <!-- Include your JavaScript -->
+    <script src="{{ url_for('static', filename='admin.js') }}?v={{ cache_buster }}"></script>
+</body>
+</html>
