@@ -291,3 +291,203 @@ class BeerValidationEngine:
             'pub_data': pub_status,
             'beer_data': beer_status
         }
+
+# ================================================================================
+# 🔧 ACTION: ADD this to the bottom of your validation_engine.py file
+# This is the "action taker" that does the actual work after validation
+# ================================================================================
+
+class SubmissionProcessor:
+    """
+    The action taker: After the validation engine decides what tier,
+    this class actually does the work:
+    - Stores the submission in database
+    - Updates pub data (for Tier 1)
+    - Queues items for review (for Tier 2 & 3)
+    """
+    
+    def __init__(self, db_config):
+        self.db_config = db_config
+        self.validation_engine = BeerValidationEngine(db_config)
+        self.logger = logging.getLogger(__name__)
+    
+    def process_submission(self, submission_data, user_info=None):
+        """
+        Main entry point: Takes user submission, validates it, then acts on it
+        
+        Args:
+            submission_data: Dictionary with pub/beer info from user form
+            user_info: Dictionary with user IP, user agent, etc.
+            
+        Returns:
+            Dictionary with success/failure and submission details
+        """
+        try:
+            # Step 1: Let the smart brain validate it
+            validation_result = self.validation_engine.validate_submission(submission_data)
+            
+            # Step 2: Store the submission in our database (always)
+            submission_id = self._store_submission(submission_data, validation_result, user_info)
+            
+            # Step 3: Take action based on what the brain decided
+            if validation_result['action'] == 'update_database':
+                # Tier 1: Update database immediately
+                self._update_database_immediately(submission_data, validation_result)
+                
+            elif validation_result['action'] == 'queue_soft_validation':
+                # Tier 2: Queue for auto-approval in 24 hours
+                self._queue_soft_validation(submission_id, validation_result)
+                
+            elif validation_result['action'] == 'queue_manual_review':
+                # Tier 3: Queue for human review
+                self._queue_manual_review(submission_id, validation_result)
+            
+            # Step 4: Return result to user
+            return {
+                'success': True,
+                'submission_id': submission_id,
+                'validation_result': validation_result
+            }
+            
+        except Exception as e:
+            self.logger.error(f"Submission processing error: {str(e)}")
+            return {
+                'success': False,
+                'error': 'Failed to process submission',
+                'details': str(e)
+            }
+    
+    def _store_submission(self, submission_data, validation_result, user_info):
+        """
+        Store every submission in the submissions table for tracking
+        Even if it's auto-approved, we keep a record
+        """
+        
+        conn = mysql.connector.connect(**self.db_config)
+        cursor = conn.cursor()
+        
+        try:
+            cursor.execute("""
+                INSERT INTO submissions 
+                (pub_id, pub_name, address, postcode, brewery, beer_name, 
+                 beer_style, beer_abv, beer_format, validation_tier, 
+                 validation_status, user_ip, user_agent, submission_time)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
+            """, (
+                submission_data.get('pub_id'),
+                submission_data.get('pub_name'),
+                submission_data.get('address'),
+                submission_data.get('postcode'),
+                submission_data.get('brewery'),
+                submission_data.get('beer_name'),
+                submission_data.get('beer_style'),
+                submission_data.get('beer_abv'),
+                submission_data.get('beer_format'),
+                validation_result['tier'],
+                validation_result['status'],
+                user_info.get('ip') if user_info else None,
+                user_info.get('user_agent') if user_info else None
+            ))
+            
+            submission_id = cursor.lastrowid
+            conn.commit()
+            return submission_id
+            
+        finally:
+            cursor.close()
+            conn.close()
+    
+    def _update_database_immediately(self, submission_data, validation_result):
+        """
+        For Tier 1 (auto-approved): Update the main database right now
+        - Mark the pub as having this beer format
+        - Add to pubs_updates table with specific beer details
+        """
+        
+        conn = mysql.connector.connect(**self.db_config)
+        cursor = conn.cursor()
+        
+        try:
+            pub_id = validation_result['pub_data']['pub_id']
+            beer_format = submission_data['beer_format']
+            
+            # Update the pub's beer format availability (bottle, tap, cask, can)
+            # This uses the fixed CASE statement from our stored procedure
+            if beer_format == 'bottle':
+                cursor.execute("UPDATE pubs SET bottle = 1 WHERE pub_id = %s", (pub_id,))
+            elif beer_format == 'tap':
+                cursor.execute("UPDATE pubs SET tap = 1 WHERE pub_id = %s", (pub_id,))
+            elif beer_format == 'cask':
+                cursor.execute("UPDATE pubs SET cask = 1 WHERE pub_id = %s", (pub_id,))
+            elif beer_format == 'can':
+                cursor.execute("UPDATE pubs SET can = 1 WHERE pub_id = %s", (pub_id,))
+            
+            # If we know the specific beer, add to pubs_updates table
+            if validation_result['beer_data']['status'] == 'existing':
+                beer_id = validation_result['beer_data']['beer_id']
+                
+                cursor.execute("""
+                    INSERT INTO pubs_updates (pub_id, beer_id, beer_format, update_time)
+                    VALUES (%s, %s, %s, NOW())
+                    ON DUPLICATE KEY UPDATE 
+                    update_time = NOW()
+                """, (pub_id, beer_id, beer_format))
+            
+            conn.commit()
+            self.logger.info(f"Auto-approved update applied to pub {pub_id}")
+            
+        finally:
+            cursor.close()
+            conn.close()
+    
+    def _queue_soft_validation(self, submission_id, validation_result):
+        """
+        For Tier 2: Queue for auto-approval after 24 hours
+        Unless someone flags it in the meantime
+        """
+        
+        conn = mysql.connector.connect(**self.db_config)
+        cursor = conn.cursor()
+        
+        try:
+            # Calculate when it should be auto-approved (24 hours from now)
+            approval_time = datetime.now() + timedelta(hours=validation_result['delay_hours'])
+            
+            cursor.execute("""
+                INSERT INTO validation_queue 
+                (submission_id, validation_type, scheduled_approval_time, status)
+                VALUES (%s, 'soft_validation', %s, 'pending')
+            """, (submission_id, approval_time))
+            
+            conn.commit()
+            self.logger.info(f"Submission {submission_id} queued for soft validation")
+            
+        finally:
+            cursor.close()
+            conn.close()
+    
+    def _queue_manual_review(self, submission_id, validation_result):
+        """
+        For Tier 3: Queue for human review
+        Shows up in admin dashboard
+        """
+        
+        conn = mysql.connector.connect(**self.db_config)
+        cursor = conn.cursor()
+        
+        try:
+            cursor.execute("""
+                INSERT INTO validation_queue 
+                (submission_id, validation_type, review_reasons, status)
+                VALUES (%s, 'manual_review', %s, 'pending')
+            """, (submission_id, ",".join(validation_result['reasons'])))
+            
+            conn.commit()
+            self.logger.info(f"Submission {submission_id} queued for manual review")
+            
+            # TODO: Could send email notification to admin here
+            # self._send_admin_notification(submission_id, validation_result)
+            
+        finally:
+            cursor.close()
+            conn.close()
