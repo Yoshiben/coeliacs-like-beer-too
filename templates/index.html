@@ -858,8 +858,9 @@
     </div>
 
     <!-- Bottom Navigation Bar -->
+    <!-- Bottom Navigation Bar -->
     <nav class="bottom-nav">
-        <a href="/" class="nav-item active">
+        <a href="#" onclick="return handleHomeButtonClick(event)" class="nav-item active">
             <div class="nav-icon">🏠</div>
             <div class="nav-label">Home</div>
         </a>
@@ -874,12 +875,12 @@
             <div class="nav-label">Breweries</div>
         </a>
         
-        <a href="/about" class="nav-item">
+        <a href="#" onclick="showAboutUs(); return false;" class="nav-item">
             <div class="nav-icon">ℹ️</div>
             <div class="nav-label">About</div>
         </a>
         
-        <a href="/more" class="nav-item">
+        <a href="#" onclick="showComingSoon('More Features'); return false;" class="nav-item">
             <div class="nav-icon">⋯</div>
             <div class="nav-label">More</div>
         </a>
@@ -1744,17 +1745,28 @@
             console.log('🏠 Closing results and returning to homepage');
             
             // Close results overlay
-            document.getElementById('resultsOverlay').classList.remove('active');
+            const resultsOverlay = document.getElementById('resultsOverlay');
+            if (resultsOverlay) {
+                resultsOverlay.classList.remove('active');
+            }
             
-            // Restore background scrolling
+            // CRITICAL: Remove all body classes and restore scrolling
+            document.body.classList.remove('pub-details-open');
             document.body.style.overflow = '';
+            document.body.style.position = '';
+            document.body.style.width = '';
+            document.body.style.height = '';
             
             // Clear the overlay content to prevent stale data
-            document.getElementById('resultsList').innerHTML = '';
-            document.getElementById('resultsLoading').style.display = 'flex';
-            document.getElementById('noResultsFound').style.display = 'none';
+            const resultsList = document.getElementById('resultsList');
+            const resultsLoading = document.getElementById('resultsLoading');
+            const noResultsFound = document.getElementById('noResultsFound');
             
-            // IMPORTANT: Reset homepage to clean state
+            if (resultsList) resultsList.innerHTML = '';
+            if (resultsLoading) resultsLoading.style.display = 'flex';
+            if (noResultsFound) noResultsFound.style.display = 'none';
+            
+            // Reset homepage to clean state
             resetHomepageToCleanState();
             
             trackEvent('close_results', 'Navigation');
@@ -1766,6 +1778,13 @@
         
         function resetHomepageToCleanState() {
             console.log('🧹 Resetting homepage to clean state');
+            
+            // Force remove any modal/overlay classes from body
+            document.body.classList.remove('pub-details-open');
+            document.body.style.overflow = '';
+            document.body.style.position = '';
+            document.body.style.width = '';
+            document.body.style.height = '';
             
             // Hide map if visible
             const mapContainer = document.getElementById('mapContainer');
@@ -1780,18 +1799,21 @@
                 }
             }
             
-            // Show features and activity sections
+            // Show features and activity sections with clean styling
             const featuresSection = document.getElementById('featuresSection');
             const activitySection = document.getElementById('activitySection');
             
             if (featuresSection) {
                 featuresSection.style.display = 'block';
                 featuresSection.style.marginTop = '0';
+                featuresSection.style.paddingTop = '0';
+                featuresSection.classList.remove('map-hidden');
             }
             
             if (activitySection) {
                 activitySection.style.display = 'block';
                 activitySection.style.marginTop = '0';
+                activitySection.style.paddingTop = '0';
             }
             
             // Hide results section if visible
@@ -1800,10 +1822,11 @@
                 resultsSection.style.display = 'none';
             }
             
-            // Reset search section margin
+            // Reset search section margin to default
             const searchSection = document.getElementById('search');
             if (searchSection) {
                 searchSection.style.marginTop = '-20px';
+                searchSection.style.paddingTop = '0';
             }
             
             // Clear any search state
@@ -1815,6 +1838,9 @@
             if (window.location.hash) {
                 window.location.hash = '';
             }
+            
+            // Force scroll to top
+            window.scrollTo({ top: 0, behavior: 'auto' });
             
             console.log('✅ Homepage reset to clean search state');
         }
@@ -2596,8 +2622,45 @@ function addSwipeGestures() {
 
         // ADD: New function for home navigation
         function goHome() {
-            window.location.href = '/';
+            console.log('🏠 Going home via navigation');
+            
+            // Close any open overlays
+            closeResults();
+            closePubDetails();
+            
+            // Close any search modals
+            closeSearchModal();
+            
+            // Additional cleanup for navigation from other pages
+            const allModals = document.querySelectorAll('.modal');
+            allModals.forEach(modal => {
+                modal.style.display = 'none';
+            });
+            
+            // Force clean state
+            resetHomepageToCleanState();
+            
             trackEvent('go_home', 'Navigation', 'home_button');
+        }
+
+        function handleHomeButtonClick(event) {
+            event.preventDefault();
+            console.log('🏠 Home button clicked from bottom nav');
+            
+            // Add visual feedback
+            const homeButton = event.currentTarget;
+            homeButton.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                homeButton.style.transform = '';
+            }, 150);
+            
+            // Perform cleanup
+            goHome();
+            
+            // Add temporary success visual
+            showSuccessToast('🏠 Returned to homepage');
+            
+            return false;
         }
 
         // ================================
