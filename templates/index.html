@@ -1674,7 +1674,9 @@
             });
         }
         
-        // Updated nearby search with custom radius
+        // REPLACE: In templates/index.html, find the findNearbyPubsWithRadius function
+        // Replace the line that forces gf_only = true
+        
         async function findNearbyPubsWithRadius(radiusKm) {
             if (!userLocation) {
                 showNoResults('Location not available');
@@ -1685,7 +1687,8 @@
             showResultsLoading(`Finding pubs within ${radiusKm}km...`);
             
             try {
-                const gfOnly = true;
+                // CHANGE: Don't force gf_only=true, let users see all pubs initially
+                const gfOnly = false; // Changed from: const gfOnly = true;
                 const url = `/nearby?lat=${userLocation.lat}&lng=${userLocation.lng}&radius=${radiusKm}&gf_only=${gfOnly}`;
                 
                 console.log('📡 API request:', url);
@@ -1707,7 +1710,7 @@
                 console.log(`✅ Found ${nearbyPubs.length} pubs`);
                 
                 if (nearbyPubs.length === 0) {
-                    showNoResults(`No GF pubs found within ${radiusKm}km`);
+                    showNoResults(`No pubs found within ${radiusKm}km`);
                     return;
                 }
                 
