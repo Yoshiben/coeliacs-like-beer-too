@@ -69,13 +69,13 @@
     <div class="admin-section">
         <div class="container">
             <div class="admin-tabs">
-                <button class="admin-tab active" onclick="switchTab('manual')" id="manual-tab-btn">
+                <button class="admin-tab active" onclick="openAdminModal('manual')" id="manual-tab-btn">
                     ⚠️ Manual Review (<span id="manual-count">0</span>)
                 </button>
-                <button class="admin-tab" onclick="switchTab('soft')" id="soft-tab-btn">
+                <button class="admin-tab" onclick="openAdminModal('soft')" id="soft-tab-btn">
                     ⏰ Soft Validation (<span id="soft-count">0</span>)
                 </button>
-                <button class="admin-tab" onclick="switchTab('recent')" id="recent-tab-btn">
+                <button class="admin-tab" onclick="openAdminModal('recent')" id="recent-tab-btn">
                     📊 Recent Activity
                 </button>
             </div>
@@ -141,6 +141,40 @@
             <div class="modal-body">
                 <div id="adminModalContent" class="submissions-container">
                     <div class="loading-state">Loading...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Full-Screen Admin Review Modal -->
+    <div id="adminReviewModal" class="admin-review-modal">
+        <div class="admin-modal-container">
+            <!-- Modal Header -->
+            <div class="admin-modal-header">
+                <button class="admin-nav-btn" onclick="closeAdminModal()">
+                    🏠 Dashboard
+                </button>
+                <h2 class="admin-modal-title" id="adminModalTitle">Manual Reviews</h2>
+                <button class="admin-nav-btn" onclick="refreshModalData()">
+                    🔄 Refresh
+                </button>
+            </div>
+            
+            <!-- Modal Content -->
+            <div class="admin-modal-content">
+                <div id="adminModalLoadingState" class="admin-modal-loading">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">Loading submissions...</div>
+                </div>
+                
+                <div id="adminModalSubmissions" class="admin-modal-submissions" style="display: none;">
+                    <!-- Submissions will be loaded here -->
+                </div>
+                
+                <div id="adminModalEmpty" class="admin-modal-empty" style="display: none;">
+                    <div class="empty-icon">🎉</div>
+                    <div class="empty-title">All caught up!</div>
+                    <div class="empty-message">No pending submissions to review.</div>
                 </div>
             </div>
         </div>
