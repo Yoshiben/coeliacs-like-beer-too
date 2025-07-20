@@ -756,86 +756,118 @@ function refreshModalData() {
     }
 }
 
+// ================================
+// 🔧 REPLACE: Fix the loadModalContent function - it's targeting wrong elements
+// ================================
+
 async function loadModalContent(modalType) {
-    const loadingState = document.getElementById('adminModalLoadingState');
-    const submissionsContainer = document.getElementById('adminModalSubmissions');
-    const emptyState = document.getElementById('adminModalEmpty');
+    const loadingDiv = document.getElementById('adminModalLoading');
+    const contentDiv = document.getElementById('adminModalContent'); 
+    const emptyDiv = document.getElementById('adminModalEmpty');
     
-    // Show loading
-    loadingState.style.display = 'flex';
-    submissionsContainer.style.display = 'none';
-    emptyState.style.display = 'none';
+    console.log('🔍 Loading modal content for:', modalType);
+    console.log('🔍 Found elements:', {
+        loading: !!loadingDiv,
+        content: !!contentDiv, 
+        empty: !!emptyDiv
+    });
+    
+    // Show loading, hide others
+    if (loadingDiv) loadingDiv.style.display = 'block';
+    if (contentDiv) contentDiv.style.display = 'none';
+    if (emptyDiv) emptyDiv.style.display = 'none';
     
     try {
+        // Determine API endpoint
         let endpoint;
-        
         if (modalType === 'manual') {
             endpoint = '/api/admin/pending-manual-reviews';
         } else if (modalType === 'soft') {
             endpoint = '/api/admin/soft-validation-queue';
         } else if (modalType === 'recent') {
             endpoint = '/api/admin/recent-submissions';
+        } else {
+            throw new Error(`Unknown modal type: ${modalType}`);
         }
+        
+        console.log(`📡 Fetching from: ${endpoint}`);
         
         const response = await fetch(endpoint, {
             headers: { 'Authorization': adminToken }
         });
         
         if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         
         const items = await response.json();
+        console.log(`✅ Received ${items.length} items`);
         
         // Hide loading
-        loadingState.style.display = 'none';
+        if (loadingDiv) loadingDiv.style.display = 'none';
         
         if (items.length === 0) {
             // Show empty state
-            emptyState.style.display = 'flex';
-            
-            // Update empty state based on modal type
-            const emptyIcon = emptyState.querySelector('.empty-icon');
-            const emptyTitle = emptyState.querySelector('.empty-title');
-            const emptyMessage = emptyState.querySelector('.empty-message');
-            
-            if (modalType === 'manual') {
-                emptyIcon.textContent = '🎉';
-                emptyTitle.textContent = 'All caught up!';
-                emptyMessage.textContent = 'No submissions need manual review right now.';
-            } else if (modalType === 'soft') {
-                emptyIcon.textContent = '⏰';
-                emptyTitle.textContent = 'Queue is empty';
-                emptyMessage.textContent = 'No items in soft validation queue.';
-            } else {
-                emptyIcon.textContent = '📊';
-                emptyTitle.textContent = 'No recent activity';
-                emptyMessage.textContent = 'No submissions in the last 7 days.';
-            }
+            if (emptyDiv) emptyDiv.style.display = 'block';
         } else {
-            // Show submissions
-            submissionsContainer.style.display = 'block';
-            submissionsContainer.innerHTML = items.map(item => createSubmissionCard(item, modalType)).join('');
+            // Show content
+            if (contentDiv) {
+                contentDiv.style.display = 'block';
+                contentDiv.innerHTML = items.map(item => createSubmissionCard(item, modalType)).join('');
+            }
         }
         
-        console.log(`✅ Loaded ${items.length} items for ${modalType} modal`);
+        console.log(`✅ Successfully loaded ${modalType} modal content`);
         
     } catch (error) {
         console.error(`❌ Error loading ${modalType} data:`, error);
         
-        // Hide loading and show error
-        loadingState.style.display = 'none';
-        emptyState.style.display = 'flex';
-        
-        const emptyIcon = emptyState.querySelector('.empty-icon');
-        const emptyTitle = emptyState.querySelector('.empty-title');
-        const emptyMessage = emptyState.querySelector('.empty-message');
-        
-        emptyIcon.textContent = '❌';
-        emptyTitle.textContent = 'Error loading data';
-        emptyMessage.textContent = 'Please try refreshing or check your connection.';
-        
-        showToast(`Failed to load ${modalType} data`, 'error');
+        // Hide loading, show error
+        if (loadingDiv) loadingDiv.style.display = 'none';
+        if (contentDiv) {
+            contentDiv.style.display = 'block';
+            contentDiv.innerHTML = `
+                <div style="text-align: center; padding: var(--space-4xl); color: var(--error-color);">
+                    <div style="font-size: 2rem; margin-bottom: var(--space-lg);">❌</div>
+                    <div style="font-size: var(--text-lg); font-weight: 600; margin-bottom: var(--space-sm);">Error loading data</div>
+                    <div style="color: var(--text-secondary);">${error.message}</div>
+                    <button onclick="loadModalContent('${modalType}')" class="btn btn-primary" style="margin-top: var(--space-lg);">Try Again</button>
+                </div>
+            `;
+        }
+    }
+}
+
+// ================================
+// 🔧 ADD: Quick debug function to check what's in your API
+// ================================
+
+async function debugAdminAPI() {
+    console.log('🧪 Testing admin API endpoints...');
+    
+    const endpoints = [
+        '/api/admin/validation-stats',
+        '/api/admin/pending-manual-reviews', 
+        '/api/admin/soft-validation-queue',
+        '/api/admin/recent-submissions'
+    ];
+    
+    for (const endpoint of endpoints) {
+        try {
+            console.log(`Testing: ${endpoint}`);
+            const response = await fetch(endpoint, {
+                headers: { 'Authorization': adminToken }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                console.log(`✅ ${endpoint}:`, data);
+            } else {
+                console.log(`❌ ${endpoint}: HTTP ${response.status}`);
+            }
+        } catch (error) {
+            console.log(`❌ ${endpoint}: ${error.message}`);
+        }
     }
 }
 
