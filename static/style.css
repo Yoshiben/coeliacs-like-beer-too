@@ -2062,18 +2062,35 @@ body.pub-details-open {
  Ensure you change the height of all search sections, mobile etc included, by the same px */
 
 .search-section {
-    /* Keep your existing height but make sure we use ALL of it */
-    height: calc(100vh - 200px) !important; /*lower the second number, taller the box */
-    height: calc(100dvh - 200px) !important;
+    /* Use full viewport height minus hero section */
+    height: calc(100vh - 220px) !important;
+    height: calc(100dvh - 220px) !important;
     margin: -20px 0 0 0 !important;
     display: flex !important;
-    align-items: stretch !important; /* Key: stretch to fill */
+    align-items: stretch !important;
+    
+    /* Ensure it reaches bottom regardless of body padding */
+    min-height: calc(100vh - 220px) !important;
+    min-height: calc(100dvh - 220px) !important;
+    
+    /* Force it to bottom edge */
+    margin-bottom: calc(-1 * var(--space-4xl)) !important;
 }
 
+/* ================================
+   ➕ ADD: Homepage body override in static/style.css
+   Add this new class to override body padding on homepage
+   ================================ */
+
+body.homepage-active {
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+/* Ensure search card fills all space */
 .search-card {
-    /* Make the card fill ALL available space */
     width: 100% !important;
-    height: 100% !important; /* Fill the entire search-section height */
+    height: 100% !important;
     max-width: none !important;
     margin: 0 auto !important;
     display: flex !important;
@@ -2083,6 +2100,9 @@ body.pub-details-open {
     box-shadow: var(--shadow-lg) !important;
     backdrop-filter: blur(10px) !important;
     overflow: hidden !important;
+    
+    /* Force to bottom */
+    margin-bottom: 0 !important;
 }
 
 .search-header {
