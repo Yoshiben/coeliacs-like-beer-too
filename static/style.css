@@ -230,31 +230,11 @@ body {
     background: var(--primary-gradient);
     min-height: 100vh;
     margin: 0;
-    padding-bottom: 0; /* CHANGED: Remove default padding */
+    padding-bottom: var(--space-4xl);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     overflow-x: hidden;
     color: var(--text-primary);
     line-height: 1.6;
-}
-
-/* ================================
-   ➕ ADD: Homepage-specific body styling
-   Add this new rule after your main body styles  
-   ================================ */
-
-/* Only add bottom padding when bottom nav is present */
-body:not(.no-bottom-nav) {
-    padding-bottom: var(--space-4xl);
-}
-
-/* Force clean homepage state */
-body.homepage-reset {
-    padding-bottom: var(--space-4xl) !important;
-    margin: 0 !important;
-    height: auto !important;
-    min-height: 100vh !important;
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
 }
 
 /* ================================
@@ -2082,35 +2062,18 @@ body.pub-details-open {
  Ensure you change the height of all search sections, mobile etc included, by the same px */
 
 .search-section {
-    /* Use full viewport height minus hero section */
-    height: calc(100vh - 220px) !important;
-    height: calc(100dvh - 220px) !important;
+    /* Keep your existing height but make sure we use ALL of it */
+    height: calc(100vh - 200px) !important; /*lower the second number, taller the box */
+    height: calc(100dvh - 200px) !important;
     margin: -20px 0 0 0 !important;
     display: flex !important;
-    align-items: stretch !important;
-    
-    /* Ensure it reaches bottom regardless of body padding */
-    min-height: calc(100vh - 220px) !important;
-    min-height: calc(100dvh - 220px) !important;
-    
-    /* Force it to bottom edge */
-    margin-bottom: calc(-1 * var(--space-4xl)) !important;
+    align-items: stretch !important; /* Key: stretch to fill */
 }
 
-/* ================================
-   ➕ ADD: Homepage body override in static/style.css
-   Add this new class to override body padding on homepage
-   ================================ */
-
-body.homepage-active {
-    padding-bottom: 0 !important;
-    margin-bottom: 0 !important;
-}
-
-/* Ensure search card fills all space */
 .search-card {
+    /* Make the card fill ALL available space */
     width: 100% !important;
-    height: 100% !important;
+    height: 100% !important; /* Fill the entire search-section height */
     max-width: none !important;
     margin: 0 auto !important;
     display: flex !important;
@@ -2120,9 +2083,6 @@ body.homepage-active {
     box-shadow: var(--shadow-lg) !important;
     backdrop-filter: blur(10px) !important;
     overflow: hidden !important;
-    
-    /* Force to bottom */
-    margin-bottom: 0 !important;
 }
 
 .search-header {
@@ -4138,70 +4098,6 @@ body {
     z-index: var(--z-search-suggestions);
     margin-top: var(--space-sm);
     animation: dropdownSlideIn 0.3s ease-out;
-}
-
-/* ================================
-   ➕ ADD: Body reset styles to static/style.css
-   Add this to your CSS file after existing body styles
-   ================================ */
-
-/* Force body reset when returning to homepage */
-body.homepage-clean {
-    overflow: auto !important;
-    position: static !important;
-    width: auto !important;
-    height: auto !important;
-    background: var(--primary-gradient) !important;
-}
-
-/* Ensure no lingering overlay backgrounds */
-body::after {
-    display: none !important;
-}
-
-/* Reset any transform or positioning issues */
-body > * {
-    transform: none !important;
-}
-
-.homepage-reset {
-    background: var(--primary-gradient) !important;
-}
-
-.homepage-reset * {
-    box-sizing: border-box !important;
-}
-
-/* Ensure search section maintains proper spacing */
-.homepage-reset .search-section {
-    height: calc(100vh - 200px) !important;
-    height: calc(100dvh - 200px) !important;
-    margin: -20px 0 0 0 !important;
-}
-
-/* Force features section to display correctly */
-.homepage-reset .features-section {
-    display: block !important;
-    margin-top: 0 !important;
-    padding-top: 0 !important;
-}
-
-/* Ensure no overlay remnants */
-.homepage-reset .results-overlay,
-.homepage-reset .pub-details-overlay {
-    display: none !important;
-}
-
-/* Force clean footer positioning */
-.homepage-reset .footer {
-    margin-top: var(--space-4xl) !important;
-}
-
-/* Mobile safari viewport fix */
-@supports (-webkit-touch-callout: none) {
-    body.homepage-clean {
-        min-height: -webkit-fill-available !important;
-    }
 }
 
 /* ================================
