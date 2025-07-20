@@ -504,30 +504,48 @@ document.addEventListener('keydown', function(e) {
 // MODAL MANAGEMENT
 // ================================
 
+function trackEvent(action, category = 'Admin', label = '') {
+    if (typeof gtag !== 'undefined') {
+        gtag('event', action, {
+            event_category: category,
+            event_label: label
+        });
+    }
+    // Fallback - just log if gtag not available
+    console.log(`📊 Track: ${action} | ${category} | ${label}`);
+}
+
+// ================================
+// ADMIN MODAL MANAGEMENT
+// ================================
+
+let currentModalType = null;
+
 function openAdminModal(modalType) {
     console.log(`🔍 Opening ${modalType} modal`);
     
+    currentModalType = modalType;
+    
     const modal = document.getElementById('adminReviewModal');
     const title = document.getElementById('adminModalTitle');
-    const content = document.getElementById('adminModalContent');
     
-    // Set title based on modal type
-    if (modalType === 'manual') {
-        title.textContent = '⚠️ Manual Review Required';
-    } else if (modalType === 'soft') {
-        title.textContent = '⏰ Soft Validation Queue';
-    } else if (modalType === 'recent') {
-        title.textContent = '📊 Recent Activity';
-    }
+    // Set title and show modal
+    const titles = {
+        'manual': '⚠️ Manual Review Required',
+        'soft': '⏰ Soft Validation Queue', 
+        'recent': '📊 Recent Activity'
+    };
     
-    // Show modal
+    title.textContent = titles[modalType] || 'Admin Review';
+    
+    // Show modal with animation
     modal.classList.add('active');
-    
-    // Load content
-    loadModalContent(modalType, content);
     
     // Prevent background scrolling
     document.body.style.overflow = 'hidden';
+    
+    // Load content
+    loadModalContent(modalType);
     
     trackEvent('admin_modal_open', 'Admin', modalType);
 }
@@ -538,6 +556,8 @@ function closeAdminModal() {
     
     // Restore background scrolling
     document.body.style.overflow = '';
+    
+    currentModalType = null;
     
     trackEvent('admin_modal_close', 'Admin');
 }
