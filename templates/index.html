@@ -858,9 +858,8 @@
     </div>
 
     <!-- Bottom Navigation Bar -->
-    <!-- Bottom Navigation Bar -->
     <nav class="bottom-nav">
-        <a href="#" onclick="return handleHomeButtonClick(event)" class="nav-item active">
+        <a href="/" class="nav-item active">
             <div class="nav-icon">🏠</div>
             <div class="nav-label">Home</div>
         </a>
@@ -875,12 +874,12 @@
             <div class="nav-label">Breweries</div>
         </a>
         
-        <a href="#" onclick="showAboutUs(); return false;" class="nav-item">
+        <a href="/about" class="nav-item">
             <div class="nav-icon">ℹ️</div>
             <div class="nav-label">About</div>
         </a>
         
-        <a href="#" onclick="showComingSoon('More Features'); return false;" class="nav-item">
+        <a href="/more" class="nav-item">
             <div class="nav-icon">⋯</div>
             <div class="nav-label">More</div>
         </a>
@@ -1742,53 +1741,23 @@
         // ================================
         
         function closeResults() {
-            console.log('🏠 Closing results with deep clean');
+            console.log('🏠 Closing results and returning to homepage');
             
-            // Close results overlay immediately
-            const resultsOverlay = document.getElementById('resultsOverlay');
-            if (resultsOverlay) {
-                resultsOverlay.style.display = 'none';
-                resultsOverlay.classList.remove('active');
-            }
+            // Close results overlay
+            document.getElementById('resultsOverlay').classList.remove('active');
             
-            // Clear overlay content
-            const resultsList = document.getElementById('resultsList');
-            const resultsLoading = document.getElementById('resultsLoading');  
-            const noResultsFound = document.getElementById('noResultsFound');
+            // Restore background scrolling
+            document.body.style.overflow = '';
             
-            if (resultsList) resultsList.innerHTML = '';
-            if (resultsLoading) resultsLoading.style.display = 'flex';
-            if (noResultsFound) noResultsFound.style.display = 'none';
+            // Clear the overlay content to prevent stale data
+            document.getElementById('resultsList').innerHTML = '';
+            document.getElementById('resultsLoading').style.display = 'flex';
+            document.getElementById('noResultsFound').style.display = 'none';
             
-            // Force deep clean
+            // IMPORTANT: Reset homepage to clean state
             resetHomepageToCleanState();
             
-            // Additional delay to ensure clean state
-            setTimeout(() => {
-                resetHomepageToCleanState();
-            }, 50);
-            
             trackEvent('close_results', 'Navigation');
-        }
-        
-        // ================================
-        // ➕ ADD: Debug function to check current state
-        // Add this new function to help troubleshoot
-        // ================================
-        
-        function debugPageState() {
-            console.log('🔍 DEBUG: Current page state');
-            console.log('Body classes:', document.body.className);
-            console.log('Body styles:', document.body.style.cssText);
-            
-            const searchSection = document.getElementById('search');
-            console.log('Search section styles:', searchSection ? searchSection.style.cssText : 'not found');
-            
-            const featuresSection = document.getElementById('featuresSection');  
-            console.log('Features section styles:', featuresSection ? featuresSection.style.cssText : 'not found');
-            
-            console.log('mapVisible:', mapVisible);
-            console.log('currentQuery:', currentQuery);
         }
         
         // ================================
@@ -1796,119 +1765,59 @@
         // ================================
         
         function resetHomepageToCleanState() {
-            console.log('🧹 DEEP CLEAN: Resetting homepage to pristine state');
+            console.log('🧹 Resetting homepage to clean state');
             
-            // STEP 1: Force body reset with class
-            document.body.className = 'homepage-reset';
-            document.body.style.cssText = `
-                background: var(--primary-gradient) !important;
-                margin: 0 !important;
-                padding-bottom: var(--space-4xl) !important;
-                overflow-x: hidden !important;
-                overflow-y: auto !important;
-                position: static !important;
-                width: auto !important;
-                height: auto !important;
-                min-height: 100vh !important;
-            `;
+            // Hide map if visible
+            const mapContainer = document.getElementById('mapContainer');
+            if (mapVisible && mapContainer) {
+                mapContainer.style.display = 'none';
+                mapVisible = false;
+                
+                // Update toggle button text if it exists
+                const toggleBtn = document.getElementById('toggleMapBtn');
+                if (toggleBtn) {
+                    toggleBtn.innerHTML = '🗺️ Show Map';
+                }
+            }
             
-            // STEP 2: Reset search section completely
+            // Show features and activity sections
+            const featuresSection = document.getElementById('featuresSection');
+            const activitySection = document.getElementById('activitySection');
+            
+            if (featuresSection) {
+                featuresSection.style.display = 'block';
+                featuresSection.style.marginTop = '0';
+            }
+            
+            if (activitySection) {
+                activitySection.style.display = 'block';
+                activitySection.style.marginTop = '0';
+            }
+            
+            // Hide results section if visible
+            const resultsSection = document.getElementById('results-section');
+            if (resultsSection) {
+                resultsSection.style.display = 'none';
+            }
+            
+            // Reset search section margin
             const searchSection = document.getElementById('search');
             if (searchSection) {
-                searchSection.style.cssText = `
-                    height: calc(100vh - 200px) !important;
-                    height: calc(100dvh - 200px) !important;
-                    margin: -20px 0 0 0 !important;
-                    display: flex !important;
-                    align-items: stretch !important;
-                `;
+                searchSection.style.marginTop = '-20px';
             }
             
-            // STEP 3: Reset features section completely  
-            const featuresSection = document.getElementById('featuresSection');
-            if (featuresSection) {
-                featuresSection.style.cssText = `
-                    display: block !important;
-                    margin: 0 !important;
-                    padding: 0 !important;
-                `;
-                featuresSection.classList.remove('map-hidden');
-            }
-            
-            // STEP 4: Reset activity section
-            const activitySection = document.getElementById('activitySection');
-            if (activitySection) {
-                activitySection.style.cssText = `
-                    display: block !important;
-                    margin: 0 !important;
-                    padding: 0 !important;
-                `;
-            }
-            
-            // STEP 5: Hide ALL overlays and modals
-            const overlaysToHide = [
-                'resultsOverlay',
-                'pubDetailsOverlay', 
-                'mapContainer',
-                'results-section'
-            ];
-            
-            overlaysToHide.forEach(id => {
-                const element = document.getElementById(id);
-                if (element) {
-                    element.style.display = 'none !important';
-                    element.classList.remove('active');
-                }
-            });
-            
-            // STEP 6: Reset map visibility state
-            mapVisible = false;
-            const toggleBtn = document.getElementById('toggleMapBtn');
-            if (toggleBtn) {
-                toggleBtn.innerHTML = '🗺️ Show Map';
-            }
-            
-            // STEP 7: Clear search state
+            // Clear any search state
             currentQuery = '';
             currentSearchType = 'all';
             currentPage = 1;
             
-            // STEP 8: Clear URL hash
+            // Clear URL hash
             if (window.location.hash) {
                 window.location.hash = '';
             }
             
-            // STEP 9: Force scroll to top immediately
-            document.documentElement.scrollTop = 0;
-            document.body.scrollTop = 0;
-            window.scrollTo(0, 0);
-            
-            // STEP 10: Remove any lingering CSS classes
-            const elementsToClean = document.querySelectorAll('[class*="split-view"], [class*="map-visible"], [class*="pub-details-open"]');
-            elementsToClean.forEach(el => {
-                el.classList.remove('split-view', 'map-visible', 'pub-details-open');
-            });
-            
-            console.log('✅ DEEP CLEAN COMPLETE: Homepage should be pristine');
+            console.log('✅ Homepage reset to clean search state');
         }
-        // ================================
-        // ➕ ADD: Initialize homepage state on page load
-        // Add this to your DOMContentLoaded event listener
-        // ================================
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 Page loaded, setting homepage state...');
-            
-            // Set initial homepage state
-            document.body.classList.add('homepage-active');
-            
-            // Your existing DOMContentLoaded code...
-            loadStats();
-            initMobileFeedback();
-            
-            console.log('✅ Homepage state initialized');
-        });
-
 
         // 📝 ADD NEW - Better debugging for the location issue
         function debugLocationState() {
@@ -2687,46 +2596,8 @@ function addSwipeGestures() {
 
         // ADD: New function for home navigation
         function goHome() {
-            console.log('🏠 Going home via navigation');
-            
-            // Close any open overlays
-            closeResults();
-            closePubDetails();
-            closeSearchModal();
-            
-            // Close any modals
-            const allModals = document.querySelectorAll('.modal');
-            allModals.forEach(modal => {
-                modal.style.display = 'none';
-            });
-            
-            // Set homepage body class
-            document.body.classList.add('homepage-active');
-            
-            // Force clean state
-            resetHomepageToCleanState();
-            
+            window.location.href = '/';
             trackEvent('go_home', 'Navigation', 'home_button');
-        }
-
-        function handleHomeButtonClick(event) {
-            event.preventDefault();
-            console.log('🏠 Home button clicked from bottom nav');
-            
-            // Add visual feedback
-            const homeButton = event.currentTarget;
-            homeButton.style.transform = 'scale(0.95)';
-            setTimeout(() => {
-                homeButton.style.transform = '';
-            }, 150);
-            
-            // Perform cleanup
-            goHome();
-            
-            // Add temporary success visual
-            showSuccessToast('🏠 Returned to homepage');
-            
-            return false;
         }
 
         // ================================
