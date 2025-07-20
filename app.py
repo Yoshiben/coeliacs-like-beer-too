@@ -128,13 +128,16 @@ def autocomplete():
             cursor.close()
             conn.close()
 
+# REPLACE: In app.py, update the nearby search route
+# Find the @app.route('/nearby') function and replace the gf_only logic
+
 @app.route('/nearby')
 def nearby():
     """Find nearby pubs"""
     lat = request.args.get('lat', type=float)
     lng = request.args.get('lng', type=float)
     radius = request.args.get('radius', 5, type=int)
-    # gf_only = request.args.get('gf_only', 'false').lower() == 'true'
+    gf_only = request.args.get('gf_only', 'false').lower() == 'true'
     
     # Input validation
     if not lat or not lng:
@@ -171,6 +174,7 @@ def nearby():
         """
         params = [lat, lng, lat]
         
+        # CHANGE: Only apply GF filter if specifically requested (don't default to true)
         if gf_only:
             sql += " AND (p.bottle = 1 OR p.tap = 1 OR p.cask = 1 OR p.can = 1)"
         
@@ -198,6 +202,9 @@ def nearby():
         if 'conn' in locals() and conn.is_connected():
             cursor.close()
             conn.close()
+
+# REPLACE: In app.py, update the main search route
+# Find the @app.route('/search') function and update the gf_only handling
 
 @app.route('/search')
 def search():
@@ -268,6 +275,7 @@ def search():
             WHERE {search_condition}
         """
         
+        # CHANGE: Only apply GF filter if specifically requested
         if gf_only:
             count_sql += " AND (p.bottle = 1 OR p.tap = 1 OR p.cask = 1 OR p.can = 1)"
         
@@ -297,6 +305,7 @@ def search():
             WHERE {search_condition}
         """
         
+        # CHANGE: Only apply GF filter if specifically requested
         if gf_only:
             sql += " AND (p.bottle = 1 OR p.tap = 1 OR p.cask = 1 OR p.can = 1)"
         
