@@ -599,6 +599,11 @@ function openAdminModal(modalType) {
     const modal = document.getElementById('adminReviewModal');
     const title = document.getElementById('adminModalTitle');
     
+    // 🔧 DEBUG: Check if elements exist
+    console.log('🔍 DEBUG - Modal element:', modal);
+    console.log('🔍 DEBUG - Title element:', title);
+    console.log('🔍 DEBUG - Modal current classes:', modal ? modal.className : 'Modal not found');
+    
     // Set title based on modal type
     const titles = {
         'manual': '⚠️ Manual Review Required',
@@ -606,13 +611,22 @@ function openAdminModal(modalType) {
         'recent': '📊 Recent Activity'
     };
     
-    title.textContent = titles[modalType] || 'Admin Review';
+    if (title) {
+        title.textContent = titles[modalType] || 'Admin Review';
+        console.log('🔍 DEBUG - Title set to:', title.textContent);
+    }
     
     // Show modal with animation
-    modal.classList.add('active');
+    if (modal) {
+        modal.classList.add('active');
+        console.log('🔍 DEBUG - Added active class, new classes:', modal.className);
+        console.log('🔍 DEBUG - Modal display style:', window.getComputedStyle(modal).display);
+        console.log('🔍 DEBUG - Modal z-index:', window.getComputedStyle(modal).zIndex);
+    }
     
     // Prevent background scrolling
     document.body.style.overflow = 'hidden';
+    console.log('🔍 DEBUG - Body overflow set to hidden');
     
     // Load content for the modal
     loadModalContent(modalType);
@@ -623,6 +637,59 @@ function openAdminModal(modalType) {
     }
     
     console.log(`✅ ${modalType} modal opened`);
+}
+
+// ================================
+// 🔧 ADD: Quick test function to force modal open
+// Add this function and call it from console to test:
+// ================================
+
+function forceOpenModal() {
+    console.log('🧪 FORCE TESTING MODAL...');
+    
+    const modal = document.getElementById('adminReviewModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        modal.style.position = 'fixed';
+        modal.style.top = '0';
+        modal.style.left = '0';
+        modal.style.width = '100%';
+        modal.style.height = '100vh';
+        modal.style.background = 'red';
+        modal.style.zIndex = '99999';
+        modal.classList.add('active');
+        
+        console.log('🧪 FORCE TEST - Modal should be visible now');
+        console.log('🧪 Modal computed style:', window.getComputedStyle(modal));
+    } else {
+        console.log('❌ FORCE TEST - Modal element not found!');
+    }
+}
+
+// ================================
+// 🔧 ADD: Check if modal HTML exists in DOM
+// Add this to verify the modal HTML is present:
+// ================================
+
+function debugModalDOM() {
+    console.log('🔍 DEBUGGING MODAL DOM...');
+    
+    const modal = document.getElementById('adminReviewModal');
+    console.log('Modal element:', modal);
+    
+    if (modal) {
+        console.log('Modal innerHTML length:', modal.innerHTML.length);
+        console.log('Modal children:', modal.children);
+        console.log('Modal first 200 chars:', modal.innerHTML.substring(0, 200));
+    }
+    
+    // Check for all elements with "modal" in the ID
+    const allModals = document.querySelectorAll('[id*="modal"]');
+    console.log('All modal elements found:', allModals);
+    
+    // Check for elements with admin-review-modal class
+    const adminModals = document.querySelectorAll('.admin-review-modal');
+    console.log('Admin review modal elements:', adminModals);
 }
 
 function closeAdminModal() {
