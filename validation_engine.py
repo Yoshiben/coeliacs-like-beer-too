@@ -154,6 +154,7 @@ class BeerValidationEngine:
             SELECT beer_id, brewery, name, style, abv 
             FROM beers 
             WHERE LOWER(brewery) = LOWER(%s) AND LOWER(name) = LOWER(%s)
+            AND LOWER(TRIM(name)) = LOWER(TRIM(%s))
         """, (beer_data['brewery'], beer_data['beer_name']))
         
         result = cursor.fetchone()
@@ -169,20 +170,27 @@ class BeerValidationEngine:
         cursor.execute("""
             SELECT DISTINCT brewery 
             FROM beers 
-            WHERE LOWER(brewery) = LOWER(%s)
+            WHERE LOWER(TRIM(brewery)) = LOWER(TRIM(%s))
         """, (beer_data['brewery'],))
         
-        if cursor.fetchone():
-            return {
-                'status': 'new_beer_existing_brewery',
-                'confidence': 0.7
-            }
-        
-        # Completely new brewery
+        brewery_result = cursor.fetchone()
+    if brewery_result:
+        # Add debug logging to see what's happening
+        self.logger.info(f"Found known brewery: '{brewery_result['brewery']}' for input: '{beer_data['brewery']}'")
         return {
-            'status': 'new_brewery',
-            'confidence': 0.0
+            'status': 'new_beer_existing_brewery',
+            'confidence': 0.7,
+            'matched_brewery': brewery_result['brewery']
         }
+    
+    # Add debug logging for brewery not found
+    self.logger.info(f"Brewery not found: '{beer_data['brewery']}'")
+    
+    # Completely new brewery
+    return {
+        'status': 'new_brewery',
+        'confidence': 0.0
+    }
     
     def _find_similar_pubs(self, cursor, pub_data):
         """
