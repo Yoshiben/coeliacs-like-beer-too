@@ -477,13 +477,32 @@ def submit_beer_update():
     try:
         data = request.get_json()
         
+        # FIXED: Proper data extraction from the request
+        # The issue was here - data wasn't being extracted properly
+        submission_data = {
+            'pub_id': data.get('pub_id'),
+            'pub_name': data.get('pub_name') or data.get('new_pub_name'),  # Handle both forms
+            'address': data.get('address') or data.get('new_address'),
+            'postcode': data.get('postcode') or data.get('new_postcode'),
+            'brewery': data.get('new_brewery') or data.get('brewery'),  # Your form uses 'new_brewery'
+            'beer_name': data.get('new_beer_name') or data.get('beer_name'),  # Your form uses 'new_beer_name'
+            'beer_style': data.get('new_style') or data.get('beer_style'),  # Your form uses 'new_style'
+            'beer_abv': data.get('new_abv') or data.get('beer_abv'),  # Your form uses 'new_abv'
+            'beer_format': data.get('beer_format')  # This should be correct
+        }
+        
+        # Debug logging to see what we're actually getting
+        logger.info(f"Raw request data: {data}")
+        logger.info(f"Processed submission data: {submission_data}")
+        
         # Basic validation - ensure we have required fields
         required_fields = ['beer_format']
         for field in required_fields:
-            if field not in data or not data[field]:
+            if not submission_data.get(field):
+                logger.error(f"Missing required field: {field}")
                 return jsonify({'error': f'Missing required field: {field}'}), 400
         
-        # Get user info for tracking and potential spam prevention
+        # Get user info for tracking
         user_info = {
             'ip': request.remote_addr,
             'user_agent': request.headers.get('User-Agent', '')
