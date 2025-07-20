@@ -1093,6 +1093,74 @@
     max-width: 400px;
 }
 
+/* ================================
+🔧 ADD: Admin Modal - Desktop/Full Screen Styles
+Add this to static/admin.css
+================================ */
+
+/* Admin Modal Full Screen (Desktop) */
+#adminReviewModal .modal-content {
+    max-width: 95vw !important;
+    max-height: 95vh !important;
+    max-height: 95dvh !important;
+    width: 95vw !important;
+    height: 95vh !important;
+    height: 95dvh !important;
+    margin: 2.5vh auto !important;
+    margin: 2.5dvh auto !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* Admin Modal Header - Fixed at top */
+#adminReviewModal .modal-header {
+    flex-shrink: 0 !important;
+    padding: var(--space-lg) var(--space-xl) !important;
+    border-bottom: 2px solid var(--divider-color) !important;
+    background: var(--bg-white) !important;
+}
+
+/* Admin Modal Body - Scrollable content */
+#adminReviewModal .modal-body {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: var(--space-xl) !important;
+    min-height: 0 !important;
+}
+
+/* Submission cards styling */
+#adminReviewModal .submission-card {
+    margin-bottom: var(--space-xl) !important;
+    border-radius: var(--radius-xl) !important;
+    box-shadow: var(--shadow) !important;
+    transition: all var(--transition) !important;
+}
+
+#adminReviewModal .submission-card:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: var(--shadow-lg) !important;
+}
+
+/* Custom scrollbar for admin modal */
+#adminReviewModal .modal-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+#adminReviewModal .modal-body::-webkit-scrollbar-track {
+    background: var(--bg-section);
+    border-radius: 4px;
+}
+
+#adminReviewModal .modal-body::-webkit-scrollbar-thumb {
+    background: var(--primary-gradient);
+    border-radius: 4px;
+}
+
+#adminReviewModal .modal-body::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+}
 
 /* ================================
    ANIMATIONS
@@ -1248,6 +1316,35 @@
     .loading-text {
         font-size: var(--text-base);
     }
+
+   #adminReviewModal .modal-content {
+        max-width: 98vw !important;
+        max-height: 98vh !important;
+        max-height: 98dvh !important;
+        width: 98vw !important;
+        height: 98vh !important;
+        height: 98dvh !important;
+        margin: 1vh auto !important;
+        margin: 1dvh auto !important;
+        border-radius: var(--radius-lg) !important;
+    }
+    
+    #adminReviewModal .modal-header {
+        padding: var(--space-md) var(--space-lg) !important;
+    }
+    
+    #adminReviewModal .modal-title {
+        font-size: var(--text-xl) !important;
+    }
+    
+    #adminReviewModal .modal-body {
+        padding: var(--space-lg) !important;
+    }
+    
+    #adminReviewModal .submission-card {
+        margin-bottom: var(--space-lg) !important;
+        padding: var(--space-lg) !important;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1270,6 +1367,36 @@
     
     .admin-actions {
         flex-direction: column;
+    }
+
+   #adminReviewModal .modal-content {
+        max-width: 100vw !important;
+        max-height: 100vh !important;
+        max-height: 100dvh !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        height: 100dvh !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+    }
+    
+    #adminReviewModal .modal-header {
+        padding: var(--space-sm) var(--space-md) !important;
+    }
+    
+    #adminReviewModal .modal-body {
+        padding: var(--space-md) !important;
+    }
+    
+    #adminReviewModal .submission-card {
+        margin-bottom: var(--space-md) !important;
+        padding: var(--space-md) !important;
+    }
+    
+    #adminReviewModal .modal-close {
+        font-size: var(--text-2xl) !important;
+        width: 40px !important;
+        height: 40px !important;
     }
 }
 
