@@ -558,118 +558,6 @@ function trackEvent(action, category = 'Admin', label = '') {
     console.log(`📊 Track: ${action} | ${category} | ${label}`);
 }
 
-// ================================
-// ADMIN MODAL MANAGEMENT
-// ================================
-
-function openAdminModal(modalType) {
-    console.log(`🔍 Opening ${modalType} modal`);
-    
-    currentModalType = modalType;
-    
-    const modal = document.getElementById('adminReviewModal');
-    const title = document.getElementById('adminModalTitle');
-    
-    // Set title based on modal type
-    const titles = {
-        'manual': '⚠️ Manual Review Required',
-        'soft': '⏰ Soft Validation Queue', 
-        'recent': '📊 Recent Activity'
-    };
-    
-    title.textContent = titles[modalType] || 'Admin Review';
-    
-    // 🔧 FIX: Use the same pattern as your working modals
-    modal.style.display = 'block';  // NOT classList.add('active')
-    
-    // Prevent background scrolling
-    document.body.style.overflow = 'hidden';
-    
-    // Load content for the modal
-    loadModalContent(modalType);
-    
-    // Track the action
-    if (typeof trackEvent === 'function') {
-        trackEvent('admin_modal_open', 'Admin', modalType);
-    }
-    
-    console.log(`✅ ${modalType} modal opened with display: block`);
-}
-
-function closeAdminModal() {
-    console.log('🔒 Closing admin modal');
-    
-    const modal = document.getElementById('adminReviewModal');
-    if (modal) {
-        modal.classList.remove('active');
-    }
-    
-    // Restore background scrolling
-    document.body.style.overflow = '';
-    
-    currentModalType = null;
-    
-    if (typeof trackEvent === 'function') {
-        trackEvent('admin_modal_close', 'Admin');
-    }
-}
-
-async function loadModalContent(modalType) {
-    const loadingState = document.getElementById('adminModalLoadingState');
-    const submissionsContainer = document.getElementById('adminModalSubmissions');
-    const emptyState = document.getElementById('adminModalEmpty');
-    
-    // Show loading state
-    loadingState.style.display = 'flex';
-    submissionsContainer.style.display = 'none';
-    emptyState.style.display = 'none';
-    
-    try {
-        // Determine API endpoint
-        let endpoint;
-        if (modalType === 'manual') {
-            endpoint = '/api/admin/pending-manual-reviews';
-        } else if (modalType === 'soft') {
-            endpoint = '/api/admin/soft-validation-queue';
-        } else if (modalType === 'recent') {
-            endpoint = '/api/admin/recent-submissions';
-        } else {
-            throw new Error(`Unknown modal type: ${modalType}`);
-        }
-        
-        console.log(`📡 Loading data from: ${endpoint}`);
-        
-        const response = await fetch(endpoint, {
-            headers: { 'Authorization': adminToken }
-        });
-        
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-        
-        const items = await response.json();
-        console.log(`✅ Loaded ${items.length} items for ${modalType}`);
-        
-        // Hide loading
-        loadingState.style.display = 'none';
-        
-        if (items.length === 0) {
-            // Show empty state
-            showEmptyState(modalType, emptyState);
-        } else {
-            // Show items
-            showModalItems(items, modalType, submissionsContainer);
-        }
-        
-    } catch (error) {
-        console.error(`❌ Error loading ${modalType} data:`, error);
-        
-        // Hide loading and show error
-        loadingState.style.display = 'none';
-        showErrorState(error, emptyState);
-    }
-}
-
 function getEmptyStateModal(modalType) {
     const messages = {
         'manual': '🎉 No pending manual reviews! All submissions are handled.',
@@ -804,7 +692,7 @@ function openAdminModal(modalType) {
     const modal = document.getElementById('adminReviewModal');
     const title = document.getElementById('adminModalTitle');
     
-    // Set title and show modal
+    // Set title based on modal type
     const titles = {
         'manual': '⚠️ Manual Review Required',
         'soft': '⏰ Soft Validation Queue', 
@@ -813,25 +701,34 @@ function openAdminModal(modalType) {
     
     title.textContent = titles[modalType] || 'Admin Review';
     
-    // Show modal with animation
-    modal.classList.add('active');
+    // 🔧 FIX: Use the same pattern as your working modals
+    modal.style.display = 'block';  // NOT classList.add('active')
     
     // Prevent background scrolling
     document.body.style.overflow = 'hidden';
     
-    // Load content
+    // Load content for the modal
     loadModalContent(modalType);
     
-    trackEvent('admin_modal_open', 'Admin', modalType);
+    // Track the action
+    if (typeof trackEvent === 'function') {
+        trackEvent('admin_modal_open', 'Admin', modalType);
+    }
+    
+    console.log(`✅ ${modalType} modal opened with display: block`);
 }
+
+// ================================
+// 🔧 REPLACE: Fix your closeAdminModal function too
+// ================================
 
 function closeAdminModal() {
     console.log('🔒 Closing admin modal');
     
     const modal = document.getElementById('adminReviewModal');
-    if (modal) {
-        modal.classList.remove('active');
-    }
+    
+    // 🔧 FIX: Use the same pattern as your working modals
+    modal.style.display = 'none';  // NOT classList.remove('active')
     
     // Restore background scrolling
     document.body.style.overflow = '';
