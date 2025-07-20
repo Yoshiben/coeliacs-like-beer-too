@@ -9,6 +9,8 @@ import os
 from dotenv import load_dotenv
 import logging
 import time
+# ➕ ADD: Import your new smart classes
+from validation_engine import BeerValidationEngine, SubmissionProcessor
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -40,6 +42,26 @@ def security_headers(response):
     response.headers["X-XSS-Protection"] = "1; mode=block"
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     return response
+
+from functools import wraps
+
+# Simple admin authentication (we'll enhance this later)
+def admin_required(f):
+    """
+    Decorator to protect admin endpoints
+    For now uses a simple token, but we can upgrade to proper login later
+    """
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # Check for admin token in header or URL parameter
+        auth_token = request.headers.get('Authorization') or request.args.get('token')
+        expected_token = os.getenv('ADMIN_TOKEN', 'beer_admin_2025')  # Change this!
+        
+        if not auth_token or auth_token != expected_token:
+            return jsonify({'error': 'Admin authentication required'}), 401
+        
+        return f(*args, **kwargs)
+    return decorated_function
 
 # ================================================================================
 # CORE ROUTES
@@ -430,56 +452,284 @@ def get_brewery_beers(brewery_name):
             cursor.close()
             conn.close()
 
+# ================================================================================
+# 🔄 REPLACE: Your existing /api/submit_beer_update endpoint
+# Find this function in your app.py and replace the entire function
+# ================================================================================
+
 @app.route('/api/submit_beer_update', methods=['POST'])
 def submit_beer_update():
-    """Submit beer update for validation"""
+    """
+    ENHANCED: Smart beer submission with 3-tier validation system
+    - Tier 1: Auto-approve instantly (known pub + known beer)
+    - Tier 2: Soft validation (known pub + new beer from known brewery)  
+    - Tier 3: Manual review (new pub or new brewery)
+    """
     try:
         data = request.get_json()
         
-        # Basic validation
-        required_fields = ['pub_id', 'beer_format']
+        # Basic validation - ensure we have required fields
+        required_fields = ['beer_format']
         for field in required_fields:
-            if field not in data:
+            if field not in data or not data[field]:
                 return jsonify({'error': f'Missing required field: {field}'}), 400
         
+        # Get user info for tracking and potential spam prevention
+        user_info = {
+            'ip': request.remote_addr,
+            'user_agent': request.headers.get('User-Agent', '')
+        }
+        
+        # Process submission through the smart validation system
+        processor = SubmissionProcessor(db_config)
+        result = processor.process_submission(data, user_info)
+        
+        if result['success']:
+            # Success! Return user-friendly response based on validation tier
+            validation_result = result['validation_result']
+            
+            # Customize response message based on tier
+            if validation_result['tier'] == 1:
+                user_message = "🎉 Beer report approved instantly! Thanks for contributing."
+            elif validation_result['tier'] == 2:
+                user_message = f"📋 Beer report received! {validation_result['message']}"
+            else:  # tier 3
+                user_message = "📋 Beer report submitted for review. We'll verify the details and add it soon!"
+            
+            return jsonify({
+                'success': True,
+                'message': user_message,
+                'submission_id': result['submission_id'],
+                'tier': validation_result['tier'],
+                'status': validation_result['status']
+            })
+        else:
+            # Something went wrong in processing
+            logger.error(f"Submission processing failed: {result['error']}")
+            return jsonify({
+                'success': False,
+                'error': 'Failed to process beer report. Please try again.'
+            }), 500
+            
+    except Exception as e:
+        logger.error(f"Error in submit_beer_update: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Internal server error. Please try again.'
+        }), 500
+
+# ================================================================================
+# ADMIN DASHBOARD ROUTES  
+# ================================================================================
+
+@app.route('/admin')
+def admin_dashboard():
+    """
+    Admin dashboard page - simple token auth for now
+    Access via: /admin?token=beer_admin_2025
+    """
+    token = request.args.get('token')
+    expected_token = os.getenv('ADMIN_TOKEN', 'beer_admin_2025')
+    
+    if not token or token != expected_token:
+        return "🔒 Access denied. Admin token required.", 403
+    
+    # Return the admin interface HTML (we'll create this next)
+    return render_template('admin.html')
+
+@app.route('/api/admin/validation-stats')
+@admin_required
+def get_validation_stats():
+    """
+    Get validation statistics for the admin dashboard
+    Shows: pending reviews, today's submissions, auto-approvals, etc.
+    """
+    try:
         conn = mysql.connector.connect(**db_config)
-        cursor = conn.cursor()
+        cursor = conn.cursor(dictionary=True)
         
-        # Store the submission for validation
+        # Count pending manual reviews
         cursor.execute("""
-            INSERT INTO pending_beer_updates 
-            (pub_id, beer_format, new_brewery, new_beer_name, new_style, 
-             submitted_by_email, submitted_by_name, user_notes, photo_url, submission_time)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, NOW())
-        """, (
-            data['pub_id'],
-            data['beer_format'],
-            data.get('brewery', ''),
-            data.get('beer_name', ''),
-            data.get('style', ''),
-            data.get('email', ''),
-            data.get('name', 'Anonymous'),
-            data.get('notes', ''),
-            data.get('photo_url', '')
-        ))
+            SELECT COUNT(*) as count 
+            FROM validation_queue vq
+            JOIN submissions s ON vq.submission_id = s.submission_id
+            WHERE vq.validation_type = 'manual_review' AND vq.status = 'pending'
+        """)
+        pending_manual = cursor.fetchone()['count']
         
-        pending_id = cursor.lastrowid
-        conn.commit()
+        # Count pending soft validations
+        cursor.execute("""
+            SELECT COUNT(*) as count 
+            FROM validation_queue vq
+            WHERE vq.validation_type = 'soft_validation' AND vq.status = 'pending'
+        """)
+        pending_soft = cursor.fetchone()['count']
         
-        logger.info(f"Beer update submitted: pending_id {pending_id}")
+        # Count today's submissions
+        cursor.execute("""
+            SELECT COUNT(*) as count 
+            FROM submissions 
+            WHERE DATE(submission_time) = CURDATE()
+        """)
+        today_submissions = cursor.fetchone()['count']
+        
+        # Count today's auto-approved submissions
+        cursor.execute("""
+            SELECT COUNT(*) as count 
+            FROM submissions 
+            WHERE DATE(submission_time) = CURDATE() 
+            AND validation_status = 'auto_approved'
+        """)
+        auto_approved_today = cursor.fetchone()['count']
         
         return jsonify({
-            'message': 'Beer update submitted for validation',
-            'pending_id': pending_id
+            'pending_manual': pending_manual,
+            'pending_soft': pending_soft,
+            'today_submissions': today_submissions,
+            'auto_approved_today': auto_approved_today
         })
         
     except Exception as e:
-        logger.error(f"Error submitting beer update: {str(e)}")
-        return jsonify({'error': 'Submission failed'}), 500
+        logger.error(f"Error getting validation stats: {str(e)}")
+        return jsonify({'error': 'Failed to load stats'}), 500
     finally:
         if 'conn' in locals() and conn.is_connected():
             cursor.close()
             conn.close()
+
+@app.route('/api/admin/pending-manual-reviews')
+@admin_required
+def get_pending_manual_reviews():
+    """
+    Get list of submissions pending manual review
+    Uses the database view we created in the setup script
+    """
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        # Use the view we created for pending manual reviews
+        cursor.execute("""
+            SELECT * FROM pending_manual_reviews 
+            ORDER BY submission_time ASC
+            LIMIT 50
+        """)
+        
+        reviews = cursor.fetchall()
+        return jsonify(reviews)
+        
+    except Exception as e:
+        logger.error(f"Error getting pending reviews: {str(e)}")
+        return jsonify({'error': 'Failed to load pending reviews'}), 500
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+@app.route('/api/admin/soft-validation-queue')
+@admin_required
+def get_soft_validation_queue():
+    """
+    Get list of items in soft validation queue (waiting for auto-approval)
+    """
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        # Use the view we created for soft validation queue
+        cursor.execute("""
+            SELECT * FROM soft_validation_queue 
+            ORDER BY scheduled_approval_time ASC
+            LIMIT 50
+        """)
+        
+        items = cursor.fetchall()
+        return jsonify(items)
+        
+    except Exception as e:
+        logger.error(f"Error getting soft validation queue: {str(e)}")
+        return jsonify({'error': 'Failed to load soft validation queue'}), 500
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+@app.route('/api/admin/recent-submissions')
+@admin_required
+def get_recent_submissions():
+    """
+    Get recent submissions (last 7 days) for admin overview
+    Shows all tiers and their status
+    """
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        cursor.execute("""
+            SELECT 
+                s.submission_id,
+                s.pub_name,
+                s.address,
+                s.postcode,
+                s.brewery,
+                s.beer_name,
+                s.beer_format,
+                s.validation_tier,
+                s.validation_status,
+                s.submission_time,
+                s.processed_at,
+                CASE WHEN s.pub_id IS NULL THEN 'New Pub' ELSE 'Existing Pub' END as pub_status,
+                CASE 
+                    WHEN EXISTS (SELECT 1 FROM beers WHERE LOWER(brewery) = LOWER(s.brewery)) 
+                    THEN 'Known Brewery' 
+                    ELSE 'New Brewery' 
+                END as brewery_status
+            FROM submissions s
+            WHERE s.submission_time >= DATE_SUB(NOW(), INTERVAL 7 DAY)
+            ORDER BY s.submission_time DESC
+            LIMIT 100
+        """)
+        
+        submissions = cursor.fetchall()
+        return jsonify(submissions)
+        
+    except Exception as e:
+        logger.error(f"Error getting recent submissions: {str(e)}")
+        return jsonify({'error': 'Failed to load recent submissions'}), 500
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+# ================================================================================
+# HEALTH & MONITORING
+# ================================================================================
+
+@app.route('/health')
+def health_check():
+    """Health check endpoint"""
+    try:
+        # Test database connection
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor()
+        cursor.execute("SELECT 1")
+        cursor.fetchone()
+        cursor.close()
+        conn.close()
+        
+        return jsonify({
+            'status': 'healthy',
+            'timestamp': time.time(),
+            'database': 'connected'
+        })
+    except Exception as e:
+        logger.error(f"Health check failed: {str(e)}")
+        return jsonify({
+            'status': 'unhealthy',
+            'timestamp': time.time(),
+            'database': 'disconnected',
+            'error': str(e)
+        }), 503
 
 # ================================================================================
 # STATIC PAGES
@@ -514,36 +764,6 @@ def liability_notice():
 def gf_breweries():
     version = str(int(time.time()))
     return render_template('breweries.html', cache_buster=version)
-
-# ================================================================================
-# HEALTH & MONITORING
-# ================================================================================
-
-@app.route('/health')
-def health_check():
-    """Health check endpoint"""
-    try:
-        # Test database connection
-        conn = mysql.connector.connect(**db_config)
-        cursor = conn.cursor()
-        cursor.execute("SELECT 1")
-        cursor.fetchone()
-        cursor.close()
-        conn.close()
-        
-        return jsonify({
-            'status': 'healthy',
-            'timestamp': time.time(),
-            'database': 'connected'
-        })
-    except Exception as e:
-        logger.error(f"Health check failed: {str(e)}")
-        return jsonify({
-            'status': 'unhealthy',
-            'timestamp': time.time(),
-            'database': 'disconnected',
-            'error': str(e)
-        }), 503
 
 # ================================================================================
 # ERROR HANDLERS
