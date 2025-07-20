@@ -9,6 +9,7 @@
 let currentTab = 'manual';
 let adminToken = new URLSearchParams(window.location.search).get('token') || 'beer_admin_2025';
 let refreshInterval;
+let currentModalType = null;
 
 // ================================
 // INITIALIZATION
@@ -588,7 +589,7 @@ function trackEvent(action, category = 'Admin', label = '') {
 // ADMIN MODAL MANAGEMENT
 // ================================
 
-let currentModalType = null;
+
 
 function openAdminModal(modalType) {
     console.log(`🔍 Opening ${modalType} modal`);
@@ -852,8 +853,6 @@ document.addEventListener('keydown', function(e) {
 // ================================
 // ADMIN MODAL MANAGEMENT
 // ================================
-
-let currentModalType = null;
 
 function openAdminModal(modalType) {
     console.log(`🔍 Opening ${modalType} modal`);
