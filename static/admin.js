@@ -541,33 +541,6 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// ================================
-// KEYBOARD SHORTCUTS
-// ================================
-document.addEventListener('keydown', function(e) {
-    // Alt + 1, 2, 3 for tab switching
-    if (e.altKey && !e.ctrlKey && !e.shiftKey) {
-        if (e.key === '1') {
-            e.preventDefault();
-            switchTab('manual');
-        } else if (e.key === '2') {
-            e.preventDefault();
-            switchTab('soft');
-        } else if (e.key === '3') {
-            e.preventDefault();
-            switchTab('recent');
-        }
-    }
-    
-    // Ctrl + R for refresh
-    if (e.ctrlKey && e.key === 'r') {
-        e.preventDefault();
-        loadStats();
-        loadTabData(currentTab);
-        showToast('Data refreshed!', 'info');
-    }
-});
-
 // UPDATE: Add to static/admin.js - Add modal functions and clickable cards
 
 // ================================
@@ -690,18 +663,6 @@ function debugModalDOM() {
     // Check for elements with admin-review-modal class
     const adminModals = document.querySelectorAll('.admin-review-modal');
     console.log('Admin review modal elements:', adminModals);
-}
-
-function closeAdminModal() {
-    const modal = document.getElementById('adminReviewModal');
-    modal.classList.remove('active');
-    
-    // Restore background scrolling
-    document.body.style.overflow = '';
-    
-    currentModalType = null;
-    
-    trackEvent('admin_modal_close', 'Admin');
 }
 
 async function loadModalContent(modalType) {
@@ -880,41 +841,6 @@ function setupClickableCards(stats) {
     }
 }
 
-// ================================
-// UPDATE: Close modal with escape key
-// ================================
-
-document.addEventListener('keydown', function(e) {
-    // Escape key closes modal
-    if (e.key === 'Escape') {
-        const modal = document.getElementById('adminReviewModal');
-        if (modal && modal.classList.contains('active')) {
-            closeAdminModal();
-        }
-    }
-    
-    // Existing keyboard shortcuts
-    if (e.altKey && !e.ctrlKey && !e.shiftKey) {
-        if (e.key === '1') {
-            e.preventDefault();
-            switchTab('manual');
-        } else if (e.key === '2') {
-            e.preventDefault();
-            switchTab('soft');
-        } else if (e.key === '3') {
-            e.preventDefault();
-            switchTab('recent');
-        }
-    }
-    
-    if (e.ctrlKey && e.key === 'r') {
-        e.preventDefault();
-        loadStats();
-        loadTabData(currentTab);
-        showToast('Data refreshed!', 'info');
-    }
-});
-
 // ADD: Add these functions to static/admin.js
 
 // ================================
@@ -951,15 +877,30 @@ function openAdminModal(modalType) {
 }
 
 function closeAdminModal() {
+    console.log('🔒 Closing admin modal');
+    
     const modal = document.getElementById('adminReviewModal');
-    modal.classList.remove('active');
+    if (modal) {
+        modal.classList.remove('active');
+    }
     
     // Restore background scrolling
     document.body.style.overflow = '';
     
     currentModalType = null;
     
-    trackEvent('admin_modal_close', 'Admin');
+    if (typeof trackEvent === 'function') {
+        trackEvent('admin_modal_close', 'Admin');
+    }
+}
+
+function refreshModalData() {
+    console.log('🔄 Refreshing modal data');
+    
+    if (currentModalType) {
+        loadModalContent(currentModalType);
+        showToast('Data refreshed!', 'info');
+    }
 }
 
 function refreshModalData() {
@@ -1114,15 +1055,7 @@ document.addEventListener('keydown', function(e) {
         }
     }
     
-    // Modal-specific shortcuts
-    if (currentModalType) {
-        if (e.key === 'r' && (e.ctrlKey || e.metaKey)) {
-            e.preventDefault();
-            refreshModalData();
-        }
-    }
-    
-    // Existing shortcuts
+    // Your existing keyboard shortcuts...
     if (e.altKey && !e.ctrlKey && !e.shiftKey) {
         if (e.key === '1') {
             e.preventDefault();
@@ -1135,7 +1068,69 @@ document.addEventListener('keydown', function(e) {
             openAdminModal('recent');
         }
     }
+    
+    if (e.ctrlKey && e.key === 'r') {
+        e.preventDefault();
+        loadStats();
+        loadTabData(currentTab);
+        showToast('Data refreshed!', 'info');
+    }
 });
+
+// ================================
+// 🔧 ADD: Test function to verify modal exists
+// Add this and call from console to test:
+// ================================
+
+function testModalExists() {
+    const modal = document.getElementById('adminReviewModal');
+    console.log('🧪 Testing modal existence...');
+    console.log('Modal element found:', !!modal);
+    
+    if (modal) {
+        console.log('✅ Modal HTML structure:');
+        console.log('- Has admin-modal-container:', !!modal.querySelector('.admin-modal-container'));
+        console.log('- Has admin-modal-header:', !!modal.querySelector('.admin-modal-header'));
+        console.log('- Has admin-modal-content:', !!modal.querySelector('.admin-modal-content'));
+        console.log('- Has adminModalTitle:', !!document.getElementById('adminModalTitle'));
+        console.log('- Has adminModalLoadingState:', !!document.getElementById('adminModalLoadingState'));
+        console.log('- Has adminModalSubmissions:', !!document.getElementById('adminModalSubmissions'));
+        console.log('- Has adminModalEmpty:', !!document.getElementById('adminModalEmpty'));
+        
+        return true;
+    } else {
+        console.log('❌ Modal not found in DOM!');
+        console.log('Available elements with "modal" in ID:', 
+            Array.from(document.querySelectorAll('[id*="modal"]')).map(el => el.id));
+        return false;
+    }
+}
+
+// ================================
+// 🔧 ADD: Manual modal trigger for testing
+// Add this and call from console:
+// ================================
+
+function manualTestModal() {
+    console.log('🧪 Manual modal test...');
+    
+    if (testModalExists()) {
+        openAdminModal('manual');
+        
+        // Force visible after 1 second if not showing
+        setTimeout(() => {
+            const modal = document.getElementById('adminReviewModal');
+            if (modal && !modal.classList.contains('active')) {
+                console.log('🔧 Force activating modal...');
+                modal.classList.add('active');
+                modal.style.display = 'flex';
+                modal.style.zIndex = '99999';
+            }
+        }, 1000);
+    } else {
+        console.log('❌ Cannot test - modal elements missing from HTML');
+    }
+}
 
 // ================================
 // CLEANUP
