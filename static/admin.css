@@ -772,6 +772,208 @@
 }
 
 /* ================================
+   🔧 ADD: Enhanced clickable stat cards styling
+   Add this to static/admin.css after your existing .stat-card styles
+   ================================ */
+
+.stat-card {
+    background: var(--bg-white);
+    border-radius: var(--radius-xl);
+    padding: var(--space-lg);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--space-sm);
+    transition: all var(--transition);
+    border-left: 4px solid var(--border-light);
+    min-height: 120px;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Enhanced clickable state */
+.stat-card[style*="cursor: pointer"] {
+    cursor: pointer !important;
+}
+
+.stat-card[style*="cursor: pointer"]:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: var(--shadow-xl);
+}
+
+.stat-card[style*="cursor: pointer"]:active {
+    transform: translateY(-1px) scale(0.98);
+    transition: all var(--transition-fast);
+}
+
+/* Ripple effect for clickable cards */
+.stat-card[style*="cursor: pointer"]::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.4);
+    transform: translate(-50%, -50%);
+    transition: width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.stat-card[style*="cursor: pointer"]:active::after {
+    width: 100px;
+    height: 100px;
+    opacity: 1;
+}
+
+/* ================================
+   🔧 UPDATE: Modal z-index and positioning fixes
+   Update these existing styles in static/admin.css
+   ================================ */
+
+.admin-review-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    background: var(--primary-gradient);
+    z-index: var(--z-modal-backdrop);
+    display: none;
+    overflow: hidden;
+}
+
+.admin-review-modal.active {
+    display: flex;
+    flex-direction: column;
+    animation: modalSlideIn 0.3s ease-out;
+}
+
+/* Modal animation */
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ================================
+   🔧 ADD: Better modal content scrolling
+   Add this to static/admin.css
+   ================================ */
+
+.admin-modal-submissions {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: var(--space-xl);
+    scroll-behavior: smooth;
+}
+
+/* Custom scrollbar for modal */
+.admin-modal-submissions::-webkit-scrollbar {
+    width: 8px;
+}
+
+.admin-modal-submissions::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.admin-modal-submissions::-webkit-scrollbar-thumb {
+    background: var(--primary-gradient);
+    border-radius: 4px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+}
+
+.admin-modal-submissions::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+    background-clip: content-box;
+}
+
+/* ================================
+   🔧 ADD: Loading and empty state improvements
+   Add this to static/admin.css
+   ================================ */
+
+.admin-modal-loading {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-4xl);
+    text-align: center;
+    color: var(--text-white);
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255, 255, 255, 0.2);
+    border-top: 3px solid var(--text-white);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: var(--space-lg);
+}
+
+.loading-text {
+    color: var(--text-white);
+    font-size: var(--text-lg);
+    font-weight: 500;
+    opacity: 0.9;
+}
+
+.admin-modal-empty {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-4xl);
+    text-align: center;
+    color: var(--text-white);
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: var(--space-lg);
+    opacity: 0.8;
+}
+
+.empty-title {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    color: var(--text-white);
+    margin-bottom: var(--space-sm);
+}
+
+.empty-message {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: var(--text-lg);
+    line-height: 1.5;
+    max-width: 400px;
+}
+
+
+/* ================================
    ANIMATIONS
    ================================ */
 @keyframes spin {
@@ -880,6 +1082,50 @@
         left: var(--space-lg);
         right: var(--space-lg);
         max-width: none;
+    }
+
+   .admin-modal-container {
+        padding: var(--space-xs);
+    }
+    
+    .admin-modal-header {
+        padding: var(--space-sm);
+        flex-direction: column;
+        gap: var(--space-sm);
+    }
+    
+    .admin-modal-title {
+        font-size: var(--text-lg);
+    }
+    
+    .admin-nav-btn {
+        padding: var(--space-xs) var(--space-md);
+        font-size: var(--text-xs);
+    }
+    
+    .admin-modal-submissions {
+        padding: var(--space-lg);
+    }
+    
+    .admin-modal-loading,
+    .admin-modal-empty {
+        padding: var(--space-2xl);
+    }
+    
+    .empty-icon {
+        font-size: 3rem;
+    }
+    
+    .empty-title {
+        font-size: var(--text-xl);
+    }
+    
+    .empty-message {
+        font-size: var(--text-base);
+    }
+    
+    .loading-text {
+        font-size: var(--text-base);
     }
 }
 
