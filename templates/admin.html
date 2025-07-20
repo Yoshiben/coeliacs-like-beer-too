@@ -129,8 +129,26 @@
             <span class="toast-message" id="toastMessage">Success!</span>
         </div>
     </div>
+
+    <!-- Admin Review Modal -->
+    <div id="adminReviewModal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 800px; max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header">
+                <h2 class="modal-title" id="adminModalTitle">Manual Reviews</h2>
+                <button class="modal-close" onclick="closeAdminModal()" aria-label="Close modal">&times;</button>
+            </div>
+            
+            <div class="modal-body">
+                <div id="adminModalContent" class="submissions-container">
+                    <div class="loading-state">Loading...</div>
+                </div>
+            </div>
+        </div>
+    </div>
     
     <!-- Include your JavaScript -->
     <script src="{{ url_for('static', filename='admin.js') }}?v={{ cache_buster }}"></script>
+
+    
 </body>
 </html>
