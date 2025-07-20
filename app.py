@@ -134,7 +134,7 @@ def nearby():
     lat = request.args.get('lat', type=float)
     lng = request.args.get('lng', type=float)
     radius = request.args.get('radius', 5, type=int)
-    gf_only = request.args.get('gf_only', 'false').lower() == 'true'
+    # gf_only = request.args.get('gf_only', 'false').lower() == 'true'
     
     # Input validation
     if not lat or not lng:
