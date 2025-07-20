@@ -2938,6 +2938,8 @@ function addSwipeGestures() {
         }
 
         // Enhanced form submission to handle pre-populated pub
+        // UPDATE: In templates/index.html, add debug logging to handleReportSubmission
+
         function handleReportSubmission(event) {
             event.preventDefault();
             
@@ -2953,7 +2955,9 @@ function addSwipeGestures() {
                 notes: formData.get('reportNotes') || ''
             };
             
+            // ADD: Debug logging to see what we're collecting
             console.log('📋 Form data collected:', reportData);
+            console.log('📋 Selected pub data:', window.selectedPubData);
             
             // Add pub data
             if (window.selectedPubData) {
@@ -2968,7 +2972,7 @@ function addSwipeGestures() {
                 console.log('🏠 Using manual pub data');
             }
             
-            console.log('📋 Complete report data:', reportData);
+            console.log('📋 Complete report data BEFORE sending:', reportData);
             
             // Validate required fields
             const requiredFields = [];
@@ -2990,33 +2994,40 @@ function addSwipeGestures() {
             submitBeerReport(reportData);
         }
 
+        // UPDATE: In templates/index.html, add debug logging to submitBeerReport
         async function submitBeerReport(reportData) {
             console.log('📡 Submitting beer report:', reportData);
             
             showLoadingToast('Submitting your beer report...');
             
             try {
+                // FIXED: Make sure we're sending the data in the format the backend expects
+                const payload = {
+                    pub_id: reportData.pub_id || null,
+                    beer_format: reportData.beer_format,
+                    // UPDATE: Use the field names your backend expects
+                    new_brewery: reportData.brewery,     // Backend expects 'new_brewery'
+                    new_beer_name: reportData.beer_name, // Backend expects 'new_beer_name'
+                    new_style: reportData.beer_style,    // Backend expects 'new_style'
+                    new_abv: reportData.beer_abv,        // Backend expects 'new_abv'
+                    submitted_by_name: 'Anonymous',
+                    submitted_by_email: '',
+                    user_notes: reportData.notes || `${reportData.beer_format} - ${reportData.brewery} ${reportData.beer_name}`,
+                    photo_url: '',
+                    // New pub data if needed
+                    new_pub_name: reportData.pub_name,
+                    new_address: reportData.address,
+                    new_postcode: reportData.postcode
+                };
+                
+                console.log('📡 Sending payload to API:', payload);
+                
                 const response = await fetch('/api/submit_beer_update', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({
-                        pub_id: reportData.pub_id || null,
-                        beer_format: reportData.beer_format,
-                        new_brewery: reportData.brewery,
-                        new_beer_name: reportData.beer_name,
-                        new_style: reportData.beer_style,
-                        new_abv: reportData.beer_abv,
-                        submitted_by_name: 'Anonymous', // You can add a name field later
-                        submitted_by_email: '', // You can add an email field later
-                        user_notes: reportData.notes || `${reportData.beer_format} - ${reportData.brewery} ${reportData.beer_name}`,
-                        photo_url: '', // Handle photo upload later
-                        // New pub data if needed
-                        new_pub_name: reportData.pub_name,
-                        new_address: reportData.address,
-                        new_postcode: reportData.postcode
-                    })
+                    body: JSON.stringify(payload)
                 });
                 
                 console.log('📡 API Response status:', response.status);
