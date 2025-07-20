@@ -702,6 +702,283 @@ def get_recent_submissions():
             conn.close()
 
 # ================================================================================
+# 🔧 ACTION: ADD these action endpoints to your app.py
+# Add these after your existing admin routes
+# ================================================================================
+
+@app.route('/api/admin/approve-submission', methods=['POST'])
+@admin_required
+def approve_submission():
+    """
+    Approve a pending submission - this actually updates your live database!
+    Can handle both existing pubs and create new pubs as needed
+    """
+    try:
+        data = request.get_json()
+        submission_id = data.get('submission_id')
+        admin_notes = data.get('admin_notes', '')
+        
+        if not submission_id:
+            return jsonify({'error': 'submission_id required'}), 400
+        
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        # Get the submission details
+        cursor.execute("""
+            SELECT * FROM submissions WHERE submission_id = %s
+        """, (submission_id,))
+        
+        submission = cursor.fetchone()
+        if not submission:
+            return jsonify({'error': 'Submission not found'}), 404
+        
+        # Start transaction for data consistency
+        cursor.execute("START TRANSACTION")
+        
+        # If it's a new pub, create it first
+        pub_id = submission['pub_id']
+        if not pub_id:
+            logger.info(f"Creating new pub: {submission['pub_name']}")
+            
+            # Create new pub with the beer format availability
+            cursor.execute("""
+                INSERT INTO pubs (name, address, postcode, bottle, tap, cask, can)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
+            """, (
+                submission['pub_name'],
+                submission['address'],
+                submission['postcode'],
+                1 if submission['beer_format'] == 'bottle' else 0,
+                1 if submission['beer_format'] == 'tap' else 0,
+                1 if submission['beer_format'] == 'cask' else 0,
+                1 if submission['beer_format'] == 'can' else 0
+            ))
+            
+            pub_id = cursor.lastrowid
+            
+            # Update submission with new pub_id
+            cursor.execute("""
+                UPDATE submissions SET pub_id = %s WHERE submission_id = %s
+            """, (pub_id, submission_id))
+        else:
+            # Update existing pub's beer format availability
+            beer_format = submission['beer_format']
+            if beer_format == 'bottle':
+                cursor.execute("UPDATE pubs SET bottle = 1 WHERE pub_id = %s", (pub_id,))
+            elif beer_format == 'tap':
+                cursor.execute("UPDATE pubs SET tap = 1 WHERE pub_id = %s", (pub_id,))
+            elif beer_format == 'cask':
+                cursor.execute("UPDATE pubs SET cask = 1 WHERE pub_id = %s", (pub_id,))
+            elif beer_format == 'can':
+                cursor.execute("UPDATE pubs SET can = 1 WHERE pub_id = %s", (pub_id,))
+        
+        # If it's a new brewery/beer, add to beers table
+        if submission['brewery'] and submission['beer_name']:
+            cursor.execute("""
+                SELECT beer_id FROM beers 
+                WHERE LOWER(brewery) = LOWER(%s) AND LOWER(name) = LOWER(%s)
+            """, (submission['brewery'], submission['beer_name']))
+            
+            existing_beer = cursor.fetchone()
+            if not existing_beer:
+                logger.info(f"Creating new beer: {submission['brewery']} - {submission['beer_name']}")
+                
+                cursor.execute("""
+                    INSERT INTO beers (brewery, name, style, abv, gluten_status)
+                    VALUES (%s, %s, %s, %s, 'gluten_removed')
+                """, (
+                    submission['brewery'],
+                    submission['beer_name'],
+                    submission['beer_style'],
+                    submission['beer_abv']
+                ))
+                
+                beer_id = cursor.lastrowid
+            else:
+                beer_id = existing_beer['beer_id']
+            
+            # Add to pubs_updates table to track specific beer at specific pub
+            cursor.execute("""
+                INSERT INTO pubs_updates (pub_id, beer_id, beer_format, update_time)
+                VALUES (%s, %s, %s, NOW())
+                ON DUPLICATE KEY UPDATE update_time = NOW()
+            """, (pub_id, beer_id, submission['beer_format']))
+        
+        # Update submission status to approved
+        cursor.execute("""
+            UPDATE submissions 
+            SET validation_status = 'approved',
+                processed_at = NOW(),
+                processed_by = 'admin',
+                admin_notes = %s
+            WHERE submission_id = %s
+        """, (admin_notes, submission_id))
+        
+        # Update validation queue
+        cursor.execute("""
+            UPDATE validation_queue 
+            SET status = 'approved',
+                reviewed_at = NOW(),
+                reviewed_by = 'admin',
+                admin_notes = %s
+            WHERE submission_id = %s
+        """, (admin_notes, submission_id))
+        
+        # Commit all changes
+        cursor.execute("COMMIT")
+        
+        logger.info(f"Submission {submission_id} approved by admin - pub_id: {pub_id}")
+        
+        return jsonify({
+            'success': True, 
+            'message': 'Submission approved successfully!',
+            'pub_id': pub_id
+        })
+        
+    except Exception as e:
+        # Rollback on any error
+        if 'cursor' in locals():
+            cursor.execute("ROLLBACK")
+        logger.error(f"Error approving submission: {str(e)}")
+        return jsonify({'error': 'Failed to approve submission'}), 500
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+@app.route('/api/admin/reject-submission', methods=['POST'])
+@admin_required  
+def reject_submission():
+    """
+    Reject a pending submission
+    Marks it as rejected but keeps the record for audit purposes
+    """
+    try:
+        data = request.get_json()
+        submission_id = data.get('submission_id')
+        admin_notes = data.get('admin_notes', '')
+        
+        if not submission_id:
+            return jsonify({'error': 'submission_id required'}), 400
+        
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor()
+        
+        # Update submission status to rejected
+        cursor.execute("""
+            UPDATE submissions 
+            SET validation_status = 'rejected',
+                processed_at = NOW(),
+                processed_by = 'admin',
+                admin_notes = %s
+            WHERE submission_id = %s
+        """, (admin_notes, submission_id))
+        
+        # Update validation queue
+        cursor.execute("""
+            UPDATE validation_queue 
+            SET status = 'rejected',
+                reviewed_at = NOW(),
+                reviewed_by = 'admin',
+                admin_notes = %s
+            WHERE submission_id = %s
+        """, (admin_notes, submission_id))
+        
+        conn.commit()
+        
+        logger.info(f"Submission {submission_id} rejected by admin")
+        
+        return jsonify({
+            'success': True, 
+            'message': 'Submission rejected'
+        })
+        
+    except Exception as e:
+        logger.error(f"Error rejecting submission: {str(e)}")
+        return jsonify({'error': 'Failed to reject submission'}), 500
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+@app.route('/api/admin/approve-soft-validation', methods=['POST'])
+@admin_required
+def approve_soft_validation_early():
+    """
+    Approve a soft validation item early (before the 24-hour timer)
+    Useful if an admin wants to fast-track something
+    """
+    try:
+        data = request.get_json()
+        submission_id = data.get('submission_id')
+        
+        if not submission_id:
+            return jsonify({'error': 'submission_id required'}), 400
+        
+        # Use the submission processor to handle the approval
+        processor = SubmissionProcessor(db_config)
+        
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        # Get submission data
+        cursor.execute("SELECT * FROM submissions WHERE submission_id = %s", (submission_id,))
+        submission = cursor.fetchone()
+        
+        if not submission:
+            return jsonify({'error': 'Submission not found'}), 404
+        
+        # Convert to the format expected by the processor
+        submission_data = {
+            'pub_id': submission['pub_id'],
+            'beer_format': submission['beer_format']
+        }
+        
+        # Get validation result (should be tier 2)
+        validation_result = {
+            'pub_data': {'pub_id': submission['pub_id']},
+            'beer_data': {'status': 'new_beer_existing_brewery'}
+        }
+        
+        # Apply the update immediately
+        processor._update_database_immediately(submission_data, validation_result)
+        
+        # Update status
+        cursor.execute("""
+            UPDATE submissions 
+            SET validation_status = 'approved',
+                processed_at = NOW(),
+                processed_by = 'admin_early'
+            WHERE submission_id = %s
+        """, (submission_id,))
+        
+        cursor.execute("""
+            UPDATE validation_queue 
+            SET status = 'approved',
+                reviewed_at = NOW(),
+                reviewed_by = 'admin_early'
+            WHERE submission_id = %s
+        """, (submission_id,))
+        
+        conn.commit()
+        
+        logger.info(f"Soft validation {submission_id} approved early by admin")
+        
+        return jsonify({
+            'success': True, 
+            'message': 'Soft validation approved early'
+        })
+        
+    except Exception as e:
+        logger.error(f"Error approving soft validation: {str(e)}")
+        return jsonify({'error': 'Failed to approve soft validation'}), 500
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+# ================================================================================
 # HEALTH & MONITORING
 # ================================================================================
 
