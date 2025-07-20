@@ -230,11 +230,31 @@ body {
     background: var(--primary-gradient);
     min-height: 100vh;
     margin: 0;
-    padding-bottom: var(--space-4xl);
+    padding-bottom: 0; /* CHANGED: Remove default padding */
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     overflow-x: hidden;
     color: var(--text-primary);
     line-height: 1.6;
+}
+
+/* ================================
+   ➕ ADD: Homepage-specific body styling
+   Add this new rule after your main body styles  
+   ================================ */
+
+/* Only add bottom padding when bottom nav is present */
+body:not(.no-bottom-nav) {
+    padding-bottom: var(--space-4xl);
+}
+
+/* Force clean homepage state */
+body.homepage-reset {
+    padding-bottom: var(--space-4xl) !important;
+    margin: 0 !important;
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
 }
 
 /* ================================
@@ -4142,6 +4162,39 @@ body::after {
 /* Reset any transform or positioning issues */
 body > * {
     transform: none !important;
+}
+
+.homepage-reset {
+    background: var(--primary-gradient) !important;
+}
+
+.homepage-reset * {
+    box-sizing: border-box !important;
+}
+
+/* Ensure search section maintains proper spacing */
+.homepage-reset .search-section {
+    height: calc(100vh - 200px) !important;
+    height: calc(100dvh - 200px) !important;
+    margin: -20px 0 0 0 !important;
+}
+
+/* Force features section to display correctly */
+.homepage-reset .features-section {
+    display: block !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+/* Ensure no overlay remnants */
+.homepage-reset .results-overlay,
+.homepage-reset .pub-details-overlay {
+    display: none !important;
+}
+
+/* Force clean footer positioning */
+.homepage-reset .footer {
+    margin-top: var(--space-4xl) !important;
 }
 
 /* Mobile safari viewport fix */
