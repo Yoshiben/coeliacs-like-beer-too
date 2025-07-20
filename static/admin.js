@@ -75,12 +75,81 @@ async function loadStats() {
         document.getElementById('manual-count').textContent = stats.pending_manual || 0;
         document.getElementById('soft-count').textContent = stats.pending_soft || 0;
         
+        // 🔧 FIX: Make stat cards clickable based on data
+        setupClickableStatCards(stats);
+        
         console.log('✅ Stats updated:', stats);
         
     } catch (error) {
         console.error('❌ Error loading stats:', error);
         showToast('Failed to load statistics', 'error');
     }
+}
+
+// ================================
+// 🔧 ADD: New function to make stat cards clickable
+// Add this new function to static/admin.js
+// ================================
+
+function setupClickableStatCards(stats) {
+    // Remove any existing click handlers
+    document.querySelectorAll('.stat-card').forEach(card => {
+        card.style.cursor = 'default';
+        card.onclick = null;
+        card.removeAttribute('title');
+    });
+    
+    // Manual review card - only clickable if there are pending items
+    const manualCard = document.querySelector('.stat-card-danger');
+    if (manualCard && stats.pending_manual > 0) {
+        manualCard.style.cursor = 'pointer';
+        manualCard.onclick = () => openAdminModal('manual');
+        manualCard.title = `Click to view ${stats.pending_manual} pending manual review${stats.pending_manual === 1 ? '' : 's'}`;
+        
+        // Add hover effect
+        manualCard.addEventListener('mouseenter', () => {
+            manualCard.style.transform = 'translateY(-2px) scale(1.02)';
+        });
+        manualCard.addEventListener('mouseleave', () => {
+            manualCard.style.transform = '';
+        });
+    }
+    
+    // Soft validation card
+    const softCard = document.querySelector('.stat-card-warning');
+    if (softCard && stats.pending_soft > 0) {
+        softCard.style.cursor = 'pointer';
+        softCard.onclick = () => openAdminModal('soft');
+        softCard.title = `Click to view ${stats.pending_soft} pending soft validation${stats.pending_soft === 1 ? '' : 's'}`;
+        
+        softCard.addEventListener('mouseenter', () => {
+            softCard.style.transform = 'translateY(-2px) scale(1.02)';
+        });
+        softCard.addEventListener('mouseleave', () => {
+            softCard.style.transform = '';
+        });
+    }
+    
+    // Recent activity card - always clickable if there are submissions today
+    const recentCard = document.querySelector('.stat-card-primary');
+    if (recentCard && stats.today_submissions > 0) {
+        recentCard.style.cursor = 'pointer';
+        recentCard.onclick = () => openAdminModal('recent');
+        recentCard.title = `Click to view ${stats.today_submissions} submission${stats.today_submissions === 1 ? '' : 's'} from today`;
+        
+        recentCard.addEventListener('mouseenter', () => {
+            recentCard.style.transform = 'translateY(-2px) scale(1.02)';
+        });
+        recentCard.addEventListener('mouseleave', () => {
+            recentCard.style.transform = '';
+        });
+    }
+    
+    console.log('✅ Stat cards configured:', {
+        manual: stats.pending_manual > 0 ? 'clickable' : 'disabled',
+        soft: stats.pending_soft > 0 ? 'clickable' : 'disabled', 
+        recent: stats.today_submissions > 0 ? 'clickable' : 'disabled'
+    });
 }
 
 async function loadTabData(tabName) {
@@ -529,7 +598,7 @@ function openAdminModal(modalType) {
     const modal = document.getElementById('adminReviewModal');
     const title = document.getElementById('adminModalTitle');
     
-    // Set title and show modal
+    // Set title based on modal type
     const titles = {
         'manual': '⚠️ Manual Review Required',
         'soft': '⏰ Soft Validation Queue', 
@@ -544,10 +613,15 @@ function openAdminModal(modalType) {
     // Prevent background scrolling
     document.body.style.overflow = 'hidden';
     
-    // Load content
+    // Load content for the modal
     loadModalContent(modalType);
     
-    trackEvent('admin_modal_open', 'Admin', modalType);
+    // Track the action
+    if (typeof trackEvent === 'function') {
+        trackEvent('admin_modal_open', 'Admin', modalType);
+    }
+    
+    console.log(`✅ ${modalType} modal opened`);
 }
 
 function closeAdminModal() {
@@ -562,42 +636,59 @@ function closeAdminModal() {
     trackEvent('admin_modal_close', 'Admin');
 }
 
-async function loadModalContent(modalType, container) {
-    container.innerHTML = '<div class="loading-state">Loading...</div>';
+async function loadModalContent(modalType) {
+    const loadingState = document.getElementById('adminModalLoadingState');
+    const submissionsContainer = document.getElementById('adminModalSubmissions');
+    const emptyState = document.getElementById('adminModalEmpty');
+    
+    // Show loading state
+    loadingState.style.display = 'flex';
+    submissionsContainer.style.display = 'none';
+    emptyState.style.display = 'none';
     
     try {
+        // Determine API endpoint
         let endpoint;
-        
         if (modalType === 'manual') {
             endpoint = '/api/admin/pending-manual-reviews';
         } else if (modalType === 'soft') {
             endpoint = '/api/admin/soft-validation-queue';
         } else if (modalType === 'recent') {
             endpoint = '/api/admin/recent-submissions';
+        } else {
+            throw new Error(`Unknown modal type: ${modalType}`);
         }
+        
+        console.log(`📡 Loading data from: ${endpoint}`);
         
         const response = await fetch(endpoint, {
             headers: { 'Authorization': adminToken }
         });
         
         if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
         
         const items = await response.json();
+        console.log(`✅ Loaded ${items.length} items for ${modalType}`);
+        
+        // Hide loading
+        loadingState.style.display = 'none';
         
         if (items.length === 0) {
-            container.innerHTML = getEmptyStateModal(modalType);
+            // Show empty state
+            showEmptyState(modalType, emptyState);
         } else {
-            container.innerHTML = items.map(item => createSubmissionCard(item, modalType)).join('');
+            // Show items
+            showModalItems(items, modalType, submissionsContainer);
         }
-        
-        console.log(`✅ Loaded ${items.length} items for ${modalType} modal`);
         
     } catch (error) {
         console.error(`❌ Error loading ${modalType} data:`, error);
-        container.innerHTML = '<div class="loading-state">Error loading data</div>';
-        showToast(`Failed to load ${modalType} data`, 'error');
+        
+        // Hide loading and show error
+        loadingState.style.display = 'none';
+        showErrorState(error, emptyState);
     }
 }
 
@@ -609,6 +700,51 @@ function getEmptyStateModal(modalType) {
     };
     
     return `<div class="empty-state">${messages[modalType]}</div>`;
+}
+
+// ================================
+// 🔧 ADD: Helper functions for modal content
+// Add these new functions to static/admin.js
+// ================================
+
+function showEmptyState(modalType, emptyState) {
+    emptyState.style.display = 'flex';
+    
+    const emptyIcon = emptyState.querySelector('.empty-icon');
+    const emptyTitle = emptyState.querySelector('.empty-title');
+    const emptyMessage = emptyState.querySelector('.empty-message');
+    
+    if (modalType === 'manual') {
+        emptyIcon.textContent = '🎉';
+        emptyTitle.textContent = 'All caught up!';
+        emptyMessage.textContent = 'No submissions need manual review right now.';
+    } else if (modalType === 'soft') {
+        emptyIcon.textContent = '⏰';
+        emptyTitle.textContent = 'Queue is empty';
+        emptyMessage.textContent = 'No items in soft validation queue.';
+    } else if (modalType === 'recent') {
+        emptyIcon.textContent = '📊';
+        emptyTitle.textContent = 'No recent activity';
+        emptyMessage.textContent = 'No submissions in the last 7 days.';
+    }
+}
+
+function showErrorState(error, emptyState) {
+    emptyState.style.display = 'flex';
+    
+    const emptyIcon = emptyState.querySelector('.empty-icon');
+    const emptyTitle = emptyState.querySelector('.empty-title');
+    const emptyMessage = emptyState.querySelector('.empty-message');
+    
+    emptyIcon.textContent = '❌';
+    emptyTitle.textContent = 'Error loading data';
+    emptyMessage.textContent = `${error.message}. Please try refreshing or check your connection.`;
+}
+
+function showModalItems(items, modalType, submissionsContainer) {
+    submissionsContainer.style.display = 'block';
+    submissionsContainer.innerHTML = items.map(item => createSubmissionCard(item, modalType)).join('');
+    console.log(`✅ Displayed ${items.length} ${modalType} items in modal`);
 }
 
 // ================================
