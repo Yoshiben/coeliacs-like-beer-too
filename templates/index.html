@@ -1879,25 +1879,31 @@
             document.getElementById('resultsTitle').textContent = title;
             document.getElementById('resultsOverlay').classList.add('active');
             
+            // HIDE the home page search section when showing results
+            const searchSection = document.querySelector('.search-section');
+            if (searchSection) {
+                searchSection.style.display = 'none';
+            }
+            
             // Prevent background scrolling
             document.body.style.overflow = 'hidden';
         }
-        
-        // 📝 UPDATE - Improve closeResults to go back to home (not try to restore)
-        // ================================
-        // 🔄 REPLACE: Your closeResults function to properly reset home view
-        // ================================
         
         // 🔄 REPLACE: Your closeResults function
         function closeResults() {
             console.log('🏠 Closing results and returning to homepage');
             
-            // Close results overlay with explicit hide
+            // Close results overlay
             const resultsOverlay = document.getElementById('resultsOverlay');
             if (resultsOverlay) {
                 resultsOverlay.classList.remove('active');
-                // Force hide with inline style to ensure it's hidden
                 resultsOverlay.style.display = 'none';
+            }
+            
+            // SHOW the home page search section again
+            const searchSection = document.querySelector('.search-section');
+            if (searchSection) {
+                searchSection.style.display = 'block';
             }
             
             // Also close pub details overlay if open
@@ -1919,9 +1925,6 @@
             if (resultsList) resultsList.innerHTML = '';
             if (resultsLoading) resultsLoading.style.display = 'flex';
             if (noResultsFound) noResultsFound.style.display = 'none';
-            
-            // Reset homepage to clean state
-            resetHomepageToCleanState();
             
             trackEvent('close_results', 'Navigation');
         }
