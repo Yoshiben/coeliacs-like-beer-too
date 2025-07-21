@@ -230,7 +230,7 @@ body {
     background: var(--primary-gradient);
     min-height: 100vh;
     margin: 0;
-    padding-bottom: 80px;
+/*     padding-bottom: 80px; */
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     overflow-x: hidden;
     color: var(--text-primary);
