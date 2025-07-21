@@ -33,6 +33,9 @@
             'cookie_flags': 'SameSite=None;Secure'
         });
     </script>
+
+    # initialize map
+    <script type="module" src="/static/js/map.js"></script>
 </head>
 <body>
     
@@ -885,6 +888,139 @@
         </a>
     </nav>
 
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <!-- STEP 1: Add this to the <head> section of index.html -->
+    <script type="module" src="/static/js/map.js"></script>
+    
+    <!-- STEP 2: Replace the map initialization in your current JavaScript with: -->
+    <script type="module">
+        import { MapModule } from '/static/js/map.js';
+        
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Initializing modular map system...');
+            
+            // Set up the main map toggle button
+            const toggleMapBtn = document.getElementById('toggleMapBtn');
+            if (toggleMapBtn) {
+                toggleMapBtn.addEventListener('click', () => {
+                    MapModule.toggleMap();
+                });
+            }
+            
+            // Initialize map if needed
+            if (document.getElementById('map')) {
+                MapModule.initMainMap();
+            }
+        });
+        
+        // Example: When you get user location
+        function handleUserLocation(position) {
+            const location = {
+                lat: position.coords.latitude,
+                lng: position.coords.longitude
+            };
+            
+            // Update the map module
+            MapModule.setUserLocation(location);
+            
+            // Center map on user
+            MapModule.centerOnLocation();
+        }
+        
+        // Example: When search results come back
+        async function displaySearchResults(pubs) {
+            // Your existing display logic...
+            
+            // Add markers to map
+            MapModule.clearPubMarkers();
+            MapModule.addPubMarkers(pubs);
+            
+            // Show map if hidden
+            if (!MapModule.isMapVisible()) {
+                MapModule.toggleMap();
+            }
+        }
+        
+        // Example: Toggle results map
+        function toggleSearchResultsFullMap() {
+            const listContainer = document.getElementById('resultsListContainer');
+            const mapContainer = document.getElementById('resultsMapContainer');
+            const mapBtnText = document.getElementById('resultsMapBtnText');
+            
+            if (mapContainer.style.display === 'none') {
+                // Show map
+                listContainer.style.display = 'none';
+                mapContainer.style.display = 'block';
+                mapBtnText.textContent = 'List';
+                
+                // Initialize results map
+                setTimeout(() => {
+                    const resultsMap = MapModule.initResultsMap();
+                    // Add current search results to map
+                    if (window.currentSearchPubs) {
+                        MapModule.addPubMarkers(window.currentSearchPubs, resultsMap);
+                    }
+                }, 100);
+            } else {
+                // Show list
+                listContainer.style.display = 'block';
+                mapContainer.style.display = 'none';
+                mapBtnText.textContent = 'Map';
+            }
+        }
+        
+        // Example: Show pub detail map
+        function togglePubDetailsSplitMap() {
+            const container = document.getElementById('pubContainer');
+            const mapBtn = document.getElementById('pubToggleMap');
+            
+            const isMapVisible = container.classList.contains('split-view');
+            
+            if (!isMapVisible) {
+                // Show split view
+                container.classList.add('split-view');
+                mapBtn.classList.add('active');
+                
+                // Initialize pub map
+                if (window.currentPubData) {
+                    setTimeout(() => {
+                        MapModule.initPubDetailMap(window.currentPubData);
+                    }, 300);
+                }
+            } else {
+                // Hide split view
+                container.classList.remove('split-view');
+                mapBtn.classList.remove('active');
+            }
+        }
+    </script>
+
+    <!-- 1. Load the API module file -->
+    <script type="module" src="/static/js/api.js"></script>
+    
+    <!-- 2. Import it so you can use it -->
+    <script type="module">
+        import { APIModule } from '/static/js/api.js';
+        
+        // That's it! No initialization needed
+        // The API module is now available to use
+        
+        // Make it global so your existing functions can use it
+        window.APIModule = APIModule;
+    </script>
+
+    <!-- Add after api.js -->
+    <script type="module" src="/static/js/search.js"></script>
+    
+    <script type="module">
+        import { SearchModule } from '/static/js/search.js';
+        window.SearchModule = SearchModule;
+    </script>
+
+
     <!-- END OF HTML SCRIPT -->
     <!-- START OF JAVASCRIPT -->
 
@@ -913,9 +1049,10 @@
         let brewerySearchTimeout;
         let beerSearchTimeout;
         let styleSearchTimeout;
-        
-        // console.log('🔍 Initial lastSearchState:', typeof lastSearchState !== 'undefined' ? lastSearchState : 'UNDEFINED');
+
+        let currentSearchPubs = []; // Store search results globally
         let lastSearchState = null;
+        
         console.log('🔍 After declaration lastSearchState:', lastSearchState);
 
         // DEBUG: Mobile overlay detector
@@ -2325,147 +2462,11 @@
         }
         
         // ================================
-        // ➕ ADD: Initialize results map with current search results
-        // ================================
-        
-        function initializeResultsMap() {
-            const mapElement = document.getElementById('resultsMap');
-            if (!mapElement) {
-                console.error('Results map element not found');
-                return;
-            }
-            
-            // Clear any existing map
-            mapElement.innerHTML = '';
-            
-            // Create new Leaflet map
-            const resultsMap = L.map('resultsMap').setView([54.5, -3], 6); // Center on UK
-            
-            // Add tile layer
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(resultsMap);
-            
-            // Add user location if available
-            if (userLocation) {
-                const userMarker = L.circleMarker([userLocation.lat, userLocation.lng], {
-                    radius: 8,
-                    fillColor: '#667eea',
-                    color: '#ffffff',
-                    weight: 2,
-                    opacity: 1,
-                    fillOpacity: 0.8
-                }).addTo(resultsMap);
-                
-                userMarker.bindPopup('📍 Your location');
-                
-                // Center on user location
-                resultsMap.setView([userLocation.lat, userLocation.lng], 10);
-            }
-            
-            // Add markers for current search results
-            addResultsToMap(resultsMap);
-            
-            // Invalidate size to ensure proper rendering
-            setTimeout(() => {
-                resultsMap.invalidateSize();
-            }, 100);
-            
-            console.log('✅ Results map initialized');
-        }
-        
-        // ================================
-        // ➕ ADD: Add current search results to map
-        // ================================
-        
-        // ================================
         // 🔄 REPLACE: Your addResultsToMap function to actually use pub data
         // ================================
         
-        let currentSearchPubs = []; // Store search results globally
         
-        function addResultsToMap(mapInstance) {
-            console.log('📍 Adding pub data to map...', currentSearchPubs);
-            
-            if (!currentSearchPubs || currentSearchPubs.length === 0) {
-                console.log('❌ No pub data available for map');
-                showMapMessage(mapInstance, '🗺️ Map View', 'No pub location data available for current search');
-                return;
-            }
-            
-            let markersAdded = 0;
-            const mapBounds = [];
-            
-            currentSearchPubs.forEach((pub, index) => {
-                if (pub.latitude && pub.longitude && !isNaN(parseFloat(pub.latitude)) && !isNaN(parseFloat(pub.longitude))) {
-                    const lat = parseFloat(pub.latitude);
-                    const lng = parseFloat(pub.longitude);
-                    
-                    // Create marker
-                    const marker = L.circleMarker([lat, lng], {
-                        radius: 10,
-                        fillColor: '#4CAF50',
-                        color: '#ffffff',
-                        weight: 2,
-                        opacity: 1,
-                        fillOpacity: 0.9
-                    }).addTo(mapInstance);
-                    
-                    // Create popup content
-                    let popupContent = `<div style="text-align: center; padding: 8px; min-width: 200px;">`;
-                    popupContent += `<strong style="color: var(--text-primary); font-size: 14px;">${pub.name}</strong><br>`;
-                    popupContent += `<small style="color: var(--text-secondary);">${pub.address}</small><br>`;
-                    popupContent += `<small style="color: var(--text-muted);">${pub.postcode}</small>`;
-                    
-                    // Add distance if available
-                    if (pub.distance !== undefined) {
-                        popupContent += `<br><small style="color: var(--primary-color, #667eea); font-weight: 600;">${pub.distance.toFixed(1)}km away</small>`;
-                    }
-                    
-                    // Add GF status
-                    if (pub.bottle || pub.tap || pub.cask || pub.can) {
-                        let gfOptions = [];
-                        if (pub.bottle) gfOptions.push('🍺');
-                        if (pub.tap) gfOptions.push('🚰');
-                        if (pub.cask) gfOptions.push('🛢️');
-                        if (pub.can) gfOptions.push('🥫');
-                        popupContent += `<div style="margin-top: 8px; color: var(--success-color, #10b981);"><strong>GF: ${gfOptions.join(' ')}</strong></div>`;
-                    }
-                    
-                    // Add click action
-                    popupContent += `<div style="margin-top: 8px;"><button onclick="showPubDetails(${pub.pub_id})" style="background: var(--primary-gradient); color: white; border: none; padding: 4px 8px; border-radius: 12px; font-size: 12px; cursor: pointer;">View Details</button></div>`;
-                    popupContent += `</div>`;
-                    
-                    marker.bindPopup(popupContent);
-                    
-                    // Add to bounds for auto-zoom
-                    mapBounds.push([lat, lng]);
-                    markersAdded++;
-                    
-                    console.log(`✅ Added marker for ${pub.name} at ${lat}, ${lng}`);
-                } else {
-                    console.log(`❌ Missing coordinates for ${pub.name}`);
-                }
-            });
-            
-            if (markersAdded === 0) {
-                showMapMessage(mapInstance, '📍 Pubs Found', 'Pub locations will appear here once coordinate data is added');
-            } else {
-                console.log(`✅ Added ${markersAdded} pub markers to map`);
-                
-                // Auto-zoom to show all markers
-                if (mapBounds.length > 0) {
-                    if (mapBounds.length === 1) {
-                        // Single marker - center on it
-                        mapInstance.setView(mapBounds[0], 15);
-                    } else {
-                        // Multiple markers - fit bounds
-                        mapInstance.fitBounds(mapBounds, { padding: [20, 20] });
-                    }
-                }
-            }
-        }
+        
         
         // ================================
         // ➕ ADD: Function to show message overlay on map
@@ -3048,62 +3049,6 @@ function addSwipeGestures() {
                 }
             });
         }
-
-        // SMART MAP TOGGLE - Auto-show when needed
-        function toggleMap() {
-            mapVisible = !mapVisible;
-            const mapContainer = document.getElementById('mapContainer');
-            const toggleBtn = document.getElementById('toggleMapBtn');
-            const featuresSection = document.getElementById('featuresSection');
-            const searchSection = document.getElementById('search');
-            
-            if (mapVisible) {
-                mapContainer.style.display = 'block';
-                toggleBtn.innerHTML = '🗺️ Hide Map';
-                
-                if (featuresSection) {
-                    featuresSection.classList.remove('map-hidden');
-                }
-                
-                // Fix overlap: Add space below map for search
-                searchSection.style.marginTop = '40px';
-                
-                setTimeout(() => {
-                    if (map) {
-                        map.invalidateSize();
-                    }
-                }, 100);
-                
-                setTimeout(() => {
-                    mapContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }, 150);
-            } else {
-                mapContainer.style.display = 'none';
-                toggleBtn.innerHTML = '🗺️ Show Map';
-                
-                if (featuresSection) {
-                    featuresSection.classList.add('map-hidden');
-                }
-                
-                // Reset margin
-                searchSection.style.marginTop = '-20px';
-            }
-            
-            AppState.save();
-        }
-
-        // SMART MAP SHOWING - Auto show map when needed
-        function smartShowMap() {
-            if (!mapVisible) {
-                toggleMap();
-            }
-        }
-
-        // Enhanced openReportModal function
-        // ================================
-        // ✏️ UPDATE - REPLACE your existing openReportModal function
-        // Replace the entire function with this enhanced version
-        // ================================
 
         // ================================
         // 🔍 DEBUG - REPORT MODAL FIX
@@ -4370,31 +4315,6 @@ function addSwipeGestures() {
             });
         });
 
-        // Calculate distance between two points
-        function calculateDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371; // Earth's radius in kilometers
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                      Math.sin(dLon/2) * Math.sin(dLon/2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return R * c; // Distance in kilometers
-        }
-
-        // ENHANCED centerOnLocation with smart map showing
-        function centerOnLocation() {
-            trackEvent('center_on_location', 'Map Interaction');
-            smartShowMap(); // Auto-show map
-            
-            if (userLocation) {
-                map.setView([userLocation.lat, userLocation.lng], 14);
-                showSuccessToast('Centered on your location!');
-            } else {
-                getUserLocation();
-            }
-        }
-
         // TEMPORARY DEBUG - Find what's causing the gray overlay
         function debugFindGrayOverlay() {
             console.log('🔍 Searching for visible overlays...');
@@ -4447,65 +4367,6 @@ function addSwipeGestures() {
                     });
                 }
             });
-        }
-        
-        // NEW: Function to show pub details from map popup
-        function showPubDetailsFromMap(pubId) {
-            // First, we need to get the pub data
-            searchSpecificPub(pubId);
-            trackEvent('view_pub_from_map', 'Map Interaction', `pub_${pubId}`);
-        }
-
-        // Display search results with pagination
-        // function displaySearchResults(data, append = false) {
-        //     console.log('displaySearchResults called with pagination support!');
-        //     const results = document.getElementById('results');
-            
-        //     const pubs = Array.isArray(data) ? data : data.pubs;
-        //     const pagination = data.pagination || null;
-            
-        //     if (!append) {
-        //         results.innerHTML = '';
-                
-        //         // Add GF filter suggestion if there are mixed results
-        //         if (pubs.length > 0) {
-        //             const gfCount = pubs.filter(pub => pub.bottle || pub.tap || pub.cask || pub.can).length;
-        //             const totalCount = pubs.length;
-                    
-        //             // Only show filter if there are both GF and non-GF pubs
-        //             if (gfCount > 0 && gfCount < totalCount) {
-        //                 const filterDiv = document.createElement('div');
-        //                 filterDiv.className = 'filter-suggestion';
-        //                 filterDiv.innerHTML = `
-        //                     <button class="btn btn-secondary" onclick="showOnlyGF()">
-        //                         🍺 Show only pubs with GF beer (${gfCount} of ${totalCount} pubs)
-        //                     </button>
-        //                 `;
-        //                 results.appendChild(filterDiv);
-        //             }
-        //         }
-        //     }
-            
-        //     if (pubs.length === 0 && !append) {
-        //         results.innerHTML = '<li class="no-results">No pubs found.</li>';
-        //         return;
-        //     }
-            
-        //     pubs.forEach(pub => {
-        //         const resultItem = createResultItem(pub);
-        //         results.appendChild(resultItem);
-        //     });
-            
-        //     if (pagination && !append) {
-        //         addPaginationControls(pagination);
-        //     }
-        // }
-        
-        // Add this new function too
-        function showOnlyGF() {
-            // For now, just show a coming soon message
-            showSuccessToast('🍺 GF-only filter coming soon!');
-            trackEvent('gf_filter_clicked', 'User Interest', 'filter_suggestion');
         }
 
         function formatBeerDetails(beerDetails, pub) {
@@ -4793,63 +4654,6 @@ function addSwipeGestures() {
             
             trackEvent('open_navigation', 'External Navigation', pubName);
             showSuccessToast('🧭 Opening directions...');
-        }
-
-        function findOnMap(lat, lng, pubName, postcode, pubId) {
-            trackPubView(pubName);
-            
-            // Always show the map when someone clicks "Find on Map"
-            if (!mapVisible) {
-                toggleMap();
-            }
-            
-            if (lat && lng && lat !== 'null' && lng !== 'null' && !isNaN(parseFloat(lat)) && !isNaN(parseFloat(lng))) {
-                setTimeout(() => {
-                    // Zoom to the location
-                    map.setView([parseFloat(lat), parseFloat(lng)], 17);
-                    
-                    // Remove any existing highlight markers
-                    if (window.currentHighlightMarker) {
-                        map.removeLayer(window.currentHighlightMarker);
-                    }
-                    
-                    // Create a special highlight marker
-                    window.currentHighlightMarker = L.circleMarker([parseFloat(lat), parseFloat(lng)], {
-                        radius: 15,
-                        fillColor: '#ff6b6b',
-                        color: '#fff',
-                        weight: 4,
-                        opacity: 1,
-                        fillOpacity: 0.9,
-                        className: 'pulsing-marker'
-                    }).addTo(map);
-                    
-                    const markerElement = window.currentHighlightMarker.getElement();
-                    if (markerElement) {
-                        markerElement.style.animation = 'pulse 2s infinite';
-                    }
-                    
-                    window.currentHighlightMarker.bindPopup(`
-                        <div style="text-align: center; padding: 8px;">
-                            <strong style="color: #2d3748; font-size: 16px;">${pubName}</strong>
-                            <br><em style="color: #667eea;">📍 Found on map!</em>
-                            <br><small style="color: #718096;">Click for details</small>
-                        </div>
-                    `).openPopup();
-                    
-                    showSuccessToast(`📍 Found ${pubName} on map!`);
-                    
-                    setTimeout(() => {
-                        if (window.currentHighlightMarker) {
-                            map.removeLayer(window.currentHighlightMarker);
-                            window.currentHighlightMarker = null;
-                        }
-                    }, 8000);
-                    
-                }, mapVisible ? 50 : 300);
-            } else {
-                showComingSoon('Coordinate Modal for pub location');
-            }
         }
 
         function searchForPub(pubName, postcode) {
@@ -5262,93 +5066,6 @@ function addSwipeGestures() {
         //         trackEvent('pub_map_toggle', 'Map Interaction', 'hide');
         //     }
         // }
-        
-        // REPLACE the initializePubMap function with this cleaner version:
-
-        function initializePubMap(pub) {
-            const mapContainer = document.querySelector('.pub-map-placeholder');
-            
-            if (!pub.latitude || !pub.longitude) {
-                mapContainer.innerHTML = '📍 Location coordinates not available<br><small style="opacity: 0.7;">Help us by reporting the exact location!</small>';
-                return;
-            }
-            
-            // Clear the placeholder and create a map container
-            mapContainer.innerHTML = '<div id="pubMapLeaflet" style="width: 100%; height: 100%; border-radius: 0 0 var(--radius-xl) var(--radius-xl);"></div>';
-            
-            // Get CSS variables for consistent styling
-            const rootStyles = getComputedStyle(document.documentElement);
-            const pubFillColor = rootStyles.getPropertyValue('--marker-pub-fill').trim() || '#4CAF50';
-            const pubStrokeColor = rootStyles.getPropertyValue('--marker-pub-stroke').trim() || '#ffffff';
-            const userFillColor = rootStyles.getPropertyValue('--marker-user-fill').trim() || '#667eea';
-            const userStrokeColor = rootStyles.getPropertyValue('--marker-user-stroke').trim() || '#ffffff';
-            
-            // Initialize Leaflet map for the pub
-            const pubMap = L.map('pubMapLeaflet').setView([pub.latitude, pub.longitude], 16);
-            
-            // Add tile layer
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(pubMap);
-            
-            // Add marker for the pub using CSS variables
-            const pubMarker = L.circleMarker([pub.latitude, pub.longitude], {
-                radius: 12,
-                fillColor: pubFillColor,
-                color: pubStrokeColor,
-                weight: 3,
-                opacity: 1,
-                fillOpacity: 0.9
-            }).addTo(pubMap);
-            
-            // Add popup to the marker
-            let popupContent = `<div style="text-align: center; padding: 8px;">`;
-            popupContent += `<strong style="color: var(--text-primary); font-size: 14px;">${pub.name}</strong><br>`;
-            popupContent += `<small style="color: var(--text-muted);">${pub.address}</small><br>`;
-            
-            // Add GF options if available
-            if (pub.bottle || pub.tap || pub.cask || pub.can) {
-                let gfOptions = [];
-                if (pub.bottle) gfOptions.push('🍺');
-                if (pub.tap) gfOptions.push('🚰');
-                if (pub.cask) gfOptions.push('🛢️');
-                if (pub.can) gfOptions.push('🥫');
-                popupContent += `<div style="margin-top: 8px; color: var(--success-color, #10b981);"><strong>GF: ${gfOptions.join(' ')}</strong></div>`;
-            }
-            popupContent += `</div>`;
-            
-            pubMarker.bindPopup(popupContent).openPopup();
-            
-            // Add user location if available
-            if (userLocation) {
-                L.circleMarker([userLocation.lat, userLocation.lng], {
-                    radius: 8,
-                    fillColor: userFillColor,
-                    color: userStrokeColor,
-                    weight: 2,
-                    opacity: 1,
-                    fillOpacity: 0.8
-                }).addTo(pubMap).bindPopup('Your location');
-                
-                // Calculate and show distance
-                const distance = calculateDistance(
-                    userLocation.lat, userLocation.lng,
-                    pub.latitude, pub.longitude
-                );
-                
-                // Update popup with distance
-                popupContent = popupContent.replace('</div>', `<div style="color: var(--primary-color, #667eea); font-size: 12px; margin-top: 4px;">${distance.toFixed(2)} km away</div></div>`);
-                pubMarker.bindPopup(popupContent).openPopup();
-            }
-            
-            // Ensure map renders properly
-            setTimeout(() => {
-                pubMap.invalidateSize();
-            }, 100);
-            
-            console.log('✅ Pub map initialized for:', pub.name);
-        }
 
         function checkCookieConsent() {
             const consent = localStorage.getItem('cookieConsent');
@@ -5499,9 +5216,6 @@ function addSwipeGestures() {
 
         console.log('🍺 Coeliacs Like Beer Too - JavaScript loaded successfully!');
     </script>
-    
-    <!-- Leaflet JS -->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
 </body>
 </html>
