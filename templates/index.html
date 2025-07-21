@@ -1744,23 +1744,24 @@
         function closeResults() {
             console.log('🏠 Closing results and returning to homepage');
             
-            // Close results overlay
+            // Close results overlay with explicit hide
             const resultsOverlay = document.getElementById('resultsOverlay');
             if (resultsOverlay) {
                 resultsOverlay.classList.remove('active');
-                resultsOverlay.style.display = 'none'; // ✅ ADD: Force hide
+                // Force hide with inline style to ensure it's hidden
+                resultsOverlay.style.display = 'none';
             }
             
-            // 🔧 FIX: Also close pub details overlay if open
+            // Also close pub details overlay if open
             const pubDetailsOverlay = document.getElementById('pubDetailsOverlay');
             if (pubDetailsOverlay) {
                 pubDetailsOverlay.classList.remove('active');
-                pubDetailsOverlay.style.display = 'none'; // ✅ ADD: Force hide
+                pubDetailsOverlay.style.display = 'none';
             }
             
             // Restore background scrolling
             document.body.style.overflow = '';
-            document.body.classList.remove('pub-details-open'); // ✅ ADD: Remove lock class
+            document.body.classList.remove('pub-details-open');
             
             // Clear the overlay content to prevent stale data
             const resultsList = document.getElementById('resultsList');
@@ -1771,7 +1772,7 @@
             if (resultsLoading) resultsLoading.style.display = 'flex';
             if (noResultsFound) noResultsFound.style.display = 'none';
             
-            // IMPORTANT: Reset homepage to clean state
+            // Reset homepage to clean state
             resetHomepageToCleanState();
             
             trackEvent('close_results', 'Navigation');
