@@ -998,6 +998,18 @@
             if (pubContainer) {
                 debugInfo += `📦 Pub Container: split-view=${pubContainer.classList.contains('split-view')}<br>`;
             }
+
+            // check map containers
+            const resultsMapContainer = document.getElementById('resultsMapContainer');
+            if (resultsMapContainer) {
+                const styles = window.getComputedStyle(resultsMapContainer);
+                debugInfo += `🗺️ Results Map Container: display=${styles.display}<br>`;
+            }
+            
+            const resultsMap = document.getElementById('resultsMap');
+            if (resultsMap) {
+                debugInfo += `🗺️ Results Map div exists: ${resultsMap.innerHTML ? 'has content' : 'empty'}<br>`;
+            }
             
             debugPanel.innerHTML = debugInfo + '<br><button onclick="this.parentElement.remove()">Close Debug</button>';
             document.body.appendChild(debugPanel);
