@@ -913,7 +913,10 @@
         let brewerySearchTimeout;
         let beerSearchTimeout;
         let styleSearchTimeout;
+        
+        // console.log('🔍 Initial lastSearchState:', typeof lastSearchState !== 'undefined' ? lastSearchState : 'UNDEFINED');
         let lastSearchState = null;
+        console.log('🔍 After declaration lastSearchState:', lastSearchState);
         
         // ================================
         // SEARCH & SELECT BREWERIES
@@ -1689,11 +1692,21 @@
         // Replace the line that forces gf_only = true
         
         async function findNearbyPubsWithRadius(radiusKm) {
+            // ADD THESE 7 LINES HERE - RIGHT AFTER THE OPENING BRACE
+            // SAVE STATE RIGHT AT THE START
+            lastSearchState = {
+                type: 'nearby',
+                radius: radiusKm,
+                userLocation: userLocation,
+                timestamp: Date.now()
+            };
+            console.log('💾 Saved search state at start of findNearbyPubsWithRadius:', lastSearchState);
+            
             if (!userLocation) {
                 showNoResults('Location not available');
                 return;
             }
-        
+            
             console.log(`🔍 Searching for pubs within ${radiusKm}km...`);
             showResultsLoading(`Finding pubs within ${radiusKm}km...`);
             
@@ -1736,6 +1749,7 @@
                 showNoResults('Error finding pubs. Please try again.');
             }
         }
+        
         
         // Results overlay management
         function showResultsOverlay(title) {
