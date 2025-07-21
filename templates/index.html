@@ -1114,6 +1114,7 @@
     <!---------------------------
     IMPORT CONSTANTS.JS
     ---------------------------->
+    
     <script type="module" src="/static/constants.js"></script>
     
     <script type="module">
@@ -1122,6 +1123,57 @@
         // Make constants globally available
         window.Constants = Constants;
     </script>
+
+    <!---------------------------
+    IMPORT TRACKING.JS
+    ---------------------------->
+    
+    <script type="module" src="/static/tracking.js"></script>
+    
+    <script type="module">
+        import { TrackingModule } from '/static/tracking.js';
+        
+        // Make tracking module globally available
+        window.TrackingModule = TrackingModule;
+        
+        // The module auto-initializes, but let's ensure it's ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                console.log('✅ Tracking Module ready');
+            });
+        } else {
+            console.log('✅ Tracking Module ready');
+        }
+    </script>
+
+    <!---------------------------
+    IMPORT UI.JS
+    ---------------------------->
+
+    <!-- Import UI Module -->
+    <script type="module" src="/static/ui.js"></script>
+    
+    <script type="module">
+        import { UIModule } from '/static/ui.js';
+        
+        // Make UI module globally available
+        window.UIModule = UIModule;
+        
+        // The module auto-initializes
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                console.log('✅ UI Module ready');
+            });
+        } else {
+            console.log('✅ UI Module ready');
+        }
+    </script>
+
+    <!---------------------------
+    IMPORT MAIN.JS
+    ---------------------------->
+    
+    <script type="module" src="/static/main.js"></script>
 
     <!-- END OF HTML SCRIPT -->
     <!-- START OF JAVASCRIPT -->
@@ -1282,7 +1334,7 @@
             console.log('🎯 Starting location search with distance selection...');
             
             // Track the action
-            trackEvent('location_search_start', 'Search', 'distance_modal');
+            TrackingModule.trackEvent('location_search_start', 'Search', 'distance_modal');
             
             // Show distance selection modal
             openModal('distanceModal');
@@ -1367,7 +1419,7 @@
                 closePubDetails();
             }
             
-            trackEvent('back_to_results', 'Navigation', lastSearchState.type);
+            TrackingModule.trackEvent('back_to_results', 'Navigation', lastSearchState.type);
             return false; // Prevent any navigation
 }
 
@@ -1680,7 +1732,7 @@
             
             // DO NOT CLEAR lastSearchState - we want back button to work!
             
-            trackEvent('close_results', 'Navigation');
+            TrackingModule.trackEvent('close_results', 'Navigation');
         }
         
         // ================================
@@ -1924,7 +1976,7 @@
             const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
             
             window.open(googleUrl, '_blank');
-            trackEvent('view_pub_online', 'External Navigation', pubName);
+            TrackingModule.trackEvent('view_pub_online', 'External Navigation', pubName);
             
             showSuccessToast(`🔍 Searching for ${pubName} online...`);
         }
@@ -1946,7 +1998,7 @@
             }
             
             window.open(mapsUrl, '_blank');
-            trackEvent('get_directions', 'External Navigation', pubName);
+            TrackingModule.trackEvent('get_directions', 'External Navigation', pubName);
             
             showSuccessToast(`🧭 Opening directions to ${pubName}...`);
         }
@@ -1972,14 +2024,14 @@
                     initializeResultsMap();
                 }, 100);
                 
-                trackEvent('results_map_toggle', 'Map Interaction', 'show');
+                TrackingModule.trackEvent('results_map_toggle', 'Map Interaction', 'show');
             } else {
                 // Show list
                 listContainer.style.display = 'block';
                 mapContainer.style.display = 'none';
                 mapBtnText.textContent = 'Map';
                 
-                trackEvent('results_map_toggle', 'Map Interaction', 'hide');
+                TrackingModule.trackEvent('results_map_toggle', 'Map Interaction', 'hide');
             }
         }
         
@@ -2019,7 +2071,7 @@
                     }, 300);
                 }
                 
-                trackEvent('pub_map_toggle', 'Map Interaction', 'show');
+                TrackingModule.trackEvent('pub_map_toggle', 'Map Interaction', 'show');
             } else {
                 // Hide split view
                 container.classList.remove('split-view');
@@ -2028,7 +2080,7 @@
                 mapBtn.classList.remove('active');
                 
                 console.log('🗺️ Pub split-view map toggled OFF');
-                trackEvent('pub_map_toggle', 'Map Interaction', 'hide');
+                TrackingModule.trackEvent('pub_map_toggle', 'Map Interaction', 'hide');
             }
         }
         
@@ -2138,7 +2190,7 @@
                 showSuccessToast('🗺️ Full map view coming soon! Use "Pubs Near Me" to see local results on map.');
             }
             
-            trackEvent('navigation_map', 'Navigation', 'bottom_nav');
+            TrackingModule.trackEvent('navigation_map', 'Navigation', 'bottom_nav');
         }
 
         // ================================
@@ -2399,7 +2451,7 @@ function addSwipeGestures() {
         // GOOGLE ANALYTICS TRACKING
         // ================================
         
-        function trackEvent(action, category = 'User Interaction', label = '') {
+        function TrackingModule.trackEvent(action, category = 'User Interaction', label = '') {
             if (typeof gtag !== 'undefined') {
                 gtag('event', action, {
                     event_category: category,
@@ -2409,11 +2461,11 @@ function addSwipeGestures() {
         }
 
         function trackSearch(query, searchType, results) {
-            trackEvent('search', 'Search', `${searchType}: ${query} (${results} results)`);
+            TrackingModule.trackEvent('search', 'Search', `${searchType}: ${query} (${results} results)`);
         }
 
         function trackPubView(pubName) {
-            trackEvent('pub_view', 'Pub Interaction', pubName);
+            TrackingModule.trackEvent('pub_view', 'Pub Interaction', pubName);
         }
 
         // ================================
@@ -2469,7 +2521,7 @@ function addSwipeGestures() {
             // Ensure we're at the top
             window.scrollTo(0, 0);
             
-            trackEvent('go_home', 'Navigation', 'home_button');
+            TrackingModule.trackEvent('go_home', 'Navigation', 'home_button');
 
             // NUCLEAR OPTION - Force hide everything with overlay in the name
             document.querySelectorAll('[class*="overlay"], [id*="overlay"], [id*="Overlay"], .modal').forEach(el => {
@@ -2594,7 +2646,7 @@ function addSwipeGestures() {
                 document.getElementById('reportForm').reset();
                 
                 // Track success
-                trackEvent('beer_report_submitted', 'User Contribution', reportData.brewery + ' - ' + reportData.beer_name);
+                TrackingModule.trackEvent('beer_report_submitted', 'User Contribution', reportData.brewery + ' - ' + reportData.beer_name);
                 
             } catch (error) {
                 console.error('❌ Error submitting beer report:', error);
@@ -2614,12 +2666,12 @@ function addSwipeGestures() {
         }
 
         function showComingSoon(feature) {
-            trackEvent('coming_soon_click', 'Feature Interest', feature);
+            TrackingModule.trackEvent('coming_soon_click', 'Feature Interest', feature);
             showSuccessToast(`${feature} is coming soon! 🚀 We're working hard to bring you this feature.`);
         }
 
         function showAllActivity() {
-            trackEvent('view_all_activity', 'Navigation');
+            TrackingModule.trackEvent('view_all_activity', 'Navigation');
             showSuccessToast('Full activity feed coming soon! 📊 This will show all recent GF beer finds.');
         }
 
@@ -2733,7 +2785,7 @@ function addSwipeGestures() {
             // Use your existing search logic but with location type
             performSearchWithState(query, 'location');
             
-            trackEvent('search_by_location', 'Search', query);
+            TrackingModule.trackEvent('search_by_location', 'Search', query);
         }
         
         function searchByName() {
@@ -2754,7 +2806,7 @@ function addSwipeGestures() {
             // Perform the search
             performNameSearch(query);
             
-            trackEvent('search_by_name', 'Search', query);
+            TrackingModule.trackEvent('search_by_name', 'Search', query);
         }
 
         // ================================
@@ -2955,7 +3007,7 @@ function addSwipeGestures() {
             // Perform the search
             performBeerSearch(query, searchType);
             
-            trackEvent('search_by_beer', 'Search', `${searchType}:${query}`);
+            TrackingModule.trackEvent('search_by_beer', 'Search', `${searchType}:${query}`);
         }
         
         // ================================
@@ -3188,7 +3240,7 @@ function addSwipeGestures() {
                 performCitySearch(query);
             }
             
-            trackEvent('search_by_area', 'Search', `${searchType}:${query}`);
+            TrackingModule.trackEvent('search_by_area', 'Search', `${searchType}:${query}`);
         }
         
         // ================================
@@ -3890,14 +3942,14 @@ function addSwipeGestures() {
                 window.open(googleMapsUrl, '_blank');
             }
             
-            trackEvent('open_navigation', 'External Navigation', pubName);
+            TrackingModule.trackEvent('open_navigation', 'External Navigation', pubName);
             showSuccessToast('🧭 Opening directions...');
         }
 
         function searchForPub(pubName, postcode) {
             const searchQuery = `${pubName} ${postcode} pub`;
             const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
-            trackEvent('search_online', 'External Search', pubName);
+            TrackingModule.trackEvent('search_online', 'External Search', pubName);
             window.open(googleUrl, '_blank');
         }
 
@@ -3967,7 +4019,7 @@ function addSwipeGestures() {
             hideCookieBanner();
             initializeAnalytics();
             showSuccessToast('✅ Cookie preferences saved. Thanks!');
-            trackEvent('cookie_consent', 'Privacy', 'accept_all');
+            TrackingModule.trackEvent('cookie_consent', 'Privacy', 'accept_all');
         }
         
         function acceptEssentialOnly() {
@@ -3990,7 +4042,7 @@ function addSwipeGestures() {
             if (analyticsConsent) {
                 initializeAnalytics();
                 showSuccessToast('✅ Preferences saved. Analytics enabled.');
-                trackEvent('cookie_consent', 'Privacy', 'analytics_enabled');
+                TrackingModule.trackEvent('cookie_consent', 'Privacy', 'analytics_enabled');
             } else {
                 showSuccessToast('✅ Preferences saved. Analytics disabled.');
             }
@@ -4143,7 +4195,7 @@ function addSwipeGestures() {
                 const searchQuery = `${pub.name} ${pub.postcode} pub`;
                 const googleUrl = `https://www.google.com/search?q=${encodeURIComponent(searchQuery)}`;
                 window.open(googleUrl, '_blank');
-                trackEvent('search_online', 'External Search', pub.name);
+                TrackingModule.trackEvent('search_online', 'External Search', pub.name);
             };
             
             document.getElementById('pubGetDirections').onclick = () => {
@@ -4178,7 +4230,7 @@ function addSwipeGestures() {
             
             // Track the view
             trackPubView(pub.name);
-            trackEvent('pub_details_view', 'Navigation', pub.name);
+            TrackingModule.trackEvent('pub_details_view', 'Navigation', pub.name);
         }
         
         function closePubDetails() {
@@ -4246,7 +4298,7 @@ function addSwipeGestures() {
         //             }, 300);
         //         }
                 
-        //         trackEvent('pub_map_toggle', 'Map Interaction', 'show');
+        //         TrackingModule.trackEvent('pub_map_toggle', 'Map Interaction', 'show');
         //     } else {
         //         // Hide split view
         //         container.classList.remove('split-view');
@@ -4255,7 +4307,7 @@ function addSwipeGestures() {
         //         mapBtn.classList.remove('active');
                 
         //         console.log('🗺️ Map toggled OFF');
-        //         trackEvent('pub_map_toggle', 'Map Interaction', 'hide');
+        //         TrackingModule.trackEvent('pub_map_toggle', 'Map Interaction', 'hide');
         //     }
         // }
 
@@ -4348,7 +4400,7 @@ function addSwipeGestures() {
             
             // Success feedback
             showSuccessToast('🏠 Reset to homepage - ready for a fresh search!');
-            trackEvent('reset_homepage', 'Navigation', 'homepage_reset');
+            TrackingModule.trackEvent('reset_homepage', 'Navigation', 'homepage_reset');
         }
 
         console.log('🍺 Coeliacs Like Beer Too - JavaScript loaded successfully!');
