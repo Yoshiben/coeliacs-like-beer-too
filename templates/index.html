@@ -935,7 +935,7 @@
                 border-radius: 10px;
                 z-index: 99999;
                 font-size: 12px;
-                max-height: 300px;
+                max-height: 400px;
                 overflow-y: auto;
             `;
             
@@ -990,6 +990,17 @@
             
             debugPanel.innerHTML = debugInfo + '<br><button onclick="this.parentElement.remove()">Close Debug</button>';
             document.body.appendChild(debugPanel);
+
+            const pubDetailsOverlay = document.getElementById('pubDetailsOverlay');
+            if (pubDetailsOverlay) {
+                const styles = window.getComputedStyle(pubDetailsOverlay);
+                debugInfo += `🏠 Pub Details: display=${styles.display}, active=${pubDetailsOverlay.classList.contains('active')}<br>`;
+            }
+            
+            const pubContainer = document.getElementById('pubContainer');
+            if (pubContainer) {
+                debugInfo += `📦 Pub Container: split-view=${pubContainer.classList.contains('split-view')}<br>`;
+            }
         }
 
         // Add debug button to page - THIS SHOULD ALREADY EXIST IN YOUR CODE
@@ -1895,6 +1906,15 @@
                 resultsOverlay.style.display = 'none';
             }
             
+            // RESET results map to list view for next search
+            const resultsListContainer = document.getElementById('resultsListContainer');
+            const resultsMapContainer = document.getElementById('resultsMapContainer');
+            const resultsMapBtnText = document.getElementById('resultsMapBtnText');
+            
+            if (resultsListContainer) resultsListContainer.style.display = 'block';
+            if (resultsMapContainer) resultsMapContainer.style.display = 'none';
+            if (resultsMapBtnText) resultsMapBtnText.textContent = 'Map';
+            
             // SHOW the hero section again
             const heroSection = document.querySelector('.hero-section');
             if (heroSection) {
@@ -1914,6 +1934,17 @@
                 pubDetailsOverlay.style.display = 'none';
             }
             
+            // RESET pub map state too
+            pubMapVisible = false;
+            const pubContainer = document.getElementById('pubContainer');
+            if (pubContainer) {
+                pubContainer.classList.remove('split-view');
+            }
+            const pubMapContainer = document.getElementById('pubMapContainer');
+            if (pubMapContainer) {
+                pubMapContainer.classList.remove('map-visible');
+            }
+            
             // Restore background scrolling
             document.body.style.overflow = '';
             document.body.classList.remove('pub-details-open');
@@ -1927,8 +1958,7 @@
             if (resultsLoading) resultsLoading.style.display = 'flex';
             if (noResultsFound) noResultsFound.style.display = 'none';
             
-            // Clear search state so back button doesn't restore old search
-            lastSearchState = null;
+            // DO NOT CLEAR lastSearchState - we want back button to work!
             
             trackEvent('close_results', 'Navigation');
         }
