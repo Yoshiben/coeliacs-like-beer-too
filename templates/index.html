@@ -956,22 +956,42 @@
             // Add this to your showDebugInfo function after the overlay checks:
             debugInfo += '<br><strong>ELEMENTS AT BOTTOM:</strong><br>';
             
-            // Find elements that might be causing the gray bar
+            // Check the search section and card specifically
+            const searchSection = document.querySelector('.search-section');
+            const searchCard = document.querySelector('.search-card');
+            
+            if (searchSection) {
+                const rect = searchSection.getBoundingClientRect();
+                const styles = window.getComputedStyle(searchSection);
+                debugInfo += `🔍 SEARCH SECTION: bottom=${rect.bottom}px, height=${rect.height}px, bg=${styles.backgroundColor}<br>`;
+            }
+            
+            if (searchCard) {
+                const rect = searchCard.getBoundingClientRect();
+                const styles = window.getComputedStyle(searchCard);
+                debugInfo += `📦 SEARCH CARD: bottom=${rect.bottom}px, height=${rect.height}px, bg=${styles.backgroundColor}<br>`;
+            }
+            
+            // Check body and html
+            const bodyStyles = window.getComputedStyle(document.body);
+            debugInfo += `🏠 BODY: bg=${bodyStyles.backgroundColor}, padding-bottom=${bodyStyles.paddingBottom}<br>`;
+            
+            // Still check for other elements at bottom
             document.querySelectorAll('*').forEach(el => {
                 const rect = el.getBoundingClientRect();
                 const styles = window.getComputedStyle(el);
                 
-                // Check if element is near bottom of viewport and has a background
                 if (rect.bottom > window.innerHeight - 100 && 
                     rect.bottom < window.innerHeight && 
                     rect.height > 20 &&
                     styles.backgroundColor !== 'rgba(0, 0, 0, 0)' && 
-                    styles.backgroundColor !== 'transparent') {
+                    styles.backgroundColor !== 'transparent' &&
+                    !el.classList.contains('nav-item') &&
+                    el.tagName !== 'BUTTON') {
                     
                     debugInfo += `📍 ${el.tagName}.${el.className}: bg=${styles.backgroundColor}, height=${rect.height}px<br>`;
                 }
             });
-            
             // Check any element with 'overlay' in class or id
             document.querySelectorAll('[class*="overlay"], [id*="overlay"], [id*="Overlay"]').forEach(el => {
                 const styles = window.getComputedStyle(el);
