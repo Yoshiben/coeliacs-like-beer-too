@@ -2422,43 +2422,9 @@
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', initMobileFeedback);
 
-// Optional: Add swipe gestures (uncomment if you want)
-/*
-function addSwipeGestures() {
-    const searchOptions = document.querySelectorAll('.search-option');
-    
-    searchOptions.forEach(option => {
-        let startY = 0;
-        
-        option.addEventListener('touchstart', function(e) {
-            startY = e.touches[0].clientY;
-        }, { passive: true });
-        
-        option.addEventListener('touchend', function(e) {
-            const endY = e.changedTouches[0].clientY;
-            const diff = startY - endY;
-            
-            // Swipe up for quick action
-            if (diff > 50) {
-                // Quick action - maybe open modal faster?
-                console.log('Swiped up on', this.querySelector('.search-title').textContent);
-            }
-        }, { passive: true });
-    });
-}
-*/
         // ================================
         // GOOGLE ANALYTICS TRACKING
         // ================================
-        
-        function TrackingModule.trackEvent(action, category = 'User Interaction', label = '') {
-            if (typeof gtag !== 'undefined') {
-                gtag('event', action, {
-                    event_category: category,
-                    event_label: label
-                });
-            }
-        }
 
         function trackSearch(query, searchType, results) {
             TrackingModule.trackEvent('search', 'Search', `${searchType}: ${query} (${results} results)`);
