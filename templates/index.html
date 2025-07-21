@@ -987,9 +987,6 @@
             debugInfo += '<br><strong>Z-INDEX CHECK:</strong><br>';
             const overlayZ = resultsOverlay ? window.getComputedStyle(resultsOverlay).zIndex : 'N/A';
             debugInfo += `📊 Results Overlay z-index: ${overlayZ}<br>`;
-            
-            debugPanel.innerHTML = debugInfo + '<br><button onclick="this.parentElement.remove()">Close Debug</button>';
-            document.body.appendChild(debugPanel);
 
             const pubDetailsOverlay = document.getElementById('pubDetailsOverlay');
             if (pubDetailsOverlay) {
@@ -1001,6 +998,9 @@
             if (pubContainer) {
                 debugInfo += `📦 Pub Container: split-view=${pubContainer.classList.contains('split-view')}<br>`;
             }
+            
+            debugPanel.innerHTML = debugInfo + '<br><button onclick="this.parentElement.remove()">Close Debug</button>';
+            document.body.appendChild(debugPanel);
         }
 
         // Add debug button to page - THIS SHOULD ALREADY EXIST IN YOUR CODE
