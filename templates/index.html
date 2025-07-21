@@ -2663,32 +2663,46 @@ function addSwipeGestures() {
         function goHome() {
             console.log('🏠 Going to homepage - clearing all overlays');
             
-            // ✅ ADD: Close ALL possible overlays
+            // Close ALL possible overlays by ID
             const overlaysToClose = [
                 'resultsOverlay',
-                'pubDetailsOverlay', 
+                'pubDetailsOverlay',
                 'reportModal',
                 'nameModal',
-                'areaModal', 
+                'areaModal',
                 'beerModal',
-                'distanceModal'
+                'distanceModal',
+                'aboutModal',
+                'gfInfoModal',
+                'coordinateModal',
+                'cookieSettings'
             ];
             
             overlaysToClose.forEach(overlayId => {
                 const overlay = document.getElementById(overlayId);
                 if (overlay) {
                     overlay.classList.remove('active');
-                    overlay.style.display = 'none'; // ✅ Force hide with style
+                    overlay.style.display = 'none'; // Force hide with style
+                    console.log(`✅ Closed ${overlayId}`);
                 }
             });
             
-            // ✅ ADD: Restore body state completely
+            // Restore body state completely
             document.body.style.overflow = '';
             document.body.classList.remove('pub-details-open');
             
-            // Reset to homepage
-            window.location.href = '/';
+            // Clear search state
+            lastSearchState = null;
+            
+            // Reset to clean homepage
+            resetHomepageToCleanState();
+            
+            // Ensure we're at the top
+            window.scrollTo(0, 0);
+            
             trackEvent('go_home', 'Navigation', 'home_button');
+            
+            console.log('✅ Homepage restored to clean state');
         }
 
         // ================================
