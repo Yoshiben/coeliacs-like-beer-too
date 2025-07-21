@@ -917,10 +917,72 @@
         // console.log('🔍 Initial lastSearchState:', typeof lastSearchState !== 'undefined' ? lastSearchState : 'UNDEFINED');
         let lastSearchState = null;
         console.log('🔍 After declaration lastSearchState:', lastSearchState);
+
+        // DEBUG: Mobile overlay detector
+        function showDebugInfo() {
+            // Create debug panel
+            const debugPanel = document.createElement('div');
+            debugPanel.id = 'debugPanel';
+            debugPanel.style.cssText = `
+                position: fixed;
+                top: 10px;
+                left: 10px;
+                right: 10px;
+                background: rgba(255, 255, 0, 0.9);
+                color: black;
+                padding: 10px;
+                border-radius: 10px;
+                z-index: 99999;
+                font-size: 12px;
+                max-height: 200px;
+                overflow-y: auto;
+            `;
+            
+            let debugInfo = '<strong>🔍 VISIBLE OVERLAYS:</strong><br>';
+            
+            // Check specific overlays
+            const overlays = ['resultsOverlay', 'pubDetailsOverlay', 'distanceModal', 'nameModal', 'areaModal', 'beerModal'];
+            
+            overlays.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    const styles = window.getComputedStyle(el);
+                    if (styles.display !== 'none') {
+                        debugInfo += `❌ ${id}: display=${styles.display}, class=${el.className}<br>`;
+                    }
+                }
+            });
+            
+            // Check any element with 'overlay' in class or id
+            document.querySelectorAll('[class*="overlay"], [id*="overlay"], [id*="Overlay"]').forEach(el => {
+                const styles = window.getComputedStyle(el);
+                if (styles.display !== 'none' && styles.position === 'fixed') {
+                    debugInfo += `⚠️ ${el.id || el.className}: display=${styles.display}<br>`;
+                }
+            });
+            
+            debugPanel.innerHTML = debugInfo + '<br><button onclick="this.parentElement.remove()">Close Debug</button>';
+            document.body.appendChild(debugPanel);
+        }
         
-        // ================================
-        // SEARCH & SELECT BREWERIES
-        // ================================
+        // Add debug button to page
+        window.addEventListener('load', () => {
+            const debugBtn = document.createElement('button');
+            debugBtn.textContent = '🐛 Debug';
+            debugBtn.style.cssText = `
+                position: fixed;
+                bottom: 100px;
+                right: 10px;
+                z-index: 99999;
+                background: yellow;
+                color: black;
+                padding: 10px;
+                border-radius: 50%;
+                border: 2px solid black;
+            `;
+            debugBtn.onclick = showDebugInfo;
+            document.body.appendChild(debugBtn);
+        });
         
         // ================================
         // 🔄 REPLACE: Your searchBreweries function to show ALL breweries
