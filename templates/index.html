@@ -4874,16 +4874,32 @@ function addSwipeGestures() {
         }
         
         function closePubDetails() {
-            document.getElementById('pubDetailsOverlay').classList.remove('active');
+            console.log('🚪 Closing pub details overlay');
             
-            // ADDED: Unlock body scroll
+            const pubDetailsOverlay = document.getElementById('pubDetailsOverlay');
+            if (pubDetailsOverlay) {
+                pubDetailsOverlay.classList.remove('active');
+                // Force hide with inline style
+                pubDetailsOverlay.style.display = 'none';
+            }
+            
+            // Unlock body scroll
             document.body.classList.remove('pub-details-open');
+            document.body.style.overflow = '';
             
+            // Reset map state
             pubMapVisible = false;
-            document.getElementById('pubContainer').classList.remove('split-view');
-            document.getElementById('pubMapBtnText').textContent = 'Show on Map';
+            const container = document.getElementById('pubContainer');
+            if (container) {
+                container.classList.remove('split-view');
+            }
             
-            // trackEvent('pub_details_close', 'Navigation');
+            const mapBtnText = document.getElementById('pubMapBtnText');
+            if (mapBtnText) {
+                mapBtnText.textContent = 'Show on Map';
+            }
+            
+            console.log('✅ Pub details closed');
         }
         
         // 🔄 REPLACING - Replace the existing togglePubMap function
