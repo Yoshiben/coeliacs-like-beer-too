@@ -1876,17 +1876,40 @@
         
         // Results overlay management
         function showResultsOverlay(title) {
-            document.getElementById('resultsTitle').textContent = title;
-            document.getElementById('resultsOverlay').classList.add('active');
+            console.log('📋 Showing results overlay with title:', title);
             
-            // HIDE the home page search section when showing results
+            // Update title
+            document.getElementById('resultsTitle').textContent = title;
+            
+            // Get the overlay
+            const resultsOverlay = document.getElementById('resultsOverlay');
+            
+            // Make sure it's visible
+            resultsOverlay.classList.add('active');
+            resultsOverlay.style.display = 'flex'; // Force flex display
+            
+            // HIDE the home page search section
             const searchSection = document.querySelector('.search-section');
             if (searchSection) {
                 searchSection.style.display = 'none';
             }
             
+            // Hide the hero section too if it exists
+            const heroSection = document.querySelector('.hero-section');
+            if (heroSection) {
+                heroSection.style.display = 'none';
+            }
+            
             // Prevent background scrolling
             document.body.style.overflow = 'hidden';
+            
+            // Make sure the results list container is visible by default
+            const resultsListContainer = document.getElementById('resultsListContainer');
+            if (resultsListContainer) {
+                resultsListContainer.style.display = 'block';
+            }
+            
+            console.log('✅ Results overlay should now be visible');
         }
         
         // 🔄 REPLACE: Your closeResults function
@@ -2025,32 +2048,48 @@
         }
         
         function displayResultsInOverlay(pubs, title) {
+            // Store pubs globally for map access
+            currentSearchPubs = pubs;
+            console.log('💾 Stored search results for map:', pubs.length, 'pubs');
+            
+            // Hide loading and no results
             document.getElementById('resultsLoading').style.display = 'none';
             document.getElementById('noResultsFound').style.display = 'none';
-            document.getElementById('resultsList').style.display = 'block';
+            
+            // Get the results list container
+            const resultsListContainer = document.getElementById('resultsListContainer');
+            const resultsList = document.getElementById('resultsList');
+            
+            // IMPORTANT: Show the list container
+            if (resultsListContainer) {
+                resultsListContainer.style.display = 'block';
+            }
+            
+            // Show and populate the results list
+            resultsList.style.display = 'block';
+            resultsList.innerHTML = '';
             
             // Update title
             document.getElementById('resultsTitle').textContent = title;
             
             // Generate results HTML
-            const resultsList = document.getElementById('resultsList');
-            resultsList.innerHTML = '';
-            
             pubs.forEach(pub => {
                 const resultItem = createResultItemForOverlay(pub);
                 resultsList.appendChild(resultItem);
             });
-
-            // Save the current search for back button (if not already saved)
+            
+            // Save search state for back button
             if (!lastSearchState) {
                 lastSearchState = {
                     type: 'nearby',
-                    radius: 5, // Default radius
+                    radius: 5,
                     userLocation: userLocation,
                     timestamp: Date.now()
                 };
                 console.log('💾 Auto-saved search state in displayResultsInOverlay');
             }
+            
+            console.log(`✅ Displayed ${pubs.length} results in overlay`);
         }
         
         // ================================
