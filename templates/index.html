@@ -989,6 +989,25 @@
             
             debugPanel.innerHTML = debugInfo + '<br><button onclick="this.parentElement.remove()">Close Debug</button>';
             document.body.appendChild(debugPanel);
+
+            // Update the debug button creation to keep your worm
+            window.addEventListener('load', () => {
+                const debugBtn = document.createElement('button');
+                debugBtn.textContent = '🐛 Debug';  // Your worm is back! 🐛
+                debugBtn.style.cssText = `
+                    position: fixed;
+                    bottom: 100px;
+                    right: 10px;
+                    z-index: 99999;
+                    background: yellow;
+                    color: black;
+                    padding: 10px;
+                    border-radius: 50%;
+                    border: 2px solid black;
+                `;
+                debugBtn.onclick = showDebugInfo;
+                document.body.appendChild(debugBtn);
+            });
         }
         
         // ================================
@@ -1827,6 +1846,7 @@
         
         
         // Results overlay management
+        // REPLACE the showResultsOverlay function
         function showResultsOverlay(title) {
             console.log('📋 Showing results overlay with title:', title);
             
@@ -1838,15 +1858,14 @@
             
             // Make sure it's visible
             resultsOverlay.classList.add('active');
-            resultsOverlay.style.display = 'flex'; // Force flex display
+            resultsOverlay.style.display = 'flex';
             
-            // HIDE the home page search section
+            // HIDE the home page sections
             const searchSection = document.querySelector('.search-section');
             if (searchSection) {
                 searchSection.style.display = 'none';
             }
             
-            // Hide the hero section too if it exists
             const heroSection = document.querySelector('.hero-section');
             if (heroSection) {
                 heroSection.style.display = 'none';
@@ -1861,10 +1880,10 @@
                 resultsListContainer.style.display = 'block';
             }
             
-            console.log('✅ Results overlay should now be visible');
+            console.log('✅ Results overlay shown, home sections hidden');
         }
         
-        // 🔄 REPLACE: Your closeResults function
+        // REPLACE the closeResults function to properly restore the home page
         function closeResults() {
             console.log('🏠 Closing results and returning to homepage');
             
@@ -1873,6 +1892,12 @@
             if (resultsOverlay) {
                 resultsOverlay.classList.remove('active');
                 resultsOverlay.style.display = 'none';
+            }
+            
+            // SHOW the hero section again
+            const heroSection = document.querySelector('.hero-section');
+            if (heroSection) {
+                heroSection.style.display = 'block';
             }
             
             // SHOW the home page search section again
@@ -1900,6 +1925,9 @@
             if (resultsList) resultsList.innerHTML = '';
             if (resultsLoading) resultsLoading.style.display = 'flex';
             if (noResultsFound) noResultsFound.style.display = 'none';
+            
+            // Clear search state so back button doesn't restore old search
+            lastSearchState = null;
             
             trackEvent('close_results', 'Navigation');
         }
