@@ -131,7 +131,7 @@
             <!-- Search Type Selector -->
             <div class="form-group">
                 <label class="form-label">Search by:</label>
-                <select id="areaSearchType" class="form-select" onchange="updateAreaPlaceholder()">
+                <select id="areaSearchType" class="form-select" data-action="update-area-placeholder">
                     <option value="postcode">📮 Postcode</option>
                     <option value="city">🏙️ City/Region</option>
                 </select>
@@ -162,7 +162,7 @@
             <!-- Search Type Selector -->
             <div class="form-group">
                 <label class="form-label">Search by:</label>
-                <select id="beerSearchType" class="form-select" onchange="updateBeerPlaceholder()">
+                <select id="beerSearchType" class="form-select" data-action="update-beer-placeholder">
                     <option value="brewery">🏭 Brewery Name</option>
                     <option value="beer">🍺 Specific Beer</option>
                     <option value="style">🎨 Beer Style</option>
@@ -223,11 +223,11 @@
         <div class="results-container">
             <!-- Results Header -->
             <div class="results-nav">
-                <button class="btn-nav-small" onclick="closeResults()">
+                <button class="btn-nav-small" data-action="close-results">
                     🏠 Home
                 </button>
                 <h2 class="results-title" id="resultsTitle">Search Results</h2>
-                <button class="btn-nav-small" onclick="toggleSearchResultsFullMap()">
+                <button class="btn-nav-small" data-action="toggle-results-map">
                     🗺️ <span id="resultsMapBtnText">Map</span>
                 </button>
             </div>
@@ -268,10 +268,10 @@
             <div class="pub-details-card">
                 <!-- NEW: Top navigation - ADD THIS -->
                 <div class="pub-nav-top">
-                    <button class="btn-nav-small" onclick="closePubDetails()">
+                    <button class="btn-nav-small" data-action="close-pub-details">
                         🏠 Home
                     </button>
-                    <button class="btn-nav-small" onclick="goBackToResults(); return false;" type="button">
+                    <button class="btn-nav-small" data-action="back-to-results" type="button">
                         ← Back
                     </button>
                 </div>
@@ -298,7 +298,7 @@
                     <button class="btn btn-external" id="pubGetDirections">
                         🧭 Get Directions
                     </button>
-                    <button class="btn btn-toggle" id="pubToggleMap" onclick="togglePubDetailsSplitMap()">
+                    <button class="btn btn-toggle" id="pubToggleMap" data-action="toggle-pub-map">
                         🗺️ <span id="pubMapBtnText">Show on Map</span>
                     </button>
                     <button class="btn btn-positive" onclick="openReportModal()">
@@ -335,14 +335,6 @@
     <div id="locationStatus" class="location-status location-loading" style="display: none;">
         Finding your location...
     </div>
-
-
-
-<!-- ================================
-     OPTIMIZED REPORT MODAL HTML
-     Single screen, pre-population ready
-     ================================ -->
-    
     
     <!-- JavaScript to handle file upload preview -->
     <script>
@@ -523,7 +515,7 @@
             </div>
             
             <div class="modal-body">
-                <form id="reportForm" class="modal-form" onsubmit="handleReportSubmission(event)">
+                <form id="reportForm" class="modal-form" data-action="submit-report">
                     
                     <!-- Pub Search Field (hidden when pre-populated) -->
                     <div class="form-group" id="pubSearchGroup">
@@ -582,7 +574,7 @@
                         <div class="brewery-dropdown-container">
                             <input type="text" id="reportBrewery" name="reportBrewery" class="form-input" 
                                    placeholder="Start typing brewery name..." 
-                                   autocomplete="off" onInput="searchBreweries(this.value)">
+                                   autocomplete="off" data-action="search-breweries">
                             <div id="breweryDropdown" class="suggestions brewery-suggestions"></div>
                         </div>
                     </div>
@@ -593,7 +585,7 @@
                         <div class="beer-name-container">
                             <input type="text" id="reportBeerName" name="reportBeerName" class="form-input" 
                                    placeholder="Start typing beer name..." 
-                                   autocomplete="off" onInput="searchBeerNames(this.value)">
+                                   autocomplete="off" data-action="search-beer-names">>
                             <div id="beerNameDropdown" class="suggestions beer-suggestions"></div>
                         </div>
                     </div>
@@ -604,7 +596,7 @@
                         <div class="beer-style-container">
                             <input type="text" id="reportBeerStyle" name="reportBeerStyle" class="form-input" 
                                    placeholder="IPA, Lager, Stout..." 
-                                   autocomplete="off" onInput="searchBeerStyles(this.value)">
+                                   autocomplete="off" data-action="search-beer-styles">
                             <div id="beerStyleDropdown" class="suggestions style-suggestions"></div>
                         </div>
                     </div>
@@ -967,6 +959,30 @@
                         case 'accept-all-from-settings':
                             acceptAllFromSettings();
                             break;
+                        case 'close-pub-details':
+                            closePubDetails();
+                            break;
+                        case 'back-to-results':
+                            SearchModule.goBackToResults();
+                            break;
+                        case 'toggle-pub-map':
+                            togglePubDetailsSplitMap();
+                            break;
+                        case 'close-results':
+                            closeResults();
+                            break;
+                        case 'toggle-results-map':
+                            toggleSearchResultsFullMap();
+                            break;
+                        case 'scroll-to-search':
+                            scrollToSearch();
+                            break;
+                        case 'update-area-placeholder':
+                            updateAreaPlaceholder();
+                            break;
+                        case 'update-beer-placeholder':
+                            updateBeerPlaceholder();
+                            break;
                     }
                 }
             });
@@ -996,6 +1012,58 @@
                     e.preventDefault();
                     const feature = comingSoon.dataset.comingSoon;
                     showComingSoon(feature);
+                }
+            });
+            
+            // Handle form submissions
+            document.addEventListener('submit', (e) => {
+                const form = e.target;
+                if (form.dataset.action === 'submit-report') {
+                    e.preventDefault();
+                    handleReportSubmission(e);
+                }
+            });
+            
+            // Handle input events
+            document.addEventListener('input', (e) => {
+                const input = e.target;
+                if (input.dataset.action) {
+                    switch(input.dataset.action) {
+                        case 'search-breweries':
+                            searchBreweries(input.value);
+                            break;
+                        case 'search-beer-names':
+                            searchBeerNames(input.value);
+                            break;
+                        case 'search-beer-styles':
+                            searchBeerStyles(input.value);
+                            break;
+                    }
+                }
+            });
+            
+            // Handle select changes
+            document.addEventListener('change', (e) => {
+                const select = e.target;
+                if (select.dataset.action) {
+                    switch(select.dataset.action) {
+                        case 'update-area-placeholder':
+                            updateAreaPlaceholder();
+                            break;
+                        case 'update-beer-placeholder':
+                            updateBeerPlaceholder();
+                            break;
+                    }
+                }
+            });
+            
+            // Handle navigation
+            document.addEventListener('click', (e) => {
+                const navTrigger = e.target.closest('[data-navigate]');
+                if (navTrigger) {
+                    e.preventDefault();
+                    const url = navTrigger.dataset.navigate;
+                    window.location.href = url;
                 }
             });
             
