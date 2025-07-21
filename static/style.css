@@ -4099,6 +4099,30 @@ body {
     animation: dropdownSlideIn 0.3s ease-out;
 }
 
+/* ADD: Debug visibility for results overlay */
+.results-overlay.active {
+    display: flex !important;
+    background: var(--primary-gradient) !important;
+    z-index: 99999 !important;
+}
+
+.results-overlay.active .results-content {
+    background: var(--bg-white) !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+.results-overlay.active .results-list-container {
+    display: block !important;
+    flex: 1 !important;
+    overflow-y: auto !important;
+}
+
+.results-overlay.active .results-list {
+    display: block !important;
+    padding: var(--space-lg) !important;
+}
+
 /* ================================
    MOBILE RESPONSIVE - TABLETS
    ================================ */
