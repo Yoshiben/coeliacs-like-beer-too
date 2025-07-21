@@ -1740,19 +1740,36 @@
         // 🔄 REPLACE: Your closeResults function to properly reset home view
         // ================================
         
+        // 🔄 REPLACE: Your closeResults function
         function closeResults() {
             console.log('🏠 Closing results and returning to homepage');
             
             // Close results overlay
-            document.getElementById('resultsOverlay').classList.remove('active');
+            const resultsOverlay = document.getElementById('resultsOverlay');
+            if (resultsOverlay) {
+                resultsOverlay.classList.remove('active');
+                resultsOverlay.style.display = 'none'; // ✅ ADD: Force hide
+            }
+            
+            // 🔧 FIX: Also close pub details overlay if open
+            const pubDetailsOverlay = document.getElementById('pubDetailsOverlay');
+            if (pubDetailsOverlay) {
+                pubDetailsOverlay.classList.remove('active');
+                pubDetailsOverlay.style.display = 'none'; // ✅ ADD: Force hide
+            }
             
             // Restore background scrolling
             document.body.style.overflow = '';
+            document.body.classList.remove('pub-details-open'); // ✅ ADD: Remove lock class
             
             // Clear the overlay content to prevent stale data
-            document.getElementById('resultsList').innerHTML = '';
-            document.getElementById('resultsLoading').style.display = 'flex';
-            document.getElementById('noResultsFound').style.display = 'none';
+            const resultsList = document.getElementById('resultsList');
+            const resultsLoading = document.getElementById('resultsLoading');
+            const noResultsFound = document.getElementById('noResultsFound');
+            
+            if (resultsList) resultsList.innerHTML = '';
+            if (resultsLoading) resultsLoading.style.display = 'flex';
+            if (noResultsFound) noResultsFound.style.display = 'none';
             
             // IMPORTANT: Reset homepage to clean state
             resetHomepageToCleanState();
@@ -1764,8 +1781,16 @@
         // ➕ ADD: Function to reset homepage to clean search state
         // ================================
         
+        // 🔄 REPLACE: Your resetHomepageToCleanState function
         function resetHomepageToCleanState() {
             console.log('🧹 Resetting homepage to clean state');
+            
+            // ✅ ADD: Force hide ALL overlay elements
+            const allOverlays = document.querySelectorAll('[id*="Overlay"], [id*="Modal"]');
+            allOverlays.forEach(overlay => {
+                overlay.classList.remove('active');
+                overlay.style.display = 'none';
+            });
             
             // Hide map if visible
             const mapContainer = document.getElementById('mapContainer');
@@ -1773,7 +1798,6 @@
                 mapContainer.style.display = 'none';
                 mapVisible = false;
                 
-                // Update toggle button text if it exists
                 const toggleBtn = document.getElementById('toggleMapBtn');
                 if (toggleBtn) {
                     toggleBtn.innerHTML = '🗺️ Show Map';
@@ -1810,6 +1834,7 @@
             currentQuery = '';
             currentSearchType = 'all';
             currentPage = 1;
+            lastSearchState = null; // ✅ ADD: Clear search state
             
             // Clear URL hash
             if (window.location.hash) {
@@ -2594,8 +2619,34 @@ function addSwipeGestures() {
             document.getElementById('search').scrollIntoView({ behavior: 'smooth' });
         }
 
-        // ADD: New function for home navigation
+        // 🔄 REPLACE: Your goHome function  
         function goHome() {
+            console.log('🏠 Going to homepage - clearing all overlays');
+            
+            // ✅ ADD: Close ALL possible overlays
+            const overlaysToClose = [
+                'resultsOverlay',
+                'pubDetailsOverlay', 
+                'reportModal',
+                'nameModal',
+                'areaModal', 
+                'beerModal',
+                'distanceModal'
+            ];
+            
+            overlaysToClose.forEach(overlayId => {
+                const overlay = document.getElementById(overlayId);
+                if (overlay) {
+                    overlay.classList.remove('active');
+                    overlay.style.display = 'none'; // ✅ Force hide with style
+                }
+            });
+            
+            // ✅ ADD: Restore body state completely
+            document.body.style.overflow = '';
+            document.body.classList.remove('pub-details-open');
+            
+            // Reset to homepage
             window.location.href = '/';
             trackEvent('go_home', 'Navigation', 'home_button');
         }
