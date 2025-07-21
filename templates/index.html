@@ -938,106 +938,58 @@
                 overflow-y: auto;
             `;
             
-            let debugInfo = '<strong>🔍 VISIBLE OVERLAYS:</strong><br>';
+            let debugInfo = '<strong>🔍 RESULTS VISIBILITY CHECK:</strong><br>';
             
-            // Check specific overlays
-            const overlays = ['resultsOverlay', 'pubDetailsOverlay', 'distanceModal', 'nameModal', 'areaModal', 'beerModal'];
+            // Check results overlay
+            const resultsOverlay = document.getElementById('resultsOverlay');
+            if (resultsOverlay) {
+                const styles = window.getComputedStyle(resultsOverlay);
+                debugInfo += `📋 Results Overlay: display=${styles.display}, active=${resultsOverlay.classList.contains('active')}<br>`;
+            }
             
-            overlays.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) {
-                    const styles = window.getComputedStyle(el);
-                    if (styles.display !== 'none') {
-                        debugInfo += `❌ ${id}: display=${styles.display}, class=${el.className}<br>`;
-                    }
-                }
-            });
-
-            // Add this to your showDebugInfo function after the overlay checks:
-            debugInfo += '<br><strong>ELEMENTS AT BOTTOM:</strong><br>';
-
-            // Find elements that might be causing the gray bar
-            document.querySelectorAll('*').forEach(el => {
-                const rect = el.getBoundingClientRect();
-                const styles = window.getComputedStyle(el);
+            // Check results containers
+            const resultsListContainer = document.getElementById('resultsListContainer');
+            if (resultsListContainer) {
+                const styles = window.getComputedStyle(resultsListContainer);
+                debugInfo += `📦 List Container: display=${styles.display}<br>`;
+            }
+            
+            const resultsList = document.getElementById('resultsList');
+            if (resultsList) {
+                const styles = window.getComputedStyle(resultsList);
+                const resultsCount = resultsList.children.length;
+                debugInfo += `📝 Results List: display=${styles.display}, items=${resultsCount}<br>`;
                 
-                // Check if element is near bottom of viewport and has a background
-                if (rect.bottom > window.innerHeight - 100 && 
-                    rect.bottom < window.innerHeight && 
-                    rect.height > 20 &&
-                    styles.backgroundColor !== 'rgba(0, 0, 0, 0)' && 
-                    styles.backgroundColor !== 'transparent') {
-                    
-                    debugInfo += `📍 ${el.tagName}.${el.className}: bg=${styles.backgroundColor}, height=${rect.height}px<br>`;
+                if (resultsCount > 0) {
+                    debugInfo += `✅ First result: ${resultsList.firstChild.textContent.substring(0, 50)}...<br>`;
+                } else {
+                    debugInfo += `❌ No results in list!<br>`;
                 }
-            });
+            }
             
-            // Check the search section and card specifically
+            // Check what's visible
+            debugInfo += '<br><strong>VISIBLE ELEMENTS:</strong><br>';
+            
             const searchSection = document.querySelector('.search-section');
-            const searchCard = document.querySelector('.search-card');
-            
             if (searchSection) {
-                const rect = searchSection.getBoundingClientRect();
                 const styles = window.getComputedStyle(searchSection);
-                debugInfo += `🔍 SEARCH SECTION: bottom=${rect.bottom}px, height=${rect.height}px, bg=${styles.backgroundColor}<br>`;
+                debugInfo += `🔍 Search Section: display=${styles.display}<br>`;
             }
             
-            if (searchCard) {
-                const rect = searchCard.getBoundingClientRect();
-                const styles = window.getComputedStyle(searchCard);
-                debugInfo += `📦 SEARCH CARD: bottom=${rect.bottom}px, height=${rect.height}px, bg=${styles.backgroundColor}<br>`;
+            const heroSection = document.querySelector('.hero-section');
+            if (heroSection) {
+                const styles = window.getComputedStyle(heroSection);
+                debugInfo += `🦸 Hero Section: display=${styles.display}<br>`;
             }
             
-            // Check body and html
-            const bodyStyles = window.getComputedStyle(document.body);
-            debugInfo += `🏠 BODY: bg=${bodyStyles.backgroundColor}, padding-bottom=${bodyStyles.paddingBottom}<br>`;
-            
-            // Still check for other elements at bottom
-            document.querySelectorAll('*').forEach(el => {
-                const rect = el.getBoundingClientRect();
-                const styles = window.getComputedStyle(el);
-                
-                if (rect.bottom > window.innerHeight - 100 && 
-                    rect.bottom < window.innerHeight && 
-                    rect.height > 20 &&
-                    styles.backgroundColor !== 'rgba(0, 0, 0, 0)' && 
-                    styles.backgroundColor !== 'transparent' &&
-                    !el.classList.contains('nav-item') &&
-                    el.tagName !== 'BUTTON') {
-                    
-                    debugInfo += `📍 ${el.tagName}.${el.className}: bg=${styles.backgroundColor}, height=${rect.height}px<br>`;
-                }
-            });
-            // Check any element with 'overlay' in class or id
-            document.querySelectorAll('[class*="overlay"], [id*="overlay"], [id*="Overlay"]').forEach(el => {
-                const styles = window.getComputedStyle(el);
-                if (styles.display !== 'none' && styles.position === 'fixed') {
-                    debugInfo += `⚠️ ${el.id || el.className}: display=${styles.display}<br>`;
-                }
-            });
+            // Check z-index issues
+            debugInfo += '<br><strong>Z-INDEX CHECK:</strong><br>';
+            const overlayZ = resultsOverlay ? window.getComputedStyle(resultsOverlay).zIndex : 'N/A';
+            debugInfo += `📊 Results Overlay z-index: ${overlayZ}<br>`;
             
             debugPanel.innerHTML = debugInfo + '<br><button onclick="this.parentElement.remove()">Close Debug</button>';
             document.body.appendChild(debugPanel);
         }
-        
-        // Add debug button to page
-        window.addEventListener('load', () => {
-            const debugBtn = document.createElement('button');
-            debugBtn.textContent = '🐛 Debug';
-            debugBtn.style.cssText = `
-                position: fixed;
-                bottom: 100px;
-                right: 10px;
-                z-index: 99999;
-                background: yellow;
-                color: black;
-                padding: 10px;
-                border-radius: 50%;
-                border: 2px solid black;
-            `;
-            debugBtn.onclick = showDebugInfo;
-            document.body.appendChild(debugBtn);
-        });
         
         // ================================
         // 🔄 REPLACE: Your searchBreweries function to show ALL breweries
