@@ -2763,6 +2763,12 @@ function addSwipeGestures() {
             window.scrollTo(0, 0);
             
             trackEvent('go_home', 'Navigation', 'home_button');
+
+            // NUCLEAR OPTION - Force hide everything with overlay in the name
+            document.querySelectorAll('[class*="overlay"], [id*="overlay"], [id*="Overlay"], .modal').forEach(el => {
+                el.style.display = 'none';
+                el.classList.remove('active');
+            });
             
             console.log('✅ Homepage restored to clean state');
         }
