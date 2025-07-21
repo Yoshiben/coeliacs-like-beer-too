@@ -913,12 +913,7 @@
         let brewerySearchTimeout;
         let beerSearchTimeout;
         let styleSearchTimeout;
-        
-
-        // ================================
-        // ➕ ADD - NEW AUTO-COMPLETE FUNCTIONS
-        // Add these completely new functions to your JavaScript
-        // ================================
+        let lastSearchState = null;
         
         // ================================
         // SEARCH & SELECT BREWERIES
@@ -1480,26 +1475,24 @@
             // Show results overlay immediately
             showResultsOverlay(`Pubs within ${radiusKm}km`);
             
-            // Save the search state BEFORE async operations
-            lastSearchState = {
-                type: 'nearby',
-                radius: radiusKm,
-                userLocation: userLocation, // May be null initially
-                timestamp: Date.now()
-            };
-            
             // Check if we have location
             if (!userLocation) {
                 showResultsLoading('Getting your location...');
                 try {
                     await requestUserLocationForSearch();
-                    // Update the saved state with actual location
-                    lastSearchState.userLocation = userLocation;
                 } catch (error) {
                     showNoResults('Could not get your location');
                     return;
                 }
             }
+            
+            // SAVE the search state AFTER we have confirmed location
+            lastSearchState = {
+                type: 'nearby',
+                radius: radiusKm,
+                userLocation: userLocation, // Save the actual location object
+                timestamp: Date.now()
+            };
             
             console.log('💾 Saved search state:', lastSearchState);
             
@@ -1909,7 +1902,16 @@
                 resultsList.appendChild(resultItem);
             });
 
-            console.log(`✅ Displayed ${pubs.length} results in overlay`);
+            // Save the current search for back button (if not already saved)
+            if (!lastSearchState) {
+                lastSearchState = {
+                    type: 'nearby',
+                    radius: 5, // Default radius
+                    userLocation: userLocation,
+                    timestamp: Date.now()
+                };
+                console.log('💾 Auto-saved search state in displayResultsInOverlay');
+}
         }
         
         // ================================
