@@ -4145,6 +4145,15 @@ body {
         min-height: 52px;
         font-size: var(--text-lg);
     }
+
+   .results-overlay.active {
+        z-index: 9999 !important;
+    }
+    
+    /* Hide search section when results are active */
+    body:has(.results-overlay.active) .search-section {
+        display: none !important;
+    }
 }
 
  /* ====================
