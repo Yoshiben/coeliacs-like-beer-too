@@ -897,6 +897,124 @@
         window.SearchModule = SearchModule;
     </script>
 
+    <!-- Add after your other module imports -->
+    <script type="module" src="/static/js/modals.js"></script>
+    
+    <script type="module">
+        import { ModalModule } from '/static/js/modals.js';
+        import { SearchModule } from '/static/js/search.js';
+        
+        // Make modal module globally available
+        window.ModalModule = ModalModule;
+        
+        // Set up event delegation for modal triggers
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔧 Setting up modal event handlers...');
+            
+            // Handle data-modal attributes
+            document.addEventListener('click', (e) => {
+                const modalTrigger = e.target.closest('[data-modal]');
+                if (modalTrigger) {
+                    e.preventDefault();
+                    const modalId = modalTrigger.dataset.modal;
+                    ModalModule.open(modalId);
+                }
+            });
+            
+            // Handle data-action attributes
+            document.addEventListener('click', (e) => {
+                const actionTrigger = e.target.closest('[data-action]');
+                if (actionTrigger) {
+                    e.preventDefault();
+                    const action = actionTrigger.dataset.action;
+                    
+                    switch(action) {
+                        case 'location-search':
+                            SearchModule.startLocationSearch();
+                            break;
+                        case 'search-name':
+                            SearchModule.searchByName();
+                            break;
+                        case 'search-area':
+                            SearchModule.searchByArea();
+                            break;
+                        case 'search-beer':
+                            SearchModule.searchByBeer();
+                            break;
+                        case 'close-modal':
+                            const modal = actionTrigger.closest('.modal, .search-modal');
+                            if (modal && modal.id) {
+                                ModalModule.close(modal.id);
+                            }
+                            break;
+                        case 'report-beer':
+                            // Check if we're on a pub detail page
+                            if (window.currentPubData) {
+                                ModalModule.openReportModal(window.currentPubData);
+                            } else {
+                                ModalModule.openReportModal();
+                            }
+                            break;
+                        case 'accept-all-cookies':
+                            acceptAllCookies();
+                            break;
+                        case 'accept-essential-cookies':
+                            acceptEssentialOnly();
+                            break;
+                        case 'save-cookie-preferences':
+                            savesCookiePreferences();
+                            break;
+                        case 'accept-all-from-settings':
+                            acceptAllFromSettings();
+                            break;
+                    }
+                }
+            });
+            
+            // Handle distance options
+            document.addEventListener('click', (e) => {
+                const distanceOption = e.target.closest('[data-distance]');
+                if (distanceOption) {
+                    const distance = parseInt(distanceOption.dataset.distance);
+                    SearchModule.searchNearbyWithDistance(distance);
+                }
+            });
+            
+            // Handle admin modals
+            document.addEventListener('click', (e) => {
+                const adminTrigger = e.target.closest('[data-admin-modal]');
+                if (adminTrigger) {
+                    const modalType = adminTrigger.dataset.adminModal;
+                    ModalModule.openAdminModal(modalType);
+                }
+            });
+            
+            // Handle coming soon links
+            document.addEventListener('click', (e) => {
+                const comingSoon = e.target.closest('[data-coming-soon]');
+                if (comingSoon) {
+                    e.preventDefault();
+                    const feature = comingSoon.dataset.comingSoon;
+                    showComingSoon(feature);
+                }
+            });
+            
+            console.log('✅ Modal event handlers ready!');
+        });
+        
+        // Update any functions that programmatically open modals
+        window.showAboutUs = () => ModalModule.open('aboutModal');
+        window.showGFInfo = () => ModalModule.open('gfInfoModal');
+        window.showCookieSettings = () => ModalModule.open('cookieSettings');
+        window.openReportModalForCurrentPub = () => {
+            if (window.currentPubData) {
+                ModalModule.openReportModal(window.currentPubData);
+            } else {
+                ModalModule.openReportModal();
+            }
+        };
+    </script>
+
 
     <!-- END OF HTML SCRIPT -->
     <!-- START OF JAVASCRIPT -->
