@@ -268,7 +268,7 @@
                     <button class="btn-nav-small" onclick="closePubDetails()">
                         🏠 Home
                     </button>
-                    <button class="btn-nav-small" onclick="goBackToResults()">
+                    <button class="btn-nav-small" onclick="debugBackButton()">
                         ← Back
                     </button>
                 </div>
@@ -1480,24 +1480,26 @@
             // Show results overlay immediately
             showResultsOverlay(`Pubs within ${radiusKm}km`);
             
+            // Save the search state BEFORE async operations
+            lastSearchState = {
+                type: 'nearby',
+                radius: radiusKm,
+                userLocation: userLocation, // May be null initially
+                timestamp: Date.now()
+            };
+            
             // Check if we have location
             if (!userLocation) {
                 showResultsLoading('Getting your location...');
                 try {
                     await requestUserLocationForSearch();
+                    // Update the saved state with actual location
+                    lastSearchState.userLocation = userLocation;
                 } catch (error) {
                     showNoResults('Could not get your location');
                     return;
                 }
             }
-            
-            // SAVE the search state AFTER we have confirmed location
-            lastSearchState = {
-                type: 'nearby',
-                radius: radiusKm,
-                userLocation: userLocation, // Save the actual location object
-                timestamp: Date.now()
-            };
             
             console.log('💾 Saved search state:', lastSearchState);
             
@@ -1543,6 +1545,14 @@
             }
             
             trackEvent('back_to_results', 'Navigation', lastSearchState.type);
+        }
+
+        // Add this right after your goBackToResults function (around line 1280)
+        function debugBackButton() {
+            console.log('🔙 Back button debug:');
+            console.log('1. lastSearchState:', lastSearchState);
+            console.log('2. userLocation:', userLocation);
+            goBackToResults();
         }
         
         // ➕ ADD NEW - Restore nearby search
@@ -1931,7 +1941,7 @@
                 </div>
                 
                 <div class="result-actions">
-                    <button class="btn btn-primary" onclick="debugShowPubDetails(${pub.pub_id})">
+                    <button class="btn btn-primary" onclick="showPubDetails(${pub.pub_id})">
                         📍 View Details
                     </button>
                     <button class="btn btn-secondary" onclick="viewPubOnline('${pub.name}', '${pub.postcode}')">
