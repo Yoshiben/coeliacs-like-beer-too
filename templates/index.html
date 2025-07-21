@@ -1579,9 +1579,15 @@
                 }
             }
             
-            // Show results overlay
-            showResultsOverlay(`Pubs within ${state.radius}km`);
+            // Show results overlay and ensure it's visible
+            const resultsOverlay = document.getElementById('resultsOverlay');
+            resultsOverlay.classList.add('active');
+            resultsOverlay.style.display = 'flex'; // Force display
+            document.getElementById('resultsTitle').textContent = `Pubs within ${state.radius}km`;
             showResultsLoading('Restoring your search...');
+            
+            // Hide body scroll
+            document.body.style.overflow = 'hidden';
             
             // Re-run the search with proper location
             try {
