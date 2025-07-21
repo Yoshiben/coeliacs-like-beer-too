@@ -35,7 +35,7 @@
     </script>
 
     <!-- initialize map -->
-    <script type="module" src="/static/js/map.js"></script>
+    <script type="module" src="/static/map.js"></script>
 </head>
 <body>
     
@@ -765,10 +765,10 @@
     <!---------------------------
     IMPORT MAPS.JS
     ---------------------------->
-    <script type="module" src="/static/js/map.js"></script>
+    <script type="module" src="/static/map.js"></script>
     
     <script type="module">
-        import { MapModule } from '/static/js/map.js';
+        import { MapModule } from '/static/map.js';
         
         // Initialize when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
@@ -873,11 +873,11 @@
     <!---------------------------
     IMPORT API.JS
     ---------------------------->
-    <script type="module" src="/static/js/api.js"></script>
+    <script type="module" src="/static/api.js"></script>
     
     <!-- 2. Import it so you can use it -->
     <script type="module">
-        import { APIModule } from '/static/js/api.js';
+        import { APIModule } from '/static/api.js';
         
         // That's it! No initialization needed
         // The API module is now available to use
@@ -887,21 +887,21 @@
     </script>
 
     <!-- Add after api.js -->
-    <script type="module" src="/static/js/search.js"></script>
+    <script type="module" src="/static/search.js"></script>
     
     <script type="module">
-        import { SearchModule } from '/static/js/search.js';
+        import { SearchModule } from '/static/search.js';
         window.SearchModule = SearchModule;
     </script>
 
     <!---------------------------
     IMPORT MODALS.JS
     ---------------------------->
-    <script type="module" src="/static/js/modals.js"></script>
+    <script type="module" src="/static/modals.js"></script>
     
     <script type="module">
-        import { ModalModule } from '/static/js/modals.js';
-        import { SearchModule } from '/static/js/search.js';
+        import { ModalModule } from '/static/modals.js';
+        import { SearchModule } from '/static/search.js';
         
         // Make modal module globally available
         window.ModalModule = ModalModule;
@@ -1094,10 +1094,10 @@
     IMPORT UTILS.JS
     ---------------------------->
 
-    <script type="module" src="/static/js/utils.js"></script>
+    <script type="module" src="/static/utils.js"></script>
     
     <script type="module">
-        import { UtilsModule } from '/static/js/utils.js';
+        import { UtilsModule } from '/static/utils.js';
         
         // Make utilities globally available for existing code
         window.showLoadingToast = UtilsModule.showLoadingToast;
@@ -1109,6 +1109,18 @@
         
         // Make the module available globally
         window.UtilsModule = UtilsModule;
+    </script>
+
+    <!---------------------------
+    IMPORT CONSTANTS.JS
+    ---------------------------->
+    <script type="module" src="/static/constants.js"></script>
+    
+    <script type="module">
+        import { Constants } from '/static/constants.js';
+        
+        // Make constants globally available
+        window.Constants = Constants;
     </script>
 
     <!-- END OF HTML SCRIPT -->
