@@ -952,6 +952,25 @@
                     }
                 }
             });
+
+            // Add this to your showDebugInfo function after the overlay checks:
+            debugInfo += '<br><strong>ELEMENTS AT BOTTOM:</strong><br>';
+            
+            // Find elements that might be causing the gray bar
+            document.querySelectorAll('*').forEach(el => {
+                const rect = el.getBoundingClientRect();
+                const styles = window.getComputedStyle(el);
+                
+                // Check if element is near bottom of viewport and has a background
+                if (rect.bottom > window.innerHeight - 100 && 
+                    rect.bottom < window.innerHeight && 
+                    rect.height > 20 &&
+                    styles.backgroundColor !== 'rgba(0, 0, 0, 0)' && 
+                    styles.backgroundColor !== 'transparent') {
+                    
+                    debugInfo += `📍 ${el.tagName}.${el.className}: bg=${styles.backgroundColor}, height=${rect.height}px<br>`;
+                }
+            });
             
             // Check any element with 'overlay' in class or id
             document.querySelectorAll('[class*="overlay"], [id*="overlay"], [id*="Overlay"]').forEach(el => {
