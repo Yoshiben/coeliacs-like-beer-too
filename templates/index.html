@@ -4831,7 +4831,9 @@ function addSwipeGestures() {
             document.body.classList.add('pub-details-open');
             
             // Show the overlay
-            document.getElementById('pubDetailsOverlay').classList.add('active');
+            const overlay = document.getElementById('pubDetailsOverlay');
+            overlay.classList.add('active');
+            overlay.style.display = 'flex'; // Force display
             
             // Track the view
             trackPubView(pub.name);
