@@ -2438,13 +2438,13 @@ body.pub-details-open {
 } */
 
 /* Lock scroll completely - no overscroll bouncing */
-/* html {
+html {
     overflow: hidden;
     height: 100vh;
     height: 100dvh; /* Dynamic viewport height for mobile */
-} */
+}
 
-/* body {
+body {
     overflow: hidden;
     height: 100vh;
     height: 100dvh;
@@ -2452,9 +2452,9 @@ body.pub-details-open {
     width: 100%;
     padding-bottom: var(--space-4xl); */
     /* Prevent any scrolling or bouncing */
-/*     overscroll-behavior: none;
+    overscroll-behavior: none;
     -webkit-overflow-scrolling: auto;
-} */
+}
 
 /* ================================
    BOTTOM NAVIGATION BAR - VALIDATED
