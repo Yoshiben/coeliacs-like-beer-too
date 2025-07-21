@@ -1931,7 +1931,7 @@
                 </div>
                 
                 <div class="result-actions">
-                    <button class="btn btn-primary" onclick="showPubDetails(${pub.pub_id})">
+                    <button class="btn btn-primary" onclick="debugShowPubDetails(${pub.pub_id})">
                         📍 View Details
                     </button>
                     <button class="btn btn-secondary" onclick="viewPubOnline('${pub.name}', '${pub.postcode}')">
@@ -4705,6 +4705,19 @@ function addSwipeGestures() {
             
             // Use your existing searchSpecificPub function
             searchSpecificPubForDetails(pubId);
+        }
+
+        // Temporary debug - add this right after your existing showPubDetails function
+        function debugShowPubDetails(pubId) {
+            console.log('🔍 DEBUG: showPubDetails flow');
+            console.log('1. pubId received:', pubId, 'type:', typeof pubId);
+            console.log('2. resultsOverlay visible?', document.getElementById('resultsOverlay').classList.contains('active'));
+            console.log('3. Calling original showPubDetails...');
+            showPubDetails(pubId);
+            setTimeout(() => {
+                console.log('4. After 500ms - pubDetailsOverlay visible?', document.getElementById('pubDetailsOverlay').classList.contains('active'));
+                console.log('5. After 500ms - resultsOverlay visible?', document.getElementById('resultsOverlay').classList.contains('active'));
+            }, 500);
         }
         
         // 📝 ADD NEW - New function to handle the API call specifically for details
