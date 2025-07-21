@@ -268,7 +268,7 @@
                     <button class="btn-nav-small" onclick="closePubDetails()">
                         🏠 Home
                     </button>
-                    <button class="btn-nav-small" onclick="debugBackButton()">
+                    <button class="btn-nav-small" onclick="goBackToResults(); return false;" type="button">
                         ← Back
                     </button>
                 </div>
@@ -1511,18 +1511,24 @@
         function goBackToResults() {
             console.log('🔙 Going back to previous search results...');
             
+            // Prevent any default behavior
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
             if (!lastSearchState) {
                 console.log('❌ No previous search state, going home');
-                goHome();
-                return;
+                closePubDetails();
+                return false;
             }
             
             // Check if state is recent (within last 30 minutes)
             const thirtyMinutes = 30 * 60 * 1000;
             if (Date.now() - lastSearchState.timestamp > thirtyMinutes) {
                 console.log('⏰ Search state too old, going home');
-                goHome();
-                return;
+                closePubDetails();
+                return false;
             }
             
             console.log('✅ Restoring search state:', lastSearchState);
@@ -1540,12 +1546,14 @@
             } else if (lastSearchState.type === 'beer') {
                 restoreBeerSearch(lastSearchState);
             } else {
-                // Fallback to home
-                goHome();
+                // Fallback
+                console.log('❌ Unknown search type');
+                closePubDetails();
             }
             
             trackEvent('back_to_results', 'Navigation', lastSearchState.type);
-        }
+            return false; // Prevent any navigation
+}
 
         // Add this right after your goBackToResults function (around line 1280)
         function debugBackButton() {
