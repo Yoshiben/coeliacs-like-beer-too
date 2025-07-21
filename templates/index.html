@@ -4156,6 +4156,60 @@ function addSwipeGestures() {
                 getUserLocation();
             }
         }
+
+        // TEMPORARY DEBUG - Find what's causing the gray overlay
+        function debugFindGrayOverlay() {
+            console.log('🔍 Searching for visible overlays...');
+            
+            // Check all elements with common overlay classes
+            const overlaySelectors = [
+                '.results-overlay',
+                '.pub-details-overlay',
+                '.modal',
+                '.search-modal',
+                '#resultsOverlay',
+                '#pubDetailsOverlay',
+                '[class*="overlay"]',
+                '[id*="overlay"]',
+                '[id*="Overlay"]'
+            ];
+            
+            overlaySelectors.forEach(selector => {
+                const elements = document.querySelectorAll(selector);
+                elements.forEach(el => {
+                    const styles = window.getComputedStyle(el);
+                    if (styles.display !== 'none' && styles.visibility !== 'hidden') {
+                        console.log('⚠️ VISIBLE ELEMENT:', {
+                            selector: selector,
+                            id: el.id,
+                            className: el.className,
+                            display: styles.display,
+                            visibility: styles.visibility,
+                            position: styles.position,
+                            zIndex: styles.zIndex,
+                            backgroundColor: styles.backgroundColor,
+                            element: el
+                        });
+                    }
+                });
+            });
+            
+            // Also check for any fixed position elements
+            const allElements = document.querySelectorAll('*');
+            allElements.forEach(el => {
+                const styles = window.getComputedStyle(el);
+                if (styles.position === 'fixed' && styles.display !== 'none' && el.offsetHeight > 100) {
+                    console.log('🔧 FIXED ELEMENT:', {
+                        id: el.id,
+                        className: el.className,
+                        height: el.offsetHeight,
+                        bottom: styles.bottom,
+                        backgroundColor: styles.backgroundColor,
+                        element: el
+                    });
+                }
+            });
+        }
         
         // NEW: Function to show pub details from map popup
         function showPubDetailsFromMap(pubId) {
