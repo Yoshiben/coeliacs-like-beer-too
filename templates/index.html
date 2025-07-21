@@ -224,7 +224,7 @@
                     🏠 Home
                 </button>
                 <h2 class="results-title" id="resultsTitle">Search Results</h2>
-                <button class="btn-nav-small" onclick="toggleResultsMap()">
+                <button class="btn-nav-small" onclick="toggleSearchResultsFullMap()">
                     🗺️ <span id="resultsMapBtnText">Map</span>
                 </button>
             </div>
@@ -295,7 +295,7 @@
                     <button class="btn btn-external" id="pubGetDirections">
                         🧭 Get Directions
                     </button>
-                    <button class="btn btn-toggle" id="pubToggleMap" onclick="togglePubMap()">
+                    <button class="btn btn-toggle" id="pubToggleMap" onclick="togglePubDetailsSplitMap()">
                         🗺️ <span id="pubMapBtnText">Show on Map</span>
                     </button>
                     <button class="btn btn-positive" onclick="openReportModal()">
@@ -864,7 +864,7 @@
             <div class="nav-label">Home</div>
         </a>
         
-        <a href="#" onclick="goToMap(); return false;" class="nav-item">
+        <a href="#" onclick="toggleSearchResultsFullMap(); return false;" class="nav-item">
             <div class="nav-icon">🗺️</div>
             <div class="nav-label">Map</div>
         </a>
@@ -919,6 +919,7 @@
         console.log('🔍 After declaration lastSearchState:', lastSearchState);
 
         // DEBUG: Mobile overlay detector
+        // REPLACE your showDebugInfo function (remove the worm code from inside it)
         function showDebugInfo() {
             // Create debug panel
             const debugPanel = document.createElement('div');
@@ -989,26 +990,26 @@
             
             debugPanel.innerHTML = debugInfo + '<br><button onclick="this.parentElement.remove()">Close Debug</button>';
             document.body.appendChild(debugPanel);
-
-            // Update the debug button creation to keep your worm
-            window.addEventListener('load', () => {
-                const debugBtn = document.createElement('button');
-                debugBtn.textContent = '🐛 Debug';  // Your worm is back! 🐛
-                debugBtn.style.cssText = `
-                    position: fixed;
-                    bottom: 100px;
-                    right: 10px;
-                    z-index: 99999;
-                    background: yellow;
-                    color: black;
-                    padding: 10px;
-                    border-radius: 50%;
-                    border: 2px solid black;
-                `;
-                debugBtn.onclick = showDebugInfo;
-                document.body.appendChild(debugBtn);
-            });
         }
+
+        // Add debug button to page - THIS SHOULD ALREADY EXIST IN YOUR CODE
+        window.addEventListener('load', () => {
+            const debugBtn = document.createElement('button');
+            debugBtn.textContent = '🐛 Debug';  // Your worm!
+            debugBtn.style.cssText = `
+                position: fixed;
+                bottom: 100px;
+                right: 10px;
+                z-index: 99999;
+                background: yellow;
+                color: black;
+                padding: 10px;
+                border-radius: 50%;
+                border: 2px solid black;
+            `;
+            debugBtn.onclick = showDebugInfo;
+            document.body.appendChild(debugBtn);
+        });
         
         // ================================
         // 🔄 REPLACE: Your searchBreweries function to show ALL breweries
@@ -2204,13 +2205,14 @@
         // 🔄 REPLACE: Your toggleResultsMap function with working version
         // ================================
         
-        function toggleResultsMap() {
+        // RENAME: toggleResultsMap -> toggleSearchResultsFullMap
+        function toggleSearchResultsFullMap() {
             const listContainer = document.getElementById('resultsListContainer');
             const mapContainer = document.getElementById('resultsMapContainer');
             const mapBtnText = document.getElementById('resultsMapBtnText');
             
             if (mapContainer.style.display === 'none' || !mapContainer.style.display) {
-                // Show map
+                // Show FULL SCREEN map for search results
                 listContainer.style.display = 'none';
                 mapContainer.style.display = 'block';
                 mapBtnText.textContent = 'List';
@@ -2228,6 +2230,55 @@
                 mapBtnText.textContent = 'Map';
                 
                 trackEvent('results_map_toggle', 'Map Interaction', 'hide');
+            }
+        }
+        
+        // RENAME: togglePubMap -> togglePubDetailsSplitMap
+        function togglePubDetailsSplitMap() {
+            const container = document.getElementById('pubContainer');
+            const mapContainer = document.getElementById('pubMapContainer');
+            const mapBtnText = document.getElementById('pubMapBtnText');
+            const mapBtn = document.getElementById('pubToggleMap');
+            
+            pubMapVisible = !pubMapVisible;
+            
+            if (pubMapVisible) {
+                // Show SPLIT VIEW for individual pub details
+                container.classList.add('split-view');
+                mapContainer.classList.add('map-visible');
+                mapBtnText.textContent = 'Hide Map';
+                mapBtn.classList.add('active');
+                
+                console.log('🗺️ Pub split-view map toggled ON');
+                
+                // Initialize map if we have coordinates
+                if (currentPubData && currentPubData.latitude && currentPubData.longitude) {
+                    setTimeout(() => {
+                        initializePubMap(currentPubData);
+                    }, 300);
+                } else {
+                    // Show placeholder message
+                    setTimeout(() => {
+                        const placeholder = document.querySelector('.pub-map-placeholder');
+                        if (placeholder) {
+                            placeholder.innerHTML = `
+                                <div>📍 Location coordinates not available</div>
+                                <small style="opacity: 0.7;">Help us by reporting the exact location!</small>
+                            `;
+                        }
+                    }, 300);
+                }
+                
+                trackEvent('pub_map_toggle', 'Map Interaction', 'show');
+            } else {
+                // Hide split view
+                container.classList.remove('split-view');
+                mapContainer.classList.remove('map-visible');
+                mapBtnText.textContent = 'Show on Map';
+                mapBtn.classList.remove('active');
+                
+                console.log('🗺️ Pub split-view map toggled OFF');
+                trackEvent('pub_map_toggle', 'Map Interaction', 'hide');
             }
         }
         
@@ -5122,53 +5173,53 @@ function addSwipeGestures() {
         }
         
         // 🔄 REPLACING - Replace the existing togglePubMap function
-        function togglePubMap() {
-            const container = document.getElementById('pubContainer');
-            const mapContainer = document.getElementById('pubMapContainer');
-            const mapBtnText = document.getElementById('pubMapBtnText');
-            const mapBtn = document.getElementById('pubToggleMap');
+        // function togglePubMap() {
+        //     const container = document.getElementById('pubContainer');
+        //     const mapContainer = document.getElementById('pubMapContainer');
+        //     const mapBtnText = document.getElementById('pubMapBtnText');
+        //     const mapBtn = document.getElementById('pubToggleMap');
             
-            pubMapVisible = !pubMapVisible;
+        //     pubMapVisible = !pubMapVisible;
             
-            if (pubMapVisible) {
-                // Show split view
-                container.classList.add('split-view');
-                mapContainer.classList.add('map-visible');
-                mapBtnText.textContent = 'Hide Map';
-                mapBtn.classList.add('active');
+        //     if (pubMapVisible) {
+        //         // Show split view
+        //         container.classList.add('split-view');
+        //         mapContainer.classList.add('map-visible');
+        //         mapBtnText.textContent = 'Hide Map';
+        //         mapBtn.classList.add('active');
                 
-                console.log('🗺️ Map toggled ON');
+        //         console.log('🗺️ Map toggled ON');
                 
-                // Initialize map if we have coordinates
-                if (currentPubData && currentPubData.latitude && currentPubData.longitude) {
-                    setTimeout(() => {
-                        initializePubMap(currentPubData);
-                    }, 300);
-                } else {
-                    // Show placeholder message
-                    setTimeout(() => {
-                        const placeholder = document.querySelector('.pub-map-placeholder');
-                        if (placeholder) {
-                            placeholder.innerHTML = `
-                                <div>📍 Location coordinates not available</div>
-                                <small style="opacity: 0.7;">Help us by reporting the exact location!</small>
-                            `;
-                        }
-                    }, 300);
-                }
+        //         // Initialize map if we have coordinates
+        //         if (currentPubData && currentPubData.latitude && currentPubData.longitude) {
+        //             setTimeout(() => {
+        //                 initializePubMap(currentPubData);
+        //             }, 300);
+        //         } else {
+        //             // Show placeholder message
+        //             setTimeout(() => {
+        //                 const placeholder = document.querySelector('.pub-map-placeholder');
+        //                 if (placeholder) {
+        //                     placeholder.innerHTML = `
+        //                         <div>📍 Location coordinates not available</div>
+        //                         <small style="opacity: 0.7;">Help us by reporting the exact location!</small>
+        //                     `;
+        //                 }
+        //             }, 300);
+        //         }
                 
-                trackEvent('pub_map_toggle', 'Map Interaction', 'show');
-            } else {
-                // Hide split view
-                container.classList.remove('split-view');
-                mapContainer.classList.remove('map-visible');
-                mapBtnText.textContent = 'Show on Map';
-                mapBtn.classList.remove('active');
+        //         trackEvent('pub_map_toggle', 'Map Interaction', 'show');
+        //     } else {
+        //         // Hide split view
+        //         container.classList.remove('split-view');
+        //         mapContainer.classList.remove('map-visible');
+        //         mapBtnText.textContent = 'Show on Map';
+        //         mapBtn.classList.remove('active');
                 
-                console.log('🗺️ Map toggled OFF');
-                trackEvent('pub_map_toggle', 'Map Interaction', 'hide');
-            }
-        }
+        //         console.log('🗺️ Map toggled OFF');
+        //         trackEvent('pub_map_toggle', 'Map Interaction', 'hide');
+        //     }
+        // }
         
         // REPLACE the initializePubMap function with this cleaner version:
 
