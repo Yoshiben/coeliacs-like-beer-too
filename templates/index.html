@@ -34,7 +34,7 @@
         });
     </script>
 
-    # initialize map
+    <!-- initialize map -->
     <script type="module" src="/static/js/map.js"></script>
 </head>
 <body>
@@ -74,25 +74,25 @@
                 <div class="search-body">
                     <div class="search-options">
                         <!-- Top Left: Pubs Near Me -->
-                        <div class="search-option name" onclick="startLocationSearch()">
+                        <div class="search-option name" data-action="location-search">
                             <span class="search-icon">📍</span>
                             <h3 class="search-title">Pubs Near Me</h3>
                             <p class="search-description">Find pubs close to you, control the search distance.</p>
                         </div>
                         <!-- Top Right: Pubs by Name -->      
-                        <div class="search-option location" onclick="openModal('nameModal')">
+                        <div class="search-option location" data-modal="nameModal">
                             <span class="search-icon">🏠</span>
                             <h3 class="search-title">Pubs by Name</h3>
                             <p class="search-description">Search for a specific pub name - "Milestone" etc</p>
                         </div>
                         <!-- Bottom Left: Pubs by Area -->
-                        <div class="search-option area" onclick="openModal('areaModal')">
+                        <div class="search-option area" data-modal="areaModal">
                             <span class="search-icon">🗺️</span>
                             <h3 class="search-title">Pubs by Area</h3>
                             <p class="search-description">Explore pubs in regions, cities, or postcodes</p>
                         </div>
                         <!-- Bottom Right: Pubs by Beer -->
-                        <div class="search-option beer" onclick="openModal('beerModal')">
+                        <div class="search-option beer" data-modal="beerModal">
                             <span class="search-icon">🍺</span>
                             <h3 class="search-title">Pubs by Beer</h3>
                             <p class="search-description">Find pubs serving specific GF beers - "Zapato", "IPA" etc.</p>
@@ -115,8 +115,8 @@
             </div>
             <input type="text" class="form-input" placeholder="e.g. The Red Lion, Wetherspoons" id="nameInput">
             <div class="modal-actions">
-                <button class="btn btn-secondary" onclick="closeSearchModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="searchByName()">Search</button>
+                <button class="btn btn-secondary" data-action="close-modal">Cancel</button>
+                <button class="btn btn-primary" data-action="search-name">Search</button>
             </div>
         </div>
     </div>
@@ -141,8 +141,8 @@
             <input type="text" class="form-input" placeholder="Enter postcode..." id="areaInput">
             
             <div class="modal-actions">
-                <button class="btn btn-secondary" onclick="closeSearchModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="searchByArea()">Search</button>
+                <button class="btn btn-secondary" data-action="close-modal">Cancel</button>
+                <button class="btn btn-primary" data-action="search-area">Search</button>
             </div>
         </div>
     </div>
@@ -176,8 +176,8 @@
             </div>
             
             <div class="modal-actions">
-                <button class="btn btn-secondary" onclick="closeSearchModal()">Cancel</button>
-                <button class="btn btn-primary" onclick="searchByBeer()">Search</button>
+                <button class="btn btn-secondary" data-action="close-modal">Cancel</button>
+                <button class="btn btn-primary" data-action="search-beer">Search</button>
             </div>
         </div>
     </div>
@@ -190,30 +190,30 @@
             </div>
            
             <div class="distance-options">
-                <div class="distance-option" onclick="searchNearbyWithDistance(1)">
+                <div class="distance-option" data-distance="1">
                     <div class="distance-number">1km</div>
                     <div class="distance-label">Walking distance</div>
                 </div>
-                <div class="distance-option" onclick="searchNearbyWithDistance(3)">
+                <div class="distance-option" data-distance="3">
                     <div class="distance-number">3km</div>
                     <div class="distance-label">Short journey</div>
                 </div>
-                <div class="distance-option popular" onclick="searchNearbyWithDistance(5)">
+                <div class="distance-option" data-distance="5">
                     <div class="distance-number">5km</div>
                     <div class="distance-label">Most popular</div>
                 </div>
-                <div class="distance-option" onclick="searchNearbyWithDistance(10)">
+                <div class="distance-option" data-distance="10">
                     <div class="distance-number">10km</div>
                     <div class="distance-label">Longer trip</div>
                 </div>
-                <div class="distance-option" onclick="searchNearbyWithDistance(20)">
+                <div class="distance-option" data-distance="20">
                     <div class="distance-number">20km</div>
                     <div class="distance-label">Day out</div>
                 </div>
             </div>
             
             <div class="modal-actions">
-                <button class="btn btn-secondary" onclick="closeSearchModal()">Cancel</button>
+                <button class="btn btn-secondary" data-action="close-modal">Cancel</button>
             </div>
         </div>
     </div>
@@ -336,130 +336,7 @@
         Finding your location...
     </div>
 
-    <!-- Features Grid -->
-<!--     <div class="features-section" id="featuresSection">
-        <div class="features-grid">
-            <div class="feature-card">
-                <span class="feature-icon">ℹ️</span>
-                <h3 class="feature-title">About Us</h3>
-                <p class="feature-description">Learn about our mission to help coeliacs find great beer across the UK.</p>
-                <button class="btn btn-primary" onclick="showAboutUs()">Learn More</button>
-            </div> -->
-            
-            <!-- SWAPPED: What is GF Beer now comes before Report -->
-<!--             <div class="feature-card">
-                <span class="feature-icon">🔬</span>
-                <h3 class="feature-title">What is GF Beer?</h3>
-                <p class="feature-description">Everything you need to know about gluten free beer standards and safety.</p>
-                <button class="btn btn-primary" onclick="showGFInfo()">Learn More</button>
-            </div>
-            
-            <div class="feature-card">
-                <span class="feature-icon">📸</span>
-                <h3 class="feature-title">Report GF Beer</h3>
-                <p class="feature-description">Found gluten free beer somewhere? Share it with the community and help others!</p>
-                <button class="btn btn-primary" onclick="openReportModal()">Add Report</button>
-            </div>
-            
-            <div class="feature-card">
-                <span class="feature-icon">🏭</span>
-                <h3 class="feature-title">GF Breweries</h3>
-                <p class="feature-description">Discover breweries making amazing gluten free beers and where to find them.</p>
-                <button class="btn btn-primary" onclick="window.location.href='/breweries'">Discover Breweries</button>
-            </div>
-            
-            <div class="feature-card">
-                <span class="feature-icon">📧</span>
-                <h3 class="feature-title">Weekly Updates</h3>
-                <p class="feature-description">Get notified about new GF beer finds, pub additions, and brewery news.</p>
-                <button class="btn btn-primary" onclick="showComingSoon('Newsletter')">Coming Soon</button>
-            </div>
-            
-            <div class="feature-card">
-                <span class="feature-icon">⭐</span>
-                <h3 class="feature-title">GF Beer Reviews</h3>
-                <p class="feature-description">Real reviews from coeliacs - discover which beers are worth trying and which to avoid.</p>
-                <button class="btn btn-primary" onclick="showComingSoon('Beer Reviews')">Coming Soon</button>
-            </div>
-        </div>
-    </div> -->
 
-    <!-- Recent Activity -->
-<!--     <div class="activity-section" id="activitySection">
-        <div class="activity-card">
-            <div class="activity-header">
-                <h2 class="activity-title">🔥 Recent GF Beer Updates</h2>
-                <a href="#" class="view-all" onclick="showAllActivity()">View All</a>
-            </div>
-            
-            <div id="recentActivity">
-                <div class="activity-item">
-                    <div class="activity-avatar">🍺</div>
-                    <div class="activity-content">
-                        <div class="activity-text">Welcome to the community! Start by searching for pubs near you.</div>
-                        <div class="activity-time">Search above to see real pub data</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> -->
-
-    <!-- Footer -->
-<!--     <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3 class="footer-title">🍺 Coeliacs Like Beer Too</h3>
-                <p class="footer-description">The UK's largest community-driven guide to gluten free beer. Built by coeliacs, for coeliacs.</p>
-                <div class="footer-stats">
-                    <span id="footerPubCount">52,847</span> pubs · 
-                    <span id="footerGFCount">1,249</span> with GF options
-                </div>
-            </div>
-            
-            <div class="footer-section">
-                <h4 class="footer-subtitle">🔗 Quick Links</h4>
-                <div class="footer-links">
-                    <a href="#" onclick="showAboutUs()" class="footer-link">About Us</a>
-                    <a href="#" onclick="showGFInfo()" class="footer-link">What is GF Beer?</a>
-                    <a href="#" onclick="openReportModal()" class="footer-link">Report GF Beer</a>
-                    <a href="#" onclick="scrollToSearch()" class="footer-link">Search Pubs</a>       
-                </div>
-            </div>
-            
-            <div class="footer-section">
-                <h4 class="footer-subtitle">📋 Legal & Privacy</h4>
-                <div class="footer-links">
-                    <a href="/privacy" class="footer-link" target="_blank">Privacy Policy</a>
-                    <a href="/terms" class="footer-link" target="_blank">Terms of Service</a>
-                    <a href="/cookies" class="footer-link" target="_blank">Cookie Policy</a>
-                    <a href="/accessibility" class="footer-link" target="_blank">Accessibility</a>
-                    <a href="/liability" class="footer-link" target="_blank">Liability Notice</a>
-                </div>
-            </div>
-            
-            <div class="footer-section">
-                <h4 class="footer-subtitle">💬 Community</h4>
-                <div class="footer-links">
-                    <a href="#" onclick="showComingSoon('Contact Form')" class="footer-link">Contact Us</a>
-                    <a href="#" onclick="showComingSoon('Community Forum')" class="footer-link">Community Forum</a>
-                    <a href="#" onclick="showComingSoon('Newsletter')" class="footer-link">Newsletter</a>
-                    <a href="#" onclick="showComingSoon('Social Media')" class="footer-link">Follow Us</a>
-                </div>
-            </div>
-        </div>
-        
-        <div class="footer-bottom">
-            <div class="footer-bottom-content">
-                <p class="footer-copyright">
-                    © 2025 Coeliacs Like Beer Too. All rights reserved. 
-                    <span class="footer-disclaimer">This site is for informational purposes only. Always verify with venues directly.</span>
-                </p>
-                <div class="footer-version">
-                    <span class="footer-cache-info">v{{ cache_buster }}</span>
-                </div>
-            </div>
-        </div>
-    </footer> -->
 
 <!-- ================================
      OPTIMIZED REPORT MODAL HTML
@@ -498,7 +375,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2 class="modal-title">ℹ️ About Coeliacs Like Beer Too</h2>
-                <button class="modal-close" onclick="closeModal('aboutModal')" aria-label="Close about modal">&times;</button>
+                <button class="modal-close" aria-label="Close about modal">&times;</button>
             </div>
             
             <div class="modal-body">
@@ -788,9 +665,9 @@
                 <p>We use essential cookies to make our site work. With your consent, we may also use analytics cookies to improve your experience.</p>
             </div>
             <div class="cookie-buttons">
-                <button onclick="acceptAllCookies()" class="cookie-btn cookie-btn-accept">Accept All</button>
-                <button onclick="acceptEssentialOnly()" class="cookie-btn cookie-btn-essential">Essential Only</button>
-                <button onclick="showCookieSettings()" class="cookie-btn cookie-btn-settings">Settings</button>
+                <button data-action="accept-all-cookies" class="cookie-btn cookie-btn-accept">Accept All</button>
+                <button data-action="accept-essential-cookies" class="cookie-btn cookie-btn-essential">Essential Only</button>
+                <button data-modal="cookieSettings" class="cookie-btn cookie-btn-settings">Settings</button>
             </div>
         </div>
     </div>
@@ -800,7 +677,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2 class="modal-title">🍪 Cookie Settings</h2>
-                <button class="modal-close" onclick="closeModal('cookieSettings')" aria-label="Close cookie settings">&times;</button>
+                <button class="modal-close" aria-label="Close cookie settings">&times;</button>
             </div>
             
             <div class="modal-body">
@@ -2992,229 +2869,7 @@ function addSwipeGestures() {
         // Also call immediately if page already loaded
         if (document.readyState !== 'loading') {
             loadStats();
-        }
-
-        // ================================
-        // OPEN AND CLOSE SEARCH MODALS
-        // ================================
-
-        function openModal(modalId) {
-            // Small delay to let button animation finish cleanly
-            setTimeout(() => {
-                document.getElementById(modalId).style.display = 'flex';
-                
-                // Handle specific modals
-                if (modalId === 'areaModal') {
-                    // Initialize area modal with proper placeholder
-                    setTimeout(() => {
-                        initializeAreaModal();
-                    }, 100);
-                } else if (modalId === 'beerModal') {
-                    // Initialize beer modal with proper placeholder
-                    setTimeout(() => {
-                        initializeBeerModal();
-                    }, 100);
-                } else {
-                    // Focus other modal inputs normally
-                    setTimeout(() => {
-                        const input = document.querySelector(`#${modalId} .form-input`);
-                        if (input) {
-                            input.focus();
-                        }
-                    }, 100);
-                }
-            }, 150); // Just enough to let highlight animation complete
-        }
-
-        // Also add smooth modal close animation
-        function closeSearchModal() {
-            // IMMEDIATELY remove any button highlights
-            document.querySelectorAll('.search-option.tapped, .search-option.loading').forEach(option => {
-                option.classList.remove('tapped', 'loading');
-            });
-            
-            const modals = ['nameModal', 'beerModal', 'areaModal', 'distanceModal'];
-            modals.forEach(modal => {
-                const modalEl = document.getElementById(modal);
-                if (modalEl && modalEl.style.display !== 'none') {
-                    // Slower fade out - gives highlight time to disappear
-                    modalEl.style.opacity = '0';
-                    // modalEl.style.transition = 'opacity 0.3s ease-out'; // Smooth fade
-                    
-                    setTimeout(() => {
-                        modalEl.style.display = 'none';
-                        modalEl.style.opacity = '1'; // Reset for next time
-                        modalEl.style.transition = ''; // Reset transition
-                    }, 350); // Longer delay - 350ms instead of 200ms
-                }
-            });
-        }
-
-        // ================================
-        // 🔍 DEBUG - REPORT MODAL FIX
-        // ✏️ UPDATE - Replace your openReportModal function with this debug version
-        // ================================
         
-        function openReportModal(pubData = null) {
-            console.log('🔍 Debug: openReportModal called with:', pubData);
-            
-            // Debug: Check if modal exists
-            const modal = document.getElementById('reportModal');
-            console.log('🔍 Debug: modal element found:', modal);
-            
-            if (!modal) {
-                console.error('❌ ERROR: reportModal not found in DOM!');
-                console.log('🔍 Available modals:', document.querySelectorAll('[id*="modal"]'));
-                showSuccessToast('❌ Report modal not found - please refresh the page');
-                return;
-            }
-            
-            // Debug: Check modal structure
-            const modalTitle = modal.querySelector('.modal-title');
-            console.log('🔍 Debug: modal title found:', modalTitle);
-            
-            if (!modalTitle) {
-                console.error('❌ ERROR: .modal-title not found in reportModal!');
-                console.log('🔍 Modal innerHTML:', modal.innerHTML.substring(0, 200) + '...');
-                showSuccessToast('❌ Modal structure error - please refresh the page');
-                return;
-            }
-            
-            const pubSearchField = document.getElementById('reportPubSearch');
-            const selectedPubInfo = document.getElementById('selectedPubInfo');
-            const newPubFields = document.getElementById('newPubFields');
-            
-            console.log('🔍 Debug: form elements found:', {
-                pubSearchField: !!pubSearchField,
-                selectedPubInfo: !!selectedPubInfo,
-                newPubFields: !!newPubFields
-            });
-            
-            // If coming from a specific pub, handle differently
-            if (pubData) {
-                console.log('🍺 Debug: Pre-populating with pub data');
-                
-                // Hide pub search entirely
-                const pubSearchGroup = document.getElementById('pubSearchGroup');
-                if (pubSearchGroup) {
-                    pubSearchGroup.style.display = 'none';
-                } else {
-                    console.warn('⚠️ Warning: pubSearchGroup not found');
-                }
-                
-                // Show the pub info at top
-                modalTitle.innerHTML = `📸 Report GF Beer Find<br><small style="color: var(--text-secondary); font-weight: 400;">at ${pubData.name}</small>`;
-                
-                // Store the pub data globally
-                window.selectedPubData = {
-                    pub_id: pubData.pub_id || pubData.id,
-                    name: pubData.name,
-                    address: pubData.address,
-                    postcode: pubData.postcode
-                };
-                
-                console.log('✅ Debug: Pre-populated pub data:', window.selectedPubData);
-                
-            } else {
-                console.log('🔍 Debug: Normal flow - show pub search');
-                
-                // Normal flow - show pub search
-                const pubSearchGroup = document.getElementById('pubSearchGroup');
-                if (pubSearchGroup) {
-                    pubSearchGroup.style.display = 'block';
-                }
-                modalTitle.innerHTML = '📸 Report GF Beer Find';
-                window.selectedPubData = null;
-            }
-            
-            // Reset form
-            const reportForm = document.getElementById('reportForm');
-            if (reportForm) {
-                reportForm.reset();
-                console.log('✅ Debug: Form reset');
-            } else {
-                console.error('❌ ERROR: reportForm not found!');
-            }
-            
-            if (selectedPubInfo) selectedPubInfo.style.display = 'none';
-            if (newPubFields) newPubFields.style.display = 'none';
-            
-            // Hide all dropdowns
-            const dropdowns = ['breweryDropdown', 'beerNameDropdown', 'beerStyleDropdown'];
-            dropdowns.forEach(id => {
-                const dropdown = document.getElementById(id);
-                if (dropdown) {
-                    dropdown.style.display = 'none';
-                } else {
-                    console.warn(`⚠️ Warning: ${id} not found`);
-                }
-            });
-            
-            // Reset photo upload styling
-            const photoLabel = document.querySelector('.photo-upload-compact');
-            if (photoLabel) {
-                photoLabel.style.borderColor = 'var(--border-light)';
-                photoLabel.style.background = 'var(--bg-section)';
-                const textEl = photoLabel.querySelector('.photo-upload-text');
-                if (textEl) {
-                    textEl.innerHTML = `
-                        <strong>Add a photo</strong><br>
-                        <small>Beer menu, bottle, or tap</small>
-                    `;
-                }
-                console.log('✅ Debug: Photo upload reset');
-            } else {
-                console.warn('⚠️ Warning: photo-upload-compact not found');
-            }
-            
-            // Show modal
-            modal.style.display = 'block';
-            console.log('✅ Debug: Modal displayed');
-            
-            // Track event
-            if (typeof trackEvent === 'function') {
-                trackEvent('open_report_modal', 'Modal', pubData ? 'from_pub_page' : 'general');
-            }
-            
-            // Initialize dropdowns
-            try {
-                initializeReportModalDropdowns();
-                console.log('✅ Debug: Dropdowns initialized');
-            } catch (error) {
-                console.error('❌ ERROR: initializeReportModalDropdowns failed:', error);
-            }
-            
-            // Focus appropriate field
-            setTimeout(() => {
-                if (pubData) {
-                    // Focus beer format since pub is pre-filled
-                    const formatField = document.getElementById('reportFormat');
-                    if (formatField) {
-                        formatField.focus();
-                        console.log('✅ Debug: Focused format field');
-                    }
-                } else {
-                    // Focus pub search
-                    if (pubSearchField) {
-                        pubSearchField.focus();
-                        console.log('✅ Debug: Focused pub search field');
-                    }
-                }
-            }, 100);
-            
-            console.log('🎉 Debug: openReportModal completed successfully');
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-            if (modalId === 'reportModal') {
-                document.getElementById('reportForm').reset();
-                selectedPubData = null;
-                document.getElementById('selectedPubInfo').style.display = 'none';
-                document.getElementById('newPubFields').style.display = 'none';
-                document.getElementById('pubSuggestions').style.display = 'none';
-            }
-        }
 
         // Update the existing pub page report button
         function updatePubPageReportButton() {
@@ -3354,16 +3009,6 @@ function addSwipeGestures() {
                 console.warn('No current pub data available');
                 openReportModal();
             }
-        }
-
-        function showAboutUs() {
-            document.getElementById('aboutModal').style.display = 'block';
-            trackEvent('open_about_modal', 'Modal');
-        }
-
-        function showGFInfo() {
-            document.getElementById('gfInfoModal').style.display = 'block';
-            trackEvent('open_gf_info_modal', 'Modal');
         }
 
         function showComingSoon(feature) {
@@ -4780,11 +4425,6 @@ function addSwipeGestures() {
             showSuccessToast('✅ Essential cookies only. You can change this anytime.');
         }
 
-        function showCookieSettings() {
-            document.getElementById('cookieSettings').style.display = 'block';
-            const analyticsConsent = localStorage.getItem('analyticsConsent');
-            document.getElementById('analyticsConsent').checked = analyticsConsent === 'true';
-        }
 
         function savesCookiePreferences() {
             const analyticsConsent = document.getElementById('analyticsConsent').checked;
