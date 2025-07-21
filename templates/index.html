@@ -1090,6 +1090,26 @@
         };
     </script>
 
+    <!---------------------------
+    IMPORT UTILS.JS
+    ---------------------------->
+
+    <script type="module" src="/static/js/utils.js"></script>
+    
+    <script type="module">
+        import { UtilsModule } from '/static/js/utils.js';
+        
+        // Make utilities globally available for existing code
+        window.showLoadingToast = UtilsModule.showLoadingToast;
+        window.hideLoadingToast = UtilsModule.hideLoadingToast;
+        window.showSuccessToast = UtilsModule.showSuccessToast;
+        window.animateNumber = UtilsModule.animateNumber;
+        window.calculateDistance = UtilsModule.calculateDistance;
+        window.escapeHtml = UtilsModule.escapeHtml;
+        
+        // Make the module available globally
+        window.UtilsModule = UtilsModule;
+    </script>
 
     <!-- END OF HTML SCRIPT -->
     <!-- START OF JAVASCRIPT -->
@@ -2363,41 +2383,6 @@ function addSwipeGestures() {
     });
 }
 */
-
-        // ================================
-        // TOAST NOTIFICATION SYSTEM
-        // ================================
-        
-        function showLoadingToast(message = 'Loading...') {
-            const toast = document.getElementById('loadingToast');
-            document.getElementById('loadingMessage').textContent = message;
-            toast.style.display = 'block';
-            toast.style.animation = 'slideInUp 0.3s ease-out';
-        }
-
-        function hideLoadingToast() {
-            const toast = document.getElementById('loadingToast');
-            toast.style.animation = 'slideOutDown 0.3s ease-in';
-            setTimeout(() => {
-                toast.style.display = 'none';
-            }, 300);
-        }
-
-        function showSuccessToast(message = 'Success!') {
-            const toast = document.getElementById('successToast');
-            document.getElementById('successMessage').textContent = message;
-            toast.style.display = 'block';
-            toast.style.animation = 'slideInUp 0.3s ease-out';
-            
-            // Auto hide after 3 seconds
-            setTimeout(() => {
-                toast.style.animation = 'slideOutDown 0.3s ease-in';
-                setTimeout(() => {
-                    toast.style.display = 'none';
-                }, 300);
-            }, 3000);
-        }
-
         // ================================
         // GOOGLE ANALYTICS TRACKING
         // ================================
@@ -2721,15 +2706,6 @@ function addSwipeGestures() {
                 }
             }
         };
-
-        // Debounce function to limit rapid requests
-        let debounceTimeout;
-        function debounce(func, wait) {
-            return function (...args) {
-                clearTimeout(debounceTimeout);
-                debounceTimeout = setTimeout(() => func.apply(this, args), wait);
-            };
-        }
 
         // Fixed Search Functions
         
@@ -3970,40 +3946,6 @@ function addSwipeGestures() {
                 document.getElementById('footerPubCount').textContent = '49,841';
                 document.getElementById('footerGFCount').textContent = '1,249';
             }
-        }
-        
-        // Enhanced number animation with better formatting
-        function animateNumber(elementId, targetNumber) {
-            const element = document.getElementById(elementId);
-            if (!element) {
-                console.warn(`Element ${elementId} not found`);
-                return;
-            }
-            
-            const startNumber = 0;
-            const duration = 2000; // 2 seconds
-            const startTime = performance.now();
-            
-            function updateNumber(currentTime) {
-                const elapsed = currentTime - startTime;
-                const progress = Math.min(elapsed / duration, 1);
-                
-                // Ease out animation
-                const easeOut = 1 - Math.pow(1 - progress, 3);
-                const currentNumber = Math.floor(startNumber + (targetNumber - startNumber) * easeOut);
-                
-                // Format the number with commas
-                element.textContent = currentNumber.toLocaleString();
-                
-                if (progress < 1) {
-                    requestAnimationFrame(updateNumber);
-                } else {
-                    // Ensure final number is exactly correct
-                    element.textContent = targetNumber.toLocaleString();
-                }
-            }
-            
-            requestAnimationFrame(updateNumber);
         }
 
         // Cookie functions
