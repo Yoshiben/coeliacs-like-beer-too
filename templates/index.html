@@ -763,6 +763,8 @@
     
     <script type="module">
         import { MapModule } from '/static/map.js';
+
+        window.toggleSearchResultsFullMap = MapModule.toggleSearchResultsFullMap;
         
         // Initialize when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
@@ -883,18 +885,22 @@
     <!---------------------------
     IMPORT SEARCH.JS
     ---------------------------->
+    
     <script type="module" src="/static/search.js"></script>
     
     <script type="module">
         import { SearchModule } from '/static/search.js';
+        
         window.SearchModule = SearchModule;
-        // ADD: Make closeSearchModal available globally for backward compatibility
         window.closeSearchModal = () => SearchModule.closeSearchModal();
+        window.showPubDetails = SearchModule.showPubDetails;
+        
     </script>
 
     <!---------------------------
     IMPORT MODALS.JS
     ---------------------------->
+    
     <script type="module" src="/static/modals.js"></script>
     
     <script type="module">
@@ -903,6 +909,8 @@
         
         // Make modal module globally available
         window.ModalModule = ModalModule;
+        window.updateAreaPlaceholder = ModalModule.updateAreaPlaceholder;
+        window.updateBeerPlaceholder = ModalModule.updateBeerPlaceholder;
         
         // Set up event delegation for modal triggers
         document.addEventListener('DOMContentLoaded', function() {
@@ -1156,7 +1164,8 @@
         
         // Make UI module and debug globally available
         window.UIModule = UIModule;
-        window.showDebugInfo = UIModule.showDebugInfo;        
+        window.showDebugInfo = UIModule.showDebugInfo;  
+        window.closeResults = UIModule.closeResults;
         
         // The module auto-initializes
         if (document.readyState === 'loading') {
