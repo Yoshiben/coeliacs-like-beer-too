@@ -207,6 +207,52 @@ export const APIModule = (function() {
             throw error;
         }
     };
+
+    // Enhanced beer search that gets pubs with beer details
+    const searchPubsByBeer = async (query, searchType) => {
+        try {
+            console.log(`🍺 API: Searching pubs by beer - "${query}" (${searchType})`);
+            
+            // Use a broad search to get pubs with beer details
+            const response = await fetchWithTimeout('/search', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    query: query,
+                    search_type: 'all',
+                    include_beer_details: true,
+                    page: 1,
+                    per_page: 500 // Get more results for beer filtering
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.error) {
+                throw new Error(data.error);
+            }
+            
+            console.log(`🍺 API: Got ${data.pubs?.length || 0} pubs for beer filtering`);
+            return data;
+            
+        } catch (error) {
+            console.error('🍺 API: Beer search error:', error);
+            
+            // Fallback to regular search
+            console.log('🍺 API: Falling back to regular search');
+            return await searchPubs({
+                query: query,
+                searchType: 'all',
+                page: 1
+            });
+        }
+    };
     
     // Admin API calls (with auth token)
     const admin = {
@@ -285,6 +331,7 @@ export const APIModule = (function() {
     return {
         getStats,
         searchPubs,
+        searchPubsByBeer,
         findNearbyPubs,
         geocodePostcode,
         getPubSuggestions,
