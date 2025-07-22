@@ -334,6 +334,15 @@ const App = {
                 // Prevent any other close actions from running
                 event.stopPropagation();
                 event.preventDefault();
+
+                const utils = this.getModule('utils');
+                if (utils?.closeAllOverlaysAndGoHome) {
+                    utils.closeAllOverlaysAndGoHome();
+                } else {
+                    // Fallback if utils not available
+                    window.UtilsModule?.closeAllOverlaysAndGoHome?.();
+                }
+                break;
                 
                 // Close pub details overlay first
                 const pubDetailsOverlay = document.getElementById('pubDetailsOverlay');
@@ -376,6 +385,18 @@ const App = {
                 }
                 
                 console.log('✅ Returned to home view');
+                break;
+
+            case 'close-results':
+                console.log('🏠 Close results clicked - using centralized close function');
+                
+                const utilsModule = this.getModule('utils');
+                if (utilsModule?.closeAllOverlaysAndGoHome) {
+                    utilsModule.closeAllOverlaysAndGoHome();
+                } else {
+                    // Fallback
+                    window.UtilsModule?.closeAllOverlaysAndGoHome?.();
+                }
                 break;
                 
             case 'close-modal':
