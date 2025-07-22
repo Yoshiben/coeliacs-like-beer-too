@@ -8,53 +8,61 @@
    CSS Variables needed by mobile.css
    ================================ */
 
-:root {
-    /* Core variables that mobile.css depends on */
-    --space-xs: 4px;
-    --space-sm: 8px;
-    --space-md: 12px;
-    --space-lg: 16px;
-    --space-xl: 20px;
-    --space-2xl: 24px;
-    --space-3xl: 32px;
-    --space-4xl: 40px;
-    
-    --text-xs: 0.75rem;
-    --text-sm: 0.875rem;
-    --text-base: 1rem;
-    --text-lg: 1.125rem;
-    --text-xl: 1.25rem;
-    --text-2xl: 1.5rem;
-    --text-3xl: 1.875rem;
-    
-    --radius: 8px;
-    --radius-lg: 16px;
-    --radius-xl: 20px;
-    --radius-pill: 50px;
-    
-    --transition: 0.25s ease-out;
-    --transition-fast: 0.15s ease-out;
-    
-    --text-primary: #2d3748;
-    --text-secondary: #4a5568;
-    --text-muted: #718096;
-    --text-white: #ffffff;
-    
-    --bg-white: rgba(255, 255, 255, 0.95);
-    --bg-section: rgba(248, 250, 252, 0.8);
-    --border-light: rgba(0, 0, 0, 0.1);
-    
-    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    --error-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-    --warning-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    
-    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    --shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.15);
-    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
-    
-    --z-modal-backdrop: 1000;
-    --z-toast: 1050;
+@media (max-width: 768px) {
+    :root {
+        /* Spacing variables */
+        --space-xs: 4px;
+        --space-sm: 8px;
+        --space-md: 12px;
+        --space-lg: 16px;
+        --space-xl: 20px;
+        --space-2xl: 24px;
+        --space-3xl: 32px;
+        --space-4xl: 40px;
+        
+        /* Text size variables */
+        --text-xs: 0.75rem;
+        --text-sm: 0.875rem;
+        --text-base: 1rem;
+        --text-lg: 1.125rem;
+        --text-xl: 1.25rem;
+        --text-2xl: 1.5rem;
+        
+        /* Border radius variables */
+        --radius: 8px;
+        --radius-lg: 16px;
+        --radius-xl: 20px;
+        --radius-pill: 50px;
+        
+        /* Transition variables */
+        --transition: 0.25s ease-out;
+        --transition-fast: 0.15s ease-out;
+        
+        /* Color variables */
+        --text-primary: #2d3748;
+        --text-secondary: #4a5568;
+        --text-muted: #718096;
+        --text-white: #ffffff;
+        
+        --bg-white: rgba(255, 255, 255, 0.95);
+        --bg-section: rgba(248, 250, 252, 0.8);
+        --border-light: rgba(0, 0, 0, 0.1);
+        --divider-color: rgba(0, 0, 0, 0.08);
+        
+        /* Gradient variables */
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        --error-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        
+        /* Shadow variables */
+        --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.15);
+        --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
+        
+        /* Z-index variables */
+        --z-modal-backdrop: 1000;
+        --z-toast: 1050;
+    }
 }
 
 /* ================================
