@@ -798,11 +798,9 @@ export const SearchModule = (function() {
     };
 
     const showPubDetails = (pubId) => {
-    console.log('🏠 Showing pub details:', pubId);
-    if (window.showPubDetails) {
-        window.showPubDetails(pubId);
-    } else {
-        // Fallback - just call the search
+        console.log('🏠 Showing pub details:', pubId);
+        
+        // Just call searchSpecificPub directly
         searchSpecificPub(pubId);
     }
 };
