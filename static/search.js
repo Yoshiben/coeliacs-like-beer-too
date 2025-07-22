@@ -990,8 +990,14 @@ export const SearchModule = (function() {
     // ACTION: Replace the map toggle handler with enhanced version
     // ================================
     
+    // ================================
+    // 🔧 REPLACE: In search.js - Enhanced map toggle handler
+    // LOCATION: Find the setupResultsNavigationHandlers function (around line 750)
+    // ACTION: Replace the map toggle handler with this enhanced version
+    // ================================
+    
     const setupResultsNavigationHandlers = () => {
-        console.log('🔧 Setting up results navigation handlers...');
+        console.log('🔧 Setting up enhanced results navigation handlers...');
         
         // Home button handler (keep existing)
         const homeBtn = document.querySelector('[data-action="close-results"]');
@@ -1016,44 +1022,80 @@ export const SearchModule = (function() {
             });
             console.log('✅ Home button handler attached');
         }
-        
-        // Enhanced map toggle button handler
-        const mapBtn = document.querySelector('[data-action="toggle-results-map"]');
+    
+    // 🔧 FIX: Enhanced map toggle button handler with proper container management
+    const mapBtn = document.querySelector('[data-action="toggle-results-map"]');
         if (mapBtn) {
             mapBtn.onclick = null;
             mapBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('🗺️ Map toggle button clicked');
+                console.log('🗺️ ENHANCED Map toggle button clicked');
                 
                 const listContainer = document.getElementById('resultsListContainer');
                 const mapContainer = document.getElementById('resultsMapContainer');
                 const mapBtnText = document.getElementById('resultsMapBtnText');
                 
+                console.log('📋 Container states:', {
+                    list: listContainer?.style.display || 'default',
+                    map: mapContainer?.style.display || 'default'
+                });
+                
                 if (mapContainer && listContainer && mapBtnText) {
                     if (mapContainer.style.display === 'none' || !mapContainer.style.display) {
-                        // Show map
+                        // 🔧 FIX: Show map with proper full-screen setup
+                        console.log('🗺️ Switching to FULL-SCREEN map view...');
+                        
+                        // Hide list completely
                         listContainer.style.display = 'none';
+                        
+                        // Show map container with full-screen styling
                         mapContainer.style.display = 'block';
+                        mapContainer.style.flex = '1';
+                        mapContainer.style.height = '100%';
+                        
+                        // Update button text
                         mapBtnText.textContent = 'List';
+                        
+                        // 🔧 FIX: Ensure no split-view classes are applied
+                        mapContainer.classList.remove('split-view');
+                        const resultsOverlay = document.getElementById('resultsOverlay');
+                        if (resultsOverlay) {
+                            resultsOverlay.classList.remove('split-view');
+                        }
                         
                         // Initialize the results map with current search results
                         setTimeout(() => {
                             const mapModule = window.App?.getModule('map');
                             if (mapModule && mapModule.initResultsMap) {
-                                console.log('🗺️ Initializing results map with pubs...');
+                                console.log('🗺️ Initializing FULL-SCREEN results map with', currentSearchPubs?.length || 0, 'pubs...');
                                 const map = mapModule.initResultsMap(currentSearchPubs);
-                                console.log('✅ Results map initialized successfully');
+                                if (map) {
+                                    console.log('✅ FULL-SCREEN results map initialized successfully');
+                                    
+                                    // 🔧 FIX: Force multiple size invalidations to ensure proper rendering
+                                    setTimeout(() => map.invalidateSize(), 200);
+                                    setTimeout(() => map.invalidateSize(), 500);
+                                    setTimeout(() => map.invalidateSize(), 1000);
+                                }
                             } else {
                                 console.error('❌ Map module not available');
                             }
                         }, 100);
                         
-                        console.log('✅ Map view activated');
+                        console.log('✅ FULL-SCREEN Map view activated');
                     } else {
+                        // 🔧 FIX: Show list view
+                        console.log('📋 Switching to list view...');
+                        
                         // Show list
                         listContainer.style.display = 'block';
+                        listContainer.style.flex = '1';
+                        
+                        // Hide map
                         mapContainer.style.display = 'none';
+                        
+                        // Update button text
                         mapBtnText.textContent = 'Map';
                         
                         console.log('✅ List view activated');
@@ -1063,15 +1105,21 @@ export const SearchModule = (function() {
                     const tracking = window.App?.getModule('tracking');
                     if (tracking) {
                         tracking.trackEvent('results_map_toggle', 'Map Interaction', 
-                            mapContainer.style.display === 'block' ? 'show' : 'hide');
+                            mapContainer.style.display === 'block' ? 'show_fullscreen' : 'hide');
                     }
+                    
+                    console.log('📊 Final container states:', {
+                        list: listContainer.style.display,
+                        map: mapContainer.style.display,
+                        buttonText: mapBtnText.textContent
+                    });
                 }
             });
             
             console.log('✅ Enhanced map toggle button handler attached');
         }
         
-        console.log('✅ Results navigation handlers setup complete');
+        console.log('✅ Enhanced results navigation handlers setup complete');
     };
     
     const createResultItemForOverlay = (pub) => {
