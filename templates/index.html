@@ -330,32 +330,6 @@
         Finding your location...
     </div>
     
-    <!-- JavaScript to handle file upload preview -->
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const photoInput = document.getElementById('reportPhoto');
-        const photoLabel = document.querySelector('.photo-upload-compact');
-        
-        if (photoInput && photoLabel) {
-            photoInput.addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const fileName = file.name.length > 20 ? 
-                        file.name.substring(0, 17) + '...' : 
-                        file.name;
-                    
-                    photoLabel.querySelector('.photo-upload-text').innerHTML = `
-                        <strong>📸 ${fileName}</strong><br>
-                        <small>Click to change photo</small>
-                    `;
-                    photoLabel.style.borderColor = 'var(--success-color, #10b981)';
-                    photoLabel.style.background = 'rgba(16, 185, 129, 0.05)';
-                }
-            });
-        }
-    });
-    </script>
-    
     <!-- About Us Modal - UPDATED -->
     <div id="aboutModal" class="modal">
         <div class="modal-content">
@@ -626,6 +600,30 @@
             </div>
         </div>
     </div>
+
+    <template id="pub-result-template">
+        <div class="result-item">
+            <div class="result-header">
+                <div class="result-main-info">
+                    <h3 class="result-title"></h3>
+                    <div class="result-distance"></div>
+                </div>
+                <div class="gf-indicator"></div>
+            </div>
+            
+            <div class="result-location">
+                <div class="result-address"></div>
+                <div class="result-postcode"></div>
+                <div class="result-authority"></div>
+            </div>
+            
+            <div class="result-actions">
+                <button class="btn btn-primary" data-action="view-pub">
+                    📍 View Details
+                </button>
+            </div>
+        </div>
+    </template>
     
     <!-- Loading Toast - UPDATED -->
     <div id="loadingToast" class="toast toast-loading" style="display: none;">
@@ -765,10 +763,6 @@
         import { MapModule } from '/static/map.js';
 
         window.toggleSearchResultsFullMap = MapModule.toggleSearchResultsFullMap;
-        
-        // Initialize when DOM is ready
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 Initializing modular map system...');
             
             // Set up the main map toggle button
             const toggleMapBtn = document.getElementById('toggleMapBtn');
@@ -875,10 +869,6 @@
     <script type="module">
         import { APIModule } from '/static/api.js';
         
-        // That's it! No initialization needed
-        // The API module is now available to use
-        
-        // Make it global so your existing functions can use it
         window.APIModule = APIModule;
     </script>
 
@@ -911,174 +901,6 @@
         window.ModalModule = ModalModule;
         window.updateAreaPlaceholder = ModalModule.updateAreaPlaceholder;
         window.updateBeerPlaceholder = ModalModule.updateBeerPlaceholder;
-        
-        // Set up event delegation for modal triggers
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🔧 Setting up modal event handlers...');
-            
-            // Handle data-modal attributes
-            document.addEventListener('click', (e) => {
-                const modalTrigger = e.target.closest('[data-modal]');
-                if (modalTrigger) {
-                    e.preventDefault();
-                    const modalId = modalTrigger.dataset.modal;
-                    ModalModule.open(modalId);
-                }
-            });
-            
-            // Handle data-action attributes
-            document.addEventListener('click', (e) => {
-                const actionTrigger = e.target.closest('[data-action]');
-                if (actionTrigger) {
-                    e.preventDefault();
-                    const action = actionTrigger.dataset.action;
-                    
-                    switch(action) {
-                        case 'location-search':
-                            SearchModule.startLocationSearch();
-                            break;
-                        case 'search-name':
-                            SearchModule.searchByName();
-                            break;
-                        case 'search-area':
-                            SearchModule.searchByArea();
-                            break;
-                        case 'search-beer':
-                            SearchModule.searchByBeer();
-                            break;
-                        case 'close-modal':
-                            const modal = actionTrigger.closest('.modal, .search-modal');
-                            if (modal && modal.id) {
-                                ModalModule.close(modal.id);
-                            }
-                            break;
-                        case 'report-beer':
-                            // Check if we're on a pub detail page
-                            if (window.currentPubData) {
-                                ModalModule.openReportModal(window.currentPubData);
-                            } else {
-                                ModalModule.openReportModal();
-                            }
-                            break;
-                        case 'accept-all-cookies':
-                            acceptAllCookies();
-                            break;
-                        case 'accept-essential-cookies':
-                            acceptEssentialOnly();
-                            break;
-                        case 'save-cookie-preferences':
-                            savesCookiePreferences();
-                            break;
-                        case 'accept-all-from-settings':
-                            acceptAllFromSettings();
-                            break;
-                        case 'close-pub-details':
-                            closePubDetails();
-                            break;
-                        case 'back-to-results':
-                            SearchModule.goBackToResults();
-                            break;
-                        case 'toggle-pub-map':
-                            togglePubDetailsSplitMap();
-                            break;
-                        case 'close-results':
-                            closeResults();
-                            break;
-                        case 'toggle-results-map':
-                            toggleSearchResultsFullMap();
-                            break;
-                        case 'scroll-to-search':
-                            scrollToSearch();
-                            break;
-                        case 'update-area-placeholder':
-                            updateAreaPlaceholder();
-                            break;
-                        case 'update-beer-placeholder':
-                            updateBeerPlaceholder();
-                            break;
-                    }
-                }
-            });
-            
-            // Handle distance options
-            document.addEventListener('click', (e) => {
-                const distanceOption = e.target.closest('[data-distance]');
-                if (distanceOption) {
-                    const distance = parseInt(distanceOption.dataset.distance);
-                    SearchModule.searchNearbyWithDistance(distance);
-                }
-            });
-            
-            // Handle admin modals
-            document.addEventListener('click', (e) => {
-                const adminTrigger = e.target.closest('[data-admin-modal]');
-                if (adminTrigger) {
-                    const modalType = adminTrigger.dataset.adminModal;
-                    ModalModule.openAdminModal(modalType);
-                }
-            });
-            
-            // Handle coming soon links
-            document.addEventListener('click', (e) => {
-                const comingSoon = e.target.closest('[data-coming-soon]');
-                if (comingSoon) {
-                    e.preventDefault();
-                    const feature = comingSoon.dataset.comingSoon;
-                    showComingSoon(feature);
-                }
-            });
-            
-            // Handle form submissions
-            document.addEventListener('submit', (e) => {
-                const form = e.target;
-                if (form.dataset.action === 'submit-report') {
-                    e.preventDefault();
-                    handleReportSubmission(e);
-                }
-            });
-            
-            // Handle input events
-            document.addEventListener('input', (e) => {
-                const input = e.target;
-                if (input.dataset.action) {
-                    switch(input.dataset.action) {
-                        case 'search-breweries':
-                            searchBreweries(input.value);
-                            break;
-                        case 'search-beer-names':
-                            searchBeerNames(input.value);
-                            break;
-                        case 'search-beer-styles':
-                            searchBeerStyles(input.value);
-                            break;
-                    }
-                }
-            });
-            
-            // Handle select changes
-            document.addEventListener('change', (e) => {
-                const select = e.target;
-                if (select.dataset.action) {
-                    switch(select.dataset.action) {
-                        case 'update-area-placeholder':
-                            updateAreaPlaceholder();
-                            break;
-                        case 'update-beer-placeholder':
-                            updateBeerPlaceholder();
-                            break;
-                    }
-                }
-            });
-            
-            // Handle navigation
-            document.addEventListener('click', (e) => {
-                const navTrigger = e.target.closest('[data-navigate]');
-                if (navTrigger) {
-                    e.preventDefault();
-                    const url = navTrigger.dataset.navigate;
-                    window.location.href = url;
-                }
-            });
             
             console.log('✅ Modal event handlers ready!');
         });
@@ -1183,13 +1005,221 @@
     
     <script type="module" src="/static/main.js"></script>
 
-    <!-- END OF HTML SCRIPT -->
-    <!-- START OF JAVASCRIPT -->
+    <!---------------------------
+    EVENT LISTENER
+    ---------------------------->
 
     <script>
-        // Cache-busting timestamp
-        console.log('🚀 CACHE BUSTER:', '{{ cache_buster }}');
+
+         // Set up event delegation for modal triggers
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔧 Setting up modal event handlers...');
+            
+            // Handle data-modal attributes
+            document.addEventListener('click', (e) => {
+                const modalTrigger = e.target.closest('[data-modal]');
+                if (modalTrigger) {
+                    e.preventDefault();
+                    const modalId = modalTrigger.dataset.modal;
+                    ModalModule.open(modalId);
+                }
+            });
+            
+            // Handle data-action attributes
+            document.addEventListener('click', (e) => {
+                const actionTrigger = e.target.closest('[data-action]');
+                if (actionTrigger) {
+                    e.preventDefault();
+                    const action = actionTrigger.dataset.action;
+                    
+                    switch(action) {
+                        case 'location-search':
+                            SearchModule.startLocationSearch();
+                            break;
+                        case 'search-name':
+                            SearchModule.searchByName();
+                            break;
+                        case 'search-area':
+                            SearchModule.searchByArea();
+                            break;
+                        case 'search-beer':
+                            SearchModule.searchByBeer();
+                            break;
+                        case 'close-modal':
+                            const modal = actionTrigger.closest('.modal, .search-modal');
+                            if (modal && modal.id) {
+                                ModalModule.close(modal.id);
+                            }
+                            break;
+                        case 'report-beer':
+                            // Check if we're on a pub detail page
+                            if (window.currentPubData) {
+                                ModalModule.openReportModal(window.currentPubData);
+                            } else {
+                                ModalModule.openReportModal();
+                            }
+                            break;
+                        case 'accept-all-cookies':
+                            acceptAllCookies();
+                            break;
+                        case 'accept-essential-cookies':
+                            acceptEssentialOnly();
+                            break;
+                        case 'save-cookie-preferences':
+                            savesCookiePreferences();
+                            break;
+                        case 'accept-all-from-settings':
+                            acceptAllFromSettings();
+                            break;
+                        case 'close-pub-details':
+                            closePubDetails();
+                            break;
+                        case 'back-to-results':
+                            SearchModule.goBackToResults();
+                            break;
+                        case 'toggle-pub-map':
+                            togglePubDetailsSplitMap();
+                            break;
+                        case 'close-results':
+                            closeResults();
+                            break;
+                        case 'toggle-results-map':
+                            toggleSearchResultsFullMap();
+                            break;
+                        case 'scroll-to-search':
+                            scrollToSearch();
+                            break;
+                        case 'update-area-placeholder':
+                            updateAreaPlaceholder();
+                            break;
+                        case 'update-beer-placeholder':
+                            updateBeerPlaceholder();
+                            break;
+                    }
+                }
+            });
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Initializing modular map system...');
+            
+        // Handle distance options
+        document.addEventListener('click', (e) => {
+            const distanceOption = e.target.closest('[data-distance]');
+            if (distanceOption) {
+                const distance = parseInt(distanceOption.dataset.distance);
+                SearchModule.searchNearbyWithDistance(distance);
+            }
+        });
+        
+        // Handle admin modals
+        document.addEventListener('click', (e) => {
+            const adminTrigger = e.target.closest('[data-admin-modal]');
+            if (adminTrigger) {
+                const modalType = adminTrigger.dataset.adminModal;
+                ModalModule.openAdminModal(modalType);
+            }
+        });
+        
+        // Handle coming soon links
+        document.addEventListener('click', (e) => {
+            const comingSoon = e.target.closest('[data-coming-soon]');
+            if (comingSoon) {
+                e.preventDefault();
+                const feature = comingSoon.dataset.comingSoon;
+                showComingSoon(feature);
+            }
+        });
+        
+        // Handle form submissions
+        document.addEventListener('submit', (e) => {
+            const form = e.target;
+            if (form.dataset.action === 'submit-report') {
+                e.preventDefault();
+                handleReportSubmission(e);
+            }
+        });
+        
+        // Handle input events
+        document.addEventListener('input', (e) => {
+            const input = e.target;
+            if (input.dataset.action) {
+                switch(input.dataset.action) {
+                    case 'search-breweries':
+                        searchBreweries(input.value);
+                        break;
+                    case 'search-beer-names':
+                        searchBeerNames(input.value);
+                        break;
+                    case 'search-beer-styles':
+                        searchBeerStyles(input.value);
+                        break;
+                }
+            }
+        });
+            
+        // Handle select changes
+        document.addEventListener('change', (e) => {
+            const select = e.target;
+            if (select.dataset.action) {
+                switch(select.dataset.action) {
+                    case 'update-area-placeholder':
+                        updateAreaPlaceholder();
+                        break;
+                    case 'update-beer-placeholder':
+                        updateBeerPlaceholder();
+                        break;
+                }
+            }
+        });
+        
+        // Handle navigation
+        document.addEventListener('click', (e) => {
+            const navTrigger = e.target.closest('[data-navigate]');
+            if (navTrigger) {
+                e.preventDefault();
+                const url = navTrigger.dataset.navigate;
+                window.location.href = url;
+            }
+        });
+
+        // Add this in your DOMContentLoaded event listener section
+        document.addEventListener('click', (e) => {
+            if (e.target.matches('[data-action="view-pub"]')) {
+                const pubId = e.target.dataset.pubId;
+                SearchModule.showPubDetails(pubId);
+            }
+        });
+
+        // JavaScript to handle file upload preview
+        document.addEventListener('DOMContentLoaded', function() {
+            const photoInput = document.getElementById('reportPhoto');
+            const photoLabel = document.querySelector('.photo-upload-compact');
+            
+            if (photoInput && photoLabel) {
+                photoInput.addEventListener('change', function(e) {
+                    const file = e.target.files[0];
+                    if (file) {
+                        const fileName = file.name.length > 20 ? 
+                            file.name.substring(0, 17) + '...' : 
+                            file.name;
+                        
+                        photoLabel.querySelector('.photo-upload-text').innerHTML = `
+                            <strong>📸 ${fileName}</strong><br>
+                            <small>Click to change photo</small>
+                        `;
+                        photoLabel.style.borderColor = 'var(--success-color, #10b981)';
+                        photoLabel.style.background = 'rgba(16, 185, 129, 0.05)';
+                    }
+                });
+            }
+        });
     </script>
+    
+<!--     <script> -->
+        // Cache-busting timestamp
+    //     console.log('🚀 CACHE BUSTER:', '{{ cache_buster }}');
+    // </script>
 
 </body>
 </html>
