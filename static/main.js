@@ -330,9 +330,8 @@ const App = {
                 console.log(`❓ Unhandled action: ${action}`);
                 break;
         }
-    }
+    },
     
-    // 🔧 ADD MISSING COMMA here if needed
     handleDistanceSelection(distance) {
         console.log(`📍 Distance ${distance}km selected`);
         
