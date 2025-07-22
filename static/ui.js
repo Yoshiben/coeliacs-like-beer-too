@@ -481,53 +481,10 @@ export const UIModule = (function() {
     }
 
     const closeResults = () => {
-        console.log('🏠 Closing results and returning to homepage');
+        console.log('🏠 UI closeResults called - delegating to centralized function');
         
-        // Close results overlay
-        const resultsOverlay = document.getElementById('resultsOverlay');
-        if (resultsOverlay) {
-            resultsOverlay.classList.remove('active');
-            resultsOverlay.style.display = 'none';
-            console.log('✅ Results overlay closed');
-        }
-        
-        // Show the hero section again
-        const heroSection = document.querySelector('.hero-section');
-        if (heroSection) {
-            heroSection.style.display = 'block';
-            console.log('✅ Hero section restored');
-        }
-        
-        // Show the home page search section again
-        const searchSection = document.querySelector('.search-section');
-        if (searchSection) {
-            searchSection.style.display = 'flex'; // Changed from 'block' to 'flex'
-            console.log('✅ Search section restored');
-        }
-        
-        // Restore background scrolling
-        document.body.style.overflow = '';
-        
-        // Reset any map containers
-        const resultsMapContainer = document.getElementById('resultsMapContainer');
-        const resultsListContainer = document.getElementById('resultsListContainer');
-        const mapBtnText = document.getElementById('resultsMapBtnText');
-        
-        if (resultsMapContainer) resultsMapContainer.style.display = 'none';
-        if (resultsListContainer) resultsListContainer.style.display = 'block';
-        if (mapBtnText) mapBtnText.textContent = 'Map';
-        
-        // Update state
-        state.currentView = 'home';
-        updateNavigationState();
-        
-        // Track the action
-        const tracking = window.App?.getModule('tracking');
-        if (tracking) {
-            tracking.trackEvent('close_results', 'Navigation', 'ui_module');
-        }
-        
-        console.log('✅ Returned to home view successfully');
+        // Simply delegate to the working centralized function
+        return window.UtilsModule?.closeAllOverlaysAndGoHome() || false;
     };
     
     // ================================
