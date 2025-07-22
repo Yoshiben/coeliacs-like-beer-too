@@ -380,6 +380,107 @@ export const UIModule = (function() {
             element.style.display = visible ? 'block' : 'none';
         }
     }
+
+    // ================================
+    // DEBUG FUNCTIONS
+    // ================================
+    
+    function showDebugInfo() {
+        // Create debug panel
+        const debugPanel = document.createElement('div');
+        debugPanel.id = 'debugPanel';
+        debugPanel.style.cssText = `
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            background: rgba(255, 255, 0, 0.9);
+            color: black;
+            padding: 10px;
+            border-radius: 10px;
+            z-index: 99999;
+            font-size: 12px;
+            max-height: 400px;
+            overflow-y: auto;
+        `;
+        
+        let debugInfo = '<strong>🔍 RESULTS VISIBILITY CHECK:</strong><br>';
+        
+        // Check results overlay
+        const resultsOverlay = document.getElementById('resultsOverlay');
+        if (resultsOverlay) {
+            const styles = window.getComputedStyle(resultsOverlay);
+            debugInfo += `📋 Results Overlay: display=${styles.display}, active=${resultsOverlay.classList.contains('active')}<br>`;
+        }
+        
+        // Check results containers
+        const resultsListContainer = document.getElementById('resultsListContainer');
+        if (resultsListContainer) {
+            const styles = window.getComputedStyle(resultsListContainer);
+            debugInfo += `📦 List Container: display=${styles.display}<br>`;
+        }
+        
+        const resultsList = document.getElementById('resultsList');
+        if (resultsList) {
+            const styles = window.getComputedStyle(resultsList);
+            const resultsCount = resultsList.children.length;
+            debugInfo += `📝 Results List: display=${styles.display}, items=${resultsCount}<br>`;
+            
+            if (resultsCount > 0) {
+                debugInfo += `✅ First result: ${resultsList.firstChild.textContent.substring(0, 50)}...<br>`;
+            } else {
+                debugInfo += `❌ No results in list!<br>`;
+            }
+        }
+        
+        // Check what's visible
+        debugInfo += '<br><strong>VISIBLE ELEMENTS:</strong><br>';
+        
+        const searchSection = document.querySelector('.search-section');
+        if (searchSection) {
+            const styles = window.getComputedStyle(searchSection);
+            debugInfo += `🔍 Search Section: display=${styles.display}<br>`;
+        }
+        
+        const heroSection = document.querySelector('.hero-section');
+        if (heroSection) {
+            const styles = window.getComputedStyle(heroSection);
+            debugInfo += `🦸 Hero Section: display=${styles.display}<br>`;
+        }
+        
+        // Check z-index issues
+        debugInfo += '<br><strong>Z-INDEX CHECK:</strong><br>';
+        const overlayZ = resultsOverlay ? window.getComputedStyle(resultsOverlay).zIndex : 'N/A';
+        debugInfo += `📊 Results Overlay z-index: ${overlayZ}<br>`;
+    
+        const pubDetailsOverlay = document.getElementById('pubDetailsOverlay');
+        if (pubDetailsOverlay) {
+            const styles = window.getComputedStyle(pubDetailsOverlay);
+            debugInfo += `🏠 Pub Details: display=${styles.display}, active=${pubDetailsOverlay.classList.contains('active')}<br>`;
+        }
+        
+        const pubContainer = document.getElementById('pubContainer');
+        if (pubContainer) {
+            debugInfo += `📦 Pub Container: split-view=${pubContainer.classList.contains('split-view')}<br>`;
+        }
+    
+        // check map containers
+        const resultsMapContainer = document.getElementById('resultsMapContainer');
+        if (resultsMapContainer) {
+            const styles = window.getComputedStyle(resultsMapContainer);
+            debugInfo += `🗺️ Results Map Container: display=${styles.display}<br>`;
+        }
+        
+        const resultsMap = document.getElementById('resultsMap');
+        if (resultsMap) {
+            debugInfo += `🗺️ Results Map div exists: ${resultsMap.innerHTML ? 'has content' : 'empty'}<br>`;
+        }
+        
+        debugPanel.innerHTML = debugInfo + '<br><button onclick="this.parentElement.remove()">Close Debug</button>';
+        document.body.appendChild(debugPanel);
+    }
+
+    
     
     // ================================
     // PUBLIC API
@@ -421,6 +522,9 @@ export const UIModule = (function() {
         updateElementHTML,
         toggleClass,
         setElementVisibility,
+
+        // Debug functions
+        showDebugInfo,
         
         // State getters
         getCurrentView: () => state.currentView,
