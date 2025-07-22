@@ -2355,56 +2355,6 @@
             console.log('✅ Homepage restored to clean state');
         }
 
-        // ================================
-        // LOAD STATS IN HERO SECTION
-        // ================================
-
-        async function loadStats() {
-            try {
-                console.log('📊 Loading stats...');
-                const response = await fetch('/api/stats');
-                const data = await response.json();
-                
-                console.log('📊 Stats loaded:', data);
-                
-                // Update the numbers using your HTML IDs
-                const totalPubsElement = document.getElementById('totalPubs');
-                const gfPubsElement = document.getElementById('gfPubs');
-                
-                if (totalPubsElement && data.total_pubs) {
-                    totalPubsElement.textContent = data.total_pubs.toLocaleString();
-                    console.log('✅ Updated total pubs:', data.total_pubs);
-                }
-                
-                if (gfPubsElement && data.gf_pubs) {
-                    gfPubsElement.textContent = data.gf_pubs.toLocaleString();
-                    console.log('✅ Updated GF pubs:', data.gf_pubs);
-                }
-                
-            } catch (error) {
-                console.error('❌ Error loading stats:', error);
-                // Fallback to default values if API fails
-                const totalPubsElement = document.getElementById('totalPubs');
-                const gfPubsElement = document.getElementById('gfPubs');
-                
-                if (totalPubsElement) totalPubsElement.textContent = '49,841';
-                if (gfPubsElement) gfPubsElement.textContent = '9,971';
-                
-                console.log('Using fallback numbers');
-            }
-        }
-
-        // Call the function when page loads
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 Page loaded, calling loadStats...');
-            loadStats();
-        });
-        
-        // Also call immediately if page already loaded
-        if (document.readyState !== 'loading') {
-            loadStats();
-        
-
         // Update the existing pub page report button
         function updatePubPageReportButton() {
             // This would be called when showing pub details
@@ -3380,43 +3330,6 @@
             searchPubs();
         }
 
-        // REPLACE: Fixed loadDashboardStats function
-        async function loadDashboardStats() {
-            try {
-                console.log('🔄 Loading dashboard stats from database...');
-                const response = await fetch('/api/stats');
-                
-                if (response.ok) {
-                    const stats = await response.json();
-                    console.log('✅ Stats loaded:', stats);
-                    
-                    // Animate the numbers counting up
-                    animateNumber('totalPubs', stats.total_pubs);
-                    animateNumber('gfPubs', stats.gf_pubs);
-                    
-                    // Update footer stats too
-                    document.getElementById('footerPubCount').textContent = stats.total_pubs.toLocaleString();
-                    document.getElementById('footerGFCount').textContent = stats.gf_pubs.toLocaleString();
-                    
-                    console.log(`📊 Dashboard updated: ${stats.total_pubs} pubs, ${stats.gf_pubs} GF pubs`);
-                    
-                } else {
-                    console.warn('⚠️ Stats API returned error, using fallback data');
-                    throw new Error(`HTTP ${response.status}`);
-                }
-            } catch (error) {
-                console.warn('⚠️ Could not load live stats, using fallback data:', error);
-                
-                // Sensible fallback numbers
-                animateNumber('totalPubs', 49841);
-                animateNumber('gfPubs', 1249);
-                
-                // Update footer with fallback data
-                document.getElementById('footerPubCount').textContent = '49,841';
-                document.getElementById('footerGFCount').textContent = '1,249';
-            }
-        }
-
         // Cookie functions
         function acceptAllCookies() {
             localStorage.setItem('cookieConsent', 'true');
@@ -3475,11 +3388,6 @@
                 console.log('✅ Google Analytics initialized with user consent');
             }
         }
-
-        // Full-screen pub details functionality
-        let pubMapVisible = false;
-        let currentPubData = null;
-        
         
         // UPDATE the showPubDetails function to prevent background scrolling:
         
