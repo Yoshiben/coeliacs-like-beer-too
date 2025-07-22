@@ -278,6 +278,53 @@ export const UIModule = (function() {
                 handleViewChange(e.state.view);
             }
         });
+        
+        // Mobile feedback for search options
+        const searchOptions = document.querySelectorAll('.search-option');
+        
+        searchOptions.forEach(option => {
+            // Touch start - immediate feedback
+            option.addEventListener('touchstart', function(e) {
+                this.style.transform = 'scale(0.97)';
+                
+                // Haptic feedback (if supported)
+                if ('vibrate' in navigator) {
+                    navigator.vibrate(8); // Very subtle
+                }
+            }, { passive: true });
+            
+            // Touch end - release
+            option.addEventListener('touchend', function(e) {
+                this.style.transform = '';
+                
+                // Add tapped state briefly
+                this.classList.add('tapped');
+                setTimeout(() => {
+                    this.classList.remove('tapped');
+                }, 200);
+            }, { passive: true });
+            
+            // Click handler with loading state
+            option.addEventListener('click', function(e) {
+                // Add loading state
+                this.classList.add('loading');
+                
+                // Remove after modal should open
+                setTimeout(() => {
+                    this.classList.remove('loading');
+                }, 400);
+                
+                // Success feedback
+                if ('vibrate' in navigator) {
+                    navigator.vibrate([10, 50, 10]); // Success pattern
+                }
+            });
+            
+            // Cancel touch if user drags away
+            option.addEventListener('touchcancel', function(e) {
+                this.style.transform = '';
+            }, { passive: true });
+        });
     }
     
     function handleResize() {
