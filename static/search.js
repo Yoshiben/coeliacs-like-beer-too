@@ -946,12 +946,13 @@ export const SearchModule = (function() {
     const getUserLocation = () => {
         return new Promise((resolve, reject) => {
             if (!navigator.geolocation) {
-                reject(new Error('Geolocation not supported by this browser'));
+                reject(new Error('📍 Geolocation not supported by this browser'));
                 return;
             }
             
-            console.log('📍 Requesting high-accuracy location...');
+            console.log('📍 Requesting high-accuracy location with enhanced settings...');
             
+            // First attempt: High accuracy GPS
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     const location = {
@@ -960,54 +961,110 @@ export const SearchModule = (function() {
                         accuracy: position.coords.accuracy // meters
                     };
                     
-                    console.log(`✅ Location found: ${location.lat.toFixed(6)}, ${location.lng.toFixed(6)} (±${location.accuracy}m)`);
+                    console.log(`✅ High-accuracy location found: ${location.lat.toFixed(6)}, ${location.lng.toFixed(6)} (±${location.accuracy}m)`);
                     
-                    // Warn if accuracy is poor (over 1km)
+                    // Quality check - if accuracy is terrible, try again
+                    if (location.accuracy > 5000) {
+                        console.warn(`⚠️ Very poor accuracy: ±${location.accuracy}m - attempting fallback...`);
+                        attemptFallbackLocation(resolve, reject, location);
+                        return;
+                    }
+                    
+                    // Warn if accuracy is poor but usable
                     if (location.accuracy > 1000) {
                         console.warn(`⚠️ Low accuracy: ±${location.accuracy}m - results may be imprecise`);
                         if (window.showSuccessToast) {
-                            window.showSuccessToast(`📍 Location found but accuracy is ±${Math.round(location.accuracy)}m`);
+                            window.showSuccessToast(`📍 Location found (±${Math.round(location.accuracy)}m accuracy)`);
                         }
                     }
                     
                     resolve(location);
                 },
                 (error) => {
-                    console.error('❌ Location error:', error);
-                    
-                    let userMessage = 'Could not get your location. ';
-                    switch(error.code) {
-                        case error.PERMISSION_DENIED:
-                            userMessage += 'Please allow location access and try again.';
-                            break;
-                        case error.POSITION_UNAVAILABLE:
-                            userMessage += 'Location information unavailable.';
-                            break;
-                        case error.TIMEOUT:
-                            userMessage += 'Location request timed out.';
-                            break;
-                        default:
-                            userMessage += 'Unknown location error.';
-                            break;
-                    }
-                    
-                    reject(new Error(userMessage));
+                    console.error('❌ High-accuracy location failed:', error);
+                    // Try fallback with lower accuracy
+                    attemptFallbackLocation(resolve, reject, null, error);
                 },
                 {
-                    // 🔧 ENHANCED: High accuracy settings for better location precision
-                    enableHighAccuracy: true,        // Use GPS/WiFi for best accuracy
-                    timeout: 15000,                   // Allow 15 seconds (was 10)
-                    maximumAge: 60000                 // Cache for 1 minute only (was 5 minutes!)
+                    // 🔧 ENHANCED: Much more aggressive high-accuracy settings
+                    enableHighAccuracy: true,        // Force GPS usage
+                    timeout: 20000,                  // Allow 20 seconds for GPS
+                    maximumAge: 30000                // Only use cached location if < 30 seconds old
                 }
             );
         });
     };
-    
-    // ================================
-    // 🔧 REPLACE: Enhanced tryGetUserLocation function in search.js  
-    // LOCATION: Find the tryGetUserLocation function around line 850
-    // ACTION: Replace the entire function with this enhanced version
-    // ================================
+
+    const attemptFallbackLocation = (resolve, reject, lowAccuracyLocation = null, originalError = null) => {
+        console.log('🔄 Attempting fallback location with network positioning...');
+        
+        // Second attempt: Network-based positioning (usually more accurate than you'd think)
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const location = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude,
+                    accuracy: position.coords.accuracy
+                };
+                
+                console.log(`✅ Network location found: ${location.lat.toFixed(6)}, ${location.lng.toFixed(6)} (±${location.accuracy}m)`);
+                
+                // Use this if it's better than what we had before
+                if (!lowAccuracyLocation || location.accuracy < lowAccuracyLocation.accuracy) {
+                    if (location.accuracy > 2000) {
+                        if (window.showSuccessToast) {
+                            window.showSuccessToast(`📍 Approximate location found (±${Math.round(location.accuracy/1000)}km)`);
+                        }
+                    }
+                    resolve(location);
+                } else {
+                    // Use the previous location if it was better
+                    resolve(lowAccuracyLocation);
+                }
+            },
+            (networkError) => {
+                console.error('❌ Network location also failed:', networkError);
+                
+                // If we have a low-accuracy location from before, use it
+                if (lowAccuracyLocation) {
+                    console.log('📍 Using low-accuracy location as last resort');
+                    if (window.showSuccessToast) {
+                        window.showSuccessToast(`📍 Approximate location (±${Math.round(lowAccuracyLocation.accuracy/1000)}km)`);
+                    }
+                    resolve(lowAccuracyLocation);
+                    return;
+                }
+                
+                // Generate user-friendly error message
+                let userMessage = 'Could not get your location. ';
+                const errorCode = originalError?.code || networkError?.code;
+                
+                switch(errorCode) {
+                    case 1: // PERMISSION_DENIED
+                        userMessage += 'Please allow location access and try again.';
+                        break;
+                    case 2: // POSITION_UNAVAILABLE
+                        userMessage += 'Location services unavailable. Try enabling GPS or WiFi.';
+                        break;
+                    case 3: // TIMEOUT
+                        userMessage += 'Location request timed out. Try again or search by postcode.';
+                        break;
+                    default:
+                        userMessage += 'Try searching by area instead.';
+                        break;
+                }
+                
+                reject(new Error(userMessage));
+            },
+            {
+                // 🔧 FALLBACK: Lower accuracy but faster network-based positioning
+                enableHighAccuracy: false,       // Use network/WiFi positioning
+                timeout: 10000,                  // Shorter timeout for network
+                maximumAge: 120000               // Accept cached location up to 2 minutes old
+            }
+        );
+    };
+
     
     const tryGetUserLocation = async () => {
         if (userLocation) {
