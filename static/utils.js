@@ -1,5 +1,5 @@
 // ================================================================================
-// UTILS.JS - General Utility Functions
+// UTILS.JS - General Utility Functions (CONVERTED TO CONST FORMAT)
 // Handles: Toasts, animations, formatting, debouncing, storage, and common helpers
 // ================================================================================
 
@@ -10,7 +10,7 @@ export const UtilsModule = (function() {
     // TOAST NOTIFICATION SYSTEM
     // ================================
     
-    function showLoadingToast(message = 'Loading...') {
+    const showLoadingToast = (message = 'Loading...') => {
         const toast = document.getElementById('loadingToast');
         if (!toast) {
             console.warn('Loading toast element not found');
@@ -24,9 +24,9 @@ export const UtilsModule = (function() {
         
         toast.style.display = 'block';
         toast.style.animation = 'slideInUp 0.3s ease-out';
-    }
+    };
     
-    function hideLoadingToast() {
+    const hideLoadingToast = () => {
         const toast = document.getElementById('loadingToast');
         if (!toast) return;
         
@@ -34,9 +34,9 @@ export const UtilsModule = (function() {
         setTimeout(() => {
             toast.style.display = 'none';
         }, 300);
-    }
+    };
     
-    function showSuccessToast(message = 'Success!') {
+    const showSuccessToast = (message = 'Success!') => {
         const toast = document.getElementById('successToast');
         if (!toast) {
             console.warn('Success toast element not found');
@@ -60,13 +60,69 @@ export const UtilsModule = (function() {
                 toast.style.display = 'none';
             }, 300);
         }, 3000);
-    }
+    };
+    
+    // ================================
+    // CENTRALIZED OVERLAY MANAGEMENT
+    // ================================
+    
+    const closeAllOverlaysAndGoHome = () => {
+        console.log('🏠 Closing all overlays and returning to home');
+        
+        // Close pub details overlay
+        const pubDetailsOverlay = document.getElementById('pubDetailsOverlay');
+        if (pubDetailsOverlay && pubDetailsOverlay.classList.contains('active')) {
+            pubDetailsOverlay.style.display = 'none';
+            pubDetailsOverlay.classList.remove('active');
+            console.log('✅ Pub details overlay closed');
+        }
+        
+        // Close results overlay
+        const resultsOverlay = document.getElementById('resultsOverlay');
+        if (resultsOverlay && resultsOverlay.classList.contains('active')) {
+            resultsOverlay.style.display = 'none';
+            resultsOverlay.classList.remove('active');
+            console.log('✅ Results overlay closed');
+        }
+        
+        // Show home sections
+        const heroSection = document.querySelector('.hero-section');
+        const searchSection = document.querySelector('.search-section');
+        if (heroSection) {
+            heroSection.style.display = 'block';
+            console.log('✅ Hero section restored');
+        }
+        if (searchSection) {
+            searchSection.style.display = 'flex';
+            console.log('✅ Search section restored');
+        }
+        
+        // Restore background scrolling
+        document.body.style.overflow = '';
+        
+        // Reset map containers
+        const resultsMapContainer = document.getElementById('resultsMapContainer');
+        const resultsListContainer = document.getElementById('resultsListContainer');
+        const mapBtnText = document.getElementById('resultsMapBtnText');
+        
+        if (resultsMapContainer) resultsMapContainer.style.display = 'none';
+        if (resultsListContainer) resultsListContainer.style.display = 'block';
+        if (mapBtnText) mapBtnText.textContent = 'Map';
+        
+        // Track the action
+        if (window.App?.getModule('tracking')) {
+            window.App.getModule('tracking').trackEvent('close_overlays', 'Navigation', 'home');
+        }
+        
+        console.log('✅ Successfully returned to home view');
+        return true;
+    };
     
     // ================================
     // NUMBER ANIMATION
     // ================================
     
-    function animateNumber(elementId, targetNumber, duration = 2000) {
+    const animateNumber = (elementId, targetNumber, duration = 2000) => {
         const element = document.getElementById(elementId);
         if (!element) {
             console.warn(`Element ${elementId} not found for number animation`);
@@ -76,7 +132,7 @@ export const UtilsModule = (function() {
         const startNumber = parseInt(element.textContent.replace(/,/g, '')) || 0;
         const startTime = performance.now();
         
-        function updateNumber(currentTime) {
+        const updateNumber = (currentTime) => {
             const elapsed = currentTime - startTime;
             const progress = Math.min(elapsed / duration, 1);
             
@@ -93,16 +149,16 @@ export const UtilsModule = (function() {
                 // Ensure final number is exactly correct
                 element.textContent = targetNumber.toLocaleString();
             }
-        }
+        };
         
         requestAnimationFrame(updateNumber);
-    }
+    };
     
     // ================================
     // DEBOUNCE UTILITY
     // ================================
     
-    function debounce(func, wait) {
+    const debounce = (func, wait) => {
         let timeout;
         return function executedFunction(...args) {
             const later = () => {
@@ -112,24 +168,24 @@ export const UtilsModule = (function() {
             clearTimeout(timeout);
             timeout = setTimeout(later, wait);
         };
-    }
+    };
     
     // ================================
     // HTML ESCAPING
     // ================================
     
-    function escapeHtml(text) {
+    const escapeHtml = (text) => {
         if (!text) return '';
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
-    }
+    };
     
     // ================================
     // DISTANCE CALCULATION
     // ================================
     
-    function calculateDistance(lat1, lon1, lat2, lon2) {
+    const calculateDistance = (lat1, lon1, lat2, lon2) => {
         const R = 6371; // Earth's radius in kilometers
         const dLat = (lat2 - lat1) * Math.PI / 180;
         const dLon = (lon2 - lon1) * Math.PI / 180;
@@ -138,14 +194,14 @@ export const UtilsModule = (function() {
                   Math.sin(dLon/2) * Math.sin(dLon/2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
         return R * c;
-    }
+    };
     
     // ================================
     // LOCAL STORAGE HELPERS
     // ================================
     
     const Storage = {
-        get(key, defaultValue = null) {
+        get: (key, defaultValue = null) => {
             try {
                 const item = localStorage.getItem(key);
                 return item ? JSON.parse(item) : defaultValue;
@@ -155,7 +211,7 @@ export const UtilsModule = (function() {
             }
         },
         
-        set(key, value) {
+        set: (key, value) => {
             try {
                 localStorage.setItem(key, JSON.stringify(value));
                 return true;
@@ -165,7 +221,7 @@ export const UtilsModule = (function() {
             }
         },
         
-        remove(key) {
+        remove: (key) => {
             try {
                 localStorage.removeItem(key);
                 return true;
@@ -175,7 +231,7 @@ export const UtilsModule = (function() {
             }
         },
         
-        clear() {
+        clear: () => {
             try {
                 localStorage.clear();
                 return true;
@@ -191,7 +247,7 @@ export const UtilsModule = (function() {
     // ================================
     
     const Cookies = {
-        get(name) {
+        get: (name) => {
             const value = `; ${document.cookie}`;
             const parts = value.split(`; ${name}=`);
             if (parts.length === 2) {
@@ -200,14 +256,14 @@ export const UtilsModule = (function() {
             return null;
         },
         
-        set(name, value, days = 365) {
+        set: (name, value, days = 365) => {
             const date = new Date();
             date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
             const expires = `expires=${date.toUTCString()}`;
             document.cookie = `${name}=${value};${expires};path=/;SameSite=Lax`;
         },
         
-        remove(name) {
+        remove: (name) => {
             this.set(name, '', -1);
         }
     };
@@ -216,7 +272,7 @@ export const UtilsModule = (function() {
     // FORMAT HELPERS
     // ================================
     
-    function formatDate(date, format = 'short') {
+    const formatDate = (date, format = 'short') => {
         const d = new Date(date);
         
         if (format === 'short') {
@@ -236,42 +292,42 @@ export const UtilsModule = (function() {
         }
         
         return d.toLocaleString();
-    }
+    };
     
-    function formatDistanceText(distance) {
+    const formatDistanceText = (distance) => {
         if (distance < 1) {
             return `${Math.round(distance * 1000)}m away`;
         }
         return `${distance.toFixed(1)}km away`;
-    }
+    };
     
     // ================================
     // DEVICE DETECTION
     // ================================
     
-    function isMobile() {
+    const isMobile = () => {
         return /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    }
+    };
     
-    function isTouch() {
+    const isTouch = () => {
         return 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    }
+    };
     
     // ================================
     // HAPTIC FEEDBACK
     // ================================
     
-    function vibrate(pattern = 10) {
+    const vibrate = (pattern = 10) => {
         if ('vibrate' in navigator) {
             navigator.vibrate(pattern);
         }
-    }
+    };
     
     // ================================
     // SCROLL HELPERS
     // ================================
     
-    function scrollToElement(elementId, options = {}) {
+    const scrollToElement = (elementId, options = {}) => {
         const element = document.getElementById(elementId);
         if (!element) return;
         
@@ -282,60 +338,63 @@ export const UtilsModule = (function() {
         };
         
         element.scrollIntoView({ ...defaultOptions, ...options });
-    }
+    };
     
-    function lockBodyScroll() {
+    const lockBodyScroll = () => {
         document.body.style.overflow = 'hidden';
         document.body.style.position = 'fixed';
         document.body.style.width = '100%';
-    }
+    };
     
-    function unlockBodyScroll() {
+    const unlockBodyScroll = () => {
         document.body.style.overflow = '';
         document.body.style.position = '';
         document.body.style.width = '';
-    }
+    };
     
     // ================================
     // VALIDATION HELPERS
     // ================================
     
-    function isValidPostcode(postcode) {
+    const isValidPostcode = (postcode) => {
         const regex = /^[A-Z]{1,2}[0-9R][0-9A-Z]?\s?[0-9][A-Z]{2}$/i;
         return regex.test(postcode.replace(/\s/g, ''));
-    }
+    };
     
-    function isValidEmail(email) {
+    const isValidEmail = (email) => {
         const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return regex.test(email);
-    }
+    };
     
     // ================================
     // QUERY PARAMS HELPERS
     // ================================
     
-    function getQueryParam(param) {
+    const getQueryParam = (param) => {
         const urlParams = new URLSearchParams(window.location.search);
         return urlParams.get(param);
-    }
+    };
     
-    function setQueryParam(param, value) {
+    const setQueryParam = (param, value) => {
         const url = new URL(window.location);
         url.searchParams.set(param, value);
         window.history.pushState({}, '', url);
-    }
+    };
     
-    function removeQueryParam(param) {
+    const removeQueryParam = (param) => {
         const url = new URL(window.location);
         url.searchParams.delete(param);
         window.history.pushState({}, '', url);
-    }
+    };
     
     // ================================
     // PUBLIC API
     // ================================
     
     return {
+        // Centralized overlay management
+        closeAllOverlaysAndGoHome,
+        
         // Toast notifications
         showLoadingToast,
         hideLoadingToast,
