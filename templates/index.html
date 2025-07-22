@@ -5,11 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coeliacs Like Beer Too! - Find GF-Friendly Pubs - {{ cache_buster }}</title>
     
-    <!-- EMERGENCY: Load main CSS with all variables FIRST -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v={{ cache_buster }}">
-    
-    <!-- EMERGENCY: Force load mobile CSS for all devices to test -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='mobile.css') }}?v={{ cache_buster }}" media="screen">
     
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
