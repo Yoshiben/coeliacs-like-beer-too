@@ -888,6 +888,8 @@
     <script type="module">
         import { SearchModule } from '/static/search.js';
         window.SearchModule = SearchModule;
+        // ADD: Make closeSearchModal available globally for backward compatibility
+        window.closeSearchModal = () => SearchModule.closeSearchModal();
     </script>
 
     <!---------------------------
@@ -2238,62 +2240,7 @@
                 showSuccessToast('Error finding nearby pubs. Please try again.');
             }
         }
-
-        // ================================
-        // MOBILE UX FEEDBACK - ADD TO YOUR EXISTING JS - BA
-        // ================================
-
-        function initMobileFeedback() {
-            const searchOptions = document.querySelectorAll('.search-option');
-            
-            searchOptions.forEach(option => {
-                // Touch start - immediate feedback
-                option.addEventListener('touchstart', function(e) {
-                    this.style.transform = 'scale(0.97)';
-                    
-                    // Haptic feedback (if supported)
-                    if ('vibrate' in navigator) {
-                        navigator.vibrate(8); // Very subtle
-                    }
-                }, { passive: true });
-                
-                // Touch end - release
-                option.addEventListener('touchend', function(e) {
-                    this.style.transform = '';
-                    
-                    // Add tapped state briefly
-                    this.classList.add('tapped');
-                    setTimeout(() => {
-                        this.classList.remove('tapped');
-                    }, 200);
-                }, { passive: true });
-                
-                // Click handler with loading state
-                option.addEventListener('click', function(e) {
-                    // Add loading state
-                    this.classList.add('loading');
-                    
-                    // Remove after modal should open
-                    setTimeout(() => {
-                        this.classList.remove('loading');
-                    }, 400);
-                    
-                    // Success feedback
-                    if ('vibrate' in navigator) {
-                        navigator.vibrate([10, 50, 10]); // Success pattern
-                    }
-                });
-                
-                // Cancel touch if user drags away
-                option.addEventListener('touchcancel', function(e) {
-                    this.style.transform = '';
-                }, { passive: true });
-            });
-        }
-        
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', initMobileFeedback);
-        
+       
         function scrollToSearch() {
             document.getElementById('search').scrollIntoView({ behavior: 'smooth' });
         }
