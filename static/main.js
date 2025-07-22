@@ -244,12 +244,6 @@ const App = {
         window.acceptEssentialOnly = () => this.handleCookieConsent(false);
     },
     
-    // 🔧 ADD MISSING COMMA here if needed
-    // ================================
-    // 🔧 UPDATE: In main.js - Fix handleAction function
-    // LOCATION: Replace the handleAction case for 'search-name'
-    // ================================
-    
     handleAction(action, element, event) {
         console.log(`🎬 Processing action: ${action}`);
         
@@ -267,7 +261,6 @@ const App = {
                 
             case 'search-name':
                 console.log('🔍 Performing name search...');
-                // This should PERFORM the search, not open the modal
                 if (searchModule?.searchByName) {
                     searchModule.searchByName();
                 }
@@ -275,7 +268,6 @@ const App = {
                 
             case 'search-area':
                 console.log('🔍 Performing area search...');
-                // This should PERFORM the search, not open the modal  
                 if (searchModule?.searchByArea) {
                     searchModule.searchByArea();
                 }
@@ -283,7 +275,6 @@ const App = {
                 
             case 'search-beer':
                 console.log('🔍 Performing beer search...');
-                // This should PERFORM the search, not open the modal
                 if (searchModule?.searchByBeer) {
                     searchModule.searchByBeer();
                 }
@@ -316,6 +307,62 @@ const App = {
                 if (pubId && searchModule?.showPubDetails) {
                     searchModule.showPubDetails(pubId);
                 }
+                break;
+                
+            // 🔧 ADD: Missing back-to-results case
+            case 'back-to-results':
+                console.log('🔙 Going back to results...');
+                if (searchModule?.goBackToResults) {
+                    searchModule.goBackToResults();
+                } else {
+                    console.error('❌ Search module goBackToResults not available');
+                    // Fallback - try to show results overlay
+                    const resultsOverlay = document.getElementById('resultsOverlay');
+                    const pubDetailsOverlay = document.getElementById('pubDetailsOverlay');
+                    if (resultsOverlay && pubDetailsOverlay) {
+                        pubDetailsOverlay.style.display = 'none';
+                        pubDetailsOverlay.classList.remove('active');
+                        resultsOverlay.style.display = 'flex';
+                        resultsOverlay.classList.add('active');
+                    }
+                }
+                break;
+                
+            // 🔧 ADD: Missing close-pub-details case  
+            case 'close-pub-details':
+                console.log('🏠 Closing pub details...');
+                // Close pub details overlay
+                const pubDetailsOverlay = document.getElementById('pubDetailsOverlay');
+                if (pubDetailsOverlay) {
+                    pubDetailsOverlay.style.display = 'none';
+                    pubDetailsOverlay.classList.remove('active');
+                    console.log('✅ Pub details overlay closed');
+                }
+                
+                // Close results overlay if it exists
+                const resultsOverlay = document.getElementById('resultsOverlay');
+                if (resultsOverlay) {
+                    resultsOverlay.style.display = 'none';
+                    resultsOverlay.classList.remove('active');
+                    console.log('✅ Results overlay closed');
+                }
+                
+                // Show home sections
+                const heroSection = document.querySelector('.hero-section');
+                const searchSection = document.querySelector('.search-section');
+                if (heroSection) heroSection.style.display = 'block';
+                if (searchSection) searchSection.style.display = 'flex';
+                
+                // Restore body scroll
+                document.body.style.overflow = '';
+                
+                // Track the action
+                const tracking = this.getModule('tracking');
+                if (tracking) {
+                    tracking.trackEvent('close_pub_details', 'Navigation', 'home_button');
+                }
+                
+                console.log('✅ Returned to home view');
                 break;
                 
             case 'close-modal':
