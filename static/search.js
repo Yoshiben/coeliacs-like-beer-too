@@ -943,6 +943,9 @@ export const SearchModule = (function() {
         // Store pubs globally for map access
         currentSearchPubs = pubs;
         console.log('💾 Stored search results for map:', pubs.length, 'pubs');
+
+        // Also store globally for easy access
+        window.currentSearchResults = pubs;
         
         // Hide loading and no results
         document.getElementById('resultsLoading').style.display = 'none';
@@ -981,60 +984,43 @@ export const SearchModule = (function() {
     // LOCATION: Add to search.js after displayResultsInOverlay
     // ================================
     
+    // ================================
+    // 🔧 UPDATE: In search.js
+    // LOCATION: Find the setupResultsNavigationHandlers function (around line 750)
+    // ACTION: Replace the map toggle handler with enhanced version
+    // ================================
+    
     const setupResultsNavigationHandlers = () => {
         console.log('🔧 Setting up results navigation handlers...');
         
-        // Home button handler
+        // Home button handler (keep existing)
         const homeBtn = document.querySelector('[data-action="close-results"]');
         if (homeBtn) {
-            // Remove any existing handlers
             homeBtn.onclick = null;
-            
-            // Add new handler
             homeBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 console.log('🏠 Home button clicked');
                 
-                // Use UI module to close results
                 const uiModule = window.App?.getModule('ui');
                 if (uiModule && uiModule.closeResults) {
                     uiModule.closeResults();
                 } else {
-                    // Fallback
-                    const resultsOverlay = document.getElementById('resultsOverlay');
-                    if (resultsOverlay) {
-                        resultsOverlay.style.display = 'none';
-                        resultsOverlay.classList.remove('active');
-                    }
-                    
-                    // Show home sections
-                    const heroSection = document.querySelector('.hero-section');
-                    const searchSection = document.querySelector('.search-section');
-                    if (heroSection) heroSection.style.display = 'block';
-                    if (searchSection) searchSection.style.display = 'flex';
-                    
-                    // Restore body scroll
-                    document.body.style.overflow = '';
+                    window.UtilsModule?.closeAllOverlaysAndGoHome?.();
                 }
                 
-                // Track the action
                 const tracking = window.App?.getModule('tracking');
                 if (tracking) {
                     tracking.trackEvent('close_results', 'Navigation', 'home_button');
                 }
             });
-            
             console.log('✅ Home button handler attached');
         }
         
-        // Map toggle button handler
+        // Enhanced map toggle button handler
         const mapBtn = document.querySelector('[data-action="toggle-results-map"]');
         if (mapBtn) {
-            // Remove any existing handlers
             mapBtn.onclick = null;
-            
-            // Add new handler
             mapBtn.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -1051,14 +1037,15 @@ export const SearchModule = (function() {
                         mapContainer.style.display = 'block';
                         mapBtnText.textContent = 'List';
                         
-                        // Initialize the results map with current pubs
+                        // Initialize the results map with current search results
                         setTimeout(() => {
                             const mapModule = window.App?.getModule('map');
                             if (mapModule && mapModule.initResultsMap) {
-                                const map = mapModule.initResultsMap();
-                                if (map && currentSearchPubs.length > 0) {
-                                    mapModule.addPubMarkers(currentSearchPubs, map);
-                                }
+                                console.log('🗺️ Initializing results map with pubs...');
+                                const map = mapModule.initResultsMap(currentSearchPubs);
+                                console.log('✅ Results map initialized successfully');
+                            } else {
+                                console.error('❌ Map module not available');
                             }
                         }, 100);
                         
@@ -1081,7 +1068,7 @@ export const SearchModule = (function() {
                 }
             });
             
-            console.log('✅ Map toggle button handler attached');
+            console.log('✅ Enhanced map toggle button handler attached');
         }
         
         console.log('✅ Results navigation handlers setup complete');
@@ -1170,7 +1157,10 @@ export const SearchModule = (function() {
         showPubDetails,
         
         // Get current results
-        getCurrentResults: () => currentSearchPubs,
+        getCurrentResults: () => {
+            console.log('📊 getCurrentResults called, returning:', currentSearchPubs?.length || 0, 'pubs');
+            return currentSearchPubs || window.currentSearchResults || [];
+        },
         getLastSearchState: () => lastSearchState
     };
 })();
