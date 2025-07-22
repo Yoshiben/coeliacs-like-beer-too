@@ -5,6 +5,8 @@
 
 import { APIModule } from './api.js';
 import { MapModule } from './map.js';
+import { ModalModule } from './modals.js';
+import { TrackingModule } from './tracking.js';  // ADD THIS LINE
 
 export const SearchModule = (function() {
     'use strict';
@@ -31,12 +33,12 @@ export const SearchModule = (function() {
         console.log('🎯 Starting location search...');
         
         // Track the action
-        if (window.trackEvent) {
-            window.trackEvent('location_search_start', 'Search', 'distance_modal');
+        if (window.TrackingModule) {
+            window.TrackingModule.trackEvent('location_search_start', 'Search', 'distance_modal');
         }
         
         // Show distance selection modal
-        if (window.openModal) {
+        if (window.ModalModule) {
             window.ModalModule.open('distanceModal');
         }
     };
@@ -46,7 +48,7 @@ export const SearchModule = (function() {
         
         try {
             // Close distance modal
-            if (window.closeSearchModal) {
+            if (window.ModalModule) {
                 window.ModalModule.close('distanceModal');
             }
             
@@ -695,6 +697,19 @@ export const SearchModule = (function() {
         
         console.log(`✅ Displayed ${pubs.length} results`);
     };
+
+    const closeSearchModal = () => {
+        console.log('🔒 Closing search modals...');
+        
+        // Close any open search modals
+        const searchModals = ['nameModal', 'areaModal', 'beerModal', 'distanceModal'];
+        
+        searchModals.forEach(modalId => {
+            if (ModalModule && ModalModule.isOpen(modalId)) {
+                ModalModule.close(modalId);
+            }
+        });
+    };
     
     // =============================================================================
     // PUBLIC API
@@ -719,6 +734,9 @@ export const SearchModule = (function() {
         
         // Navigation
         goBackToResults,
+
+        // Modal helpers - ADD THIS
+        closeSearchModal,
         
         // Get current results
         getCurrentResults: () => currentSearchPubs,
