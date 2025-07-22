@@ -143,7 +143,16 @@ export const Constants = {
         GEOCODING_API: 'https://nominatim.openstreetmap.org/search',
         GOOGLE_MAPS_SEARCH: 'https://www.google.com/maps/search/?api=1&query=',
         GOOGLE_MAPS_DIRECTIONS: 'https://www.google.com/maps/dir/?api=1&destination=',
-        GOOGLE_SEARCH: 'https://www.google.com/search?q='
+        GOOGLE_SEARCH: 'https://www.google.com/search?q=',
+
+        // 🔧 ADD: Enhanced location settings
+        LOCATION_SETTINGS: {
+            HIGH_ACCURACY_TIMEOUT: 15000,        // 15 seconds for GPS
+            FALLBACK_TIMEOUT: 5000,              // 5 seconds for network fallback  
+            CACHE_DURATION: 300000,              // 5 minutes cache (was too long!)
+            ACCURACY_THRESHOLD: 1000,            // Warn if accuracy > 1km
+            MAX_ACCEPTABLE_ACCURACY: 5000        // Reject if accuracy > 5km
+        }
     },
     
     // ================================
