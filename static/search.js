@@ -442,9 +442,11 @@ export const SearchModule = (function() {
             if (pubs && pubs.length > 0) {
                 const pub = pubs[0];
                 
-                // Show pub details
-                if (window.showPubDetails) {
-                    window.showPubDetails(pub);
+                // Show pub details overlay
+                if (window.UIModule && window.UIModule.displayPubDetailsOverlay) {
+                    window.UIModule.displayPubDetailsOverlay(pub);
+                } else {
+                    console.error('displayPubDetailsOverlay not found');
                 }
                 
                 return pub;
