@@ -144,14 +144,27 @@ export const Constants = {
         GOOGLE_MAPS_SEARCH: 'https://www.google.com/maps/search/?api=1&query=',
         GOOGLE_MAPS_DIRECTIONS: 'https://www.google.com/maps/dir/?api=1&destination=',
         GOOGLE_SEARCH: 'https://www.google.com/search?q=',
-
-        // 🔧 ADD: Enhanced location settings
+    
+        // 🔧 ENHANCED: Much better location settings for accuracy
         LOCATION_SETTINGS: {
-            HIGH_ACCURACY_TIMEOUT: 15000,        // 15 seconds for GPS
-            FALLBACK_TIMEOUT: 5000,              // 5 seconds for network fallback  
-            CACHE_DURATION: 300000,              // 5 minutes cache (was too long!)
-            ACCURACY_THRESHOLD: 1000,            // Warn if accuracy > 1km
-            MAX_ACCEPTABLE_ACCURACY: 5000        // Reject if accuracy > 5km
+            // High-accuracy GPS attempt
+            HIGH_ACCURACY_TIMEOUT: 20000,        // 20 seconds for GPS (was 15)
+            HIGH_ACCURACY_MAX_AGE: 30000,        // 30 seconds cache (was 5 minutes!)
+            
+            // Network fallback attempt  
+            FALLBACK_TIMEOUT: 10000,             // 10 seconds for network positioning
+            FALLBACK_MAX_AGE: 120000,            // 2 minutes cache for network
+            
+            // Quality thresholds
+            EXCELLENT_ACCURACY: 100,             // ±100m or better = excellent
+            GOOD_ACCURACY: 500,                  // ±500m or better = good  
+            POOR_ACCURACY: 1000,                 // ±1km = poor but usable
+            TERRIBLE_ACCURACY: 5000,             // ±5km = try fallback
+            MAX_ACCEPTABLE_ACCURACY: 10000,      // ±10km = reject completely
+            
+            // User feedback thresholds
+            SHOW_ACCURACY_WARNING: 1000,        // Show accuracy warning if > 1km
+            SHOW_DISTANCE_WARNING: 2000         // Show distance approximation if > 2km
         }
     },
     
