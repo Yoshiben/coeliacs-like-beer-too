@@ -1,0 +1,612 @@
+/* ================================
+   MOBILE.CSS - ALL Mobile Styles from Your Perfect Design
+   Loaded conditionally only on mobile devices
+   ================================ */
+
+/* ================================
+   PERFORMANCE OPTIMIZATIONS
+   ================================ */
+*, *::before, *::after {
+    animation-duration: 0.2s !important;
+    transition-duration: 0.15s !important;
+}
+
+.results-overlay,
+.pub-details-overlay,
+.modal {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+}
+
+.modal,
+.search-modal {
+    backdrop-filter: none;
+    background: rgba(0, 0, 0, 0.85);
+}
+
+/* ================================
+   HERO SECTION MOBILE
+   ================================ */
+.hero-section {
+    padding: var(--space-lg) var(--space-md) var(--space-sm);
+}
+
+.hero-section::before {
+    font-size: 60px;
+    opacity: 0.05;
+}
+
+.hero-title {
+    font-size: clamp(1.5rem, 5vw, 2rem);
+    line-height: 1.2;
+    letter-spacing: 0.3px;
+}
+
+.hero-subtitle {
+    font-size: clamp(0.85rem, 2vw, 1rem);
+    line-height: 1.3;
+}
+
+.hero-stats {
+    gap: var(--space-lg);
+    margin-bottom: var(--space-lg);
+}
+
+/* ================================
+   SEARCH SECTION MOBILE (Your Perfect Design)
+   ================================ */
+.search-section {
+    height: calc(100vh - 240px) !important;
+    height: calc(100dvh - 240px) !important;
+}
+
+.search-body {
+    padding: var(--space-lg) !important;
+}
+
+.search-options {
+    gap: var(--space-md) !important;
+}
+
+.search-option {
+    padding: var(--space-lg);
+    min-height: auto;
+    height: 100% !important;
+}
+
+.search-icon {
+    font-size: 1.6rem;
+}
+
+.search-title {
+    font-size: 1.1rem !important;
+}
+
+.search-description {
+    font-size: 0.9rem !important;
+}
+
+/* ================================
+   MODAL OPTIMIZATIONS MOBILE
+   ================================ */
+.modal {
+    padding: var(--space-md) !important;
+}
+
+.modal-content {
+    margin: 2vh auto !important;
+    max-height: 96vh !important;
+    max-width: calc(100vw - 32px);
+}
+
+.modal-header {
+    padding: var(--space-lg) var(--space-lg) var(--space-md);
+}
+
+.modal-body {
+    padding: var(--space-md) var(--space-lg) var(--space-lg);
+}
+
+.modal-form {
+    gap: var(--space-md);
+}
+
+.modal-form .form-input,
+.modal-form .form-select {
+    min-height: 48px;
+    padding: var(--space-lg);
+    font-size: var(--text-base);
+}
+
+.photo-upload-compact {
+    padding: var(--space-md);
+    gap: var(--space-md);
+    min-height: 56px;
+}
+
+.modal-form .form-actions {
+    flex-direction: column;
+    gap: var(--space-md);
+    padding-top: var(--space-lg);
+    margin-top: var(--space-lg);
+}
+
+.modal-form .form-actions .btn {
+    min-height: 52px;
+    font-size: var(--text-lg);
+}
+
+/* ================================
+   REPORT MODAL MOBILE
+   ================================ */
+#reportModal .modal-content {
+    margin: 1vh auto;
+    max-height: 98vh;
+    border-radius: var(--radius-lg);
+}
+
+#reportModal .modal-header {
+    padding: var(--space-md) var(--space-md) var(--space-sm);
+}
+
+#reportModal .modal-title {
+    font-size: var(--text-xl);
+    line-height: 1.3;
+}
+
+#reportModal .modal-body {
+    padding: var(--space-sm) var(--space-md) var(--space-md);
+}
+
+#reportModal .modal-form {
+    gap: var(--space-sm);
+}
+
+.form-group {
+    gap: 6px;
+}
+
+.form-label {
+    font-size: var(--text-xs);
+    margin-bottom: 4px;
+}
+
+.modal-form .form-input,
+.modal-form .form-select {
+    min-height: 44px;
+    padding: var(--space-md);
+    font-size: 16px; /* Prevents zoom on iOS */
+    border-radius: var(--radius);
+}
+
+.selected-pub-card,
+.new-pub-fields {
+    padding: var(--space-md);
+    margin: var(--space-md) 0;
+}
+
+.photo-upload-compact {
+    min-height: 40px;
+    max-height: 40px;
+    padding: var(--space-sm);
+}
+
+.photo-upload-icon {
+    font-size: 1.2rem;
+}
+
+.photo-upload-text {
+    flex: none;
+}
+
+.photo-upload-text strong {
+    font-size: var(--text-xs);
+}
+
+.photo-upload-text small {
+    font-size: 0.65rem;
+}
+
+/* ================================
+   AREA/BEER MODAL MOBILE
+   ================================ */
+#areaModal .form-group {
+    margin-bottom: var(--space-lg);
+}
+
+#areaModal .form-input {
+    margin-top: var(--space-md);
+}
+
+#areaModal .modal-header {
+    padding-bottom: var(--space-lg);
+}
+
+#areaModal .modal-actions {
+    margin-top: var(--space-lg);
+    padding-top: var(--space-md);
+}
+
+#beerModal .form-group {
+    margin-bottom: var(--space-lg);
+}
+
+#beerModal .form-input {
+    margin-top: var(--space-md);
+}
+
+#beerModal .modal-header {
+    padding-bottom: var(--space-lg);
+}
+
+#beerModal .modal-actions {
+    margin-top: var(--space-lg);
+    padding-top: var(--space-md);
+}
+
+/* ================================
+   RESULTS OVERLAY MOBILE
+   ================================ */
+.results-container {
+    padding: 4px;
+}
+
+.results-nav {
+    padding: var(--space-sm);
+}
+
+.results-title {
+    font-size: 1rem;
+}
+
+.result-header {
+    flex-direction: column !important;
+    gap: var(--space-sm) !important;
+}
+
+.gf-indicator {
+    align-self: flex-start !important;
+}
+
+.result-actions {
+    grid-template-columns: 1fr !important;
+    gap: var(--space-sm) !important;
+}
+
+.result-actions .btn {
+    padding: var(--space-lg) !important;
+    font-size: 0.9rem !important;
+}
+
+/* ================================
+   PUB DETAILS OVERLAY MOBILE
+   ================================ */
+.pub-details-overlay {
+    height: calc(100vh - 8px);
+    height: calc(100dvh - 8px);
+    padding: 4px;
+}
+
+.pub-details-container {
+    height: calc(100vh - 20px);
+    height: calc(100dvh - 20px);
+    max-height: calc(100vh - 20px);
+    max-height: calc(100dvh - 20px);
+    padding: 4px;
+}
+
+.pub-details-card {
+    padding: var(--space-md);
+    border-radius: var(--radius-lg);
+}
+
+.pub-title {
+    font-size: 1.3rem !important;
+}
+
+.pub-action-grid {
+    gap: 10px !important;
+    padding: 12px 0 16px 0 !important;
+}
+
+.pub-action-grid .btn {
+    height: 44px !important;
+    min-height: 44px !important;
+    max-height: 44px !important;
+    border-radius: 22px !important;
+    font-size: 0.85rem !important;
+}
+
+.btn-nav-small {
+    min-height: 30px;
+    padding: 6px var(--space-sm);
+    font-size: 0.7rem;
+}
+
+.pub-details-card .btn {
+    min-height: 36px;
+    font-size: 0.8rem;
+}
+
+.pub-nav-buttons {
+    bottom: var(--space-md);
+    left: var(--space-md);
+    right: var(--space-md);
+}
+
+.beer-section {
+    padding: var(--space-lg) !important;
+    margin: var(--space-lg) 0 !important;
+}
+
+.beer-section-title {
+    font-size: 1rem !important;
+}
+
+/* ================================
+   SPLIT VIEW MOBILE
+   ================================ */
+.split-view .pub-details-card {
+    max-height: calc(100vh - 80px) !important;
+    max-height: calc(100dvh - 80px) !important;
+    margin-bottom: 2px !important;
+}
+
+.split-view .pub-title {
+    font-size: 1.1rem !important;
+}
+
+.split-view .beer-section {
+    padding: var(--space-md) !important;
+    margin: var(--space-sm) 0 !important;
+}
+
+.split-view .pub-map-container {
+    max-height: 55vh !important;
+}
+
+.split-view .pub-action-grid {
+    gap: 6px !important;
+    padding: 6px 0 10px 0 !important;
+}
+
+.split-view .pub-action-grid .btn {
+    height: 32px !important;
+    min-height: 32px !important;
+    max-height: 32px !important;
+    border-radius: 16px !important;
+    font-size: 0.75rem !important;
+}
+
+.split-view .pub-nav-buttons {
+    bottom: var(--space-sm);
+    left: var(--space-sm);
+    right: var(--space-sm);
+}
+
+.split-view .btn {
+    min-height: 28px;
+    font-size: 0.7rem;
+    padding: 4px 8px;
+}
+
+/* ================================
+   DROPDOWN MOBILE
+   ================================ */
+.suggestions .suggestion-item {
+    padding: var(--space-sm) var(--space-md);
+}
+
+.suggestions .suggestion-item:hover {
+    padding-left: calc(var(--space-md) - 3px);
+}
+
+#breweryDropdown,
+#beerNameDropdown,
+#beerStyleDropdown {
+    max-height: 250px;
+    border-radius: var(--radius-lg);
+}
+
+.dropdown-header {
+    padding: var(--space-xs) var(--space-md);
+    font-size: 0.7rem;
+}
+
+.beer-item,
+.brewery-item {
+    padding: var(--space-md);
+}
+
+.beer-item:hover,
+.brewery-item:hover {
+    padding-left: calc(var(--space-md) - 3px);
+    border-left: 3px solid var(--primary-gradient);
+}
+
+/* ================================
+   SEARCH MODAL MOBILE
+   ================================ */
+.search-modal {
+    padding: var(--space-md) !important;
+}
+
+.search-modal .modal-content {
+    padding: var(--space-lg) !important;
+}
+
+.distance-options {
+    gap: 6px !important;
+    margin: var(--space-md) 0 !important;
+}
+
+.distance-option {
+    padding: var(--space-sm) var(--space-md) !important;
+}
+
+.distance-number {
+    font-size: 1.1rem !important;
+}
+
+.distance-label {
+    font-size: 0.75rem !important;
+}
+
+/* ================================
+   TOUCH IMPROVEMENTS
+   ================================ */
+@media (hover: none) and (pointer: coarse) {
+    .btn,
+    .search-option,
+    .modal-close {
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    .search-option {
+        position: relative;
+        overflow: hidden;
+    }
+
+    .search-option:active {
+        transform: scale(0.98);
+    }
+
+    .search-option::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        transform: translate(-50%, -50%);
+        transition: width 0.3s ease, height 0.3s ease;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .search-option:active::after {
+        width: 100px;
+        height: 100px;
+        opacity: 1;
+    }
+
+    .search-option:hover {
+        transform: none;
+        box-shadow: var(--shadow);
+    }
+}
+
+/* ================================
+   VERY SMALL SCREENS (iPhone SE)
+   ================================ */
+@media (max-width: 375px) {
+    :root {
+        --space-lg: 12px;
+        --space-xl: 16px;
+        --space-2xl: 20px;
+        --space-3xl: 24px;
+    }
+
+    .search-option {
+        padding: var(--space-sm);
+        min-height: 80px;
+    }
+
+    .search-icon {
+        font-size: 1.3rem;
+        margin-bottom: 4px;
+    }
+
+    .search-title {
+        font-size: 0.85rem;
+        margin-bottom: 2px;
+    }
+
+    .search-description {
+        font-size: 0.7rem;
+        line-height: 1.2;
+    }
+
+    .stat-number {
+        font-size: 1.3rem;
+    }
+
+    .stat-label {
+        font-size: 0.7rem;
+    }
+}
+
+/* ================================
+   ULTRA SMALL SCREENS
+   ================================ */
+@media (max-width: 360px) {
+    .search-option {
+        padding: 8px;
+    }
+
+    .search-icon {
+        font-size: 1.3rem;
+        margin-bottom: 4px;
+    }
+
+    .search-title {
+        font-size: 0.8rem;
+        margin-bottom: 2px;
+        font-weight: 600;
+    }
+
+    .search-description {
+        font-size: 0.65rem;
+        line-height: 1.1;
+        padding: 0 1px;
+    }
+}
+
+/* ================================
+   LANDSCAPE MOBILE
+   ================================ */
+@media (max-width: 768px) and (orientation: landscape) {
+    .search-section {
+        height: calc(100vh - 160px);
+        height: calc(100dvh - 160px);
+    }
+
+    .hero-section {
+        padding: var(--space-sm) var(--space-lg) var(--space-xs);
+    }
+
+    .hero-stats {
+        gap: var(--space-lg);
+        margin-bottom: var(--space-lg);
+    }
+
+    .stat-item {
+        min-width: 100px;
+    }
+}
+
+/* ================================
+   ACCESSIBILITY & PERFORMANCE
+   ================================ */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    .search-option::after {
+        display: none;
+    }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+    .search-option {
+        border-width: 2px;
+    }
+}
