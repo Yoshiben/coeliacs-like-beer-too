@@ -85,20 +85,20 @@ export const ModalModule = (function() {
     };
     
     // ================================
-    // CORE MODAL constS
+    // CORE MODAL functionS
     // ================================
     
-    const open(modalId, data = null) {
+    function open(modalId, data = null) {
         console.log(`🔓 Opening modal: ${modalId}`, data);
         
-        const modal = document.getElementById(modalId);
+        function modal = document.getElementById(modalId);
         if (!modal) {
             console.error(`❌ Modal not found: ${modalId}`);
             return false;
         }
         
         // Get modal config
-        const config = modalRegistry[modalId] || {};
+        function config = modalRegistry[modalId] || {};
         
         // Close any active search modals if opening another search modal
         if (config.type === 'search') {
@@ -144,13 +144,13 @@ export const ModalModule = (function() {
         return true;
     }
     
-    const close(modalId) {
+    function close(modalId) {
         console.log(`🔒 Closing modal: ${modalId}`);
         
-        const modal = document.getElementById(modalId);
+        function modal = document.getElementById(modalId);
         if (!modal) return false;
         
-        const config = modalRegistry[modalId] || {};
+        function config = modalRegistry[modalId] || {};
         
         // Animate out
         modal.style.opacity = '0';
@@ -183,21 +183,21 @@ export const ModalModule = (function() {
         return true;
     }
     
-    const closeAll() {
+    function closeAll() {
         console.log('🔒 Closing all modals');
-        const modalsToClose = [...activeModals];
+        function modalsToClose = [...activeModals];
         modalsToClose.forEach(modalId => close(modalId));
     }
     
-    const closeAllOfType(type) {
-        const modalsToClose = activeModals.filter(modalId => {
-            const config = modalRegistry[modalId];
+    function closeAllOfType(type) {
+        function modalsToClose = activeModals.filter(modalId => {
+            function config = modalRegistry[modalId];
             return config && config.type === type;
         });
         modalsToClose.forEach(modalId => close(modalId));
     }
     
-    const isOpen(modalId) {
+    function isOpen(modalId) {
         return activeModals.includes(modalId);
     }
     
@@ -205,41 +205,41 @@ export const ModalModule = (function() {
     // SPECIALIZED MODAL HANDLERS
     // ================================
     
-    const openSearchModal(type) {
-        const modalMap = {
+    function openSearchModal(type) {
+        function modalMap = {
             'name': 'nameModal',
             'area': 'areaModal',
             'beer': 'beerModal',
             'distance': 'distanceModal'
         };
         
-        const modalId = modalMap[type];
+        function modalId = modalMap[type];
         if (modalId) {
             open(modalId);
         }
     }
     
-    const openReportModal(pubData = null) {
+    function openReportModal(pubData = null) {
         console.log('📸 Opening report modal with data:', pubData);
         open('reportModal', pubData);
     }
     
-    const openAdminModal(modalType) {
+    function openAdminModal(modalType) {
         console.log('👮 Opening admin modal:', modalType);
         open('adminReviewModal', modalType);
     }
     
     // ================================
-    // MODAL INITIALIZATION constS
+    // MODAL INITIALIZATION functionS
     // ================================
     
-    const initializeReportModal(pubData) {
+    function initializeReportModal(pubData) {
         console.log('🔧 Initializing report modal', pubData);
         
-        const modal = document.getElementById('reportModal');
-        const modalTitle = modal.querySelector('.modal-title');
-        const pubSearchGroup = document.getElementById('pubSearchGroup');
-        const reportForm = document.getElementById('reportForm');
+        function modal = document.getElementById('reportModal');
+        function modalTitle = modal.querySelector('.modal-title');
+        function pubSearchGroup = document.getElementById('pubSearchGroup');
+        function reportForm = document.getElementById('reportForm');
         
         if (pubData) {
             // Pre-populated from specific pub
@@ -283,8 +283,8 @@ export const ModalModule = (function() {
         }, 150);
     }
     
-    const resetReportForm() {
-        const reportForm = document.getElementById('reportForm');
+    function resetReportForm() {
+        function reportForm = document.getElementById('reportForm');
         if (reportForm) {
             reportForm.reset();
         }
@@ -296,16 +296,16 @@ export const ModalModule = (function() {
         
         // Hide all dropdowns
         ['breweryDropdown', 'beerNameDropdown', 'beerStyleDropdown', 'pubSuggestions'].forEach(id => {
-            const element = document.getElementById(id);
+            function element = document.getElementById(id);
             if (element) element.style.display = 'none';
         });
         
         // Reset photo upload
-        const photoLabel = document.querySelector('.photo-upload-compact');
+        function photoLabel = document.querySelector('.photo-upload-compact');
         if (photoLabel) {
             photoLabel.style.borderColor = 'var(--border-light)';
             photoLabel.style.background = 'var(--bg-section)';
-            const textEl = photoLabel.querySelector('.photo-upload-text');
+            function textEl = photoLabel.querySelector('.photo-upload-text');
             if (textEl) {
                 textEl.innerHTML = `
                     <strong>Add a photo</strong><br>
@@ -315,22 +315,22 @@ export const ModalModule = (function() {
         }
     }
     
-    const loadCookiePreferences() {
-        const analyticsConsent = localStorage.getItem('analyticsConsent');
-        const consentCheckbox = document.getElementById('analyticsConsent');
+    function loadCookiePreferences() {
+        function analyticsConsent = localStorage.getItem('analyticsConsent');
+        function consentCheckbox = document.getElementById('analyticsConsent');
         if (consentCheckbox) {
             consentCheckbox.checked = analyticsConsent === 'true';
         }
     }
     
-    const loadAdminModalContent(modalType) {
+    function loadAdminModalContent(modalType) {
         // This will be handled by the admin module
         if (window.AdminModule && window.AdminModule.loadModalContent) {
             window.AdminModule.loadModalContent(modalType);
         }
     }
     
-    const clearAdminModalState() {
+    function clearAdminModalState() {
         // This will be handled by the admin module
         if (window.AdminModule && window.AdminModule.clearModalState) {
             window.AdminModule.clearModalState();
@@ -338,31 +338,31 @@ export const ModalModule = (function() {
     }
     
     // ================================
-    // HELPER constS
+    // HELPER functionS
     // ================================
     
-    const focusInput(inputId) {
-        const input = document.getElementById(inputId);
+    function focusInput(inputId) {
+        function input = document.getElementById(inputId);
         if (input) {
             input.focus();
         }
     }
     
-    const clearInput(inputId) {
-        const input = document.getElementById(inputId);
+    function clearInput(inputId) {
+        function input = document.getElementById(inputId);
         if (input) {
             input.value = '';
         }
     }
     
     
-    const updateBeerPlaceholder() {
-        const searchType = document.getElementById('beerSearchType');
-        const input = document.getElementById('beerInput');
+    function updateBeerPlaceholder() {
+        function searchType = document.getElementById('beerSearchType');
+        function input = document.getElementById('beerInput');
         
         if (!searchType || !input) return;
         
-        const placeholders = {
+        function placeholders = {
             'brewery': 'Enter brewery name',
             'beer': 'Enter specific beer name',
             'style': 'Enter beer style'
@@ -371,27 +371,27 @@ export const ModalModule = (function() {
         input.placeholder = placeholders[searchType.value] || 'Enter search term';
     }
     
-    const initializeBeerAutocomplete() {
+    function initializeBeerAutocomplete() {
         // Delegate to forms module
         if (window.FormModule && window.FormModule.initBeerAutocomplete) {
             window.FormModule.initBeerAutocomplete();
         }
     }
     
-    const initializeReportModalDropdowns() {
+    function initializeReportModalDropdowns() {
         // Delegate to forms module
         if (window.FormModule && window.FormModule.initReportDropdowns) {
             window.FormModule.initReportDropdowns();
         }
     }
     
-    const setupFocusTrap(modal) {
-        const focusableElements = modal.querySelectorAll(
+    function setupFocusTrap(modal) {
+        function focusableElements = modal.querySelectorAll(
             'a[href], button, textarea, input[type="text"], input[type="radio"], input[type="checkbox"], select'
         );
         
-        const firstFocusable = focusableElements[0];
-        const lastFocusable = focusableElements[focusableElements.length - 1];
+        function firstFocusable = focusableElements[0];
+        function lastFocusable = focusableElements[focusableElements.length - 1];
         
         modal.addEventListener('keydown', (e) => {
             if (e.key === 'Tab') {
@@ -410,7 +410,7 @@ export const ModalModule = (function() {
         });
     }
     
-    const trackEvent(action, category, label) {
+    function trackEvent(action, category, label) {
         if (window.TrackingModule) {
             window.TrackingModule.trackEvent(action, category, label);
         }
@@ -420,11 +420,11 @@ export const ModalModule = (function() {
     // EVENT LISTENERS
     // ================================
     
-    const setupEventListeners() {
+    function setupEventListeners() {
         // Close modal when clicking backdrop
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('modal') || e.target.classList.contains('search-modal')) {
-                const modal = e.target;
+                function modal = e.target;
                 if (modal.id && activeModals.includes(modal.id)) {
                     close(modal.id);
                 }
@@ -434,7 +434,7 @@ export const ModalModule = (function() {
         // Close modal on Escape key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && activeModals.length > 0) {
-                const lastModal = activeModals[activeModals.length - 1];
+                function lastModal = activeModals[activeModals.length - 1];
                 close(lastModal);
             }
         });
@@ -443,7 +443,7 @@ export const ModalModule = (function() {
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('modal-close') || 
                 e.target.closest('.modal-close')) {
-                const modal = e.target.closest('.modal, .search-modal');
+                function modal = e.target.closest('.modal, .search-modal');
                 if (modal && modal.id) {
                     close(modal.id);
                 }
@@ -451,9 +451,9 @@ export const ModalModule = (function() {
         });
     }
 
-    const updateAreaPlaceholder = () => {
-        const searchType = document.getElementById('areaSearchType');
-        const input = document.getElementById('areaInput');
+    function updateAreaPlaceholder = () => {
+        function searchType = document.getElementById('areaSearchType');
+        function input = document.getElementById('areaInput');
         
         if (!searchType || !input) return;
         
@@ -466,13 +466,13 @@ export const ModalModule = (function() {
         }
     };
 
-    const updateBeerPlaceholder = () => {
-        const searchType = document.getElementById('beerSearchType');
-        const input = document.getElementById('beerInput');
+    function updateBeerPlaceholder = () => {
+        function searchType = document.getElementById('beerSearchType');
+        function input = document.getElementById('beerInput');
         
         if (!searchType || !input) return;
         
-        const placeholders = {
+        function placeholders = {
             'brewery': 'Enter brewery name',
             'beer': 'Enter specific beer name',
             'style': 'Enter beer style'
@@ -485,7 +485,7 @@ export const ModalModule = (function() {
     // INITIALIZATION
     // ================================
     
-    const init() {
+    function init() {
         console.log('🔧 Initializing Modal Module');
         setupEventListeners();
         console.log('✅ Modal Module initialized');
