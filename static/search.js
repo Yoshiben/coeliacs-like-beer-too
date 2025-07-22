@@ -545,6 +545,47 @@ export const SearchModule = (function() {
             showNoResults('Could not restore search. Please try again.');
         }
     };
+
+    const restoreNameSearch = (state) => {
+        showResultsOverlay(`Pub name: "${state.query}"`);
+        if (state.results && state.results.length > 0) {
+            currentSearchPubs = state.results;
+            displayResultsInOverlay(state.results, `${state.results.length} results for "${state.query}"`);
+        } else {
+            showResultsLoading('Restoring search...');
+            // Re-run the name search
+            performNameSearch(state.query);
+        }
+    };
+    
+    const restoreAreaSearch = (state) => {
+        showResultsOverlay(`Area: "${state.query}"`);
+        if (state.results && state.results.length > 0) {
+            currentSearchPubs = state.results;
+            displayResultsInOverlay(state.results, `${state.results.length} pubs in "${state.query}"`);
+        } else {
+            showResultsLoading('Restoring search...');
+            // Determine if it was a postcode or city search
+            const isPostcode = /^[A-Z]{1,2}[0-9R][0-9A-Z]?\s?[0-9][A-Z]{2}$/i.test(state.query.replace(/\s/g, ''));
+            if (isPostcode) {
+                performPostcodeSearch(state.query);
+            } else {
+                performCitySearch(state.query);
+            }
+        }
+    };
+    
+    const restoreBeerSearch = (state) => {
+        showResultsOverlay(`Beer: "${state.query}"`);
+        if (state.results && state.results.length > 0) {
+            currentSearchPubs = state.results;
+            displayResultsInOverlay(state.results, `${state.results.length} pubs serving "${state.query}"`);
+        } else {
+            showResultsLoading('Restoring search...');
+            // Re-run the beer search
+            performBeerSearch(state.query, 'beer');
+        }
+    };
     
     const restoreTextSearch = (state) => {
         showResultsOverlay(state.query);
@@ -737,6 +778,10 @@ export const SearchModule = (function() {
 
         // Modal helpers - ADD THIS
         closeSearchModal,
+
+        restoreNameSearch,
+        restoreAreaSearch,
+        restoreBeerSearch,
         
         // Get current results
         getCurrentResults: () => currentSearchPubs,
