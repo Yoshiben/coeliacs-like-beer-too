@@ -141,32 +141,73 @@ const App = {
     },
     
     setupEventDelegation() {
+        console.log('🔧 Setting up fixed event delegation...');
+        
         // Handle all data-* attributes in one place
         document.addEventListener('click', (e) => {
             const target = e.target.closest('[data-action], [data-modal], [data-distance]');
             if (!target) return;
             
+            // Modal triggers - FIXED
             if (target.dataset.modal) {
                 e.preventDefault();
-                this.handleModalTrigger(target.dataset.modal);
+                const modalId = target.dataset.modal;
+                console.log(`🔓 Opening modal: ${modalId}`);
+                
+                const modal = document.getElementById(modalId);
+                if (modal) {
+                    // Force proper display
+                    modal.style.display = 'flex';
+                    modal.classList.add('active'); // For CSS targeting
+                    document.body.style.overflow = 'hidden'; // Prevent background scroll
+                    
+                    console.log(`✅ Modal ${modalId} opened successfully`);
+                } else {
+                    console.error(`❌ Modal ${modalId} not found in DOM`);
+                }
             }
             
+            // Action handlers - FIXED
             if (target.dataset.action) {
                 e.preventDefault();
                 this.handleAction(target.dataset.action, target);
             }
             
+            // Distance selection - FIXED
             if (target.dataset.distance) {
                 const distance = parseInt(target.dataset.distance);
                 this.handleDistanceSelection(distance);
             }
         });
         
-        // Handle form submissions
-        document.addEventListener('submit', (e) => {
-            if (e.target.dataset.action === 'submit-report') {
-                e.preventDefault();
-                this.handleFormSubmission(e);
+        // Modal close handlers - FIXED
+        document.addEventListener('click', (e) => {
+            // Close on backdrop click
+            if (e.target.classList.contains('modal') || e.target.classList.contains('search-modal')) {
+                const modal = e.target;
+                this.closeModal(modal.id);
+            }
+            
+            // Close on close button click
+            if (e.target.classList.contains('modal-close') || 
+                e.target.closest('.modal-close') ||
+                e.target.dataset.action === 'close-modal') {
+                const modal = e.target.closest('.modal, .search-modal');
+                if (modal) {
+                    this.closeModal(modal.id);
+                }
+            }
+        });
+        
+        // Escape key handler - FIXED
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                // Close the topmost modal
+                const openModals = document.querySelectorAll('.modal[style*="display: flex"], .modal.active');
+                if (openModals.length > 0) {
+                    const lastModal = openModals[openModals.length - 1];
+                    this.closeModal(lastModal.id);
+                }
             }
         });
     },
@@ -217,9 +258,27 @@ const App = {
     },
     
     handleDistanceSelection(distance) {
+        console.log(`📍 Distance ${distance}km selected`);
+        
+        // CLOSE the distance modal first
+        const modalModule = this.getModule('modal');
+        if (modalModule) {
+            modalModule.close('distanceModal');
+        } else {
+            // Fallback close
+            const modal = document.getElementById('distanceModal');
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        }
+        
+        // Then start the search
         const search = this.getModule('search');
         if (search) {
             search.searchNearbyWithDistance(distance);
+        } else {
+            console.error('❌ Search module not available');
         }
     },
     
