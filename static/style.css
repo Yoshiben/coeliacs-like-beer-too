@@ -145,6 +145,83 @@
        ================================ */
     --container-padding: var(--space-lg);
     --section-padding: var(--space-3xl);
+
+   /* ================================
+   CRITICAL - ADD these missing variables to :root in style.css
+   ================================ */
+
+:root {
+    /* EXISTING variables stay... ADD these missing ones: */
+    
+    /* ================================
+       MISSING BUTTON VARIABLES
+       ================================ */
+    --btn-height: 44px;
+    --btn-height-sm: 36px;
+    --btn-height-lg: 52px;
+    --btn-padding: 12px 20px;
+    --btn-padding-sm: 8px 16px;
+    --btn-padding-lg: 16px 24px;
+    
+    /* ================================
+       MISSING CONTAINER VARIABLES
+       ================================ */
+    --container-xl: 1200px;
+    
+    /* ================================
+       MISSING COLOR VARIABLES
+       ================================ */
+    --hover-subtle: rgba(102, 126, 234, 0.05);
+    --primary-color: #667eea;
+    --primary-bg: rgba(102, 126, 234, 0.1);
+    --primary-border: rgba(102, 126, 234, 0.2);
+    --primary-border-strong: rgba(102, 126, 234, 0.4);
+    
+    --success-color: #10b981;
+    --success-bg: rgba(16, 185, 129, 0.1);
+    --success-border: rgba(16, 185, 129, 0.2);
+    --success-text: #047857;
+    
+    --warning-color: #f59e0b;
+    --error-color: #ef4444;
+    --info-color: #3b82f6;
+    
+    /* ================================
+       MISSING LAYOUT VARIABLES  
+       ================================ */
+    --divider-color: rgba(0, 0, 0, 0.08);
+    --glass-overlay: rgba(255, 255, 255, 0.1);
+    --glass-white: rgba(255, 255, 255, 0.9);
+    
+    /* ================================
+       MISSING MODAL VARIABLES
+       ================================ */
+    --modal-backdrop: rgba(0, 0, 0, 0.8);
+    --modal-blur: blur(5px);
+    --z-modal-content: 1001;
+    --z-dropdown: 100;
+    --z-search-suggestions: 110;
+    --z-cookie: 900;
+    
+    /* ================================
+       MISSING REPORT FORM VARIABLES
+       ================================ */
+    --report-modal-bg: var(--bg-white);
+    --report-modal-border: var(--border-light);
+    --report-input-focus: rgba(102, 126, 234, 0.1);
+    --selected-pub-bg: rgba(16, 185, 129, 0.1);
+    --selected-pub-border: rgba(16, 185, 129, 0.2);
+    --selected-pub-text: var(--success-text);
+    --new-pub-bg: rgba(59, 130, 246, 0.1);
+    --new-pub-border: rgba(59, 130, 246, 0.2);
+    --photo-upload-bg: var(--bg-section);
+    --photo-upload-border: var(--border-light);
+    --photo-upload-hover: rgba(102, 126, 234, 0.05);
+    --photo-upload-active: var(--success-bg);
+    --photo-upload-active-border: var(--success-border);
+    --suggestion-bg: var(--bg-white);
+    --suggestion-border: var(--border-light);
+    --suggestion-hover: var(--hover-subtle);
 }
 
 /* ================================
