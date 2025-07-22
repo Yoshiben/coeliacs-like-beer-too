@@ -324,7 +324,67 @@ function handleGlobalAction(action, element) {
         case 'update-beer-placeholder':
             ModalModule.updateBeerPlaceholder();
             break;
+        
+        // 🔧 ADD: New cases for migrating inline handlers
+        case 'clear-selected-pub':
+            if (FormModule?.clearSelectedPub) {
+                FormModule.clearSelectedPub();
+            }
+            break;
+        case 'save-cookie-preferences':
+            saveCookiePreferences();
+            break;
+        case 'accept-all-from-settings':
+            acceptAllFromSettings();
+            break;
+        case 'show-cookie-settings':
+            ModalModule.open('cookieSettings');
+            break;
+        case 'coming-soon':
+            const feature = element.dataset.feature || 'feature';
+            showComingSoon(feature);
+            break;
+        case 'submit-report':
+            // This is handled by form submission listener, not click
+            break;
+            
+        // 🔧 ADD: Debug actions
+        case 'debug-app':
+            if (UIModule?.showDebugInfo) {
+                UIModule.showDebugInfo();
+            }
+            break;
     }
+}
+
+// Helper functions for actions
+function saveCookiePreferences() {
+    const analyticsConsent = document.getElementById('analyticsConsent')?.checked || false;
+    
+    UtilsModule.Storage.set('cookieConsent', true);
+    UtilsModule.Storage.set('analyticsConsent', analyticsConsent);
+    
+    TrackingModule.updateConsent(analyticsConsent);
+    ModalModule.close('cookieSettings');
+    
+    UtilsModule.showSuccessToast('✅ Cookie preferences saved!');
+}
+
+function acceptAllFromSettings() {
+    UtilsModule.Storage.set('cookieConsent', true);
+    UtilsModule.Storage.set('analyticsConsent', true);
+    
+    TrackingModule.updateConsent(true);
+    ModalModule.close('cookieSettings');
+    
+    UtilsModule.showSuccessToast('✅ All cookies accepted!');
+}
+
+function showComingSoon(feature) {
+    UtilsModule.showSuccessToast(`🚧 ${feature} coming soon! Thanks for your interest.`);
+    
+    // Track interest in features
+    TrackingModule.trackEvent('feature_interest', 'Coming Soon', feature);
 }
 
 // Show fallback error message
