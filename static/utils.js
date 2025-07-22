@@ -390,6 +390,103 @@ export const UtilsModule = (function() {
     // ================================
     // PUBLIC API
     // ================================
+
+    debugLocation: async () => {
+        console.log('🔍 LOCATION DEBUG STARTED');
+        console.log('📱 User Agent:', navigator.userAgent.substring(0, 100));
+        console.log('🌐 Online:', navigator.onLine);
+        console.log('📡 Connection:', navigator.connection?.effectiveType || 'unknown');
+        
+        if (!navigator.geolocation) {
+            console.error('❌ Geolocation not supported');
+            return { error: 'Geolocation not supported' };
+        }
+        
+        console.log('✅ Geolocation API available');
+        
+        // Test high accuracy
+        console.log('🎯 Testing HIGH ACCURACY positioning...');
+        try {
+            const highAccResult = await new Promise((resolve, reject) => {
+                const timeout = setTimeout(() => reject(new Error('High accuracy timeout')), 15000);
+                
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        clearTimeout(timeout);
+                        resolve({
+                            lat: pos.coords.latitude,
+                            lng: pos.coords.longitude,
+                            accuracy: pos.coords.accuracy,
+                            timestamp: pos.timestamp,
+                            method: 'high_accuracy'
+                        });
+                    },
+                    (err) => {
+                        clearTimeout(timeout);
+                        reject(err);
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 15000,
+                        maximumAge: 0
+                    }
+                );
+            });
+            
+            console.log('✅ High accuracy result:', highAccResult);
+        } catch (error) {
+            console.log('❌ High accuracy failed:', error.message);
+        }
+        
+        // Test network positioning
+        console.log('📶 Testing NETWORK positioning...');
+        try {
+            const networkResult = await new Promise((resolve, reject) => {
+                const timeout = setTimeout(() => reject(new Error('Network timeout')), 10000);
+                
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        clearTimeout(timeout);
+                        resolve({
+                            lat: pos.coords.latitude,
+                            lng: pos.coords.longitude,
+                            accuracy: pos.coords.accuracy,
+                            timestamp: pos.timestamp,
+                            method: 'network'
+                        });
+                    },
+                    (err) => {
+                        clearTimeout(timeout);
+                        reject(err);
+                    },
+                    {
+                        enableHighAccuracy: false,
+                        timeout: 10000,
+                        maximumAge: 0
+                    }
+                );
+            });
+            
+            console.log('✅ Network result:', networkResult);
+        } catch (error) {
+            console.log('❌ Network positioning failed:', error.message);
+        }
+        
+        // Test current implementation
+        console.log('🧪 Testing CURRENT implementation...');
+        try {
+            if (window.App?.getModule('search')?.getUserLocation) {
+                const currentResult = await window.App.getModule('search').getUserLocation();
+                console.log('✅ Current implementation result:', currentResult);
+            } else {
+                console.log('❌ Current implementation not available');
+            }
+        } catch (error) {
+            console.log('❌ Current implementation failed:', error.message);
+        }
+        
+        console.log('🔍 LOCATION DEBUG COMPLETED');
+    }
     
     return {
         // Centralized overlay management
