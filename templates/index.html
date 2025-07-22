@@ -5,22 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coeliacs Like Beer Too! - Find GF-Friendly Pubs - {{ cache_buster }}</title>
     
-    <!-- CRITICAL: Load main CSS first (contains all variables) -->
+    <!-- EMERGENCY: Load main CSS with all variables FIRST -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}?v={{ cache_buster }}">
     
-    <!-- CRITICAL: Load mobile CSS conditionally and inline for performance -->
-    <script>
-    // Load mobile CSS only if needed and ensure it loads after main CSS
-    if (window.innerWidth <= 768 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-        const mobileCSS = document.createElement('link');
-        mobileCSS.rel = 'stylesheet';
-        mobileCSS.href = "{{ url_for('static', filename='mobile.css') }}?v={{ cache_buster }}";
-        // Add after main CSS loads
-        mobileCSS.media = 'screen and (max-width: 768px)';
-        document.head.appendChild(mobileCSS);
-        console.log('📱 Mobile CSS loaded conditionally');
-    }
-    </script>
+    <!-- EMERGENCY: Force load mobile CSS for all devices to test -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='mobile.css') }}?v={{ cache_buster }}" media="screen">
     
     <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
