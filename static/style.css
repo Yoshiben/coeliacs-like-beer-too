@@ -3665,3 +3665,40 @@ p {
         padding: 0 !important;
     }
 }
+
+/* ================================
+   SEARCH TEXT SIZE ADJUSTMENTS
+   Consistent with Phase 1 CSS structure and variables
+   ================================ */
+
+/* Make search header more compact */
+.section-title {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* Enhanced search box content sizing */
+.search-icon {
+    font-size: 2rem;
+    margin-bottom: var(--space-sm);
+    display: block;
+    line-height: 1;
+}
+
+.search-title {
+    font-size: var(--text-xl) !important;
+    font-weight: 700 !important;
+    color: var(--text-primary) !important;
+    margin-bottom: var(--space-xs) !important;
+    line-height: 1.2 !important;
+}
+
+.search-description {
+    font-size: var(--text-base) !important;
+    color: var(--text-secondary) !important;
+    line-height: 1.4 !important;
+    text-align: center !important;
+    padding: 0 var(--space-xs) !important;
+}
