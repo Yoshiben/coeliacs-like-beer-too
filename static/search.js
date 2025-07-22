@@ -432,6 +432,7 @@ export const SearchModule = (function() {
     // SEARCH A SPECIFIC PUB (by ID)
     // =============================================================================
     
+    // REPLACE your searchSpecificPub function in search.js
     const searchSpecificPub = async (pubId) => {
         console.log('🔍 Searching for specific pub:', pubId);
         
@@ -440,7 +441,7 @@ export const SearchModule = (function() {
                 window.showLoadingToast('Loading pub details...');
             }
             
-            const results = await APIModule.searchPubs({ pubId: pubId });
+            const results = await getAPI().searchPubs({ pubId: pubId });
             const pubs = Array.isArray(results) ? results : results.pubs;
             
             if (window.hideLoadingToast) {
@@ -450,11 +451,15 @@ export const SearchModule = (function() {
             if (pubs && pubs.length > 0) {
                 const pub = pubs[0];
                 
-                // Show pub details overlay
-                if (window.UIModule && window.UIModule.displayPubDetailsOverlay) {
-                    window.UIModule.displayPubDetailsOverlay(pub);
+                // Use UI module to display pub details
+                const uiModule = getUI();
+                if (uiModule && uiModule.displayPubDetailsOverlay) {
+                    console.log('✅ Using UI module to display pub details');
+                    uiModule.displayPubDetailsOverlay(pub);
                 } else {
-                    console.error('displayPubDetailsOverlay not found');
+                    console.log('🔧 UI module not ready, using direct DOM manipulation');
+                    // Fallback - direct DOM manipulation
+                    displayPubDetailsFallback(pub);
                 }
                 
                 return pub;
@@ -474,6 +479,39 @@ export const SearchModule = (function() {
                 window.showSuccessToast('Error loading pub details.');
             }
             return null;
+        }
+    };
+    
+    // ADD this fallback function to search.js
+    const displayPubDetailsFallback = (pub) => {
+        console.log('🔧 Using fallback pub details display for:', pub.name);
+        
+        // Show the pub details overlay
+        const overlay = document.getElementById('pubDetailsOverlay');
+        if (overlay) {
+            overlay.classList.add('active');
+            overlay.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            
+            // Populate the content
+            document.getElementById('pubDetailsTitle').textContent = pub.name;
+            document.getElementById('pubDetailsAddress').textContent = pub.address;
+            document.getElementById('pubDetailsLocation').textContent = `${pub.postcode} • ${pub.local_authority}`;
+            
+            // Set up beer details
+            const beerEl = document.getElementById('pubDetailsBeer');
+            if (pub.bottle || pub.tap || pub.cask || pub.can) {
+                let formats = [];
+                if (pub.bottle) formats.push('🍺 Bottles');
+                if (pub.tap) formats.push('🚰 Tap');
+                if (pub.cask) formats.push('🛢️ Cask');
+                if (pub.can) formats.push('🥫 Cans');
+                beerEl.innerHTML = `<strong>Available in: ${formats.join(', ')}</strong>`;
+            } else {
+                beerEl.innerHTML = '<em>No specific GF beer information available. Help us by reporting what you find!</em>';
+            }
+            
+            console.log('✅ Pub details displayed via fallback');
         }
     };
     
