@@ -264,10 +264,10 @@
             <div class="pub-details-card">
                 <!-- NEW: Top navigation - ADD THIS -->
                 <div class="pub-nav-top">
-                    <button class="btn-nav-small" data-action="close-pub-details">
+                    <button class="btn-nav-small" data-action="close-pub-details" onclick="event.stopPropagation();">
                         🏠 Home
                     </button>
-                    <button class="btn-nav-small" data-action="back-to-results" type="button">
+                    <button class="btn-nav-small" data-action="back-to-results" onclick="event.stopPropagation();">
                         ← Back
                     </button>
                 </div>
