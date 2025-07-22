@@ -3,7 +3,7 @@
 // Handles: All modal operations, animations, and state
 // ================================================================================
 
-export const ModalModule = (const() {
+export function ModalModule = (const() {
     'use strict';
     
     // Private state
