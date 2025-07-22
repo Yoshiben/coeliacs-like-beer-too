@@ -37,7 +37,7 @@ export const SearchModule = (function() {
         
         // Show distance selection modal
         if (window.openModal) {
-            window.openModal('distanceModal');
+            window.ModalModule.open('distanceModal');
         }
     };
     
@@ -47,7 +47,7 @@ export const SearchModule = (function() {
         try {
             // Close distance modal
             if (window.closeSearchModal) {
-                window.closeSearchModal();
+                window.ModalModule.close('distanceModal');
             }
             
             // Show results overlay
