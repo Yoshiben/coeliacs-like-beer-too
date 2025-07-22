@@ -439,7 +439,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2 class="modal-title" id="modalPubName">Help us locate this pub!</h2>
-                <button class="modal-close" onclick="closeModal('coordinateModal')" aria-label="Close coordinate modal">&times;</button>
+                <button class="modal-close" data-action="close-modal" aria-label="Close coordinate modal">&times;</button>
             </div>
             
             <div class="modal-body">
@@ -460,7 +460,7 @@
                     <button id="confirmLocation" class="btn btn-success">
                         ✅ Confirm Location
                     </button>
-                    <button id="cancelModal" class="btn btn-secondary" onclick="closeModal('coordinateModal')">
+                    <button id="cancelModal" class="btn btn-secondary" data-action="close-modal">
                         ❌ Cancel
                     </button>
                 </div>
@@ -501,7 +501,7 @@
                         <div class="selected-pub-card">
                             <strong id="selectedPubName"></strong>
                             <div id="selectedPubAddress"></div>
-                            <button type="button" onclick="clearSelectedPub()" class="btn btn-secondary btn-sm">
+                            <button type="button" data-action="clear-selected-pub" class="btn btn-secondary btn-sm">
                                 Choose Different Pub
                             </button>
                         </div>
@@ -588,7 +588,7 @@
                     
                     <!-- Form Actions (Sticky at bottom) -->
                     <div class="form-actions">
-                        <button type="button" onclick="closeModal('reportModal')" class="btn btn-secondary">
+                        <button class="modal-close" data-action="close-modal" aria-label="Close report modal">&times;</button>
                             Cancel
                         </button>
                         <button type="submit" class="btn btn-success">
@@ -728,7 +728,7 @@
             <div class="nav-label">Home</div>
         </a>
         
-        <a href="#" onclick="toggleSearchResultsFullMap(); return false;" class="nav-item">
+        <a href="#" data-action="toggle-results-map" class="nav-item">
             <div class="nav-icon">🗺️</div>
             <div class="nav-label">Map</div>
         </a>
