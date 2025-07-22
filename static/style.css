@@ -4088,6 +4088,95 @@ body {
 }
 
 /* ================================
+   🔧 ADD to the end of style.css
+   Fallback UI styles for initialization errors
+   ================================ */
+
+/* ================================
+   INITIALIZATION FALLBACK STYLES
+   ================================ */
+
+.initialization-fallback {
+    position: fixed;
+    top: var(--space-xl);
+    left: var(--space-xl);
+    right: var(--space-xl);
+    background: var(--warning-gradient);
+    color: var(--text-white);
+    padding: var(--space-lg);
+    border-radius: var(--radius-lg);
+    z-index: var(--z-toast);
+    font-family: system-ui;
+    text-align: center;
+    box-shadow: var(--shadow-lg);
+    backdrop-filter: blur(10px);
+    animation: slideInUp 0.3s ease-out;
+}
+
+.initialization-fallback strong {
+    display: block;
+    margin-bottom: var(--space-sm);
+    font-size: var(--text-lg);
+}
+
+.initialization-fallback .fallback-btn {
+    background: var(--text-white);
+    color: var(--warning-color, #f59e0b);
+    border: none;
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius);
+    margin-top: var(--space-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.initialization-fallback .fallback-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
+}
+
+.loading-error-fallback {
+    position: fixed;
+    top: var(--space-xl);
+    left: var(--space-xl);
+    right: var(--space-xl);
+    background: var(--error-gradient);
+    color: var(--text-white);
+    padding: var(--space-lg);
+    border-radius: var(--radius-lg);
+    z-index: var(--z-toast);
+    font-family: system-ui;
+    text-align: center;
+    box-shadow: var(--shadow-lg);
+    backdrop-filter: blur(10px);
+    animation: slideInUp 0.3s ease-out;
+}
+
+.loading-error-fallback strong {
+    display: block;
+    margin-bottom: var(--space-sm);
+    font-size: var(--text-lg);
+}
+
+.loading-error-fallback .fallback-btn {
+    background: var(--text-white);
+    color: var(--error-color, #ef4444);
+    border: none;
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius);
+    margin-top: var(--space-md);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.loading-error-fallback .fallback-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
+}
+
+/* ================================
    MOBILE RESPONSIVE - TABLETS
    ================================ */
 @media (max-width: 768px) {
@@ -4358,6 +4447,19 @@ body {
     .beer-search-suggestions {
         max-height: 250px;
         border-radius: var(--radius-lg);
+    }
+
+   .initialization-fallback,
+    .loading-error-fallback {
+        top: var(--space-md);
+        left: var(--space-md);
+        right: var(--space-md);
+        padding: var(--space-md);
+    }
+    
+    .initialization-fallback strong,
+    .loading-error-fallback strong {
+        font-size: var(--text-base);
     }
 }
 
