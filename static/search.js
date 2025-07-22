@@ -3,11 +3,6 @@
 // Handles: Location search, name search, area search, beer search
 // ================================================================================
 
-import { APIModule } from './api.js';
-import { MapModule } from './map.js';
-import { ModalModule } from './modals.js';
-import { TrackingModule } from './tracking.js';  // ADD THIS LINE
-
 export const SearchModule = (function() {
     'use strict';
     
@@ -16,14 +11,12 @@ export const SearchModule = (function() {
     let currentSearchPubs = [];
     let userLocation = null;
     
-    // Search type mapping (consolidating duplicates)
-    const searchTypeMap = {
-        'location': 'all',
-        'name': 'name',
-        'beer': 'all',
-        'area': 'area',
-        'postcode': 'postcode'
-    };
+// Get other modules through the app instead of imports
+    const getAPI = () => window.App?.getModule('api');
+    const getMap = () => window.App?.getModule('map');
+    const getModal = () => window.App?.getModule('modal');
+    const getTracking = () => window.App?.getModule('tracking');
+    const getUI = () => window.App?.getModule('ui');
     
     // =============================================================================
     // LOCATION SEARCH (Pubs Near Me)
