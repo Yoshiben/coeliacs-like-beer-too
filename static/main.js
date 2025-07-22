@@ -328,33 +328,46 @@ const App = {
                 }
                 break;
                 
-            // 🔧 ADD: Missing close-pub-details case  
             case 'close-pub-details':
-                console.log('🏠 Closing pub details...');
-                // Close pub details overlay
+                console.log('🏠 Closing pub details and going home...');
+                
+                // Prevent any other close actions from running
+                event.stopPropagation();
+                event.preventDefault();
+                
+                // Close pub details overlay first
                 const pubDetailsOverlay = document.getElementById('pubDetailsOverlay');
-                if (pubDetailsOverlay) {
+                if (pubDetailsOverlay && pubDetailsOverlay.classList.contains('active')) {
                     pubDetailsOverlay.style.display = 'none';
                     pubDetailsOverlay.classList.remove('active');
                     console.log('✅ Pub details overlay closed');
                 }
                 
-                // Close results overlay if it exists
+                // Close results overlay too (if it exists)
                 const resultsOverlay = document.getElementById('resultsOverlay');
-                if (resultsOverlay) {
+                if (resultsOverlay && resultsOverlay.classList.contains('active')) {
                     resultsOverlay.style.display = 'none';
                     resultsOverlay.classList.remove('active');
-                    console.log('✅ Results overlay closed');
+                    console.log('✅ Results overlay also closed');
                 }
                 
                 // Show home sections
                 const heroSection = document.querySelector('.hero-section');
                 const searchSection = document.querySelector('.search-section');
-                if (heroSection) heroSection.style.display = 'block';
-                if (searchSection) searchSection.style.display = 'flex';
+                if (heroSection) {
+                    heroSection.style.display = 'block';
+                    console.log('✅ Hero section restored');
+                }
+                if (searchSection) {
+                    searchSection.style.display = 'flex';
+                    console.log('✅ Search section restored');
+                }
                 
                 // Restore body scroll
                 document.body.style.overflow = '';
+                
+                // Update app state
+                this.state.currentView = 'home';
                 
                 // Track the action
                 const tracking = this.getModule('tracking');
