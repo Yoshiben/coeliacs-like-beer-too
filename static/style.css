@@ -4490,6 +4490,130 @@ body {
     height: 100% !important;
 }
 
+/* Location accuracy indicators */
+.location-accuracy-indicator {
+    position: fixed;
+    top: var(--space-lg);
+    left: var(--space-md);
+    right: var(--space-md);
+    background: rgba(102, 126, 234, 0.95);
+    color: var(--text-white);
+    padding: var(--space-sm) var(--space-md);
+    border-radius: var(--radius-lg);
+    font-size: var(--text-sm);
+    z-index: var(--z-toast);
+    backdrop-filter: blur(10px);
+    text-align: center;
+    animation: slideInUp 0.3s ease-out;
+}
+
+.location-accuracy-indicator.excellent {
+    background: rgba(16, 185, 129, 0.95);
+}
+
+.location-accuracy-indicator.good {
+    background: rgba(59, 130, 246, 0.95);
+}
+
+.location-accuracy-indicator.poor {
+    background: rgba(245, 158, 11, 0.95);
+}
+
+.location-accuracy-indicator.terrible {
+    background: rgba(239, 68, 68, 0.95);
+}
+
+/* GPS searching indicator */
+.gps-searching {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: var(--text-white);
+    padding: var(--space-xl);
+    border-radius: var(--radius-xl);
+    text-align: center;
+    z-index: var(--z-modal-backdrop);
+    backdrop-filter: blur(10px);
+}
+
+.gps-searching .gps-icon {
+    font-size: 3rem;
+    margin-bottom: var(--space-md);
+    animation: pulse 2s infinite;
+}
+
+.gps-searching .gps-text {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    margin-bottom: var(--space-sm);
+}
+
+.gps-searching .gps-subtext {
+    font-size: var(--text-sm);
+    opacity: 0.8;
+}
+
+/* Location permission prompt styling */
+.location-permission-prompt {
+    position: fixed;
+    bottom: var(--space-xl);
+    left: var(--space-md);
+    right: var(--space-md);
+    background: var(--bg-white);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+    padding: var(--space-lg);
+    z-index: var(--z-toast);
+    border-left: 4px solid var(--primary-color, #667eea);
+}
+
+.location-permission-prompt .prompt-title {
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-sm);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.location-permission-prompt .prompt-text {
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    line-height: 1.4;
+    margin-bottom: var(--space-md);
+}
+
+.location-permission-prompt .prompt-actions {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.location-permission-prompt .btn {
+    flex: 1;
+    min-height: 40px;
+    font-size: var(--text-sm);
+}
+
+/* Landscape mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+    .gps-searching {
+        top: 30%;
+        transform: translate(-50%, -30%);
+        padding: var(--space-lg);
+    }
+    
+    .gps-searching .gps-icon {
+        font-size: 2rem;
+        margin-bottom: var(--space-sm);
+    }
+    
+    .location-permission-prompt {
+        bottom: var(--space-lg);
+    }
+}
+
 /* ================================
    MOBILE RESPONSIVE - TABLETS
    ================================ */
@@ -4833,6 +4957,33 @@ body {
     .modal-form .form-actions .btn {
         min-height: 44px;
         padding: var(--space-sm);
+    }
+
+   .location-accuracy-indicator {
+        top: var(--space-sm);
+        left: var(--space-xs);
+        right: var(--space-xs);
+        padding: var(--space-xs) var(--space-sm);
+        font-size: var(--text-xs);
+    }
+    
+    .gps-searching {
+        padding: var(--space-lg);
+    }
+    
+    .gps-searching .gps-icon {
+        font-size: 2.5rem;
+    }
+    
+    .gps-searching .gps-text {
+        font-size: var(--text-base);
+    }
+    
+    .location-permission-prompt {
+        bottom: var(--space-md);
+        left: var(--space-xs);
+        right: var(--space-xs);
+        padding: var(--space-md);
     }
 }
 
