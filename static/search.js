@@ -483,35 +483,61 @@ export const SearchModule = (function() {
     };
     
     // ADD this fallback function to search.js
+    // REPLACE the displayPubDetailsFallback function in search.js
     const displayPubDetailsFallback = (pub) => {
         console.log('🔧 Using fallback pub details display for:', pub.name);
         
-        // Show the pub details overlay
+        // FORCE: Hide results overlay first
+        const resultsOverlay = document.getElementById('resultsOverlay');
+        if (resultsOverlay) {
+            resultsOverlay.style.display = 'none';
+            resultsOverlay.classList.remove('active');
+            console.log('🔧 Hidden results overlay');
+        }
+        
+        // FORCE: Show the pub details overlay with maximum priority
         const overlay = document.getElementById('pubDetailsOverlay');
         if (overlay) {
-            overlay.classList.add('active');
+            overlay.style.position = 'fixed';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100%';
+            overlay.style.height = '100vh';
+            overlay.style.zIndex = '9999';
+            overlay.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
             overlay.style.display = 'flex';
+            overlay.classList.add('active');
             document.body.style.overflow = 'hidden';
             
+            console.log('🔧 Forced overlay visibility with z-index 9999');
+            
             // Populate the content
-            document.getElementById('pubDetailsTitle').textContent = pub.name;
-            document.getElementById('pubDetailsAddress').textContent = pub.address;
-            document.getElementById('pubDetailsLocation').textContent = `${pub.postcode} • ${pub.local_authority}`;
+            const titleEl = document.getElementById('pubDetailsTitle');
+            const addressEl = document.getElementById('pubDetailsAddress');
+            const locationEl = document.getElementById('pubDetailsLocation');
+            const beerEl = document.getElementById('pubDetailsBeer');
+            
+            if (titleEl) titleEl.textContent = pub.name;
+            if (addressEl) addressEl.textContent = pub.address;
+            if (locationEl) locationEl.textContent = `${pub.postcode} • ${pub.local_authority}`;
             
             // Set up beer details
-            const beerEl = document.getElementById('pubDetailsBeer');
-            if (pub.bottle || pub.tap || pub.cask || pub.can) {
-                let formats = [];
-                if (pub.bottle) formats.push('🍺 Bottles');
-                if (pub.tap) formats.push('🚰 Tap');
-                if (pub.cask) formats.push('🛢️ Cask');
-                if (pub.can) formats.push('🥫 Cans');
-                beerEl.innerHTML = `<strong>Available in: ${formats.join(', ')}</strong>`;
-            } else {
-                beerEl.innerHTML = '<em>No specific GF beer information available. Help us by reporting what you find!</em>';
+            if (beerEl) {
+                if (pub.bottle || pub.tap || pub.cask || pub.can) {
+                    let formats = [];
+                    if (pub.bottle) formats.push('🍺 Bottles');
+                    if (pub.tap) formats.push('🚰 Tap');
+                    if (pub.cask) formats.push('🛢️ Cask');
+                    if (pub.can) formats.push('🥫 Cans');
+                    beerEl.innerHTML = `<strong>Available in: ${formats.join(', ')}</strong>`;
+                } else {
+                    beerEl.innerHTML = '<em>No specific GF beer information available. Help us by reporting what you find!</em>';
+                }
             }
             
-            console.log('✅ Pub details displayed via fallback');
+            console.log('✅ Pub details populated and forced visible');
+        } else {
+            console.error('❌ pubDetailsOverlay element not found in DOM');
         }
     };
     
