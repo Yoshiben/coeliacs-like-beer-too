@@ -20,7 +20,7 @@ export const MapModule = (function() {
         defaultCenter: [54.5, -3], // UK center
         defaultZoom: 6,
         maxZoom: 19,
-        pubMarkerRadius: 12,
+        pubMarkerRadius: 8,
         userMarkerRadius: 8,
         tileLayer: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
         attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -364,39 +364,39 @@ export const MapModule = (function() {
     };
     
     const getMarkerStyleForGFStatus = (gfStatus) => {
-        const baseStyle = {
-            weight: 2,
-            opacity: 1,
-            fillOpacity: 0.9
-        };
-        
-        switch(gfStatus) {
-            case 'gf_available':
-                return {
-                    ...baseStyle,
-                    radius: 10,
-                    fillColor: 'var(--marker-gf-fill)',
-                    color: 'var(--marker-gf-stroke)'
-                };
-                
-            case 'no_gf':
-                return {
-                    ...baseStyle,
-                    radius: 10,
-                    fillColor: 'var(--marker-no-gf-fill)',
-                    color: 'var(--marker-no-gf-stroke)'
-                };
-                
-            case 'unknown':
-            default:
-                return {
-                    ...baseStyle,
-                    radius: 8,
-                    fillColor: 'var(--marker-unknown-fill)',
-                    color: 'var(--marker-unknown-stroke)'
-                };
-        }
+    const rootStyles = getComputedStyle(document.documentElement);
+    
+    const baseStyle = {
+        weight: parseInt(rootStyles.getPropertyValue('--marker-stroke-width')) || 2,
+        opacity: 1,
+        fillOpacity: 0.9,
+        radius: parseInt(rootStyles.getPropertyValue('--marker-radius')) || 8
     };
+    
+    switch(gfStatus) {
+        case 'gf_available':
+            return {
+                ...baseStyle,
+                fillColor: rootStyles.getPropertyValue('--marker-gf-fill').trim() || '#10b981',
+                color: rootStyles.getPropertyValue('--marker-gf-stroke').trim() || '#ffffff'
+            };
+            
+        case 'no_gf':
+            return {
+                ...baseStyle,
+                fillColor: rootStyles.getPropertyValue('--marker-no-gf-fill').trim() || '#ef4444',
+                color: rootStyles.getPropertyValue('--marker-no-gf-stroke').trim() || '#ffffff'
+            };
+            
+        case 'unknown':
+        default:
+            return {
+                ...baseStyle,
+                fillColor: rootStyles.getPropertyValue('--marker-unknown-fill').trim() || '#9ca3af',
+                color: rootStyles.getPropertyValue('--marker-unknown-stroke').trim() || '#ffffff'
+            };
+    }
+};
     
     const createPubPopupContent = (pub, gfStatus = null) => {
         if (!gfStatus) {
