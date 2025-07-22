@@ -760,6 +760,9 @@ export const SearchModule = (function() {
     };
     
     const createResultItemForOverlay = (pub) => {
+        console.log('Pub object:', pub);  // ADD THIS
+        console.log('Pub ID:', pub.pub_id, 'Type:', typeof pub.pub_id);  // AND THIS
+        
         const template = document.getElementById('pub-result-template');
         const clone = template.content.cloneNode(true);
         
