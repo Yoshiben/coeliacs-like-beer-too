@@ -796,6 +796,16 @@ export const SearchModule = (function() {
         
         return div;
     };
+
+    const showPubDetails = (pubId) => {
+    console.log('🏠 Showing pub details:', pubId);
+    if (window.showPubDetails) {
+        window.showPubDetails(pubId);
+    } else {
+        // Fallback - just call the search
+        searchSpecificPub(pubId);
+    }
+};
     
     // =============================================================================
     // PUBLIC API
@@ -829,6 +839,7 @@ export const SearchModule = (function() {
         restoreNameSearch,
         restoreAreaSearch,
         restoreBeerSearch,
+        showPubDetails,
         
         // Get current results
         getCurrentResults: () => currentSearchPubs,
