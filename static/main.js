@@ -245,6 +245,11 @@ const App = {
     },
     
     // 🔧 ADD MISSING COMMA here if needed
+    // ================================
+    // 🔧 UPDATE: In main.js - Fix handleAction function
+    // LOCATION: Replace the handleAction case for 'search-name'
+    // ================================
+    
     handleAction(action, element, event) {
         console.log(`🎬 Processing action: ${action}`);
         
@@ -261,23 +266,26 @@ const App = {
                 break;
                 
             case 'search-name':
-                console.log('🏠 Opening name search modal...');
-                if (modalModule?.openSearchModal) {
-                    modalModule.openSearchModal('name');
+                console.log('🔍 Performing name search...');
+                // This should PERFORM the search, not open the modal
+                if (searchModule?.searchByName) {
+                    searchModule.searchByName();
                 }
                 break;
                 
             case 'search-area':
-                console.log('🗺️ Opening area search modal...');
-                if (modalModule?.openSearchModal) {
-                    modalModule.openSearchModal('area');
+                console.log('🔍 Performing area search...');
+                // This should PERFORM the search, not open the modal  
+                if (searchModule?.searchByArea) {
+                    searchModule.searchByArea();
                 }
                 break;
                 
             case 'search-beer':
-                console.log('🍺 Opening beer search modal...');
-                if (modalModule?.openSearchModal) {
-                    modalModule.openSearchModal('beer');
+                console.log('🔍 Performing beer search...');
+                // This should PERFORM the search, not open the modal
+                if (searchModule?.searchByBeer) {
+                    searchModule.searchByBeer();
                 }
                 break;
                 
@@ -322,7 +330,7 @@ const App = {
                 console.log(`❓ Unhandled action: ${action}`);
                 break;
         }
-    },
+    }
     
     // 🔧 ADD MISSING COMMA here if needed
     handleDistanceSelection(distance) {
