@@ -69,6 +69,7 @@ const App = {
         }
     },
     
+    // 🔧 ADD MISSING COMMA here if needed
     async loadPhase1() {
         console.log('🔧 Phase 1: Loading Core Utilities...');
         
@@ -82,6 +83,7 @@ const App = {
         window.animateNumber = UtilsModule.animateNumber;
     },
     
+    // 🔧 ADD MISSING COMMA here if needed
     async loadPhase2() {
         console.log('🔧 Phase 2: Loading Data Layer...');
         
@@ -95,6 +97,7 @@ const App = {
         await this.loadStats();
     },
     
+    // 🔧 ADD MISSING COMMA here if needed
     async loadPhase3() {
         console.log('🔧 Phase 3: Loading UI Layer...');
         
@@ -108,6 +111,7 @@ const App = {
         this.setupEventDelegation();
     },
     
+    // 🔧 ADD MISSING COMMA here if needed
     async loadPhase4() {
         console.log('🔧 Phase 4: Loading Features...');
         
@@ -123,6 +127,7 @@ const App = {
         this.setupGlobalFunctions();
     },
     
+    // 🔧 ADD MISSING COMMA here if needed
     async loadStats() {
         try {
             const api = this.getModule('api');
@@ -140,6 +145,7 @@ const App = {
         }
     },
     
+    // 🔧 ADD MISSING COMMA here if needed
     setupEventDelegation() {
         console.log('🔧 Setting up fixed event delegation...');
         
@@ -225,6 +231,7 @@ const App = {
         console.log('✅ Event delegation setup complete');
     },
     
+    // 🔧 ADD MISSING COMMA here if needed
     setupGlobalFunctions() {
         // Set up functions that templates expect without circular imports
         window.closeResults = () => this.getModule('ui')?.closeResults?.();
@@ -237,14 +244,7 @@ const App = {
         window.acceptEssentialOnly = () => this.handleCookieConsent(false);
     },
     
-    // Event handlers without circular dependencies
-    handleModalTrigger(modalId) {
-        const modal = this.getModule('modal');
-        if (modal) {
-            modal.open(modalId);
-        }
-    },
-    
+    // 🔧 ADD MISSING COMMA here if needed
     handleAction(action, element, event) {
         console.log(`🎬 Processing action: ${action}`);
         
@@ -324,6 +324,7 @@ const App = {
         }
     },
     
+    // 🔧 ADD MISSING COMMA here if needed
     handleDistanceSelection(distance) {
         console.log(`📍 Distance ${distance}km selected`);
         
@@ -349,13 +350,7 @@ const App = {
         }
     },
     
-    handleFormSubmission(e) {
-        const form = this.getModule('form');
-        if (form) {
-            form.handleReportSubmission(e);
-        }
-    },
-    
+    // 🔧 ADD MISSING COMMA here if needed
     handleCookieConsent(analyticsAllowed) {
         const utils = this.getModule('utils');
         const tracking = this.getModule('tracking');
@@ -377,7 +372,8 @@ const App = {
         
         utils.showSuccessToast('✅ Cookie preferences saved!');
     },
-
+    
+    // 🔧 ADD MISSING COMMA here if needed
     toggleResultsMapFallback() {
         const listContainer = document.getElementById('resultsListContainer');
         const mapContainer = document.getElementById('resultsMapContainer');
@@ -400,11 +396,7 @@ const App = {
         }
     },
     
-    // ================================
-    // 🔧 ADD: Proper modal closing function
-    // LOCATION: Add to main.js
-    // ================================
-    
+    // 🔧 ADD MISSING COMMA here if needed
     closeModal(modalId) {
         if (!modalId) return;
         
@@ -415,9 +407,9 @@ const App = {
             document.body.style.overflow = '';
             console.log(`✅ Modal ${modalId} closed`);
         }
-    }
-
+    },
     
+    // 🔧 ENSURE THIS HAS A COMMA if there are more methods after it
     showFallback(error) {
         const fallbackDiv = document.createElement('div');
         fallbackDiv.className = 'initialization-fallback';
@@ -432,6 +424,8 @@ const App = {
         
         setTimeout(() => fallbackDiv.remove(), 10000);
     }
+    
+    // 🔧 MAKE SURE: No comma after the last method in the object
 };
 
 // ================================
