@@ -1,219 +1,167 @@
 /* ================================
-   COELIACS LIKE BEER TOO - REWRITTEN CSS
-   Professional Design System with Variables
+   CSS ORGANIZATION IMPROVEMENT
+   ADD: Better variable grouping at top of style.css
    ================================ */
 
-/* ================================
-   DESIGN SYSTEM - CSS VARIABLES
-   ================================ */
 :root {
-    /* Brand Colors & Gradients */
-    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    --error-gradient: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-    --warning-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    --info-gradient: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-    --purple-gradient: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    /* ================================
+       CORE BRAND SYSTEM
+       ================================ */
+    --brand-primary: #667eea;
+    --brand-secondary: #764ba2;
+    --brand-success: #10b981;
+    --brand-warning: #f59e0b;
+    --brand-error: #ef4444;
+    --brand-info: #3b82f6;
     
-    /* Text Colors */
+    /* ================================
+       GRADIENT SYSTEM
+       ================================ */
+    --primary-gradient: linear-gradient(135deg, var(--brand-primary) 0%, var(--brand-secondary) 100%);
+    --success-gradient: linear-gradient(135deg, var(--brand-success) 0%, #059669 100%);
+    --error-gradient: linear-gradient(135deg, var(--brand-error) 0%, #dc2626 100%);
+    --warning-gradient: linear-gradient(135deg, var(--brand-warning) 0%, #d97706 100%);
+    --info-gradient: linear-gradient(135deg, var(--brand-info) 0%, #1d4ed8 100%);
+    
+    /* ================================
+       SEMANTIC COLORS
+       ================================ */
     --text-primary: #2d3748;
     --text-secondary: #4a5568;
     --text-muted: #718096;
     --text-white: #ffffff;
     
-    /* Background Colors */
     --bg-white: rgba(255, 255, 255, 0.95);
     --bg-glass: rgba(255, 255, 255, 0.1);
     --bg-section: rgba(248, 250, 252, 0.8);
     --bg-overlay: rgba(0, 0, 0, 0.8);
     
-    /* Button System */
-    --btn-height: 44px;           /* Mobile-first */
-    --btn-height-sm: 36px;
-    --btn-height-lg: 56px;
-    --btn-padding: 12px 20px;
-    --btn-padding-sm: 8px 16px;
-    --btn-padding-lg: 16px 24px;
+    --border-light: rgba(0, 0, 0, 0.1);
+    --border-medium: rgba(0, 0, 0, 0.2);
+    --border-strong: rgba(0, 0, 0, 0.3);
     
-    /* Spacing System */
-    --space-xs: 4px;
-    --space-sm: 8px;
-    --space-md: 12px;
-    --space-lg: 16px;
-    --space-xl: 20px;
-    --space-2xl: 24px;
-    --space-3xl: 32px;
-    --space-4xl: 40px;
+    /* ================================
+       COMPONENT-SPECIFIC COLORS
+       ================================ */
+    --search-location-bg: rgba(16, 185, 129, 0.1);
+    --search-location-border: rgba(16, 185, 129, 0.2);
+    --search-location-hover: rgba(16, 185, 129, 0.3);
     
-    /* Border Radius */
-    --radius-sm: 8px;
-    --radius: 12px;
-    --radius-lg: 15px;
+    --search-name-bg: rgba(59, 130, 246, 0.1);
+    --search-name-border: rgba(59, 130, 246, 0.2);
+    --search-name-hover: rgba(59, 130, 246, 0.3);
+    
+    --search-beer-bg: rgba(245, 158, 11, 0.1);
+    --search-beer-border: rgba(245, 158, 11, 0.2);
+    --search-beer-hover: rgba(245, 158, 11, 0.3);
+    
+    --search-area-bg: rgba(139, 92, 246, 0.1);
+    --search-area-border: rgba(139, 92, 246, 0.2);
+    --search-area-hover: rgba(139, 92, 246, 0.3);
+    
+    /* ================================
+       SPACING SYSTEM (8px base)
+       ================================ */
+    --space-xs: 4px;   /* 0.25rem */
+    --space-sm: 8px;   /* 0.5rem */
+    --space-md: 12px;  /* 0.75rem */
+    --space-lg: 16px;  /* 1rem */
+    --space-xl: 20px;  /* 1.25rem */
+    --space-2xl: 24px; /* 1.5rem */
+    --space-3xl: 32px; /* 2rem */
+    --space-4xl: 40px; /* 2.5rem */
+    --space-5xl: 48px; /* 3rem */
+    --space-6xl: 64px; /* 4rem */
+    
+    /* ================================
+       TYPOGRAPHY SCALE
+       ================================ */
+    --text-xs: 0.75rem;   /* 12px */
+    --text-sm: 0.875rem;  /* 14px */
+    --text-base: 1rem;    /* 16px */
+    --text-lg: 1.125rem;  /* 18px */
+    --text-xl: 1.25rem;   /* 20px */
+    --text-2xl: 1.5rem;   /* 24px */
+    --text-3xl: 1.875rem; /* 30px */
+    --text-4xl: 2.25rem;  /* 36px */
+    --text-5xl: 3rem;     /* 48px */
+    
+    /* ================================
+       BORDER RADIUS SYSTEM
+       ================================ */
+    --radius-sm: 4px;
+    --radius: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
     --radius-xl: 20px;
-    --radius-pill: 25px;
+    --radius-2xl: 24px;
+    --radius-pill: 50px;
     
-    /* Shadows */
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
-    --shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.2);
-    --shadow-xl: 0 12px 40px rgba(0, 0, 0, 0.25);
+    /* ================================
+       SHADOW SYSTEM
+       ================================ */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --shadow-lg: 0 8px 25px rgba(0, 0, 0, 0.15);
+    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
+    --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.25);
     
-    /* Z-Index Scale */
+    /* Component-specific shadows */
+    --shadow-primary: 0 4px 15px rgba(102, 126, 234, 0.3);
+    --shadow-success: 0 4px 15px rgba(16, 185, 129, 0.3);
+    --shadow-error: 0 4px 15px rgba(239, 68, 68, 0.3);
+    
+    /* ================================
+       Z-INDEX SCALE
+       ================================ */
     --z-base: 1;
-    --z-dropdown: 100;
-    --z-search-suggestions: 150;
-    --z-sticky: 200;
-    --z-toast: 900;
-    --z-modal-backdrop: 1000;
-    --z-modal-content: 1010;
-    --z-cookie: 1100;
+    --z-dropdown: 10;
+    --z-sticky: 20;
+    --z-fixed: 30;
+    --z-overlay: 40;
+    --z-modal: 50;
+    --z-toast: 60;
+    --z-tooltip: 70;
     
-    /* Transitions */
+    /* ================================
+       TRANSITION SYSTEM
+       ================================ */
     --transition-fast: 0.15s ease-out;
     --transition: 0.25s ease-out;
     --transition-slow: 0.4s ease-out;
+    --transition-bounce: 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     
-    /* Typography Scale */
-    --text-xs: 0.75rem;
-    --text-sm: 0.875rem;
-    --text-base: 1rem;
-    --text-lg: 1.125rem;
-    --text-xl: 1.25rem;
-    --text-2xl: 1.5rem;
-    --text-3xl: 1.875rem;
-    --text-4xl: 2.25rem;
+    /* ================================
+       BREAKPOINT VARIABLES (for JS)
+       ================================ */
+    --breakpoint-sm: 640px;
+    --breakpoint-md: 768px;
+    --breakpoint-lg: 1024px;
+    --breakpoint-xl: 1280px;
     
-    /* Container Widths */
-    --container-sm: 640px;
-    --container-md: 768px;
-    --container-lg: 1024px;
-    --container-xl: 1200px;
-
-   /* Dividers, borders & hovers */
-    --divider-color: rgba(102, 126, 234, 0.1);
-    --border-light: rgba(0, 0, 0, 0.1);    
-    --hover-subtle: rgba(102, 126, 234, 0.05);
-
-   /* Map marker colors */
-    --marker-pub-fill: #4CAF50;
-    --marker-pub-stroke: #ffffff;
-    --marker-user-fill: #667eea;
-    --marker-user-stroke: #ffffff;
-    
-    /* Map marker sizes */
-    --marker-pub-radius: 12;
-    --marker-user-radius: 8;
-    --marker-stroke-width: 3;
-
-   /* Search option colors */
-    --search-location-bg: rgba(16, 185, 129, 0.1);
-    --search-location-bg-light: rgba(5, 150, 105, 0.05);
-    --search-location-border: rgba(16, 185, 129, 0.2);
-    --search-location-border-hover: rgba(16, 185, 129, 0.4);
-    
-    --search-name-bg: rgba(59, 130, 246, 0.1);
-    --search-name-bg-light: rgba(29, 78, 216, 0.05);
-    --search-name-border: rgba(59, 130, 246, 0.2);
-    --search-name-border-hover: rgba(59, 130, 246, 0.4);
-    
-    --search-beer-bg: rgba(245, 158, 11, 0.1);
-    --search-beer-bg-light: rgba(217, 119, 6, 0.05);
-    --search-beer-border: rgba(245, 158, 11, 0.2);
-    --search-beer-border-hover: rgba(245, 158, 11, 0.4);
-    
-    --search-area-bg: rgba(139, 92, 246, 0.1);
-    --search-area-bg-light: rgba(124, 58, 237, 0.05);
-    --search-area-border: rgba(139, 92, 246, 0.2);
-    --search-area-border-hover: rgba(139, 92, 246, 0.4);
-
-   /* Modal Variables */
-    --modal-backdrop: rgba(0, 0, 0, 0.8);
-    --modal-blur: blur(5px);
-    --modal-padding-mobile: var(--space-lg);
-    --modal-padding-top: 15vh;
-    --modal-border-radius: var(--radius-xl);
-
-   /* Enhanced Success Colors */
-    --success-bg: rgba(16, 185, 129, 0.1);
-    --success-bg-light: rgba(5, 150, 105, 0.05);
-    --success-border: rgba(16, 185, 129, 0.2);
-    --success-border-strong: rgba(16, 185, 129, 0.6);
-    --success-shadow: rgba(16, 185, 129, 0.3);
-    
-    /* Enhanced Primary Colors */
-    --primary-bg: rgba(102, 126, 234, 0.1);
-    --primary-border: rgba(102, 126, 234, 0.2);
-    --primary-border-strong: rgba(102, 126, 234, 0.3);
-    --primary-shadow: rgba(102, 126, 234, 0.3);
-    
-    /* Enhanced Purple Colors */
-    --purple-bg: rgba(139, 92, 246, 0.1);
-    --purple-border: rgba(139, 92, 246, 0.3);
-    --purple-shadow: rgba(139, 92, 246, 0.1);
-    --purple-shadow-strong: rgba(139, 92, 246, 0.4);
-    
-    /* Enhanced Blue Colors */
-    --blue-shadow: rgba(59, 130, 246, 0.3);
-    
-    /* Enhanced Gray Colors */
-    --gray-bg: rgba(156, 163, 175, 0.1);
-    --gray-border: rgba(156, 163, 175, 0.2);
-    
-    /* Glass/Backdrop Effects */
-    --glass-white: rgba(255, 255, 255, 0.9);
-    --glass-overlay: rgba(255, 255, 255, 0.2);
-    
-    /* Enhanced Shadows */
-    --shadow-primary: 0 4px 15px var(--primary-shadow);
-    --shadow-success: 0 4px 15px var(--success-shadow);
-    --shadow-purple: 0 4px 15px var(--purple-shadow);
-    --shadow-blue: 0 4px 15px var(--blue-shadow);
-    
-    /* Text Colors Enhanced */
-    --success-text: #10b981;
-    --purple-text: #8b5cf6;
-
-   /* Report Modal Colors */
-   --report-modal-bg: rgba(255, 255, 255, 0.98);
-   --report-modal-border: rgba(102, 126, 234, 0.1);
-   --report-form-bg: rgba(248, 250, 252, 0.5);
-   --report-input-focus: rgba(102, 126, 234, 0.1);
-   
-   /* Selected Pub Card */
-   --selected-pub-bg: rgba(16, 185, 129, 0.1);
-   --selected-pub-border: rgba(16, 185, 129, 0.2);
-   --selected-pub-text: var(--success-text);
-   
-   /* New Pub Fields */
-   --new-pub-bg: rgba(59, 130, 246, 0.05);
-   --new-pub-border: rgba(59, 130, 246, 0.1);
-   
-   /* Photo Upload */
-   --photo-upload-bg: var(--bg-section);
-   --photo-upload-border: var(--border-light);
-   --photo-upload-hover: rgba(102, 126, 234, 0.05);
-   --photo-upload-active: var(--success-bg);
-   --photo-upload-active-border: var(--success-border);
-   
-   /* Dropdown Suggestions */
-   --suggestion-bg: var(--bg-white);
-   --suggestion-hover: var(--hover-subtle);
-   --suggestion-border: var(--border-light);
+    /* ================================
+       RESPONSIVE SPACING
+       ================================ */
+    --container-padding: var(--space-lg);
+    --section-padding: var(--space-3xl);
 }
 
-/* Desktop Adjustments */
+/* ================================
+   DESKTOP ADJUSTMENTS
+   ================================ */
 @media (min-width: 768px) {
     :root {
-        --btn-height: 48px;
-        --btn-padding: 14px 24px;
-        --space-lg: 20px;
-        --space-xl: 24px;
-        --space-2xl: 32px;
+        --container-padding: var(--space-2xl);
+        --section-padding: var(--space-5xl);
+        
+        /* Larger spacing for desktop */
         --space-3xl: 40px;
-        --space-4xl: 60px;
+        --space-4xl: 56px;
+        --space-5xl: 64px;
+        --space-6xl: 80px;
     }
 }
-
 /* ================================
    RESET & BASE STYLES
    ================================ */
@@ -4236,268 +4184,5 @@ body {
     /* Hide search section when results are active */
     body:has(.results-overlay.active) .search-section {
         display: none !important;
-    }
-}
-
- /* ====================
-   MOBILE OPTIMIZATIONS
-   ==================== */
-@media (max-width: 480px) {
-    #reportModal {
-        padding: var(--space-sm);
-    }
-
-   .suggestions .suggestion-item {
-        padding: var(--space-sm) var(--space-md);
-    }
-    
-    .suggestions .suggestion-item:hover {
-        padding-left: calc(var(--space-md) - 3px);
-    }
-   
-    .modal {
-        padding: 4px !important;
-    }
-    
-    .modal-content {
-        margin: 2vh auto !important;
-        max-height: 96vh !important;
-    }
-    
-    .modal-header {
-        padding: 12px 16px 8px !important;
-    }
-    
-    .modal-body {
-        padding: 0 16px 12px !important;
-    }
-    
-    .modal-form {
-        gap: 10px !important;
-    }
-    
-    .form-input,
-    .form-select {
-        min-height: 40px !important;
-        padding: 8px 14px !important;
-        font-size: 16px !important; /* Prevent zoom on iOS */
-    }
-    
-    .brewery-beer-row {
-        gap: 8px !important;
-    }
-    
-    .form-actions {
-        gap: 8px !important;
-        padding: 12px 0 0 !important;
-    }
-    
-    #reportModal .modal-content {
-        margin: 1vh auto;
-        max-height: 98vh;
-        border-radius: var(--radius-lg);
-    }
-    
-    #reportModal .modal-header {
-        padding: var(--space-md) var(--space-md) var(--space-sm);
-    }
-    
-    #reportModal .modal-title {
-        font-size: var(--text-xl);
-        line-height: 1.3;
-    }
-    
-    #reportModal .modal-body {
-        padding: var(--space-sm) var(--space-md) var(--space-md);
-    }
-    
-    .modal-form {
-        gap: var(--space-sm);
-    }
-    
-    .form-group {
-        gap: 6px;
-    }
-    
-    .form-label {
-        font-size: var(--text-xs);
-        margin-bottom: 4px;
-    }
-    
-    .modal-form .form-input,
-    .modal-form .form-select {
-        min-height: 44px;
-        padding: var(--space-md);
-        font-size: 16px; /* Prevents zoom on iOS */
-        border-radius: var(--radius);
-    }
-    
-    .selected-pub-card,
-    .new-pub-fields {
-        padding: var(--space-md);
-        margin: var(--space-md) 0;
-    }
-    
-    .photo-upload-compact {
-        min-height: 40px;
-        max-height: 40px;
-        padding: var(--space-sm);
-    }
-    
-    .photo-upload-icon {
-        font-size: 1.2rem;
-    }
-    
-    .photo-upload-text {
-        flex: none;
-    }
-    
-    .photo-upload-text strong {
-        font-size: var(--text-xs);
-    }
-    
-    .photo-upload-text small {
-        font-size: 0.65rem;
-    }
-    
-    .modal-form .form-actions {
-        gap: var(--space-sm);
-        padding-top: var(--space-md);
-        margin-top: var(--space-md);
-    }
-    
-    .modal-form .form-actions .btn {
-        min-height: 48px;
-        font-size: var(--text-base);
-        padding: var(--space-md);
-    }
-
-   #areaModal .form-group {
-        margin-bottom: var(--space-lg);
-    }
-    
-    #areaModal .form-input {
-        margin-top: var(--space-md);
-    }
-    
-    #areaModal .modal-header {
-        padding-bottom: var(--space-lg);
-    }
-    
-    #areaModal .modal-actions {
-        margin-top: var(--space-lg);
-        padding-top: var(--space-md);
-    }
-  
-    /* Dropdown suggestions mobile optimization */
-    .brewery-suggestions,
-    .beer-suggestions,
-    .style-suggestions {
-        max-height: 150px;
-        font-size: var(--text-sm);
-    }
-    
-    .brewery-suggestions .suggestion-item,
-    .beer-suggestions .suggestion-item,
-    .style-suggestions .suggestion-item {
-        padding: var(--space-sm) var(--space-md);
-        font-size: var(--text-xs);
-    }
-
-   #breweryDropdown,
-    #beerNameDropdown,
-    #beerStyleDropdown {
-        max-height: 250px;
-        border-radius: var(--radius-lg);
-    }
-    
-    .dropdown-header {
-        padding: var(--space-xs) var(--space-md);
-        font-size: 0.7rem;
-    }
-    
-    .beer-item,
-    .brewery-item {
-        padding: var(--space-md);
-    }
-    
-    .beer-item:hover,
-    .brewery-item:hover {
-        padding-left: calc(var(--space-md) - 3px);
-        border-left: 3px solid var(--primary-gradient);
-    }
-
-   beerModal .form-group {
-        margin-bottom: var(--space-lg);
-    }
-    
-    #beerModal .form-input {
-        margin-top: var(--space-md);
-    }
-    
-    #beerModal .modal-header {
-        padding-bottom: var(--space-lg);
-    }
-    
-    #beerModal .modal-actions {
-        margin-top: var(--space-lg);
-        padding-top: var(--space-md);
-    }
-    
-    .beer-search-suggestions {
-        max-height: 250px;
-        border-radius: var(--radius-lg);
-    }
-
-   .initialization-fallback,
-    .loading-error-fallback {
-        top: var(--space-md);
-        left: var(--space-md);
-        right: var(--space-md);
-        padding: var(--space-md);
-    }
-    
-    .initialization-fallback strong,
-    .loading-error-fallback strong {
-        font-size: var(--text-base);
-    }
-}
-
-/* ================================
-   VERY SMALL SCREENS
-   ================================ */
-@media (max-width: 360px) {
-    #reportModal .modal-content {
-        max-height: 99vh;
-        margin: 0.5vh auto;
-    }
-    
-    #reportModal .modal-header {
-        padding: var(--space-sm);
-    }
-    
-    #reportModal .modal-title {
-        font-size: var(--text-lg);
-    }
-    
-    #reportModal .modal-body {
-        padding: var(--space-xs) var(--space-sm) var(--space-sm);
-    }
-    
-    .modal-form .form-input,
-    .modal-form .form-select {
-        min-height: 40px;
-        padding: var(--space-sm);
-        font-size: 16px;
-    }
-    
-    .selected-pub-card,
-    .new-pub-fields {
-        padding: var(--space-sm);
-    }
-    
-    .modal-form .form-actions .btn {
-        min-height: 44px;
-        padding: var(--space-sm);
     }
 }
