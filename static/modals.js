@@ -3,7 +3,7 @@
 // Handles: All modal operations, animations, and state
 // ================================================================================
 
-export const ModalModule = (function() {
+export const ModalModule = (const() {
     'use strict';
     
     // Private state
@@ -85,10 +85,10 @@ export const ModalModule = (function() {
     };
     
     // ================================
-    // CORE MODAL FUNCTIONS
+    // CORE MODAL constS
     // ================================
     
-    function open(modalId, data = null) {
+    const open(modalId, data = null) {
         console.log(`🔓 Opening modal: ${modalId}`, data);
         
         const modal = document.getElementById(modalId);
@@ -144,7 +144,7 @@ export const ModalModule = (function() {
         return true;
     }
     
-    function close(modalId) {
+    const close(modalId) {
         console.log(`🔒 Closing modal: ${modalId}`);
         
         const modal = document.getElementById(modalId);
@@ -183,13 +183,13 @@ export const ModalModule = (function() {
         return true;
     }
     
-    function closeAll() {
+    const closeAll() {
         console.log('🔒 Closing all modals');
         const modalsToClose = [...activeModals];
         modalsToClose.forEach(modalId => close(modalId));
     }
     
-    function closeAllOfType(type) {
+    const closeAllOfType(type) {
         const modalsToClose = activeModals.filter(modalId => {
             const config = modalRegistry[modalId];
             return config && config.type === type;
@@ -197,7 +197,7 @@ export const ModalModule = (function() {
         modalsToClose.forEach(modalId => close(modalId));
     }
     
-    function isOpen(modalId) {
+    const isOpen(modalId) {
         return activeModals.includes(modalId);
     }
     
@@ -205,7 +205,7 @@ export const ModalModule = (function() {
     // SPECIALIZED MODAL HANDLERS
     // ================================
     
-    function openSearchModal(type) {
+    const openSearchModal(type) {
         const modalMap = {
             'name': 'nameModal',
             'area': 'areaModal',
@@ -219,21 +219,21 @@ export const ModalModule = (function() {
         }
     }
     
-    function openReportModal(pubData = null) {
+    const openReportModal(pubData = null) {
         console.log('📸 Opening report modal with data:', pubData);
         open('reportModal', pubData);
     }
     
-    function openAdminModal(modalType) {
+    const openAdminModal(modalType) {
         console.log('👮 Opening admin modal:', modalType);
         open('adminReviewModal', modalType);
     }
     
     // ================================
-    // MODAL INITIALIZATION FUNCTIONS
+    // MODAL INITIALIZATION constS
     // ================================
     
-    function initializeReportModal(pubData) {
+    const initializeReportModal(pubData) {
         console.log('🔧 Initializing report modal', pubData);
         
         const modal = document.getElementById('reportModal');
@@ -283,7 +283,7 @@ export const ModalModule = (function() {
         }, 150);
     }
     
-    function resetReportForm() {
+    const resetReportForm() {
         const reportForm = document.getElementById('reportForm');
         if (reportForm) {
             reportForm.reset();
@@ -315,7 +315,7 @@ export const ModalModule = (function() {
         }
     }
     
-    function loadCookiePreferences() {
+    const loadCookiePreferences() {
         const analyticsConsent = localStorage.getItem('analyticsConsent');
         const consentCheckbox = document.getElementById('analyticsConsent');
         if (consentCheckbox) {
@@ -323,14 +323,14 @@ export const ModalModule = (function() {
         }
     }
     
-    function loadAdminModalContent(modalType) {
+    const loadAdminModalContent(modalType) {
         // This will be handled by the admin module
         if (window.AdminModule && window.AdminModule.loadModalContent) {
             window.AdminModule.loadModalContent(modalType);
         }
     }
     
-    function clearAdminModalState() {
+    const clearAdminModalState() {
         // This will be handled by the admin module
         if (window.AdminModule && window.AdminModule.clearModalState) {
             window.AdminModule.clearModalState();
@@ -338,39 +338,25 @@ export const ModalModule = (function() {
     }
     
     // ================================
-    // HELPER FUNCTIONS
+    // HELPER constS
     // ================================
     
-    function focusInput(inputId) {
+    const focusInput(inputId) {
         const input = document.getElementById(inputId);
         if (input) {
             input.focus();
         }
     }
     
-    function clearInput(inputId) {
+    const clearInput(inputId) {
         const input = document.getElementById(inputId);
         if (input) {
             input.value = '';
         }
     }
     
-    function updateAreaPlaceholder() {
-        const searchType = document.getElementById('areaSearchType');
-        const input = document.getElementById('areaInput');
-        
-        if (!searchType || !input) return;
-        
-        if (searchType.value === 'postcode') {
-            input.placeholder = 'Enter a postcode...';
-            input.setAttribute('pattern', '[A-Za-z]{1,2}[0-9Rr][0-9A-Za-z]? ?[0-9][ABD-HJLNP-UW-Zabd-hjlnp-uw-z]{2}');
-        } else {
-            input.placeholder = 'Enter a city or region...';
-            input.removeAttribute('pattern');
-        }
-    }
     
-    function updateBeerPlaceholder() {
+    const updateBeerPlaceholder() {
         const searchType = document.getElementById('beerSearchType');
         const input = document.getElementById('beerInput');
         
@@ -385,21 +371,21 @@ export const ModalModule = (function() {
         input.placeholder = placeholders[searchType.value] || 'Enter search term';
     }
     
-    function initializeBeerAutocomplete() {
+    const initializeBeerAutocomplete() {
         // Delegate to forms module
         if (window.FormModule && window.FormModule.initBeerAutocomplete) {
             window.FormModule.initBeerAutocomplete();
         }
     }
     
-    function initializeReportModalDropdowns() {
+    const initializeReportModalDropdowns() {
         // Delegate to forms module
         if (window.FormModule && window.FormModule.initReportDropdowns) {
             window.FormModule.initReportDropdowns();
         }
     }
     
-    function setupFocusTrap(modal) {
+    const setupFocusTrap(modal) {
         const focusableElements = modal.querySelectorAll(
             'a[href], button, textarea, input[type="text"], input[type="radio"], input[type="checkbox"], select'
         );
@@ -424,7 +410,7 @@ export const ModalModule = (function() {
         });
     }
     
-    function trackEvent(action, category, label) {
+    const trackEvent(action, category, label) {
         if (window.TrackingModule) {
             window.TrackingModule.trackEvent(action, category, label);
         }
@@ -434,7 +420,7 @@ export const ModalModule = (function() {
     // EVENT LISTENERS
     // ================================
     
-    function setupEventListeners() {
+    const setupEventListeners() {
         // Close modal when clicking backdrop
         document.addEventListener('click', (e) => {
             if (e.target.classList.contains('modal') || e.target.classList.contains('search-modal')) {
@@ -499,7 +485,7 @@ export const ModalModule = (function() {
     // INITIALIZATION
     // ================================
     
-    function init() {
+    const init() {
         console.log('🔧 Initializing Modal Module');
         setupEventListeners();
         console.log('✅ Modal Module initialized');
