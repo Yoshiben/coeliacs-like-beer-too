@@ -220,6 +220,20 @@
     --legend-marker-margin: var(--space-xs);
     --legend-marker-border: 1px solid var(--text-white);
     --legend-user-marker-size: 10px;
+
+   /* Map marker colors */
+    --marker-gf-fill: #10b981;        /* Green for GF available */
+    --marker-gf-stroke: #ffffff;      /* White border */
+    --marker-no-gf-fill: #ef4444;     /* Red for no GF options */
+    --marker-no-gf-stroke: #ffffff;   /* White border */
+    --marker-unknown-fill: #9ca3af;   /* Gray for unknown */
+    --marker-unknown-stroke: #ffffff; /* White border */
+    --marker-user-fill: #667eea;      /* Purple for user location */
+    --marker-user-stroke: #ffffff;    /* White border */
+    
+    /* Standardized marker sizes */
+    --marker-radius: 8;               /* Consistent size for all markers */
+    --marker-stroke-width: 2;         /* Consistent border width */
 }
 
 /* Desktop Adjustments */
