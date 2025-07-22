@@ -91,14 +91,14 @@ export const ModalModule = (function() {
     function open(modalId, data = null) {
         console.log(`🔓 Opening modal: ${modalId}`, data);
         
-        function modal = document.getElementById(modalId);
+        const modal = document.getElementById(modalId);
         if (!modal) {
             console.error(`❌ Modal not found: ${modalId}`);
             return false;
         }
         
         // Get modal config
-        function config = modalRegistry[modalId] || {};
+        const config = modalRegistry[modalId] || {};
         
         // Close any active search modals if opening another search modal
         if (config.type === 'search') {
@@ -147,10 +147,10 @@ export const ModalModule = (function() {
     function close(modalId) {
         console.log(`🔒 Closing modal: ${modalId}`);
         
-        function modal = document.getElementById(modalId);
+        const modal = document.getElementById(modalId);
         if (!modal) return false;
         
-        function config = modalRegistry[modalId] || {};
+        const config = modalRegistry[modalId] || {};
         
         // Animate out
         modal.style.opacity = '0';
@@ -185,13 +185,13 @@ export const ModalModule = (function() {
     
     function closeAll() {
         console.log('🔒 Closing all modals');
-        function modalsToClose = [...activeModals];
+        const modalsToClose = [...activeModals];
         modalsToClose.forEach(modalId => close(modalId));
     }
     
     function closeAllOfType(type) {
-        function modalsToClose = activeModals.filter(modalId => {
-            function config = modalRegistry[modalId];
+        const modalsToClose = activeModals.filter(modalId => {
+            const config = modalRegistry[modalId];
             return config && config.type === type;
         });
         modalsToClose.forEach(modalId => close(modalId));
@@ -206,14 +206,14 @@ export const ModalModule = (function() {
     // ================================
     
     function openSearchModal(type) {
-        function modalMap = {
+        const modalMap = {
             'name': 'nameModal',
             'area': 'areaModal',
             'beer': 'beerModal',
             'distance': 'distanceModal'
         };
         
-        function modalId = modalMap[type];
+        const modalId = modalMap[type];
         if (modalId) {
             open(modalId);
         }
@@ -236,10 +236,10 @@ export const ModalModule = (function() {
     function initializeReportModal(pubData) {
         console.log('🔧 Initializing report modal', pubData);
         
-        function modal = document.getElementById('reportModal');
-        function modalTitle = modal.querySelector('.modal-title');
-        function pubSearchGroup = document.getElementById('pubSearchGroup');
-        function reportForm = document.getElementById('reportForm');
+        const modal = document.getElementById('reportModal');
+        const modalTitle = modal.querySelector('.modal-title');
+        const pubSearchGroup = document.getElementById('pubSearchGroup');
+        const reportForm = document.getElementById('reportForm');
         
         if (pubData) {
             // Pre-populated from specific pub
@@ -284,7 +284,7 @@ export const ModalModule = (function() {
     }
     
     function resetReportForm() {
-        function reportForm = document.getElementById('reportForm');
+        const reportForm = document.getElementById('reportForm');
         if (reportForm) {
             reportForm.reset();
         }
@@ -296,7 +296,7 @@ export const ModalModule = (function() {
         
         // Hide all dropdowns
         ['breweryDropdown', 'beerNameDropdown', 'beerStyleDropdown', 'pubSuggestions'].forEach(id => {
-            function element = document.getElementById(id);
+            const element = document.getElementById(id);
             if (element) element.style.display = 'none';
         });
         
@@ -305,7 +305,7 @@ export const ModalModule = (function() {
         if (photoLabel) {
             photoLabel.style.borderColor = 'var(--border-light)';
             photoLabel.style.background = 'var(--bg-section)';
-            function textEl = photoLabel.querySelector('.photo-upload-text');
+            const textEl = photoLabel.querySelector('.photo-upload-text');
             if (textEl) {
                 textEl.innerHTML = `
                     <strong>Add a photo</strong><br>
@@ -316,8 +316,8 @@ export const ModalModule = (function() {
     }
     
     function loadCookiePreferences() {
-        function analyticsConsent = localStorage.getItem('analyticsConsent');
-        function consentCheckbox = document.getElementById('analyticsConsent');
+        const analyticsConsent = localStorage.getItem('analyticsConsent');
+        const consentCheckbox = document.getElementById('analyticsConsent');
         if (consentCheckbox) {
             consentCheckbox.checked = analyticsConsent === 'true';
         }
@@ -342,14 +342,14 @@ export const ModalModule = (function() {
     // ================================
     
     function focusInput(inputId) {
-        function input = document.getElementById(inputId);
+        const input = document.getElementById(inputId);
         if (input) {
             input.focus();
         }
     }
     
     function clearInput(inputId) {
-        function input = document.getElementById(inputId);
+        const input = document.getElementById(inputId);
         if (input) {
             input.value = '';
         }
@@ -357,12 +357,12 @@ export const ModalModule = (function() {
     
     
     function updateBeerPlaceholder() {
-        function searchType = document.getElementById('beerSearchType');
-        function input = document.getElementById('beerInput');
+        const searchType = document.getElementById('beerSearchType');
+        const input = document.getElementById('beerInput');
         
         if (!searchType || !input) return;
         
-        function placeholders = {
+        const placeholders = {
             'brewery': 'Enter brewery name',
             'beer': 'Enter specific beer name',
             'style': 'Enter beer style'
@@ -386,12 +386,12 @@ export const ModalModule = (function() {
     }
     
     function setupFocusTrap(modal) {
-        function focusableElements = modal.querySelectorAll(
+        const focusableElements = modal.querySelectorAll(
             'a[href], button, textarea, input[type="text"], input[type="radio"], input[type="checkbox"], select'
         );
         
-        function firstFocusable = focusableElements[0];
-        function lastFocusable = focusableElements[focusableElements.length - 1];
+        const firstFocusable = focusableElements[0];
+        const lastFocusable = focusableElements[focusableElements.length - 1];
         
         modal.addEventListener('keydown', (e) => {
             if (e.key === 'Tab') {
@@ -452,8 +452,8 @@ export const ModalModule = (function() {
     }
 
     function updateAreaPlaceholder = () => {
-        function searchType = document.getElementById('areaSearchType');
-        function input = document.getElementById('areaInput');
+        const searchType = document.getElementById('areaSearchType');
+        const input = document.getElementById('areaInput');
         
         if (!searchType || !input) return;
         
@@ -467,8 +467,8 @@ export const ModalModule = (function() {
     };
 
     function updateBeerPlaceholder = () => {
-        function searchType = document.getElementById('beerSearchType');
-        function input = document.getElementById('beerInput');
+        const searchType = document.getElementById('beerSearchType');
+        const input = document.getElementById('beerInput');
         
         if (!searchType || !input) return;
         
