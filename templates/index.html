@@ -2288,11 +2288,6 @@
                 option.addEventListener('touchcancel', function(e) {
                     this.style.transform = '';
                 }, { passive: true });
-                
-                // Prevent scrolling while touching buttons
-                option.addEventListener('touchmove', function(e) {
-                    e.preventDefault();
-                });
             });
         }
         
