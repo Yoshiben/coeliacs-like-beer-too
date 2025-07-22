@@ -623,15 +623,25 @@ export const SearchModule = (function() {
             // Home button
             if (homeBtn) {
                 homeBtn.onclick = () => {
+                    // Close pub details overlay
                     overlay.style.display = 'none';
                     overlay.classList.remove('active');
+                    
+                    // ALSO close results overlay if it exists
+                    if (resultsOverlay) {
+                        resultsOverlay.style.display = 'none';
+                        resultsOverlay.classList.remove('active');
+                    }
+                    
+                    // Restore body scroll
                     document.body.style.overflow = '';
                     
                     // Show home sections
                     const heroSection = document.querySelector('.hero-section');
                     const searchSection = document.querySelector('.search-section');
                     if (heroSection) heroSection.style.display = 'block';
-                    if (searchSection) searchSection.style.display = 'block';
+                    if (searchSection) searchSection.style.display = 'flex'; // Changed to flex
+                    
                     console.log('🏠 Returned to home');
                 };
             }
