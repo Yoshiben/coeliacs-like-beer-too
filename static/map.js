@@ -72,7 +72,14 @@ export const MapModule = (function() {
     };
     
     // Initialize results overlay map
-    const initResultsMap = () => {
+    // ================================
+    // 🔧 UPDATE: In map.js
+    // LOCATION: Find the initResultsMap function (around line 60)
+    // ACTION: Replace with this enhanced version that can accept pubs data
+    // ================================
+    
+    // Initialize results overlay map
+    const initResultsMap = (pubsData = null) => {
         console.log('🗺️ Initializing results map...');
         
         const mapElement = document.getElementById('resultsMap');
@@ -109,12 +116,26 @@ export const MapModule = (function() {
             }).addTo(resultsMap).bindPopup('📍 Your location');
         }
         
+        // Add pubs if provided or get from search module
+        let pubs = pubsData;
+        if (!pubs && window.App?.getModule('search')?.getCurrentResults) {
+            pubs = window.App.getModule('search').getCurrentResults();
+            console.log('🍺 Got pubs from search module:', pubs?.length || 0);
+        }
+        
+        if (pubs && pubs.length > 0) {
+            const markersAdded = addPubMarkers(pubs, resultsMap);
+            console.log(`✅ Added ${markersAdded} pub markers to results map`);
+        } else {
+            console.log('ℹ️ No pubs data available for results map');
+        }
+        
         // Ensure proper rendering
         setTimeout(() => {
             resultsMap.invalidateSize();
         }, 100);
         
-        console.log('✅ Results map initialized');
+        console.log('✅ Results map initialized with pubs and user location');
         return resultsMap;
     };
     
