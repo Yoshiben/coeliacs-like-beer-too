@@ -464,6 +464,36 @@ export const ModalModule = (function() {
             }
         });
     }
+
+    const updateAreaPlaceholder = () => {
+        const searchType = document.getElementById('areaSearchType');
+        const input = document.getElementById('areaInput');
+        
+        if (!searchType || !input) return;
+        
+        if (searchType.value === 'postcode') {
+            input.placeholder = 'Enter a postcode...';
+            input.setAttribute('pattern', '[A-Za-z]{1,2}[0-9Rr][0-9A-Za-z]? ?[0-9][ABD-HJLNP-UW-Zabd-hjlnp-uw-z]{2}');
+        } else {
+            input.placeholder = 'Enter a city or region...';
+            input.removeAttribute('pattern');
+        }
+    };
+
+    const updateBeerPlaceholder = () => {
+        const searchType = document.getElementById('beerSearchType');
+        const input = document.getElementById('beerInput');
+        
+        if (!searchType || !input) return;
+        
+        const placeholders = {
+            'brewery': 'Enter brewery name',
+            'beer': 'Enter specific beer name',
+            'style': 'Enter beer style'
+        };
+        
+        input.placeholder = placeholders[searchType.value] || 'Enter search term';
+    };
     
     // ================================
     // INITIALIZATION
@@ -489,6 +519,8 @@ export const ModalModule = (function() {
         openSearchModal,
         openReportModal,
         openAdminModal,
+        updateAreaPlaceholder,
+        updateBeerPlaceholder,
         
         // For external access if needed
         getActiveModals: () => [...activeModals],
