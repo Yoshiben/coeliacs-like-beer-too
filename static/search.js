@@ -534,6 +534,109 @@ export const SearchModule = (function() {
                     beerEl.innerHTML = '<em>No specific GF beer information available. Help us by reporting what you find!</em>';
                 }
             }
+
+            // SET UP BUTTON HANDLERS
+            const findOnlineBtn = document.getElementById('pubFindOnline');
+            const directionsBtn = document.getElementById('pubGetDirections');
+            const mapBtn = document.getElementById('pubToggleMap');
+            const reportBtn = document.querySelector('[data-action="report-beer"]');
+            const backBtn = document.querySelector('[data-action="back-to-results"]');
+            const homeBtn = document.querySelector('[data-action="close-pub-details"]');
+            
+            // Find Online button
+            if (findOnlineBtn) {
+                findOnlineBtn.onclick = () => {
+                    const searchQuery = encodeURIComponent(`${pub.name} ${pub.postcode} pub`);
+                    window.open(`https://www.google.com/search?q=${searchQuery}`, '_blank');
+                    console.log('🔍 Opened Google search for pub');
+                };
+            }
+            
+            // Get Directions button
+            if (directionsBtn) {
+                directionsBtn.onclick = () => {
+                    const destination = encodeURIComponent(`${pub.name}, ${pub.address}, ${pub.postcode}`);
+                    window.open(`https://www.google.com/maps/dir/?api=1&destination=${destination}`, '_blank');
+                    console.log('🧭 Opened Google Maps directions');
+                };
+            }
+            
+            // Show on Map button
+            if (mapBtn) {
+                mapBtn.onclick = () => {
+                    // Toggle map visibility
+                    const mapContainer = document.getElementById('pubMapContainer');
+                    const btnText = document.getElementById('pubMapBtnText');
+                    if (mapContainer) {
+                        if (mapContainer.style.display === 'none' || !mapContainer.style.display) {
+                            mapContainer.style.display = 'block';
+                            if (btnText) btnText.textContent = 'Hide Map';
+                            console.log('🗺️ Showed pub map');
+                        } else {
+                            mapContainer.style.display = 'none';
+                            if (btnText) btnText.textContent = 'Show on Map';
+                            console.log('🗺️ Hid pub map');
+                        }
+                    }
+                };
+            }
+            
+            // Report Beer button
+            if (reportBtn) {
+                reportBtn.onclick = () => {
+                    // Close pub details and open report modal
+                    overlay.style.display = 'none';
+                    overlay.classList.remove('active');
+                    
+                    // Open report modal with pub data
+                    const modalModule = getModal();
+                    if (modalModule) {
+                        modalModule.openReportModal(pub);
+                    } else {
+                        // Fallback
+                        const reportModal = document.getElementById('reportModal');
+                        if (reportModal) {
+                            reportModal.style.display = 'flex';
+                            // Pre-populate with pub data
+                            window.selectedPubData = pub;
+                        }
+                    }
+                    console.log('📝 Opened report modal');
+                };
+            }
+            
+            // Back to Results button
+            if (backBtn) {
+                backBtn.onclick = () => {
+                    overlay.style.display = 'none';
+                    overlay.classList.remove('active');
+                    
+                    // Show results overlay again
+                    if (resultsOverlay) {
+                        resultsOverlay.style.display = 'flex';
+                        resultsOverlay.classList.add('active');
+                    }
+                    console.log('🔙 Back to results');
+                };
+            }
+            
+            // Home button
+            if (homeBtn) {
+                homeBtn.onclick = () => {
+                    overlay.style.display = 'none';
+                    overlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                    
+                    // Show home sections
+                    const heroSection = document.querySelector('.hero-section');
+                    const searchSection = document.querySelector('.search-section');
+                    if (heroSection) heroSection.style.display = 'block';
+                    if (searchSection) searchSection.style.display = 'block';
+                    console.log('🏠 Returned to home');
+                };
+            }
+            
+            console.log('✅ Button handlers set up successfully');
             
             console.log('✅ Pub details populated and forced visible');
         } else {
