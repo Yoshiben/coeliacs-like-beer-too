@@ -943,52 +943,64 @@ export const SearchModule = (function() {
         // Store pubs globally for map access
         currentSearchPubs = pubs;
         console.log('💾 Stored search results for map:', pubs.length, 'pubs');
-
-        // Also store globally for easy access
         window.currentSearchResults = pubs;
         
-        // Hide loading and no results
-        document.getElementById('resultsLoading').style.display = 'none';
-        document.getElementById('noResultsFound').style.display = 'none';
+        // 🔧 FIX: Force reset map toggle state to ensure we start with list view
+        const listContainer = document.getElementById('resultsListContainer');
+        const mapContainer = document.getElementById('resultsMapContainer');
+        const mapBtnText = document.getElementById('resultsMapBtnText');
         
-        // Get the results list container
-        const resultsListContainer = document.getElementById('resultsListContainer');
-        const resultsList = document.getElementById('resultsList');
-        
-        // IMPORTANT: Show the list container
-        if (resultsListContainer) {
-            resultsListContainer.style.display = 'block';
+        // Force reset to list view state
+        if (listContainer) {
+            listContainer.style.display = 'block';
+            listContainer.style.flex = '1';
+        }
+        if (mapContainer) {
+            mapContainer.style.display = 'none';
+            mapContainer.classList.remove('split-view');
+        }
+        if (mapBtnText) {
+            mapBtnText.textContent = 'Map';
         }
         
+        // 🔧 FIX: Also reset the results overlay container classes
+        const resultsOverlay = document.getElementById('resultsOverlay');
+        if (resultsOverlay) {
+            resultsOverlay.classList.remove('split-view');
+        }
+        
+        console.log('🔄 Reset map toggle state to list view');
+        
+        // Hide loading and no results states
+        const loadingEl = document.getElementById('resultsLoading');
+        const noResultsEl = document.getElementById('noResultsFound');
+        if (loadingEl) loadingEl.style.display = 'none';
+        if (noResultsEl) noResultsEl.style.display = 'none';
+        
         // Show and populate the results list
-        resultsList.style.display = 'block';
-        resultsList.innerHTML = '';
+        const resultsList = document.getElementById('resultsList');
+        if (resultsList) {
+            resultsList.style.display = 'block';
+            resultsList.innerHTML = '';
+            
+            // Generate results HTML
+            pubs.forEach(pub => {
+                const resultItem = createResultItemForOverlay(pub);
+                resultsList.appendChild(resultItem);
+            });
+        }
         
         // Update title
-        document.getElementById('resultsTitle').textContent = title;
+        const titleEl = document.getElementById('resultsTitle');
+        if (titleEl) {
+            titleEl.textContent = title;
+        }
         
-        // Generate results HTML
-        pubs.forEach(pub => {
-            const resultItem = createResultItemForOverlay(pub);
-            resultsList.appendChild(resultItem);
-        });
-        
-        // 🔧 FIX: Set up navigation button handlers AFTER results are displayed
+        // Set up navigation button handlers AFTER results are displayed
         setupResultsNavigationHandlers();
         
-        console.log(`✅ Displayed ${pubs.length} results with navigation handlers`);
+        console.log(`✅ Displayed ${pubs.length} results with proper map state reset`);
     };
-    
-    // ================================
-    // 🔧 ADD: New function to set up navigation handlers
-    // LOCATION: Add to search.js after displayResultsInOverlay
-    // ================================
-    
-    // ================================
-    // 🔧 UPDATE: In search.js
-    // LOCATION: Find the setupResultsNavigationHandlers function (around line 750)
-    // ACTION: Replace the map toggle handler with enhanced version
-    // ================================
     
     // ================================
     // 🔧 REPLACE: In search.js - Enhanced map toggle handler
@@ -1043,8 +1055,14 @@ export const SearchModule = (function() {
                 
                 if (mapContainer && listContainer && mapBtnText) {
                     if (mapContainer.style.display === 'none' || !mapContainer.style.display) {
-                        // 🔧 FIX: Show map with proper full-screen setup
+                        // 🔧 FIX: Show map with proper cleanup first
                         console.log('🗺️ Switching to FULL-SCREEN map view...');
+                        
+                        // Clean up any existing map instance first
+                        const mapModule = window.App?.getModule('map');
+                        if (mapModule && mapModule.cleanupResultsMap) {
+                            mapModule.cleanupResultsMap();
+                        }
                         
                         // Hide list completely
                         listContainer.style.display = 'none';
@@ -1057,7 +1075,7 @@ export const SearchModule = (function() {
                         // Update button text
                         mapBtnText.textContent = 'List';
                         
-                        // 🔧 FIX: Ensure no split-view classes are applied
+                        // Ensure no split-view classes are applied
                         mapContainer.classList.remove('split-view');
                         const resultsOverlay = document.getElementById('resultsOverlay');
                         if (resultsOverlay) {
@@ -1066,17 +1084,18 @@ export const SearchModule = (function() {
                         
                         // Initialize the results map with current search results
                         setTimeout(() => {
-                            const mapModule = window.App?.getModule('map');
                             if (mapModule && mapModule.initResultsMap) {
                                 console.log('🗺️ Initializing FULL-SCREEN results map with', currentSearchPubs?.length || 0, 'pubs...');
                                 const map = mapModule.initResultsMap(currentSearchPubs);
                                 if (map) {
                                     console.log('✅ FULL-SCREEN results map initialized successfully');
                                     
-                                    // 🔧 FIX: Force multiple size invalidations to ensure proper rendering
+                                    // Force multiple size invalidations to ensure proper rendering
                                     setTimeout(() => map.invalidateSize(), 200);
                                     setTimeout(() => map.invalidateSize(), 500);
                                     setTimeout(() => map.invalidateSize(), 1000);
+                                } else {
+                                    console.error('❌ Failed to initialize results map');
                                 }
                             } else {
                                 console.error('❌ Map module not available');
@@ -1085,8 +1104,14 @@ export const SearchModule = (function() {
                         
                         console.log('✅ FULL-SCREEN Map view activated');
                     } else {
-                        // 🔧 FIX: Show list view
+                        // 🔧 FIX: Show list view with cleanup
                         console.log('📋 Switching to list view...');
+                        
+                        // Clean up map instance
+                        const mapModule = window.App?.getModule('map');
+                        if (mapModule && mapModule.cleanupResultsMap) {
+                            mapModule.cleanupResultsMap();
+                        }
                         
                         // Show list
                         listContainer.style.display = 'block';
