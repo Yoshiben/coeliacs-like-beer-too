@@ -30,9 +30,24 @@ export const SearchModule = (function() {
             window.TrackingModule.trackEvent('location_search_start', 'Search', 'distance_modal');
         }
         
-        // Show distance selection modal
+        // Debug: Check if ModalModule exists
         if (window.ModalModule) {
+            console.log('✅ ModalModule found, opening distanceModal');
             window.ModalModule.open('distanceModal');
+        } else if (window.App?.getModule('modal')) {
+            console.log('✅ Modal module found via App, opening distanceModal');
+            window.App.getModule('modal').open('distanceModal');
+        } else {
+            console.log('❌ No modal module found, trying direct DOM manipulation');
+            // Fallback - direct modal opening
+            const modal = document.getElementById('distanceModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+                console.log('✅ Opened distanceModal via fallback');
+            } else {
+                console.error('❌ distanceModal element not found in DOM');
+            }
         }
     };
     
