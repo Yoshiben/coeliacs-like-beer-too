@@ -395,74 +395,86 @@ export const MapModule = (function() {
                 fillColor: rootStyles.getPropertyValue('--marker-unknown-fill').trim() || '#9ca3af',
                 color: rootStyles.getPropertyValue('--marker-unknown-stroke').trim() || '#ffffff'
             };
-    }
-};
+        }
+    };
     
     const createPubPopupContent = (pub, gfStatus = null) => {
         if (!gfStatus) {
             gfStatus = determineGFStatus(pub);
         }
         
-        // Get the popup template
+        // Try to get the popup template first
         const template = document.getElementById('popup-content-template');
-        if (!template) {
-            // Fallback to basic content if template not found
-            return createBasicPopupContent(pub, gfStatus);
+        if (template) {
+            const clone = template.content.cloneNode(true);
+            
+            // Fill in the template data
+            const nameEl = clone.querySelector('[data-field="name"]');
+            if (nameEl) nameEl.textContent = pub.name;
+            
+            const addressEl = clone.querySelector('[data-field="address"]');
+            if (addressEl) {
+                if (pub.address) {
+                    addressEl.textContent = pub.address;
+                } else {
+                    addressEl.style.display = 'none';
+                }
+            }
+            
+            const postcodeEl = clone.querySelector('[data-field="postcode"]');
+            if (postcodeEl) postcodeEl.textContent = pub.postcode;
+            
+            // Add distance if available
+            const distanceEl = clone.querySelector('[data-field="distance"]');
+            if (distanceEl && pub.distance !== undefined) {
+                distanceEl.textContent = `${pub.distance.toFixed(1)}km away`;
+                distanceEl.style.display = 'block';
+            }
+            
+            // Set GF status
+            const gfStatusEl = clone.querySelector('[data-field="gf-status"]');
+            if (gfStatusEl) {
+                if (gfStatus === 'gf_available') {
+                    let gfOptions = [];
+                    if (pub.bottle) gfOptions.push('🍺');
+                    if (pub.tap) gfOptions.push('🚰');
+                    if (pub.cask) gfOptions.push('🛢️');
+                    if (pub.can) gfOptions.push('🥫');
+                    gfStatusEl.textContent = `✅ GF Available: ${gfOptions.join(' ')}`;
+                    gfStatusEl.className = 'popup-gf-status available';
+                } else if (gfStatus === 'no_gf') {
+                    gfStatusEl.textContent = '❌ No GF Options Known';
+                    gfStatusEl.className = 'popup-gf-status not-available';
+                } else {
+                    gfStatusEl.textContent = '❓ GF Status Unknown';
+                    gfStatusEl.className = 'popup-gf-status unknown';
+                }
+            }
+            
+            // Fix the button
+            const button = clone.querySelector('[data-action="view-details"]');
+            if (button) {
+                button.setAttribute('data-action', 'view-pub');
+                button.setAttribute('data-pub-id', pub.pub_id);
+            }
+            
+            // Return the HTML string for Leaflet
+            const div = document.createElement('div');
+            div.appendChild(clone);
+            return div.innerHTML;
         }
         
-        const clone = template.content.cloneNode(true);
-        
-        // Fill in the template data
-        clone.querySelector('[data-field="name"]').textContent = pub.name;
-        
-        const addressEl = clone.querySelector('[data-field="address"]');
-        if (pub.address) {
-            addressEl.textContent = pub.address;
-        } else {
-            addressEl.style.display = 'none';
-        }
-        
-        clone.querySelector('[data-field="postcode"]').textContent = pub.postcode;
-        
-        // Add distance if available
-        const distanceEl = clone.querySelector('[data-field="distance"]');
-        if (pub.distance !== undefined) {
-            distanceEl.textContent = `${pub.distance.toFixed(1)}km away`;
-            distanceEl.style.display = 'block';
-        }
-        
-        // Set GF status with appropriate class
-        const gfStatusEl = clone.querySelector('[data-field="gf-status"]');
-        if (gfStatus === 'gf_available') {
-            let gfOptions = [];
-            if (pub.bottle) gfOptions.push('🍺');
-            if (pub.tap) gfOptions.push('🚰');
-            if (pub.cask) gfOptions.push('🛢️');
-            if (pub.can) gfOptions.push('🥫');
-            gfStatusEl.textContent = `✅ GF Available: ${gfOptions.join(' ')}`;
-            gfStatusEl.className = 'popup-gf-status available';
-        } else if (gfStatus === 'no_gf') {
-            gfStatusEl.textContent = '❌ No GF Options Known';
-            gfStatusEl.className = 'popup-gf-status not-available';
-        } else {
-            gfStatusEl.textContent = '❓ GF Status Unknown';
-            gfStatusEl.className = 'popup-gf-status unknown';
-        }
-        
-        // Set up button click handler
-        const button = clone.querySelector('[data-action="view-details"]');
-        button.setAttribute('data-action', 'view-pub');  // Change from 'view-details' to 'view-pub'
-        button.setAttribute('data-pub-id', pub.pub_id);
-        button.onclick = null; // Remove the custom onclick, let the main handler deal with it
-        
-        // Return the HTML string for Leaflet
-        const div = document.createElement('div');
-        div.appendChild(clone);
-        return div.innerHTML;
+        // Fallback to basic content if template not found
+        return createBasicPopupContent(pub, gfStatus);
     };
-
+    
+    // ================================
+    // 🔧 REPLACE: In map.js - Fix createBasicPopupContent function
+    // LOCATION: Find the createBasicPopupContent function 
+    // ACTION: Replace the entire function
+    // ================================
+    
     const createBasicPopupContent = (pub, gfStatus) => {
-        // Fallback function using CSS classes instead of inline styles
         let content = `<div class="popup-content">`;
         content += `<div class="popup-title">${escapeHtml(pub.name)}</div>`;
         
@@ -489,6 +501,7 @@ export const MapModule = (function() {
             content += `<div class="popup-gf-status unknown">❓ GF Status Unknown</div>`;
         }
         
+        // Fixed button with proper action
         content += `<button class="popup-button" data-action="view-pub" data-pub-id="${pub.pub_id}">View Details</button>`;
         content += `</div>`;
         
