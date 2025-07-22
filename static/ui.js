@@ -480,7 +480,33 @@ export const UIModule = (function() {
         document.body.appendChild(debugPanel);
     }
 
-    
+    const closeResults = () => {
+        console.log('🏠 Closing results and returning to homepage');
+        
+        // Close results overlay
+        const resultsOverlay = document.getElementById('resultsOverlay');
+        if (resultsOverlay) {
+            resultsOverlay.classList.remove('active');
+            resultsOverlay.style.display = 'none';
+        }
+        
+        // Show the hero section again
+        const heroSection = document.querySelector('.hero-section');
+        if (heroSection) {
+            heroSection.style.display = 'block';
+        }
+        
+        // Show the home page search section again
+        const searchSection = document.querySelector('.search-section');
+        if (searchSection) {
+            searchSection.style.display = 'block';
+        }
+        
+        // Restore background scrolling
+        document.body.style.overflow = '';
+        
+        TrackingModule.trackEvent('close_results', 'Navigation');
+    };
     
     // ================================
     // PUBLIC API
@@ -525,6 +551,8 @@ export const UIModule = (function() {
 
         // Debug functions
         showDebugInfo,
+
+        closeResults,
         
         // State getters
         getCurrentView: () => state.currentView,
