@@ -750,6 +750,34 @@ export const MapModule = (function() {
             TrackingModule.trackEvent('results_map_toggle', 'Map Interaction', 'hide');
         }
     };
+
+    const cleanupResultsMap = () => {
+        console.log('🧹 Cleaning up results map instance...');
+        
+        if (resultsMap) {
+            try {
+                resultsMap.remove();
+                resultsMap = null;
+                console.log('✅ Results map cleaned up successfully');
+            } catch (error) {
+                console.warn('Warning cleaning up results map:', error);
+                resultsMap = null;
+            }
+        }
+        
+        // Clear the map container
+        const mapElement = document.getElementById('resultsMap');
+        if (mapElement) {
+            mapElement.innerHTML = '';
+        }
+        
+        // Reset container classes
+        const resultsMapContainer = document.getElementById('resultsMapContainer');
+        if (resultsMapContainer) {
+            resultsMapContainer.classList.remove('split-view');
+        }
+    };
+
     
     // Public API
     return {
@@ -764,6 +792,7 @@ export const MapModule = (function() {
         centerOnLocation,
         showPubFromMap,
         toggleSearchResultsFullMap,
+        cleanupResultsMap, // 🔧 ADD this line
         isMapVisible: () => mapVisible,
         calculateDistance
     };
