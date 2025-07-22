@@ -232,66 +232,154 @@ export const SearchModule = (function() {
         }
     };
 
+    const debugBeerSearch = (pubs, query, searchType) => {
+        console.log('🔍 DEBUG: Beer search details');
+        console.log(`Query: "${query}" | Type: ${searchType}`);
+        console.log(`Total pubs to search: ${pubs.length}`);
+        
+        // Check first few pubs to see their beer_details structure
+        const samplePubs = pubs.slice(0, 5);
+        samplePubs.forEach((pub, index) => {
+            console.log(`Pub ${index + 1}: ${pub.name}`);
+            console.log(`  Beer details: ${pub.beer_details || 'null'}`);
+            console.log(`  GF flags: bottle=${pub.bottle}, tap=${pub.tap}, cask=${pub.cask}, can=${pub.can}`);
+        });
+        
+        // Count how many pubs have beer details
+        const pubsWithBeerDetails = pubs.filter(pub => pub.beer_details).length;
+        console.log(`Pubs with beer_details: ${pubsWithBeerDetails}/${pubs.length}`);
+        
+        // Show example beer_details if any exist
+        const examplePub = pubs.find(pub => pub.beer_details);
+        if (examplePub) {
+            console.log('Example beer_details structure:');
+            console.log(examplePub.beer_details);
+        }
+    };
+
     const performBeerSearch = async (query, searchType) => {
         try {
+            console.log(`🍺 Performing enhanced beer search: "${query}" (${searchType})`);
+            
             // Try to get user location for sorting
             if (!userLocation) {
                 userLocation = await tryGetUserLocation();
             }
             
-            const results = await APIModule.searchPubs({
-                query: query,
-                searchType: 'all', // Beer search uses 'all' then filters
-                page: 1
-            });
+            // Use enhanced beer search API
+            const apiModule = getAPI();
+            let results;
             
-            let pubs = Array.isArray(results) ? results : results.pubs;
+            if (apiModule.searchPubsByBeer) {
+                console.log('🍺 Using enhanced beer search API');
+                results = await apiModule.searchPubsByBeer(query, searchType);
+            } else {
+                console.log('🍺 Using fallback search method');
+                results = await apiModule.searchPubs({
+                    query: query,
+                    searchType: 'all',
+                    page: 1
+                });
+            }
             
-            // Filter based on beer details
-            pubs = pubs.filter(pub => {
-                if (!pub.beer_details) return false;
-                const beerDetails = pub.beer_details.toLowerCase();
-                const searchQuery = query.toLowerCase();
-                return beerDetails.includes(searchQuery);
-            });
+            let allPubs = Array.isArray(results) ? results : results.pubs || [];
+            console.log(`📊 Got ${allPubs.length} pubs from API`);
             
-            if (pubs.length === 0) {
-                showNoResults(`No pubs found serving "${query}"`);
+            // Filter based on beer search criteria
+            const searchQuery = query.toLowerCase().trim();
+            let filteredPubs = [];
+            
+            // More sophisticated filtering
+            if (searchType === 'brewery') {
+                filteredPubs = allPubs.filter(pub => {
+                    if (!pub.beer_details) return false;
+                    const beerDetails = pub.beer_details.toLowerCase();
+                    // Look for brewery name (more precise matching)
+                    return beerDetails.includes(` ${searchQuery} `) || 
+                           beerDetails.startsWith(searchQuery) ||
+                           beerDetails.includes(`${searchQuery} `) ||
+                           beerDetails.includes(` ${searchQuery}`);
+                });
+            } else if (searchType === 'beer') {
+                filteredPubs = allPubs.filter(pub => {
+                    if (!pub.beer_details) return false;
+                    const beerDetails = pub.beer_details.toLowerCase();
+                    // Look for beer name
+                    return beerDetails.includes(searchQuery);
+                });
+            } else if (searchType === 'style') {
+                filteredPubs = allPubs.filter(pub => {
+                    if (!pub.beer_details) return false;
+                    const beerDetails = pub.beer_details.toLowerCase();
+                    // Look for style - check common beer style patterns
+                    return beerDetails.includes(searchQuery) ||
+                           beerDetails.includes(`(${searchQuery})`) ||
+                           beerDetails.includes(`${searchQuery} `) ||
+                           beerDetails.includes(` ${searchQuery}`);
+                });
+            }
+            
+            console.log(`🔍 Filtered to ${filteredPubs.length} pubs matching "${query}" (${searchType})`);
+            
+            // If no results with strict filtering, try looser matching
+            if (filteredPubs.length === 0 && searchQuery.length > 3) {
+                console.log('🔍 Trying looser beer search matching...');
+                filteredPubs = allPubs.filter(pub => {
+                    if (!pub.beer_details) return false;
+                    const beerDetails = pub.beer_details.toLowerCase();
+                    // Very loose matching for partial words
+                    return beerDetails.includes(searchQuery.substring(0, 4));
+                });
+                console.log(`🔍 Loose matching found ${filteredPubs.length} pubs`);
+            }
+            
+            if (filteredPubs.length === 0) {
+                showNoResults(`No pubs found serving "${query}". Try searching for a brewery name or beer style.`);
                 return;
             }
             
             // Sort by proximity if we have location
             if (userLocation) {
-                pubs = sortPubsByDistance(pubs, userLocation);
+                filteredPubs = sortPubsByDistance(filteredPubs, userLocation);
+                console.log('📍 Sorted by distance from user location');
             }
             
-            // Save state
+            // Save state for back button
             lastSearchState = {
                 type: 'beer',
                 query: `${query} (${searchType})`,
-                results: pubs,
+                results: filteredPubs,
                 timestamp: Date.now()
             };
             
-            currentSearchPubs = pubs;
+            currentSearchPubs = filteredPubs;
             
+            // Display results
             const title = userLocation ? 
-                `${pubs.length} pubs serving "${query}" (nearest first)` :
-                `${pubs.length} pubs serving "${query}"`;
+                `${filteredPubs.length} pubs serving "${query}" (nearest first)` :
+                `${filteredPubs.length} pubs serving "${query}"`;
                 
-            displayResultsInOverlay(pubs, title);
+            displayResultsInOverlay(filteredPubs, title);
             
+            // Show success message
             if (window.showSuccessToast) {
-                window.showSuccessToast(`✅ Found ${pubs.length} pubs serving "${query}"`);
+                window.showSuccessToast(`✅ Found ${filteredPubs.length} pubs serving "${query}"`);
             }
             
+            // Track the search
             if (window.trackSearch) {
-                window.trackSearch(query, searchType, pubs.length);
+                window.trackSearch(query, `beer_${searchType}`, filteredPubs.length);
             }
+            
+            console.log(`✅ Enhanced beer search completed: ${filteredPubs.length} results`);
             
         } catch (error) {
-            console.error('❌ Error searching by beer:', error);
-            showNoResults(`Error searching for "${query}"`);
+            console.error('❌ Error in enhanced beer search:', error);
+            showNoResults(`Error searching for "${query}". Please try again.`);
+            
+            if (window.showSuccessToast) {
+                window.showSuccessToast(`❌ Search failed: ${error.message}`);
+            }
         }
     };
     
