@@ -244,17 +244,16 @@ export const MapModule = (function() {
         const targetMap = mapInstance || map;
         if (!targetMap) {
             console.error('No map instance available');
-            return;
+            return 0;
         }
         
-        console.log(`📍 Adding ${pubs.length} pub markers...`);
+        console.log(`📍 Adding ${pubs.length} pub markers with GF color coding...`);
         
         // Clear existing pub markers if using main map
         if (!mapInstance) {
             clearPubMarkers();
         }
         
-        const styles = getMapStyles();
         const bounds = [];
         let markersAdded = 0;
         
@@ -266,16 +265,13 @@ export const MapModule = (function() {
                 const lat = parseFloat(pub.latitude);
                 const lng = parseFloat(pub.longitude);
                 
-                const marker = L.circleMarker([lat, lng], {
-                    radius: config.pubMarkerRadius,
-                    fillColor: styles.pubFillColor,
-                    color: styles.pubStrokeColor,
-                    weight: 2,
-                    opacity: 1,
-                    fillOpacity: 0.9
-                }).addTo(targetMap);
+                // Determine marker color and size based on GF availability
+                const gfStatus = determineGFStatus(pub);
+                const markerStyle = getMarkerStyleForGFStatus(gfStatus);
                 
-                const popupContent = createPubPopupContent(pub);
+                const marker = L.circleMarker([lat, lng], markerStyle).addTo(targetMap);
+                
+                const popupContent = createPubPopupContent(pub, gfStatus);
                 marker.bindPopup(popupContent);
                 
                 if (!mapInstance) {
@@ -296,7 +292,7 @@ export const MapModule = (function() {
             }
         }
         
-        console.log(`✅ Added ${markersAdded} pub markers to map`);
+        console.log(`✅ Added ${markersAdded} GF-color-coded pub markers to map`);
         return markersAdded;
     };
     
@@ -310,38 +306,283 @@ export const MapModule = (function() {
         pubMarkers = [];
         console.log('🧹 Cleared all pub markers');
     };
-    
-    // Create popup content for pub
-    const createPubPopupContent = (pub) => {
-        let content = `<div style="text-align: center; padding: 8px; min-width: 200px;">`;
-        content += `<strong style="color: var(--text-primary); font-size: 14px;">${pub.name}</strong><br>`;
-        content += `<small style="color: var(--text-secondary);">${pub.address || ''}</small><br>`;
-        content += `<small style="color: var(--text-muted);">${pub.postcode}</small>`;
-        
-        // Add distance if available
-        if (pub.distance !== undefined) {
-            content += `<br><small style="color: var(--primary-color, #667eea); font-weight: 600;">${pub.distance.toFixed(1)}km away</small>`;
+
+    const determineGFStatus = (pub) => {
+        // Check if pub has any GF options
+        if (pub.bottle || pub.tap || pub.cask || pub.can) {
+            return 'gf_available';
         }
         
-        // Add GF status
-        if (pub.bottle || pub.tap || pub.cask || pub.can) {
+        // If we have the pub in database but no GF flags set
+        if (pub.pub_id) {
+            return 'no_gf';
+        }
+        
+        // Unknown status
+        return 'unknown';
+    };
+    
+    const getMarkerStyleForGFStatus = (gfStatus) => {
+        const baseStyle = {
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.9
+        };
+        
+        switch(gfStatus) {
+            case 'gf_available':
+                return {
+                    ...baseStyle,
+                    radius: 10,
+                    fillColor: 'var(--marker-gf-fill)',
+                    color: 'var(--marker-gf-stroke)'
+                };
+                
+            case 'no_gf':
+                return {
+                    ...baseStyle,
+                    radius: 10,
+                    fillColor: 'var(--marker-no-gf-fill)',
+                    color: 'var(--marker-no-gf-stroke)'
+                };
+                
+            case 'unknown':
+            default:
+                return {
+                    ...baseStyle,
+                    radius: 8,
+                    fillColor: 'var(--marker-unknown-fill)',
+                    color: 'var(--marker-unknown-stroke)'
+                };
+        }
+    };
+    
+    const createPubPopupContent = (pub, gfStatus = null) => {
+        if (!gfStatus) {
+            gfStatus = determineGFStatus(pub);
+        }
+        
+        // Get the popup template
+        const template = document.getElementById('popup-content-template');
+        if (!template) {
+            // Fallback to basic content if template not found
+            return createBasicPopupContent(pub, gfStatus);
+        }
+        
+        const clone = template.content.cloneNode(true);
+        
+        // Fill in the template data
+        clone.querySelector('[data-field="name"]').textContent = pub.name;
+        
+        const addressEl = clone.querySelector('[data-field="address"]');
+        if (pub.address) {
+            addressEl.textContent = pub.address;
+        } else {
+            addressEl.style.display = 'none';
+        }
+        
+        clone.querySelector('[data-field="postcode"]').textContent = pub.postcode;
+        
+        // Add distance if available
+        const distanceEl = clone.querySelector('[data-field="distance"]');
+        if (pub.distance !== undefined) {
+            distanceEl.textContent = `${pub.distance.toFixed(1)}km away`;
+            distanceEl.style.display = 'block';
+        }
+        
+        // Set GF status with appropriate class
+        const gfStatusEl = clone.querySelector('[data-field="gf-status"]');
+        if (gfStatus === 'gf_available') {
             let gfOptions = [];
             if (pub.bottle) gfOptions.push('🍺');
             if (pub.tap) gfOptions.push('🚰');
             if (pub.cask) gfOptions.push('🛢️');
             if (pub.can) gfOptions.push('🥫');
-            content += `<div style="margin-top: 8px; color: var(--success-color, #10b981);"><strong>GF: ${gfOptions.join(' ')}</strong></div>`;
+            gfStatusEl.textContent = `✅ GF Available: ${gfOptions.join(' ')}`;
+            gfStatusEl.className = 'popup-gf-status available';
+        } else if (gfStatus === 'no_gf') {
+            gfStatusEl.textContent = '❌ No GF Options Known';
+            gfStatusEl.className = 'popup-gf-status not-available';
+        } else {
+            gfStatusEl.textContent = '❓ GF Status Unknown';
+            gfStatusEl.className = 'popup-gf-status unknown';
         }
         
-        // Add view details button
-        content += `<div style="margin-top: 8px;">`;
-        content += `<button onclick="MapModule.showPubFromMap(${pub.pub_id})" `;
-        content += `style="background: var(--primary-gradient); color: white; border: none; `;
-        content += `padding: 4px 8px; border-radius: 12px; font-size: 12px; cursor: pointer;">`;
-        content += `View Details</button></div>`;
+        // Set up button click handler
+        const button = clone.querySelector('[data-action="view-details"]');
+        button.onclick = () => MapModule.showPubFromMap(pub.pub_id);
+        
+        // Return the HTML string for Leaflet
+        const div = document.createElement('div');
+        div.appendChild(clone);
+        return div.innerHTML;
+    };
+
+    const createBasicPopupContent = (pub, gfStatus) => {
+        // Fallback function using CSS classes instead of inline styles
+        let content = `<div class="popup-content">`;
+        content += `<div class="popup-title">${escapeHtml(pub.name)}</div>`;
+        
+        if (pub.address) {
+            content += `<div class="popup-address">${escapeHtml(pub.address)}</div>`;
+        }
+        content += `<div class="popup-postcode">${escapeHtml(pub.postcode)}</div>`;
+        
+        if (pub.distance !== undefined) {
+            content += `<div class="popup-distance">${pub.distance.toFixed(1)}km away</div>`;
+        }
+        
+        // GF status with appropriate class
+        if (gfStatus === 'gf_available') {
+            let gfOptions = [];
+            if (pub.bottle) gfOptions.push('🍺');
+            if (pub.tap) gfOptions.push('🚰');
+            if (pub.cask) gfOptions.push('🛢️');
+            if (pub.can) gfOptions.push('🥫');
+            content += `<div class="popup-gf-status available">✅ GF Available: ${gfOptions.join(' ')}</div>`;
+        } else if (gfStatus === 'no_gf') {
+            content += `<div class="popup-gf-status not-available">❌ No GF Options Known</div>`;
+        } else {
+            content += `<div class="popup-gf-status unknown">❓ GF Status Unknown</div>`;
+        }
+        
+        content += `<button class="popup-button" onclick="MapModule.showPubFromMap(${pub.pub_id})">View Details</button>`;
         content += `</div>`;
         
         return content;
+    };
+    
+    const addMapLegend = (mapInstance) => {
+        // Create legend control
+        const legend = L.control({ position: 'bottomright' });
+        
+        legend.onAdd = function(map) {
+            const div = L.DomUtil.create('div', 'legend-container');
+            
+            // Get the legend template
+            const template = document.getElementById('map-legend-template');
+            if (template) {
+                const clone = template.content.cloneNode(true);
+                div.appendChild(clone);
+            } else {
+                // Fallback legend
+                div.innerHTML = `
+                    <div class="map-legend">
+                        <div class="legend-title">🍺 GF Beer Status</div>
+                        <div class="legend-item">
+                            <div class="legend-marker gf-available"></div>
+                            <span class="legend-text">GF Available</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-marker no-gf"></div>
+                            <span class="legend-text">No GF Options</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-marker unknown"></div>
+                            <span class="legend-text">Unknown</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-marker user-location"></div>
+                            <span class="legend-text">Your Location</span>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            return div;
+        };
+        
+        legend.addTo(mapInstance);
+    };
+    
+    const initPubDetailsSplitMap = (pub) => {
+        console.log('🗺️ Initializing SPLIT-SCREEN pub details map for:', pub.name);
+        
+        const mapContainer = document.querySelector('.pub-map-placeholder');
+        if (!mapContainer) {
+            console.error('Pub map container not found');
+            return null;
+        }
+        
+        if (!pub.latitude || !pub.longitude) {
+            // Use template for error state
+            const template = document.getElementById('map-error-template');
+            if (template) {
+                const clone = template.content.cloneNode(true);
+                mapContainer.innerHTML = '';
+                mapContainer.appendChild(clone);
+            } else {
+                mapContainer.className = 'map-error-container';
+                mapContainer.innerHTML = `
+                    <div class="map-error-icon">📍</div>
+                    <div class="map-error-title">Location coordinates not available</div>
+                    <div class="map-error-text">Help us by reporting the exact location!</div>
+                `;
+            }
+            return null;
+        }
+        
+        // Create split-screen map container
+        mapContainer.innerHTML = '<div id="pubMapLeaflet" style="width: 100%; height: 100%; border-radius: 0 0 var(--radius-xl) var(--radius-xl);"></div>';
+        
+        // Create map optimized for split-screen view
+        pubDetailMap = L.map('pubMapLeaflet', {
+            zoomControl: true,
+            attributionControl: false,
+            scrollWheelZoom: true,
+            doubleClickZoom: true,
+            touchZoom: true,
+            boxZoom: false,
+            keyboard: false
+        }).setView([pub.latitude, pub.longitude], 16);
+        
+        // Add tile layer
+        L.tileLayer(config.tileLayer, {
+            maxZoom: config.maxZoom,
+            attribution: config.attribution
+        }).addTo(pubDetailMap);
+        
+        // Determine GF status and get appropriate marker style
+        const gfStatus = determineGFStatus(pub);
+        const markerStyle = getMarkerStyleForGFStatus(gfStatus);
+        
+        // Add pub marker with GF status color
+        const pubMarker = L.circleMarker([pub.latitude, pub.longitude], {
+            ...markerStyle,
+            radius: 14
+        }).addTo(pubDetailMap);
+        
+        // Create popup content using template
+        const popupContent = createPubPopupContent(pub, gfStatus);
+        pubMarker.bindPopup(popupContent).openPopup();
+        
+        // Add user location if available
+        if (userLocation) {
+            L.circleMarker([userLocation.lat, userLocation.lng], {
+                radius: 8,
+                fillColor: 'var(--marker-user-fill)',
+                color: 'var(--marker-user-stroke)',
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.8
+            }).addTo(pubDetailMap).bindPopup('Your location');
+        }
+        
+        // Ensure proper rendering for split-screen
+        setTimeout(() => {
+            pubDetailMap.invalidateSize();
+        }, 150);
+        
+        console.log('✅ Split-screen pub detail map initialized with GF status colors');
+        return pubDetailMap;
+    };
+    
+    // Helper function for HTML escaping
+    const escapeHtml = (text) => {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
     };
     
     // Calculate distance between two points
