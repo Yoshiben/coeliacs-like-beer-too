@@ -143,48 +143,57 @@ const App = {
     setupEventDelegation() {
         console.log('🔧 Setting up fixed event delegation...');
         
-        // Handle all data-* attributes in one place
+        // Handle all data-* attributes in one place with proper event capture
         document.addEventListener('click', (e) => {
+            // Find the closest element with a data-action attribute
             const target = e.target.closest('[data-action], [data-modal], [data-distance]');
             if (!target) return;
             
-            // Modal triggers - FIXED
+            // Prevent default for all handled actions
+            e.preventDefault();
+            e.stopPropagation();
+            
+            console.log('🎯 Event delegation caught:', target.dataset);
+            
+            // Modal triggers
             if (target.dataset.modal) {
-                e.preventDefault();
                 const modalId = target.dataset.modal;
                 console.log(`🔓 Opening modal: ${modalId}`);
                 
                 const modal = document.getElementById(modalId);
                 if (modal) {
-                    // Force proper display
                     modal.style.display = 'flex';
-                    modal.classList.add('active'); // For CSS targeting
-                    document.body.style.overflow = 'hidden'; // Prevent background scroll
-                    
+                    modal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
                     console.log(`✅ Modal ${modalId} opened successfully`);
                 } else {
                     console.error(`❌ Modal ${modalId} not found in DOM`);
                 }
             }
             
-            // Action handlers - FIXED
+            // Action handlers
             if (target.dataset.action) {
-                e.preventDefault();
-                this.handleAction(target.dataset.action, target);
+                console.log(`🎬 Handling action: ${target.dataset.action}`);
+                this.handleAction(target.dataset.action, target, e);
             }
             
-            // Distance selection - FIXED
+            // Distance selection
             if (target.dataset.distance) {
                 const distance = parseInt(target.dataset.distance);
+                console.log(`📍 Distance selected: ${distance}km`);
                 this.handleDistanceSelection(distance);
             }
-        });
+        }, true); // Use capture phase to ensure we catch all events
         
-        // Modal close handlers - FIXED
+        // Modal close handlers with higher specificity
         document.addEventListener('click', (e) => {
             // Close on backdrop click
-            if (e.target.classList.contains('modal') || e.target.classList.contains('search-modal')) {
+            if (e.target.classList.contains('modal') || 
+                e.target.classList.contains('search-modal') ||
+                e.target.classList.contains('results-overlay')) {
+                
                 const modal = e.target;
+                console.log(`🔒 Backdrop click detected on: ${modal.id}`);
                 this.closeModal(modal.id);
             }
             
@@ -192,24 +201,28 @@ const App = {
             if (e.target.classList.contains('modal-close') || 
                 e.target.closest('.modal-close') ||
                 e.target.dataset.action === 'close-modal') {
-                const modal = e.target.closest('.modal, .search-modal');
+                
+                const modal = e.target.closest('.modal, .search-modal, .results-overlay');
                 if (modal) {
+                    console.log(`🔒 Close button clicked for: ${modal.id}`);
                     this.closeModal(modal.id);
                 }
             }
         });
         
-        // Escape key handler - FIXED
+        // Escape key handler
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                // Close the topmost modal
                 const openModals = document.querySelectorAll('.modal[style*="display: flex"], .modal.active');
                 if (openModals.length > 0) {
                     const lastModal = openModals[openModals.length - 1];
+                    console.log(`⌨️ Escape pressed - closing: ${lastModal.id}`);
                     this.closeModal(lastModal.id);
                 }
             }
         });
+        
+        console.log('✅ Event delegation setup complete');
     },
     
     setupGlobalFunctions() {
@@ -232,28 +245,82 @@ const App = {
         }
     },
     
-    handleAction(action, element) {
+    handleAction(action, element, event) {
+        console.log(`🎬 Processing action: ${action}`);
+        
         const searchModule = this.getModule('search');
         const modalModule = this.getModule('modal');
+        const uiModule = this.getModule('ui');
         
         switch(action) {
             case 'location-search':
-                searchModule?.startLocationSearch?.();
+                console.log('📍 Starting location search...');
+                if (searchModule?.startLocationSearch) {
+                    searchModule.startLocationSearch();
+                }
                 break;
+                
             case 'search-name':
-                modalModule?.openSearchModal?.('name');
+                console.log('🏠 Opening name search modal...');
+                if (modalModule?.openSearchModal) {
+                    modalModule.openSearchModal('name');
+                }
                 break;
+                
             case 'search-area':
-                modalModule?.openSearchModal?.('area');
+                console.log('🗺️ Opening area search modal...');
+                if (modalModule?.openSearchModal) {
+                    modalModule.openSearchModal('area');
+                }
                 break;
+                
             case 'search-beer':
-                modalModule?.openSearchModal?.('beer');
+                console.log('🍺 Opening beer search modal...');
+                if (modalModule?.openSearchModal) {
+                    modalModule.openSearchModal('beer');
+                }
                 break;
+                
+            case 'close-results':
+                console.log('🏠 Closing results overlay...');
+                if (uiModule?.closeResults) {
+                    uiModule.closeResults();
+                } else {
+                    // Fallback
+                    window.closeResults?.();
+                }
+                break;
+                
+            case 'toggle-results-map':
+                console.log('🗺️ Toggling results map...');
+                const mapModule = this.getModule('map');
+                if (mapModule?.toggleSearchResultsFullMap) {
+                    mapModule.toggleSearchResultsFullMap();
+                } else {
+                    // Fallback implementation
+                    this.toggleResultsMapFallback();
+                }
+                break;
+                
             case 'view-pub':
+                console.log('🏠 Viewing pub details...');
                 const pubId = element.dataset.pubId;
-                searchModule?.showPubDetails?.(pubId);
+                if (pubId && searchModule?.showPubDetails) {
+                    searchModule.showPubDetails(pubId);
+                }
                 break;
-            // Add more actions as needed
+                
+            case 'close-modal':
+                console.log('🔒 Closing modal...');
+                const modal = element.closest('.modal, .search-modal');
+                if (modal) {
+                    this.closeModal(modal.id);
+                }
+                break;
+                
+            default:
+                console.log(`❓ Unhandled action: ${action}`);
+                break;
         }
     },
     
@@ -310,6 +377,46 @@ const App = {
         
         utils.showSuccessToast('✅ Cookie preferences saved!');
     },
+
+    toggleResultsMapFallback() {
+        const listContainer = document.getElementById('resultsListContainer');
+        const mapContainer = document.getElementById('resultsMapContainer');
+        const mapBtnText = document.getElementById('resultsMapBtnText');
+        
+        if (mapContainer && listContainer && mapBtnText) {
+            if (mapContainer.style.display === 'none' || !mapContainer.style.display) {
+                // Show map
+                listContainer.style.display = 'none';
+                mapContainer.style.display = 'block';
+                mapBtnText.textContent = 'List';
+                console.log('✅ Map view activated (fallback)');
+            } else {
+                // Show list
+                listContainer.style.display = 'block';
+                mapContainer.style.display = 'none';
+                mapBtnText.textContent = 'Map';
+                console.log('✅ List view activated (fallback)');
+            }
+        }
+    },
+    
+    // ================================
+    // 🔧 ADD: Proper modal closing function
+    // LOCATION: Add to main.js
+    // ================================
+    
+    closeModal(modalId) {
+        if (!modalId) return;
+        
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            modal.style.display = 'none';
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
+            console.log(`✅ Modal ${modalId} closed`);
+        }
+    }
+
     
     showFallback(error) {
         const fallbackDiv = document.createElement('div');
