@@ -199,6 +199,27 @@
    --suggestion-bg: var(--bg-white);
    --suggestion-hover: var(--hover-subtle);
    --suggestion-border: var(--border-light);
+
+   /* Legend container */
+    --legend-bg: rgba(255, 255, 255, 0.95);
+    --legend-padding: var(--space-md);
+    --legend-border-radius: var(--radius);
+    --legend-shadow: var(--shadow);
+    --legend-font-size: var(--text-xs);
+    --legend-line-height: 1.4;
+    
+    /* Legend items */
+    --legend-title-color: var(--text-primary);
+    --legend-title-weight: 600;
+    --legend-title-margin: var(--space-xs);
+    --legend-item-margin: var(--space-xs);
+    --legend-text-color: var(--text-primary);
+    
+    /* Legend markers */
+    --legend-marker-size: 12px;
+    --legend-marker-margin: var(--space-xs);
+    --legend-marker-border: 1px solid var(--text-white);
+    --legend-user-marker-size: 10px;
 }
 
 /* Desktop Adjustments */
@@ -4176,10 +4197,229 @@ body {
     box-shadow: var(--shadow);
 }
 
+.map-legend {
+    background: var(--legend-bg);
+    padding: var(--legend-padding);
+    border-radius: var(--legend-border-radius);
+    box-shadow: var(--legend-shadow);
+    font-size: var(--legend-font-size);
+    line-height: var(--legend-line-height);
+    backdrop-filter: blur(10px);
+}
+
+/* Legend Title */
+.legend-title {
+    font-weight: var(--legend-title-weight);
+    margin-bottom: var(--legend-title-margin);
+    color: var(--legend-title-color);
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+/* Legend Items */
+.legend-item {
+    margin-bottom: var(--legend-item-margin);
+    display: flex;
+    align-items: center;
+    gap: var(--legend-marker-margin);
+}
+
+.legend-item:last-child {
+    margin-bottom: 0;
+}
+
+/* Legend Markers */
+.legend-marker {
+    width: var(--legend-marker-size);
+    height: var(--legend-marker-size);
+    border-radius: 50%;
+    border: var(--legend-marker-border);
+    flex-shrink: 0;
+}
+
+.legend-marker.gf-available {
+    background: var(--marker-gf-fill);
+}
+
+.legend-marker.no-gf {
+    background: var(--marker-no-gf-fill);
+}
+
+.legend-marker.unknown {
+    width: var(--legend-user-marker-size);
+    height: var(--legend-user-marker-size);
+    background: var(--marker-unknown-fill);
+}
+
+.legend-marker.user-location {
+    width: var(--legend-user-marker-size);
+    height: var(--legend-user-marker-size);
+    background: var(--marker-user-fill);
+}
+
+/* Legend Text */
+.legend-text {
+    color: var(--legend-text-color);
+    font-size: var(--legend-font-size);
+}
+
+/* Map Error States */
+.map-error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: var(--space-xl);
+    text-align: center;
+    background: repeating-linear-gradient(
+        45deg,
+        var(--bg-section),
+        var(--bg-section) 10px,
+        var(--border-light) 10px,
+        var(--border-light) 20px
+    );
+}
+
+.map-error-icon {
+    font-size: 2rem;
+    margin-bottom: var(--space-md);
+    opacity: 0.6;
+}
+
+.map-error-title {
+    color: var(--text-secondary);
+    font-weight: 600;
+    margin-bottom: var(--space-xs);
+    font-size: var(--text-base);
+}
+
+.map-error-text {
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    line-height: 1.4;
+}
+
+/* Popup Styling Variables */
+:root {
+    --popup-bg: var(--bg-white);
+    --popup-padding: var(--space-sm);
+    --popup-min-width: 200px;
+    --popup-border-radius: var(--radius);
+    --popup-shadow: var(--shadow);
+    
+    /* Popup text */
+    --popup-title-color: var(--text-primary);
+    --popup-title-size: var(--text-sm);
+    --popup-text-color: var(--text-secondary);
+    --popup-text-size: var(--text-xs);
+    --popup-muted-color: var(--text-muted);
+    
+    /* Popup button */
+    --popup-btn-bg: var(--primary-gradient);
+    --popup-btn-color: var(--text-white);
+    --popup-btn-padding: 4px var(--space-sm);
+    --popup-btn-border-radius: var(--radius);
+    --popup-btn-font-size: var(--text-xs);
+}
+
+/* Leaflet Popup Overrides */
+.leaflet-popup-content-wrapper {
+    background: var(--popup-bg) !important;
+    border-radius: var(--popup-border-radius) !important;
+    box-shadow: var(--popup-shadow) !important;
+}
+
+.leaflet-popup-content {
+    margin: var(--popup-padding) !important;
+    min-width: var(--popup-min-width) !important;
+    text-align: center !important;
+}
+
+/* Popup Content Classes */
+.popup-title {
+    color: var(--popup-title-color);
+    font-size: var(--popup-title-size);
+    font-weight: 600;
+    margin-bottom: var(--space-xs);
+    line-height: 1.2;
+}
+
+.popup-address {
+    color: var(--popup-text-color);
+    font-size: var(--popup-text-size);
+    margin-bottom: 2px;
+}
+
+.popup-postcode {
+    color: var(--popup-muted-color);
+    font-size: var(--popup-text-size);
+    margin-bottom: var(--space-xs);
+}
+
+.popup-distance {
+    color: var(--primary-color, #667eea);
+    font-weight: 600;
+    font-size: var(--popup-text-size);
+    margin-bottom: var(--space-xs);
+}
+
+.popup-gf-status {
+    margin-top: var(--space-sm);
+    font-weight: 600;
+    font-size: var(--popup-text-size);
+    padding: var(--space-xs);
+    border-radius: var(--radius-sm);
+}
+
+.popup-gf-status.available {
+    color: var(--marker-gf-fill);
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.popup-gf-status.not-available {
+    color: var(--marker-no-gf-fill);
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.popup-gf-status.unknown {
+    color: var(--marker-unknown-fill);
+    background: rgba(156, 163, 175, 0.1);
+}
+
+.popup-button {
+    background: var(--popup-btn-bg);
+    color: var(--popup-btn-color);
+    border: none;
+    padding: var(--popup-btn-padding);
+    border-radius: var(--popup-btn-border-radius);
+    font-size: var(--popup-btn-font-size);
+    cursor: pointer;
+    margin-top: var(--space-sm);
+    transition: all var(--transition);
+}
+
+.popup-button:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+
 /* ================================
    MOBILE RESPONSIVE - TABLETS
    ================================ */
 @media (max-width: 768px) {
+   :root {
+        --legend-font-size: 0.7rem;
+        --legend-padding: var(--space-sm);
+        --legend-marker-size: 10px;
+        --legend-user-marker-size: 8px;
+        --popup-min-width: 160px;
+        --popup-title-size: var(--text-xs);
+        --popup-text-size: 0.7rem;
+    }
+   
     .modal-content {
         margin: var(--space-xl) auto;
         max-height: 90vh;
