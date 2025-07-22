@@ -776,7 +776,6 @@
             if (document.getElementById('map')) {
                 MapModule.initMainMap();
             }
-        });
         
         // Example: When you get user location
         function handleUserLocation(position) {
@@ -902,8 +901,7 @@
         window.updateAreaPlaceholder = ModalModule.updateAreaPlaceholder;
         window.updateBeerPlaceholder = ModalModule.updateBeerPlaceholder;
             
-            console.log('✅ Modal event handlers ready!');
-        });
+        console.log('✅ Modal event handlers ready!');
         
         // Update any functions that programmatically open modals
         window.showAboutUs = () => ModalModule.open('aboutModal');
