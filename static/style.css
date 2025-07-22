@@ -3184,6 +3184,8 @@ body {
     gap: var(--space-xs);
 }
 
+
+
 /* ====================
    MOBILE OPTIMISATIONS
    ==================== */
@@ -4405,6 +4407,74 @@ body {
     box-shadow: var(--shadow-sm);
 }
 
+/* ================================
+   🔧 ADD: Fixed Results Map Container CSS
+   📍 LOCATION: Add to style.css after existing results overlay styles
+   ================================ */
+
+/* Force full-screen results map (NOT split-screen) */
+.results-map-container {
+    flex: 1 !important;
+    position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    background: var(--bg-white) !important;
+    border-radius: 0 0 var(--radius-xl) var(--radius-xl) !important;
+    overflow: hidden !important;
+}
+
+.results-map-container #resultsMap {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 400px !important; /* Minimum height for visibility */
+    border: none !important;
+    border-radius: 0 0 var(--radius-xl) var(--radius-xl) !important;
+}
+
+/* Ensure results map is NEVER in split-view mode */
+.results-map-container:not(.split-view) {
+    display: block !important;
+}
+
+/* Override any split-view styles for results map */
+.results-overlay .results-map-container {
+    max-height: none !important; /* Remove any height restrictions */
+    flex: 1 !important; /* Take full available space */
+}
+
+/* Force map tiles to render properly */
+.results-map-container .leaflet-container {
+    width: 100% !important;
+    height: 100% !important;
+    background: var(--bg-white) !important;
+}
+
+/* ================================
+   🔧 UPDATE: Enhanced map toggle visibility
+   📍 LOCATION: Update existing results overlay styles in style.css
+   ================================ */
+
+/* When map is shown, hide list completely */
+.results-content:has(.results-map-container[style*="display: block"]) .results-list-container {
+    display: none !important;
+}
+
+/* When list is shown, hide map completely */
+.results-content:has(.results-list-container[style*="display: block"]) .results-map-container {
+    display: none !important;
+}
+
+/* Map container visibility states */
+.results-map-container[style*="display: none"] {
+    display: none !important;
+}
+
+.results-map-container[style*="display: block"] {
+    display: block !important;
+    flex: 1 !important;
+    height: 100% !important;
+}
 
 /* ================================
    MOBILE RESPONSIVE - TABLETS
@@ -4418,6 +4488,16 @@ body {
         --popup-min-width: 160px;
         --popup-title-size: var(--text-xs);
         --popup-text-size: 0.7rem;
+    }
+
+   .results-map-container #resultsMap {
+        min-height: 300px !important; /* Smaller minimum on mobile */
+        border-radius: 0 0 var(--radius-lg) var(--radius-lg) !important;
+    }
+    
+    /* Ensure touch interactions work on mobile map */
+    .results-map-container .leaflet-container {
+        touch-action: pan-x pan-y !important;
     }
    
     .modal-content {
@@ -4740,4 +4820,15 @@ body {
         min-height: 44px;
         padding: var(--space-sm);
     }
+}
+
+/* ================================
+   DEBUG HELPERS (remove in production)
+   ================================ */
+.results-map-container[style*="display: block"] {
+    border: 2px solid green !important; /* Temporary debug border */
+}
+
+.results-list-container[style*="display: block"] {
+    border: 2px solid blue !important; /* Temporary debug border */
 }
