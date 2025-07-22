@@ -51,8 +51,14 @@ export const SearchModule = (function() {
         }
     };
     
+    // ================================
+    // 🔧 UPDATE: Enhanced searchNearbyWithDistance function in search.js
+    // LOCATION: Find searchNearbyWithDistance function around line 50
+    // ACTION: Update the location acquisition section with better feedback
+    // ================================
+    
     const searchNearbyWithDistance = async (radiusKm) => {
-        console.log(`🎯 Searching within ${radiusKm}km...`);
+        console.log(`🎯 Searching within ${radiusKm}km with enhanced accuracy...`);
         
         try {
             // Close distance modal
@@ -62,12 +68,41 @@ export const SearchModule = (function() {
             
             // Show results overlay
             showResultsOverlay(`Pubs within ${radiusKm}km`);
-            showResultsLoading('Getting your location...');
+            
+            // 🔧 ENHANCED: Better location feedback
+            showResultsLoading('📍 Getting precise location...');
             
             // Get user location if we don't have it
             if (!userLocation) {
-                userLocation = await getUserLocation();
-                MapModule.setUserLocation(userLocation);
+                try {
+                    userLocation = await getUserLocation();
+                    
+                    // 🔧 ADD: Show accuracy feedback to user
+                    if (userLocation.accuracy) {
+                        if (userLocation.accuracy <= 100) {
+                            showResultsLoading('🎯 Excellent location accuracy - finding nearby GF beer...');
+                        } else if (userLocation.accuracy <= 500) {
+                            showResultsLoading('📍 Good location accuracy - finding nearby GF beer...');
+                        } else if (userLocation.accuracy <= 1000) {
+                            showResultsLoading('📍 Reasonable location accuracy - finding nearby GF beer...');
+                        } else {
+                            showResultsLoading('📍 Location found (low accuracy) - finding nearby GF beer...');
+                            if (window.showSuccessToast) {
+                                window.showSuccessToast(`⚠️ Location accuracy: ±${Math.round(userLocation.accuracy)}m`);
+                            }
+                        }
+                    }
+                    
+                    const mapModule = getMap();
+                    if (mapModule && mapModule.setUserLocation) {
+                        mapModule.setUserLocation(userLocation);
+                    }
+                    
+                } catch (locationError) {
+                    console.error('❌ Location error:', locationError);
+                    showNoResults(`${locationError.message} Please try again or search by area instead.`);
+                    return;
+                }
             }
             
             // Save search state
@@ -79,7 +114,7 @@ export const SearchModule = (function() {
             };
             
             // Perform search
-            showResultsLoading('Finding nearby GF beer...');
+            showResultsLoading('🔍 Searching for GF beer options...');
             const pubs = await APIModule.findNearbyPubs(
                 userLocation.lat, 
                 userLocation.lng, 
@@ -90,15 +125,18 @@ export const SearchModule = (function() {
             console.log(`✅ Found ${pubs.length} pubs`);
             
             if (pubs.length === 0) {
-                showNoResults(`No pubs found within ${radiusKm}km`);
+                showNoResults(`No pubs found within ${radiusKm}km of your location`);
                 return;
             }
             
             // Store results
             currentSearchPubs = pubs;
             
-            // Display results
-            displayResultsInOverlay(pubs, `${pubs.length} pubs within ${radiusKm}km`);
+            // Display results with location accuracy info
+            const accuracyText = userLocation.accuracy && userLocation.accuracy > 500 ? 
+                ` (±${Math.round(userLocation.accuracy)}m accuracy)` : '';
+            
+            displayResultsInOverlay(pubs, `${pubs.length} pubs within ${radiusKm}km${accuracyText}`);
             
             // Track success
             if (window.trackSearch) {
@@ -899,43 +937,115 @@ export const SearchModule = (function() {
     // HELPER FUNCTIONS
     // =============================================================================
     
+    // ================================
+    // 🔧 REPLACE: Enhanced getUserLocation function in search.js
+    // LOCATION: Find the getUserLocation function around line 800
+    // ACTION: Replace the entire function with this enhanced version
+    // ================================
+    
     const getUserLocation = () => {
         return new Promise((resolve, reject) => {
             if (!navigator.geolocation) {
-                reject(new Error('Location not supported'));
+                reject(new Error('Geolocation not supported by this browser'));
                 return;
             }
+            
+            console.log('📍 Requesting high-accuracy location...');
             
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     const location = {
                         lat: position.coords.latitude,
-                        lng: position.coords.longitude
+                        lng: position.coords.longitude,
+                        accuracy: position.coords.accuracy // meters
                     };
+                    
+                    console.log(`✅ Location found: ${location.lat.toFixed(6)}, ${location.lng.toFixed(6)} (±${location.accuracy}m)`);
+                    
+                    // Warn if accuracy is poor (over 1km)
+                    if (location.accuracy > 1000) {
+                        console.warn(`⚠️ Low accuracy: ±${location.accuracy}m - results may be imprecise`);
+                        if (window.showSuccessToast) {
+                            window.showSuccessToast(`📍 Location found but accuracy is ±${Math.round(location.accuracy)}m`);
+                        }
+                    }
+                    
                     resolve(location);
                 },
                 (error) => {
-                    reject(error);
+                    console.error('❌ Location error:', error);
+                    
+                    let userMessage = 'Could not get your location. ';
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            userMessage += 'Please allow location access and try again.';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            userMessage += 'Location information unavailable.';
+                            break;
+                        case error.TIMEOUT:
+                            userMessage += 'Location request timed out.';
+                            break;
+                        default:
+                            userMessage += 'Unknown location error.';
+                            break;
+                    }
+                    
+                    reject(new Error(userMessage));
                 },
                 {
-                    enableHighAccuracy: true,
-                    timeout: 10000,
-                    maximumAge: 300000 // 5 minutes
+                    // 🔧 ENHANCED: High accuracy settings for better location precision
+                    enableHighAccuracy: true,        // Use GPS/WiFi for best accuracy
+                    timeout: 15000,                   // Allow 15 seconds (was 10)
+                    maximumAge: 60000                 // Cache for 1 minute only (was 5 minutes!)
                 }
             );
         });
     };
     
+    // ================================
+    // 🔧 REPLACE: Enhanced tryGetUserLocation function in search.js  
+    // LOCATION: Find the tryGetUserLocation function around line 850
+    // ACTION: Replace the entire function with this enhanced version
+    // ================================
+    
     const tryGetUserLocation = async () => {
-        if (userLocation) return userLocation;
+        if (userLocation) {
+            // Check if cached location is still fresh (less than 5 minutes old)
+            if (userLocation.timestamp && Date.now() - userLocation.timestamp < 300000) {
+                console.log('📍 Using fresh cached location');
+                return userLocation;
+            }
+            console.log('📍 Cached location expired, requesting fresh location...');
+        }
         
         try {
-            console.log('📍 Attempting to get user location for proximity ordering...');
-            userLocation = await getUserLocation();
-            MapModule.setUserLocation(userLocation);
+            console.log('📍 Attempting to get high-accuracy user location...');
+            
+            const location = await getUserLocation();
+            
+            // Add timestamp for cache management
+            location.timestamp = Date.now();
+            
+            userLocation = location;
+            
+            // Update map module with new location
+            const mapModule = getMap();
+            if (mapModule && mapModule.setUserLocation) {
+                mapModule.setUserLocation(userLocation);
+            }
+            
+            console.log(`✅ Fresh location acquired: accuracy ±${location.accuracy}m`);
             return userLocation;
+            
         } catch (error) {
-            console.log('📍 Could not get location:', error.message);
+            console.log('📍 Could not get location for proximity sorting:', error.message);
+            
+            // Show user-friendly message for location errors
+            if (window.showSuccessToast && error.message.includes('allow location')) {
+                window.showSuccessToast('💡 Tip: Allow location access for distance-sorted results');
+            }
+            
             return null;
         }
     };
