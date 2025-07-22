@@ -1021,81 +1021,82 @@
                     const modalId = modalTrigger.dataset.modal;
                     ModalModule.open(modalId);
                 }
-            });
+            })
+        });
             
-            // Handle data-action attributes
-            document.addEventListener('click', (e) => {
-                const actionTrigger = e.target.closest('[data-action]');
-                if (actionTrigger) {
-                    e.preventDefault();
-                    const action = actionTrigger.dataset.action;
-                    
-                    switch(action) {
-                        case 'location-search':
-                            SearchModule.startLocationSearch();
-                            break;
-                        case 'search-name':
-                            SearchModule.searchByName();
-                            break;
-                        case 'search-area':
-                            SearchModule.searchByArea();
-                            break;
-                        case 'search-beer':
-                            SearchModule.searchByBeer();
-                            break;
-                        case 'close-modal':
-                            const modal = actionTrigger.closest('.modal, .search-modal');
-                            if (modal && modal.id) {
-                                ModalModule.close(modal.id);
-                            }
-                            break;
-                        case 'report-beer':
-                            // Check if we're on a pub detail page
-                            if (window.currentPubData) {
-                                ModalModule.openReportModal(window.currentPubData);
-                            } else {
-                                ModalModule.openReportModal();
-                            }
-                            break;
-                        case 'accept-all-cookies':
-                            acceptAllCookies();
-                            break;
-                        case 'accept-essential-cookies':
-                            acceptEssentialOnly();
-                            break;
-                        case 'save-cookie-preferences':
-                            savesCookiePreferences();
-                            break;
-                        case 'accept-all-from-settings':
-                            acceptAllFromSettings();
-                            break;
-                        case 'close-pub-details':
-                            closePubDetails();
-                            break;
-                        case 'back-to-results':
-                            SearchModule.goBackToResults();
-                            break;
-                        case 'toggle-pub-map':
-                            togglePubDetailsSplitMap();
-                            break;
-                        case 'close-results':
-                            closeResults();
-                            break;
-                        case 'toggle-results-map':
-                            toggleSearchResultsFullMap();
-                            break;
-                        case 'scroll-to-search':
-                            scrollToSearch();
-                            break;
-                        case 'update-area-placeholder':
-                            updateAreaPlaceholder();
-                            break;
-                        case 'update-beer-placeholder':
-                            updateBeerPlaceholder();
-                            break;
-                    }
+        // Handle data-action attributes
+        document.addEventListener('click', (e) => {
+            const actionTrigger = e.target.closest('[data-action]');
+            if (actionTrigger) {
+                e.preventDefault();
+                const action = actionTrigger.dataset.action;
+                
+                switch(action) {
+                    case 'location-search':
+                        SearchModule.startLocationSearch();
+                        break;
+                    case 'search-name':
+                        SearchModule.searchByName();
+                        break;
+                    case 'search-area':
+                        SearchModule.searchByArea();
+                        break;
+                    case 'search-beer':
+                        SearchModule.searchByBeer();
+                        break;
+                    case 'close-modal':
+                        const modal = actionTrigger.closest('.modal, .search-modal');
+                        if (modal && modal.id) {
+                            ModalModule.close(modal.id);
+                        }
+                        break;
+                    case 'report-beer':
+                        // Check if we're on a pub detail page
+                        if (window.currentPubData) {
+                            ModalModule.openReportModal(window.currentPubData);
+                        } else {
+                            ModalModule.openReportModal();
+                        }
+                        break;
+                    case 'accept-all-cookies':
+                        acceptAllCookies();
+                        break;
+                    case 'accept-essential-cookies':
+                        acceptEssentialOnly();
+                        break;
+                    case 'save-cookie-preferences':
+                        savesCookiePreferences();
+                        break;
+                    case 'accept-all-from-settings':
+                        acceptAllFromSettings();
+                        break;
+                    case 'close-pub-details':
+                        closePubDetails();
+                        break;
+                    case 'back-to-results':
+                        SearchModule.goBackToResults();
+                        break;
+                    case 'toggle-pub-map':
+                        togglePubDetailsSplitMap();
+                        break;
+                    case 'close-results':
+                        closeResults();
+                        break;
+                    case 'toggle-results-map':
+                        toggleSearchResultsFullMap();
+                        break;
+                    case 'scroll-to-search':
+                        scrollToSearch();
+                        break;
+                    case 'update-area-placeholder':
+                        updateAreaPlaceholder();
+                        break;
+                    case 'update-beer-placeholder':
+                        updateBeerPlaceholder();
+                        break;
                 }
-            });
+            }
+        });
 
         // Initialize when DOM is ready
         document.addEventListener('DOMContentLoaded', function() {
