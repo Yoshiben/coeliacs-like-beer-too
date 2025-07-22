@@ -912,6 +912,11 @@ export const SearchModule = (function() {
         });
     };
 
+    // ================================
+    // 🔧 REPLACE: In search.js - Fix navigation button handlers
+    // LOCATION: Replace the displayResultsInOverlay function
+    // ================================
+    
     const displayResultsInOverlay = (pubs, title) => {
         // Store pubs globally for map access
         currentSearchPubs = pubs;
@@ -943,7 +948,121 @@ export const SearchModule = (function() {
             resultsList.appendChild(resultItem);
         });
         
-        console.log(`✅ Actually displayed ${pubs.length} results in DOM`);
+        // 🔧 FIX: Set up navigation button handlers AFTER results are displayed
+        setupResultsNavigationHandlers();
+        
+        console.log(`✅ Displayed ${pubs.length} results with navigation handlers`);
+    };
+    
+    // ================================
+    // 🔧 ADD: New function to set up navigation handlers
+    // LOCATION: Add to search.js after displayResultsInOverlay
+    // ================================
+    
+    const setupResultsNavigationHandlers = () => {
+        console.log('🔧 Setting up results navigation handlers...');
+        
+        // Home button handler
+        const homeBtn = document.querySelector('[data-action="close-results"]');
+        if (homeBtn) {
+            // Remove any existing handlers
+            homeBtn.onclick = null;
+            
+            // Add new handler
+            homeBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('🏠 Home button clicked');
+                
+                // Use UI module to close results
+                const uiModule = window.App?.getModule('ui');
+                if (uiModule && uiModule.closeResults) {
+                    uiModule.closeResults();
+                } else {
+                    // Fallback
+                    const resultsOverlay = document.getElementById('resultsOverlay');
+                    if (resultsOverlay) {
+                        resultsOverlay.style.display = 'none';
+                        resultsOverlay.classList.remove('active');
+                    }
+                    
+                    // Show home sections
+                    const heroSection = document.querySelector('.hero-section');
+                    const searchSection = document.querySelector('.search-section');
+                    if (heroSection) heroSection.style.display = 'block';
+                    if (searchSection) searchSection.style.display = 'flex';
+                    
+                    // Restore body scroll
+                    document.body.style.overflow = '';
+                }
+                
+                // Track the action
+                const tracking = window.App?.getModule('tracking');
+                if (tracking) {
+                    tracking.trackEvent('close_results', 'Navigation', 'home_button');
+                }
+            });
+            
+            console.log('✅ Home button handler attached');
+        }
+        
+        // Map toggle button handler
+        const mapBtn = document.querySelector('[data-action="toggle-results-map"]');
+        if (mapBtn) {
+            // Remove any existing handlers
+            mapBtn.onclick = null;
+            
+            // Add new handler
+            mapBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('🗺️ Map toggle button clicked');
+                
+                const listContainer = document.getElementById('resultsListContainer');
+                const mapContainer = document.getElementById('resultsMapContainer');
+                const mapBtnText = document.getElementById('resultsMapBtnText');
+                
+                if (mapContainer && listContainer && mapBtnText) {
+                    if (mapContainer.style.display === 'none' || !mapContainer.style.display) {
+                        // Show map
+                        listContainer.style.display = 'none';
+                        mapContainer.style.display = 'block';
+                        mapBtnText.textContent = 'List';
+                        
+                        // Initialize the results map with current pubs
+                        setTimeout(() => {
+                            const mapModule = window.App?.getModule('map');
+                            if (mapModule && mapModule.initResultsMap) {
+                                const map = mapModule.initResultsMap();
+                                if (map && currentSearchPubs.length > 0) {
+                                    mapModule.addPubMarkers(currentSearchPubs, map);
+                                }
+                            }
+                        }, 100);
+                        
+                        console.log('✅ Map view activated');
+                    } else {
+                        // Show list
+                        listContainer.style.display = 'block';
+                        mapContainer.style.display = 'none';
+                        mapBtnText.textContent = 'Map';
+                        
+                        console.log('✅ List view activated');
+                    }
+                    
+                    // Track the action
+                    const tracking = window.App?.getModule('tracking');
+                    if (tracking) {
+                        tracking.trackEvent('results_map_toggle', 'Map Interaction', 
+                            mapContainer.style.display === 'block' ? 'show' : 'hide');
+                    }
+                }
+            });
+            
+            console.log('✅ Map toggle button handler attached');
+        }
+        
+        console.log('✅ Results navigation handlers setup complete');
     };
     
     const createResultItemForOverlay = (pub) => {
