@@ -711,33 +711,6 @@ export const SearchModule = (function() {
         const noResultsText = document.querySelector('.no-results-text');
         if (noResultsText) noResultsText.textContent = message;
     };
-    
-    const displayResultsInOverlay = (pubs, title) => {
-        // Update results list
-        const loadingEl = document.getElementById('resultsLoading');
-        const listEl = document.getElementById('resultsList');
-        const noResultsEl = document.getElementById('noResultsFound');
-        
-        if (loadingEl) loadingEl.style.display = 'none';
-        if (noResultsEl) noResultsEl.style.display = 'none';
-        if (listEl) {
-            listEl.style.display = 'block';
-            listEl.innerHTML = '';
-            
-            // This will move to UIModule later
-            pubs.forEach(pub => {
-                if (window.createResultItemForOverlay) {
-                    const item = window.createResultItemForOverlay(pub);
-                    listEl.appendChild(item);
-                }
-            });
-        }
-        
-        const resultsTitle = document.getElementById('resultsTitle');
-        if (resultsTitle) resultsTitle.textContent = title;
-        
-        console.log(`✅ Displayed ${pubs.length} results`);
-    };
 
     const closeSearchModal = () => {
         console.log('🔒 Closing search modals...');
@@ -750,6 +723,78 @@ export const SearchModule = (function() {
                 ModalModule.close(modalId);
             }
         });
+    };
+
+    const displayResultsInOverlay = (pubs, title) => {
+        // Store pubs globally for map access
+        currentSearchPubs = pubs;
+        console.log('💾 Stored search results for map:', pubs.length, 'pubs');
+        
+        // Hide loading and no results
+        document.getElementById('resultsLoading').style.display = 'none';
+        document.getElementById('noResultsFound').style.display = 'none';
+        
+        // Get the results list container
+        const resultsListContainer = document.getElementById('resultsListContainer');
+        const resultsList = document.getElementById('resultsList');
+        
+        // IMPORTANT: Show the list container
+        if (resultsListContainer) {
+            resultsListContainer.style.display = 'block';
+        }
+        
+        // Show and populate the results list
+        resultsList.style.display = 'block';
+        resultsList.innerHTML = '';
+        
+        // Update title
+        document.getElementById('resultsTitle').textContent = title;
+        
+        // Generate results HTML
+        pubs.forEach(pub => {
+            const resultItem = createResultItemForOverlay(pub);
+            resultsList.appendChild(resultItem);
+        });
+        
+        console.log(`✅ Actually displayed ${pubs.length} results in DOM`);
+    };
+    
+    const createResultItemForOverlay = (pub) => {
+        const div = document.createElement('div');
+        div.className = 'result-item';
+        
+        // Calculate distance if available
+        let distanceText = '';
+        if (pub.distance !== undefined) {
+            distanceText = `<div class="result-distance">${pub.distance.toFixed(1)}km away</div>`;
+        }
+        
+        // Build the HTML
+        div.innerHTML = `
+            <div class="result-header">
+                <div class="result-main-info">
+                    <h3 class="result-title">${pub.name}</h3>
+                    ${distanceText}
+                </div>
+                ${pub.bottle || pub.tap || pub.cask || pub.can ? 
+                    '<div class="gf-indicator">✅ GF Available</div>' : 
+                    '<div class="gf-indicator unknown">❓ GF Unknown</div>'}
+            </div>
+            
+            <div class="result-location">
+                <div class="result-address">${pub.address}</div>
+                <div class="result-postcode">${pub.postcode}</div>
+                <div class="result-authority">${pub.local_authority}</div>
+            </div>
+            
+            <div class="result-actions">
+                <button class="btn btn-primary" onclick="showPubDetails(${pub.pub_id})">
+                    📍 View Details
+                </button>
+            </div>
+        `;
+        
+        return div;
     };
     
     // =============================================================================
@@ -778,6 +823,8 @@ export const SearchModule = (function() {
 
         // Modal helpers - ADD THIS
         closeSearchModal,
+        displayResultsInOverlay,
+        createResultItemForOverlay,
 
         restoreNameSearch,
         restoreAreaSearch,
