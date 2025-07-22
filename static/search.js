@@ -127,8 +127,18 @@ export const SearchModule = (function() {
         
         console.log('🏠 Searching for pub name:', query);
         
-        if (window.closeSearchModal) {
-            window.closeSearchModal();
+        // 🔧 FIX: Close the modal properly
+        const modalModule = getModal();
+        if (modalModule) {
+            modalModule.close('nameModal');
+        } else {
+            // Fallback close
+            const modal = document.getElementById('nameModal');
+            if (modal) {
+                modal.style.display = 'none';
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
         }
         
         showResultsOverlay(`Pub name: "${query}"`);
@@ -138,6 +148,150 @@ export const SearchModule = (function() {
         
         if (window.trackEvent) {
             window.trackEvent('search_by_name', 'Search', query);
+        }
+    };
+    
+    const searchByArea = async () => {
+        const query = document.getElementById('areaInput').value.trim();
+        const searchType = document.getElementById('areaSearchType').value;
+        
+        if (!query) {
+            if (window.showSuccessToast) {
+                window.showSuccessToast('Please enter a location to search');
+            }
+            return;
+        }
+        
+        console.log(`🗺️ Searching by ${searchType}:`, query);
+        
+        // 🔧 FIX: Close the modal properly
+        const modalModule = getModal();
+        if (modalModule) {
+            modalModule.close('areaModal');
+        } else {
+            // Fallback close
+            const modal = document.getElementById('areaModal');
+            if (modal) {
+                modal.style.display = 'none';
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+        
+        const searchTypeText = searchType === 'postcode' ? 'postcode' : 'area';
+        showResultsOverlay(`${searchTypeText}: "${query}"`);
+        showResultsLoading('Finding pubs in this area...');
+        
+        if (searchType === 'postcode') {
+            await performPostcodeSearch(query);
+        } else {
+            await performCitySearch(query);
+        }
+        
+        if (window.trackEvent) {
+            window.trackEvent('search_by_area', 'Search', `${searchType}:${query}`);
+        }
+    };
+    
+    const searchByBeer = async () => {
+        const query = document.getElementById('beerInput').value.trim();
+        const searchType = document.getElementById('beerSearchType').value;
+        
+        if (!query) {
+            if (window.showSuccessToast) {
+                window.showSuccessToast('Please enter something to search for');
+            }
+            return;
+        }
+        
+        console.log(`🍺 Searching by ${searchType}:`, query);
+        
+        // 🔧 FIX: Close the modal properly
+        const modalModule = getModal();
+        if (modalModule) {
+            modalModule.close('beerModal');
+        } else {
+            // Fallback close
+            const modal = document.getElementById('beerModal');
+            if (modal) {
+                modal.style.display = 'none';
+                modal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+        
+        const searchTypeText = searchType === 'brewery' ? 'brewery' : 
+                             searchType === 'beer' ? 'beer' : 'style';
+        showResultsOverlay(`${searchTypeText}: "${query}"`);
+        showResultsLoading('Finding pubs with this beer...');
+        
+        await performBeerSearch(query, searchType);
+        
+        if (window.trackEvent) {
+            window.trackEvent('search_by_beer', 'Search', `${searchType}:${query}`);
+        }
+    };
+
+    const performBeerSearch = async (query, searchType) => {
+        try {
+            // Try to get user location for sorting
+            if (!userLocation) {
+                userLocation = await tryGetUserLocation();
+            }
+            
+            const results = await APIModule.searchPubs({
+                query: query,
+                searchType: 'all', // Beer search uses 'all' then filters
+                page: 1
+            });
+            
+            let pubs = Array.isArray(results) ? results : results.pubs;
+            
+            // Filter based on beer details
+            pubs = pubs.filter(pub => {
+                if (!pub.beer_details) return false;
+                const beerDetails = pub.beer_details.toLowerCase();
+                const searchQuery = query.toLowerCase();
+                return beerDetails.includes(searchQuery);
+            });
+            
+            if (pubs.length === 0) {
+                showNoResults(`No pubs found serving "${query}"`);
+                return;
+            }
+            
+            // Sort by proximity if we have location
+            if (userLocation) {
+                pubs = sortPubsByDistance(pubs, userLocation);
+            }
+            
+            // Save state
+            lastSearchState = {
+                type: 'beer',
+                query: `${query} (${searchType})`,
+                results: pubs,
+                timestamp: Date.now()
+            };
+            
+            currentSearchPubs = pubs;
+            
+            const title = userLocation ? 
+                `${pubs.length} pubs serving "${query}" (nearest first)` :
+                `${pubs.length} pubs serving "${query}"`;
+                
+            displayResultsInOverlay(pubs, title);
+            
+            if (window.showSuccessToast) {
+                window.showSuccessToast(`✅ Found ${pubs.length} pubs serving "${query}"`);
+            }
+            
+            if (window.trackSearch) {
+                window.trackSearch(query, searchType, pubs.length);
+            }
+            
+        } catch (error) {
+            console.error('❌ Error searching by beer:', error);
+            showNoResults(`Error searching for "${query}"`);
         }
     };
     
@@ -194,42 +348,6 @@ export const SearchModule = (function() {
         } catch (error) {
             console.error('❌ Error searching by name:', error);
             showNoResults(`Error searching for "${query}". Please try again.`);
-        }
-    };
-    
-    // =============================================================================
-    // AREA SEARCH (Postcode or City)
-    // =============================================================================
-    
-    const searchByArea = async () => {
-        const query = document.getElementById('areaInput').value.trim();
-        const searchType = document.getElementById('areaSearchType').value;
-        
-        if (!query) {
-            if (window.showSuccessToast) {
-                window.showSuccessToast('Please enter a location to search');
-            }
-            return;
-        }
-        
-        console.log(`🗺️ Searching by ${searchType}:`, query);
-        
-        if (window.closeSearchModal) {
-            window.closeSearchModal();
-        }
-        
-        const searchTypeText = searchType === 'postcode' ? 'postcode' : 'area';
-        showResultsOverlay(`${searchTypeText}: "${query}"`);
-        showResultsLoading('Finding pubs in this area...');
-        
-        if (searchType === 'postcode') {
-            await performPostcodeSearch(query);
-        } else {
-            await performCitySearch(query);
-        }
-        
-        if (window.trackEvent) {
-            window.trackEvent('search_by_area', 'Search', `${searchType}:${query}`);
         }
     };
     
@@ -331,103 +449,7 @@ export const SearchModule = (function() {
             showNoResults(`Error searching for "${city}"`);
         }
     };
-    
-    // =============================================================================
-    // BEER SEARCH (Brewery, Beer Name, or Style)
-    // =============================================================================
-    
-    const searchByBeer = async () => {
-        const query = document.getElementById('beerInput').value.trim();
-        const searchType = document.getElementById('beerSearchType').value;
-        
-        if (!query) {
-            if (window.showSuccessToast) {
-                window.showSuccessToast('Please enter something to search for');
-            }
-            return;
-        }
-        
-        console.log(`🍺 Searching by ${searchType}:`, query);
-        
-        if (window.closeSearchModal) {
-            window.closeSearchModal();
-        }
-        
-        const searchTypeText = searchType === 'brewery' ? 'brewery' : 
-                             searchType === 'beer' ? 'beer' : 'style';
-        showResultsOverlay(`${searchTypeText}: "${query}"`);
-        showResultsLoading('Finding pubs with this beer...');
-        
-        await performBeerSearch(query, searchType);
-        
-        if (window.trackEvent) {
-            window.trackEvent('search_by_beer', 'Search', `${searchType}:${query}`);
-        }
-    };
-    
-    const performBeerSearch = async (query, searchType) => {
-        try {
-            // Try to get user location for sorting
-            if (!userLocation) {
-                userLocation = await tryGetUserLocation();
-            }
-            
-            const results = await APIModule.searchPubs({
-                query: query,
-                searchType: 'all', // Beer search uses 'all' then filters
-                page: 1
-            });
-            
-            let pubs = Array.isArray(results) ? results : results.pubs;
-            
-            // Filter based on beer details
-            pubs = pubs.filter(pub => {
-                if (!pub.beer_details) return false;
-                const beerDetails = pub.beer_details.toLowerCase();
-                const searchQuery = query.toLowerCase();
-                return beerDetails.includes(searchQuery);
-            });
-            
-            if (pubs.length === 0) {
-                showNoResults(`No pubs found serving "${query}"`);
-                return;
-            }
-            
-            // Sort by proximity if we have location
-            if (userLocation) {
-                pubs = sortPubsByDistance(pubs, userLocation);
-            }
-            
-            // Save state
-            lastSearchState = {
-                type: 'beer',
-                query: `${query} (${searchType})`,
-                results: pubs,
-                timestamp: Date.now()
-            };
-            
-            currentSearchPubs = pubs;
-            
-            const title = userLocation ? 
-                `${pubs.length} pubs serving "${query}" (nearest first)` :
-                `${pubs.length} pubs serving "${query}"`;
-                
-            displayResultsInOverlay(pubs, title);
-            
-            if (window.showSuccessToast) {
-                window.showSuccessToast(`✅ Found ${pubs.length} pubs serving "${query}"`);
-            }
-            
-            if (window.trackSearch) {
-                window.trackSearch(query, searchType, pubs.length);
-            }
-            
-        } catch (error) {
-            console.error('❌ Error searching by beer:', error);
-            showNoResults(`Error searching for "${query}"`);
-        }
-    };
-    
+
     // =============================================================================
     // SEARCH A SPECIFIC PUB (by ID)
     // =============================================================================
@@ -1122,25 +1144,26 @@ export const SearchModule = (function() {
         searchNearbyWithDistance,
         
         // Name search
-        searchByName,
+        searchByName,  // 🔧 ENSURE this is exported
         
         // Area search
-        searchByArea,
+        searchByArea,  // 🔧 ENSURE this is exported
         
         // Beer search
-        searchByBeer,
+        searchByBeer,  // 🔧 ENSURE this is exported
         
         // Specific pub
         searchSpecificPub,
         
         // Navigation
         goBackToResults,
-
-        // Modal helpers - ADD THIS
+    
+        // Modal helpers
         closeSearchModal,
         displayResultsInOverlay,
         createResultItemForOverlay,
-
+    
+        // Restore functions
         restoreNameSearch,
         restoreAreaSearch,
         restoreBeerSearch,
