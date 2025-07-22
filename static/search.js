@@ -802,8 +802,8 @@ export const SearchModule = (function() {
         
         // Just call searchSpecificPub directly
         searchSpecificPub(pubId);
-    }
-};
+    };
+}
     
     // =============================================================================
     // PUBLIC API
