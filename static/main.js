@@ -291,80 +291,14 @@ const App = {
                 break;
                 
             case 'toggle-results-map':
-                console.log('🗺️ MAIN.JS: Enhanced map toggle handler...');
-                
-                // 🔧 FIX: Prevent any split-view classes from being applied
-                const resultsOverlay = document.getElementById('resultsOverlay');
-                const mapContainer = document.getElementById('resultsMapContainer');
-                const listContainer = document.getElementById('resultsListContainer');
-                
-                // Remove split-view classes that might interfere
-                if (resultsOverlay) resultsOverlay.classList.remove('split-view');
-                if (mapContainer) mapContainer.classList.remove('split-view');
-                
-                // Check current state and toggle
-                const isMapCurrentlyVisible = mapContainer && mapContainer.style.display === 'block';
-                
-                console.log('🔍 Current state:', {
-                    mapVisible: isMapCurrentlyVisible,
-                    mapDisplay: mapContainer?.style.display,
-                    listDisplay: listContainer?.style.display
-                });
-                
-                // Get the map module
+                console.log('🗺️ Toggling results map...');
                 const mapModule = this.getModule('map');
-                if (mapModule && mapModule.toggleSearchResultsFullMap) {
-                    console.log('🗺️ Using map module toggle function');
+                if (mapModule?.toggleSearchResultsFullMap) {
                     mapModule.toggleSearchResultsFullMap();
                 } else {
-                    console.log('🔧 Using fallback map toggle');
-                    
-                    // Fallback implementation with enhanced debugging
-                    if (mapContainer && listContainer) {
-                        const mapBtnText = document.getElementById('resultsMapBtnText');
-                        
-                        if (!isMapCurrentlyVisible) {
-                            // Show FULL-SCREEN map
-                            console.log('🗺️ Activating FULL-SCREEN map mode...');
-                            
-                            listContainer.style.display = 'none';
-                            mapContainer.style.display = 'block';
-                            mapContainer.style.flex = '1';
-                            mapContainer.style.height = '100%';
-                            
-                            if (mapBtnText) mapBtnText.textContent = 'List';
-                            
-                            // Force map initialization
-                            setTimeout(() => {
-                                if (mapModule && mapModule.initResultsMap) {
-                                    console.log('🔄 Force-initializing results map...');
-                                    const searchModule = this.getModule('search');
-                                    const pubs = searchModule?.getCurrentResults() || [];
-                                    mapModule.initResultsMap(pubs);
-                                }
-                            }, 150);
-                            
-                        } else {
-                            // Show list
-                            console.log('📋 Activating list mode...');
-                            
-                            listContainer.style.display = 'block';
-                            mapContainer.style.display = 'none';
-                            
-                            if (mapBtnText) mapBtnText.textContent = 'Map';
-                        }
-                        
-                        console.log('✅ Map toggle completed via fallback');
-                    }
+                    // Fallback implementation
+                    this.toggleResultsMapFallback();
                 }
-                
-                // Track the toggle
-                const tracking = this.getModule('tracking');
-                if (tracking) {
-                    const newState = mapContainer?.style.display === 'block' ? 'show_fullscreen' : 'show_list';
-                    tracking.trackEvent('map_toggle_enhanced', 'Map Interaction', newState);
-                }
-                
                 break;
                 
             case 'view-pub':
