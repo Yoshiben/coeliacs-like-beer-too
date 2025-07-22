@@ -760,41 +760,40 @@ export const SearchModule = (function() {
     };
     
     const createResultItemForOverlay = (pub) => {
-        const div = document.createElement('div');
-        div.className = 'result-item';
+        const template = document.getElementById('pub-result-template');
+        const clone = template.content.cloneNode(true);
         
-        // Calculate distance if available
-        let distanceText = '';
+        // Set the content
+        clone.querySelector('.result-title').textContent = pub.name;
+        
+        // Set distance if available
+        const distanceEl = clone.querySelector('.result-distance');
         if (pub.distance !== undefined) {
-            distanceText = `<div class="result-distance">${pub.distance.toFixed(1)}km away</div>`;
+            distanceEl.textContent = `${pub.distance.toFixed(1)}km away`;
+        } else {
+            distanceEl.style.display = 'none';
         }
         
-        // Build the HTML
-        div.innerHTML = `
-            <div class="result-header">
-                <div class="result-main-info">
-                    <h3 class="result-title">${pub.name}</h3>
-                    ${distanceText}
-                </div>
-                ${pub.bottle || pub.tap || pub.cask || pub.can ? 
-                    '<div class="gf-indicator">✅ GF Available</div>' : 
-                    '<div class="gf-indicator unknown">❓ GF Unknown</div>'}
-            </div>
-            
-            <div class="result-location">
-                <div class="result-address">${pub.address}</div>
-                <div class="result-postcode">${pub.postcode}</div>
-                <div class="result-authority">${pub.local_authority}</div>
-            </div>
-            
-            <div class="result-actions">
-                <button class="btn btn-primary" onclick="showPubDetails(${pub.pub_id})">
-                    📍 View Details
-                </button>
-            </div>
-        `;
+        // Set GF indicator
+        const gfIndicator = clone.querySelector('.gf-indicator');
+        if (pub.bottle || pub.tap || pub.cask || pub.can) {
+            gfIndicator.textContent = '✅ GF Available';
+            gfIndicator.className = 'gf-indicator';
+        } else {
+            gfIndicator.textContent = '❓ GF Unknown';
+            gfIndicator.className = 'gf-indicator unknown';
+        }
         
-        return div;
+        // Set location details
+        clone.querySelector('.result-address').textContent = pub.address;
+        clone.querySelector('.result-postcode').textContent = pub.postcode;
+        clone.querySelector('.result-authority').textContent = pub.local_authority;
+        
+        // Set up the button with data attribute
+        const viewButton = clone.querySelector('[data-action="view-pub"]');
+        viewButton.dataset.pubId = pub.pub_id;
+        
+        return clone;
     };
 
     const showPubDetails = (pubId) => {
