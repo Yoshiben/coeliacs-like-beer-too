@@ -1,104 +1,120 @@
 <!---------------------------
-    LEAFLET.JS - Keep this external dependency
-    ---------------------------->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+CONDITIONAL MOBILE CSS LOADING
+Load mobile.css only on mobile devices for performance
+---------------------------->
+<script>
+if (window.innerWidth <= 768 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+    const mobileCSS = document.createElement('link');
+    mobileCSS.rel = 'stylesheet';
+    mobileCSS.href = "{{ url_for('static', filename='mobile.css') }}?v={{ cache_buster }}";
+    document.head.appendChild(mobileCSS);
+    console.log('📱 Mobile CSS loaded');
+} else {
+    console.log('🖥️ Desktop - mobile CSS skipped');
+}
+</script>
 
-    <!---------------------------
-    SINGLE MODULE ENTRY POINT
-    All modules now load through main.js in proper order
-    ---------------------------->
-    <script type="module" src="/static/main.js?v={{ cache_buster }}"></script>
+<!---------------------------
+LEAFLET.JS - Keep this external dependency
+---------------------------->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
-    <!---------------------------
-    LEGACY SUPPORT & INITIALIZATION
-    Essential functions and setup that can't be modularized yet
-    ---------------------------->
-    <script>
-        // Wait for app to initialize before setting up remaining handlers
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🔧 Setting up legacy event handlers...');
-            
-            // Check if app initialized successfully after a delay
-            setTimeout(() => {
-                if (!window.CoeliacsApp?.initialized) {
-                    console.warn('⚠️ App initialization may have failed');
-                    showInitializationFallback();
-                }
-            }, 3000);
-            
-            // Handle file upload preview for photo input
-            const photoInput = document.getElementById('reportPhoto');
-            const photoLabel = document.querySelector('.photo-upload-compact');
-            
-            if (photoInput && photoLabel) {
-                photoInput.addEventListener('change', function(e) {
-                    const file = e.target.files[0];
-                    if (file) {
-                        const fileName = file.name.length > 20 ? 
-                            file.name.substring(0, 17) + '...' : 
-                            file.name;
-                        
-                        const textEl = photoLabel.querySelector('.photo-upload-text');
-                        if (textEl) {
-                            textEl.innerHTML = `
-                                <strong>📸 ${fileName}</strong><br>
-                                <small>Click to change photo</small>
-                            `;
-                        }
-                        photoLabel.classList.add('active');
+<!---------------------------
+SINGLE MODULE ENTRY POINT
+All modules now load through main.js in proper order
+---------------------------->
+<script type="module" src="/static/main.js?v={{ cache_buster }}"></script>
+
+<!---------------------------
+LEGACY SUPPORT & INITIALIZATION
+Essential functions and setup that can't be modularized yet
+---------------------------->
+<script>
+    // Wait for app to initialize before setting up remaining handlers
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🔧 Setting up legacy event handlers...');
+        
+        // Check if app initialized successfully after a delay
+        setTimeout(() => {
+            if (!window.CoeliacsApp?.initialized) {
+                console.warn('⚠️ App initialization may have failed');
+                showInitializationFallback();
+            }
+        }, 3000);
+        
+        // Handle file upload preview for photo input
+        const photoInput = document.getElementById('reportPhoto');
+        const photoLabel = document.querySelector('.photo-upload-compact');
+        
+        if (photoInput && photoLabel) {
+            photoInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const fileName = file.name.length > 20 ? 
+                        file.name.substring(0, 17) + '...' : 
+                        file.name;
+                    
+                    const textEl = photoLabel.querySelector('.photo-upload-text');
+                    if (textEl) {
+                        textEl.innerHTML = `
+                            <strong>📸 ${fileName}</strong><br>
+                            <small>Click to change photo</small>
+                        `;
                     }
-                });
-            }
-        });
-        
-        // Fallback initialization if modules fail to load
-        function showInitializationFallback() {
-            const fallbackDiv = document.createElement('div');
-            fallbackDiv.className = 'initialization-fallback';
-            fallbackDiv.innerHTML = `
-                <strong>⚠️ Slow Loading</strong>
-                The app is taking longer than expected to load...
-                <button onclick="location.reload()" class="fallback-btn">
-                    Refresh Page
-                </button>
-            `;
-            document.body.appendChild(fallbackDiv);
-            
-            setTimeout(() => {
-                fallbackDiv.remove();
-            }, 10000);
-        }
-        
-        // Debug helper - available globally
-        window.debugApp = function() {
-            console.log('🔍 App State:', window.AppState);
-            console.log('🔍 Available Modules:', Object.keys(window.CoeliacsApp?.modules || {}));
-            if (window.CoeliacsApp?.state) {
-                console.log('🔍 Module Status:', window.CoeliacsApp.state.modules);
-            }
-        };
-        
-        // Performance monitoring
-        window.addEventListener('load', function() {
-            // Log performance metrics
-            if (performance && performance.timing) {
-                const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
-                console.log(`⚡ Page load time: ${loadTime}ms`);
-                
-                // Track slow loads
-                if (loadTime > 3000 && window.CoeliacsApp?.modules?.tracking) {
-                    window.CoeliacsApp.modules.tracking.trackEvent('slow_page_load', 'Performance', `${loadTime}ms`);
+                    photoLabel.classList.add('active');
                 }
-            }
-        });
-    </script>
+            });
+        }
+    });
     
-    <script>
-        // Cache-busting timestamp
-        console.log('🚀 CACHE BUSTER:', '{{ cache_buster }}');
+    // Fallback initialization if modules fail to load
+    function showInitializationFallback() {
+        const fallbackDiv = document.createElement('div');
+        fallbackDiv.className = 'initialization-fallback';
+        fallbackDiv.innerHTML = `
+            <strong>⚠️ Slow Loading</strong>
+            The app is taking longer than expected to load...
+            <button onclick="location.reload()" class="fallback-btn">
+                Refresh Page
+            </button>
+        `;
+        document.body.appendChild(fallbackDiv);
         
-        // Environment info for debugging
-        console.log('📱 User Agent:', navigator.userAgent.substring(0, 50) + '...');
-        console.log('📺 Viewport:', window.innerWidth + 'x' + window.innerHeight);
-        console.log('🌐 Connection:', navigator.connection?.effectiveType || 'unknown');
-    </script>
+        setTimeout(() => {
+            fallbackDiv.remove();
+        }, 10000);
+    }
+    
+    // Debug helper - available globally
+    window.debugApp = function() {
+        console.log('🔍 App State:', window.AppState);
+        console.log('🔍 Available Modules:', Object.keys(window.CoeliacsApp?.modules || {}));
+        if (window.CoeliacsApp?.state) {
+            console.log('🔍 Module Status:', window.CoeliacsApp.state.modules);
+        }
+    };
+    
+    // Performance monitoring
+    window.addEventListener('load', function() {
+        // Log performance metrics
+        if (performance && performance.timing) {
+            const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+            console.log(`⚡ Page load time: ${loadTime}ms`);
+            
+            // Track slow loads
+            if (loadTime > 3000 && window.CoeliacsApp?.modules?.tracking) {
+                window.CoeliacsApp.modules.tracking.trackEvent('slow_page_load', 'Performance', `${loadTime}ms`);
+            }
+        }
+    });
+</script>
+
+<script>
+    // Cache-busting timestamp
+    console.log('🚀 CACHE BUSTER:', '{{ cache_buster }}');
+    
+    // Environment info for debugging
+    console.log('📱 User Agent:', navigator.userAgent.substring(0, 50) + '...');
+    console.log('📺 Viewport:', window.innerWidth + 'x' + window.innerHeight);
+    console.log('🌐 Connection:', navigator.connection?.effectiveType || 'unknown');
+</script>
