@@ -442,8 +442,10 @@ export const SearchModule = (function() {
             if (pubs && pubs.length > 0) {
                 const pub = pubs[0];
                 
-                // Show pub details (use a dedicated render function; implement this in main.js or UI module if needed)
-                renderPubDetails(pub);  // Assuming this exists or you'll add it—handles displaying the pub object
+                // Show pub details
+                if (window.showPubDetails) {
+                    window.showPubDetails(pub);
+                }
                 
                 return pub;
             } else {
@@ -797,7 +799,6 @@ export const SearchModule = (function() {
 
     const showPubDetails = (pubId) => {
     console.log('🏠 Showing pub details:', pubId);
-        searchSpecificPub(pubId);
     if (window.showPubDetails) {
         window.showPubDetails(pubId);
     } else {
