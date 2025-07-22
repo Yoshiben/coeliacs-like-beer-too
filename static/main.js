@@ -258,6 +258,17 @@ const App = {
                     searchModule.startLocationSearch();
                 }
                 break;
+
+            case 'view-details':
+                console.log('🏠 Viewing pub details from map popup...');
+                const pubIdFromMap = element.dataset.pubId || 
+                                    element.closest('[data-pub-id]')?.dataset.pubId;
+                if (pubIdFromMap && searchModule?.showPubDetails) {
+                    searchModule.showPubDetails(pubIdFromMap);
+                } else {
+                    console.error('❌ No pub ID found or search module unavailable');
+                }
+                break;
                 
             case 'search-name':
                 console.log('🔍 Performing name search...');
