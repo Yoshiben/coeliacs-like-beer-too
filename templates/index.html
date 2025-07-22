@@ -723,6 +723,60 @@
         </button>
     </div>
 
+    <!-- ================================
+     MAP LEGEND TEMPLATE
+     🔧 ACTION: ADD to templates/index.html after existing templates
+     📍 LOCATION: Add before the closing </body> tag
+     ================================ -->
+
+    <!-- Map Legend Template -->
+    <template id="map-legend-template">
+        <div class="map-legend">
+            <div class="legend-title">
+                🍺 GF Beer Status
+            </div>
+            <div class="legend-item">
+                <div class="legend-marker gf-available"></div>
+                <span class="legend-text">GF Available</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-marker no-gf"></div>
+                <span class="legend-text">No GF Options</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-marker unknown"></div>
+                <span class="legend-text">Unknown</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-marker user-location"></div>
+                <span class="legend-text">Your Location</span>
+            </div>
+        </div>
+    </template>
+    
+    <!-- Map Error State Template -->
+    <template id="map-error-template">
+        <div class="map-error-container">
+            <div class="map-error-icon">📍</div>
+            <div class="map-error-title">Location coordinates not available</div>
+            <div class="map-error-text">Help us by reporting the exact location!</div>
+        </div>
+    </template>
+    
+    <!-- Popup Content Template -->
+    <template id="popup-content-template">
+        <div class="popup-content">
+            <div class="popup-title" data-field="name"></div>
+            <div class="popup-address" data-field="address"></div>
+            <div class="popup-postcode" data-field="postcode"></div>
+            <div class="popup-distance" data-field="distance" style="display: none;"></div>
+            <div class="popup-gf-status" data-field="gf-status"></div>
+            <button class="popup-button" data-action="view-details">
+                View Details
+            </button>
+        </div>
+    </template>
+
     <!-- Bottom Navigation Bar -->
     <nav class="bottom-nav">
         <a href="/" class="nav-item active">
@@ -750,22 +804,6 @@
             <div class="nav-label">More</div>
         </a>
     </nav>
-    
-    <!---------------------------
-    CONDITIONAL MOBILE CSS LOADING
-    Load mobile.css only on mobile devices for performance
-    ---------------------------->
-    <script>
-    if (window.innerWidth <= 768 || /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-        const mobileCSS = document.createElement('link');
-        mobileCSS.rel = 'stylesheet';
-        mobileCSS.href = "{{ url_for('static', filename='mobile.css') }}?v={{ cache_buster }}";
-        document.head.appendChild(mobileCSS);
-        console.log('📱 Mobile CSS loaded');
-    } else {
-        console.log('🖥️ Desktop - mobile CSS skipped');
-    }
-    </script>
     
     <!---------------------------
     LEAFLET.JS - Keep this external dependency
