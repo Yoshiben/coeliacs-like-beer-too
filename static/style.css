@@ -101,9 +101,9 @@
     --marker-user-stroke: #ffffff;
     
     /* Map marker sizes */
-    --marker-pub-radius: 12;
+    --marker-pub-radius: 8;
     --marker-user-radius: 8;
-    --marker-stroke-width: 3;
+    --marker-stroke-width: 2;
 
    /* Search option colors */
     --search-location-bg: rgba(16, 185, 129, 0.1);
