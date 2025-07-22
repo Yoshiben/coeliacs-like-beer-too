@@ -397,6 +397,33 @@ export const MapModule = (function() {
             console.log('🎯 Map centered on location');
         }
     };
+
+    const toggleSearchResultsFullMap = () => {
+        const listContainer = document.getElementById('resultsListContainer');
+        const mapContainer = document.getElementById('resultsMapContainer');
+        const mapBtnText = document.getElementById('resultsMapBtnText');
+        
+        if (mapContainer.style.display === 'none' || !mapContainer.style.display) {
+            // Show map
+            listContainer.style.display = 'none';
+            mapContainer.style.display = 'block';
+            mapBtnText.textContent = 'List';
+            
+            // Initialize the results map
+            setTimeout(() => {
+                initResultsMap();
+            }, 100);
+            
+            TrackingModule.trackEvent('results_map_toggle', 'Map Interaction', 'show');
+        } else {
+            // Show list
+            listContainer.style.display = 'block';
+            mapContainer.style.display = 'none';
+            mapBtnText.textContent = 'Map';
+            
+            TrackingModule.trackEvent('results_map_toggle', 'Map Interaction', 'hide');
+        }
+    };
     
     // Public API
     return {
@@ -410,6 +437,7 @@ export const MapModule = (function() {
         getUserLocation,
         centerOnLocation,
         showPubFromMap,
+        toggleSearchResultsFullMap,
         isMapVisible: () => mapVisible,
         calculateDistance
     };
