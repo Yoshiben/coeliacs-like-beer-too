@@ -451,7 +451,9 @@ export const MapModule = (function() {
         
         // Set up button click handler
         const button = clone.querySelector('[data-action="view-details"]');
-        button.onclick = () => MapModule.showPubFromMap(pub.pub_id);
+        button.setAttribute('data-action', 'view-pub');  // Change from 'view-details' to 'view-pub'
+        button.setAttribute('data-pub-id', pub.pub_id);
+        button.onclick = null; // Remove the custom onclick, let the main handler deal with it
         
         // Return the HTML string for Leaflet
         const div = document.createElement('div');
@@ -487,7 +489,7 @@ export const MapModule = (function() {
             content += `<div class="popup-gf-status unknown">❓ GF Status Unknown</div>`;
         }
         
-        content += `<button class="popup-button" onclick="MapModule.showPubFromMap(${pub.pub_id})">View Details</button>`;
+        content += `<button class="popup-button" data-action="view-pub" data-pub-id="${pub.pub_id}">View Details</button>`;
         content += `</div>`;
         
         return content;
