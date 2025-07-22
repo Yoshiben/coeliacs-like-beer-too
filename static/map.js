@@ -71,20 +71,7 @@ export const MapModule = (function() {
         return map;
     };
     
-    // Initialize results overlay map
-    // ================================
-    // 🔧 UPDATE: In map.js
-    // LOCATION: Find the initResultsMap function (around line 60)
-    // ACTION: Replace with this enhanced version that can accept pubs data
-    // ================================
-    
-    // Initialize results overlay map
-    // ================================
-    // 🔧 REPLACE: In map.js - Fix initResultsMap function
-    // LOCATION: Find the initResultsMap function (around line 60)
-    // ACTION: Replace with this enhanced version that prevents split-screen mode
-    // ================================
-    
+    // Initialize results overlay map    
     const initResultsMap = (pubsData = null) => {
         console.log('🗺️ Initializing FULL-SCREEN results map...');
         
@@ -94,7 +81,19 @@ export const MapModule = (function() {
             return null;
         }
         
-        // 🔧 FIX: Clear any existing map AND remove split-screen classes
+        // 🔧 FIX: Check if map already exists and clean it up properly
+        if (resultsMap) {
+            console.log('🔄 Map already exists, cleaning up...');
+            try {
+                resultsMap.remove(); // Properly destroy the existing map
+                resultsMap = null;
+            } catch (error) {
+                console.warn('Warning cleaning up existing map:', error);
+                resultsMap = null;
+            }
+        }
+        
+        // 🔧 FIX: Clear the container completely
         mapElement.innerHTML = '';
         mapElement.classList.remove('split-view'); // Remove split-screen mode
         
@@ -110,73 +109,82 @@ export const MapModule = (function() {
             resultsOverlay.classList.remove('split-view');
         }
         
-        // Create new map with full-screen configuration
-        resultsMap = L.map('resultsMap', {
-            // 🔧 FIX: Full-screen map options
-            zoomControl: true,
-            attributionControl: true,
-            scrollWheelZoom: true,
-            doubleClickZoom: true,
-            touchZoom: true,
-            boxZoom: true,
-            keyboard: true
-        }).setView(
-            userLocation ? [userLocation.lat, userLocation.lng] : config.defaultCenter,
-            userLocation ? 12 : config.defaultZoom // Closer zoom for results
-        );
-        
-        // Add tile layer
-        L.tileLayer(config.tileLayer, {
-            maxZoom: config.maxZoom,
-            attribution: config.attribution
-        }).addTo(resultsMap);
-        
-        // Add user location if available
-        if (userLocation) {
-            const styles = getMapStyles();
-            L.circleMarker([userLocation.lat, userLocation.lng], {
-                radius: config.userMarkerRadius,
-                fillColor: styles.userFillColor,
-                color: styles.userStrokeColor,
-                weight: 2,
-                opacity: 1,
-                fillOpacity: 0.8
-            }).addTo(resultsMap).bindPopup('📍 Your location');
-        }
-        
-        // Add pubs if provided or get from search module
-        let pubs = pubsData;
-        if (!pubs && window.App?.getModule('search')?.getCurrentResults) {
-            pubs = window.App.getModule('search').getCurrentResults();
-            console.log('🍺 Got pubs from search module:', pubs?.length || 0);
-        }
-        
-        if (pubs && pubs.length > 0) {
-            const markersAdded = addPubMarkers(pubs, resultsMap);
-            console.log(`✅ Added ${markersAdded} pub markers to FULL-SCREEN results map`);
-        } else {
-            console.log('ℹ️ No pubs data available for results map');
-        }
-        
-        // 🔧 FIX: Add legend for full-screen map
-        addMapLegend(resultsMap);
-        
-        // 🔧 FIX: Force proper rendering with multiple invalidation calls
+        // 🔧 FIX: Small delay to ensure DOM is clean before recreating
         setTimeout(() => {
-            if (resultsMap) {
-                resultsMap.invalidateSize();
-                console.log('🔄 Results map size invalidated (first)');
+            try {
+                // Create new map with full-screen configuration
+                resultsMap = L.map('resultsMap', {
+                    zoomControl: true,
+                    attributionControl: true,
+                    scrollWheelZoom: true,
+                    doubleClickZoom: true,
+                    touchZoom: true,
+                    boxZoom: true,
+                    keyboard: true
+                }).setView(
+                    userLocation ? [userLocation.lat, userLocation.lng] : config.defaultCenter,
+                    userLocation ? 12 : config.defaultZoom // Closer zoom for results
+                );
+                
+                // Add tile layer
+                L.tileLayer(config.tileLayer, {
+                    maxZoom: config.maxZoom,
+                    attribution: config.attribution
+                }).addTo(resultsMap);
+                
+                // Add user location if available
+                if (userLocation) {
+                    const styles = getMapStyles();
+                    L.circleMarker([userLocation.lat, userLocation.lng], {
+                        radius: config.userMarkerRadius,
+                        fillColor: styles.userFillColor,
+                        color: styles.userStrokeColor,
+                        weight: 2,
+                        opacity: 1,
+                        fillOpacity: 0.8
+                    }).addTo(resultsMap).bindPopup('📍 Your location');
+                }
+                
+                // Add pubs if provided or get from search module
+                let pubs = pubsData;
+                if (!pubs && window.App?.getModule('search')?.getCurrentResults) {
+                    pubs = window.App.getModule('search').getCurrentResults();
+                    console.log('🍺 Got pubs from search module:', pubs?.length || 0);
+                }
+                
+                if (pubs && pubs.length > 0) {
+                    const markersAdded = addPubMarkers(pubs, resultsMap);
+                    console.log(`✅ Added ${markersAdded} pub markers to FULL-SCREEN results map`);
+                } else {
+                    console.log('ℹ️ No pubs data available for results map');
+                }
+                
+                // 🔧 FIX: Add legend for full-screen map
+                addMapLegend(resultsMap);
+                
+                // 🔧 FIX: Force proper rendering with multiple invalidation calls
+                setTimeout(() => {
+                    if (resultsMap) {
+                        resultsMap.invalidateSize();
+                        console.log('🔄 Results map size invalidated (first)');
+                    }
+                }, 100);
+                
+                setTimeout(() => {
+                    if (resultsMap) {
+                        resultsMap.invalidateSize();
+                        console.log('🔄 Results map size invalidated (second)');
+                    }
+                }, 300);
+                
+                console.log('✅ FULL-SCREEN results map initialized successfully');
+                
+            } catch (error) {
+                console.error('❌ Error creating results map:', error);
+                mapElement.innerHTML = '<div style="padding: 20px; text-align: center;">Error loading map. Please try again.</div>';
             }
-        }, 100);
+        }, 50); // Small delay to ensure DOM cleanup
         
-        setTimeout(() => {
-            if (resultsMap) {
-                resultsMap.invalidateSize();
-                console.log('🔄 Results map size invalidated (second)');
-            }
-        }, 300);
-        
-        console.log('✅ FULL-SCREEN results map initialized successfully');
         return resultsMap;
     };
     
