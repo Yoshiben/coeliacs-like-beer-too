@@ -673,7 +673,7 @@ const App = {
                 }
                 
                 // Track the action
-                const tracking = getTracking();
+                const tracking = this.getModule('tracking');
                 if (tracking) {
                     tracking.trackEvent('report_beer_click', 'User Action', pubData?.name || 'unknown_pub');
                 }
