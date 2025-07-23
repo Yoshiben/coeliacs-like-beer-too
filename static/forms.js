@@ -321,11 +321,11 @@ export const FormModule = (function() {
             item.dataset.brewery = brewery;
             
             // Add click handler directly to ensure it works
-            item.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                selectBrewery(brewery);
-            });
+            // item.addEventListener('click', (e) => {
+            //     e.preventDefault();
+            //     e.stopPropagation();
+            //     selectBrewery(brewery);
+            // });
             
             dropdown.appendChild(item);
         });
@@ -363,9 +363,11 @@ export const FormModule = (function() {
         
         // Load beers for this brewery
         try {
-            await loadBreweryBeers(brewery);
+            loadBreweryBeers(brewery).catch(error => {
+                console.error('❌ Error loading brewery beers:', error);
+            });
         } catch (error) {
-            console.error('❌ Error loading brewery beers:', error);
+            console.error('❌ Error in loadBreweryBeers call:', error);
         }
         
         trackEvent('brewery_selected', 'Form', brewery);
@@ -901,6 +903,7 @@ export const FormModule = (function() {
         clearSelectedPub,
         initReportDropdowns,
         resetReportForm,
+        selectbrewery,
         
         // For external access if needed
         getSelectedPub: () => state.selectedPubData,
