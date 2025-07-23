@@ -598,6 +598,10 @@ export const SearchModule = (function() {
             
             if (pubs && pubs.length > 0) {
                 const pub = pubs[0];
+
+                // 🔧 ADD: Store pub data globally BEFORE displaying
+                window.currentPubData = pub;
+                console.log('💾 Stored pub data globally:', pub.name);
                 
                 // Use UI module to display pub details
                 const uiModule = getUI();
