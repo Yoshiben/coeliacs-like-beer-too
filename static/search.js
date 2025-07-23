@@ -602,6 +602,85 @@ export const SearchModule = (function() {
                 // 🔧 ADD: Store pub data globally BEFORE displaying
                 window.currentPubData = pub;
                 console.log('💾 Stored pub data globally:', pub.name);
+
+                // 🔧 ADD: Reset any existing split-view state before showing new pub
+                const pubContainer = document.getElementById('pubContainer');
+                const pubMapContainer = document.getElementById('pubMapContainer');
+                const mapBtnText = document.getElementById('pubMapBtnText');
+                
+                if (pubContainer) {
+                    pubContainer.classList.remove('split-view');
+                    console.log('🔄 Reset: Removed split-view class');
+                }
+                
+                if (pubMapContainer) {
+                    pubMapContainer.style.display = 'none';
+                    console.log('🔄 Reset: Hidden map container');
+                }
+                
+                if (mapBtnText) {
+                    mapBtnText.textContent = 'Show on Map';
+                    console.log('🔄 Reset: Map button text');
+                }
+
+                if (mapBtn) {
+                    mapBtn.onclick = () => {
+                        console.log('🗺️ Map button clicked - toggling split view');
+                        
+                        // Toggle map visibility
+                        const mapContainer = document.getElementById('pubMapContainer');
+                        const btnText = document.getElementById('pubMapBtnText');
+                        const pubContainer = document.getElementById('pubContainer');
+                        
+                        console.log('🔍 Current states:');
+                        console.log('  Map container display:', mapContainer?.style.display || 'default');
+                        console.log('  Split-view class:', pubContainer?.classList.contains('split-view'));
+                        console.log('  Button text:', btnText?.textContent);
+                        
+                        if (mapContainer) {
+                            if (mapContainer.style.display === 'none' || !mapContainer.style.display) {
+                                // Show map
+                                console.log('🗺️ Activating split-screen mode');
+                                mapContainer.style.display = 'block';
+                                if (btnText) btnText.textContent = 'Hide Map';
+                                if (pubContainer) pubContainer.classList.add('split-view');
+                                
+                                // Initialize map if we have coordinates
+                                if (window.currentPubData && window.currentPubData.latitude && window.currentPubData.longitude) {
+                                    console.log('🗺️ Initializing map with pub data:', window.currentPubData.name);
+                                    
+                                    const mapModule = window.App?.getModule('map');
+                                    if (mapModule && mapModule.initPubDetailMap) {
+                                        try {
+                                            mapModule.initPubDetailMap(window.currentPubData);
+                                            console.log('✅ Map initialized successfully');
+                                        } catch (error) {
+                                            console.error('❌ Map initialization failed:', error);
+                                        }
+                                    } else {
+                                        console.error('❌ Map module or initPubDetailMap not available');
+                                    }
+                                } else {
+                                    console.warn('⚠️ No pub coordinates available for map');
+                                }
+                                
+                                console.log('✅ Split-screen activated');
+                            } else {
+                                // Hide map
+                                console.log('🗺️ Deactivating split-screen mode');
+                                mapContainer.style.display = 'none';
+                                if (btnText) btnText.textContent = 'Show on Map';
+                                if (pubContainer) pubContainer.classList.remove('split-view');
+                                console.log('✅ Split-screen deactivated');
+                            }
+                        } else {
+                            console.error('❌ Map container not found');
+                        }
+                    };
+                    console.log('✅ Map button handler set up');
+                } else {
+                    console.warn('⚠️ Map button not found');
+                }    
                 
                 // Use UI module to display pub details
                 const uiModule = getUI();
