@@ -801,17 +801,6 @@ export const FormModule = (function() {
                 searchBeerStyles(e.target.value);
             }, config.debounceDelay));
         }
-        
-        // Initialize beer name field
-        const beerNameInput = document.getElementById('reportBeerName');
-        if (beerNameInput) {
-            beerNameInput.addEventListener('focus', () => {
-                const brewery = document.getElementById('reportBrewery').value;
-                if (brewery && !beerNameInput.value) {
-                    loadBreweryBeers(brewery);
-                }
-            });
-        }
     }
     
     // ================================
