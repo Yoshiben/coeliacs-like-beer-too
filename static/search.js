@@ -607,6 +607,8 @@ export const SearchModule = (function() {
                 const pubContainer = document.getElementById('pubContainer');
                 const pubMapContainer = document.getElementById('pubMapContainer');
                 const mapBtnText = document.getElementById('pubMapBtnText');
+                const mapBtn = document.getElementById('pubToggleMap');
+                console.log('🔍 Map button element:', mapBtn ? 'found' : 'not found');
                 
                 if (pubContainer) {
                     pubContainer.classList.remove('split-view');
