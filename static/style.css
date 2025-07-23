@@ -3305,6 +3305,69 @@ p {
     color: var(--text-secondary) !important;
 }
 
+/* UPDATE: In style.css brewery dropdown styles */
+/* LOCATION: Find the brewery/beer dropdown styles (around line 3200) */
+/* ACTION: Update these styles to ensure proper click handling */
+
+.brewery-item,
+.beer-item {
+    padding: var(--space-lg);
+    cursor: pointer !important;
+    transition: all var(--transition);
+    border-bottom: 1px solid var(--divider-color);
+    position: relative;
+    overflow: hidden;
+    user-select: none; /* Prevent text selection on click */
+}
+
+.brewery-item:hover,
+.beer-item:hover {
+    background: linear-gradient(135deg, var(--primary-bg) 0%, rgba(102, 126, 234, 0.05) 100%);
+    border-left: 4px solid var(--primary-gradient);
+    padding-left: calc(var(--space-lg) - 4px);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+}
+
+.brewery-item:active,
+.beer-item:active {
+    transform: translateY(0);
+    background: var(--primary-bg);
+}
+
+/* Ensure dropdown is properly positioned and clickable */
+#breweryDropdown,
+#beerNameDropdown,
+#beerStyleDropdown {
+    background: var(--bg-white);
+    border: 2px solid var(--primary-border);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg), 0 0 20px rgba(102, 126, 234, 0.2);
+    backdrop-filter: blur(10px);
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: calc(var(--z-dropdown) + 10) !important; /* Higher z-index */
+    margin-top: var(--space-sm);
+    animation: dropdownSlideIn 0.3s ease-out;
+    pointer-events: auto !important; /* Ensure clicks work */
+}
+
+/* Mobile optimization for touch */
+@media (hover: none) and (pointer: coarse) {
+    .brewery-item,
+    .beer-item {
+        min-height: 44px; /* Touch-friendly size */
+        display: flex;
+        align-items: center;
+    }
+    
+    .brewery-item:active,
+    .beer-item:active {
+        background: var(--primary-bg);
+        transform: scale(0.98);
+    }
+}
+
 /* Mobile Optimizations */
 @media (max-width: 768px) {
     #reportModal .modal-content {
