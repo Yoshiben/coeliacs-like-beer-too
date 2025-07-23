@@ -48,6 +48,11 @@ const App = {
     getModule(name) {
         return this.modules[name] || null;
     },
+
+    // 🔧 ADD THIS: Helper to get form module
+    getForm() {
+        return this.getModule('form');
+    },
     
     // Initialize app in phases
     async initialize() {
@@ -224,6 +229,36 @@ const App = {
                     const lastModal = openModals[openModals.length - 1];
                     console.log(`⌨️ Escape pressed - closing: ${lastModal.id}`);
                     this.closeModal(lastModal.id);
+                }
+            }
+        });
+
+        // 🔧 ADD: In setupEventDelegation function, after the click event listener
+        // Location: Around line 210, after the click handler
+        
+        // Form submission handler
+        document.addEventListener('submit', (e) => {
+            // Check if it's a form with data-action
+            const form = e.target;
+            if (form.dataset.action) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                console.log(`📝 Form submission: ${form.dataset.action}`);
+                
+                if (form.dataset.action === 'submit-report') {
+                    console.log('📸 Handling beer report submission');
+                    
+                    const formModule = window.App?.getModule('form');
+                    if (formModule && formModule.handleReportSubmission) {
+                        formModule.handleReportSubmission(e);
+                    } else {
+                        console.error('❌ Form module not available for submission');
+                        // Fallback - show error
+                        if (window.showSuccessToast) {
+                            window.showSuccessToast('❌ Unable to submit report. Please try again.');
+                        }
+                    }
                 }
             }
         });
@@ -564,6 +599,85 @@ const App = {
                 
             default:
                 console.log(`❓ Unhandled action: ${action}`);
+                break;
+
+            case 'report-beer':
+                console.log('📝 Report beer action triggered');
+                
+                // Get the current pub data
+                const pubData = window.currentPubData || 
+                               App.state?.selectedPub || 
+                               window.selectedPubData;
+                
+                console.log('🔍 Current pub data for report:', pubData);
+                
+                // Close pub details overlay first
+                const pubDetailsOverlay = document.getElementById('pubDetailsOverlay');
+                if (pubDetailsOverlay) {
+                    pubDetailsOverlay.style.display = 'none';
+                    pubDetailsOverlay.classList.remove('active');
+                    console.log('✅ Closed pub details overlay');
+                }
+                
+                // Also close results overlay if it's open
+                const resultsOverlay = document.getElementById('resultsOverlay');
+                if (resultsOverlay) {
+                    resultsOverlay.style.display = 'none';
+                    resultsOverlay.classList.remove('active');
+                    console.log('✅ Closed results overlay');
+                }
+                
+                // Restore body scroll
+                document.body.style.overflow = '';
+                
+                // Open report modal with pub data
+                const modalModule = this.getModule('modal');
+                if (modalModule && modalModule.openReportModal) {
+                    console.log('🔓 Opening report modal with pub data');
+                    modalModule.openReportModal(pubData);
+                } else {
+                    console.error('❌ Modal module or openReportModal not available');
+                    
+                    // Fallback - try direct modal opening
+                    const reportModal = document.getElementById('reportModal');
+                    if (reportModal) {
+                        console.log('🔓 Using fallback to open report modal');
+                        
+                        // Store pub data for the form
+                        window.selectedPubData = pubData;
+                        
+                        // Show the modal
+                        reportModal.style.display = 'flex';
+                        reportModal.classList.add('active');
+                        document.body.style.overflow = 'hidden';
+                        
+                        // Update modal title if we have pub data
+                        if (pubData && pubData.name) {
+                            const modalTitle = reportModal.querySelector('.modal-title');
+                            if (modalTitle) {
+                                modalTitle.innerHTML = `📸 Report GF Beer Find<br><small style="color: var(--text-secondary); font-weight: 400;">at ${pubData.name}</small>`;
+                            }
+                            
+                            // Hide pub search field
+                            const pubSearchGroup = document.getElementById('pubSearchGroup');
+                            if (pubSearchGroup) {
+                                pubSearchGroup.style.display = 'none';
+                            }
+                        }
+                        
+                        console.log('✅ Report modal opened via fallback');
+                    } else {
+                        console.error('❌ Report modal element not found');
+                        alert('Sorry, the report form is not available right now. Please try again later.');
+                    }
+                }
+                
+                // Track the action
+                const tracking = getTracking();
+                if (tracking) {
+                    tracking.trackEvent('report_beer_click', 'User Action', pubData?.name || 'unknown_pub');
+                }
+                
                 break;
         }
     },
