@@ -3884,3 +3884,129 @@ p {
     text-align: center !important;
     padding: 0 var(--space-xs) !important;
 }
+
+/* ================================
+   MOBILE SPLIT-SCREEN FIXES
+   ADD to mobile.css or at the end of style.css in mobile section
+   ================================ */
+
+/* Mobile Split View Container Fix */
+@media (max-width: 768px) {
+    /* When in split view, ensure proper layout */
+    .split-view .pub-details-container {
+        display: flex;
+        flex-direction: column;
+        height: calc(100vh - 16px);
+        height: calc(100dvh - 16px);
+        gap: var(--space-sm);
+    }
+    
+    /* Details card takes less space, map takes more */
+    .split-view .pub-details-card {
+        flex: 0 0 auto;
+        max-height: 50vh;
+        max-height: 50dvh;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    /* Map container gets remaining space */
+    .split-view .pub-map-container {
+        flex: 1;
+        min-height: 40vh;
+        min-height: 40dvh;
+        display: block !important;
+    }
+    
+    /* Hide the beer section in split view on mobile */
+    .split-view .beer-section {
+        display: none !important;
+    }
+    
+    /* Ensure header stays visible */
+    .split-view .pub-nav-top {
+        flex-shrink: 0;
+    }
+    
+    .split-view .pub-header {
+        flex-shrink: 0;
+        padding-bottom: var(--space-md);
+        margin-bottom: var(--space-md);
+    }
+    
+    /* Make action buttons always visible in split view */
+    .split-view .pub-action-grid {
+        flex-shrink: 0;
+        position: sticky;
+        bottom: 0;
+        background: var(--bg-white);
+        padding: var(--space-md) 0;
+        margin: 0;
+        border-top: 1px solid var(--border-light);
+        z-index: 10;
+    }
+    
+    /* Smaller buttons in split view */
+    .split-view .pub-action-grid .btn {
+        height: 40px !important;
+        min-height: 40px !important;
+        max-height: 40px !important;
+        font-size: 0.75rem !important;
+        padding: 0 var(--space-sm) !important;
+    }
+    
+    /* Adjust pub title in split view */
+    .split-view .pub-title {
+        font-size: 1.1rem !important;
+        margin-bottom: var(--space-xs) !important;
+    }
+    
+    /* Compact address info in split view */
+    .split-view .pub-address,
+    .split-view .pub-location {
+        font-size: 0.85rem !important;
+        margin-bottom: 2px !important;
+    }
+}
+
+/* Small mobile screens (480px and below) */
+@media (max-width: 480px) {
+    .split-view .pub-details-card {
+        max-height: 45vh;
+        max-height: 45dvh;
+    }
+    
+    .split-view .pub-map-container {
+        min-height: 45vh;
+        min-height: 45dvh;
+    }
+    
+    .split-view .pub-action-grid .btn {
+        height: 36px !important;
+        min-height: 36px !important;
+        max-height: 36px !important;
+        font-size: 0.7rem !important;
+    }
+    
+    .split-view .pub-title {
+        font-size: 1rem !important;
+    }
+}
+
+/* Very small screens (360px and below) */
+@media (max-width: 360px) {
+    .split-view .pub-action-grid {
+        gap: 6px !important;
+        padding: var(--space-sm) 0 !important;
+    }
+    
+    .split-view .pub-action-grid .btn {
+        height: 32px !important;
+        min-height: 32px !important;
+        max-height: 32px !important;
+        font-size: 0.65rem !important;
+        border-radius: 16px !important;
+    }
+}
