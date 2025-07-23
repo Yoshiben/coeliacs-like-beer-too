@@ -603,6 +603,20 @@ const App = {
                     }
                 }
                 break;
+
+            case 'select-beer':
+                console.log('🍺 Selecting beer from dropdown...');
+                const beerData = element.dataset.beerData;
+                
+                if (beerData) {
+                    const formModule = this.getModule('form');
+                    if (formModule && formModule.selectBeer) {
+                        formModule.selectBeer(beerData);
+                    } else {
+                        console.error('❌ Form module or selectBeer not available');
+                    }
+                }
+                break;
                 
             case 'close-modal':
                 console.log('🔒 Closing modal...');
