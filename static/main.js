@@ -311,6 +311,74 @@ const App = {
                     this.toggleResultsMapFallback();
                 }
                 break;
+
+            // ================================
+            // 🔧 UPDATE: In static/main.js - Add missing case
+            // LOCATION: Find the switch statement in handleAction function (around line 248)
+            // ACTION: Add this case before the default case
+            // ================================
+            
+            case 'toggle-pub-map':
+                console.log('🗺️ Toggling pub detail map...');
+                
+                // Get the map container and button
+                const mapContainer = document.getElementById('pubMapContainer');
+                const mapBtnText = document.getElementById('pubMapBtnText');
+                
+                if (mapContainer && mapBtnText) {
+                    if (mapContainer.style.display === 'none' || !mapContainer.style.display) {
+                        // Show map - activate split view
+                        console.log('🗺️ Activating split-screen view...');
+                        
+                        mapContainer.style.display = 'block';
+                        mapBtnText.textContent = 'Hide Map';
+                        
+                        // Add split-view class to container
+                        const pubContainer = document.getElementById('pubContainer');
+                        if (pubContainer) {
+                            pubContainer.classList.add('split-view');
+                        }
+                        
+                        // Initialize the pub detail map
+                        const mapModule = App.getModule('map');
+                        if (mapModule && mapModule.initPubDetailMap) {
+                            // Get current pub data - it should be stored globally
+                            const currentPub = window.currentPubData || App.state.selectedPub;
+                            if (currentPub) {
+                                console.log('🗺️ Initializing pub detail map for:', currentPub.name);
+                                mapModule.initPubDetailMap(currentPub);
+                            } else {
+                                console.error('❌ No current pub data available for map');
+                            }
+                        }
+                        
+                        console.log('✅ Split-screen map view activated');
+                    } else {
+                        // Hide map - return to full detail view
+                        console.log('🗺️ Deactivating split-screen view...');
+                        
+                        mapContainer.style.display = 'none';
+                        mapBtnText.textContent = 'Show on Map';
+                        
+                        // Remove split-view class
+                        const pubContainer = document.getElementById('pubContainer');
+                        if (pubContainer) {
+                            pubContainer.classList.remove('split-view');
+                        }
+                        
+                        console.log('✅ Returned to full detail view');
+                    }
+                    
+                    // Track the action
+                    const tracking = App.getModule('tracking');
+                    if (tracking) {
+                        tracking.trackEvent('pub_map_toggle', 'Map Interaction', 
+                            mapContainer.style.display === 'block' ? 'show' : 'hide');
+                    }
+                } else {
+                    console.error('❌ Map container or button not found');
+                }
+                break;
                 
             case 'view-pub':
                 console.log('🏠 Viewing pub details...');
