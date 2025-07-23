@@ -321,62 +321,138 @@ const App = {
             case 'toggle-pub-map':
                 console.log('🗺️ Toggling pub detail map...');
                 
+                // Debug: Check all possible sources of pub data
+                const currentPub = window.currentPubData || 
+                                  App.state?.selectedPub || 
+                                  window.selectedPubData ||
+                                  App.getModule('search')?.getCurrentPub?.();
+                
+                console.log('🔍 Debug - Checking pub data sources:');
+                console.log('  window.currentPubData:', window.currentPubData);
+                console.log('  App.state.selectedPub:', App.state?.selectedPub);
+                console.log('  window.selectedPubData:', window.selectedPubData);
+                console.log('  Final currentPub:', currentPub);
+                
                 // Get the map container and button
                 const mapContainer = document.getElementById('pubMapContainer');
                 const mapBtnText = document.getElementById('pubMapBtnText');
                 
-                if (mapContainer && mapBtnText) {
-                    if (mapContainer.style.display === 'none' || !mapContainer.style.display) {
-                        // Show map - activate split view
-                        console.log('🗺️ Activating split-screen view...');
-                        
-                        mapContainer.style.display = 'block';
-                        mapBtnText.textContent = 'Hide Map';
-                        
-                        // Add split-view class to container
-                        const pubContainer = document.getElementById('pubContainer');
-                        if (pubContainer) {
-                            pubContainer.classList.add('split-view');
-                        }
-                        
-                        // Initialize the pub detail map
-                        const mapModule = App.getModule('map');
-                        if (mapModule && mapModule.initPubDetailMap) {
-                            // Get current pub data - it should be stored globally
-                            const currentPub = window.currentPubData || App.state.selectedPub;
-                            if (currentPub) {
-                                console.log('🗺️ Initializing pub detail map for:', currentPub.name);
-                                mapModule.initPubDetailMap(currentPub);
-                            } else {
-                                console.error('❌ No current pub data available for map');
-                            }
-                        }
-                        
-                        console.log('✅ Split-screen map view activated');
-                    } else {
-                        // Hide map - return to full detail view
-                        console.log('🗺️ Deactivating split-screen view...');
-                        
-                        mapContainer.style.display = 'none';
-                        mapBtnText.textContent = 'Show on Map';
-                        
-                        // Remove split-view class
-                        const pubContainer = document.getElementById('pubContainer');
-                        if (pubContainer) {
-                            pubContainer.classList.remove('split-view');
-                        }
-                        
-                        console.log('✅ Returned to full detail view');
+                if (!mapContainer) {
+                    console.error('❌ Map container not found');
+                    break;
+                }
+                
+                if (!mapBtnText) {
+                    console.error('❌ Map button text element not found');
+                    break;
+                }
+                
+                if (mapContainer.style.display === 'none' || !mapContainer.style.display) {
+                    // Show map - activate split view
+                    console.log('🗺️ Activating split-screen view...');
+                    
+                    mapContainer.style.display = 'block';
+                    mapBtnText.textContent = 'Hide Map';
+                    
+                    // Add split-view class to container
+                    const pubContainer = document.getElementById('pubContainer');
+                    if (pubContainer) {
+                        pubContainer.classList.add('split-view');
+                        console.log('✅ Added split-view class');
                     }
                     
-                    // Track the action
-                    const tracking = App.getModule('tracking');
-                    if (tracking) {
-                        tracking.trackEvent('pub_map_toggle', 'Map Interaction', 
-                            mapContainer.style.display === 'block' ? 'show' : 'hide');
+                    // Initialize the pub detail map
+                    if (!currentPub) {
+                        console.error('❌ No current pub data available for map');
+                        // Show error in map container
+                        const mapPlaceholder = mapContainer.querySelector('.pub-map-placeholder');
+                        if (mapPlaceholder) {
+                            mapPlaceholder.innerHTML = `
+                                <div style="text-align: center; padding: 20px; color: var(--text-secondary);">
+                                    <div style="font-size: 2rem; margin-bottom: 10px;">❌</div>
+                                    <div>No pub data available</div>
+                                    <div style="font-size: 0.8rem; margin-top: 5px;">Please try refreshing the page</div>
+                                </div>
+                            `;
+                        }
+                    } else {
+                        console.log('🗺️ Found pub data, initializing map for:', currentPub.name);
+                        
+                        // Get map module
+                        const mapModule = App.getModule('map');
+                        if (mapModule) {
+                            try {
+                                if (mapModule.initPubDetailMap) {
+                                    console.log('🗺️ Calling initPubDetailMap...');
+                                    mapModule.initPubDetailMap(currentPub);
+                                } else if (mapModule.initPubDetailsSplitMap) {
+                                    console.log('🗺️ Using initPubDetailsSplitMap fallback...');
+                                    mapModule.initPubDetailsSplitMap(currentPub);
+                                } else {
+                                    console.error('❌ No pub map initialization function found');
+                                    // Fallback - show basic info
+                                    const mapPlaceholder = mapContainer.querySelector('.pub-map-placeholder');
+                                    if (mapPlaceholder) {
+                                        if (currentPub.latitude && currentPub.longitude) {
+                                            mapPlaceholder.innerHTML = `
+                                                <div style="text-align: center; padding: 20px;">
+                                                    <div style="font-size: 1.2rem; margin-bottom: 10px;">📍 ${currentPub.name}</div>
+                                                    <div style="color: var(--text-secondary);">Lat: ${currentPub.latitude}</div>
+                                                    <div style="color: var(--text-secondary);">Lng: ${currentPub.longitude}</div>
+                                                    <div style="margin-top: 10px; font-size: 0.8rem;">Map function not available</div>
+                                                </div>
+                                            `;
+                                        } else {
+                                            mapPlaceholder.innerHTML = `
+                                                <div style="text-align: center; padding: 20px; color: var(--text-muted);">
+                                                    <div style="font-size: 2rem; margin-bottom: 10px;">📍</div>
+                                                    <div>No coordinates available</div>
+                                                    <div style="font-size: 0.8rem; margin-top: 5px;">for ${currentPub.name}</div>
+                                                </div>
+                                            `;
+                                        }
+                                    }
+                                }
+                            } catch (error) {
+                                console.error('❌ Error initializing pub map:', error);
+                                const mapPlaceholder = mapContainer.querySelector('.pub-map-placeholder');
+                                if (mapPlaceholder) {
+                                    mapPlaceholder.innerHTML = `
+                                        <div style="text-align: center; padding: 20px; color: var(--text-secondary);">
+                                            <div style="font-size: 2rem; margin-bottom: 10px;">⚠️</div>
+                                            <div>Map initialization failed</div>
+                                            <div style="font-size: 0.8rem; margin-top: 5px;">${error.message}</div>
+                                        </div>
+                                    `;
+                                }
+                            }
+                        } else {
+                            console.error('❌ Map module not available');
+                        }
                     }
+                    
+                    console.log('✅ Split-screen map view activated');
                 } else {
-                    console.error('❌ Map container or button not found');
+                    // Hide map - return to full detail view
+                    console.log('🗺️ Deactivating split-screen view...');
+                    
+                    mapContainer.style.display = 'none';
+                    mapBtnText.textContent = 'Show on Map';
+                    
+                    // Remove split-view class
+                    const pubContainer = document.getElementById('pubContainer');
+                    if (pubContainer) {
+                        pubContainer.classList.remove('split-view');
+                    }
+                    
+                    console.log('✅ Returned to full detail view');
+                }
+                
+                // Track the action
+                const tracking = App.getModule('tracking');
+                if (tracking) {
+                    tracking.trackEvent('pub_map_toggle', 'Map Interaction', 
+                        mapContainer.style.display === 'block' ? 'show' : 'hide');
                 }
                 break;
                 
