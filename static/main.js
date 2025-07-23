@@ -346,12 +346,6 @@ const App = {
                     this.toggleResultsMapFallback();
                 }
                 break;
-
-            // ================================
-            // 🔧 UPDATE: In static/main.js - Add missing case
-            // LOCATION: Find the switch statement in handleAction function (around line 248)
-            // ACTION: Add this case before the default case
-            // ================================
             
             case 'toggle-pub-map':
                 console.log('🗺️ Toggling pub detail map...');
@@ -586,6 +580,45 @@ const App = {
                 } else {
                     // Fallback
                     window.UtilsModule?.closeAllOverlaysAndGoHome?.();
+                }
+                break;
+
+            case 'search-breweries':
+                console.log('🏭 Searching breweries...');
+                const breweryInput = element;
+                const query = breweryInput.value;
+                
+                const formModule = this.getModule('form');
+                if (formModule && formModule.searchBreweries) {
+                    formModule.searchBreweries(query);
+                } else {
+                    console.error('❌ Form module or searchBreweries not available');
+                }
+                break;
+            
+            case 'search-beer-names':
+                console.log('🍺 Searching beer names...');
+                const beerInput = element;
+                const beerQuery = beerInput.value;
+                
+                const formModuleBeer = this.getModule('form');
+                if (formModuleBeer && formModuleBeer.searchBeerNames) {
+                    formModuleBeer.searchBeerNames(beerQuery);
+                } else {
+                    console.error('❌ Form module or searchBeerNames not available');
+                }
+                break;
+            
+            case 'search-beer-styles':
+                console.log('🎨 Searching beer styles...');
+                const styleInput = element;
+                const styleQuery = styleInput.value;
+                
+                const formModuleStyle = this.getModule('form');
+                if (formModuleStyle && formModuleStyle.searchBeerStyles) {
+                    formModuleStyle.searchBeerStyles(styleQuery);
+                } else {
+                    console.error('❌ Form module or searchBeerStyles not available');
                 }
                 break;
                 
