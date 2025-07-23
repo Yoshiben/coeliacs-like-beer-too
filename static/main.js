@@ -589,6 +589,20 @@ const App = {
                     console.error('❌ Form module or searchBeerStyles not available');
                 }
                 break;
+
+            case 'select-brewery':
+                console.log('🏭 Selecting brewery from dropdown...');
+                const brewery = element.dataset.brewery;
+                
+                if (brewery) {
+                    const formModule = this.getModule('form');
+                    if (formModule && formModule.selectBrewery) {
+                        formModule.selectBrewery(brewery);
+                    } else {
+                        console.error('❌ Form module or selectBrewery not available');
+                    }
+                }
+                break;
                 
             case 'close-modal':
                 console.log('🔒 Closing modal...');
