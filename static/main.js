@@ -449,9 +449,9 @@ const App = {
                 }
                 
                 // Track the action
-                const tracking = App.getModule('tracking');
-                if (tracking) {
-                    tracking.trackEvent('pub_map_toggle', 'Map Interaction', 
+                // 🔧 FIX: Use different variable name to avoid duplicate declaration
+                if (App.getModule('tracking')) {
+                    App.getModule('tracking').trackEvent('pub_map_toggle', 'Map Interaction', 
                         mapContainer.style.display === 'block' ? 'show' : 'hide');
                 }
                 break;
