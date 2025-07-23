@@ -108,7 +108,7 @@ export const FormModule = (function() {
                 document.body.style.overflow = '';
                 
                 // Show home sections
-                const heroSection = document.querySelector('.hero-section');
+                // const heroSection = document.querySelector('.hero-section');
                 const searchSection = document.querySelector('.search-section');
                 if (heroSection) {
                     heroSection.style.display = 'block';
