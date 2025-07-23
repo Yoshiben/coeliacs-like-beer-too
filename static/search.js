@@ -641,6 +641,27 @@ export const SearchModule = (function() {
 
         // 🔧 ADD: Store pub data globally for map access
         window.currentPubData = pub;
+        console.log('💾 Stored pub data globally (fallback):', pub.name);
+
+        // 🔧 ADD: Reset any existing split-view state
+        const pubContainer = document.getElementById('pubContainer');
+        const pubMapContainer = document.getElementById('pubMapContainer');
+        const mapBtnText = document.getElementById('pubMapBtnText');
+        
+        if (pubContainer) {
+            pubContainer.classList.remove('split-view');
+            console.log('🔄 Removed split-view class from pub container');
+        }
+        
+        if (pubMapContainer) {
+            pubMapContainer.style.display = 'none';
+            console.log('🔄 Hidden map container');
+        }
+        
+        if (mapBtnText) {
+            mapBtnText.textContent = 'Show on Map';
+            console.log('🔄 Reset map button text');
+        }
         
         // FORCE: Hide results overlay first
         const resultsOverlay = document.getElementById('resultsOverlay');
