@@ -528,49 +528,6 @@ const App = {
                 }
                 break;
                 
-                // // Close pub details overlay first
-                // const pubDetailsOverlay = document.getElementById('pubDetailsOverlay');
-                // if (pubDetailsOverlay && pubDetailsOverlay.classList.contains('active')) {
-                //     pubDetailsOverlay.style.display = 'none';
-                //     pubDetailsOverlay.classList.remove('active');
-                //     console.log('✅ Pub details overlay closed');
-                // }
-                
-                // // Close results overlay too (if it exists)
-                // const resultsOverlay = document.getElementById('resultsOverlay');
-                // if (resultsOverlay && resultsOverlay.classList.contains('active')) {
-                //     resultsOverlay.style.display = 'none';
-                //     resultsOverlay.classList.remove('active');
-                //     console.log('✅ Results overlay also closed');
-                // }
-                
-                // // Show home sections
-                // const heroSection = document.querySelector('.hero-section');
-                // const searchSection = document.querySelector('.search-section');
-                // if (heroSection) {
-                //     heroSection.style.display = 'block';
-                //     console.log('✅ Hero section restored');
-                // }
-                // if (searchSection) {
-                //     searchSection.style.display = 'flex';
-                //     console.log('✅ Search section restored');
-                // }
-                
-                // // Restore body scroll
-                // document.body.style.overflow = '';
-                
-                // // Update app state
-                // this.state.currentView = 'home';
-                
-                // // Track the action
-                // const tracking = this.getModule('tracking');
-                // if (tracking) {
-                //     tracking.trackEvent('close_pub_details', 'Navigation', 'home_button');
-                // }
-                
-                // console.log('✅ Returned to home view');
-                // break;
-
             case 'close-results':
                 console.log('🏠 Close results clicked - using centralized close function');
                 
@@ -595,16 +552,16 @@ const App = {
                 break;
 
             case 'search-breweries':
-                // console.log('🏭 Searching breweries...');
-                // const breweryInput = element;
-                // const breweryquery = breweryInput.value;
+                console.log('🏭 Searching breweries...');
+                const breweryInput = element;
+                const breweryquery = breweryInput.value;
                 
-                // const formModuleForBrewery = this.getModule('form');
-                // if (formModuleForBrewery && formModuleForBrewery.searchBreweries) {
-                //     formModuleForBrewery.searchBreweries(breweryQuery);
-                // } else {
-                //     console.error('❌ Form module or searchBreweries not available');
-                // }
+                const formModuleForBrewery = this.getModule('form');
+                if (formModuleForBrewery && formModuleForBrewery.searchBreweries) {
+                    formModuleForBrewery.searchBreweries(breweryQuery);
+                } else {
+                    console.error('❌ Form module or searchBreweries not available');
+                }
                 break;
             
             case 'search-beer-names':
