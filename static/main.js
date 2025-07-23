@@ -540,16 +540,16 @@ const App = {
                 }
                 break;
 
-            case 'submit-report':
-                console.log('📝 Submitting beer report...');
-                // This is handled by the form submission event listener
-                // The action here is just for logging/tracking
-                const formModule = this.getModule('form');
-                if (formModule && formModule.handleReportSubmission) {
-                    // The actual submission is handled by the submit event listener
-                    console.log('✅ Form module ready for submission');
-                }
-                break;
+            // case 'submit-report':
+            //     console.log('📝 Submitting beer report...');
+            //     // This is handled by the form submission event listener
+            //     // The action here is just for logging/tracking
+            //     const formModule = this.getModule('form');
+            //     if (formModule && formModule.handleReportSubmission) {
+            //         // The actual submission is handled by the submit event listener
+            //         console.log('✅ Form module ready for submission');
+            //     }
+            //     break;
 
             case 'search-breweries':
                 console.log('🏭 Searching breweries...');
