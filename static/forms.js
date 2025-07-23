@@ -869,6 +869,7 @@ export const FormModule = (function() {
         searchBeerNames,
         searchBeerStyles,
         selectBrewery,
+        selectBeer,
         clearSelectedPub,
         initReportDropdowns,
         resetReportForm,
