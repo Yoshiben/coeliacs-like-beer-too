@@ -540,16 +540,23 @@ const App = {
                 }
                 break;
 
-            // case 'submit-report':
-            //     console.log('📝 Submitting beer report...');
-            //     // This is handled by the form submission event listener
-            //     // The action here is just for logging/tracking
-            //     const formModule = this.getModule('form');
-            //     if (formModule && formModule.handleReportSubmission) {
-            //         // The actual submission is handled by the submit event listener
-            //         console.log('✅ Form module ready for submission');
-            //     }
-            //     break;
+            case 'submit-report':
+                console.log('📝 Submit report button clicked');
+                
+                // Find the form and submit it programmatically
+                const reportForm = document.getElementById('reportForm');
+                if (reportForm) {
+                    // Trigger the form's submit event
+                    const submitEvent = new Event('submit', {
+                        bubbles: true,
+                        cancelable: true
+                    });
+                    reportForm.dispatchEvent(submitEvent);
+                    console.log('✅ Triggered form submission');
+                } else {
+                    console.error('❌ Report form not found');
+                }
+                break;
 
             case 'search-breweries':
                 console.log('🏭 Searching breweries...');
