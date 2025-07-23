@@ -69,12 +69,18 @@ class BeerValidationEngine:
         Clean up pub data from user submission
         Removes extra spaces, standardizes format
         """
-        return {
+        pub_data = {
             'pub_id': submission.get('pub_id'),  # If they selected existing pub
             'name': submission.get('pub_name', '').strip(),
             'address': submission.get('address', '').strip(), 
             'postcode': submission.get('postcode', '').strip().upper()
         }
+        
+        # DEBUG: Log what we're getting
+        self.logger.info(f"DEBUG - Extracted pub data: {pub_data}")
+        self.logger.info(f"DEBUG - pub_id type: {type(pub_data['pub_id'])}, value: {pub_data['pub_id']}")
+        
+        return pub_data
     
     def _extract_beer_data(self, submission):
         """
