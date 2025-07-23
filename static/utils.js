@@ -90,10 +90,12 @@ export const UtilsModule = (function() {
         const searchSection = document.querySelector('.search-section');
         if (heroSection) {
             heroSection.style.display = 'block';
+            heroSection.style.visibility = 'visible'; // ADD THIS
             console.log('✅ Hero section restored');
         }
         if (searchSection) {
             searchSection.style.display = 'flex';
+            searchSection.style.visibility = 'visible'; // ADD THIS
             console.log('✅ Search section restored');
         }
         
