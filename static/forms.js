@@ -755,33 +755,29 @@ export const FormModule = (function() {
                 hideDropdown('pubSuggestions');
             }
         });
-        
-        // Initialize brewery field to show dropdown on focus
-        // const breweryInput = document.getElementById('reportBrewery');
-        // if (breweryInput) {
-        //     breweryInput.addEventListener('focus', () => {
-        //         if (!breweryInput.value) {
-        //             searchBreweries('');
-        //         }
-        //     });
-            
-        //     breweryInput.addEventListener('click', () => {
-        //         if (!breweryInput.value) {
-        //             searchBreweries('');
-        //         }
-        //     });
-        // }
 
         // Brewery autocomplete
         const breweryInput = document.getElementById('reportBrewery');
         if (breweryInput) {
-            breweryInput.addEventListener('input', debounce((e) => {
+            // Remove any existing listeners first
+            const newBreweryInput = breweryInput.cloneNode(true);
+            breweryInput.parentNode.replaceChild(newBreweryInput, breweryInput);
+            
+            // Add new listeners to the fresh element
+            newBreweryInput.addEventListener('input', debounce((e) => {
                 searchBreweries(e.target.value);
             }, config.debounceDelay));
             
-            breweryInput.addEventListener('focus', (e) => {
+            newBreweryInput.addEventListener('focus', (e) => {
                 if (!e.target.value) {
                     searchBreweries(''); // Show all breweries on focus
+                }
+            });
+            
+            newBreweryInput.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (!e.target.value) {
+                    searchBreweries(''); // Show all breweries on click
                 }
             });
         }
@@ -789,15 +785,30 @@ export const FormModule = (function() {
         // Beer name autocomplete
         const beerNameInput = document.getElementById('reportBeerName');
         if (beerNameInput) {
-            beerNameInput.addEventListener('input', debounce((e) => {
+            // Remove any existing listeners first
+            const newBeerNameInput = beerNameInput.cloneNode(true);
+            beerNameInput.parentNode.replaceChild(newBeerNameInput, beerNameInput);
+            
+            newBeerNameInput.addEventListener('input', debounce((e) => {
                 searchBeerNames(e.target.value);
             }, config.debounceDelay));
+            
+            newBeerNameInput.addEventListener('focus', (e) => {
+                const brewery = document.getElementById('reportBrewery').value;
+                if (brewery && !e.target.value) {
+                    loadBreweryBeers(brewery); // Show brewery beers on focus
+                }
+            });
         }
         
         // Beer style autocomplete
         const beerStyleInput = document.getElementById('reportBeerStyle');
         if (beerStyleInput) {
-            beerStyleInput.addEventListener('input', debounce((e) => {
+            // Remove any existing listeners first
+            const newBeerStyleInput = beerStyleInput.cloneNode(true);
+            beerStyleInput.parentNode.replaceChild(newBeerStyleInput, beerStyleInput);
+            
+            newBeerStyleInput.addEventListener('input', debounce((e) => {
                 searchBeerStyles(e.target.value);
             }, config.debounceDelay));
         }
