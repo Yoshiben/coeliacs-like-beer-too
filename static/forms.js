@@ -319,6 +319,14 @@ export const FormModule = (function() {
             item.innerHTML = `<strong>${escapeHtml(brewery)}</strong>`;
             item.dataset.action = 'select-brewery';
             item.dataset.brewery = brewery;
+            
+            // Add click handler directly to ensure it works
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                selectBrewery(brewery);
+            });
+            
             dropdown.appendChild(item);
         });
         
@@ -328,20 +336,37 @@ export const FormModule = (function() {
     async function selectBrewery(brewery) {
         console.log('🍺 Brewery selected:', brewery);
         
+        if (!brewery) {
+            console.error('❌ No brewery provided to selectBrewery');
+            return;
+        }
+        
         // Set brewery field
-        document.getElementById('reportBrewery').value = brewery;
+        const breweryInput = document.getElementById('reportBrewery');
+        if (breweryInput) {
+            breweryInput.value = brewery;
+        }
+        
         state.currentBrewery = brewery;
         
-        // Hide brewery dropdown
+        // Hide brewery dropdown immediately
         hideDropdown('breweryDropdown');
         
         // Clear dependent fields
-        document.getElementById('reportBeerName').value = '';
-        document.getElementById('reportBeerStyle').value = '';
-        document.getElementById('reportBeerABV').value = '';
+        const beerNameInput = document.getElementById('reportBeerName');
+        const beerStyleInput = document.getElementById('reportBeerStyle');
+        const beerABVInput = document.getElementById('reportBeerABV');
+        
+        if (beerNameInput) beerNameInput.value = '';
+        if (beerStyleInput) beerStyleInput.value = '';
+        if (beerABVInput) beerABVInput.value = '';
         
         // Load beers for this brewery
-        await loadBreweryBeers(brewery);
+        try {
+            await loadBreweryBeers(brewery);
+        } catch (error) {
+            console.error('❌ Error loading brewery beers:', error);
+        }
         
         trackEvent('brewery_selected', 'Form', brewery);
     }
@@ -701,6 +726,18 @@ export const FormModule = (function() {
         // Handle dropdown item clicks
         document.addEventListener('click', (e) => {
             const action = e.target.closest('[data-action]');
+            
+            // Also check if clicking on a brewery item without data-action
+            const breweryItem = e.target.closest('.brewery-item');
+            if (breweryItem && !action) {
+                // Handle brewery selection
+                const brewery = breweryItem.dataset.brewery || breweryItem.textContent.trim();
+                if (brewery) {
+                    selectBrewery(brewery);
+                    return;
+                }
+            }
+            
             if (!action) return;
             
             switch(action.dataset.action) {
@@ -738,23 +775,33 @@ export const FormModule = (function() {
         
         // Hide dropdowns when clicking outside
         document.addEventListener('click', (e) => {
+            // Check if click is outside brewery dropdown
             if (!e.target.closest('.brewery-dropdown-container') && 
-                !e.target.closest('#breweryDropdown')) {
+                !e.target.closest('#breweryDropdown') &&
+                !e.target.closest('#reportBrewery')) {
                 hideDropdown('breweryDropdown');
             }
+            
+            // Check if click is outside beer name dropdown
             if (!e.target.closest('.beer-name-container') && 
-                !e.target.closest('#beerNameDropdown')) {
+                !e.target.closest('#beerNameDropdown') &&
+                !e.target.closest('#reportBeerName')) {
                 hideDropdown('beerNameDropdown');
             }
+            
+            // Check if click is outside beer style dropdown
             if (!e.target.closest('.beer-style-container') && 
-                !e.target.closest('#beerStyleDropdown')) {
+                !e.target.closest('#beerStyleDropdown') &&
+                !e.target.closest('#reportBeerStyle')) {
                 hideDropdown('beerStyleDropdown');
             }
+            
+            // Check if click is outside pub suggestions
             if (!e.target.closest('#reportPubSearch') && 
                 !e.target.closest('#pubSuggestions')) {
                 hideDropdown('pubSuggestions');
             }
-        });
+        }, true); // Use capture phase to catch all clicks
 
         // Brewery autocomplete
         const breweryInput = document.getElementById('reportBrewery');
