@@ -634,6 +634,9 @@ export const SearchModule = (function() {
     // REPLACE the displayPubDetailsFallback function in search.js
     const displayPubDetailsFallback = (pub) => {
         console.log('🔧 Using fallback pub details display for:', pub.name);
+
+        // 🔧 ADD: Store pub data globally for map access
+        window.currentPubData = pub;
         
         // FORCE: Hide results overlay first
         const resultsOverlay = document.getElementById('resultsOverlay');
