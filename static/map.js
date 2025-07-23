@@ -194,71 +194,106 @@ export const MapModule = (function() {
         
         const mapContainer = document.querySelector('.pub-map-placeholder');
         if (!mapContainer) {
-            console.error('Pub map container not found');
+            console.error('❌ Pub map container (.pub-map-placeholder) not found');
             return null;
         }
         
         if (!pub.latitude || !pub.longitude) {
-            mapContainer.innerHTML = '📍 Location coordinates not available<br><small style="opacity: 0.7;">Help us by reporting the exact location!</small>';
+            console.warn('⚠️ No coordinates available for pub:', pub.name);
+            mapContainer.innerHTML = `
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 20px; text-align: center; color: var(--text-secondary);">
+                    <div style="font-size: 2rem; margin-bottom: 10px;">📍</div>
+                    <div style="font-weight: 600; margin-bottom: 5px;">Location coordinates not available</div>
+                    <div style="font-size: 0.9rem; opacity: 0.7;">Help us by reporting the exact location!</div>
+                </div>
+            `;
             return null;
         }
+        
+        console.log('🗺️ Creating map with coordinates:', pub.latitude, pub.longitude);
         
         // Clear and create map container
         mapContainer.innerHTML = '<div id="pubMapLeaflet" style="width: 100%; height: 100%; border-radius: 0 0 var(--radius-xl) var(--radius-xl);"></div>';
         
-        // Create map
-        pubDetailMap = L.map('pubMapLeaflet').setView([pub.latitude, pub.longitude], 16);
-        
-        // Add tile layer
-        L.tileLayer(config.tileLayer, {
-            maxZoom: config.maxZoom,
-            attribution: config.attribution
-        }).addTo(pubDetailMap);
-        
-        // Add pub marker
-        const styles = getMapStyles();
-        const pubMarker = L.circleMarker([pub.latitude, pub.longitude], {
-            radius: config.pubMarkerRadius,
-            fillColor: styles.pubFillColor,
-            color: styles.pubStrokeColor,
-            weight: 3,
-            opacity: 1,
-            fillOpacity: 0.9
-        }).addTo(pubDetailMap);
-        
-        // Create popup content
-        let popupContent = createPubPopupContent(pub);
-        pubMarker.bindPopup(popupContent).openPopup();
-        
-        // Add user location if available
-        if (userLocation) {
-            L.circleMarker([userLocation.lat, userLocation.lng], {
-                radius: config.userMarkerRadius,
-                fillColor: styles.userFillColor,
-                color: styles.userStrokeColor,
-                weight: 2,
-                opacity: 1,
-                fillOpacity: 0.8
-            }).addTo(pubDetailMap).bindPopup('Your location');
+        try {
+            // Create map
+            if (pubDetailMap) {
+                pubDetailMap.remove();
+                pubDetailMap = null;
+            }
             
-            // Update popup with distance
-            const distance = calculateDistance(
-                userLocation.lat, userLocation.lng,
-                pub.latitude, pub.longitude
-            );
-            popupContent = popupContent.replace('</div>', 
-                `<div style="color: var(--primary-color, #667eea); font-size: 12px; margin-top: 4px;">${distance.toFixed(2)} km away</div></div>`
-            );
+            pubDetailMap = L.map('pubMapLeaflet', {
+                zoomControl: true,
+                attributionControl: true,
+                scrollWheelZoom: true,
+                doubleClickZoom: true,
+                touchZoom: true
+            }).setView([parseFloat(pub.latitude), parseFloat(pub.longitude)], 16);
+            
+            // Add tile layer
+            L.tileLayer(config.tileLayer, {
+                maxZoom: config.maxZoom,
+                attribution: config.attribution
+            }).addTo(pubDetailMap);
+            
+            // Get styles
+            const styles = getMapStyles();
+            
+            // Add pub marker
+            const pubMarker = L.circleMarker([parseFloat(pub.latitude), parseFloat(pub.longitude)], {
+                radius: 12,
+                fillColor: styles.pubFillColor || '#4CAF50',
+                color: styles.pubStrokeColor || '#ffffff',
+                weight: 3,
+                opacity: 1,
+                fillOpacity: 0.9
+            }).addTo(pubDetailMap);
+            
+            // Create popup content
+            const popupContent = createPubPopupContent ? createPubPopupContent(pub) : `
+                <div style="text-align: center;">
+                    <div style="font-weight: 600; margin-bottom: 5px;">${pub.name}</div>
+                    <div style="font-size: 0.9rem; color: #666;">${pub.address || ''}</div>
+                    <div style="font-size: 0.9rem; color: #666;">${pub.postcode || ''}</div>
+                </div>
+            `;
+            
             pubMarker.bindPopup(popupContent).openPopup();
+            
+            // Add user location if available
+            if (userLocation) {
+                L.circleMarker([userLocation.lat, userLocation.lng], {
+                    radius: 8,
+                    fillColor: styles.userFillColor || '#667eea',
+                    color: styles.userStrokeColor || '#ffffff',
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 0.8
+                }).addTo(pubDetailMap).bindPopup('📍 Your location');
+            }
+            
+            // Ensure proper rendering
+            setTimeout(() => {
+                if (pubDetailMap) {
+                    pubDetailMap.invalidateSize();
+                    console.log('🔄 Map size invalidated');
+                }
+            }, 150);
+            
+            console.log('✅ Pub detail map initialized successfully');
+            return pubDetailMap;
+            
+        } catch (error) {
+            console.error('❌ Error creating pub detail map:', error);
+            mapContainer.innerHTML = `
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 20px; text-align: center; color: var(--text-secondary);">
+                    <div style="font-size: 2rem; margin-bottom: 10px;">⚠️</div>
+                    <div style="font-weight: 600; margin-bottom: 5px;">Map Error</div>
+                    <div style="font-size: 0.9rem; opacity: 0.7;">${error.message}</div>
+                </div>
+            `;
+            return null;
         }
-        
-        // Ensure proper rendering
-        setTimeout(() => {
-            pubDetailMap.invalidateSize();
-        }, 100);
-        
-        console.log('✅ Pub detail map initialized');
-        return pubDetailMap;
     };
     
     // Add user location marker
