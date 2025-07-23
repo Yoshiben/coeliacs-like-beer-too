@@ -80,10 +80,22 @@ export const FormModule = (function() {
             
             if (result.success) {
                 showSuccess('🎉 Beer report submitted successfully! Thanks for contributing!');
+
+                // Debug: Log what's happening
+                console.log('🔍 Before modal close - checking hero visibility');
+                const heroSection = document.querySelector('.hero-section');
+                console.log('Hero section display:', heroSection?.style.display);
                 
                 // Close modal and reset form
                 ModalModule.close('reportModal');
                 resetReportForm();
+
+                // Debug: Check after modal close
+                setTimeout(() => {
+                    console.log('🔍 After modal close - checking hero visibility');
+                    const heroSectionAfter = document.querySelector('.hero-section');
+                    console.log('Hero section display after:', heroSectionAfter?.style.display);
+                }, 500);
                 
                 // Track success
                 trackFormSubmission('beer_report', reportData);
