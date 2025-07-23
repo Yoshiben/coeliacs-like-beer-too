@@ -757,20 +757,20 @@ export const FormModule = (function() {
         });
         
         // Initialize brewery field to show dropdown on focus
-        const breweryInput = document.getElementById('reportBrewery');
-        if (breweryInput) {
-            breweryInput.addEventListener('focus', () => {
-                if (!breweryInput.value) {
-                    searchBreweries('');
-                }
-            });
+        // const breweryInput = document.getElementById('reportBrewery');
+        // if (breweryInput) {
+        //     breweryInput.addEventListener('focus', () => {
+        //         if (!breweryInput.value) {
+        //             searchBreweries('');
+        //         }
+        //     });
             
-            breweryInput.addEventListener('click', () => {
-                if (!breweryInput.value) {
-                    searchBreweries('');
-                }
-            });
-        }
+        //     breweryInput.addEventListener('click', () => {
+        //         if (!breweryInput.value) {
+        //             searchBreweries('');
+        //         }
+        //     });
+        // }
 
         // Brewery autocomplete
         const breweryInput = document.getElementById('reportBrewery');
