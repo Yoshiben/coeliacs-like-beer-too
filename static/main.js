@@ -599,9 +599,9 @@ const App = {
                 const breweryInput = element;
                 const query = breweryInput.value;
                 
-                const formModule = this.getModule('form');
-                if (formModule && formModule.searchBreweries) {
-                    formModule.searchBreweries(query);
+                const formModuleForBrewery = this.getModule('form');
+                if (formModuleForBrewery && formModuleForBrewery.searchBreweries) {
+                    formModuleForBrewery.searchBreweries(breweryQuery);
                 } else {
                     console.error('❌ Form module or searchBreweries not available');
                 }
