@@ -232,9 +232,6 @@ const App = {
                 }
             }
         });
-
-        // 🔧 ADD: In setupEventDelegation function, after the click event listener
-        // Location: Around line 210, after the click handler
         
         // Form submission handler
         document.addEventListener('submit', (e) => {
@@ -249,8 +246,11 @@ const App = {
                 if (form.dataset.action === 'submit-report') {
                     console.log('📸 Handling beer report submission');
                     
-                    const formModule = window.App?.getModule('form');
+                    // Get the form module
+                    const formModule = window.App?.getModule('form') || window.FormModule;
+                    
                     if (formModule && formModule.handleReportSubmission) {
+                        // Call the submission handler
                         formModule.handleReportSubmission(e);
                     } else {
                         console.error('❌ Form module not available for submission');
