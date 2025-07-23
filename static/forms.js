@@ -89,6 +89,38 @@ export const FormModule = (function() {
                 // Close modal and reset form
                 ModalModule.close('reportModal');
                 resetReportForm();
+                
+                // Force return to home view
+                // Close any open overlays and show home sections
+                const pubDetailsOverlay = document.getElementById('pubDetailsOverlay');
+                if (pubDetailsOverlay) {
+                    pubDetailsOverlay.style.display = 'none';
+                    pubDetailsOverlay.classList.remove('active');
+                }
+                
+                const resultsOverlay = document.getElementById('resultsOverlay');
+                if (resultsOverlay) {
+                    resultsOverlay.style.display = 'none';
+                    resultsOverlay.classList.remove('active');
+                }
+                
+                // Restore body scroll
+                document.body.style.overflow = '';
+                
+                // Show home sections
+                const heroSection = document.querySelector('.hero-section');
+                const searchSection = document.querySelector('.search-section');
+                if (heroSection) {
+                    heroSection.style.display = 'block';
+                    console.log('✅ Hero section restored after form submission');
+                }
+                if (searchSection) {
+                    searchSection.style.display = 'flex';
+                    console.log('✅ Search section restored after form submission');
+                }
+                
+                // Track success
+                trackFormSubmission('beer_report', reportData);
 
                 // Debug: Check after modal close
                 setTimeout(() => {
