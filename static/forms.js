@@ -771,6 +771,36 @@ export const FormModule = (function() {
                 }
             });
         }
+
+        // Brewery autocomplete
+        const breweryInput = document.getElementById('reportBrewery');
+        if (breweryInput) {
+            breweryInput.addEventListener('input', debounce((e) => {
+                searchBreweries(e.target.value);
+            }, config.debounceDelay));
+            
+            breweryInput.addEventListener('focus', (e) => {
+                if (!e.target.value) {
+                    searchBreweries(''); // Show all breweries on focus
+                }
+            });
+        }
+        
+        // Beer name autocomplete
+        const beerNameInput = document.getElementById('reportBeerName');
+        if (beerNameInput) {
+            beerNameInput.addEventListener('input', debounce((e) => {
+                searchBeerNames(e.target.value);
+            }, config.debounceDelay));
+        }
+        
+        // Beer style autocomplete
+        const beerStyleInput = document.getElementById('reportBeerStyle');
+        if (beerStyleInput) {
+            beerStyleInput.addEventListener('input', debounce((e) => {
+                searchBeerStyles(e.target.value);
+            }, config.debounceDelay));
+        }
         
         // Initialize beer name field
         const beerNameInput = document.getElementById('reportBeerName');
