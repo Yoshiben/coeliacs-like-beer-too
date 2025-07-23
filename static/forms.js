@@ -34,7 +34,7 @@ export const FormModule = (function() {
     // REPORT FORM HANDLING
     // ================================
     
-    async function handleReportSubmission(event) {
+    const handleReportSubmission = async (event) => {
         event.preventDefault();
         console.log('📝 Handling report submission...');
         
@@ -94,9 +94,9 @@ export const FormModule = (function() {
             console.error('❌ Error submitting report:', error);
             showError('Error submitting report. Please try again.');
         }
-    }
+    };
     
-    function validateReportForm(data) {
+    const validateReportForm = (data) => {
         const errors = [];
         
         if (!data.beer_format) errors.push('Beer Format');
@@ -108,18 +108,18 @@ export const FormModule = (function() {
             isValid: errors.length === 0,
             errors: errors
         };
-    }
+    };
     
-    function showValidationError(errors) {
+    const showValidationError = (errors) => {
         const message = `❌ Please fill in: ${errors.join(', ')}`;
         if (window.showSuccessToast) {
             window.showSuccessToast(message);
         } else {
             alert(message);
         }
-    }
+    };
     
-    function resetReportForm() {
+    const resetReportForm = () => {
         const form = document.getElementById('reportForm');
         if (form) {
             form.reset();
@@ -140,9 +140,9 @@ export const FormModule = (function() {
         
         // Reset photo upload
         resetPhotoUpload();
-    }
+    };
     
-    function resetPhotoUpload() {
+    const resetPhotoUpload = () => {
         const photoLabel = document.querySelector('.photo-upload-compact');
         if (photoLabel) {
             photoLabel.classList.remove('active');
@@ -154,13 +154,13 @@ export const FormModule = (function() {
                 `;
             }
         }
-    }
+    };
     
     // ================================
     // PUB SEARCH & AUTOCOMPLETE
     // ================================
     
-    async function initializePubSearch() {
+    const initializePubSearch = async () => {
         const pubSearchInput = document.getElementById('reportPubSearch');
         if (!pubSearchInput) return;
         
@@ -175,9 +175,9 @@ export const FormModule = (function() {
                 searchPubs(e.target.value);
             }
         });
-    }
+    };
     
-    async function searchPubs(query) {
+    const searchPubs = async (query) => {
         const suggestionsDiv = document.getElementById('pubSuggestions');
         if (!suggestionsDiv) return;
         
@@ -212,9 +212,9 @@ export const FormModule = (function() {
             console.error('Error searching pubs:', error);
             hideDropdown('pubSuggestions');
         }
-    }
+    };
     
-    function selectPub(pubElement) {
+    const selectPub = (pubElement) => {
         const pubId = pubElement.dataset.pubId;
         const pubName = pubElement.querySelector('strong').textContent;
         const pubDetails = pubElement.querySelector('small').textContent;
@@ -237,18 +237,18 @@ export const FormModule = (function() {
         
         hideDropdown('pubSuggestions');
         trackEvent('pub_selected', 'Form', pubName);
-    }
+    };
     
-    function showNewPubFields() {
+    const showNewPubFields = () => {
         document.getElementById('newPubFields').style.display = 'block';
         document.getElementById('pubSearchGroup').style.display = 'none';
         document.getElementById('reportPubName').value = document.getElementById('reportPubSearch').value;
         
         hideDropdown('pubSuggestions');
         document.getElementById('reportAddress').focus();
-    }
+    };
     
-    function clearSelectedPub() {
+    const clearSelectedPub = () => {
         state.selectedPubData = null;
         window.selectedPubData = null;
         
@@ -256,13 +256,13 @@ export const FormModule = (function() {
         document.getElementById('pubSearchGroup').style.display = 'block';
         document.getElementById('reportPubSearch').value = '';
         document.getElementById('reportPubSearch').focus();
-    }
+    };
     
     // ================================
     // BREWERY AUTOCOMPLETE
     // ================================
     
-    async function searchBreweries(query) {
+    const searchBreweries = async (query) => {
         clearTimeout(state.searchTimeouts.brewery);
         const dropdown = document.getElementById('breweryDropdown');
         if (!dropdown) return;
@@ -291,9 +291,9 @@ export const FormModule = (function() {
                 hideDropdown('breweryDropdown');
             }
         }, config.debounceDelay);
-    }
+    };
     
-    function displayBreweryDropdown(breweries, totalCount, searchQuery = null) {
+    const displayBreweryDropdown = (breweries, totalCount, searchQuery = null) => {
         const dropdown = document.getElementById('breweryDropdown');
         if (!dropdown) return;
         
@@ -319,21 +319,13 @@ export const FormModule = (function() {
             item.innerHTML = `<strong>${escapeHtml(brewery)}</strong>`;
             item.dataset.action = 'select-brewery';
             item.dataset.brewery = brewery;
-            
-            // Add click handler directly to ensure it works
-            // item.addEventListener('click', (e) => {
-            //     e.preventDefault();
-            //     e.stopPropagation();
-            //     selectBrewery(brewery);
-            // });
-            
             dropdown.appendChild(item);
         });
         
         showDropdown('breweryDropdown');
-    }
+    };
     
-    async function selectBrewery(brewery) {
+    const selectBrewery = async (brewery) => {
         console.log('🍺 Brewery selected:', brewery);
         
         if (!brewery) {
@@ -363,17 +355,15 @@ export const FormModule = (function() {
         
         // Load beers for this brewery
         try {
-            loadBreweryBeers(brewery).catch(error => {
-                console.error('❌ Error loading brewery beers:', error);
-            });
+            await loadBreweryBeers(brewery);
         } catch (error) {
-            console.error('❌ Error in loadBreweryBeers call:', error);
+            console.error('❌ Error loading brewery beers:', error);
         }
         
         trackEvent('brewery_selected', 'Form', brewery);
-    }
+    };
     
-    async function loadBreweryBeers(brewery) {
+    const loadBreweryBeers = async (brewery) => {
         const beerNameInput = document.getElementById('reportBeerName');
         if (!beerNameInput) return;
         
@@ -399,13 +389,13 @@ export const FormModule = (function() {
             console.error('Error loading brewery beers:', error);
             beerNameInput.placeholder = 'Enter beer name...';
         }
-    }
+    };
     
     // ================================
     // BEER NAME AUTOCOMPLETE
     // ================================
     
-    async function searchBeerNames(query) {
+    const searchBeerNames = async (query) => {
         clearTimeout(state.searchTimeouts.beer);
         const dropdown = document.getElementById('beerNameDropdown');
         const brewery = document.getElementById('reportBrewery').value;
@@ -443,9 +433,9 @@ export const FormModule = (function() {
                 hideDropdown('beerNameDropdown');
             }
         }, config.debounceDelay);
-    }
+    };
     
-    function displayBeerDropdown(beers, brewery, searchQuery = null) {
+    const displayBeerDropdown = (beers, brewery, searchQuery = null) => {
         const dropdown = document.getElementById('beerNameDropdown');
         if (!dropdown) return;
         
@@ -486,9 +476,9 @@ export const FormModule = (function() {
         });
         
         showDropdown('beerNameDropdown');
-    }
+    };
     
-    function displayAddNewBeerOption(query, brewery) {
+    const displayAddNewBeerOption = (query, brewery) => {
         const dropdown = document.getElementById('beerNameDropdown');
         if (!dropdown) return;
         
@@ -502,9 +492,9 @@ export const FormModule = (function() {
         `;
         
         showDropdown('beerNameDropdown');
-    }
+    };
     
-    function showAddNewBeerDropdown(brewery) {
+    const showAddNewBeerDropdown = (brewery) => {
         const dropdown = document.getElementById('beerNameDropdown');
         if (!dropdown) return;
         
@@ -517,9 +507,9 @@ export const FormModule = (function() {
         `;
         
         showDropdown('beerNameDropdown');
-    }
+    };
     
-    function selectBeer(beerData) {
+    const selectBeer = (beerData) => {
         const beer = JSON.parse(beerData);
         
         // Fill fields
@@ -545,13 +535,13 @@ export const FormModule = (function() {
         focusNextEmptyField(['reportFormat', 'reportPhoto']);
         
         trackEvent('beer_selected', 'Form', beer.name);
-    }
+    };
     
     // ================================
     // BEER STYLE AUTOCOMPLETE
     // ================================
     
-    function searchBeerStyles(query) {
+    const searchBeerStyles = (query) => {
         clearTimeout(state.searchTimeouts.style);
         const dropdown = document.getElementById('beerStyleDropdown');
         
@@ -591,35 +581,35 @@ export const FormModule = (function() {
         });
         
         showDropdown('beerStyleDropdown');
-    }
+    };
     
-    function selectStyle(style) {
+    const selectStyle = (style) => {
         document.getElementById('reportBeerStyle').value = style;
         hideDropdown('beerStyleDropdown');
         trackEvent('style_selected', 'Form', style);
-    }
+    };
     
     // ================================
     // DROPDOWN MANAGEMENT
     // ================================
     
-    function showDropdown(dropdownId) {
+    const showDropdown = (dropdownId) => {
         const dropdown = document.getElementById(dropdownId);
         if (dropdown) {
             dropdown.style.display = 'block';
             state.dropdownsOpen.add(dropdownId);
         }
-    }
+    };
     
-    function hideDropdown(dropdownId) {
+    const hideDropdown = (dropdownId) => {
         const dropdown = document.getElementById(dropdownId);
         if (dropdown) {
             dropdown.style.display = 'none';
             state.dropdownsOpen.delete(dropdownId);
         }
-    }
+    };
     
-    function hideAllDropdowns() {
+    const hideAllDropdowns = () => {
         const dropdownIds = [
             'breweryDropdown', 
             'beerNameDropdown', 
@@ -627,13 +617,13 @@ export const FormModule = (function() {
             'pubSuggestions'
         ];
         dropdownIds.forEach(id => hideDropdown(id));
-    }
+    };
     
     // ================================
     // PHOTO UPLOAD
     // ================================
     
-    function initializePhotoUpload() {
+    const initializePhotoUpload = () => {
         const photoInput = document.getElementById('reportPhoto');
         const photoLabel = document.querySelector('.photo-upload-compact');
         
@@ -658,13 +648,13 @@ export const FormModule = (function() {
                 trackEvent('photo_selected', 'Form', 'photo_upload');
             }
         });
-    }
+    };
     
     // ================================
     // HELPER FUNCTIONS
     // ================================
     
-    function debounce(func, wait) {
+    const debounce = (func, wait) => {
         let timeout;
         return function executedFunction(...args) {
             const later = () => {
@@ -674,15 +664,15 @@ export const FormModule = (function() {
             clearTimeout(timeout);
             timeout = setTimeout(later, wait);
         };
-    }
+    };
     
-    function escapeHtml(text) {
+    const escapeHtml = (text) => {
         const div = document.createElement('div');
         div.textContent = text || '';
         return div.innerHTML;
-    }
+    };
     
-    function focusNextEmptyField(fieldIds) {
+    const focusNextEmptyField = (fieldIds) => {
         for (const id of fieldIds) {
             const field = document.getElementById(id);
             if (field && !field.value) {
@@ -690,55 +680,44 @@ export const FormModule = (function() {
                 break;
             }
         }
-    }
+    };
     
-    function showSuccess(message) {
+    const showSuccess = (message) => {
         if (window.showSuccessToast) {
             window.showSuccessToast(message);
         } else {
             console.log('✅', message);
         }
-    }
+    };
     
-    function showError(message) {
+    const showError = (message) => {
         if (window.showSuccessToast) {
             window.showSuccessToast(`❌ ${message}`);
         } else {
             console.error('❌', message);
         }
-    }
+    };
     
-    function trackEvent(action, category, label) {
+    const trackEvent = (action, category, label) => {
         if (window.TrackingModule) {
             window.TrackingModule.trackEvent(action, category, label);
         }
-    }
+    };
     
-    function trackFormSubmission(formName, data) {
+    const trackFormSubmission = (formName, data) => {
         if (window.TrackingModule) {
             window.TrackingModule.trackEvent('form_submission', 'Form', formName);
         }
-    }
+    };
     
     // ================================
     // EVENT LISTENERS
     // ================================
     
-    function setupEventListeners() {
+    const setupEventListeners = () => {
         // Handle dropdown item clicks
         document.addEventListener('click', (e) => {
             const action = e.target.closest('[data-action]');
-            
-            // Also check if clicking on a brewery item without data-action
-            const breweryItem = e.target.closest('.brewery-item');
-            if (breweryItem && !action) {
-                // Handle brewery selection
-                const brewery = breweryItem.dataset.brewery || breweryItem.textContent.trim();
-                if (brewery) {
-                    selectBrewery(brewery);
-                    return;
-                }
-            }
             
             if (!action) return;
             
@@ -748,9 +727,6 @@ export const FormModule = (function() {
                     break;
                 case 'add-new-pub':
                     showNewPubFields();
-                    break;
-                case 'select-brewery':
-                    selectBrewery(action.dataset.brewery);
                     break;
                 case 'select-beer':
                     selectBeer(action.dataset.beerData);
@@ -803,30 +779,28 @@ export const FormModule = (function() {
                 !e.target.closest('#pubSuggestions')) {
                 hideDropdown('pubSuggestions');
             }
-        }, true); // Use capture phase to catch all clicks
+        }, true);
 
         // Brewery autocomplete
         const breweryInput = document.getElementById('reportBrewery');
         if (breweryInput) {
-            // Remove any existing listeners first
             const newBreweryInput = breweryInput.cloneNode(true);
             breweryInput.parentNode.replaceChild(newBreweryInput, breweryInput);
             
-            // Add new listeners to the fresh element
             newBreweryInput.addEventListener('input', debounce((e) => {
                 searchBreweries(e.target.value);
             }, config.debounceDelay));
             
             newBreweryInput.addEventListener('focus', (e) => {
                 if (!e.target.value) {
-                    searchBreweries(''); // Show all breweries on focus
+                    searchBreweries('');
                 }
             });
             
             newBreweryInput.addEventListener('click', (e) => {
                 e.stopPropagation();
                 if (!e.target.value) {
-                    searchBreweries(''); // Show all breweries on click
+                    searchBreweries('');
                 }
             });
         }
@@ -834,7 +808,6 @@ export const FormModule = (function() {
         // Beer name autocomplete
         const beerNameInput = document.getElementById('reportBeerName');
         if (beerNameInput) {
-            // Remove any existing listeners first
             const newBeerNameInput = beerNameInput.cloneNode(true);
             beerNameInput.parentNode.replaceChild(newBeerNameInput, beerNameInput);
             
@@ -845,7 +818,7 @@ export const FormModule = (function() {
             newBeerNameInput.addEventListener('focus', (e) => {
                 const brewery = document.getElementById('reportBrewery').value;
                 if (brewery && !e.target.value) {
-                    loadBreweryBeers(brewery); // Show brewery beers on focus
+                    loadBreweryBeers(brewery);
                 }
             });
         }
@@ -853,7 +826,6 @@ export const FormModule = (function() {
         // Beer style autocomplete
         const beerStyleInput = document.getElementById('reportBeerStyle');
         if (beerStyleInput) {
-            // Remove any existing listeners first
             const newBeerStyleInput = beerStyleInput.cloneNode(true);
             beerStyleInput.parentNode.replaceChild(newBeerStyleInput, beerStyleInput);
             
@@ -861,34 +833,30 @@ export const FormModule = (function() {
                 searchBeerStyles(e.target.value);
             }, config.debounceDelay));
         }
-    }
+    };
     
     // ================================
     // INITIALIZATION
     // ================================
     
-    function init() {
+    const init = () => {
         console.log('🔧 Initializing Form Module');
         
         setupEventListeners();
         initializePubSearch();
         initializePhotoUpload();
         
-        // Initialize report form dropdowns when modal opens
         window.initReportDropdowns = initReportDropdowns;
         
         console.log('✅ Form Module initialized');
-    }
+    };
     
-    function initReportDropdowns() {
+    const initReportDropdowns = () => {
         console.log('🔧 Initializing report form dropdowns');
         
-        // Clear any existing state
         hideAllDropdowns();
-        
-        // Re-initialize photo upload in case modal was closed/reopened
         initializePhotoUpload();
-    }
+    };
     
     // ================================
     // PUBLIC API
@@ -900,10 +868,11 @@ export const FormModule = (function() {
         searchBreweries,
         searchBeerNames,
         searchBeerStyles,
+        selectBrewery,
         clearSelectedPub,
         initReportDropdowns,
         resetReportForm,
-        selectbrewery,
+        setupEventListeners,
         
         // For external access if needed
         getSelectedPub: () => state.selectedPubData,
