@@ -170,20 +170,22 @@ export const APIModule = (function() {
     const submitBeerReport = async (reportData) => {
         try {
             // Transform data to match backend expectations
+            // FIXED: Don't prefix with "new_" for known items
             const payload = {
                 pub_id: reportData.pub_id || null,
                 beer_format: reportData.beer_format,
-                new_brewery: reportData.brewery,
-                new_beer_name: reportData.beer_name,
-                new_style: reportData.beer_style,
-                new_abv: reportData.beer_abv,
+                brewery: reportData.brewery,  // CHANGED: was new_brewery
+                beer_name: reportData.beer_name,  // CHANGED: was new_beer_name
+                beer_style: reportData.beer_style,  // CHANGED: was new_style
+                beer_abv: reportData.beer_abv,  // CHANGED: was new_abv
                 submitted_by_name: 'Anonymous',
                 submitted_by_email: '',
                 user_notes: reportData.notes || `${reportData.beer_format} - ${reportData.brewery} ${reportData.beer_name}`,
                 photo_url: '',
-                new_pub_name: reportData.pub_name,
-                new_address: reportData.address,
-                new_postcode: reportData.postcode
+                // Only use "new_" prefix for actual new pub fields
+                new_pub_name: reportData.pub_name && !reportData.pub_id ? reportData.pub_name : null,
+                new_address: reportData.address && !reportData.pub_id ? reportData.address : null,
+                new_postcode: reportData.postcode && !reportData.pub_id ? reportData.postcode : null
             };
             
             console.log('API: Submitting beer report:', payload);
