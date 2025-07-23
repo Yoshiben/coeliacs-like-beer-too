@@ -752,6 +752,7 @@ export const SearchModule = (function() {
             console.log('🔧 Hidden results overlay');
         }
         
+        
         // FORCE: Show the pub details overlay with maximum priority
         const overlay = document.getElementById('pubDetailsOverlay');
         if (overlay) {
@@ -791,6 +792,42 @@ export const SearchModule = (function() {
                     beerEl.innerHTML = '<em>No specific GF beer information available. Help us by reporting what you find!</em>';
                 }
             }
+
+            const setupBeerDetails = (pub) => {
+                const beerSection = document.getElementById('beerSection');
+                const beerEl = document.getElementById('pubDetailsBeer');
+                
+                if (!beerSection || !beerEl) return;
+                
+                // Check if pub has any GF options
+                const hasGFOptions = pub.bottle || pub.tap || pub.cask || pub.can;
+                
+                if (hasGFOptions) {
+                    // Show the section
+                    beerSection.style.display = 'block';
+                    
+                    // Build the formats list
+                    let formats = [];
+                    if (pub.bottle) formats.push('🍺 Bottles');
+                    if (pub.tap) formats.push('🚰 Tap');
+                    if (pub.cask) formats.push('🛢️ Cask');
+                    if (pub.can) formats.push('🥫 Cans');
+                    
+                    // Set the content
+                    beerEl.innerHTML = `<strong>Available in: ${formats.join(', ')}</strong>`;
+                    
+                    // If we have specific beer details, show them
+                    if (pub.beer_details) {
+                        beerEl.innerHTML += `<br><small style="margin-top: var(--space-sm); display: block;">${pub.beer_details}</small>`;
+                    }
+                } else {
+                    // Hide the section completely - no GF options
+                    beerSection.style.display = 'none';
+                    
+                    // Clear any previous content
+                    beerEl.innerHTML = '';
+                }
+            };
 
             // SET UP BUTTON HANDLERS
             const findOnlineBtn = document.getElementById('pubFindOnline');
