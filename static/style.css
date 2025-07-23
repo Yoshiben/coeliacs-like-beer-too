@@ -4010,3 +4010,55 @@ p {
         border-radius: 16px !important;
     }
 }
+
+/* ================================
+   DESKTOP SPLIT-SCREEN STYLES
+   ADD to style.css after the pub-details-overlay section
+   ================================ */
+
+/* Desktop Split View */
+@media (min-width: 769px) {
+    .split-view .pub-details-container {
+        display: flex;
+        flex-direction: row;
+        gap: var(--space-md);
+    }
+    
+    .split-view .pub-details-card {
+        flex: 1;
+        max-height: calc(100vh - 32px);
+        max-height: calc(100dvh - 32px);
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .split-view .pub-map-container {
+        flex: 1;
+        display: block !important;
+        max-height: calc(100vh - 32px);
+        max-height: calc(100dvh - 32px);
+    }
+    
+    /* Keep beer section visible on desktop */
+    .split-view .beer-section {
+        display: block !important;
+    }
+    
+    /* Action buttons stay at bottom of details card */
+    .split-view .pub-action-grid {
+        margin-top: auto;
+        padding-top: var(--space-xl);
+    }
+}
+
+/* Large desktop screens */
+@media (min-width: 1200px) {
+    .split-view .pub-details-card {
+        max-width: 600px;
+    }
+    
+    .split-view .pub-map-container {
+        flex: 1.5;
+    }
+}
