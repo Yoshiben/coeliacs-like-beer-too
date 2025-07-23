@@ -264,6 +264,12 @@ export const ModalModule = (function() {
             modalTitle.innerHTML = '📸 Report GF Beer Find';
             window.selectedPubData = null;
         }
+
+        // Initialize autocomplete for brewery/beer fields
+        const formModule = window.App?.getModule('form');
+        if (formModule && formModule.setupEventListeners) {
+            formModule.setupEventListeners();
+}
         
         // Reset form
         if (reportForm) {
