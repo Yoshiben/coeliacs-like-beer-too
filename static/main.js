@@ -597,7 +597,7 @@ const App = {
             case 'search-breweries':
                 console.log('🏭 Searching breweries...');
                 const breweryInput = element;
-                const query = breweryInput.value;
+                const breweryquery = breweryInput.value;
                 
                 const formModuleForBrewery = this.getModule('form');
                 if (formModuleForBrewery && formModuleForBrewery.searchBreweries) {
