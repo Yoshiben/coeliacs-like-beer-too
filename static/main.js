@@ -595,16 +595,16 @@ const App = {
                 break;
 
             case 'search-breweries':
-                console.log('🏭 Searching breweries...');
-                const breweryInput = element;
-                const breweryquery = breweryInput.value;
+                // console.log('🏭 Searching breweries...');
+                // const breweryInput = element;
+                // const breweryquery = breweryInput.value;
                 
-                const formModuleForBrewery = this.getModule('form');
-                if (formModuleForBrewery && formModuleForBrewery.searchBreweries) {
-                    formModuleForBrewery.searchBreweries(breweryQuery);
-                } else {
-                    console.error('❌ Form module or searchBreweries not available');
-                }
+                // const formModuleForBrewery = this.getModule('form');
+                // if (formModuleForBrewery && formModuleForBrewery.searchBreweries) {
+                //     formModuleForBrewery.searchBreweries(breweryQuery);
+                // } else {
+                //     console.error('❌ Form module or searchBreweries not available');
+                // }
                 break;
             
             case 'search-beer-names':
