@@ -461,11 +461,6 @@ def get_brewery_beers(brewery_name):
             cursor.close()
             conn.close()
 
-# ================================================================================
-# 🔄 REPLACE: Your existing /api/submit_beer_update endpoint
-# Find this function in your app.py and replace the entire function
-# ================================================================================
-
 @app.route('/api/submit_beer_update', methods=['POST'])
 def submit_beer_update():
     """
@@ -477,18 +472,19 @@ def submit_beer_update():
     try:
         data = request.get_json()
         
-        # FIXED: Proper data extraction from the request
-        # The issue was here - data wasn't being extracted properly
+        # FIXED: Handle both old and new field naming conventions
         submission_data = {
             'pub_id': data.get('pub_id'),
-            'pub_name': data.get('pub_name') or data.get('new_pub_name'),  # Handle both forms
+            # Handle pub name from multiple possible fields
+            'pub_name': data.get('pub_name') or data.get('new_pub_name'),
             'address': data.get('address') or data.get('new_address'),
             'postcode': data.get('postcode') or data.get('new_postcode'),
-            'brewery': data.get('new_brewery') or data.get('brewery'),  # Your form uses 'new_brewery'
-            'beer_name': data.get('new_beer_name') or data.get('beer_name'),  # Your form uses 'new_beer_name'
-            'beer_style': data.get('new_style') or data.get('beer_style'),  # Your form uses 'new_style'
-            'beer_abv': data.get('new_abv') or data.get('beer_abv'),  # Your form uses 'new_abv'
-            'beer_format': data.get('beer_format')  # This should be correct
+            # FIXED: Check for both field names (with and without "new_" prefix)
+            'brewery': data.get('brewery') or data.get('new_brewery'),
+            'beer_name': data.get('beer_name') or data.get('new_beer_name'),
+            'beer_style': data.get('beer_style') or data.get('new_style'),
+            'beer_abv': data.get('beer_abv') or data.get('new_abv'),
+            'beer_format': data.get('beer_format')
         }
         
         # Debug logging to see what we're actually getting
