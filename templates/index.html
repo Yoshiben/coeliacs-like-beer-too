@@ -471,18 +471,12 @@
         </div>
     </div>
 
-    <!-- ================================
-     REPORT MODAL HTML
-     🔧 ACTION: ADD this entire modal to templates/index.html
-     📍 LOCATION: Add after your existing modals (after aboutModal, gfInfoModal, etc.)
-     📝 NOTE: This should go BEFORE the bottom navigation bar
-     ================================ -->
-
+    <!-- REPLACE: The entire reportModal div in templates/index.html -->
     <div id="reportModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 class="modal-title">📸 Report GF Beer Find</h2>
-                <button data-action="close-modal" aria-label="Close report modal">&times;</button>
+                <button class="modal-close" data-action="close-modal" aria-label="Close report modal">&times;</button>
             </div>
             
             <div class="modal-body">
@@ -504,7 +498,7 @@
                         <div class="selected-pub-card">
                             <strong id="selectedPubName"></strong>
                             <div id="selectedPubAddress"></div>
-                            <button type="button" data-action="clear-selected-pub" class="btn btn-secondary btn-sm">
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="if(window.FormModule) FormModule.clearSelectedPub();">
                                 Choose Different Pub
                             </button>
                         </div>
@@ -545,7 +539,7 @@
                         <div class="brewery-dropdown-container">
                             <input type="text" id="reportBrewery" name="reportBrewery" class="form-input" 
                                    placeholder="Start typing brewery name..." 
-                                   autocomplete="off" 
+                                   autocomplete="off">
                             <div id="breweryDropdown" class="suggestions brewery-suggestions"></div>
                         </div>
                     </div>
@@ -556,7 +550,7 @@
                         <div class="beer-name-container">
                             <input type="text" id="reportBeerName" name="reportBeerName" class="form-input" 
                                    placeholder="Start typing beer name..." 
-                                   autocomplete="off" data-action="search-beer-names">>
+                                   autocomplete="off">
                             <div id="beerNameDropdown" class="suggestions beer-suggestions"></div>
                         </div>
                     </div>
@@ -567,7 +561,7 @@
                         <div class="beer-style-container">
                             <input type="text" id="reportBeerStyle" name="reportBeerStyle" class="form-input" 
                                    placeholder="IPA, Lager, Stout..." 
-                                   autocomplete="off" data-action="search-beer-styles">
+                                   autocomplete="off">
                             <div id="beerStyleDropdown" class="suggestions style-suggestions"></div>
                         </div>
                     </div>
@@ -584,6 +578,10 @@
                         <label class="form-label">Photo (Optional)</label>
                         <label for="reportPhoto" class="photo-upload-compact">
                             <div class="photo-upload-icon">📷</div>
+                            <div class="photo-upload-text">
+                                <strong>Add a photo</strong><br>
+                                <small>Beer menu, bottle, or tap</small>
+                            </div>
                             <input type="file" id="reportPhoto" name="reportPhoto" 
                                    accept="image/*" style="display: none;">
                         </label>
@@ -591,7 +589,7 @@
                     
                     <!-- Form Actions (Sticky at bottom) -->
                     <div class="form-actions">
-                        <button class="modal-close" data-action="close-modal" aria-label="Close report modal">&times;</button>
+                        <button type="button" class="btn btn-secondary" data-action="close-modal">
                             Cancel
                         </button>
                         <button type="submit" class="btn btn-success">
