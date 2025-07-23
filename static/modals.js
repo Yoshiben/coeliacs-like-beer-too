@@ -264,16 +264,24 @@ export const ModalModule = (function() {
             modalTitle.innerHTML = '📸 Report GF Beer Find';
             window.selectedPubData = null;
         }
-
-        // Initialize autocomplete for brewery/beer fields
-        const formModule = window.App?.getModule('form');
-        if (formModule && formModule.setupEventListeners) {
-            formModule.setupEventListeners();
-}
-        
+    
         // Reset form
         if (reportForm) {
             reportForm.reset();
+        }
+        
+        // Reset selected pub info
+        document.getElementById('selectedPubInfo').style.display = 'none';
+        document.getElementById('newPubFields').style.display = 'none';
+        
+        // Initialize form module event listeners
+        const formModule = window.App?.getModule('form') || window.FormModule;
+        if (formModule && formModule.setupEventListeners) {
+            // Re-initialize event listeners for the modal
+            setTimeout(() => {
+                formModule.setupEventListeners();
+                console.log('✅ Form event listeners re-initialized');
+            }, 100);
         }
         
         // Initialize dropdowns
