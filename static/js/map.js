@@ -1006,10 +1006,6 @@ export const MapModule = (function() {
         // Add the control to the map
         mapInstance.addControl(new LocationControl());
     };
-        
-        // Add the control to the map
-        mapInstance.addControl(new locationControl());
-    };
     
     // Load all pubs from the API
     const loadAllPubsOnMap = async () => {
