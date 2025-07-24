@@ -285,6 +285,9 @@
     --marker-pulse-duration: 1s;
     --marker-pulse-count: 2;
     --marker-pulse-total-duration: 2s; /* duration × count */
+
+    --z-pub-overlay: 9999;
+    --z-status-modals: 10100; /* Higher than pub overlay */
 }
 
 /* ================================
@@ -4710,31 +4713,12 @@ p {
         display: none;
     }
 
-/* FIX: Ensure status modals appear above pub details overlay */
-.status-modal,
-.confirm-modal,
-.prompt-modal {
-    z-index: calc(var(--z-modal-backdrop) + 100) !important;
+#pubDetailsOverlay {
+    z-index: var(--z-pub-overlay);
 }
 
-.status-modal .modal-content,
-.confirm-modal .modal-content,
-.prompt-modal .modal-content {
-    z-index: calc(var(--z-modal-content) + 100) !important;
-}
-
-/* NUCLEAR OPTION - Force status modals to top */
 #gfStatusModal,
 #gfStatusConfirmModal,
 #beerDetailsPromptModal {
-    z-index: 99999 !important;
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-}
-
-#pubDetailsOverlay {
-    z-index: 9999 !important; /* Lower than status modals */
+    z-index: var(--z-status-modals) !important;
 }
