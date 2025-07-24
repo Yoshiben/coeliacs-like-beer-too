@@ -1117,7 +1117,7 @@ export const FormModule = (function() {
         }
     
     // Initialize when ready
-    document.addEventListener('DOMContentLoaded', () => GFStatusFlow.init());
+    // document.addEventListener('DOMContentLoaded', () => GFStatusFlow.init());
     
     // ================================
     // INITIALIZATION
@@ -1129,6 +1129,7 @@ export const FormModule = (function() {
         setupEventListeners();
         initializePubSearch();
         initializePhotoUpload();
+        GFStatusFlow.init(); // ADD THIS LINE
         
         window.initReportDropdowns = initReportDropdowns;
         
