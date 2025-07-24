@@ -314,37 +314,42 @@
                     </div>
                 </div>
                 <!-- ADD: Quick GF Status Toggle (add to pub details overlay) -->
+                <!-- UPDATE: Refined status toggle with better messaging -->
                 <div class="gf-status-toggle-section">
-                    <h3 class="toggle-title">🍺 Update GF Beer Status</h3>
+                    <h3 class="toggle-title">🍺 What's the GF beer situation here?</h3>
                     
                     <div class="status-toggle-grid">
                         <button class="status-toggle-btn always" data-status="always">
-                            <span class="status-icon">🟢</span>
-                            <span class="status-label">Always Has GF</span>
-                            <small>Permanent menu item</small>
+                            <span class="status-icon">⭐</span>
+                            <span class="status-label">Always Available</span>
+                            <small>Permanent menu fixture</small>
                         </button>
                         
                         <button class="status-toggle-btn currently" data-status="currently">
-                            <span class="status-icon">🟡</span>
-                            <span class="status-label">Currently Has GF</span>
-                            <small>Available now</small>
+                            <span class="status-icon">✅</span>
+                            <span class="status-label">Available Now</span>
+                            <small>Currently in stock</small>
                         </button>
                         
                         <button class="status-toggle-btn not-currently" data-status="not_currently">
-                            <span class="status-icon">🔴</span>
-                            <span class="status-label">No GF Currently</span>
-                            <small>None available</small>
+                            <span class="status-icon">❌</span>
+                            <span class="status-label">Not Available</span>
+                            <small>None right now</small>
                         </button>
                         
                         <button class="status-toggle-btn unknown active" data-status="unknown">
-                            <span class="status-icon">⚪</span>
-                            <span class="status-label">Unknown</span>
-                            <small>Not checked</small>
+                            <span class="status-icon">❓</span>
+                            <span class="status-label">Not Sure</span>
+                            <small>Help us find out!</small>
                         </button>
                     </div>
                     
-                    <!-- Show form only for 'always' or 'currently' -->
-                    <div id="gfDetailsForm" class="gf-details-form" style="display: none;">
+                    <div class="status-message" id="statusMessage">
+                        <!-- Dynamic message based on selection -->
+                    </div>
+                    
+                    <div id="gfDetailsPrompt" class="gf-details-prompt" style="display: none;">
+                        <p class="prompt-text">🎉 Great news! Want to add specific beer details?</p>
                         <button class="btn btn-primary" data-action="report-beer-details">
                             📝 Add Beer Details
                         </button>
