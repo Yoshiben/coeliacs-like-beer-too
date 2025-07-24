@@ -813,6 +813,161 @@ export const MapModule = (function() {
         }
     };
 
+    // Initialize full UK map with all pubs
+    const initFullUKMap = async () => {
+        console.log('🗺️ Initializing full UK map with all pubs...');
+        
+        const mapElement = document.getElementById('fullMap');
+        if (!mapElement) {
+            console.error('Full map element not found');
+            return null;
+        }
+        
+        // Clean up any existing map
+        if (window.fullUKMap) {
+            window.fullUKMap.remove();
+            window.fullUKMap = null;
+        }
+        
+        // Create new map centered on UK
+        window.fullUKMap = L.map('fullMap', {
+            zoomControl: true,
+            attributionControl: true,
+            scrollWheelZoom: true,
+            doubleClickZoom: true,
+            touchZoom: true
+        }).setView(config.defaultCenter, config.defaultZoom);
+        
+        // Add tile layer
+        L.tileLayer(config.tileLayer, {
+            maxZoom: config.maxZoom,
+            attribution: config.attribution
+        }).addTo(window.fullUKMap);
+        
+        // Add user location if available
+        if (userLocation) {
+            const styles = getMapStyles();
+            L.circleMarker([userLocation.lat, userLocation.lng], {
+                radius: config.userMarkerRadius,
+                fillColor: styles.userFillColor,
+                color: styles.userStrokeColor,
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.8
+            }).addTo(window.fullUKMap).bindPopup('📍 Your location');
+        }
+        
+        // Add legend
+        addMapLegend(window.fullUKMap);
+        
+        // Load and display all pubs
+        await loadAllPubsOnMap();
+        
+        // Ensure proper rendering
+        setTimeout(() => {
+            if (window.fullUKMap) {
+                window.fullUKMap.invalidateSize();
+            }
+        }, 150);
+        
+        console.log('✅ Full UK map initialized');
+        return window.fullUKMap;
+    };
+    
+    // Load all pubs from the API
+    const loadAllPubsOnMap = async () => {
+        console.log('📍 Loading all UK pubs for map...');
+        
+        try {
+            // Show loading state
+            const mapContainer = document.querySelector('.map-overlay-content');
+            if (mapContainer) {
+                const loadingDiv = document.createElement('div');
+                loadingDiv.className = 'map-loading-overlay';
+                loadingDiv.innerHTML = `
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">Loading pubs across the UK...</div>
+                `;
+                loadingDiv.style.cssText = `
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: rgba(255, 255, 255, 0.9);
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: center;
+                    z-index: 1000;
+                `;
+                mapContainer.appendChild(loadingDiv);
+            }
+            
+            // Fetch all pubs - you might need to create this endpoint
+            const api = window.App?.getModule('api') || window.APIModule;
+            if (!api) {
+                console.error('API module not available');
+                return;
+            }
+            
+            // Search with no query to get all pubs
+            const results = await api.searchPubs({
+                query: '',
+                searchType: 'all',
+                page: 1
+            });
+            
+            const pubs = Array.isArray(results) ? results : results.pubs || [];
+            console.log(`📊 Got ${pubs.length} pubs to display on map`);
+            
+            // Add markers to map
+            if (window.fullUKMap && pubs.length > 0) {
+                addPubMarkers(pubs, window.fullUKMap);
+            }
+            
+            // Remove loading overlay
+            const loadingOverlay = document.querySelector('.map-loading-overlay');
+            if (loadingOverlay) {
+                loadingOverlay.remove();
+            }
+            
+            // Show stats
+            if (window.showSuccessToast) {
+                window.showSuccessToast(`✅ Loaded ${pubs.length} pubs on map!`);
+            }
+            
+        } catch (error) {
+            console.error('❌ Error loading pubs for map:', error);
+            
+            // Remove loading overlay
+            const loadingOverlay = document.querySelector('.map-loading-overlay');
+            if (loadingOverlay) {
+                loadingOverlay.remove();
+            }
+            
+            if (window.showSuccessToast) {
+                window.showSuccessToast('❌ Error loading pubs. Please try again.');
+            }
+        }
+    };
+    
+    // Clean up full UK map
+    const cleanupFullUKMap = () => {
+        console.log('🧹 Cleaning up full UK map...');
+        
+        if (window.fullUKMap) {
+            try {
+                window.fullUKMap.remove();
+                window.fullUKMap = null;
+                console.log('✅ Full UK map cleaned up');
+            } catch (error) {
+                console.warn('Warning cleaning up full UK map:', error);
+                window.fullUKMap = null;
+            }
+        }
+    };
+
     
     // Public API
     return {
@@ -825,6 +980,9 @@ export const MapModule = (function() {
         setUserLocation,
         getUserLocation,
         centerOnLocation,
+        initFullUKMap,
+        loadAllPubsOnMap,
+        cleanupFullUKMap,
         showPubFromMap,
         toggleSearchResultsFullMap,
         cleanupResultsMap, // 🔧 ADD this line
