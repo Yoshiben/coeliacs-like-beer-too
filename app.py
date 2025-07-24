@@ -1061,7 +1061,6 @@ def get_all_pubs_for_map():
                 gf_status
             FROM pubs
             WHERE latitude IS NOT NULL AND longitude IS NOT NULL AND latitude != 0 AND longitude != 0
-            LIMIT 10000
         """)
         
         pubs = cursor.fetchall()
