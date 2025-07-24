@@ -985,17 +985,25 @@ export const FormModule = (function() {
         },
         
         async confirmStatusUpdate() {
-            // CHANGE: Add safety check
-            if (!this.currentPub || !this.currentPub.pub_id) {
-                console.error('❌ No pub data available');
-                this.currentPub = window.currentPubData; // Try to recover
-                
-                if (!this.currentPub || !this.currentPub.pub_id) {
-                    if (window.showSuccessToast) {
-                        window.showSuccessToast('❌ Error: No pub selected');
-                    }
-                    return;
+            console.log('🔍 confirmStatusUpdate called');
+            console.log('Current pub:', this.currentPub);
+            console.log('Selected status:', this.selectedStatus);
+            console.log('Window currentPubData:', window.currentPubData);
+            
+            // Safety check
+            const pubToUpdate = this.currentPub || window.currentPubData;
+            if (!pubToUpdate || !pubToUpdate.pub_id) {
+                console.error('❌ No pub data available for update');
+                if (window.showSuccessToast) {
+                    window.showSuccessToast('❌ Error: No pub selected');
                 }
+                return;
+            }
+            
+            // Make sure we have a status
+            if (!this.selectedStatus) {
+                console.error('❌ No status selected');
+                return;
             }
             
             // Close modal first
@@ -1014,7 +1022,7 @@ export const FormModule = (function() {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        pub_id: this.currentPub.pub_id,
+                        pub_id: pubToUpdate.pub_id,  // Use pubToUpdate here
                         status: this.selectedStatus
                     })
                 });
