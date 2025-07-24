@@ -2904,12 +2904,7 @@ p {
     font-weight: bold !important;
     text-align: center !important;
     border-radius: 50% !important;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.3) !important;
-}
-
-.marker-cluster-small {
-    width: 15px !important;
-    height: 15px !important;
+/*     box-shadow: 0 2px 5px rgba(0,0,0,0.3) !important; */
 }
 
 .marker-cluster-small div {
@@ -2919,11 +2914,12 @@ p {
     line-height: 15px !important;
     font-size: 6px !important;  /* Was 12px */
 }
-
-.marker-cluster-medium {
-    width: 20px !important;
-    height: 20px !important;
+.marker-cluster-small {
+    width: 15px !important;
+    height: 15px !important;
 }
+
+
 
 
 .marker-cluster-medium div {
@@ -2933,11 +2929,12 @@ p {
     line-height: 20px !important;
     font-size: 8px !important;  /* Was 13px */
 }
-
-.marker-cluster-large {
-    width: 25px !important;
-    height: 25px !important;
+.marker-cluster-medium {
+    width: 20px !important;
+    height: 20px !important;
 }
+
+
 
 .marker-cluster-large div {
     width: 30px !important;  /* Was 50px */
@@ -2945,6 +2942,10 @@ p {
     margin: 5px !important;
     line-height: 30px !important;
     font-size: 10px !important;  /* Was 14px */
+}
+.marker-cluster-large {
+    width: 25px !important;
+    height: 25px !important;
 }
 
 /* Override default cluster colors */
