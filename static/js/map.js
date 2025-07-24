@@ -400,20 +400,20 @@ export const MapModule = (function() {
         // Create layer groups
         window.gfPubsLayer = L.layerGroup().addTo(targetMap);
         window.clusteredPubsLayer = L.markerClusterGroup({
-            maxClusterRadius: 60,
+            maxClusterRadius: 40,  // Reduced from 60 - clusters break apart sooner
+            disableClusteringAtZoom: 13,  // Force individual markers at zoom 13+
             spiderfyOnMaxZoom: true,
             showCoverageOnHover: false,
             iconCreateFunction: function(cluster) {
                 const count = cluster.getChildCount();
                 let size = 'small';
-                let className = 'marker-cluster-unknown';
                 
                 if (count > 100) size = 'large';
                 else if (count > 50) size = 'medium';
                 
                 return L.divIcon({
                     html: `<div><span>${count}</span></div>`,
-                    className: `marker-cluster marker-cluster-${size} ${className}`,
+                    className: `marker-cluster marker-cluster-${size}`,  // Removed marker-cluster-unknown
                     iconSize: L.point(40, 40)
                 });
             }
