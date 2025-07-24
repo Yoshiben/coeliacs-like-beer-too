@@ -756,7 +756,49 @@ const App = {
                     }
                 }
                 break;
-        }
+
+            case 'select-status':
+                console.log('📊 Status option selected');
+                const status = element.dataset.status;
+                
+                const formModuleStatus = this.getModule('form');
+                if (formModuleStatus && formModuleStatus.GFStatusFlow) {
+                    formModuleStatus.GFStatusFlow.selectStatus(status);
+                }
+                break;
+            
+            case 'confirm-status':
+                console.log('✅ Confirming status update');
+                
+                const formModuleConfirm = this.getModule('form');
+                if (formModuleConfirm && formModuleConfirm.GFStatusFlow) {
+                    formModuleConfirm.GFStatusFlow.confirmStatusUpdate();
+                }
+                break;
+            
+            case 'cancel-status':
+                console.log('❌ Cancelling status update');
+                this.closeModal('gfStatusConfirmModal');
+                break;
+            
+            case 'skip-details':
+                console.log('⏭️ Skipping beer details');
+                this.closeModal('beerDetailsPromptModal');
+                if (window.showSuccessToast) {
+                    window.showSuccessToast('✅ Status updated successfully!');
+                }
+                break;
+            
+            case 'add-beer-details':
+                console.log('📝 Adding beer details');
+                this.closeModal('beerDetailsPromptModal');
+                
+                const modalModuleReport = this.getModule('modal');
+                if (modalModuleReport) {
+                    modalModuleReport.openReportModal(window.currentPubData);
+                }
+                break;
+                    }
     },
     
     handleDistanceSelection(distance) {
