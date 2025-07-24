@@ -415,9 +415,9 @@ export const MapModule = (function() {
                 pubsToShow.push(pub); // Always show
             } else if (gfStatus === 'currently') {
                 pubsToShow.push(pub); // Always show
-            } else if (gfStatus === 'unknown' && currentZoom >= 11) {
+            } else if (gfStatus === 'unknown' && currentZoom >= 9) {
                 pubsToShow.push(pub); // Show at city level
-            } else if (gfStatus === 'not_currently' && currentZoom >= 14) {
+            } else if (gfStatus === 'not_currently' && currentZoom >= 12) {
                 pubsToShow.push(pub); // Show only when very zoomed in
             }
         });
@@ -689,6 +689,45 @@ export const MapModule = (function() {
         };
         
         legend.addTo(mapInstance);
+    };
+
+    // Add zoom hint to map
+    const addZoomHint = (mapInstance) => {
+        const hintControl = L.Control.extend({
+            options: {
+                position: 'topright'
+            },
+            
+            onAdd: function(map) {
+                const container = L.DomUtil.create('div', 'zoom-hint-container');
+                container.innerHTML = `
+                    <div class="zoom-hint">
+                        <span class="zoom-hint-icon">💡</span>
+                        <span class="zoom-hint-text">Zoom in to discover more pubs</span>
+                    </div>
+                `;
+                
+                // Update visibility based on zoom
+                const updateHintVisibility = () => {
+                    const zoom = map.getZoom();
+                    if (zoom < 9) {
+                        container.style.display = 'block';
+                    } else {
+                        container.style.display = 'none';
+                    }
+                };
+                
+                // Initial check
+                updateHintVisibility();
+                
+                // Update on zoom
+                map.on('zoomend', updateHintVisibility);
+                
+                return container;
+            }
+        });
+        
+        mapInstance.addControl(new hintControl());
     };
     
     const initPubDetailsSplitMap = (pub) => {
@@ -1013,6 +1052,9 @@ export const MapModule = (function() {
         
         // Add legend (permanent, no toggle)
         addMapLegend(window.fullUKMap);
+
+        // Add zoom hint
+        addZoomHint(window.fullUKMap);
         
         // Add "Go to My Location" button (even if no location yet)
         addLocationButton(window.fullUKMap);
