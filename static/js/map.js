@@ -10,7 +10,7 @@ export const MapModule = (function() {
     let map = null;
     let userMarker = null;
     let pubMarkers = [];
-    let userLocation = null;
+    // let userLocation = null;
     let mapVisible = false;
     let resultsMap = null;
     let pubDetailMap = null;
@@ -63,7 +63,7 @@ export const MapModule = (function() {
         }).addTo(map);
         
         // Add user location if available
-        if (userLocation) {
+        if (window.App.state.userLocation) {
             addUserMarker(userLocation);
         }
         
@@ -122,8 +122,8 @@ export const MapModule = (function() {
                     boxZoom: true,
                     keyboard: true
                 }).setView(
-                    userLocation ? [userLocation.lat, userLocation.lng] : config.defaultCenter,
-                    userLocation ? 12 : config.defaultZoom // Closer zoom for results
+                    window.App.state.userLocation ? [window.App.state.userLocation.lat, window.App.state.userLocation.lng] : config.defaultCenter,
+                    window.App.state.userLocation ? 12 : config.defaultZoom // Closer zoom for results
                 );
                 
                 // Add tile layer
@@ -133,9 +133,9 @@ export const MapModule = (function() {
                 }).addTo(resultsMap);
                 
                 // Add user location if available
-                if (userLocation) {
+                if (window.App.state.userLocation) {
                     const styles = getMapStyles();
-                    L.circleMarker([userLocation.lat, userLocation.lng], {
+                    L.circleMarker([window.App.state.userLocation.lat, window.App.state.userLocation.lng], {
                         radius: config.userMarkerRadius,
                         fillColor: styles.userFillColor,
                         color: styles.userStrokeColor,
@@ -261,8 +261,8 @@ export const MapModule = (function() {
             pubMarker.bindPopup(popupContent).openPopup();
             
             // Add user location if available
-            if (userLocation) {
-                L.circleMarker([userLocation.lat, userLocation.lng], {
+            if (window.App.state.userLocation) {
+                L.circleMarker([window.App.state.userLocation.lat, window.App.state.userLocation.lng], {
                     radius: 8,
                     fillColor: styles.userFillColor || '#667eea',
                     color: styles.userStrokeColor || '#ffffff',
@@ -300,7 +300,7 @@ export const MapModule = (function() {
     const addUserMarker = (location) => {
         if (!map) return;
         
-        userLocation = location;
+        window.App.state.userLocation = location;
         const styles = getMapStyles();
         
         // Remove existing user marker
@@ -677,8 +677,8 @@ export const MapModule = (function() {
         pubMarker.bindPopup(popupContent).openPopup();
         
         // Add user location if available
-        if (userLocation) {
-            L.circleMarker([userLocation.lat, userLocation.lng], {
+        if (window.App.state.userLocation) {
+            L.circleMarker([window.App.state.userLocation.lat, window.App.state.userLocation.lng], {
                 radius: 8,
                 fillColor: 'var(--marker-user-fill)',
                 color: 'var(--marker-user-stroke)',
@@ -762,18 +762,18 @@ export const MapModule = (function() {
     
     // Set user location
     const setUserLocation = (location) => {
-        userLocation = location;
+        window.App.state.userLocation = location;
         if (map) {
             addUserMarker(location);
         }
     };
     
     // Get user location
-    const getUserLocation = () => userLocation;
+    const getUserLocation = () => window.App.state.userLocation;
     
     // Center map on location
     const centerOnLocation = (location = null) => {
-        const targetLocation = location || userLocation;
+        const targetLocation = location || window.App.state.userLocation;
         if (targetLocation && map) {
             map.setView([targetLocation.lat, targetLocation.lng], 14);
             console.log('🎯 Map centered on location');
@@ -851,12 +851,12 @@ export const MapModule = (function() {
         }
         
         // Try to get user location first if we don't have it
-        if (!userLocation) {
+        if (!window.App.state.userLocation) {
             try {
                 console.log('📍 Getting user location for map...');
                 const location = await getUserLocation();
-                userLocation = location;
-                console.log('✅ Got user location:', userLocation);
+                window.App.state.userLocation = location;
+                console.log('✅ Got user location:', window.App.state.userLocation);
             } catch (error) {
                 console.log('📍 Could not get user location:', error);
             }
@@ -866,8 +866,8 @@ export const MapModule = (function() {
         let initialCenter = config.defaultCenter;
         let initialZoom = config.defaultZoom;
         
-        if (userLocation) {
-            initialCenter = [userLocation.lat, userLocation.lng];
+        if (window.App.state.userLocation) {
+            initialCenter = [window.App.state.userLocation.lat, window.App.state.userLocation.lng];
             initialZoom = 12; // Closer zoom when we have user location
             console.log('📍 Centering map on user location:', initialCenter);
         } else {
@@ -890,9 +890,9 @@ export const MapModule = (function() {
         }).addTo(window.fullUKMap);
         
         // Add user location marker if available - with emphasis
-        if (userLocation) {
+        if (window.App.state.userLocation) {
             const styles = getMapStyles();
-            const userMarker = L.circleMarker([userLocation.lat, userLocation.lng], {
+            const userMarker = L.circleMarker([window.App.state.userLocation.lat, window.App.state.userLocation.lng], {
                 radius: 12, // Larger for emphasis
                 fillColor: styles.userFillColor || '#667eea',
                 color: styles.userStrokeColor || '#ffffff',
