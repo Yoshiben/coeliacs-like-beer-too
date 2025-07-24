@@ -4722,3 +4722,19 @@ p {
 .prompt-modal .modal-content {
     z-index: calc(var(--z-modal-content) + 100) !important;
 }
+
+/* NUCLEAR OPTION - Force status modals to top */
+#gfStatusModal,
+#gfStatusConfirmModal,
+#beerDetailsPromptModal {
+    z-index: 99999 !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+#pubDetailsOverlay {
+    z-index: 9999 !important; /* Lower than status modals */
+}
