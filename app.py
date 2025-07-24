@@ -1110,7 +1110,7 @@ def update_gf_status():
         
         # Log to history
         cursor.execute("""
-            INSERT INTO gf_status_history (pub_id, status, reported_by)
+            INSERT INTO gf_status_history (pub_id, new_status, reported_by)
             VALUES (%s, %s, %s)
         """, (pub_id, status, request.remote_addr))
         
