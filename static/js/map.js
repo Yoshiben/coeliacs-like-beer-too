@@ -1177,7 +1177,7 @@ export const MapModule = (function() {
                 loadingDiv.className = 'map-loading-overlay';
                 loadingDiv.innerHTML = `
                     <div class="loading-spinner"></div>
-                    <div class="loading-text">Loading GF beer venues across the UK...</div>
+                    <div class="loading-text">Loading GF beer venues across the UK <br> Please bear with us...</div>
                 `;
                 loadingDiv.style.cssText = `
                     position: absolute;
