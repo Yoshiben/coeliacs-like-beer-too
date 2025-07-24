@@ -73,17 +73,17 @@ export const SearchModule = (function() {
             showResultsLoading('📍 Getting precise location...');
             
             // Get user location if we don't have it
-            if (!userLocation) {
+            if (!window.App.state.userLocation)) {
                 try {
                     window.App.state.userLocation = await getUserLocation();
                     
                     // 🔧 ADD: Show accuracy feedback to user
-                    if (userLocation.accuracy) {
-                        if (userLocation.accuracy <= 100) {
+                    if (window.App.state.userLocation).accuracy) {
+                        if (window.App.state.userLocation).accuracy <= 100) {
                             showResultsLoading('🎯 Excellent location accuracy - finding nearby GF beer...');
-                        } else if (userLocation.accuracy <= 500) {
+                        } else if (window.App.state.userLocation).accuracy <= 500) {
                             showResultsLoading('📍 Good location accuracy - finding nearby GF beer...');
-                        } else if (userLocation.accuracy <= 1000) {
+                        } else if (window.App.state.userLocation).accuracy <= 1000) {
                             showResultsLoading('📍 Reasonable location accuracy - finding nearby GF beer...');
                         } else {
                             showResultsLoading('📍 Location found (low accuracy) - finding nearby GF beer...');
@@ -95,7 +95,7 @@ export const SearchModule = (function() {
                     
                     const mapModule = getMap();
                     if (mapModule && mapModule.setUserLocation) {
-                        mapModule.setUserLocation(userLocation);
+                        mapModule.setUserLocation(window.App.state.userLocation));
                     }
                     
                 } catch (locationError) {
@@ -109,15 +109,15 @@ export const SearchModule = (function() {
             lastSearchState = {
                 type: 'nearby',
                 radius: radiusKm,
-                userLocation: userLocation,
+                userLocation: window.App.state.userLocation),
                 timestamp: Date.now()
             };
             
             // Perform search
             showResultsLoading('🔍 Searching for GF beer options...');
             const pubs = await APIModule.findNearbyPubs(
-                userLocation.lat, 
-                userLocation.lng, 
+                window.App.state.userLocation).lat, 
+                window.App.state.userLocation).lng, 
                 radiusKm, 
                 false // Don't force GF-only
             );
@@ -133,8 +133,8 @@ export const SearchModule = (function() {
             currentSearchPubs = pubs;
             
             // Display results with location accuracy info
-            const accuracyText = userLocation.accuracy && userLocation.accuracy > 500 ? 
-                ` (±${Math.round(userLocation.accuracy)}m accuracy)` : '';
+            const accuracyText = window.App.state.userLocation).accuracy && window.App.state.userLocation).accuracy > 500 ? 
+                ` (±${Math.round(window.App.state.userLocation).accuracy)}m accuracy)` : '';
             
             displayResultsInOverlay(pubs, `${pubs.length} pubs within ${radiusKm}km${accuracyText}`);
             
@@ -377,8 +377,8 @@ export const SearchModule = (function() {
             }
             
             // Sort by proximity if we have location
-            if (userLocation) {
-                filteredPubs = sortPubsByDistance(filteredPubs, userLocation);
+            if (window.App.state.userLocation)) {
+                filteredPubs = sortPubsByDistance(filteredPubs, window.App.state.userLocation));
                 console.log('📍 Sorted by distance from user location');
             }
             
@@ -442,8 +442,8 @@ export const SearchModule = (function() {
             }
             
             // Sort by proximity if we have location
-            if (userLocation) {
-                pubs = sortPubsByDistance(pubs, userLocation);
+            if (window.App.state.userLocation)) {
+                pubs = sortPubsByDistance(pubs, window.App.state.userLocation));
             }
             
             // Save state
@@ -542,8 +542,8 @@ export const SearchModule = (function() {
             }
             
             // Sort by proximity if we have location
-            if (userLocation) {
-                pubs = sortPubsByDistance(pubs, userLocation);
+            if (window.App.state.userLocation)) {
+                pubs = sortPubsByDistance(pubs, window.App.state.userLocation));
             }
             
             // Save state
@@ -1213,11 +1213,11 @@ export const SearchModule = (function() {
 
     
     const tryGetUserLocation = async () => {
-        if (userLocation) {
+        if (window.App.state.userLocation)) {
             // Check if cached location is still fresh (less than 5 minutes old)
-            if (userLocation.timestamp && Date.now() - userLocation.timestamp < 300000) {
+            if (window.App.state.userLocation).timestamp && Date.now() - window.App.state.userLocation).timestamp < 300000) {
                 console.log('📍 Using fresh cached location');
-                return userLocation;
+                return window.App.state.userLocation);
             }
             console.log('📍 Cached location expired, requesting fresh location...');
         }
@@ -1235,11 +1235,11 @@ export const SearchModule = (function() {
             // Update map module with new location
             const mapModule = getMap();
             if (mapModule && mapModule.setUserLocation) {
-                mapModule.setUserLocation(userLocation);
+                mapModule.setUserLocation(window.App.state.userLocation));
             }
             
             console.log(`✅ Fresh location acquired: accuracy ±${location.accuracy}m`);
-            return userLocation;
+            return window.App.state.userLocation);
             
         } catch (error) {
             console.log('📍 Could not get location for proximity sorting:', error.message);
