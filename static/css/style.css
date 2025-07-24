@@ -59,9 +59,12 @@
    --z-search-suggestions: 150;
    --z-sticky: 200;
    --z-toast: 900;
-   --z-modal-backdrop: 1000;
-   --z-modal-content: 1010;
-   --z-cookie: 1100;
+   --z-results-overlay: 1000;      /* Results overlay */
+   --z-pub-details: 1100;           /* Pub details overlay */
+   --z-modal-backdrop: 1200;        /* Regular modals */
+   --z-modal-content: 1210;         /* Modal content */
+   --z-status-modals: 1300;         /* Status modals (above pub details) */
+   --z-cookie: 1400;                /* Cookie banner */
    
    /* Transitions */
    --transition-fast: 0.15s ease-out;
@@ -4709,3 +4712,10 @@ p {
     .status-toggle-btn small {
         display: none;
     }
+
+#resultsOverlay { z-index: var(--z-results-overlay); }
+#pubDetailsOverlay { z-index: var(--z-pub-details); }
+.modal { z-index: var(--z-modal-backdrop); }
+#gfStatusModal,
+#gfStatusConfirmModal,
+#beerDetailsPromptModal { z-index: var(--z-status-modals); }
