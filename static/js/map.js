@@ -948,54 +948,30 @@ export const MapModule = (function() {
                 
                 // Prevent map click events
                 L.DomEvent.disableClickPropagation(button);
-                L.DomEvent.on(button, 'click', async function(e) {
+                L.DomEvent.on(button, 'click', function(e) {
                     L.DomEvent.preventDefault(e);
                     
-                    // If we don't have location yet, try to get it
-                    if (!userLocation) {
-                        try {
-                            button.innerHTML = '<span class="location-icon">⏳</span><span class="location-text">Getting location...</span>';
-                            const location = await getUserLocation();
-                            userLocation = location;
-                            
-                            // Add user marker
-                            const styles = getMapStyles();
-                            const userMarker = L.circleMarker([userLocation.lat, userLocation.lng], {
-                                radius: 12,
-                                fillColor: styles.userFillColor || '#667eea',
-                                color: styles.userStrokeColor || '#ffffff',
-                                weight: 3,
-                                opacity: 1,
-                                fillOpacity: 0.9,
-                                className: 'pulsing-marker'
-                            }).addTo(map);
-                            
-                            userMarker.bindPopup('📍 You are here!').openPopup();
-                            window.fullUKMapUserMarker = userMarker;
-                            
-                            button.innerHTML = '<span class="location-icon">📍</span><span class="location-text">My Location</span>';
-                        } catch (error) {
-                            button.innerHTML = '<span class="location-icon">❌</span><span class="location-text">Location failed</span>';
-                            console.error('Location error:', error);
-                            setTimeout(() => {
-                                button.innerHTML = '<span class="location-icon">📍</span><span class="location-text">My Location</span>';
-                            }, 2000);
-                            return;
+                    // Check if we have location
+                    const currentLocation = getUserLocation();
+                    if (!currentLocation) {
+                        console.log('📍 No user location available');
+                        if (window.showSuccessToast) {
+                            window.showSuccessToast('📍 Location not available. Please enable location services.');
                         }
+                        return;
                     }
                     
-                    if (userLocation) {
-                        map.setView([userLocation.lat, userLocation.lng], 14);
-                        
-                        // Flash the user marker
-                        if (window.fullUKMapUserMarker) {
-                            window.fullUKMapUserMarker.openPopup();
-                        }
-                        
-                        // Track the action
-                        if (window.TrackingModule) {
-                            window.TrackingModule.trackEvent('go_to_location', 'Map Interaction', 'button_click');
-                        }
+                    // Center on location
+                    map.setView([currentLocation.lat, currentLocation.lng], 14);
+                    
+                    // Flash the user marker
+                    if (window.fullUKMapUserMarker) {
+                        window.fullUKMapUserMarker.openPopup();
+                    }
+                    
+                    // Track the action
+                    if (window.TrackingModule) {
+                        window.TrackingModule.trackEvent('go_to_location', 'Map Interaction', 'button_click');
                     }
                 });
                 
