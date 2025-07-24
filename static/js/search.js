@@ -761,7 +761,7 @@ export const SearchModule = (function() {
             overlay.style.left = '0';
             overlay.style.width = '100%';
             overlay.style.height = '100vh';
-            overlay.style.zIndex = '9999';
+            // overlay.style.zIndex = '9999';
             overlay.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
             overlay.style.display = 'flex';
             overlay.classList.add('active');
