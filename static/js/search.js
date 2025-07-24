@@ -73,7 +73,7 @@ export const SearchModule = (function() {
             showResultsLoading('📍 Getting precise location...');
             
             // Get user location if we don't have it
-            if (!window.App.state.userLocation {
+            if (!window.App.state.userLocation) {
                 try {
                     window.App.state.userLocation = await getUserLocation();
                     
@@ -300,7 +300,7 @@ export const SearchModule = (function() {
             console.log(`🍺 Performing enhanced beer search: "${query}" (${searchType})`);
             
             // Try to get user location for sorting
-            if (!window.App.state.userLocation {
+            if (!window.App.state.userLocation) {
                 window.App.state.userLocation = await tryGetUserLocation();
             }
             
@@ -424,7 +424,7 @@ export const SearchModule = (function() {
     const performNameSearch = async (query) => {
         try {
             // Try to get user location for proximity sorting
-            if (!window.App.state.userLocation {
+            if (!window.App.state.userLocation) {
                 window.App.state.userLocation = await tryGetUserLocation();
             }
             
@@ -524,7 +524,7 @@ export const SearchModule = (function() {
     const performCitySearch = async (city) => {
         try {
             // Try to get user location for sorting
-            if (!window.App.state.userLocation {
+            if (!window.App.state.userLocation) {
                 window.App.state.userLocation = await tryGetUserLocation();
             }
             
