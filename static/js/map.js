@@ -422,34 +422,37 @@ export const MapModule = (function() {
             case 'always':
                 return {
                     ...baseStyle,
-                    fillColor: rootStyles.getPropertyValue('--marker-always-gf-fill').trim() || '#10b981',
-                    color: rootStyles.getPropertyValue('--marker-always-gf-stroke').trim() || '#ffffff',
-                    radius: baseStyle.radius + 2, // Slightly larger for emphasis
-                    weight: 3 // Thicker border
+                    fillColor: rootStyles.getPropertyValue('--marker-always-gf-fill').trim(),
+                    color: rootStyles.getPropertyValue('--marker-always-gf-stroke').trim(),
+                    radius: baseStyle.radius + 3,
+                    weight: 3,
+                    className: 'always-gf-marker'
                 };
                 
             case 'currently':
                 return {
                     ...baseStyle,
-                    fillColor: rootStyles.getPropertyValue('--marker-current-gf-fill').trim() || '#86efac',
-                    color: rootStyles.getPropertyValue('--marker-current-gf-stroke').trim() || '#ffffff'
+                    fillColor: rootStyles.getPropertyValue('--marker-current-gf-fill').trim(),
+                    color: rootStyles.getPropertyValue('--marker-current-gf-stroke').trim(),
+                    radius: baseStyle.radius + 1
                 };
                 
             case 'not_currently':
                 return {
                     ...baseStyle,
-                    fillColor: rootStyles.getPropertyValue('--marker-no-gf-fill').trim() || '#ef4444',
-                    color: rootStyles.getPropertyValue('--marker-no-gf-stroke').trim() || '#ffffff'
+                    fillColor: rootStyles.getPropertyValue('--marker-no-gf-fill').trim(),
+                    color: rootStyles.getPropertyValue('--marker-no-gf-stroke').trim(),
+                    radius: baseStyle.radius - 1
                 };
                 
             case 'unknown':
             default:
                 return {
                     ...baseStyle,
-                    fillColor: rootStyles.getPropertyValue('--marker-unknown-fill').trim() || '#9ca3af',
-                    color: rootStyles.getPropertyValue('--marker-unknown-stroke').trim() || '#ffffff',
-                    radius: baseStyle.radius - 1, // Slightly smaller
-                    fillOpacity: 0.7 // Less prominent
+                    fillColor: rootStyles.getPropertyValue('--marker-unknown-fill').trim(),
+                    color: rootStyles.getPropertyValue('--marker-unknown-stroke').trim(),
+                    radius: baseStyle.radius - 1,
+                    fillOpacity: 0.7
                 };
         }
     };
