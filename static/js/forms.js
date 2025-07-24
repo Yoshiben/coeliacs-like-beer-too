@@ -940,6 +940,14 @@ export const FormModule = (function() {
         
         openStatusModal() {
             console.log('🔍 openStatusModal called');
+
+            // Debug z-indexes
+            const pubOverlay = document.getElementById('pubDetailsOverlay');
+            const statusModal = document.getElementById('gfStatusModal');
+            
+            console.log('🎯 Z-index check:');
+            console.log('Pub overlay z-index:', window.getComputedStyle(pubOverlay).zIndex);
+            console.log('Status modal z-index:', window.getComputedStyle(statusModal).zIndex);
             this.currentPub = window.currentPubData;
             console.log('🏠 Current pub:', this.currentPub);
             
