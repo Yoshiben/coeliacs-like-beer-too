@@ -409,8 +409,6 @@ class SubmissionProcessor:
     def _update_database_immediately(self, submission_data, validation_result):
         """
         For Tier 1 (auto-approved): Update the main database right now
-        - Mark the pub as having this beer format
-        - Add to pubs_updates table with specific beer details
         """
         
         conn = mysql.connector.connect(**self.db_config)
@@ -420,8 +418,12 @@ class SubmissionProcessor:
             pub_id = validation_result['pub_data']['pub_id']
             beer_format = submission_data['beer_format']
             
-            # Update the pub's beer format availability (bottle, tap, cask, can)
-            # This uses the fixed CASE statement from our stored procedure
+            # Get current status
+            cursor.execute("SELECT gf_status FROM pubs WHERE pub_id = %s", (pub_id,))
+            result = cursor.fetchone()
+            old_status = result[0] if result else 'unknown'
+            
+            # Update the pub's beer format availability
             if beer_format == 'bottle':
                 cursor.execute("UPDATE pubs SET bottle = 1 WHERE pub_id = %s", (pub_id,))
             elif beer_format == 'tap':
@@ -431,16 +433,25 @@ class SubmissionProcessor:
             elif beer_format == 'can':
                 cursor.execute("UPDATE pubs SET can = 1 WHERE pub_id = %s", (pub_id,))
             
-            # If we know the specific beer, add to pubs_updates table
-            if validation_result['beer_data']['status'] == 'existing':
-                beer_id = validation_result['beer_data']['beer_id']
-                
+            # Update GF status if needed
+            # If it was 'unknown' or 'not_currently', update to 'currently'
+            if old_status in ('unknown', 'not_currently'):
                 cursor.execute("""
-                    INSERT INTO pubs_updates (pub_id, beer_id, beer_format, update_time)
-                    VALUES (%s, %s, %s, NOW())
-                    ON DUPLICATE KEY UPDATE 
-                    update_time = NOW()
-                """, (pub_id, beer_id, beer_format))
+                    UPDATE pubs 
+                    SET gf_status = 'currently',
+                        gf_status_updated = NOW(),
+                        gf_status_updated_by = 'system_auto'
+                    WHERE pub_id = %s
+                """, (pub_id,))
+                
+                # Log the status change
+                cursor.execute("""
+                    INSERT INTO gf_status_history 
+                    (pub_id, old_status, new_status, changed_by, change_reason)
+                    VALUES (%s, %s, 'currently', 'system_auto', 'Beer report confirmed availability')
+                """, (pub_id, old_status))
+            
+            # Rest of the existing code...
             
             conn.commit()
             self.logger.info(f"Auto-approved update applied to pub {pub_id}")
