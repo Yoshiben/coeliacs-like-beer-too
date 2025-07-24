@@ -1,232 +1,263 @@
 /* ================================
-   COELIACS LIKE BEER TOO - OPTIMIZED CSS
-   Phase 1: Duplicates Removed (Zero Visual Changes)
-   Removed ~150 lines of pure duplicates
-   ================================ */
-
-/* ================================
    DESIGN SYSTEM - CSS VARIABLES
    ================================ */
 :root {
-    /* Brand Colors & Gradients */
-    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    --error-gradient: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
-    --warning-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    --info-gradient: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-    --purple-gradient: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+   /* Brand Colors & Gradients */
+   --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+   --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+   --error-gradient: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+   --warning-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+   --info-gradient: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+   --purple-gradient: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
     
-    /* Text Colors */
-    --text-primary: #2d3748;
-    --text-secondary: #4a5568;
-    --text-muted: #718096;
-    --text-white: #ffffff;
-    
-    /* Background Colors */
-    --bg-white: rgba(255, 255, 255, 0.95);
-    --bg-glass: rgba(255, 255, 255, 0.1);
-    --bg-section: rgba(248, 250, 252, 0.8);
-    --bg-overlay: rgba(0, 0, 0, 0.8);
-    
-    /* Button System */
-    --btn-height: 44px;
-    --btn-height-sm: 36px;
-    --btn-height-lg: 56px;
-    --btn-padding: 12px 20px;
-    --btn-padding-sm: 8px 16px;
-    --btn-padding-lg: 16px 24px;
-    
-    /* Spacing System */
-    --space-xs: 4px;
-    --space-sm: 8px;
-    --space-md: 12px;
-    --space-lg: 16px;
-    --space-xl: 20px;
-    --space-2xl: 24px;
-    --space-3xl: 32px;
-    --space-4xl: 40px;
-    
-    /* Border Radius */
-    --radius-sm: 8px;
-    --radius: 12px;
-    --radius-lg: 15px;
-    --radius-xl: 20px;
-    --radius-pill: 25px;
-    
-    /* Shadows */
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
-    --shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.2);
-    --shadow-xl: 0 12px 40px rgba(0, 0, 0, 0.25);
-    
-    /* Z-Index Scale */
-    --z-base: 1;
-    --z-dropdown: 100;
-    --z-search-suggestions: 150;
-    --z-sticky: 200;
-    --z-toast: 900;
-    --z-modal-backdrop: 1000;
-    --z-modal-content: 1010;
-    --z-cookie: 1100;
-    
-    /* Transitions */
-    --transition-fast: 0.15s ease-out;
-    --transition: 0.25s ease-out;
-    --transition-slow: 0.4s ease-out;
-    
-    /* Typography Scale */
-    --text-xs: 0.75rem;
-    --text-sm: 0.875rem;
-    --text-md: 1rem;
-    --text-lg: 1.125rem;
-    --text-xl: 1.25rem;
-    --text-2xl: 1.5rem;
-    --text-3xl: 1.875rem;
-    --text-4xl: 2.25rem;
-    
-    /* Container Widths */
-    --container-sm: 640px;
-    --container-md: 768px;
-    --container-lg: 1024px;
-    --container-xl: 1200px;
-
-    /* Dividers, borders & hovers */
-    --divider-color: rgba(102, 126, 234, 0.1);
-    --border-light: rgba(0, 0, 0, 0.1);    
-    --hover-subtle: rgba(102, 126, 234, 0.05);
-
-    /* Map marker colors */
-    --marker-gf-fill: #10b981;
-    --marker-gf-stroke: #ffffff;
-    --marker-no-gf-fill: #ef4444;
-    --marker-no-gf-stroke: #ffffff;
-    --marker-unknown-fill: #9ca3af;
-    --marker-unknown-stroke: #ffffff;
-    --marker-user-fill: #667eea;
-    --marker-user-stroke: #ffffff;
-    
-    /* Map marker sizes */
-    --marker-radius: 8;
-    --marker-stroke-width: 2;
-
-    /* Search option colors */
-    --search-location-bg: rgba(16, 185, 129, 0.1);
-    --search-location-bg-light: rgba(5, 150, 105, 0.05);
-    --search-location-border: rgba(16, 185, 129, 0.2);
-    --search-location-border-hover: rgba(16, 185, 129, 0.4);
-    
-    --search-name-bg: rgba(59, 130, 246, 0.1);
-    --search-name-bg-light: rgba(29, 78, 216, 0.05);
-    --search-name-border: rgba(59, 130, 246, 0.2);
-    --search-name-border-hover: rgba(59, 130, 246, 0.4);
-    
-    --search-beer-bg: rgba(245, 158, 11, 0.1);
-    --search-beer-bg-light: rgba(217, 119, 6, 0.05);
-    --search-beer-border: rgba(245, 158, 11, 0.2);
-    --search-beer-border-hover: rgba(245, 158, 11, 0.4);
-    
-    --search-area-bg: rgba(139, 92, 246, 0.1);
-    --search-area-bg-light: rgba(124, 58, 237, 0.05);
-    --search-area-border: rgba(139, 92, 246, 0.2);
-    --search-area-border-hover: rgba(139, 92, 246, 0.4);
-
-    /* Modal Variables */
-    --modal-backdrop: rgba(0, 0, 0, 0.8);
-    --modal-blur: blur(5px);
-    --modal-padding-mobile: var(--space-lg);
-    --modal-padding-top: 15vh;
-    --modal-border-radius: var(--radius-xl);
-
-    /* Enhanced Success Colors */
-    --success-bg: rgba(16, 185, 129, 0.1);
-    --success-bg-light: rgba(5, 150, 105, 0.05);
-    --success-border: rgba(16, 185, 129, 0.2);
-    --success-border-strong: rgba(16, 185, 129, 0.6);
-    --success-shadow: rgba(16, 185, 129, 0.3);
-    
-    /* Enhanced Primary Colors */
-    --primary-bg: rgba(102, 126, 234, 0.1);
-    --primary-border: rgba(102, 126, 234, 0.2);
-    --primary-border-strong: rgba(102, 126, 234, 0.3);
-    --primary-shadow: rgba(102, 126, 234, 0.3);
-    
-    /* Enhanced Purple Colors */
-    --purple-bg: rgba(139, 92, 246, 0.1);
-    --purple-border: rgba(139, 92, 246, 0.3);
-    --purple-shadow: rgba(139, 92, 246, 0.1);
-    --purple-shadow-strong: rgba(139, 92, 246, 0.4);
-    
-    /* Enhanced Blue Colors */
-    --blue-shadow: rgba(59, 130, 246, 0.3);
-    
-    /* Enhanced Gray Colors */
-    --gray-bg: rgba(156, 163, 175, 0.1);
-    --gray-border: rgba(156, 163, 175, 0.2);
-    
-    /* Glass/Backdrop Effects */
-    --glass-white: rgba(255, 255, 255, 0.9);
-    --glass-overlay: rgba(255, 255, 255, 0.2);
-    
-    /* Enhanced Shadows */
-    --shadow-primary: 0 4px 15px var(--primary-shadow);
-    --shadow-success: 0 4px 15px var(--success-shadow);
-    --shadow-purple: 0 4px 15px var(--purple-shadow);
-    --shadow-blue: 0 4px 15px var(--blue-shadow);
-    
-    /* Text Colors Enhanced */
-    --success-text: #10b981;
-    --purple-text: #8b5cf6;
-
-    /* Report Modal Colors */
-    --report-modal-bg: rgba(255, 255, 255, 0.98);
-    --report-modal-border: rgba(102, 126, 234, 0.1);
-    --report-form-bg: rgba(248, 250, 252, 0.5);
-    --report-input-focus: rgba(102, 126, 234, 0.1);
-    
-    /* Selected Pub Card */
-    --selected-pub-bg: rgba(16, 185, 129, 0.1);
-    --selected-pub-border: rgba(16, 185, 129, 0.2);
-    --selected-pub-text: var(--success-text);
-    
-    /* New Pub Fields */
-    --new-pub-bg: rgba(59, 130, 246, 0.05);
-    --new-pub-border: rgba(59, 130, 246, 0.1);
-    
-    /* Photo Upload */
-    --photo-upload-bg: var(--bg-section);
-    --photo-upload-border: var(--border-light);
-    --photo-upload-hover: rgba(102, 126, 234, 0.05);
-    --photo-upload-active: var(--success-bg);
-    --photo-upload-active-border: var(--success-border);
-    
-    /* Dropdown Suggestions */
-    --suggestion-bg: var(--bg-white);
-    --suggestion-hover: var(--hover-subtle);
-    --suggestion-border: var(--border-light);
-
-    /* Legend container */
-    --legend-bg: rgba(255, 255, 255, 0.95);
-    --legend-padding: var(--space-md);
-    --legend-border-radius: var(--radius);
-    --legend-shadow: var(--shadow);
-    --legend-font-size: var(--text-xs);
-    --legend-line-height: 1.4;
-    
-    /* Legend items */
-    --legend-title-color: var(--text-primary);
-    --legend-title-weight: 600;
-    --legend-title-margin: var(--space-xs);
-    --legend-item-margin: var(--space-xs);
-    --legend-text-color: var(--text-primary);
-    
-    /* Legend markers */
-    --legend-marker-size: 12px;
-    --legend-marker-margin: var(--space-xs);
-    --legend-marker-border: 1px solid var(--text-white);
-    --legend-user-marker-size: 10px;
+   /* Text Colors */
+   --text-primary: #2d3748;
+   --text-secondary: #4a5568;
+   --text-muted: #718096;
+   --text-white: #ffffff;
+   
+   /* Background Colors */
+   --bg-white: rgba(255, 255, 255, 0.95);
+   --bg-glass: rgba(255, 255, 255, 0.1);
+   --bg-section: rgba(248, 250, 252, 0.8);
+   --bg-overlay: rgba(0, 0, 0, 0.8);
+   
+   /* Button System */
+   --btn-height: 44px;
+   --btn-height-sm: 36px;
+   --btn-height-lg: 56px;
+   --btn-padding: 12px 20px;
+   --btn-padding-sm: 8px 16px;
+   --btn-padding-lg: 16px 24px;
+   
+   /* Spacing System */
+   --space-xs: 4px;
+   --space-sm: 8px;
+   --space-md: 12px;
+   --space-lg: 16px;
+   --space-xl: 20px;
+   --space-2xl: 24px;
+   --space-3xl: 32px;
+   --space-4xl: 40px;
+   
+   /* Border Radius */
+   --radius-sm: 8px;
+   --radius: 12px;
+   --radius-lg: 15px;
+   --radius-xl: 20px;
+   --radius-pill: 25px;
+   
+   /* Shadows */
+   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+   --shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+   --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.2);
+   --shadow-xl: 0 12px 40px rgba(0, 0, 0, 0.25);
+   
+   /* Z-Index Scale */
+   --z-base: 1;
+   --z-dropdown: 100;
+   --z-search-suggestions: 150;
+   --z-sticky: 200;
+   --z-toast: 900;
+   --z-modal-backdrop: 1000;
+   --z-modal-content: 1010;
+   --z-cookie: 1100;
+   
+   /* Transitions */
+   --transition-fast: 0.15s ease-out;
+   --transition: 0.25s ease-out;
+   --transition-slow: 0.4s ease-out;
+   
+   /* Typography Scale */
+   --text-xs: 0.75rem;
+   --text-sm: 0.875rem;
+   --text-md: 1rem;
+   --text-lg: 1.125rem;
+   --text-xl: 1.25rem;
+   --text-2xl: 1.5rem;
+   --text-3xl: 1.875rem;
+   --text-4xl: 2.25rem;
+   
+   /* Container Widths */
+   --container-sm: 640px;
+   --container-md: 768px;
+   --container-lg: 1024px;
+   --container-xl: 1200px;
+   
+   /* Dividers, borders & hovers */
+   --divider-color: rgba(102, 126, 234, 0.1);
+   --border-light: rgba(0, 0, 0, 0.1);    
+   --hover-subtle: rgba(102, 126, 234, 0.05);
+   
+   /* Map marker colors */
+   --marker-gf-fill: #10b981;
+   --marker-gf-stroke: #ffffff;
+   --marker-no-gf-fill: #ef4444;
+   --marker-no-gf-stroke: #ffffff;
+   --marker-unknown-fill: #9ca3af;
+   --marker-unknown-stroke: #ffffff;
+   --marker-user-fill: #667eea;
+   --marker-user-stroke: #ffffff;
+   
+   /* Map marker sizes */
+   --marker-radius: 8;
+   --marker-stroke-width: 2;
+   
+   /* Search option colors */
+   --search-location-bg: rgba(16, 185, 129, 0.1);
+   --search-location-bg-light: rgba(5, 150, 105, 0.05);
+   --search-location-border: rgba(16, 185, 129, 0.2);
+   --search-location-border-hover: rgba(16, 185, 129, 0.4);
+   
+   --search-name-bg: rgba(59, 130, 246, 0.1);
+   --search-name-bg-light: rgba(29, 78, 216, 0.05);
+   --search-name-border: rgba(59, 130, 246, 0.2);
+   --search-name-border-hover: rgba(59, 130, 246, 0.4);
+   
+   --search-beer-bg: rgba(245, 158, 11, 0.1);
+   --search-beer-bg-light: rgba(217, 119, 6, 0.05);
+   --search-beer-border: rgba(245, 158, 11, 0.2);
+   --search-beer-border-hover: rgba(245, 158, 11, 0.4);
+   
+   --search-area-bg: rgba(139, 92, 246, 0.1);
+   --search-area-bg-light: rgba(124, 58, 237, 0.05);
+   --search-area-border: rgba(139, 92, 246, 0.2);
+   --search-area-border-hover: rgba(139, 92, 246, 0.4);
+   
+   /* Modal Variables */
+   --modal-backdrop: rgba(0, 0, 0, 0.8);
+   --modal-blur: blur(5px);
+   --modal-padding-mobile: var(--space-lg);
+   --modal-padding-top: 15vh;
+   --modal-border-radius: var(--radius-xl);
+   
+   /* Enhanced Success Colors */
+   --success-bg: rgba(16, 185, 129, 0.1);
+   --success-bg-light: rgba(5, 150, 105, 0.05);
+   --success-border: rgba(16, 185, 129, 0.2);
+   --success-border-strong: rgba(16, 185, 129, 0.6);
+   --success-shadow: rgba(16, 185, 129, 0.3);
+   
+   /* Enhanced Primary Colors */
+   --primary-bg: rgba(102, 126, 234, 0.1);
+   --primary-border: rgba(102, 126, 234, 0.2);
+   --primary-border-strong: rgba(102, 126, 234, 0.3);
+   --primary-shadow: rgba(102, 126, 234, 0.3);
+   
+   /* Enhanced Purple Colors */
+   --purple-bg: rgba(139, 92, 246, 0.1);
+   --purple-border: rgba(139, 92, 246, 0.3);
+   --purple-shadow: rgba(139, 92, 246, 0.1);
+   --purple-shadow-strong: rgba(139, 92, 246, 0.4);
+   
+   /* Enhanced Blue Colors */
+   --blue-shadow: rgba(59, 130, 246, 0.3);
+   
+   /* Enhanced Gray Colors */
+   --gray-bg: rgba(156, 163, 175, 0.1);
+   --gray-border: rgba(156, 163, 175, 0.2);
+   
+   /* Glass/Backdrop Effects */
+   --glass-white: rgba(255, 255, 255, 0.9);
+   --glass-overlay: rgba(255, 255, 255, 0.2);
+   
+   /* Enhanced Shadows */
+   --shadow-primary: 0 4px 15px var(--primary-shadow);
+   --shadow-success: 0 4px 15px var(--success-shadow);
+   --shadow-purple: 0 4px 15px var(--purple-shadow);
+   --shadow-blue: 0 4px 15px var(--blue-shadow);
+   
+   /* Text Colors Enhanced */
+   --success-text: #10b981;
+   --purple-text: #8b5cf6;
+   
+   /* Report Modal Colors */
+   --report-modal-bg: rgba(255, 255, 255, 0.98);
+   --report-modal-border: rgba(102, 126, 234, 0.1);
+   --report-form-bg: rgba(248, 250, 252, 0.5);
+   --report-input-focus: rgba(102, 126, 234, 0.1);
+   
+   /* Selected Pub Card */
+   --selected-pub-bg: rgba(16, 185, 129, 0.1);
+   --selected-pub-border: rgba(16, 185, 129, 0.2);
+   --selected-pub-text: var(--success-text);
+   
+   /* New Pub Fields */
+   --new-pub-bg: rgba(59, 130, 246, 0.05);
+   --new-pub-border: rgba(59, 130, 246, 0.1);
+   
+   /* Photo Upload */
+   --photo-upload-bg: var(--bg-section);
+   --photo-upload-border: var(--border-light);
+   --photo-upload-hover: rgba(102, 126, 234, 0.05);
+   --photo-upload-active: var(--success-bg);
+   --photo-upload-active-border: var(--success-border);
+   
+   /* Dropdown Suggestions */
+   --suggestion-bg: var(--bg-white);
+   --suggestion-hover: var(--hover-subtle);
+   --suggestion-border: var(--border-light);
+   
+   /* Legend container */
+   --legend-bg: rgba(255, 255, 255, 0.95);
+   --legend-padding: var(--space-md);
+   --legend-border-radius: var(--radius);
+   --legend-shadow: var(--shadow);
+   --legend-font-size: var(--text-xs);
+   --legend-line-height: 1.4;
+   
+   /* Legend items */
+   --legend-title-color: var(--text-primary);
+   --legend-title-weight: 600;
+   --legend-title-margin: var(--space-xs);
+   --legend-item-margin: var(--space-xs);
+   --legend-text-color: var(--text-primary);
+   
+   /* Legend markers */
+   --legend-marker-size: 12px;
+   --legend-marker-margin: var(--space-xs);
+   --legend-marker-border: 1px solid var(--text-white);
+   --legend-user-marker-size: 10px;
+   
+   /* Enhanced GF Status Colors */
+   --marker-always-gf-fill: #10b981;        /* Bright green - always has GF */
+   --marker-always-gf-stroke: #ffffff;
+   --marker-current-gf-fill: #86efac;       /* Pastel green - currently has GF */
+   --marker-current-gf-stroke: #ffffff;
+   --marker-no-gf-fill: #ef4444;            /* Red - no GF currently */
+   --marker-no-gf-stroke: #ffffff;
+   --marker-unknown-fill: #9ca3af;          /* Grey - unknown status */
+   --marker-unknown-stroke: #ffffff;
+   
+   /* Enhanced status backgrounds for UI */
+   --status-always-gf-bg: rgba(16, 185, 129, 0.15);
+   --status-always-gf-border: rgba(16, 185, 129, 0.3);
+   --status-current-gf-bg: rgba(134, 239, 172, 0.15);
+   --status-current-gf-border: rgba(134, 239, 172, 0.3);
+   --status-no-gf-bg: rgba(239, 68, 68, 0.1);
+   --status-no-gf-border: rgba(239, 68, 68, 0.2);
+   
+   /* Pop up */
+   --popup-bg: var(--bg-white);
+   --popup-padding: var(--space-sm);
+   --popup-min-width: 200px;
+   --popup-border-radius: var(--radius);
+   --popup-shadow: var(--shadow);
+   
+   --popup-title-color: var(--text-primary);
+   --popup-title-size: var(--text-sm);
+   --popup-text-color: var(--text-secondary);
+   --popup-text-size: var(--text-xs);
+   --popup-muted-color: var(--text-muted);
+   
+   --popup-btn-bg: var(--primary-gradient);
+   --popup-btn-color: var(--text-white);
+   --popup-btn-padding: 4px var(--space-sm);
+   --popup-btn-border-radius: var(--radius);
+   --popup-btn-font-size: var(--text-xs);
 }
 
-/* Desktop Adjustments */
+/* Desktop Variables */
 @media (min-width: 768px) {
     :root {
         --btn-height: 48px;
@@ -236,8 +267,53 @@
         --space-2xl: 32px;
         --space-3xl: 40px;
         --space-4xl: 60px;
+
+        --legend-font-size: 0.7rem;
+        --legend-padding: var(--space-sm);
+        --legend-marker-size: 10px;
+        --legend-user-marker-size: 8px;
+        --popup-min-width: 160px;
+        --popup-title-size: var(--text-xs);
+        --popup-text-size: 0.7rem;
     }
 }
+
+/* TABLET */
+@media (min-width: 768px) {
+    .footer-content {
+        padding: 0 var(--space-xl);
+    }
+    
+    .footer-bottom-content {
+        padding: 0 var(--space-xl);
+    }
+    
+    .cookie-content {
+        flex-direction: row;
+    }
+    
+    .search-section {
+        height: calc(100vh - 280px) !important;
+        height: calc(100dvh - 280px) !important;
+    }
+    
+    .search-body {
+        padding: var(--space-lg) !important;
+    }
+    
+    .search-options {
+        gap: var(--space-md) !important;
+    }
+    
+    .results-map-container #resultsMap {
+        min-height: 300px !important;
+        border-radius: 0 0 var(--radius-lg) var(--radius-lg) !important;
+    }
+    
+    .results-map-container .leaflet-container {
+        touch-action: pan-x pan-y !important;
+    }
+    }
 
 /* ================================
    RESET & BASE STYLES
@@ -429,10 +505,7 @@ p {
     padding: var(--space-xl);
 }
 
-@media (min-width: 768px) {
-    .card-body {
-        padding: var(--space-3xl);
-    }
+
 }
 
 /* ================================
@@ -2708,6 +2781,7 @@ p {
 /* ================================
    MAP & LEGEND STYLES
    ================================ */
+
 .map-legend {
     background: var(--legend-bg);
     padding: var(--legend-padding);
@@ -2807,27 +2881,6 @@ p {
     line-height: 1.4;
 }
 
-/* Popup Styling Variables */
-:root {
-    --popup-bg: var(--bg-white);
-    --popup-padding: var(--space-sm);
-    --popup-min-width: 200px;
-    --popup-border-radius: var(--radius);
-    --popup-shadow: var(--shadow);
-    
-    --popup-title-color: var(--text-primary);
-    --popup-title-size: var(--text-sm);
-    --popup-text-color: var(--text-secondary);
-    --popup-text-size: var(--text-xs);
-    --popup-muted-color: var(--text-muted);
-    
-    --popup-btn-bg: var(--primary-gradient);
-    --popup-btn-color: var(--text-white);
-    --popup-btn-padding: 4px var(--space-sm);
-    --popup-btn-border-radius: var(--radius);
-    --popup-btn-font-size: var(--text-xs);
-}
-
 .leaflet-popup-content-wrapper {
     background: var(--popup-bg) !important;
     border-radius: var(--popup-border-radius) !important;
@@ -2905,6 +2958,46 @@ p {
 .popup-button:hover {
     transform: translateY(-1px);
     box-shadow: var(--shadow-sm);
+}
+
+/* Enhanced legend markers */
+.legend-marker.always-gf {
+    background: var(--marker-always-gf-fill);
+    border-width: 2px;
+    box-shadow: 0 0 4px rgba(16, 185, 129, 0.4);
+}
+
+.legend-marker.current-gf {
+    background: var(--marker-current-gf-fill);
+}
+
+.legend-marker.no-gf {
+    background: var(--marker-no-gf-fill);
+}
+
+.legend-marker.unknown {
+    background: var(--marker-unknown-fill);
+    opacity: 0.7;
+}
+
+/* Enhanced popup status styling */
+.popup-gf-status.always-gf {
+    color: var(--marker-always-gf-fill);
+    background: var(--status-always-gf-bg);
+    border: 1px solid var(--status-always-gf-border);
+    font-weight: 700;
+}
+
+.popup-gf-status.current-gf {
+    color: #059669;
+    background: var(--status-current-gf-bg);
+    border: 1px solid var(--status-current-gf-border);
+}
+
+.popup-gf-status.no-gf {
+    color: var(--marker-no-gf-fill);
+    background: var(--status-no-gf-bg);
+    border: 1px solid var(--status-no-gf-border);
 }
 
 /* ================================
@@ -4127,6 +4220,10 @@ p {
     }
 }
 
+/* =================
+   DESKTOP VARIABLES
+   ================= */
+
 /* Large desktop screens */
 @media (min-width: 1200px) {
     .split-view .pub-details-card {
@@ -4137,3 +4234,4 @@ p {
         flex: 1.5;
     }
 }
+
