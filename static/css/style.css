@@ -226,7 +226,7 @@
    --marker-current-gf-stroke: #ffffff;
    --marker-no-gf-fill: #ef4444;            /* Red - no GF currently */
    --marker-no-gf-stroke: #ffffff;
-   --marker-unknown-fill: #9ca3af;          /* Grey - unknown status */
+   --marker-unknown-fill: #FFBF00;          /* Grey - unknown status */
    --marker-unknown-stroke: #ffffff;
    
    /* Enhanced status backgrounds for UI */
