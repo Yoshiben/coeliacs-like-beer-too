@@ -738,6 +738,18 @@ const App = {
                     }
                 }
                 break;
+
+            case 'change-gf-status':
+                console.log('📊 Opening GF status modal...');
+                
+                // Get the form module
+                const formModuleForStatus = this.getModule('form');
+                if (formModuleForStatus && formModuleForStatus.GFStatusFlow) {
+                    formModuleForStatus.GFStatusFlow.openStatusModal();
+                } else {
+                    console.error('❌ GFStatusFlow not available');
+                }
+                break;
         }
     },
     
