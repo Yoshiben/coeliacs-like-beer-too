@@ -4186,8 +4186,8 @@ p {
 
 /* Go to My Location Button */
 .map-location-btn {
-    background: var(--bg-white);
-    border: 2px solid var(--primary-border);
+    background: var(--primary-gradient);
+    border: 2px solid var(--text-white);
     border-radius: var(--radius);
     padding: 8px 12px;
     cursor: pointer;
@@ -4196,18 +4196,15 @@ p {
     gap: 6px;
     font-size: var(--text-sm);
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--text-white);
     transition: all var(--transition);
     white-space: nowrap;
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow);
 }
 
 .map-location-btn:hover {
-    background: var(--primary-gradient);
-    color: var(--text-white);
-    border-color: transparent;
-    transform: translateY(-1px);
-    box-shadow: var(--shadow);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: var(--shadow-lg);
 }
 
 .map-location-btn:active {
@@ -4240,7 +4237,7 @@ p {
 }
 
 .leaflet-marker-pane .pulsing-marker {
-    animation: markerPulse 2s ease-in-out infinite;
+    animation: markerPulse 2s ease-in-out 2;
 }
 
 /* Mobile: Compact button */
