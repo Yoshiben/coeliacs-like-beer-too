@@ -2859,6 +2859,47 @@ p {
     border: 1px solid var(--status-no-gf-border);
 }
 
+/* Zoom hint */
+.zoom-hint-container {
+    background: var(--bg-white);
+    border-radius: var(--radius);
+    padding: 10px 16px;
+    box-shadow: var(--shadow);
+    border: 2px solid var(--primary-border);
+    margin: 10px;
+}
+
+.zoom-hint {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.zoom-hint-icon {
+    font-size: 1.2rem;
+    animation: gentle-pulse 2s ease-in-out infinite;
+}
+
+@keyframes gentle-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .zoom-hint-container {
+        padding: 8px 12px;
+        margin: 8px;
+    }
+    
+    .zoom-hint {
+        font-size: var(--text-xs);
+    }
+}
+
 /* ================================
    INITIALIZATION FALLBACK STYLES
    ================================ */
