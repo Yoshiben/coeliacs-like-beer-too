@@ -1057,10 +1057,11 @@ def get_all_pubs_for_map():
         cursor.execute("""
             SELECT 
                 pub_id, name, address, postcode, local_authority,
-                bottle, tap, cask, can, latitude, longitude
+                bottle, tap, cask, can, latitude, longitude,
+                gf_status
             FROM pubs
             WHERE latitude IS NOT NULL AND longitude IS NOT NULL
-            LIMIT 5000
+            LIMIT 10000
         """)
         
         pubs = cursor.fetchall()
