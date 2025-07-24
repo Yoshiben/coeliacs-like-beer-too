@@ -850,6 +850,18 @@ export const MapModule = (function() {
             window.fullUKMap = null;
         }
         
+        // Try to get user location first if we don't have it
+        if (!userLocation) {
+            try {
+                console.log('📍 Getting user location for map...');
+                const location = await getUserLocation();
+                userLocation = location;
+                console.log('✅ Got user location:', userLocation);
+            } catch (error) {
+                console.log('📍 Could not get user location:', error);
+            }
+        }
+        
         // Determine initial view - prioritize user location if available
         let initialCenter = config.defaultCenter;
         let initialZoom = config.defaultZoom;
@@ -857,7 +869,9 @@ export const MapModule = (function() {
         if (userLocation) {
             initialCenter = [userLocation.lat, userLocation.lng];
             initialZoom = 12; // Closer zoom when we have user location
-            console.log('📍 Centering map on user location');
+            console.log('📍 Centering map on user location:', initialCenter);
+        } else {
+            console.log('📍 No user location, using UK center');
         }
         
         // Create new map
@@ -879,9 +893,9 @@ export const MapModule = (function() {
         if (userLocation) {
             const styles = getMapStyles();
             const userMarker = L.circleMarker([userLocation.lat, userLocation.lng], {
-                radius: config.userMarkerRadius + 4, // Larger for emphasis
-                fillColor: styles.userFillColor,
-                color: styles.userStrokeColor,
+                radius: 12, // Larger for emphasis
+                fillColor: styles.userFillColor || '#667eea',
+                color: styles.userStrokeColor || '#ffffff',
                 weight: 3,
                 opacity: 1,
                 fillOpacity: 0.9,
@@ -897,7 +911,7 @@ export const MapModule = (function() {
         // Add legend (permanent, no toggle)
         addMapLegend(window.fullUKMap);
         
-        // Add "Go to My Location" button
+        // Add "Go to My Location" button (even if no location yet)
         addLocationButton(window.fullUKMap);
         
         // Load and display all pubs
@@ -916,10 +930,8 @@ export const MapModule = (function() {
 
     // Add "Go to My Location" button to the map
     const addLocationButton = (mapInstance) => {
-        if (!userLocation) return;
-        
         // Create custom control
-        const locationControl = L.Control.extend({
+        const LocationControl = L.Control.extend({
             options: {
                 position: 'topleft'
             },
@@ -927,14 +939,51 @@ export const MapModule = (function() {
             onAdd: function(map) {
                 const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
                 
-                container.innerHTML = `
-                    <button class="map-location-btn" title="Go to my location">
-                        <span class="location-icon">📍</span>
-                        <span class="location-text">My Location</span>
-                    </button>
+                const button = L.DomUtil.create('button', 'map-location-btn', container);
+                button.innerHTML = `
+                    <span class="location-icon">📍</span>
+                    <span class="location-text">My Location</span>
                 `;
+                button.title = 'Go to my location';
                 
-                container.onclick = function() {
+                // Prevent map click events
+                L.DomEvent.disableClickPropagation(button);
+                L.DomEvent.on(button, 'click', async function(e) {
+                    L.DomEvent.preventDefault(e);
+                    
+                    // If we don't have location yet, try to get it
+                    if (!userLocation) {
+                        try {
+                            button.innerHTML = '<span class="location-icon">⏳</span><span class="location-text">Getting location...</span>';
+                            const location = await getUserLocation();
+                            userLocation = location;
+                            
+                            // Add user marker
+                            const styles = getMapStyles();
+                            const userMarker = L.circleMarker([userLocation.lat, userLocation.lng], {
+                                radius: 12,
+                                fillColor: styles.userFillColor || '#667eea',
+                                color: styles.userStrokeColor || '#ffffff',
+                                weight: 3,
+                                opacity: 1,
+                                fillOpacity: 0.9,
+                                className: 'pulsing-marker'
+                            }).addTo(map);
+                            
+                            userMarker.bindPopup('📍 You are here!').openPopup();
+                            window.fullUKMapUserMarker = userMarker;
+                            
+                            button.innerHTML = '<span class="location-icon">📍</span><span class="location-text">My Location</span>';
+                        } catch (error) {
+                            button.innerHTML = '<span class="location-icon">❌</span><span class="location-text">Location failed</span>';
+                            console.error('Location error:', error);
+                            setTimeout(() => {
+                                button.innerHTML = '<span class="location-icon">📍</span><span class="location-text">My Location</span>';
+                            }, 2000);
+                            return;
+                        }
+                    }
+                    
                     if (userLocation) {
                         map.setView([userLocation.lat, userLocation.lng], 14);
                         
@@ -948,11 +997,15 @@ export const MapModule = (function() {
                             window.TrackingModule.trackEvent('go_to_location', 'Map Interaction', 'button_click');
                         }
                     }
-                };
+                });
                 
                 return container;
             }
         });
+        
+        // Add the control to the map
+        mapInstance.addControl(new LocationControl());
+    };
         
         // Add the control to the map
         mapInstance.addControl(new locationControl());
