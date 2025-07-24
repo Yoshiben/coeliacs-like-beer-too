@@ -255,6 +255,11 @@
    --popup-btn-padding: 4px var(--space-sm);
    --popup-btn-border-radius: var(--radius);
    --popup-btn-font-size: var(--text-xs);
+
+   /* Nav bar map animation durations */
+    --marker-pulse-duration: 1s;
+    --marker-pulse-count: 2;
+    --marker-pulse-total-duration: 2s; /* duration × count */
 }
 
 /* ================================
@@ -4119,6 +4124,14 @@ p {
     margin-bottom: var(--space-xs);
     font-weight: 400;
     white-space: nowrap;
+}
+
+/* ================================
+   NAV MAP SECTION
+   ================================ */
+
+.leaflet-marker-pane .pulsing-marker {
+    animation: markerPulse var(--marker-pulse-duration) ease-in-out var(--marker-pulse-count);
 }
 
 /* ===============
