@@ -2,7 +2,7 @@
 // MAIN.JS - Updated to use consolidated helpers.js
 // ================================================================================
 
-import { Constants } from './js/constants.js';
+import { Constants } from './constants.js';
 
 // ================================
 // EVENT BUS - Central Communication Hub
@@ -76,7 +76,7 @@ const App = {
         console.log('🔧 Phase 1: Loading Core Utilities...');
         
         // Load consolidated helpers module
-        const { HelpersModule } = await import('./js/helpers.js');
+        const { HelpersModule } = await import('./helpers.js');
         this.registerModule('helpers', HelpersModule);
         
         // Legacy support - register as both ui and utils
@@ -94,8 +94,8 @@ const App = {
     async loadPhase2() {
         console.log('🔧 Phase 2: Loading Data Layer...');
         
-        const { APIModule } = await import('./js/api.js');
-        const { TrackingModule } = await import('./js/tracking.js');
+        const { APIModule } = await import('./api.js');
+        const { TrackingModule } = await import('./tracking.js');
         
         this.registerModule('api', APIModule);
         this.registerModule('tracking', TrackingModule);
@@ -107,7 +107,7 @@ const App = {
     async loadPhase3() {
         console.log('🔧 Phase 3: Loading UI Layer...');
         
-        const { ModalModule } = await import('./js/modals.js');
+        const { ModalModule } = await import('./modals.js');
         
         this.registerModule('modal', ModalModule);
         
@@ -118,9 +118,9 @@ const App = {
     async loadPhase4() {
         console.log('🔧 Phase 4: Loading Features...');
         
-        const { MapModule } = await import('./js/map.js');
-        const { SearchModule } = await import('./js/search.js');
-        const { FormModule } = await import('./js/forms.js');
+        const { MapModule } = await import('./map.js');
+        const { SearchModule } = await import('./search.js');
+        const { FormModule } = await import('./forms.js');
         
         this.registerModule('map', MapModule);
         this.registerModule('search', SearchModule);
