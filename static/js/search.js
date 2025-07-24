@@ -9,7 +9,7 @@ export const SearchModule = (function() {
     // Private state
     let lastSearchState = null;
     let currentSearchPubs = [];
-    let userLocation = null;
+    // let userLocation = null;
     
 // Get other modules through the app instead of imports
     const getAPI = () => window.App?.getModule('api');
@@ -75,7 +75,7 @@ export const SearchModule = (function() {
             // Get user location if we don't have it
             if (!userLocation) {
                 try {
-                    userLocation = await getUserLocation();
+                    window.App.state.userLocation = await getUserLocation();
                     
                     // 🔧 ADD: Show accuracy feedback to user
                     if (userLocation.accuracy) {
@@ -300,8 +300,8 @@ export const SearchModule = (function() {
             console.log(`🍺 Performing enhanced beer search: "${query}" (${searchType})`);
             
             // Try to get user location for sorting
-            if (!userLocation) {
-                userLocation = await tryGetUserLocation();
+            if (!window.App.state.userLocation) {
+                window.App.state.userLocation = await tryGetUserLocation();
             }
             
             // Use enhanced beer search API
@@ -393,7 +393,7 @@ export const SearchModule = (function() {
             currentSearchPubs = filteredPubs;
             
             // Display results
-            const title = userLocation ? 
+            const title = window.App.state.userLocation ? 
                 `${filteredPubs.length} pubs serving "${query}" (nearest first)` :
                 `${filteredPubs.length} pubs serving "${query}"`;
                 
@@ -424,8 +424,8 @@ export const SearchModule = (function() {
     const performNameSearch = async (query) => {
         try {
             // Try to get user location for proximity sorting
-            if (!userLocation) {
-                userLocation = await tryGetUserLocation();
+            if (!window.App.state.userLocation) {
+                window.App.state.userLocation = await tryGetUserLocation();
             }
             
             const results = await APIModule.searchPubs({
@@ -457,7 +457,7 @@ export const SearchModule = (function() {
             currentSearchPubs = pubs;
             
             // Display results
-            const title = userLocation ? 
+            const title = window.App.state.userLocation ? 
                 `${pubs.length} pubs matching "${query}" (nearest first)` :
                 `${pubs.length} pubs matching "${query}"`;
                 
@@ -524,8 +524,8 @@ export const SearchModule = (function() {
     const performCitySearch = async (city) => {
         try {
             // Try to get user location for sorting
-            if (!userLocation) {
-                userLocation = await tryGetUserLocation();
+            if (!window.App.state.userLocation) {
+                window.App.state.userLocation = await tryGetUserLocation();
             }
             
             const results = await APIModule.searchPubs({
@@ -556,7 +556,7 @@ export const SearchModule = (function() {
             
             currentSearchPubs = pubs;
             
-            const title = userLocation ? 
+            const title = window.App.state.userLocation ? 
                 `${pubs.length} pubs in ${city} (nearest first)` :
                 `${pubs.length} pubs in ${city}`;
                 
@@ -1009,8 +1009,8 @@ export const SearchModule = (function() {
         
         // Restore user location
         if (state.userLocation) {
-            userLocation = state.userLocation;
-            MapModule.setUserLocation(userLocation);
+            window.App.state.userLocation = state.userLocation;
+            MapModule.setUserLocation(state.userLocation);
         }
         
         showResultsOverlay(`Pubs within ${state.radius}km`);
@@ -1230,7 +1230,7 @@ export const SearchModule = (function() {
             // Add timestamp for cache management
             location.timestamp = Date.now();
             
-            userLocation = location;
+            window.App.state.userLocation = location;
             
             // Update map module with new location
             const mapModule = getMap();
