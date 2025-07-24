@@ -92,10 +92,10 @@
    /* Map marker colors */
    --marker-gf-fill: #10b981;
    --marker-gf-stroke: #ffffff;
-   --marker-no-gf-fill: #ef4444;
-   --marker-no-gf-stroke: #ffffff;
-   --marker-unknown-fill: #FFBF00;
-   --marker-unknown-stroke: #ffffff;
+   --no-gf-fill: #ef4444;
+   --no-gf-border: #ffffff;
+   --unknown-gf-fill: #FFBF00;
+   --unknown-gf-border: #ffffff;
    --marker-user-fill: #667eea;
    --marker-user-stroke: #ffffff;
    
@@ -220,14 +220,33 @@
    --legend-user-marker-size: 10px;
    
   /* Enhanced GF Status Colors */
-    --marker-always-gf-fill: #FFD700;        /* Gold */
-    --marker-always-gf-stroke: #FFA500;      /* Darker gold */
-    --marker-current-gf-fill: #10b981;       /* Green */
-    --marker-current-gf-stroke: #ffffff;
-    --marker-no-gf-fill: #ef4444;            /* Red */
-    --marker-no-gf-stroke: #ffffff;
-    --marker-unknown-fill: #9ca3af;          /* Grey */
-    --marker-unknown-stroke: #ffffff;
+    --always-gf-fill: #FFD700;        /* Gold */
+    --always-gf-border: #FFA500;      /* Darker gold */
+    --currently-gf-fill: #10b981;       /* Green */
+    --currently-gf-border: #ffffff;
+    --no-gf-fill: #ef4444;            /* Red */
+    --no-gf-border: #ffffff;
+    --unknown-gf-fill: #9ca3af;          /* Grey */
+    --unknown-gf-border: #ffffff;
+
+    --status-always-bg: rgba(255, 215, 0, 0.1);      /* Gold bg */
+    --status-always-border: rgba(255, 215, 0, 0.3);  /* Gold border */
+    --status-always-text: #B8860B;                   /* Dark gold text */
+    
+    --status-current-bg: rgba(16, 185, 129, 0.1);    /* Green bg */
+    --status-current-border: rgba(16, 185, 129, 0.3);/* Green border */
+    --status-current-text: #059669;                  /* Dark green text */
+    
+    --status-no-bg: rgba(239, 68, 68, 0.1);          /* Red bg */
+    --status-no-border: rgba(239, 68, 68, 0.3);      /* Red border */
+    --status-no-text: #dc2626;                       /* Dark red text */
+    
+    --status-unknown-bg: rgba(156, 163, 175, 0.1);   /* Grey bg */
+    --status-unknown-border: rgba(156, 163, 175, 0.3);/* Grey border */
+    --status-unknown-text: #6b7280;                  /* Dark grey text */
+
+   /* Gold star glow effect */
+    --gold-star-glow: 0 0 10px rgba(255, 215, 0, 0.6);
 
    /* Cluster colors */
     --cluster-bg: rgba(156, 163, 175, 0.6);
@@ -2690,13 +2709,13 @@ p {
 }
 
 .legend-marker.no-gf {
-    background: var(--marker-no-gf-fill);
+    background: var(--no-gf-fill);
 }
 
 .legend-marker.unknown {
     width: var(--legend-user-marker-size);
     height: var(--legend-user-marker-size);
-    background: var(--marker-unknown-fill);
+    background: var(--unknown-gf-fill);
 }
 
 .legend-marker.user-location {
@@ -2799,12 +2818,12 @@ p {
 }
 
 .popup-gf-status.not-available {
-    color: var(--marker-no-gf-fill);
+    color: var(--no-gf-fill);
     background: rgba(239, 68, 68, 0.1);
 }
 
 .popup-gf-status.unknown {
-    color: var(--marker-unknown-fill);
+    color: var(--unknown-gf-fill);
     background: rgba(156, 163, 175, 0.1);
 }
 
@@ -2828,26 +2847,26 @@ p {
   Enhanced legend markers
   ======================= */
 .legend-marker.always-gf {
-    background: var(--marker-always-gf-fill);
-    border-color: var(--marker-always-gf-stroke);
+    background: var(--always-gf-fill);
+    border-color: var(--always-gf-border);
     box-shadow: 0 0 4px rgba(255, 215, 0, 0.6);
 }
 
 .legend-marker.current-gf {
-    background: var(--marker-current-gf-fill);
+    background: var(--currently-gf-fill);
 }
 
 .legend-marker.no-gf {
-    background: var(--marker-no-gf-fill);
+    background: var(--no-gf-fill);
 }
 
 .legend-marker.unknown {
-    background: var(--marker-unknown-fill);
+    background: var(--unknown-gf-fill);
 }
 
 /* Enhanced popup status styling */
 .popup-gf-status.always-gf {
-    color: var(--marker-always-gf-fill);
+    color: var(--always-gf-fill);
     background: var(--status-always-gf-bg);
     border: 1px solid var(--status-always-gf-border);
     font-weight: 700;
@@ -2860,7 +2879,7 @@ p {
 }
 
 .popup-gf-status.no-gf {
-    color: var(--marker-no-gf-fill);
+    color: var(--no-gf-fill);
     background: var(--status-no-gf-bg);
     border: 1px solid var(--status-no-gf-border);
 }
@@ -4374,4 +4393,74 @@ p {
         margin-left: 10px;
         margin-top: 60px; /* Below zoom controls */
     }
+}
+
+/* ================================
+   GOLD STAR MARKER ANIMATION
+   ================================ */
+
+/* Special effect for "always GF" pubs */
+.always-gf-marker {
+    filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.6));
+    animation: goldPulse 3s ease-in-out infinite;
+}
+
+@keyframes goldPulse {
+    0%, 100% {
+        filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.6));
+    }
+    50% {
+        filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.9));
+    }
+}
+
+/* Hover effect for map markers */
+.leaflet-marker-pane .always-gf-marker:hover {
+    filter: drop-shadow(0 0 15px rgba(255, 215, 0, 1));
+}
+
+/* ================================
+   STATUS BADGES IN UI
+   ================================ */
+
+.gf-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    padding: var(--space-xs) var(--space-md);
+    border-radius: var(--radius-pill);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    border: 2px solid;
+}
+
+.gf-status-badge.always {
+    background: var(--status-always-bg);
+    border-color: var(--status-always-border);
+    color: var(--status-always-text);
+    box-shadow: var(--gold-star-glow);
+}
+
+.gf-status-badge.currently {
+    background: var(--status-current-bg);
+    border-color: var(--status-current-border);
+    color: var(--status-current-text);
+}
+
+.gf-status-badge.not-currently {
+    background: var(--status-no-bg);
+    border-color: var(--status-no-border);
+    color: var(--status-no-text);
+}
+
+.gf-status-badge.unknown {
+    background: var(--status-unknown-bg);
+    border-color: var(--status-unknown-border);
+    color: var(--status-unknown-text);
+}
+
+/* Star icon for "always" status */
+.gf-status-badge.always::before {
+    content: '⭐';
+    font-size: var(--text-lg);
 }
