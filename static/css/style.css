@@ -2883,6 +2883,65 @@ p {
     animation: gentle-pulse 2s ease-in-out infinite;
 }
 
+/* Custom cluster colors */
+.marker-cluster-unknown {
+    background-color: rgba(156, 163, 175, 0.6);
+}
+
+.marker-cluster-unknown div {
+    background-color: rgba(156, 163, 175, 0.8);
+    color: white;
+    font-weight: bold;
+}
+
+.marker-cluster-small {
+    background-color: rgba(156, 163, 175, 0.6);
+}
+
+.marker-cluster-small div {
+    background-color: rgba(156, 163, 175, 0.8);
+    width: 30px;
+    height: 30px;
+    margin: 5px;
+    line-height: 30px;
+    border-radius: 15px;
+    font-size: 12px;
+}
+
+.marker-cluster-medium {
+    background-color: rgba(156, 163, 175, 0.6);
+}
+
+.marker-cluster-medium div {
+    background-color: rgba(156, 163, 175, 0.8);
+    width: 40px;
+    height: 40px;
+    margin: 5px;
+    line-height: 40px;
+    border-radius: 20px;
+    font-size: 13px;
+}
+
+.marker-cluster-large {
+    background-color: rgba(156, 163, 175, 0.6);
+}
+
+.marker-cluster-large div {
+    background-color: rgba(156, 163, 175, 0.8);
+    width: 50px;
+    height: 50px;
+    margin: 5px;
+    line-height: 50px;
+    border-radius: 25px;
+    font-size: 14px;
+}
+
+/* Hide default cluster styles we don't want */
+.leaflet-cluster-anim .leaflet-marker-icon, 
+.leaflet-cluster-anim .leaflet-marker-shadow {
+    transition: none !important;
+}
+
 @keyframes gentle-pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.6; }
