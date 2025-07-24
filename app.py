@@ -1090,6 +1090,7 @@ def update_gf_status():
     """Quick update of GF status without full beer details"""
     try:
         data = request.get_json()
+        logger.info(f"Received data: {data}")  # ADD THIS
         pub_id = data.get('pub_id')
         status = data.get('status')
         
