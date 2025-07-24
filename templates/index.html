@@ -313,6 +313,43 @@
                         🗺️ Interactive Map Loading...
                     </div>
                 </div>
+                <!-- ADD: Quick GF Status Toggle (add to pub details overlay) -->
+                <div class="gf-status-toggle-section">
+                    <h3 class="toggle-title">🍺 Update GF Beer Status</h3>
+                    
+                    <div class="status-toggle-grid">
+                        <button class="status-toggle-btn always" data-status="always">
+                            <span class="status-icon">🟢</span>
+                            <span class="status-label">Always Has GF</span>
+                            <small>Permanent menu item</small>
+                        </button>
+                        
+                        <button class="status-toggle-btn currently" data-status="currently">
+                            <span class="status-icon">🟡</span>
+                            <span class="status-label">Currently Has GF</span>
+                            <small>Available now</small>
+                        </button>
+                        
+                        <button class="status-toggle-btn not-currently" data-status="not_currently">
+                            <span class="status-icon">🔴</span>
+                            <span class="status-label">No GF Currently</span>
+                            <small>None available</small>
+                        </button>
+                        
+                        <button class="status-toggle-btn unknown active" data-status="unknown">
+                            <span class="status-icon">⚪</span>
+                            <span class="status-label">Unknown</span>
+                            <small>Not checked</small>
+                        </button>
+                    </div>
+                    
+                    <!-- Show form only for 'always' or 'currently' -->
+                    <div id="gfDetailsForm" class="gf-details-form" style="display: none;">
+                        <button class="btn btn-primary" data-action="report-beer-details">
+                            📝 Add Beer Details
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     
