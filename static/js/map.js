@@ -400,7 +400,7 @@ export const MapModule = (function() {
         // Create layer groups
         window.gfPubsLayer = L.layerGroup().addTo(targetMap);
         window.clusteredPubsLayer = L.markerClusterGroup({
-            maxClusterRadius: 30,  // Even smaller - was 40
+            maxClusterRadius: 120,  // Even smaller - was 40
             disableClusteringAtZoom: 13,
             spiderfyOnMaxZoom: true,
             showCoverageOnHover: false,
