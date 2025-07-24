@@ -2883,56 +2883,41 @@ p {
     animation: gentle-pulse 2s ease-in-out infinite;
 }
 
-/* Custom cluster colors */
-.marker-cluster-unknown {
+/* Grey cluster styling */
+.marker-cluster {
     background-color: rgba(156, 163, 175, 0.6);
+    border-radius: 50%;
 }
 
-.marker-cluster-unknown div {
-    background-color: rgba(156, 163, 175, 0.8);
+.marker-cluster div {
+    background-color: rgba(156, 163, 175, 0.9);
     color: white;
     font-weight: bold;
-}
-
-.marker-cluster-small {
-    background-color: rgba(156, 163, 175, 0.6);
+    text-align: center;
+    border-radius: 50%;
 }
 
 .marker-cluster-small div {
-    background-color: rgba(156, 163, 175, 0.8);
     width: 30px;
     height: 30px;
     margin: 5px;
     line-height: 30px;
-    border-radius: 15px;
     font-size: 12px;
 }
 
-.marker-cluster-medium {
-    background-color: rgba(156, 163, 175, 0.6);
-}
-
 .marker-cluster-medium div {
-    background-color: rgba(156, 163, 175, 0.8);
     width: 40px;
     height: 40px;
     margin: 5px;
     line-height: 40px;
-    border-radius: 20px;
     font-size: 13px;
 }
 
-.marker-cluster-large {
-    background-color: rgba(156, 163, 175, 0.6);
-}
-
 .marker-cluster-large div {
-    background-color: rgba(156, 163, 175, 0.8);
     width: 50px;
     height: 50px;
     margin: 5px;
     line-height: 50px;
-    border-radius: 25px;
     font-size: 14px;
 }
 
