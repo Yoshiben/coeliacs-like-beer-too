@@ -415,7 +415,7 @@ export const MapModule = (function() {
                 pubsToShow.push(pub); // Always show
             } else if (gfStatus === 'currently') {
                 pubsToShow.push(pub); // Always show
-            } else if (gfStatus === 'unknown' && currentZoom >= 9) {
+            } else if (gfStatus === 'unknown' && currentZoom >= 10) {
                 pubsToShow.push(pub); // Show at city level
             } else if (gfStatus === 'not_currently' && currentZoom >= 12) {
                 pubsToShow.push(pub); // Show only when very zoomed in
