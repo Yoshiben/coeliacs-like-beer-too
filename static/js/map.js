@@ -23,7 +23,7 @@ export const MapModule = (function() {
         pubMarkerRadius: 8,
         userMarkerRadius: 8,
         markerPulseDuration: 1000, // ms
-        markerPulseCount: 2,
+        markerPulseCount: 4,
         tileLayer: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
         attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     };
