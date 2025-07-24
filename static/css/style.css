@@ -257,64 +257,6 @@
    --popup-btn-font-size: var(--text-xs);
 }
 
-/* Desktop Variables */
-@media (min-width: 768px) {
-    :root {
-        --btn-height: 48px;
-        --btn-padding: 14px 24px;
-        --space-lg: 20px;
-        --space-xl: 24px;
-        --space-2xl: 32px;
-        --space-3xl: 40px;
-        --space-4xl: 60px;
-
-        --legend-font-size: 0.7rem;
-        --legend-padding: var(--space-sm);
-        --legend-marker-size: 10px;
-        --legend-user-marker-size: 8px;
-        --popup-min-width: 160px;
-        --popup-title-size: var(--text-xs);
-        --popup-text-size: 0.7rem;
-    }
-}
-
-/* TABLET */
-@media (min-width: 768px) {
-    .footer-content {
-        padding: 0 var(--space-xl);
-    }
-    
-    .footer-bottom-content {
-        padding: 0 var(--space-xl);
-    }
-    
-    .cookie-content {
-        flex-direction: row;
-    }
-    
-    .search-section {
-        height: calc(100vh - 280px) !important;
-        height: calc(100dvh - 280px) !important;
-    }
-    
-    .search-body {
-        padding: var(--space-lg) !important;
-    }
-    
-    .search-options {
-        gap: var(--space-md) !important;
-    }
-    
-    .results-map-container #resultsMap {
-        min-height: 300px !important;
-        border-radius: 0 0 var(--radius-lg) var(--radius-lg) !important;
-    }
-    
-    .results-map-container .leaflet-container {
-        touch-action: pan-x pan-y !important;
-    }
-    }
-
 /* ================================
    RESET & BASE STYLES
    ================================ */
@@ -482,12 +424,6 @@ p {
     max-width: var(--container-xl);
     margin: 0 auto;
     padding: 0 var(--space-lg);
-}
-
-@media (min-width: 768px) {
-    .container {
-        padding: 0 var(--space-xl);
-    }
 }
 
 /* ================================
@@ -3510,57 +3446,6 @@ p {
    RESPONSIVE BREAKPOINTS
    ================================ */
 
-/* TABLET */
-@media (min-width: 768px) {
-    .footer-content {
-        padding: 0 var(--space-xl);
-    }
-    
-    .footer-bottom-content {
-        padding: 0 var(--space-xl);
-    }
-    
-    .cookie-content {
-        flex-direction: row;
-    }
-    
-    .search-section {
-        height: calc(100vh - 280px) !important;
-        height: calc(100dvh - 280px) !important;
-    }
-    
-    .search-body {
-        padding: var(--space-lg) !important;
-    }
-    
-    .search-options {
-        gap: var(--space-md) !important;
-    }
-    
-    .results-map-container #resultsMap {
-        min-height: 300px !important;
-        border-radius: 0 0 var(--radius-lg) var(--radius-lg) !important;
-    }
-    
-    .results-map-container .leaflet-container {
-        touch-action: pan-x pan-y !important;
-    }
-    
-    :root {
-        --legend-font-size: 0.7rem;
-        --legend-padding: var(--space-sm);
-        --legend-marker-size: 10px;
-        --legend-user-marker-size: 8px;
-        --popup-min-width: 160px;
-        --popup-title-size: var(--text-xs);
-        --popup-text-size: 0.7rem;
-    }
-
-    .split-view .pub-nav-top {
-        margin-bottom: var(--space-md);
-    }
-}
-
 /* MOBILE */
 @media (max-width: 640px) {
     .form-actions {
@@ -4153,10 +4038,12 @@ p {
     }
 }
 
+/* ALL CODE BELOW THIS SECTION HAS BEEN VALIDATED */
 
 /* ================================
    HERO SECTION
    ================================ */
+
 .hero-section {
     background: var(--primary-gradient);
     color: var(--text-white);
@@ -4232,4 +4119,140 @@ p {
     margin-bottom: var(--space-xs);
     font-weight: 400;
     white-space: nowrap;
+}
+
+/* ===============
+   MEDIA MIN 768PX
+   =============== */
+
+@media (min-width: 768px) {
+    :root {
+        --btn-height: 48px;
+        --btn-padding: 14px 24px;
+        --space-lg: 20px;
+        --space-xl: 24px;
+        --space-2xl: 32px;
+        --space-3xl: 40px;
+        --space-4xl: 60px;
+        --legend-font-size: 0.7rem;
+        --legend-padding: var(--space-sm);
+        --legend-marker-size: 10px;
+        --legend-user-marker-size: 8px;
+        --popup-min-width: 160px;
+        --popup-title-size: var(--text-xs);
+        --popup-text-size: 0.7rem;
+    }
+    .footer-content {
+        padding: 0 var(--space-xl);
+    }    
+    .footer-bottom-content {
+        padding: 0 var(--space-xl);
+    }    
+    .cookie-content {
+        flex-direction: row;
+    } 
+    .search-section {
+        height: calc(100vh - 280px) !important;
+        height: calc(100dvh - 280px) !important;
+    }    
+    .search-body {
+        padding: var(--space-lg) !important;
+    }    
+    .search-options {
+        gap: var(--space-md) !important;
+    }    
+    .results-map-container #resultsMap {
+        min-height: 300px !important;
+        border-radius: 0 0 var(--radius-lg) var(--radius-lg) !important;
+    }    
+    .results-map-container .leaflet-container {
+        touch-action: pan-x pan-y !important;
+    }   
+   .container {
+        padding: 0 var(--space-xl);
+    }    
+    .split-view .pub-nav-top {
+        margin-bottom: var(--space-md);
+    }
+   .map-location-btn {
+        padding: 10px 16px;
+    } 
+    .location-text {
+        display: inline;
+    }
+}
+
+/* NEW CODE TO BE VALIDATED */
+
+/* Go to My Location Button */
+.map-location-btn {
+    background: var(--bg-white);
+    border: 2px solid var(--primary-border);
+    border-radius: var(--radius);
+    padding: 8px 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--text-primary);
+    transition: all var(--transition);
+    white-space: nowrap;
+    box-shadow: var(--shadow-sm);
+}
+
+.map-location-btn:hover {
+    background: var(--primary-gradient);
+    color: var(--text-white);
+    border-color: transparent;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
+}
+
+.map-location-btn:active {
+    transform: translateY(0);
+}
+
+.location-icon {
+    font-size: 1.1rem;
+    line-height: 1;
+}
+
+.location-text {
+    display: none;
+}
+
+/* Pulsing animation for user marker */
+@keyframes markerPulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.leaflet-marker-pane .pulsing-marker {
+    animation: markerPulse 2s ease-in-out infinite;
+}
+
+/* Mobile: Compact button */
+@media (max-width: 767px) {
+    .map-location-btn {
+        padding: 10px;
+        min-width: 44px;
+        justify-content: center;
+    }
+    
+    .leaflet-control-custom {
+        margin-left: 10px;
+        margin-top: 60px; /* Below zoom controls */
+    }
 }
