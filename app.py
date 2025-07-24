@@ -1060,8 +1060,8 @@ def get_all_pubs_for_map():
                 bottle, tap, cask, can, latitude, longitude,
                 gf_status
             FROM pubs
-            WHERE latitude IS NOT NULL AND longitude IS NOT NULL
-            LIMIT 10000
+            WHERE latitude IS NOT NULL AND longitude IS NOT NULL AND latitude != 0 AND longitude != 0
+            LIMIT 5000
         """)
         
         pubs = cursor.fetchall()
