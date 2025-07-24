@@ -1594,6 +1594,124 @@ export const SearchModule = (function() {
         // Just call searchSpecificPub directly
         searchSpecificPub(pubId);
     };
+
+    // ADD: GF Status Toggle Handler (add to search.js or new status.js module)
+
+    const GFStatusModule = (function() {
+        'use strict';
+        
+        let currentPubId = null;
+        let currentStatus = 'unknown';
+        
+        const init = () => {
+            setupEventListeners();
+        };
+        
+        const setupEventListeners = () => {
+            // Status toggle buttons
+            document.addEventListener('click', (e) => {
+                const statusBtn = e.target.closest('.status-toggle-btn');
+                if (statusBtn) {
+                    handleStatusToggle(statusBtn);
+                }
+            });
+        };
+        
+        const handleStatusToggle = async (button) => {
+            const newStatus = button.dataset.status;
+            const pubId = window.currentPubData?.pub_id;
+            
+            if (!pubId) {
+                console.error('No pub selected');
+                return;
+            }
+            
+            // Update UI
+            document.querySelectorAll('.status-toggle-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            button.classList.add('active');
+            
+            // Show/hide details form
+            const detailsForm = document.getElementById('gfDetailsForm');
+            if (detailsForm) {
+                detailsForm.style.display = 
+                    (newStatus === 'always' || newStatus === 'currently') ? 'block' : 'none';
+            }
+            
+            // Send update to server
+            try {
+                const response = await fetch('/api/update-gf-status', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        pub_id: pubId,
+                        status: newStatus,
+                        timestamp: new Date().toISOString()
+                    })
+                });
+                
+                if (response.ok) {
+                    showSuccessToast(`✅ Status updated to: ${getStatusLabel(newStatus)}`);
+                    currentStatus = newStatus;
+                    
+                    // Track the action
+                    if (window.TrackingModule) {
+                        window.TrackingModule.trackEvent('gf_status_update', 'User Action', newStatus);
+                    }
+                } else {
+                    showErrorToast('❌ Failed to update status');
+                }
+            } catch (error) {
+                console.error('Error updating status:', error);
+                showErrorToast('❌ Network error');
+            }
+        };
+        
+        const getStatusLabel = (status) => {
+            const labels = {
+                'always': 'Always has GF beer',
+                'currently': 'Currently has GF beer',
+                'not_currently': 'No GF beer currently',
+                'unknown': 'Unknown status'
+            };
+            return labels[status] || status;
+        };
+        
+        const showSuccessToast = (message) => {
+            if (window.showSuccessToast) {
+                window.showSuccessToast(message);
+            } else {
+                console.log(message);
+            }
+        };
+        
+        const showErrorToast = (message) => {
+            if (window.showSuccessToast) {
+                window.showSuccessToast(message);
+            } else {
+                console.error(message);
+            }
+        };
+        
+        return {
+            init,
+            setCurrentPub: (pubId, status) => {
+                currentPubId = pubId;
+                currentStatus = status || 'unknown';
+                
+                // Update UI to show current status
+                document.querySelectorAll('.status-toggle-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.status === currentStatus);
+                });
+            }
+        };
+    })();
+    
+    // Initialize when DOM ready
+    document.addEventListener('DOMContentLoaded', GFStatusModule.init);
     
     // =============================================================================
     // PUBLIC API
