@@ -890,6 +890,198 @@ export const FormModule = (function() {
             }, config.debounceDelay));
         }
     };
+
+    // ADD: Complete GF Status flow handler
+
+    const GFStatusFlow = {
+        currentPub: null,
+        selectedStatus: null,
+        
+        init() {
+            this.setupEventListeners();
+        },
+        
+        setupEventListeners() {
+            // Change status button
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('[data-action="change-gf-status"]')) {
+                    this.openStatusModal();
+                }
+                
+                // Status option selection
+                if (e.target.closest('.status-option')) {
+                    const option = e.target.closest('.status-option');
+                    this.selectStatus(option.dataset.status);
+                }
+                
+                // Confirm status
+                if (e.target.matches('[data-action="confirm-status"]')) {
+                    this.confirmStatusUpdate();
+                }
+                
+                // Cancel status
+                if (e.target.matches('[data-action="cancel-status"]')) {
+                    this.closeModal('gfStatusConfirmModal');
+                }
+                
+                // Skip details
+                if (e.target.matches('[data-action="skip-details"]')) {
+                    this.closeModal('beerDetailsPromptModal');
+                    this.showSuccessMessage();
+                }
+                
+                // Add beer details
+                if (e.target.matches('[data-action="add-beer-details"]')) {
+                    this.closeModal('beerDetailsPromptModal');
+                    this.openBeerReportModal();
+                }
+            });
+        },
+        
+        openStatusModal() {
+            this.currentPub = window.currentPubData;
+            if (!this.currentPub) return;
+            
+            // Set pub name in modal
+            const pubNameEl = document.getElementById('statusPubName');
+            if (pubNameEl) pubNameEl.textContent = this.currentPub.name;
+            
+            // Open modal
+            this.openModal('gfStatusModal');
+        },
+        
+        selectStatus(status) {
+            this.selectedStatus = status;
+            this.closeModal('gfStatusModal');
+            
+            // Show confirmation
+            const confirmStatusEl = document.getElementById('confirmStatus');
+            const statusLabels = {
+                'always': '⭐ Always Available',
+                'currently': '✅ Available Now',
+                'not_currently': '❌ Not Available',
+                'unknown': '❓ Not Sure'
+            };
+            
+            if (confirmStatusEl) {
+                confirmStatusEl.innerHTML = statusLabels[status] || status;
+            }
+            
+            this.openModal('gfStatusConfirmModal');
+        },
+        
+        async confirmStatusUpdate() {
+            this.closeModal('gfStatusConfirmModal');
+            
+            try {
+                // Show loading
+                if (window.showLoadingToast) {
+                    window.showLoadingToast('Updating status...');
+                }
+                
+                // Send update
+                const response = await fetch('/api/update-gf-status', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        pub_id: this.currentPub.pub_id,
+                        status: this.selectedStatus
+                    })
+                });
+                
+                if (response.ok) {
+                    // Update UI
+                    this.updateStatusDisplay(this.selectedStatus);
+                    
+                    // Hide loading
+                    if (window.hideLoadingToast) {
+                        window.hideLoadingToast();
+                    }
+                    
+                    // Show beer details prompt for positive statuses
+                    if (this.selectedStatus === 'always' || this.selectedStatus === 'currently') {
+                        this.openModal('beerDetailsPromptModal');
+                    } else {
+                        this.showSuccessMessage();
+                    }
+                }
+            } catch (error) {
+                console.error('Error updating status:', error);
+                if (window.showSuccessToast) {
+                    window.showSuccessToast('❌ Failed to update status');
+                }
+            }
+        },
+        
+        updateStatusDisplay(status) {
+            const statusEl = document.getElementById('currentGFStatus');
+            if (!statusEl) return;
+            
+            const displays = {
+                'always': {
+                    icon: '⭐',
+                    text: 'Always Available',
+                    meta: 'Permanent GF options!'
+                },
+                'currently': {
+                    icon: '✅',
+                    text: 'Available Now',
+                    meta: 'GF beer in stock'
+                },
+                'not_currently': {
+                    icon: '❌',
+                    text: 'Not Available',
+                    meta: 'No GF options currently'
+                },
+                'unknown': {
+                    icon: '❓',
+                    text: 'Not Sure',
+                    meta: 'Help us find out!'
+                }
+            };
+            
+            const display = displays[status] || displays.unknown;
+            
+            statusEl.className = `current-status ${status}`;
+            statusEl.innerHTML = `
+                <span class="status-icon">${display.icon}</span>
+                <span class="status-text">${display.text}</span>
+                <span class="status-meta">${display.meta}</span>
+            `;
+        },
+        
+        openBeerReportModal() {
+            // Use existing report modal
+            if (window.ModalModule) {
+                window.ModalModule.openReportModal(this.currentPub);
+            }
+        },
+        
+        showSuccessMessage() {
+            if (window.showSuccessToast) {
+                window.showSuccessToast('✅ Status updated successfully!');
+            }
+        },
+        
+        openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            }
+        },
+        
+        closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        }
+    };
+    
+    // Initialize when ready
+    document.addEventListener('DOMContentLoaded', () => GFStatusFlow.init());
     
     // ================================
     // INITIALIZATION
