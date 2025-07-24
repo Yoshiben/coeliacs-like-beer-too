@@ -4464,3 +4464,127 @@ p {
     content: '⭐';
     font-size: var(--text-lg);
 }
+
+/* Toggle Section */
+.gf-status-toggle-section {
+    background: var(--bg-section);
+    border-radius: var(--radius-xl);
+    padding: var(--space-xl);
+    margin: var(--space-xl) 0;
+}
+
+.toggle-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-lg);
+    text-align: center;
+}
+
+/* Toggle Grid */
+.status-toggle-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+}
+
+/* Toggle Buttons */
+.status-toggle-btn {
+    background: var(--bg-white);
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    cursor: pointer;
+    transition: all var(--transition);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.status-toggle-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.status-toggle-btn.active {
+    transform: scale(1.02);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Status-specific styles */
+.status-toggle-btn.always.active {
+    background: var(--status-always-bg);
+    border-color: var(--status-always-border);
+}
+
+.status-toggle-btn.currently.active {
+    background: var(--status-currently-bg);
+    border-color: var(--status-currently-border);
+}
+
+.status-toggle-btn.not-currently.active {
+    background: var(--status-not-bg);
+    border-color: var(--status-not-border);
+}
+
+.status-toggle-btn.unknown.active {
+    background: var(--status-unknown-bg);
+    border-color: var(--status-unknown-border);
+}
+
+/* Button content */
+.status-icon {
+    font-size: var(--text-2xl);
+    display: block;
+    margin-bottom: var(--space-sm);
+}
+
+.status-label {
+    font-weight: 600;
+    color: var(--text-primary);
+    display: block;
+    margin-bottom: var(--space-xs);
+}
+
+.status-toggle-btn small {
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+}
+
+/* Details form */
+.gf-details-form {
+    text-align: center;
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--border-light);
+}
+
+/* ================================
+   MOBILE OPTIMIZATIONS
+   ================================ */
+@media (max-width: 768px) {
+    .status-toggle-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-sm);
+    }
+    
+    .status-toggle-btn {
+        padding: var(--space-md);
+        display: flex;
+        align-items: center;
+        gap: var(--space-md);
+        text-align: left;
+    }
+    
+    .status-icon {
+        font-size: var(--text-xl);
+        margin-bottom: 0;
+    }
+    
+    .status-label {
+        margin-bottom: 0;
+    }
+    
+    .status-toggle-btn small {
+        display: none;
+    }
