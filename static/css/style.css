@@ -4465,100 +4465,221 @@ p {
     font-size: var(--text-lg);
 }
 
-/* Toggle Section */
-.gf-status-toggle-section {
-    background: var(--bg-section);
-    border-radius: var(--radius-xl);
-    padding: var(--space-xl);
+/* ================================
+   GF STATUS CARD STYLES
+   ================================ */
+
+.gf-status-section {
     margin: var(--space-xl) 0;
+    padding: var(--space-xl) 0;
+    border-top: 1px solid var(--divider-color);
 }
 
-.toggle-title {
+.status-card {
+    background: var(--bg-section);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    text-align: center;
+}
+
+.status-question {
     font-size: var(--text-lg);
-    font-weight: 700;
+    font-weight: 600;
     color: var(--text-primary);
     margin-bottom: var(--space-lg);
-    text-align: center;
 }
 
-/* Toggle Grid */
-.status-toggle-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--space-md);
+.current-status {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xs);
     margin-bottom: var(--space-lg);
 }
 
-/* Toggle Buttons */
-.status-toggle-btn {
+.current-status .status-icon {
+    font-size: var(--text-3xl);
+}
+
+.current-status .status-text {
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.current-status .status-meta {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+}
+
+/* Status-specific styling */
+.current-status.always .status-icon { color: var(--marker-always-gf-fill); }
+.current-status.currently .status-icon { color: var(--marker-current-gf-fill); }
+.current-status.not-currently .status-icon { color: var(--marker-no-gf-fill); }
+.current-status.unknown .status-icon { color: var(--marker-unknown-fill); }
+
+/* ================================
+   STATUS MODAL STYLES
+   ================================ */
+
+.status-modal .modal-content {
+    max-width: 500px;
+}
+
+.status-prompt {
+    text-align: center;
+    color: var(--text-secondary);
+    margin-bottom: var(--space-2xl);
+    font-size: var(--text-md);
+}
+
+.status-prompt strong {
+    color: var(--text-primary);
+}
+
+.status-options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.status-option {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    padding: var(--space-xl);
     background: var(--bg-white);
-    border: 2px solid var(--border-light);
-    border-radius: var(--radius-lg);
-    padding: var(--space-lg);
+    border: 3px solid var(--border-light);
+    border-radius: var(--radius-xl);
     cursor: pointer;
     transition: all var(--transition);
-    text-align: center;
-    position: relative;
-    overflow: hidden;
+    text-align: left;
 }
 
-.status-toggle-btn:hover {
+.status-option:hover {
     transform: translateY(-2px);
-    box-shadow: var(--shadow);
-}
-
-.status-toggle-btn.active {
-    transform: scale(1.02);
     box-shadow: var(--shadow-lg);
 }
 
-/* Status-specific styles */
-.status-toggle-btn.always.active {
-    background: var(--status-always-bg);
-    border-color: var(--status-always-border);
-}
-
-.status-toggle-btn.currently.active {
-    background: var(--status-currently-bg);
-    border-color: var(--status-currently-border);
-}
-
-.status-toggle-btn.not-currently.active {
-    background: var(--status-not-bg);
-    border-color: var(--status-not-border);
-}
-
-.status-toggle-btn.unknown.active {
-    background: var(--status-unknown-bg);
-    border-color: var(--status-unknown-border);
-}
-
-/* Button content */
-.status-icon {
-    font-size: var(--text-2xl);
-    display: block;
-    margin-bottom: var(--space-sm);
-}
-
-.status-label {
-    font-weight: 600;
-    color: var(--text-primary);
-    display: block;
-    margin-bottom: var(--space-xs);
-}
-
-.status-toggle-btn small {
-    color: var(--text-muted);
-    font-size: var(--text-xs);
-}
-
-/* Details form */
-.gf-details-form {
+.option-icon {
+    font-size: var(--text-4xl);
+    min-width: 60px;
     text-align: center;
-    padding-top: var(--space-lg);
-    border-top: 1px solid var(--border-light);
 }
 
+.option-content h4 {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 var(--space-xs) 0;
+}
+
+.option-content p {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* Status option colors */
+.status-option.always:hover {
+    background: var(--status-always-bg);
+    border-color: var(--marker-always-gf-fill);
+}
+
+.status-option.currently:hover {
+    background: var(--status-current-bg);
+    border-color: var(--marker-current-gf-fill);
+}
+
+.status-option.not-currently:hover {
+    background: var(--status-no-bg);
+    border-color: var(--marker-no-gf-fill);
+}
+
+.status-option.unknown:hover {
+    background: var(--status-unknown-bg);
+    border-color: var(--marker-unknown-fill);
+}
+
+/* ================================
+   CONFIRMATION MODAL STYLES
+   ================================ */
+
+.confirm-modal .modal-content {
+    max-width: 400px;
+}
+
+.confirm-message {
+    text-align: center;
+    padding: var(--space-xl);
+}
+
+.confirm-status {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-lg);
+    margin: var(--space-xl) 0;
+    background: var(--bg-section);
+    border-radius: var(--radius-lg);
+    font-size: var(--text-xl);
+    font-weight: 700;
+}
+
+.confirm-warning {
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    font-style: italic;
+}
+
+/* ================================
+   PROMPT MODAL STYLES
+   ================================ */
+
+.prompt-modal .modal-content {
+    max-width: 400px;
+    text-align: center;
+}
+
+.success-icon {
+    font-size: var(--text-4xl);
+    margin-bottom: var(--space-lg);
+}
+
+.prompt-modal h3 {
+    font-size: var(--text-xl);
+    color: var(--text-primary);
+    margin-bottom: var(--space-md);
+}
+
+.prompt-modal p {
+    color: var(--text-secondary);
+    margin-bottom: var(--space-2xl);
+}
+
+/* ================================
+   MOBILE OPTIMIZATIONS
+   ================================ */
+
+@media (max-width: 768px) {
+    .status-option {
+        padding: var(--space-lg);
+    }
+    
+    .option-icon {
+        font-size: var(--text-3xl);
+        min-width: 50px;
+    }
+    
+    .option-content h4 {
+        font-size: var(--text-md);
+    }
+    
+    .confirm-status {
+        font-size: var(--text-lg);
+        padding: var(--space-md);
+    }
+}
 /* ================================
    MOBILE OPTIMIZATIONS
    ================================ */
