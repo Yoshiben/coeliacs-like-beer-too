@@ -285,9 +285,6 @@
     --marker-pulse-duration: 1s;
     --marker-pulse-count: 2;
     --marker-pulse-total-duration: 2s; /* duration × count */
-
-    --z-pub-overlay: 9999;
-    --z-status-modals: 10100; /* Higher than pub overlay */
 }
 
 /* ================================
@@ -4712,13 +4709,3 @@ p {
     .status-toggle-btn small {
         display: none;
     }
-
-#pubDetailsOverlay {
-    z-index: var(--z-pub-overlay);
-}
-
-#gfStatusModal,
-#gfStatusConfirmModal,
-#beerDetailsPromptModal {
-    z-index: var(--z-status-modals) !important;
-}
