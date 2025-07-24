@@ -850,13 +850,33 @@ export const MapModule = (function() {
             window.fullUKMap = null;
         }
         
-        // Try to get user location first if we don't have it
         if (!window.App.state.userLocation) {
             try {
-                console.log('📍 Getting user location for map...');
-                const location = await getUserLocation();
-                window.App.state.userLocation = location;
-                console.log('✅ Got user location:', window.App.state.userLocation);
+                console.log('📍 No existing location, requesting from user...');
+                
+                // Request location using the browser API
+                await new Promise((resolve, reject) => {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            window.App.state.userLocation = {
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude,
+                                accuracy: position.coords.accuracy
+                            };
+                            console.log('✅ Got user location:', window.App.state.userLocation);
+                            resolve();
+                        },
+                        (error) => {
+                            console.log('❌ Location error:', error);
+                            reject(error);
+                        },
+                        {
+                            enableHighAccuracy: true,
+                            timeout: 10000,
+                            maximumAge: 30000
+                        }
+                    );
+                });
             } catch (error) {
                 console.log('📍 Could not get user location:', error);
             }
