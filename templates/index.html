@@ -625,6 +625,27 @@
             </div>
         </div>
     </template>
+
+    <!-- Full UK Map Overlay -->
+    <div id="fullMapOverlay" class="map-overlay">
+        <div class="map-overlay-container">
+            <!-- Map Header -->
+            <div class="map-overlay-nav">
+                <button class="btn-nav-small" data-action="close-full-map">
+                    🏠 Home
+                </button>
+                <h2 class="map-overlay-title">UK GF Beer Map</h2>
+                <button class="btn-nav-small" data-action="toggle-map-legend">
+                    ℹ️ Legend
+                </button>
+            </div>
+            
+            <!-- Map Content -->
+            <div class="map-overlay-content">
+                <div id="fullMap" class="full-map"></div>
+            </div>
+        </div>
+    </div>
     
     <!-- Loading Toast - UPDATED -->
     <div id="loadingToast" class="toast toast-loading" style="display: none;">
@@ -783,7 +804,7 @@
             <div class="nav-label">Home</div>
         </a>
         
-        <a href="#" data-action="toggle-results-map" class="nav-item">
+        <a href="#" data-action="show-full-map" class="nav-item">
             <div class="nav-icon">🗺️</div>
             <div class="nav-label">Map</div>
         </a>
