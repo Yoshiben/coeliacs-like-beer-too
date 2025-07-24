@@ -544,9 +544,9 @@ def submit_beer_update():
             'error': 'Internal server error. Please try again.'
         }), 500
 
-# ================================================================================
+# ======================
 # ADMIN DASHBOARD ROUTES  
-# ================================================================================
+# ======================
 
 @app.route('/admin')
 def admin_dashboard():
@@ -727,10 +727,9 @@ def get_recent_submissions():
             cursor.close()
             conn.close()
 
-# ================================================================================
-# 🔧 ACTION: ADD these action endpoints to your app.py
-# Add these after your existing admin routes
-# ================================================================================
+# ==================
+# APPROVE SUBMISSION
+# ==================
 
 @app.route('/api/admin/approve-submission', methods=['POST'])
 @admin_required
@@ -873,6 +872,10 @@ def approve_submission():
             cursor.close()
             conn.close()
 
+# =================
+# REJECT SUBMISSION
+# =================
+
 @app.route('/api/admin/reject-submission', methods=['POST'])
 @admin_required  
 def reject_submission():
@@ -927,6 +930,10 @@ def reject_submission():
         if 'conn' in locals() and conn.is_connected():
             cursor.close()
             conn.close()
+
+# =======================
+# APPROVE SOFT VALIDATION
+# =======================
 
 @app.route('/api/admin/approve-soft-validation', methods=['POST'])
 @admin_required
@@ -1004,9 +1011,9 @@ def approve_soft_validation_early():
             cursor.close()
             conn.close()
 
-# ================================================================================
+# ====================
 # HEALTH & MONITORING
-# ================================================================================
+# ====================
 
 @app.route('/health')
 def health_check():
@@ -1034,9 +1041,50 @@ def health_check():
             'error': str(e)
         }), 503
 
-# ================================================================================
+# ============
+# GET ALL PUBS
+# ============
+
+@app.route('/api/all-pubs')
+def get_all_pubs_for_map():
+    """Get all pubs with coordinates for map display"""
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        # Get all pubs that have coordinates
+        # Limit to reasonable number for performance
+        cursor.execute("""
+            SELECT 
+                pub_id, name, address, postcode, local_authority,
+                bottle, tap, cask, can, latitude, longitude
+            FROM pubs
+            WHERE latitude IS NOT NULL AND longitude IS NOT NULL
+            LIMIT 5000
+        """)
+        
+        pubs = cursor.fetchall()
+        
+        return jsonify({
+            'success': True,
+            'pubs': pubs,
+            'total': len(pubs)
+        })
+        
+    except Exception as e:
+        logger.error(f"Error fetching all pubs: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Failed to load pubs'
+        }), 500
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+# ============
 # STATIC PAGES
-# ================================================================================
+# ============
 
 @app.route('/privacy')
 def privacy_policy():
