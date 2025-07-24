@@ -22,6 +22,8 @@ export const MapModule = (function() {
         maxZoom: 19,
         pubMarkerRadius: 8,
         userMarkerRadius: 8,
+        markerPulseDuration: 1000, // ms
+        markerPulseCount: 2,
         tileLayer: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
         attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     };
@@ -926,11 +928,13 @@ export const MapModule = (function() {
             userMarker.bindPopup('📍 You are here!').openPopup();
             window.fullUKMapUserMarker = userMarker;
             // Bring to front after animation completes (2 seconds for 2 pulses)
+            // Remove pulsing class and bring to front after animation
             setTimeout(() => {
-                if (window.fullUKMapUserMarker) {
-                    window.fullUKMapUserMarker.bringToFront();
-                }
-            }, 2000);
+               if (window.fullUKMapUserMarker && window.fullUKMapUserMarker._path) {
+                   L.DomUtil.removeClass(window.fullUKMapUserMarker._path, 'pulsing-marker');
+                   window.fullUKMapUserMarker.bringToFront();
+               }
+            }, config.markerPulseDuration * config.markerPulseCount);
         }
         
         // Add legend (permanent, no toggle)
