@@ -1,938 +1,939 @@
 <!DOCTYPE html>
 <html lang="en">
-<body>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coeliacs Like Beer Too! {{ cache_buster }}</title>
-    
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v={{ cache_buster }}">
-    
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-    
-    <!------------------------------------------->
-    <!-- Google Analytics with GDPR compliance -->
-    <!------------------------------------------->
-    
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WSHR39KSXS"></script>
-    
-    <!--------------------------->
-    <!-- Basic analytics setup -->
-    <!--------------------------->
-    
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Coeliacs Like Beer Too! {{ cache_buster }}</title>
         
-        // Set default consent to denied (GDPR compliant)
-        gtag('consent', 'default', {
-            'analytics_storage': 'denied'
-        });
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v={{ cache_buster }}">
         
-        gtag('js', new Date());
-        gtag('config', 'G-WSHR39KSXS', {
-            'anonymize_ip': true,
-            'cookie_flags': 'SameSite=None;Secure'
-        });
-    </script>
-    
-    <!----------------------->
-    <!-- HTML hero section -->
-    <!----------------------->
-    
-    <div class="hero-section">
-        <div class="hero-content">
-            <h1 class="hero-title">Coeliacs Like Beer Too!</h1>
-            <p class="hero-subtitle">The UK's largest community-driven guide to gluten free beer</p>
+        <!-- Leaflet CSS -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+        
+        <!------------------------------------------->
+        <!-- Google Analytics with GDPR compliance -->
+        <!------------------------------------------->
+        
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-WSHR39KSXS"></script>
+        
+        <!--------------------------->
+        <!-- Basic analytics setup -->
+        <!--------------------------->
+        
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
             
-            <div class="hero-stats">
-                <div class="stat-item">
-                    <span class="stat-number" id="totalPubs">Loading...</span>
-                    <span class="stat-label">Pubs in the UK</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number" id="gfPubs">Loading...</span>
-                    <span class="stat-label">Serving GF Beer</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!------------------------->
-    <!-- HTML search section -->
-    <!------------------------->
-    
-    <div class="search-section" id="search">
-        <div class="container">
-            <div class="search-card">
-                <div class="search-header">
-                    <h2 class="section-title">🔍 What are you searching for? 🍺
-                    </h2>
-                </div>
-                <div class="search-body">
-                    <div class="search-options">
-                        <!-- Top Left: Pubs Near Me -->
-                        <div class="search-option name" data-action="location-search">
-                            <span class="search-icon">📍</span>
-                            <h3 class="search-title">Pubs Near Me</h3>
-                            <p class="search-description">Find pubs close to you, control the search distance.</p>
-                        </div>
-                        <!-- Top Right: Pubs by Name -->      
-                        <div class="search-option location" data-modal="nameModal">
-                            <span class="search-icon">🏠</span>
-                            <h3 class="search-title">Pubs by Name</h3>
-                            <p class="search-description">Search for a specific pub name - "Milestone" etc</p>
-                        </div>
-                        <!-- Bottom Left: Pubs by Area -->
-                        <div class="search-option area" data-modal="areaModal">
-                            <span class="search-icon">🗺️</span>
-                            <h3 class="search-title">Pubs by Area</h3>
-                            <p class="search-description">Explore pubs in regions, cities, or postcodes</p>
-                        </div>
-                        <!-- Bottom Right: Pubs by Beer -->
-                        <div class="search-option beer" data-modal="beerModal">
-                            <span class="search-icon">🍺</span>
-                            <h3 class="search-title">Pubs by Beer</h3>
-                            <p class="search-description">Find pubs serving specific GF beers - "Zapato", "IPA" etc.</p>
-                        </div>            
+            // Set default consent to denied (GDPR compliant)
+            gtag('consent', 'default', {
+                'analytics_storage': 'denied'
+            });
+            
+            gtag('js', new Date());
+            gtag('config', 'G-WSHR39KSXS', {
+                'anonymize_ip': true,
+                'cookie_flags': 'SameSite=None;Secure'
+            });
+        </script>
+    </head>    
+    <body>
+        <!----------------------->
+        <!-- HTML hero section -->
+        <!----------------------->
+        
+        <div class="hero-section">
+            <div class="hero-content">
+                <h1 class="hero-title">Coeliacs Like Beer Too!</h1>
+                <p class="hero-subtitle">The UK's largest community-driven guide to gluten free beer</p>
+                
+                <div class="hero-stats">
+                    <div class="stat-item">
+                        <span class="stat-number" id="totalPubs">Loading...</span>
+                        <span class="stat-label">Pubs in the UK</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number" id="gfPubs">Loading...</span>
+                        <span class="stat-label">Serving GF Beer</span>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-
-    <!------------------------------->
-    <!-- HTML search modal section -->
-    <!------------------------------->
     
-    <div id="nameModal" class="search-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">🏠 Search by Pub Name</h3>
-                <p class="modal-subtitle">Enter the name of the pub you're looking for</p>
-            </div>
-            <input type="text" class="form-input" placeholder="e.g. The Red Lion, Wetherspoons" id="nameInput">
-            <div class="modal-actions">
-                <button class="btn btn-secondary" data-action="close-modal">Cancel</button>
-                <button class="btn btn-primary" data-action="search-name">Search</button>
+        <!------------------------->
+        <!-- HTML search section -->
+        <!------------------------->
+        
+        <div class="search-section" id="search">
+            <div class="container">
+                <div class="search-card">
+                    <div class="search-header">
+                        <h2 class="section-title">🔍 What are you searching for? 🍺
+                        </h2>
+                    </div>
+                    <div class="search-body">
+                        <div class="search-options">
+                            <!-- Top Left: Pubs Near Me -->
+                            <div class="search-option name" data-action="location-search">
+                                <span class="search-icon">📍</span>
+                                <h3 class="search-title">Pubs Near Me</h3>
+                                <p class="search-description">Find pubs close to you, control the search distance.</p>
+                            </div>
+                            <!-- Top Right: Pubs by Name -->      
+                            <div class="search-option location" data-modal="nameModal">
+                                <span class="search-icon">🏠</span>
+                                <h3 class="search-title">Pubs by Name</h3>
+                                <p class="search-description">Search for a specific pub name - "Milestone" etc</p>
+                            </div>
+                            <!-- Bottom Left: Pubs by Area -->
+                            <div class="search-option area" data-modal="areaModal">
+                                <span class="search-icon">🗺️</span>
+                                <h3 class="search-title">Pubs by Area</h3>
+                                <p class="search-description">Explore pubs in regions, cities, or postcodes</p>
+                            </div>
+                            <!-- Bottom Right: Pubs by Beer -->
+                            <div class="search-option beer" data-modal="beerModal">
+                                <span class="search-icon">🍺</span>
+                                <h3 class="search-title">Pubs by Beer</h3>
+                                <p class="search-description">Find pubs serving specific GF beers - "Zapato", "IPA" etc.</p>
+                            </div>            
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
     
-    <div id="areaModal" class="search-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">🗺️ Search by Area</h3>
-                <p class="modal-subtitle">Find pubs in a specific location</p>
-            </div>
-            
-            <!-- Search Type Selector -->
-            <div class="form-group">
-                <label class="form-label">Search by:</label>
-                <select id="areaSearchType" class="form-select" data-action="update-area-placeholder">
-                    <option value="postcode">📮 Postcode</option>
-                    <option value="city">🏙️ City/Region</option>
-                </select>
-            </div>
-            
-            <!-- Search Input -->
-            <input type="text" class="form-input" placeholder="Enter postcode..." id="areaInput">
-            
-            <div class="modal-actions">
-                <button class="btn btn-secondary" data-action="close-modal">Cancel</button>
-                <button class="btn btn-primary" data-action="search-area">Search</button>
+        <!------------------------------->
+        <!-- HTML search modal section -->
+        <!------------------------------->
+        
+        <div id="nameModal" class="search-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">🏠 Search by Pub Name</h3>
+                    <p class="modal-subtitle">Enter the name of the pub you're looking for</p>
+                </div>
+                <input type="text" class="form-input" placeholder="e.g. The Red Lion, Wetherspoons" id="nameInput">
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" data-action="close-modal">Cancel</button>
+                    <button class="btn btn-primary" data-action="search-name">Search</button>
+                </div>
             </div>
         </div>
-    </div>
-
-    <div id="beerModal" class="search-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">🍺 Search by Beer</h3>
-                <p class="modal-subtitle">Find pubs serving specific gluten-free beers</p>
-            </div>
-            
-            <!-- Search Type Selector -->
-            <div class="form-group">
-                <label class="form-label">Search by:</label>
-                <select id="beerSearchType" class="form-select" data-action="update-beer-placeholder">
-                    <option value="brewery">🏭 Brewery Name</option>
-                    <option value="beer">🍺 Specific Beer</option>
-                    <option value="style">🎨 Beer Style</option>
-                </select>
-            </div>
-            
-            <!-- Search Input with Autocomplete -->
-            <div class="beer-search-container">
-                <input type="text" class="form-input" placeholder="Start typing brewery name..." id="beerInput">
-                <div id="beerSuggestions" class="suggestions beer-search-suggestions"></div>
-            </div>
-            
-            <div class="modal-actions">
-                <button class="btn btn-secondary" data-action="close-modal">Cancel</button>
-                <button class="btn btn-primary" data-action="search-beer">Search</button>
+        
+        <div id="areaModal" class="search-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">🗺️ Search by Area</h3>
+                    <p class="modal-subtitle">Find pubs in a specific location</p>
+                </div>
+                
+                <!-- Search Type Selector -->
+                <div class="form-group">
+                    <label class="form-label">Search by:</label>
+                    <select id="areaSearchType" class="form-select" data-action="update-area-placeholder">
+                        <option value="postcode">📮 Postcode</option>
+                        <option value="city">🏙️ City/Region</option>
+                    </select>
+                </div>
+                
+                <!-- Search Input -->
+                <input type="text" class="form-input" placeholder="Enter postcode..." id="areaInput">
+                
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" data-action="close-modal">Cancel</button>
+                    <button class="btn btn-primary" data-action="search-area">Search</button>
+                </div>
             </div>
         </div>
-    </div>
-
-    <!-- Distance Selection Modal -->
-    <div id="distanceModal" class="search-modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">📍 How far will you travel?</h3>
-            </div>
-           
-            <div class="distance-options">
-                <div class="distance-option" data-distance="1">
-                    <div class="distance-number">1km</div>
-                    <div class="distance-label">Walking distance</div>
+    
+        <div id="beerModal" class="search-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">🍺 Search by Beer</h3>
+                    <p class="modal-subtitle">Find pubs serving specific gluten-free beers</p>
                 </div>
-                <div class="distance-option" data-distance="3">
-                    <div class="distance-number">3km</div>
-                    <div class="distance-label">Short journey</div>
+                
+                <!-- Search Type Selector -->
+                <div class="form-group">
+                    <label class="form-label">Search by:</label>
+                    <select id="beerSearchType" class="form-select" data-action="update-beer-placeholder">
+                        <option value="brewery">🏭 Brewery Name</option>
+                        <option value="beer">🍺 Specific Beer</option>
+                        <option value="style">🎨 Beer Style</option>
+                    </select>
                 </div>
-                <div class="distance-option" data-distance="5">
-                    <div class="distance-number">5km</div>
-                    <div class="distance-label">Most popular</div>
+                
+                <!-- Search Input with Autocomplete -->
+                <div class="beer-search-container">
+                    <input type="text" class="form-input" placeholder="Start typing brewery name..." id="beerInput">
+                    <div id="beerSuggestions" class="suggestions beer-search-suggestions"></div>
                 </div>
-                <div class="distance-option" data-distance="10">
-                    <div class="distance-number">10km</div>
-                    <div class="distance-label">Longer trip</div>
+                
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" data-action="close-modal">Cancel</button>
+                    <button class="btn btn-primary" data-action="search-beer">Search</button>
                 </div>
-                <div class="distance-option" data-distance="20">
-                    <div class="distance-number">20km</div>
-                    <div class="distance-label">Day out</div>
-                </div>
-            </div>
-            
-            <div class="modal-actions">
-                <button class="btn btn-secondary" data-action="close-modal">Cancel</button>
             </div>
         </div>
-    </div>
-
-    <!---------------------------------------------->
-    <!-- HTML full screen results overlay section -->
-    <!---------------------------------------------->
-    <div id="resultsOverlay" class="results-overlay">
-        <div class="results-container">
-            <!-- Results Header -->
-            <div class="results-nav">
-                <button class="btn-nav-small" data-action="close-results">
-                    🏠 Home
-                </button>
-                <h2 class="results-title" id="resultsTitle">Search Results</h2>
-                <button class="btn-nav-small" data-action="toggle-results-map">
-                    🗺️ <span id="resultsMapBtnText">Map</span>
-                </button>
-            </div>
-            
-            <!-- Results Content -->
-            <div class="results-content">
-                <div class="results-list-container" id="resultsListContainer">
-                    <!-- Loading state -->
-                    <div class="results-loading" id="resultsLoading">
-                        <div class="loading-spinner"></div>
-                        <div class="loading-text">Finding nearby GF beer...</div>
+    
+        <!-- Distance Selection Modal -->
+        <div id="distanceModal" class="search-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">📍 How far will you travel?</h3>
+                </div>
+               
+                <div class="distance-options">
+                    <div class="distance-option" data-distance="1">
+                        <div class="distance-number">1km</div>
+                        <div class="distance-label">Walking distance</div>
                     </div>
-                    
-                    <!-- Results list -->
-                    <div class="results-list" id="resultsList" style="display: none;">
-                        <!-- Results will be populated here -->
+                    <div class="distance-option" data-distance="3">
+                        <div class="distance-number">3km</div>
+                        <div class="distance-label">Short journey</div>
                     </div>
-                    
-                    <!-- No results -->
-                    <div class="no-results-found" id="noResultsFound" style="display: none;">
-                        <div class="no-results-icon">🔍</div>
-                        <div class="no-results-title">No pubs found</div>
-                        <div class="no-results-text">Try expanding your search distance or removing filters</div>
+                    <div class="distance-option" data-distance="5">
+                        <div class="distance-number">5km</div>
+                        <div class="distance-label">Most popular</div>
+                    </div>
+                    <div class="distance-option" data-distance="10">
+                        <div class="distance-number">10km</div>
+                        <div class="distance-label">Longer trip</div>
+                    </div>
+                    <div class="distance-option" data-distance="20">
+                        <div class="distance-number">20km</div>
+                        <div class="distance-label">Day out</div>
                     </div>
                 </div>
                 
-                <!-- Results Map (hidden by default) -->
-                <div class="results-map-container" id="resultsMapContainer" style="display: none;">
-                    <div id="resultsMap" class="results-map"></div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" data-action="close-modal">Cancel</button>
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-------------------------------------------------->
-    <!-- HTML full screen pub details overlay section -->
-    <!-------------------------------------------------->
-    <div id="pubDetailsOverlay" class="pub-details-overlay">
-        <div class="pub-details-container" id="pubContainer">
-            <div class="pub-details-card">
-                <!-- NEW: Top navigation - ADD THIS -->
-                <div class="pub-nav-top">
-                    <button class="btn-nav-small" data-action="close-pub-details" onclick="event.stopPropagation();">
+    
+        <!---------------------------------------------->
+        <!-- HTML full screen results overlay section -->
+        <!---------------------------------------------->
+        <div id="resultsOverlay" class="results-overlay">
+            <div class="results-container">
+                <!-- Results Header -->
+                <div class="results-nav">
+                    <button class="btn-nav-small" data-action="close-results">
                         🏠 Home
                     </button>
-                    <button class="btn-nav-small" data-action="back-to-results" onclick="event.stopPropagation();">
-                        ← Back
+                    <h2 class="results-title" id="resultsTitle">Search Results</h2>
+                    <button class="btn-nav-small" data-action="toggle-results-map">
+                        🗺️ <span id="resultsMapBtnText">Map</span>
                     </button>
                 </div>
-    
-                <div class="pub-header">
-                    <h1 class="pub-title" id="pubDetailsTitle">Pub Name</h1>
-                    <div class="pub-address" id="pubDetailsAddress">Address</div>
-                    <div class="pub-location" id="pubDetailsLocation">Location</div>
-                </div>
-    
-                <div class="beer-section" id="beerSection" style="display: none;">
-                    <div class="beer-section-title">
-                        🍺 Available Gluten Free Beers
-                    </div>
-                    <div class="beer-status" id="pubDetailsBeer">
-                        <!-- Content will be populated by JavaScript -->
-                    </div>
-                </div>
-    
-                <div class="pub-action-grid">
-                    <button class="btn btn-external" id="pubFindOnline">
-                        🔍 Find Online
-                    </button>
-                    <button class="btn btn-external" id="pubGetDirections">
-                        🧭 Get Directions
-                    </button>
-                    <button class="btn btn-toggle" id="pubToggleMap" data-action="toggle-pub-map">
-                        🗺️ <span id="pubMapBtnText">Show on Map</span>
-                    </button>
-                    <b<button class="btn btn-positive" data-action="report-beer">
-                        📝 Report GF Beer
-                    </button>
-                </div>
-            </div>
-    
-            <div class="pub-map-container" id="pubMapContainer">
-                <div class="pub-map-placeholder">
-                    🗺️ Interactive Map Loading...
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Dynamic Results Section - Pushed down when visible -->
-    <div id="results-section" style="display: none;">
-        <div class="results-header">
-            <h2 class="section-title">📍 Search Results</h2>
-        </div>
-        <ul id="results" class="results-list"></ul>
-    </div>
-
-    <!-- Map Section (Hidden by Default, Smart Show) -->
-    <div class="map-container" id="mapContainer" style="display: none;">
-        <div class="map-section-header">
-            <h2 class="section-title">🗺️ Interactive Map</h2>
-        </div>
-        <div id="map"></div>
-    </div>
-
-    <!-- Location Status -->
-    <div id="locationStatus" class="location-status location-loading" style="display: none;">
-        Finding your location...
-    </div>
-    
-    <!-- About Us Modal - UPDATED -->
-    <div id="aboutModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">ℹ️ About Coeliacs Like Beer Too</h2>
-                <button class="modal-close" aria-label="Close about modal">&times;</button>
-            </div>
-            
-            <div class="modal-body">
-                <div class="about-content">
-                    <div class="about-section">
-                        <h3>🍺 Our Mission</h3>
-                        <p>We believe that being coeliac shouldn't mean missing out on great beer experiences. Our mission is to create the UK's most comprehensive, community-driven guide to gluten free beer options across the country.</p>
-                    </div>
-                    
-                    <div class="about-section">
-                        <h3>👥 Our Story</h3>
-                        <p>Started by coeliacs, for coeliacs. We understand the frustration of walking into a pub and not knowing if they have any safe options. That's why we built this platform - to help our community find amazing gluten free beer wherever they are in the UK.</p>
-                    </div>
-                    
-                    <div class="about-section">
-                        <h3>🤝 Community Driven</h3>
-                        <p>Every beer report, every pub update, every photo comes from real people in the coeliac community. Together, we're building something that helps everyone discover new places and feel confident about their choices.</p>
-                    </div>
-                    
-                    <div class="about-section">
-                        <h3>📈 Growing Together</h3>
-                        <p>With thousands of pubs in our database and growing reports every day, we're becoming the go-to resource for gluten free beer discovery. Join us in making the UK more accessible for coeliacs!</p>
-                    </div>
-                    
-                    <div class="contact-info">
-                        <h3>💬 Get in Touch</h3>
-                        <p>Questions, suggestions, or partnership opportunities? We'd love to hear from you!</p>
-                        <button data-action="coming-soon" data-feature="Contact Form" class="btn btn-primary">Contact Us</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- GF Info Modal - UPDATED -->
-    <div id="gfInfoModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">🔬 What is Gluten Free Beer?</h2>
-                <button data-action="close-modal" aria-label="Close GF info modal">&times;</button>
-            </div>
-            
-            <div class="modal-body">
-                <div class="gf-content">
-                    <div class="gf-section">
-                        <h3>🧪 Official Standards</h3>
-                        <div class="standards-grid">
-                            <div class="standard-item">
-                                <strong>🇬🇧 UK & EU</strong>
-                                <p>Less than 20ppm gluten</p>
-                            </div>
-                            <div class="standard-item">
-                                <strong>🇺🇸 USA</strong>
-                                <p>Made only with gluten free ingredients</p>
-                            </div>
-                            <div class="standard-item">
-                                <strong>🇦🇺 Australia</strong>
-                                <p>Made only with gluten free ingredients</p>
-                            </div>
+                
+                <!-- Results Content -->
+                <div class="results-content">
+                    <div class="results-list-container" id="resultsListContainer">
+                        <!-- Loading state -->
+                        <div class="results-loading" id="resultsLoading">
+                            <div class="loading-spinner"></div>
+                            <div class="loading-text">Finding nearby GF beer...</div>
+                        </div>
+                        
+                        <!-- Results list -->
+                        <div class="results-list" id="resultsList" style="display: none;">
+                            <!-- Results will be populated here -->
+                        </div>
+                        
+                        <!-- No results -->
+                        <div class="no-results-found" id="noResultsFound" style="display: none;">
+                            <div class="no-results-icon">🔍</div>
+                            <div class="no-results-title">No pubs found</div>
+                            <div class="no-results-text">Try expanding your search distance or removing filters</div>
                         </div>
                     </div>
                     
-                    <div class="gf-section">
-                        <h3>🏷️ Types of GF Beer</h3>
-                        <div class="beer-types">
-                            <div class="beer-type-item">
-                                <strong>✅ Certified Gluten Free</strong>
-                                <p>Made from naturally gluten free grains (rice, sorghum, millet). Safest option.</p>
-                            </div>
-                            <div class="beer-type-item">
-                                <strong>⚗️ Gluten Removed/Reduced</strong>
-                                <p>Made from barley/wheat but treated with enzymes to break down gluten. Some coeliacs react.</p>
-                            </div>
-                            <div class="beer-type-item">
-                                <strong>🌾 "Made Without Gluten"</strong>
-                                <p>No gluten ingredients added, but may have cross-contamination. Check carefully!</p>
-                            </div>
+                    <!-- Results Map (hidden by default) -->
+                    <div class="results-map-container" id="resultsMapContainer" style="display: none;">
+                        <div id="resultsMap" class="results-map"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <!-------------------------------------------------->
+        <!-- HTML full screen pub details overlay section -->
+        <!-------------------------------------------------->
+        <div id="pubDetailsOverlay" class="pub-details-overlay">
+            <div class="pub-details-container" id="pubContainer">
+                <div class="pub-details-card">
+                    <!-- NEW: Top navigation - ADD THIS -->
+                    <div class="pub-nav-top">
+                        <button class="btn-nav-small" data-action="close-pub-details" onclick="event.stopPropagation();">
+                            🏠 Home
+                        </button>
+                        <button class="btn-nav-small" data-action="back-to-results" onclick="event.stopPropagation();">
+                            ← Back
+                        </button>
+                    </div>
+        
+                    <div class="pub-header">
+                        <h1 class="pub-title" id="pubDetailsTitle">Pub Name</h1>
+                        <div class="pub-address" id="pubDetailsAddress">Address</div>
+                        <div class="pub-location" id="pubDetailsLocation">Location</div>
+                    </div>
+        
+                    <div class="beer-section" id="beerSection" style="display: none;">
+                        <div class="beer-section-title">
+                            🍺 Available Gluten Free Beers
+                        </div>
+                        <div class="beer-status" id="pubDetailsBeer">
+                            <!-- Content will be populated by JavaScript -->
                         </div>
                     </div>
-                    
-                    <div class="gf-section">
-                        <h3>⚠️ Important Notes</h3>
-                        <ul class="safety-notes">
-                            <li><strong>Cross-contamination</strong> can happen in breweries that also make regular beer</li>
-                            <li><strong>Always check labels</strong> and ask staff about preparation methods</li>
-                            <li><strong>Coeliacs vs Gluten Intolerant</strong> - Coeliac disease is an autoimmune condition requiring strict gluten avoidance, while gluten intolerance is a separate digestive sensitivity</li>
-                            <li><strong>When in doubt</strong>, choose certified gluten free options</li>
-                        </ul>
+        
+                    <div class="pub-action-grid">
+                        <button class="btn btn-external" id="pubFindOnline">
+                            🔍 Find Online
+                        </button>
+                        <button class="btn btn-external" id="pubGetDirections">
+                            🧭 Get Directions
+                        </button>
+                        <button class="btn btn-toggle" id="pubToggleMap" data-action="toggle-pub-map">
+                            🗺️ <span id="pubMapBtnText">Show on Map</span>
+                        </button>
+                        <b<button class="btn btn-positive" data-action="report-beer">
+                            📝 Report GF Beer
+                        </button>
                     </div>
-                    
-                    <div class="disclaimer">
-                        <p><strong>Disclaimer:</strong> This information is for guidance only. Always consult with healthcare professionals and verify product safety for your individual needs.</p>
+                </div>
+        
+                <div class="pub-map-container" id="pubMapContainer">
+                    <div class="pub-map-placeholder">
+                        🗺️ Interactive Map Loading...
                     </div>
                 </div>
             </div>
         </div>
-    </div>
     
-    <!-- Smart Coordinate Modal - UPDATED -->
-    <div id="coordinateModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title" id="modalPubName">Help us locate this pub!</h2>
-                <button class="modal-close" data-action="close-modal" aria-label="Close coordinate modal">&times;</button>
+        <!-- Dynamic Results Section - Pushed down when visible -->
+        <div id="results-section" style="display: none;">
+            <div class="results-header">
+                <h2 class="section-title">📍 Search Results</h2>
             </div>
-            
-            <div class="modal-body">
-                <p>We'll search near the postcode and you can click to pinpoint the exact location.</p>
-                
-                <div class="modal-instructions">
-                    <span id="modalInstructions">🗺️ Searching for the pub area...</span>
+            <ul id="results" class="results-list"></ul>
+        </div>
+    
+        <!-- Map Section (Hidden by Default, Smart Show) -->
+        <div class="map-container" id="mapContainer" style="display: none;">
+            <div class="map-section-header">
+                <h2 class="section-title">🗺️ Interactive Map</h2>
+            </div>
+            <div id="map"></div>
+        </div>
+    
+        <!-- Location Status -->
+        <div id="locationStatus" class="location-status location-loading" style="display: none;">
+            Finding your location...
+        </div>
+        
+        <!-- About Us Modal - UPDATED -->
+        <div id="aboutModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">ℹ️ About Coeliacs Like Beer Too</h2>
+                    <button class="modal-close" aria-label="Close about modal">&times;</button>
                 </div>
                 
-                <div id="coordinateMap" class="modal-map"></div>
-                
-                <div id="selectedLocationInfo" class="selected-location" style="display: none;">
-                    <div>📍 Selected location:</div>
-                    <div class="coordinates" id="selectedCoordinates"></div>
-                </div>
-                
-                <div class="form-actions">
-                    <button id="confirmLocation" class="btn btn-success">
-                        ✅ Confirm Location
-                    </button>
-                    <button id="cancelModal" class="btn btn-secondary" data-action="close-modal">
-                        ❌ Cancel
-                    </button>
+                <div class="modal-body">
+                    <div class="about-content">
+                        <div class="about-section">
+                            <h3>🍺 Our Mission</h3>
+                            <p>We believe that being coeliac shouldn't mean missing out on great beer experiences. Our mission is to create the UK's most comprehensive, community-driven guide to gluten free beer options across the country.</p>
+                        </div>
+                        
+                        <div class="about-section">
+                            <h3>👥 Our Story</h3>
+                            <p>Started by coeliacs, for coeliacs. We understand the frustration of walking into a pub and not knowing if they have any safe options. That's why we built this platform - to help our community find amazing gluten free beer wherever they are in the UK.</p>
+                        </div>
+                        
+                        <div class="about-section">
+                            <h3>🤝 Community Driven</h3>
+                            <p>Every beer report, every pub update, every photo comes from real people in the coeliac community. Together, we're building something that helps everyone discover new places and feel confident about their choices.</p>
+                        </div>
+                        
+                        <div class="about-section">
+                            <h3>📈 Growing Together</h3>
+                            <p>With thousands of pubs in our database and growing reports every day, we're becoming the go-to resource for gluten free beer discovery. Join us in making the UK more accessible for coeliacs!</p>
+                        </div>
+                        
+                        <div class="contact-info">
+                            <h3>💬 Get in Touch</h3>
+                            <p>Questions, suggestions, or partnership opportunities? We'd love to hear from you!</p>
+                            <button data-action="coming-soon" data-feature="Contact Form" class="btn btn-primary">Contact Us</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- REPLACE: The entire reportModal div in templates/index.html -->
-    <div id="reportModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">📸 Report GF Beer Find</h2>
-                <button class="modal-close" data-action="close-modal" aria-label="Close report modal">&times;</button>
+        
+        <!-- GF Info Modal - UPDATED -->
+        <div id="gfInfoModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">🔬 What is Gluten Free Beer?</h2>
+                    <button data-action="close-modal" aria-label="Close GF info modal">&times;</button>
+                </div>
+                
+                <div class="modal-body">
+                    <div class="gf-content">
+                        <div class="gf-section">
+                            <h3>🧪 Official Standards</h3>
+                            <div class="standards-grid">
+                                <div class="standard-item">
+                                    <strong>🇬🇧 UK & EU</strong>
+                                    <p>Less than 20ppm gluten</p>
+                                </div>
+                                <div class="standard-item">
+                                    <strong>🇺🇸 USA</strong>
+                                    <p>Made only with gluten free ingredients</p>
+                                </div>
+                                <div class="standard-item">
+                                    <strong>🇦🇺 Australia</strong>
+                                    <p>Made only with gluten free ingredients</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="gf-section">
+                            <h3>🏷️ Types of GF Beer</h3>
+                            <div class="beer-types">
+                                <div class="beer-type-item">
+                                    <strong>✅ Certified Gluten Free</strong>
+                                    <p>Made from naturally gluten free grains (rice, sorghum, millet). Safest option.</p>
+                                </div>
+                                <div class="beer-type-item">
+                                    <strong>⚗️ Gluten Removed/Reduced</strong>
+                                    <p>Made from barley/wheat but treated with enzymes to break down gluten. Some coeliacs react.</p>
+                                </div>
+                                <div class="beer-type-item">
+                                    <strong>🌾 "Made Without Gluten"</strong>
+                                    <p>No gluten ingredients added, but may have cross-contamination. Check carefully!</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="gf-section">
+                            <h3>⚠️ Important Notes</h3>
+                            <ul class="safety-notes">
+                                <li><strong>Cross-contamination</strong> can happen in breweries that also make regular beer</li>
+                                <li><strong>Always check labels</strong> and ask staff about preparation methods</li>
+                                <li><strong>Coeliacs vs Gluten Intolerant</strong> - Coeliac disease is an autoimmune condition requiring strict gluten avoidance, while gluten intolerance is a separate digestive sensitivity</li>
+                                <li><strong>When in doubt</strong>, choose certified gluten free options</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="disclaimer">
+                            <p><strong>Disclaimer:</strong> This information is for guidance only. Always consult with healthcare professionals and verify product safety for your individual needs.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            
-            <div class="modal-body">
-                <form id="reportForm" class="modal-form" data-action="submit-report">
+        </div>
+        
+        <!-- Smart Coordinate Modal - UPDATED -->
+        <div id="coordinateModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="modalPubName">Help us locate this pub!</h2>
+                    <button class="modal-close" data-action="close-modal" aria-label="Close coordinate modal">&times;</button>
+                </div>
+                
+                <div class="modal-body">
+                    <p>We'll search near the postcode and you can click to pinpoint the exact location.</p>
                     
-                    <!-- Pub Search Field (hidden when pre-populated) -->
-                    <div class="form-group" id="pubSearchGroup">
-                        <label class="form-label">Find Your Pub *</label>
-                        <input type="text" id="reportPubSearch" class="form-input" 
-                               placeholder="Start typing pub name..." autocomplete="off">
-                        <div id="pubSuggestions" class="suggestions"></div>
-                        <small style="color: var(--text-muted); font-size: 0.8rem;">
-                            Search for an existing pub first - we'll check our database!
-                        </small>
+                    <div class="modal-instructions">
+                        <span id="modalInstructions">🗺️ Searching for the pub area...</span>
                     </div>
                     
-                    <!-- Selected Pub Info (shown when pub selected) -->
-                    <div id="selectedPubInfo" class="selected-pub-info" style="display: none;">
-                        <div class="selected-pub-card">
-                            <strong id="selectedPubName"></strong>
-                            <div id="selectedPubAddress"></div>
-                            <button type="button" class="btn btn-secondary btn-sm" onclick="if(window.FormModule) FormModule.clearSelectedPub();">
-                                Choose Different Pub
+                    <div id="coordinateMap" class="modal-map"></div>
+                    
+                    <div id="selectedLocationInfo" class="selected-location" style="display: none;">
+                        <div>📍 Selected location:</div>
+                        <div class="coordinates" id="selectedCoordinates"></div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button id="confirmLocation" class="btn btn-success">
+                            ✅ Confirm Location
+                        </button>
+                        <button id="cancelModal" class="btn btn-secondary" data-action="close-modal">
+                            ❌ Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <!-- REPLACE: The entire reportModal div in templates/index.html -->
+        <div id="reportModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">📸 Report GF Beer Find</h2>
+                    <button class="modal-close" data-action="close-modal" aria-label="Close report modal">&times;</button>
+                </div>
+                
+                <div class="modal-body">
+                    <form id="reportForm" class="modal-form" data-action="submit-report">
+                        
+                        <!-- Pub Search Field (hidden when pre-populated) -->
+                        <div class="form-group" id="pubSearchGroup">
+                            <label class="form-label">Find Your Pub *</label>
+                            <input type="text" id="reportPubSearch" class="form-input" 
+                                   placeholder="Start typing pub name..." autocomplete="off">
+                            <div id="pubSuggestions" class="suggestions"></div>
+                            <small style="color: var(--text-muted); font-size: 0.8rem;">
+                                Search for an existing pub first - we'll check our database!
+                            </small>
+                        </div>
+                        
+                        <!-- Selected Pub Info (shown when pub selected) -->
+                        <div id="selectedPubInfo" class="selected-pub-info" style="display: none;">
+                            <div class="selected-pub-card">
+                                <strong id="selectedPubName"></strong>
+                                <div id="selectedPubAddress"></div>
+                                <button type="button" class="btn btn-secondary btn-sm" onclick="if(window.FormModule) FormModule.clearSelectedPub();">
+                                    Choose Different Pub
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- New Pub Fields (shown when adding new pub) -->
+                        <div id="newPubFields" class="new-pub-fields" style="display: none;">
+                            <h4>📍 Add New Pub</h4>
+                            <div class="form-group">
+                                <label class="form-label">Pub Name *</label>
+                                <input type="text" id="reportPubName" class="form-input" placeholder="The Red Lion">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Address *</label>
+                                <input type="text" id="reportAddress" class="form-input" placeholder="123 High Street">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Postcode *</label>
+                                <input type="text" id="reportPostcode" class="form-input" placeholder="SW1A 1AA">
+                            </div>
+                        </div>
+                        
+                        <!-- Beer Format (Required) -->
+                        <div class="form-group">
+                            <label class="form-label">Beer Format *</label>
+                            <select id="reportFormat" name="reportFormat" class="form-select" required>
+                                <option value="">Select format...</option>
+                                <option value="bottle">🍺 Bottle</option>
+                                <option value="tap">🚰 Tap</option>
+                                <option value="cask">🛢️ Cask</option>
+                                <option value="can">🥫 Can</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Brewery (Dropdown with search) -->
+                        <div class="form-group">
+                            <label class="form-label">Brewery</label>
+                            <div class="brewery-dropdown-container">
+                                <input type="text" id="reportBrewery" name="reportBrewery" class="form-input" 
+                                       placeholder="Start typing brewery name..." 
+                                       autocomplete="off">
+                                <div id="breweryDropdown" class="suggestions brewery-suggestions"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Beer Name (Auto-complete based on brewery) -->
+                        <div class="form-group">
+                            <label class="form-label">Beer Name</label>
+                            <div class="beer-name-container">
+                                <input type="text" id="reportBeerName" name="reportBeerName" class="form-input" 
+                                       placeholder="Start typing beer name..." 
+                                       autocomplete="off">
+                                <div id="beerNameDropdown" class="suggestions beer-suggestions"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Beer Style (Auto-complete based on selected beer) -->
+                        <div class="form-group">
+                            <label class="form-label">Beer Style</label>
+                            <div class="beer-style-container">
+                                <input type="text" id="reportBeerStyle" name="reportBeerStyle" class="form-input" 
+                                       placeholder="IPA, Lager, Stout..." 
+                                       autocomplete="off">
+                                <div id="beerStyleDropdown" class="suggestions style-suggestions"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Beer ABV (Auto-complete based on selected beer) -->
+                        <div class="form-group">
+                            <label class="form-label">ABV (Alcohol %)</label>
+                            <input type="number" id="reportBeerABV" name="reportBeerABV" class="form-input" 
+                                   placeholder="4.5" step="0.1" min="0" max="20">
+                        </div>
+                        
+                        <!-- Compact Photo Upload -->
+                        <div class="form-group">
+                            <label class="form-label">Photo (Optional)</label>
+                            <label for="reportPhoto" class="photo-upload-compact">
+                                <div class="photo-upload-icon">📷</div>
+                                <div class="photo-upload-text">
+                                    <strong>Add a photo</strong><br>
+                                    <small>Beer menu, bottle, or tap</small>
+                                </div>
+                                <input type="file" id="reportPhoto" name="reportPhoto" 
+                                       accept="image/*" style="display: none;">
+                            </label>
+                        </div>
+                        
+                        <!-- Form Actions (Sticky at bottom) -->
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" data-action="close-modal">
+                                Cancel
+                            </button>
+                            <button type="submit" class="btn btn-success">
+                                Submit Report
                             </button>
                         </div>
-                    </div>
-                    
-                    <!-- New Pub Fields (shown when adding new pub) -->
-                    <div id="newPubFields" class="new-pub-fields" style="display: none;">
-                        <h4>📍 Add New Pub</h4>
-                        <div class="form-group">
-                            <label class="form-label">Pub Name *</label>
-                            <input type="text" id="reportPubName" class="form-input" placeholder="The Red Lion">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Address *</label>
-                            <input type="text" id="reportAddress" class="form-input" placeholder="123 High Street">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Postcode *</label>
-                            <input type="text" id="reportPostcode" class="form-input" placeholder="SW1A 1AA">
-                        </div>
-                    </div>
-                    
-                    <!-- Beer Format (Required) -->
-                    <div class="form-group">
-                        <label class="form-label">Beer Format *</label>
-                        <select id="reportFormat" name="reportFormat" class="form-select" required>
-                            <option value="">Select format...</option>
-                            <option value="bottle">🍺 Bottle</option>
-                            <option value="tap">🚰 Tap</option>
-                            <option value="cask">🛢️ Cask</option>
-                            <option value="can">🥫 Can</option>
-                        </select>
-                    </div>
-                    
-                    <!-- Brewery (Dropdown with search) -->
-                    <div class="form-group">
-                        <label class="form-label">Brewery</label>
-                        <div class="brewery-dropdown-container">
-                            <input type="text" id="reportBrewery" name="reportBrewery" class="form-input" 
-                                   placeholder="Start typing brewery name..." 
-                                   autocomplete="off">
-                            <div id="breweryDropdown" class="suggestions brewery-suggestions"></div>
-                        </div>
-                    </div>
-                    
-                    <!-- Beer Name (Auto-complete based on brewery) -->
-                    <div class="form-group">
-                        <label class="form-label">Beer Name</label>
-                        <div class="beer-name-container">
-                            <input type="text" id="reportBeerName" name="reportBeerName" class="form-input" 
-                                   placeholder="Start typing beer name..." 
-                                   autocomplete="off">
-                            <div id="beerNameDropdown" class="suggestions beer-suggestions"></div>
-                        </div>
-                    </div>
-                    
-                    <!-- Beer Style (Auto-complete based on selected beer) -->
-                    <div class="form-group">
-                        <label class="form-label">Beer Style</label>
-                        <div class="beer-style-container">
-                            <input type="text" id="reportBeerStyle" name="reportBeerStyle" class="form-input" 
-                                   placeholder="IPA, Lager, Stout..." 
-                                   autocomplete="off">
-                            <div id="beerStyleDropdown" class="suggestions style-suggestions"></div>
-                        </div>
-                    </div>
-                    
-                    <!-- Beer ABV (Auto-complete based on selected beer) -->
-                    <div class="form-group">
-                        <label class="form-label">ABV (Alcohol %)</label>
-                        <input type="number" id="reportBeerABV" name="reportBeerABV" class="form-input" 
-                               placeholder="4.5" step="0.1" min="0" max="20">
-                    </div>
-                    
-                    <!-- Compact Photo Upload -->
-                    <div class="form-group">
-                        <label class="form-label">Photo (Optional)</label>
-                        <label for="reportPhoto" class="photo-upload-compact">
-                            <div class="photo-upload-icon">📷</div>
-                            <div class="photo-upload-text">
-                                <strong>Add a photo</strong><br>
-                                <small>Beer menu, bottle, or tap</small>
-                            </div>
-                            <input type="file" id="reportPhoto" name="reportPhoto" 
-                                   accept="image/*" style="display: none;">
-                        </label>
-                    </div>
-                    
-                    <!-- Form Actions (Sticky at bottom) -->
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-secondary" data-action="close-modal">
-                            Cancel
-                        </button>
-                        <button type="submit" class="btn btn-success">
-                            Submit Report
-                        </button>
-                    </div>
-                    
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <template id="pub-result-template">
-        <div class="result-item">
-            <div class="result-header">
-                <div class="result-main-info">
-                    <h3 class="result-title"></h3>
-                    <div class="result-distance"></div>
+                        
+                    </form>
                 </div>
-                <div class="gf-indicator"></div>
-            </div>
-            
-            <div class="result-location">
-                <div class="result-address"></div>
-                <div class="result-postcode"></div>
-                <div class="result-authority"></div>
-            </div>
-            
-            <div class="result-actions">
-                <button class="btn btn-primary" data-action="view-pub">
-                    📍 View Details
-                </button>
             </div>
         </div>
-    </template>
-
-    <!-- Full UK Map Overlay -->
-    <div id="fullMapOverlay" class="map-overlay">
-        <div class="map-overlay-container">
-            <!-- Map Header -->
-            <div class="map-overlay-nav">
-                <button class="btn-nav-small" data-action="close-full-map">
-                    🏠 Home
-                </button>
-                <h2 class="map-overlay-title">UK GF Beer Map</h2>
-                <button class="btn-nav-small" data-action="toggle-map-legend">
-                    ℹ️ Legend
-                </button>
-            </div>
-            
-            <!-- Map Content -->
-            <div class="map-overlay-content">
-                <div id="fullMap" class="full-map"></div>
-            </div>
-        </div>
-    </div>
     
-    <!-- Loading Toast - UPDATED -->
-    <div id="loadingToast" class="toast toast-loading" style="display: none;">
-        <div class="toast-content">
-            <div class="spinner"></div>
-            <span id="loadingMessage">Loading...</span>
-        </div>
-    </div>
-    
-    <!-- Success Toast - UPDATED -->
-    <div id="successToast" class="toast toast-success" style="display: none;">
-        <div class="toast-content">
-            <span class="toast-icon">✅</span>
-            <span id="successMessage">Success!</span>
-        </div>
-    </div>
-    
-    <!-- Cookie Consent Banner -->
-    <div id="cookieConsent" class="cookie-consent" style="display: none;">
-        <div class="cookie-content">
-            <div class="cookie-text">
-                <h4>🍪 We use cookies</h4>
-                <p>We use essential cookies to make our site work. With your consent, we may also use analytics cookies to improve your experience.</p>
-            </div>
-            <div class="cookie-buttons">
-                <button data-action="accept-all-cookies" class="cookie-btn cookie-btn-accept">Accept All</button>
-                <button data-action="accept-essential-cookies" class="cookie-btn cookie-btn-essential">Essential Only</button>
-                <button data-modal="cookieSettings" class="cookie-btn cookie-btn-settings">Settings</button>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Cookie Settings Modal -->
-    <div id="cookieSettings" class="modal" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">🍪 Cookie Settings</h2>
-                <button class="modal-close" aria-label="Close cookie settings">&times;</button>
-            </div>
-            
-            <div class="modal-body">
-                <div class="cookie-settings-content">
-                    <div class="cookie-category">
-                        <div class="cookie-category-header">
-                            <h3>Essential Cookies</h3>
-                            <label class="cookie-toggle">
-                                <input type="checkbox" checked disabled>
-                                <span class="toggle-slider essential"></span>
-                            </label>
-                        </div>
-                        <p>These cookies are necessary for the website to function and cannot be switched off. They are usually only set in response to actions made by you which amount to a request for services.</p>
-                        <div class="cookie-details">
-                            <strong>Examples:</strong> Session management, search preferences, location consent
-                        </div>
+        <template id="pub-result-template">
+            <div class="result-item">
+                <div class="result-header">
+                    <div class="result-main-info">
+                        <h3 class="result-title"></h3>
+                        <div class="result-distance"></div>
                     </div>
-                    
-                    <div class="cookie-category">
-                        <div class="cookie-category-header">
-                            <h3>Analytics Cookies</h3>
-                            <label class="cookie-toggle">
-                                <input type="checkbox" id="analyticsConsent">
-                                <span class="toggle-slider"></span>
-                            </label>
-                        </div>
-                        <p>These cookies help us understand how visitors interact with our website by collecting and reporting information anonymously. This helps us improve our service.</p>
-                        <div class="cookie-details">
-                            <strong>Provider:</strong> Google Analytics<br>
-                            <strong>Purpose:</strong> Usage statistics, popular features, performance monitoring
-                        </div>
-                    </div>
-                    
-                    <div class="cookie-info">
-                        <h4>📋 Your Rights</h4>
-                        <ul>
-                            <li>You can change your preferences at any time</li>
-                            <li>Withdrawing consent may limit website functionality</li>
-                            <li>Essential cookies cannot be disabled</li>
-                            <li>See our <a href="/cookies" target="_blank">Cookie Policy</a> for full details</li>
-                        </ul>
-                    </div>
+                    <div class="gf-indicator"></div>
                 </div>
                 
-                <div class="form-actions">
-                    <button data-action="save-cookie-preferences" class="btn btn-primary">Save Preferences</button>
-                    <button data-action="accept-all-from-settings" class="btn btn-success">Accept All</button>
+                <div class="result-location">
+                    <div class="result-address"></div>
+                    <div class="result-postcode"></div>
+                    <div class="result-authority"></div>
+                </div>
+                
+                <div class="result-actions">
+                    <button class="btn btn-primary" data-action="view-pub">
+                        📍 View Details
+                    </button>
+                </div>
+            </div>
+        </template>
+    
+        <!-- Full UK Map Overlay -->
+        <div id="fullMapOverlay" class="map-overlay">
+            <div class="map-overlay-container">
+                <!-- Map Header -->
+                <div class="map-overlay-nav">
+                    <button class="btn-nav-small" data-action="close-full-map">
+                        🏠 Home
+                    </button>
+                    <h2 class="map-overlay-title">UK GF Beer Map</h2>
+                    <button class="btn-nav-small" data-action="toggle-map-legend">
+                        ℹ️ Legend
+                    </button>
+                </div>
+                
+                <!-- Map Content -->
+                <div class="map-overlay-content">
+                    <div id="fullMap" class="full-map"></div>
                 </div>
             </div>
         </div>
-    </div>
-    
-    <!-- Floating Cookie Settings Button (appears after consent given) -->
-    <div id="cookieSettingsFloat" class="cookie-settings-float" style="display: none;">
-        <button data-action="show-cookie-settings" class="cookie-float-btn" title="Cookie Settings">
-            🍪
-        </button>
-    </div>
-
-    <!-- ================================
-     MAP LEGEND TEMPLATE
-     🔧 ACTION: ADD to templates/index.html after existing templates
-     📍 LOCATION: Add before the closing </body> tag
-     ================================ -->
-
-    <!-- Enhanced Map Legend Template -->
-    <template id="map-legend-template">
-        <div class="map-legend">
-            <div class="legend-title">
-                🍺 GF Beer Status
-            </div>
-            <div class="legend-item">
-                <div class="legend-marker always-gf"></div>
-                <span class="legend-text">Always Has GF Beer</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-marker current-gf"></div>
-                <span class="legend-text">Currently Has GF Beer</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-marker no-gf"></div>
-                <span class="legend-text">No GF Currently</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-marker unknown"></div>
-                <span class="legend-text">Unknown Status</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-marker user-location"></div>
-                <span class="legend-text">Your Location</span>
+        
+        <!-- Loading Toast - UPDATED -->
+        <div id="loadingToast" class="toast toast-loading" style="display: none;">
+            <div class="toast-content">
+                <div class="spinner"></div>
+                <span id="loadingMessage">Loading...</span>
             </div>
         </div>
-    </template>
-    
-    <!-- Map Error State Template -->
-    <template id="map-error-template">
-        <div class="map-error-container">
-            <div class="map-error-icon">📍</div>
-            <div class="map-error-title">Location coordinates not available</div>
-            <div class="map-error-text">Help us by reporting the exact location!</div>
+        
+        <!-- Success Toast - UPDATED -->
+        <div id="successToast" class="toast toast-success" style="display: none;">
+            <div class="toast-content">
+                <span class="toast-icon">✅</span>
+                <span id="successMessage">Success!</span>
+            </div>
         </div>
-    </template>
-    
-    <!-- Popup Content Template -->
-    <template id="popup-content-template">
-        <div class="popup-content">
-            <div class="popup-title" data-field="name"></div>
-            <div class="popup-address" data-field="address"></div>
-            <div class="popup-postcode" data-field="postcode"></div>
-            <div class="popup-distance" data-field="distance" style="display: none;"></div>
-            <div class="popup-gf-status" data-field="gf-status"></div>
-            <button class="popup-button" data-action="view-details">
-                View Details
+        
+        <!-- Cookie Consent Banner -->
+        <div id="cookieConsent" class="cookie-consent" style="display: none;">
+            <div class="cookie-content">
+                <div class="cookie-text">
+                    <h4>🍪 We use cookies</h4>
+                    <p>We use essential cookies to make our site work. With your consent, we may also use analytics cookies to improve your experience.</p>
+                </div>
+                <div class="cookie-buttons">
+                    <button data-action="accept-all-cookies" class="cookie-btn cookie-btn-accept">Accept All</button>
+                    <button data-action="accept-essential-cookies" class="cookie-btn cookie-btn-essential">Essential Only</button>
+                    <button data-modal="cookieSettings" class="cookie-btn cookie-btn-settings">Settings</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Cookie Settings Modal -->
+        <div id="cookieSettings" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">🍪 Cookie Settings</h2>
+                    <button class="modal-close" aria-label="Close cookie settings">&times;</button>
+                </div>
+                
+                <div class="modal-body">
+                    <div class="cookie-settings-content">
+                        <div class="cookie-category">
+                            <div class="cookie-category-header">
+                                <h3>Essential Cookies</h3>
+                                <label class="cookie-toggle">
+                                    <input type="checkbox" checked disabled>
+                                    <span class="toggle-slider essential"></span>
+                                </label>
+                            </div>
+                            <p>These cookies are necessary for the website to function and cannot be switched off. They are usually only set in response to actions made by you which amount to a request for services.</p>
+                            <div class="cookie-details">
+                                <strong>Examples:</strong> Session management, search preferences, location consent
+                            </div>
+                        </div>
+                        
+                        <div class="cookie-category">
+                            <div class="cookie-category-header">
+                                <h3>Analytics Cookies</h3>
+                                <label class="cookie-toggle">
+                                    <input type="checkbox" id="analyticsConsent">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <p>These cookies help us understand how visitors interact with our website by collecting and reporting information anonymously. This helps us improve our service.</p>
+                            <div class="cookie-details">
+                                <strong>Provider:</strong> Google Analytics<br>
+                                <strong>Purpose:</strong> Usage statistics, popular features, performance monitoring
+                            </div>
+                        </div>
+                        
+                        <div class="cookie-info">
+                            <h4>📋 Your Rights</h4>
+                            <ul>
+                                <li>You can change your preferences at any time</li>
+                                <li>Withdrawing consent may limit website functionality</li>
+                                <li>Essential cookies cannot be disabled</li>
+                                <li>See our <a href="/cookies" target="_blank">Cookie Policy</a> for full details</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button data-action="save-cookie-preferences" class="btn btn-primary">Save Preferences</button>
+                        <button data-action="accept-all-from-settings" class="btn btn-success">Accept All</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Floating Cookie Settings Button (appears after consent given) -->
+        <div id="cookieSettingsFloat" class="cookie-settings-float" style="display: none;">
+            <button data-action="show-cookie-settings" class="cookie-float-btn" title="Cookie Settings">
+                🍪
             </button>
         </div>
-    </template>
-
-    <!-- Bottom Navigation Bar -->
-    <nav class="bottom-nav">
-        <a href="/" class="nav-item active">
-            <div class="nav-icon">🏠</div>
-            <div class="nav-label">Home</div>
-        </a>
-        
-        <a href="#" data-action="show-full-map" class="nav-item">
-            <div class="nav-icon">🗺️</div>
-            <div class="nav-label">Map</div>
-        </a>
-        
-        <a href="/breweries" class="nav-item">
-            <div class="nav-icon">🍺</div>
-            <div class="nav-label">Breweries</div>
-        </a>
-        
-        <a href="/about" class="nav-item">
-            <div class="nav-icon">ℹ️</div>
-            <div class="nav-label">About</div>
-        </a>
-        
-        <a href="/more" class="nav-item">
-            <div class="nav-icon">⋯</div>
-            <div class="nav-label">More</div>
-        </a>
-    </nav>
     
-    <!---------------------------
-    LEAFLET.JS - Keep this external dependency
-    ---------------------------->
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+        <!-- ================================
+         MAP LEGEND TEMPLATE
+         🔧 ACTION: ADD to templates/index.html after existing templates
+         📍 LOCATION: Add before the closing </body> tag
+         ================================ -->
     
-    <!---------------------------
-    SINGLE MODULE ENTRY POINT
-    All modules now load through main.js in proper order
-    ---------------------------->
-    <script type="module" src="/static/js/main.js?v={{ cache_buster }}"></script>
-    
-    <!---------------------------
-    LEGACY SUPPORT & INITIALIZATION
-    Essential functions and setup that can't be modularized yet
-    ---------------------------->
-    <script>
-        // Wait for app to initialize before setting up remaining handlers
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🔧 Setting up legacy event handlers...');
-            
-            // Check if app initialized successfully after a delay
-            setTimeout(() => {
-                if (!window.CoeliacsApp?.initialized) {
-                    console.warn('⚠️ App initialization may have failed');
-                    showInitializationFallback();
-                }
-            }, 3000);
-            
-            // Handle file upload preview for photo input
-            const photoInput = document.getElementById('reportPhoto');
-            const photoLabel = document.querySelector('.photo-upload-compact');
-            
-            if (photoInput && photoLabel) {
-                photoInput.addEventListener('change', function(e) {
-                    const file = e.target.files[0];
-                    if (file) {
-                        const fileName = file.name.length > 20 ? 
-                            file.name.substring(0, 17) + '...' : 
-                            file.name;
-                        
-                        const textEl = photoLabel.querySelector('.photo-upload-text');
-                        if (textEl) {
-                            textEl.innerHTML = `
-                                <strong>📸 ${fileName}</strong><br>
-                                <small>Click to change photo</small>
-                            `;
-                        }
-                        photoLabel.classList.add('active');
-                    }
-                });
-            }
-        });
+        <!-- Enhanced Map Legend Template -->
+        <template id="map-legend-template">
+            <div class="map-legend">
+                <div class="legend-title">
+                    🍺 GF Beer Status
+                </div>
+                <div class="legend-item">
+                    <div class="legend-marker always-gf"></div>
+                    <span class="legend-text">Always Has GF Beer</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-marker current-gf"></div>
+                    <span class="legend-text">Currently Has GF Beer</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-marker no-gf"></div>
+                    <span class="legend-text">No GF Currently</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-marker unknown"></div>
+                    <span class="legend-text">Unknown Status</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-marker user-location"></div>
+                    <span class="legend-text">Your Location</span>
+                </div>
+            </div>
+        </template>
         
-        // Fallback initialization if modules fail to load
-        function showInitializationFallback() {
-            const fallbackDiv = document.createElement('div');
-            fallbackDiv.className = 'initialization-fallback';
-            fallbackDiv.innerHTML = `
-                <strong>⚠️ Slow Loading</strong>
-                The app is taking longer than expected to load...
-                <button onclick="location.reload()" class="fallback-btn">
-                    Refresh Page
+        <!-- Map Error State Template -->
+        <template id="map-error-template">
+            <div class="map-error-container">
+                <div class="map-error-icon">📍</div>
+                <div class="map-error-title">Location coordinates not available</div>
+                <div class="map-error-text">Help us by reporting the exact location!</div>
+            </div>
+        </template>
+        
+        <!-- Popup Content Template -->
+        <template id="popup-content-template">
+            <div class="popup-content">
+                <div class="popup-title" data-field="name"></div>
+                <div class="popup-address" data-field="address"></div>
+                <div class="popup-postcode" data-field="postcode"></div>
+                <div class="popup-distance" data-field="distance" style="display: none;"></div>
+                <div class="popup-gf-status" data-field="gf-status"></div>
+                <button class="popup-button" data-action="view-details">
+                    View Details
                 </button>
-            `;
-            document.body.appendChild(fallbackDiv);
+            </div>
+        </template>
+    
+        <!-- Bottom Navigation Bar -->
+        <nav class="bottom-nav">
+            <a href="/" class="nav-item active">
+                <div class="nav-icon">🏠</div>
+                <div class="nav-label">Home</div>
+            </a>
             
-            setTimeout(() => {
-                fallbackDiv.remove();
-            }, 10000);
-        }
+            <a href="#" data-action="show-full-map" class="nav-item">
+                <div class="nav-icon">🗺️</div>
+                <div class="nav-label">Map</div>
+            </a>
+            
+            <a href="/breweries" class="nav-item">
+                <div class="nav-icon">🍺</div>
+                <div class="nav-label">Breweries</div>
+            </a>
+            
+            <a href="/about" class="nav-item">
+                <div class="nav-icon">ℹ️</div>
+                <div class="nav-label">About</div>
+            </a>
+            
+            <a href="/more" class="nav-item">
+                <div class="nav-icon">⋯</div>
+                <div class="nav-label">More</div>
+            </a>
+        </nav>
         
-        // Debug helper - available globally
-        window.debugApp = function() {
-            console.log('🔍 App State:', window.AppState);
-            console.log('🔍 Available Modules:', Object.keys(window.CoeliacsApp?.modules || {}));
-            if (window.CoeliacsApp?.state) {
-                console.log('🔍 Module Status:', window.CoeliacsApp.state.modules);
-            }
-        };
+        <!---------------------------
+        LEAFLET.JS - Keep this external dependency
+        ---------------------------->
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
         
-        // Performance monitoring
-        window.addEventListener('load', function() {
-            // Log performance metrics
-            if (performance && performance.timing) {
-                const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
-                console.log(`⚡ Page load time: ${loadTime}ms`);
+        <!---------------------------
+        SINGLE MODULE ENTRY POINT
+        All modules now load through main.js in proper order
+        ---------------------------->
+        <script type="module" src="/static/js/main.js?v={{ cache_buster }}"></script>
+        
+        <!---------------------------
+        LEGACY SUPPORT & INITIALIZATION
+        Essential functions and setup that can't be modularized yet
+        ---------------------------->
+        <script>
+            // Wait for app to initialize before setting up remaining handlers
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('🔧 Setting up legacy event handlers...');
                 
-                // Track slow loads
-                if (loadTime > 3000 && window.CoeliacsApp?.modules?.tracking) {
-                    window.CoeliacsApp.modules.tracking.trackEvent('slow_page_load', 'Performance', `${loadTime}ms`);
+                // Check if app initialized successfully after a delay
+                setTimeout(() => {
+                    if (!window.CoeliacsApp?.initialized) {
+                        console.warn('⚠️ App initialization may have failed');
+                        showInitializationFallback();
+                    }
+                }, 3000);
+                
+                // Handle file upload preview for photo input
+                const photoInput = document.getElementById('reportPhoto');
+                const photoLabel = document.querySelector('.photo-upload-compact');
+                
+                if (photoInput && photoLabel) {
+                    photoInput.addEventListener('change', function(e) {
+                        const file = e.target.files[0];
+                        if (file) {
+                            const fileName = file.name.length > 20 ? 
+                                file.name.substring(0, 17) + '...' : 
+                                file.name;
+                            
+                            const textEl = photoLabel.querySelector('.photo-upload-text');
+                            if (textEl) {
+                                textEl.innerHTML = `
+                                    <strong>📸 ${fileName}</strong><br>
+                                    <small>Click to change photo</small>
+                                `;
+                            }
+                            photoLabel.classList.add('active');
+                        }
+                    });
                 }
+            });
+            
+            // Fallback initialization if modules fail to load
+            function showInitializationFallback() {
+                const fallbackDiv = document.createElement('div');
+                fallbackDiv.className = 'initialization-fallback';
+                fallbackDiv.innerHTML = `
+                    <strong>⚠️ Slow Loading</strong>
+                    The app is taking longer than expected to load...
+                    <button onclick="location.reload()" class="fallback-btn">
+                        Refresh Page
+                    </button>
+                `;
+                document.body.appendChild(fallbackDiv);
+                
+                setTimeout(() => {
+                    fallbackDiv.remove();
+                }, 10000);
             }
-        });
-    </script>
-    
-    <script>
-        // Cache-busting timestamp
-        console.log('🚀 CACHE BUSTER:', '{{ cache_buster }}');
+            
+            // Debug helper - available globally
+            window.debugApp = function() {
+                console.log('🔍 App State:', window.AppState);
+                console.log('🔍 Available Modules:', Object.keys(window.CoeliacsApp?.modules || {}));
+                if (window.CoeliacsApp?.state) {
+                    console.log('🔍 Module Status:', window.CoeliacsApp.state.modules);
+                }
+            };
+            
+            // Performance monitoring
+            window.addEventListener('load', function() {
+                // Log performance metrics
+                if (performance && performance.timing) {
+                    const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+                    console.log(`⚡ Page load time: ${loadTime}ms`);
+                    
+                    // Track slow loads
+                    if (loadTime > 3000 && window.CoeliacsApp?.modules?.tracking) {
+                        window.CoeliacsApp.modules.tracking.trackEvent('slow_page_load', 'Performance', `${loadTime}ms`);
+                    }
+                }
+            });
+        </script>
         
-        // Environment info for debugging
-        console.log('📱 User Agent:', navigator.userAgent.substring(0, 50) + '...');
-        console.log('📺 Viewport:', window.innerWidth + 'x' + window.innerHeight);
-        console.log('🌐 Connection:', navigator.connection?.effectiveType || 'unknown');
-    </script>
-    
-</body>
+        <script>
+            // Cache-busting timestamp
+            console.log('🚀 CACHE BUSTER:', '{{ cache_buster }}');
+            
+            // Environment info for debugging
+            console.log('📱 User Agent:', navigator.userAgent.substring(0, 50) + '...');
+            console.log('📺 Viewport:', window.innerWidth + 'x' + window.innerHeight);
+            console.log('🌐 Connection:', navigator.connection?.effectiveType || 'unknown');
+        </script>
+        
+    </body>
 </html>
