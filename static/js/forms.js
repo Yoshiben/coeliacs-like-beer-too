@@ -1115,6 +1115,7 @@ export const FormModule = (function() {
                 pubOverlay.style.display = 'flex';
             }
         }
+    }
     
     // Initialize when ready
     // document.addEventListener('DOMContentLoaded', () => GFStatusFlow.init());
