@@ -4709,3 +4709,16 @@ p {
     .status-toggle-btn small {
         display: none;
     }
+
+/* FIX: Ensure status modals appear above pub details overlay */
+.status-modal,
+.confirm-modal,
+.prompt-modal {
+    z-index: calc(var(--z-modal-backdrop) + 100) !important;
+}
+
+.status-modal .modal-content,
+.confirm-modal .modal-content,
+.prompt-modal .modal-content {
+    z-index: calc(var(--z-modal-content) + 100) !important;
+}
