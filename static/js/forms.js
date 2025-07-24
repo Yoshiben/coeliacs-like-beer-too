@@ -939,12 +939,23 @@ export const FormModule = (function() {
         },
         
         openStatusModal() {
+            console.log('🔍 openStatusModal called');
             this.currentPub = window.currentPubData;
-            if (!this.currentPub) return;
+            console.log('🏠 Current pub:', this.currentPub);
+            
+            if (!this.currentPub) {
+                console.error('❌ No current pub data');
+                return;
+            }
             
             // Set pub name in modal
             const pubNameEl = document.getElementById('statusPubName');
-            if (pubNameEl) pubNameEl.textContent = this.currentPub.name;
+            if (pubNameEl) {
+                pubNameEl.textContent = this.currentPub.name;
+                console.log('✅ Set pub name:', this.currentPub.name);
+            } else {
+                console.warn('⚠️ statusPubName element not found');
+            }
             
             // Open modal
             this.openModal('gfStatusModal');
@@ -1064,10 +1075,16 @@ export const FormModule = (function() {
         },
         
         openModal(modalId) {
+            console.log(`🔓 Trying to open modal: ${modalId}`);
+            
             const modal = document.getElementById(modalId);
             if (modal) {
                 modal.style.display = 'flex';
+                modal.classList.add('active');
                 document.body.style.overflow = 'hidden';
+                console.log(`✅ Modal ${modalId} opened`);
+            } else {
+                console.error(`❌ Modal ${modalId} not found in DOM`);
             }
         },
         
