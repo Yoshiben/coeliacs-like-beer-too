@@ -401,15 +401,15 @@ export const MapModule = (function() {
         window.gfPubsLayer = L.layerGroup().addTo(targetMap);
         window.clusteredPubsLayer = L.markerClusterGroup({
             maxClusterRadius: 120,  // Even smaller - was 40
-            disableClusteringAtZoom: 13,
+            disableClusteringAtZoom: 11,
             spiderfyOnMaxZoom: true,
             showCoverageOnHover: false,
             iconCreateFunction: function(cluster) {
                 const count = cluster.getChildCount();
                 let size = 'small';
                 
-                if (count > 100) size = 'large';
-                else if (count > 50) size = 'medium';
+                if (count > 1000) size = 'large';
+                else if (count > 100) size = 'medium';
                 
                 return L.divIcon({
                     html: `<div><span>${count}</span></div>`,
