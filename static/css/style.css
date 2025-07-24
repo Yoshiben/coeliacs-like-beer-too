@@ -2893,7 +2893,9 @@ p {
 .marker-cluster {
     background-color: var(--cluster-bg) !important;
     border-radius: 50% !important;
-    border: 2px solid var(--cluster-border) !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
 }
 
 .marker-cluster div {
@@ -2906,7 +2908,8 @@ p {
 }
 
 .marker-cluster-small {
-    background-color: var(--cluster-bg) !important;
+    width: 15px !important;
+    height: 15px !important;
 }
 
 .marker-cluster-small div {
@@ -2918,8 +2921,10 @@ p {
 }
 
 .marker-cluster-medium {
-    background-color: var(--cluster-bg) !important;
+    width: 20px !important;
+    height: 20px !important;
 }
+
 
 .marker-cluster-medium div {
     width: 20px !important;  /* Was 40px */
@@ -2930,7 +2935,8 @@ p {
 }
 
 .marker-cluster-large {
-    background-color: var(--cluster-bg) !important;
+    width: 25px !important;
+    height: 25px !important;
 }
 
 .marker-cluster-large div {
