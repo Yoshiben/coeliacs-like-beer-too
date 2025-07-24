@@ -919,13 +919,18 @@ export const MapModule = (function() {
                 weight: 3,
                 opacity: 1,
                 fillOpacity: 0.9,
-                className: 'pulsing-marker' // For animation
+                className: 'pulsing-marker',
+                zIndexOffset: 1000 // Start with high z-index// For animation
             }).addTo(window.fullUKMap);
             
             userMarker.bindPopup('📍 You are here!').openPopup();
-            
-            // Store reference for the "go to location" button
             window.fullUKMapUserMarker = userMarker;
+            // Bring to front after animation completes (2 seconds for 2 pulses)
+            setTimeout(() => {
+                if (window.fullUKMapUserMarker) {
+                    window.fullUKMapUserMarker.bringToFront();
+                }
+            }, 2000);
         }
         
         // Add legend (permanent, no toggle)
@@ -962,9 +967,9 @@ export const MapModule = (function() {
                 const button = L.DomUtil.create('button', 'map-location-btn', container);
                 button.innerHTML = `
                     <span class="location-icon">📍</span>
-                    <span class="location-text">My Location</span>
+                    <span class="location-text">Go to My Location</span>
                 `;
-                button.title = 'Go to my location';
+                button.title = 'Click to center map on your location';
                 
                 // Prevent map click events
                 L.DomEvent.disableClickPropagation(button);
