@@ -1026,6 +1026,16 @@ export const FormModule = (function() {
                         status: this.selectedStatus
                     })
                 });
+
+                // ADD THIS PART - error logging
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Server response:', errorText);
+                    console.error('Request data was:', {
+                        pub_id: pubToUpdate.pub_id,
+                        status: this.selectedStatus
+                    });
+                }
                 
                 if (response.ok) {
                     // Update UI
