@@ -400,8 +400,8 @@ export const MapModule = (function() {
         // Create layer groups
         window.gfPubsLayer = L.layerGroup().addTo(targetMap);
         window.clusteredPubsLayer = L.markerClusterGroup({
-            maxClusterRadius: 40,  // Reduced from 60 - clusters break apart sooner
-            disableClusteringAtZoom: 13,  // Force individual markers at zoom 13+
+            maxClusterRadius: 30,  // Even smaller - was 40
+            disableClusteringAtZoom: 13,
             spiderfyOnMaxZoom: true,
             showCoverageOnHover: false,
             iconCreateFunction: function(cluster) {
@@ -413,8 +413,8 @@ export const MapModule = (function() {
                 
                 return L.divIcon({
                     html: `<div><span>${count}</span></div>`,
-                    className: `marker-cluster marker-cluster-${size}`,  // Removed marker-cluster-unknown
-                    iconSize: L.point(40, 40)
+                    className: `marker-cluster marker-cluster-${size}`,
+                    iconSize: L.point(30, 30)  // Smaller base size
                 });
             }
         }).addTo(targetMap);
@@ -485,7 +485,7 @@ export const MapModule = (function() {
         });
         
         // Ensure GF pubs are on top
-        window.gfPubsLayer.bringToFront();
+        // window.gfPubsLayer.bringToFront();
         
         return pubs.length;
     };
