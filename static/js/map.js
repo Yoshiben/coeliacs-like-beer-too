@@ -520,47 +520,45 @@ export const MapModule = (function() {
         const rootStyles = getComputedStyle(document.documentElement);
         
         const baseStyle = {
-            weight: parseInt(rootStyles.getPropertyValue('--marker-stroke-width')) || 2,
+            weight: 2,
             opacity: 1,
             fillOpacity: 0.9,
-            radius: parseInt(rootStyles.getPropertyValue('--marker-radius')) || 8
+            radius: 8
         };
         
         switch(gfStatus) {
             case 'always':
                 return {
                     ...baseStyle,
-                    fillColor: rootStyles.getPropertyValue('--marker-always-gf-fill').trim(),
-                    color: rootStyles.getPropertyValue('--marker-always-gf-stroke').trim(),
-                    radius: baseStyle.radius + 3,
-                    weight: 3,
-                    className: 'always-gf-marker'
+                    fillColor: rootStyles.getPropertyValue('--always-gf-fill').trim(),
+                    color: rootStyles.getPropertyValue('--always-gf-border').trim(),
+                    radius: 10, // Slightly larger
+                    weight: 3,  // Thicker border
+                    className: 'always-gf-marker' // For special effects
                 };
                 
             case 'currently':
                 return {
                     ...baseStyle,
-                    fillColor: rootStyles.getPropertyValue('--marker-current-gf-fill').trim(),
-                    color: rootStyles.getPropertyValue('--marker-current-gf-stroke').trim(),
-                    radius: baseStyle.radius + 1
+                    fillColor: rootStyles.getPropertyValue('--current-gf-fill').trim(),
+                    color: rootStyles.getPropertyValue('--current-gf-border').trim()
                 };
                 
             case 'not_currently':
                 return {
                     ...baseStyle,
-                    fillColor: rootStyles.getPropertyValue('--marker-no-gf-fill').trim(),
-                    color: rootStyles.getPropertyValue('--marker-no-gf-stroke').trim(),
-                    radius: baseStyle.radius - 1
+                    fillColor: rootStyles.getPropertyValue('--no-gf-fill').trim(),
+                    color: rootStyles.getPropertyValue('--no-gf-border').trim(),
+                    fillOpacity: 0.7 // Slightly faded
                 };
                 
             case 'unknown':
             default:
                 return {
                     ...baseStyle,
-                    fillColor: rootStyles.getPropertyValue('--marker-unknown-fill').trim(),
-                    color: rootStyles.getPropertyValue('--marker-unknown-stroke').trim(),
-                    radius: baseStyle.radius - 1,
-                    fillOpacity: 0.7
+                    fillColor: rootStyles.getPropertyValue('--unknown-gf-fill').trim(),
+                    color: rootStyles.getPropertyValue('--unknown-gf-border').trim(),
+                    fillOpacity: 0.6 // More faded
                 };
         }
     };
