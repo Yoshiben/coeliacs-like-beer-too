@@ -1122,6 +1122,7 @@ export const FormModule = (function() {
         initReportDropdowns,
         resetReportForm,
         setupEventListeners,
+        GFStatusFlow,
         
         // For external access if needed
         getSelectedPub: () => state.selectedPubData,
