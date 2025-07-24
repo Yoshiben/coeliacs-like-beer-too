@@ -694,6 +694,50 @@ const App = {
             default:
                 console.log(`❓ Unhandled action: ${action}`);
                 break;
+
+            // In setupEventDelegation function, add this case:
+            case 'show-full-map':
+                console.log('🗺️ Showing full UK map...');
+                
+                // Show the map overlay
+                const mapOverlay = document.getElementById('fullMapOverlay');
+                if (mapOverlay) {
+                    mapOverlay.classList.add('active');
+                    mapOverlay.style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                    
+                    // Initialize the map
+                    const mapModule = this.getModule('map');
+                    if (mapModule && mapModule.initFullUKMap) {
+                        setTimeout(() => {
+                            mapModule.initFullUKMap();
+                        }, 100);
+                    }
+                    
+                    // Track the action
+                    const tracking = this.getModule('tracking');
+                    if (tracking) {
+                        tracking.trackEvent('full_map_view', 'Navigation', 'nav_bar');
+                    }
+                }
+                break;
+            
+            case 'close-full-map':
+                console.log('🏠 Closing full UK map...');
+                
+                const fullMapOverlay = document.getElementById('fullMapOverlay');
+                if (fullMapOverlay) {
+                    fullMapOverlay.classList.remove('active');
+                    fullMapOverlay.style.display = 'none';
+                    document.body.style.overflow = '';
+                    
+                    // Clean up map
+                    const mapModule = this.getModule('map');
+                    if (mapModule && mapModule.cleanupFullUKMap) {
+                        mapModule.cleanupFullUKMap();
+                    }
+                }
+                break;
         }
     },
     
