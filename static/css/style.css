@@ -2891,11 +2891,9 @@ p {
 
 /* Grey cluster styling with variables */
 .marker-cluster {
-    background-color: var(--cluster-bg) !important;
-    border-radius: 50% !important;
+    background-color: transparent !important;
     border: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
+    box-shadow: none !important;
 }
 
 .marker-cluster div {
