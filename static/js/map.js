@@ -392,52 +392,63 @@ export const MapModule = (function() {
     };
 
     const determineGFStatus = (pub) => {
-        // Check if pub has any GF options
+        // If we have the explicit status field, use it
+        if (pub.gf_status) {
+            return pub.gf_status;
+        }
+        
+        // Fallback for older data without the status field
+        // This maintains backwards compatibility
         if (pub.bottle || pub.tap || pub.cask || pub.can) {
-            return 'gf_available';
+            return 'currently';
         }
         
-        // If we have the pub in database but no GF flags set
-        if (pub.pub_id) {
-            return 'no_gf';
-        }
-        
-        // Unknown status
         return 'unknown';
     };
     
     const getMarkerStyleForGFStatus = (gfStatus) => {
-    const rootStyles = getComputedStyle(document.documentElement);
-    
-    const baseStyle = {
-        weight: parseInt(rootStyles.getPropertyValue('--marker-stroke-width')) || 2,
-        opacity: 1,
-        fillOpacity: 0.9,
-        radius: parseInt(rootStyles.getPropertyValue('--marker-radius')) || 8
-    };
-    
-    switch(gfStatus) {
-        case 'gf_available':
-            return {
-                ...baseStyle,
-                fillColor: rootStyles.getPropertyValue('--marker-gf-fill').trim() || '#10b981',
-                color: rootStyles.getPropertyValue('--marker-gf-stroke').trim() || '#ffffff'
-            };
-            
-        case 'no_gf':
-            return {
-                ...baseStyle,
-                fillColor: rootStyles.getPropertyValue('--marker-no-gf-fill').trim() || '#ef4444',
-                color: rootStyles.getPropertyValue('--marker-no-gf-stroke').trim() || '#ffffff'
-            };
-            
-        case 'unknown':
-        default:
-            return {
-                ...baseStyle,
-                fillColor: rootStyles.getPropertyValue('--marker-unknown-fill').trim() || '#9ca3af',
-                color: rootStyles.getPropertyValue('--marker-unknown-stroke').trim() || '#ffffff'
-            };
+        const rootStyles = getComputedStyle(document.documentElement);
+        
+        const baseStyle = {
+            weight: parseInt(rootStyles.getPropertyValue('--marker-stroke-width')) || 2,
+            opacity: 1,
+            fillOpacity: 0.9,
+            radius: parseInt(rootStyles.getPropertyValue('--marker-radius')) || 8
+        };
+        
+        switch(gfStatus) {
+            case 'always':
+                return {
+                    ...baseStyle,
+                    fillColor: rootStyles.getPropertyValue('--marker-always-gf-fill').trim() || '#10b981',
+                    color: rootStyles.getPropertyValue('--marker-always-gf-stroke').trim() || '#ffffff',
+                    radius: baseStyle.radius + 2, // Slightly larger for emphasis
+                    weight: 3 // Thicker border
+                };
+                
+            case 'currently':
+                return {
+                    ...baseStyle,
+                    fillColor: rootStyles.getPropertyValue('--marker-current-gf-fill').trim() || '#86efac',
+                    color: rootStyles.getPropertyValue('--marker-current-gf-stroke').trim() || '#ffffff'
+                };
+                
+            case 'not_currently':
+                return {
+                    ...baseStyle,
+                    fillColor: rootStyles.getPropertyValue('--marker-no-gf-fill').trim() || '#ef4444',
+                    color: rootStyles.getPropertyValue('--marker-no-gf-stroke').trim() || '#ffffff'
+                };
+                
+            case 'unknown':
+            default:
+                return {
+                    ...baseStyle,
+                    fillColor: rootStyles.getPropertyValue('--marker-unknown-fill').trim() || '#9ca3af',
+                    color: rootStyles.getPropertyValue('--marker-unknown-stroke').trim() || '#ffffff',
+                    radius: baseStyle.radius - 1, // Slightly smaller
+                    fillOpacity: 0.7 // Less prominent
+                };
         }
     };
     
@@ -474,23 +485,33 @@ export const MapModule = (function() {
                 distanceEl.style.display = 'block';
             }
             
-            // Set GF status
+            // Set enhanced GF status
             const gfStatusEl = clone.querySelector('[data-field="gf-status"]');
             if (gfStatusEl) {
-                if (gfStatus === 'gf_available') {
-                    let gfOptions = [];
-                    if (pub.bottle) gfOptions.push('🍺');
-                    if (pub.tap) gfOptions.push('🚰');
-                    if (pub.cask) gfOptions.push('🛢️');
-                    if (pub.can) gfOptions.push('🥫');
-                    gfStatusEl.textContent = `✅ GF Available: ${gfOptions.join(' ')}`;
-                    gfStatusEl.className = 'popup-gf-status available';
-                } else if (gfStatus === 'no_gf') {
-                    gfStatusEl.textContent = '❌ No GF Options Known';
-                    gfStatusEl.className = 'popup-gf-status not-available';
-                } else {
-                    gfStatusEl.textContent = '❓ GF Status Unknown';
-                    gfStatusEl.className = 'popup-gf-status unknown';
+                switch(gfStatus) {
+                    case 'always_gf':
+                        gfStatusEl.innerHTML = '🟢 <strong>Always Has GF Beer!</strong>';
+                        gfStatusEl.className = 'popup-gf-status always-gf';
+                        break;
+                        
+                    case 'current_gf':
+                        let gfOptions = [];
+                        if (pub.bottle) gfOptions.push('🍺');
+                        if (pub.tap) gfOptions.push('🚰');
+                        if (pub.cask) gfOptions.push('🛢️');
+                        if (pub.can) gfOptions.push('🥫');
+                        gfStatusEl.innerHTML = `✅ GF Available: ${gfOptions.join(' ')}`;
+                        gfStatusEl.className = 'popup-gf-status current-gf';
+                        break;
+                        
+                    case 'no_gf_currently':
+                        gfStatusEl.innerHTML = '🔴 No GF Options Currently';
+                        gfStatusEl.className = 'popup-gf-status no-gf';
+                        break;
+                        
+                    default:
+                        gfStatusEl.innerHTML = '⚪ GF Status Unknown';
+                        gfStatusEl.className = 'popup-gf-status unknown';
                 }
             }
             
