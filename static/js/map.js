@@ -382,26 +382,46 @@ export const MapModule = (function() {
         return markersAdded;
     };
 
-    // Add zoom-based pub filtering
+    // Add hybrid clustering - GF pubs individual, others clustered
     const addFilteredPubMarkers = (pubs, mapInstance = null) => {
         const targetMap = mapInstance || map;
         if (!targetMap) return 0;
         
-        console.log(`🎯 Adding filtered pub markers based on zoom level...`);
+        console.log(`🎯 Adding hybrid markers: GF individual, others clustered...`);
         
-        // Get current zoom
-        const currentZoom = targetMap.getZoom();
-        console.log(`📍 Current zoom level: ${currentZoom}`);
-        
-        // Clear existing markers
-        if (window.pubLayerGroup) {
-            window.pubLayerGroup.clearLayers();
-        } else {
-            window.pubLayerGroup = L.layerGroup().addTo(targetMap);
+        // Clear existing layers
+        if (window.gfPubsLayer) {
+            targetMap.removeLayer(window.gfPubsLayer);
+        }
+        if (window.clusteredPubsLayer) {
+            targetMap.removeLayer(window.clusteredPubsLayer);
         }
         
-        // Filter pubs based on zoom and GF status
-        let pubsToShow = [];
+        // Create layer groups
+        window.gfPubsLayer = L.layerGroup().addTo(targetMap);
+        window.clusteredPubsLayer = L.markerClusterGroup({
+            maxClusterRadius: 60,
+            spiderfyOnMaxZoom: true,
+            showCoverageOnHover: false,
+            iconCreateFunction: function(cluster) {
+                const count = cluster.getChildCount();
+                let size = 'small';
+                let className = 'marker-cluster-unknown';
+                
+                if (count > 100) size = 'large';
+                else if (count > 50) size = 'medium';
+                
+                return L.divIcon({
+                    html: `<div><span>${count}</span></div>`,
+                    className: `marker-cluster marker-cluster-${size} ${className}`,
+                    iconSize: L.point(40, 40)
+                });
+            }
+        }).addTo(targetMap);
+        
+        // Separate pubs by GF status
+        let gfPubs = [];
+        let otherPubs = [];
         let counts = { always: 0, currently: 0, unknown: 0, no_gf: 0 };
         
         pubs.forEach(pub => {
@@ -410,24 +430,17 @@ export const MapModule = (function() {
             const gfStatus = determineGFStatus(pub);
             counts[gfStatus]++;
             
-            // Zoom-based filtering rules
-            if (gfStatus === 'always') {
-                pubsToShow.push(pub); // Always show
-            } else if (gfStatus === 'currently') {
-                pubsToShow.push(pub); // Always show
-            } else if (gfStatus === 'unknown' && currentZoom >= 10) {
-                pubsToShow.push(pub); // Show at city level
-            } else if (gfStatus === 'not_currently' && currentZoom >= 12) {
-                pubsToShow.push(pub); // Show only when very zoomed in
+            if (gfStatus === 'always' || gfStatus === 'currently') {
+                gfPubs.push(pub);
+            } else {
+                otherPubs.push(pub);
             }
         });
         
-        console.log(`📊 Showing ${pubsToShow.length} of ${pubs.length} pubs at zoom ${currentZoom}`);
-        console.log(`   Always GF: ${counts.always}, Currently: ${counts.currently}, Unknown: ${counts.unknown}, No GF: ${counts.no_gf}`);
+        console.log(`📊 GF Pubs (individual): ${gfPubs.length}, Others (clustered): ${otherPubs.length}`);
         
-        // Add filtered markers
-        const bounds = [];
-        pubsToShow.forEach(pub => {
+        // Add GF pubs as individual markers (never clustered)
+        gfPubs.forEach(pub => {
             const lat = parseFloat(pub.latitude);
             const lng = parseFloat(pub.longitude);
             
@@ -435,22 +448,46 @@ export const MapModule = (function() {
             const markerStyle = getMarkerStyleForGFStatus(gfStatus);
             
             const marker = L.circleMarker([lat, lng], markerStyle);
+            const popupContent = createPubPopupContent(pub, gfStatus);
+            marker.bindPopup(popupContent);
+            
+            window.gfPubsLayer.addLayer(marker);
+        });
+        
+        // Add other pubs to cluster layer
+        otherPubs.forEach(pub => {
+            const lat = parseFloat(pub.latitude);
+            const lng = parseFloat(pub.longitude);
+            
+            const gfStatus = determineGFStatus(pub);
+            const markerStyle = getMarkerStyleForGFStatus(gfStatus);
+            
+            // Use regular markers for clustering (not circleMarkers)
+            const marker = L.marker([lat, lng], {
+                icon: L.divIcon({
+                    className: 'clusterable-marker',
+                    html: `<div style="
+                        width: ${markerStyle.radius * 2}px;
+                        height: ${markerStyle.radius * 2}px;
+                        background: ${markerStyle.fillColor};
+                        border: ${markerStyle.weight}px solid ${markerStyle.color};
+                        border-radius: 50%;
+                        opacity: ${markerStyle.fillOpacity};
+                    "></div>`,
+                    iconSize: [markerStyle.radius * 2, markerStyle.radius * 2]
+                })
+            });
             
             const popupContent = createPubPopupContent(pub, gfStatus);
             marker.bindPopup(popupContent);
             
-            window.pubLayerGroup.addLayer(marker);
-            bounds.push([lat, lng]);
+            window.clusteredPubsLayer.addLayer(marker);
         });
         
-        // Add status message
-        if (currentZoom < 11) {
-            console.log('💡 Zoom in to see pubs with unknown GF status');
-        } else if (currentZoom < 14) {
-            console.log('💡 Zoom in more to see all pubs');
-        }
+        // Ensure GF pubs are on top
+        window.gfPubsLayer.bringToFront();
         
-        return pubsToShow.length;
+        return pubs.length;
     };
     
     // Clear all pub markers
