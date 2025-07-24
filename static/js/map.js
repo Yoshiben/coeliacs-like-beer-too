@@ -964,7 +964,7 @@ export const MapModule = (function() {
         
         if (window.App.state.userLocation) {
             initialCenter = [window.App.state.userLocation.lat, window.App.state.userLocation.lng];
-            initialZoom = 12; // Closer zoom when we have user location
+            initialZoom = config.defaultZoom; // Closer zoom when we have user location
             console.log('📍 Centering map on user location:', initialCenter);
         } else {
             console.log('📍 No user location, using UK center');
