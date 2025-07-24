@@ -2818,12 +2818,13 @@ p {
     transform: translateY(-1px);
     box-shadow: var(--shadow-sm);
 }
-
-/* Enhanced legend markers */
+/*=======================
+  Enhanced legend markers
+  ======================= */
 .legend-marker.always-gf {
     background: var(--marker-always-gf-fill);
-    border-width: 2px;
-    box-shadow: 0 0 4px rgba(16, 185, 129, 0.4);
+    border-color: var(--marker-always-gf-stroke);
+    box-shadow: 0 0 4px rgba(255, 215, 0, 0.6);
 }
 
 .legend-marker.current-gf {
@@ -2836,7 +2837,6 @@ p {
 
 .legend-marker.unknown {
     background: var(--marker-unknown-fill);
-    opacity: 0.7;
 }
 
 /* Enhanced popup status styling */
