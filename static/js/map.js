@@ -879,7 +879,7 @@ export const MapModule = (function() {
         console.log('📍 Loading all UK pubs for map...');
         
         try {
-            // Show loading state
+            // Show loading state (same as before)
             const mapContainer = document.querySelector('.map-overlay-content');
             if (mapContainer) {
                 const loadingDiv = document.createElement('div');
@@ -904,21 +904,15 @@ export const MapModule = (function() {
                 mapContainer.appendChild(loadingDiv);
             }
             
-            // Fetch all pubs - you might need to create this endpoint
-            const api = window.App?.getModule('api') || window.APIModule;
-            if (!api) {
-                console.error('API module not available');
-                return;
+            // Fetch all pubs from dedicated endpoint
+            const response = await fetch('/api/all-pubs');
+            const data = await response.json();
+            
+            if (!data.success) {
+                throw new Error(data.error || 'Failed to load pubs');
             }
             
-            // Search with no query to get all pubs
-            const results = await api.searchPubs({
-                query: '',
-                searchType: 'all',
-                page: 1
-            });
-            
-            const pubs = Array.isArray(results) ? results : results.pubs || [];
+            const pubs = data.pubs || [];
             console.log(`📊 Got ${pubs.length} pubs to display on map`);
             
             // Add markers to map
