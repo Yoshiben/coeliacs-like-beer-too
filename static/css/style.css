@@ -219,15 +219,15 @@
    --legend-marker-border: 1px solid var(--text-white);
    --legend-user-marker-size: 10px;
    
-   /* Enhanced GF Status Colors */
-   --marker-always-gf-fill: #10b981;        /* Bright green - always has GF */
-   --marker-always-gf-stroke: #ffffff;
-   --marker-current-gf-fill: #86efac;       /* Pastel green - currently has GF */
-   --marker-current-gf-stroke: #ffffff;
-   --marker-no-gf-fill: #ef4444;            /* Red - no GF currently */
-   --marker-no-gf-stroke: #ffffff;
-   --marker-unknown-fill: #808080;          /* Grey - unknown status */
-   --marker-unknown-stroke: #ffffff;
+  /* Enhanced GF Status Colors */
+    --marker-always-gf-fill: #FFD700;        /* Gold */
+    --marker-always-gf-stroke: #FFA500;      /* Darker gold */
+    --marker-current-gf-fill: #10b981;       /* Green */
+    --marker-current-gf-stroke: #ffffff;
+    --marker-no-gf-fill: #ef4444;            /* Red */
+    --marker-no-gf-stroke: #ffffff;
+    --marker-unknown-fill: #9ca3af;          /* Grey */
+    --marker-unknown-stroke: #ffffff;
    
    /* Enhanced status backgrounds for UI */
    --status-always-gf-bg: rgba(16, 185, 129, 0.15);
