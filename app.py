@@ -1083,6 +1083,52 @@ def get_all_pubs_for_map():
             cursor.close()
             conn.close()
 
+# ADD: To app.py after existing endpoints
+
+@app.route('/api/update-gf-status', methods=['POST'])
+def update_gf_status():
+    """Quick update of GF status without full beer details"""
+    try:
+        data = request.get_json()
+        pub_id = data.get('pub_id')
+        status = data.get('status')
+        
+        # Validate status
+        valid_statuses = ['always', 'currently', 'not_currently', 'unknown']
+        if status not in valid_statuses:
+            return jsonify({'error': 'Invalid status'}), 400
+        
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor()
+        
+        # Update pub status
+        cursor.execute("""
+            UPDATE pubs 
+            SET gf_status = %s 
+            WHERE pub_id = %s
+        """, (status, pub_id))
+        
+        # Log to history
+        cursor.execute("""
+            INSERT INTO gf_status_history (pub_id, status, reported_by)
+            VALUES (%s, %s, %s)
+        """, (pub_id, status, request.remote_addr))
+        
+        conn.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': f'Status updated to {status}'
+        })
+        
+    except Exception as e:
+        logger.error(f"Error updating GF status: {str(e)}")
+        return jsonify({'error': 'Failed to update status'}), 500
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
+
 # ============
 # STATIC PAGES
 # ============
