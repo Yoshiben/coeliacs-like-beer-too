@@ -81,6 +81,24 @@ export const ModalModule = (function() {
             fullscreen: true,
             onOpen: (modalType) => loadAdminModalContent(modalType),
             onClose: () => clearAdminModalState()
+        },
+
+        // ADD THESE THREE:
+        'gfStatusModal': {
+            type: 'form',
+            onOpen: () => {
+                // Set pub name if available
+                const pubNameEl = document.getElementById('statusPubName');
+                if (pubNameEl && window.currentPubData) {
+                    pubNameEl.textContent = window.currentPubData.name;
+                }
+            }
+        },
+        'gfStatusConfirmModal': {
+            type: 'form'
+        },
+        'beerDetailsPromptModal': {
+            type: 'form'
         }
     };
     
