@@ -1085,6 +1085,12 @@ export const FormModule = (function() {
         openModal(modalId) {
             console.log(`🔓 Trying to open modal: ${modalId}`);
             
+            // Hide pub details overlay temporarily
+            const pubOverlay = document.getElementById('pubDetailsOverlay');
+            if (pubOverlay) {
+                pubOverlay.style.display = 'none';
+            }
+            
             const modal = document.getElementById(modalId);
             if (modal) {
                 modal.style.display = 'flex';
@@ -1102,8 +1108,13 @@ export const FormModule = (function() {
                 modal.style.display = 'none';
                 document.body.style.overflow = '';
             }
+            
+            // Restore pub overlay
+            const pubOverlay = document.getElementById('pubDetailsOverlay');
+            if (pubOverlay) {
+                pubOverlay.style.display = 'flex';
+            }
         }
-    };
     
     // Initialize when ready
     document.addEventListener('DOMContentLoaded', () => GFStatusFlow.init());
