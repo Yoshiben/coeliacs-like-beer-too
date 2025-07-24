@@ -1083,6 +1083,44 @@ def get_all_pubs_for_map():
             cursor.close()
             conn.close()
 
+
+@app.route('/api/test-pubs')
+def test_pubs():
+    """Test endpoint to debug the issue"""
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        # Test 1: Simple count
+        cursor.execute("SELECT COUNT(*) as count FROM pubs WHERE latitude IS NOT NULL AND longitude IS NOT NULL")
+        count = cursor.fetchone()
+        
+        # Test 2: Get just 10 pubs
+        cursor.execute("""
+            SELECT pub_id, name, latitude, longitude 
+            FROM pubs 
+            WHERE latitude IS NOT NULL AND longitude IS NOT NULL 
+            LIMIT 10
+        """)
+        test_pubs = cursor.fetchall()
+        
+        return jsonify({
+            'success': True,
+            'total_with_coords': count['count'],
+            'test_sample': test_pubs
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'error_type': type(e).__name__
+        }), 500
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
+
 # ============
 # STATIC PAGES
 # ============
