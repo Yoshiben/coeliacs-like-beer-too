@@ -381,6 +381,77 @@ export const MapModule = (function() {
         console.log(`✅ Added ${markersAdded} GF-color-coded pub markers to map`);
         return markersAdded;
     };
+
+    // Add zoom-based pub filtering
+    const addFilteredPubMarkers = (pubs, mapInstance = null) => {
+        const targetMap = mapInstance || map;
+        if (!targetMap) return 0;
+        
+        console.log(`🎯 Adding filtered pub markers based on zoom level...`);
+        
+        // Get current zoom
+        const currentZoom = targetMap.getZoom();
+        console.log(`📍 Current zoom level: ${currentZoom}`);
+        
+        // Clear existing markers
+        if (window.pubLayerGroup) {
+            window.pubLayerGroup.clearLayers();
+        } else {
+            window.pubLayerGroup = L.layerGroup().addTo(targetMap);
+        }
+        
+        // Filter pubs based on zoom and GF status
+        let pubsToShow = [];
+        let counts = { always: 0, currently: 0, unknown: 0, no_gf: 0 };
+        
+        pubs.forEach(pub => {
+            if (!pub.latitude || !pub.longitude) return;
+            
+            const gfStatus = determineGFStatus(pub);
+            counts[gfStatus]++;
+            
+            // Zoom-based filtering rules
+            if (gfStatus === 'always') {
+                pubsToShow.push(pub); // Always show
+            } else if (gfStatus === 'currently') {
+                pubsToShow.push(pub); // Always show
+            } else if (gfStatus === 'unknown' && currentZoom >= 11) {
+                pubsToShow.push(pub); // Show at city level
+            } else if (gfStatus === 'not_currently' && currentZoom >= 14) {
+                pubsToShow.push(pub); // Show only when very zoomed in
+            }
+        });
+        
+        console.log(`📊 Showing ${pubsToShow.length} of ${pubs.length} pubs at zoom ${currentZoom}`);
+        console.log(`   Always GF: ${counts.always}, Currently: ${counts.currently}, Unknown: ${counts.unknown}, No GF: ${counts.no_gf}`);
+        
+        // Add filtered markers
+        const bounds = [];
+        pubsToShow.forEach(pub => {
+            const lat = parseFloat(pub.latitude);
+            const lng = parseFloat(pub.longitude);
+            
+            const gfStatus = determineGFStatus(pub);
+            const markerStyle = getMarkerStyleForGFStatus(gfStatus);
+            
+            const marker = L.circleMarker([lat, lng], markerStyle);
+            
+            const popupContent = createPubPopupContent(pub, gfStatus);
+            marker.bindPopup(popupContent);
+            
+            window.pubLayerGroup.addLayer(marker);
+            bounds.push([lat, lng]);
+        });
+        
+        // Add status message
+        if (currentZoom < 11) {
+            console.log('💡 Zoom in to see pubs with unknown GF status');
+        } else if (currentZoom < 14) {
+            console.log('💡 Zoom in more to see all pubs');
+        }
+        
+        return pubsToShow.length;
+    };
     
     // Clear all pub markers
     const clearPubMarkers = () => {
@@ -1017,17 +1088,17 @@ export const MapModule = (function() {
     
     // Load all pubs from the API
     const loadAllPubsOnMap = async () => {
-        console.log('📍 Loading all UK pubs for map...');
+        console.log('📍 Loading all UK pubs for smart filtered map...');
         
         try {
-            // Show loading state (same as before)
+            // Show loading state
             const mapContainer = document.querySelector('.map-overlay-content');
             if (mapContainer) {
                 const loadingDiv = document.createElement('div');
                 loadingDiv.className = 'map-loading-overlay';
                 loadingDiv.innerHTML = `
                     <div class="loading-spinner"></div>
-                    <div class="loading-text">Loading pubs across the UK...</div>
+                    <div class="loading-text">Loading GF beer venues across the UK...</div>
                 `;
                 loadingDiv.style.cssText = `
                     position: absolute;
@@ -1045,7 +1116,7 @@ export const MapModule = (function() {
                 mapContainer.appendChild(loadingDiv);
             }
             
-            // Fetch all pubs from dedicated endpoint
+            // Fetch all pubs
             const response = await fetch('/api/all-pubs');
             const data = await response.json();
             
@@ -1053,12 +1124,18 @@ export const MapModule = (function() {
                 throw new Error(data.error || 'Failed to load pubs');
             }
             
-            const pubs = data.pubs || [];
-            console.log(`📊 Got ${pubs.length} pubs to display on map`);
+            window.allPubsData = data.pubs || [];
+            console.log(`📊 Got ${window.allPubsData.length} total pubs`);
             
-            // Add markers to map
-            if (window.fullUKMap && pubs.length > 0) {
-                addPubMarkers(pubs, window.fullUKMap);
+            // Add initial filtered markers
+            if (window.fullUKMap) {
+                const markersShown = addFilteredPubMarkers(window.allPubsData, window.fullUKMap);
+                
+                // Set up zoom change handler
+                window.fullUKMap.on('zoomend', function() {
+                    console.log('🔍 Zoom changed, updating markers...');
+                    addFilteredPubMarkers(window.allPubsData, window.fullUKMap);
+                });
             }
             
             // Remove loading overlay
@@ -1067,15 +1144,18 @@ export const MapModule = (function() {
                 loadingOverlay.remove();
             }
             
-            // Show stats
+            // Show initial stats
+            const gfCount = window.allPubsData.filter(p => 
+                p.gf_status === 'always' || p.gf_status === 'currently'
+            ).length;
+            
             if (window.showSuccessToast) {
-                window.showSuccessToast(`✅ Loaded ${pubs.length} pubs on map!`);
+                window.showSuccessToast(`✅ Showing ${gfCount} pubs with GF beer!`);
             }
             
         } catch (error) {
             console.error('❌ Error loading pubs for map:', error);
             
-            // Remove loading overlay
             const loadingOverlay = document.querySelector('.map-loading-overlay');
             if (loadingOverlay) {
                 loadingOverlay.remove();
