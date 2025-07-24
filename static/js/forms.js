@@ -940,19 +940,15 @@ export const FormModule = (function() {
         
         openStatusModal() {
             console.log('🔍 openStatusModal called');
-
-            // Debug z-indexes
-            const pubOverlay = document.getElementById('pubDetailsOverlay');
-            const statusModal = document.getElementById('gfStatusModal');
-            
-            console.log('🎯 Z-index check:');
-            console.log('Pub overlay z-index:', window.getComputedStyle(pubOverlay).zIndex);
-            console.log('Status modal z-index:', window.getComputedStyle(statusModal).zIndex);
+            // CHANGE: Use window.currentPubData directly
             this.currentPub = window.currentPubData;
             console.log('🏠 Current pub:', this.currentPub);
             
             if (!this.currentPub) {
                 console.error('❌ No current pub data');
+                if (window.showSuccessToast) {
+                    window.showSuccessToast('❌ No pub selected');
+                }
                 return;
             }
             
@@ -960,13 +956,12 @@ export const FormModule = (function() {
             const pubNameEl = document.getElementById('statusPubName');
             if (pubNameEl) {
                 pubNameEl.textContent = this.currentPub.name;
-                console.log('✅ Set pub name:', this.currentPub.name);
-            } else {
-                console.warn('⚠️ statusPubName element not found');
             }
             
-            // Open modal
-            this.openModal('gfStatusModal');
+            // Open modal using ModalModule
+            if (window.ModalModule) {
+                window.ModalModule.open('gfStatusModal');
+            }
         },
         
         selectStatus(status) {
@@ -990,7 +985,23 @@ export const FormModule = (function() {
         },
         
         async confirmStatusUpdate() {
-            this.closeModal('gfStatusConfirmModal');
+            // CHANGE: Add safety check
+            if (!this.currentPub || !this.currentPub.pub_id) {
+                console.error('❌ No pub data available');
+                this.currentPub = window.currentPubData; // Try to recover
+                
+                if (!this.currentPub || !this.currentPub.pub_id) {
+                    if (window.showSuccessToast) {
+                        window.showSuccessToast('❌ Error: No pub selected');
+                    }
+                    return;
+                }
+            }
+            
+            // Close modal first
+            if (window.ModalModule) {
+                window.ModalModule.close('gfStatusConfirmModal');
+            }
             
             try {
                 // Show loading
