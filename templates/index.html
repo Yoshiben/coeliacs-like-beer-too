@@ -749,23 +749,27 @@
      📍 LOCATION: Add before the closing </body> tag
      ================================ -->
 
-    <!-- Map Legend Template -->
+    <!-- Enhanced Map Legend Template -->
     <template id="map-legend-template">
         <div class="map-legend">
             <div class="legend-title">
                 🍺 GF Beer Status
             </div>
             <div class="legend-item">
-                <div class="legend-marker gf-available"></div>
-                <span class="legend-text">GF Available</span>
+                <div class="legend-marker always-gf"></div>
+                <span class="legend-text">Always Has GF Beer</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-marker current-gf"></div>
+                <span class="legend-text">Currently Has GF Beer</span>
             </div>
             <div class="legend-item">
                 <div class="legend-marker no-gf"></div>
-                <span class="legend-text">No GF Options</span>
+                <span class="legend-text">No GF Currently</span>
             </div>
             <div class="legend-item">
                 <div class="legend-marker unknown"></div>
-                <span class="legend-text">Unknown</span>
+                <span class="legend-text">Unknown Status</span>
             </div>
             <div class="legend-item">
                 <div class="legend-marker user-location"></div>
