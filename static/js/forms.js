@@ -1083,22 +1083,19 @@ export const FormModule = (function() {
         },
         
         openModal(modalId) {
-            console.log(`🔓 Trying to open modal: ${modalId}`);
-            
-            // Hide pub details overlay temporarily
-            const pubOverlay = document.getElementById('pubDetailsOverlay');
-            if (pubOverlay) {
-                pubOverlay.style.display = 'none';
-            }
-            
             const modal = document.getElementById(modalId);
             if (modal) {
-                modal.style.display = 'flex';
-                modal.classList.add('active');
+                // Force it to the absolute top
+                modal.style.cssText = `
+                    display: flex !important;
+                    z-index: 999999 !important;
+                    position: fixed !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                    width: 100% !important;
+                    height: 100% !important;
+                `;
                 document.body.style.overflow = 'hidden';
-                console.log(`✅ Modal ${modalId} opened`);
-            } else {
-                console.error(`❌ Modal ${modalId} not found in DOM`);
             }
         },
         
