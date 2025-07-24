@@ -1090,11 +1090,13 @@ def update_gf_status():
     """Quick update of GF status without full beer details"""
     try:
         data = request.get_json()
-        logger.info(f"Received data: {data}")  # ADD THIS
         pub_id = data.get('pub_id')
         status = data.get('status')
         
-        # Validate status
+        # Validate
+        if not pub_id or not status:
+            return jsonify({'error': 'Missing pub_id or status'}), 400
+            
         valid_statuses = ['always', 'currently', 'not_currently', 'unknown']
         if status not in valid_statuses:
             return jsonify({'error': 'Invalid status'}), 400
@@ -1109,13 +1111,9 @@ def update_gf_status():
             WHERE pub_id = %s
         """, (status, pub_id))
         
-        # Log to history
-        cursor.execute("""
-            INSERT INTO gf_status_history (pub_id, new_status, reported_by)
-            VALUES (%s, %s, %s)
-        """, (pub_id, status, request.remote_addr))
-        
         conn.commit()
+        
+        logger.info(f"Updated pub {pub_id} GF status to {status}")
         
         return jsonify({
             'success': True,
@@ -1124,7 +1122,8 @@ def update_gf_status():
         
     except Exception as e:
         logger.error(f"Error updating GF status: {str(e)}")
-        return jsonify({'error': 'Failed to update status'}), 500
+        # CHANGE THIS LINE to return the actual error:
+        return jsonify({'error': f'Failed to update status: {str(e)}'}), 500
     finally:
         if 'conn' in locals() and conn.is_connected():
             cursor.close()
