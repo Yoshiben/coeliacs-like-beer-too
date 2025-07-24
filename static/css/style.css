@@ -228,6 +228,12 @@
     --marker-no-gf-stroke: #ffffff;
     --marker-unknown-fill: #9ca3af;          /* Grey */
     --marker-unknown-stroke: #ffffff;
+
+   /* Cluster colors */
+    --cluster-bg: rgba(156, 163, 175, 0.6);
+    --cluster-bg-solid: rgba(156, 163, 175, 0.9);
+    --cluster-text: #ffffff;
+    --cluster-border: rgba(156, 163, 175, 0.3);
    
    /* Enhanced status backgrounds for UI */
    --status-always-gf-bg: rgba(16, 185, 129, 0.15);
@@ -2883,48 +2889,61 @@ p {
     animation: gentle-pulse 2s ease-in-out infinite;
 }
 
-/* Grey cluster styling */
+/* Grey cluster styling with variables */
 .marker-cluster {
-    background-color: rgba(156, 163, 175, 0.6);
-    border-radius: 50%;
+    background-color: var(--cluster-bg) !important;
+    border-radius: 50% !important;
+    border: 2px solid var(--cluster-border) !important;
 }
 
 .marker-cluster div {
-    background-color: rgba(156, 163, 175, 0.9);
-    color: white;
-    font-weight: bold;
-    text-align: center;
-    border-radius: 50%;
+    background-color: var(--cluster-bg-solid) !important;
+    color: var(--cluster-text) !important;
+    font-weight: bold !important;
+    text-align: center !important;
+    border-radius: 50% !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.3) !important;
+}
+
+.marker-cluster-small {
+    background-color: var(--cluster-bg) !important;
 }
 
 .marker-cluster-small div {
-    width: 30px;
-    height: 30px;
-    margin: 5px;
-    line-height: 30px;
-    font-size: 12px;
+    width: 30px !important;
+    height: 30px !important;
+    margin: 5px !important;
+    line-height: 30px !important;
+    font-size: 12px !important;
+}
+
+.marker-cluster-medium {
+    background-color: var(--cluster-bg) !important;
 }
 
 .marker-cluster-medium div {
-    width: 40px;
-    height: 40px;
-    margin: 5px;
-    line-height: 40px;
-    font-size: 13px;
+    width: 40px !important;
+    height: 40px !important;
+    margin: 5px !important;
+    line-height: 40px !important;
+    font-size: 13px !important;
+}
+
+.marker-cluster-large {
+    background-color: var(--cluster-bg) !important;
 }
 
 .marker-cluster-large div {
-    width: 50px;
-    height: 50px;
-    margin: 5px;
-    line-height: 50px;
-    font-size: 14px;
+    width: 50px !important;
+    height: 50px !important;
+    margin: 5px !important;
+    line-height: 50px !important;
+    font-size: 14px !important;
 }
 
-/* Hide default cluster styles we don't want */
-.leaflet-cluster-anim .leaflet-marker-icon, 
-.leaflet-cluster-anim .leaflet-marker-shadow {
-    transition: none !important;
+/* Override default cluster colors */
+.leaflet-markercluster-group {
+    --cluster-default: var(--cluster-bg) !important;
 }
 
 @keyframes gentle-pulse {
