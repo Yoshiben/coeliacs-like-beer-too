@@ -310,6 +310,30 @@
                 </div>
             </div>
         </div>
+
+        <!-- Pub Added Success Modal -->
+        <div id="pubAddedPromptModal" class="modal prompt-modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-body" style="text-align: center;">
+                    <div class="success-icon" style="font-size: 4rem; margin-bottom: 20px;">🎉</div>
+                    <h3 style="margin-bottom: 10px;">Pub Added Successfully!</h3>
+                    <p style="margin-bottom: 20px;"><strong id="addedPubName"></strong> has been added to our database.</p>
+                    <p style="margin-bottom: 30px;">What would you like to do next?</p>
+                    
+                    <div class="modal-actions" style="display: flex; flex-direction: column; gap: 12px;">
+                        <button class="btn btn-primary" data-action="update-gf-status-new-pub">
+                            📊 Update GF Beer Status
+                        </button>
+                        <button class="btn btn-success" data-action="report-gf-beer-new-pub">
+                            🍺 Report GF Beer Available
+                        </button>
+                        <button class="btn btn-secondary" data-action="close-pub-added-modal">
+                            ✅ Done For Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>   
     
         <!-------------------------------------------------->
         <!-- HTML full screen pub details overlay section -->
