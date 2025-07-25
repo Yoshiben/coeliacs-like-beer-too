@@ -239,12 +239,12 @@ html {
    ================================ */
 
 .search-section {
-    height: calc(100vh - 260px);
-    height: calc(100dvh - 260px);
-    margin: -20px 0 0 0;
+    min-height: calc(100vh - 330px); /* Changed from fixed height to min-height */
+    min-height: calc(100dvh - 330px); /* Added extra space for nav */
+    margin: var(--space-xl) 0 0 0; /* Use variable instead of -20px */
     display: flex;
-    align-items: stretch;
-    margin-bottom: 70px; /* Add margin for nav bar */
+    align-items: center; /* Changed from stretch to center */
+    padding-bottom: calc(70px + var(--space-xl)); /* Space for nav + extra */
 }
 
 .search-card {
@@ -278,24 +278,24 @@ html {
     flex: 1;
     display: flex;
     flex-direction: column;
-    padding: var(--space-lg);
+    padding: var(--space-xl); /* Increased padding */
     min-height: 0;
+    justify-content: center; /* Center the grid vertically */
 }
 
 .search-options {
-    flex: 1;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    gap: var(--space-lg); /* Increased from space-md */
+    grid-template-rows: auto auto; /* Changed from 1fr 1fr to auto */
+    gap: var(--space-xl); /* Use xl spacing */
     width: 100%;
-    max-height: 100%;
+    margin: auto; /* Center the grid */
 }
 
 .search-option {
     border: 3px solid var(--border-light) !important;
     border-radius: var(--radius-xl) !important;
-    padding: var(--space-xl) !important; /* Increased from space-md */
+    padding: var(--space-2xl) !important; /* Increased padding */
     cursor: pointer !important;
     transition: all var(--transition) !important;
     text-align: center !important;
@@ -305,8 +305,8 @@ html {
     flex-direction: column !important;
     justify-content: center !important;
     align-items: center !important;
-    min-height: 0 !important;
-    height: 100% !important;
+    min-height: 140px !important; /* Set minimum height */
+    height: auto !important; /* Changed from 100% to auto */
 }
 
 .search-option:hover {
@@ -3119,21 +3119,23 @@ p {
     
     /* Search section styles */
     .search-section {
-        height: calc(100vh - 200px);
-        height: calc(100dvh - 200px);
-    }
-    
-    .search-body {
-        padding: var(--space-md);
-    }
-    
-    .search-options {
-        gap: var(--space-md);
-    }
-    
-    .search-option {
-        padding: var(--space-md) !important; /* Keep smaller padding on mobile */
-    }
+    min-height: calc(100vh - 280px);
+    min-height: calc(100dvh - 280px);
+    padding-bottom: calc(60px + var(--space-lg)); /* Adjusted for mobile nav */
+   }
+   
+   .search-body {
+       padding: var(--space-lg); /* Smaller padding on mobile */
+   }
+   
+   .search-options {
+       gap: var(--space-lg); /* Smaller gap on mobile */
+   }
+   
+   .search-option {
+       padding: var(--space-lg) !important; /* Smaller padding on mobile */
+       min-height: 120px !important; /* Smaller minimum height */
+   }
     
     .search-icon {
         font-size: var(--text-3xl); /* Slightly smaller on mobile */
@@ -3317,13 +3319,18 @@ p {
 @media (max-width: 480px) {
     /* Search styles */
     .search-section {
-        height: calc(100vh - 220px);
-        height: calc(100dvh - 220px);
-    }
-    
-    .search-option {
-        padding: var(--space-sm) !important;
-    }
+    min-height: calc(100vh - 300px);
+    min-height: calc(100dvh - 300px);
+   }
+   
+   .search-options {
+       gap: var(--space-md); /* Even smaller gap */
+   }
+   
+   .search-option {
+       padding: var(--space-md) !important;
+       min-height: 100px !important;
+   }
     
     .search-icon {
         font-size: var(--text-xl);
