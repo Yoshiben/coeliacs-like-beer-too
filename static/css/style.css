@@ -329,41 +329,40 @@ html {
 }
 
 .search-option.name {
-    background: var(--search-name-bg);
-    border-color: var(--search-name-border);
+    background: linear-gradient(135deg, var(--search-name-bg) 0%, var(--search-name-bg-light) 100%) !important;
+    border-color: var(--search-name-border) !important;
 }
 
 .search-option.name:hover {
-    border-color: var(--search-name-border-hover);
+    border-color: var(--search-name-border-hover) !important;
 }
 
 .search-option.location {
-    background: var(--search-location-bg);
-    border-color: var(--search-location-border);
+    background: linear-gradient(135deg, var(--search-location-bg) 0%, var(--search-location-bg-light) 100%) !important;
+    border-color: var(--search-location-border) !important;
 }
 
 .search-option.location:hover {
-    border-color: var(--search-location-border-hover);
+    border-color: var(--search-location-border-hover) !important;
 }
 
 .search-option.area {
-    background: var(--search-area-bg);
-    border-color: var(--search-area-border);
+    background: linear-gradient(135deg, var(--search-area-bg) 0%, var(--search-area-bg-light) 100%) !important;
+    border-color: var(--search-area-border) !important;
 }
 
 .search-option.area:hover {
-    border-color: var(--search-area-border-hover);
+    border-color: var(--search-area-border-hover) !important;
 }
 
 .search-option.beer {
-    background: var(--search-beer-bg);
-    border-color: var(--search-beer-border);
+    background: linear-gradient(135deg, var(--search-beer-bg) 0%, var(--search-beer-bg-light) 100%) !important;
+    border-color: var(--search-beer-border) !important;
 }
 
 .search-option.beer:hover {
-    border-color: var(--search-beer-border-hover);
+    border-color: var(--search-beer-border-hover) !important;
 }
-
 .search-icon {
     font-size: var(--text-4xl); /* Increased from text-2xl */
     margin-bottom: var(--space-lg); /* Increased from space-sm */
