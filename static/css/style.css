@@ -4918,7 +4918,7 @@ p {
     display: flex !important;
     justify-content: space-around !important;
     padding: var(--space-sm) 0 !important;
-    z-index: var(--z-navigation) !important;
+    z-index: var(--z-cookie) !important;
     box-shadow: var(--shadow) !important;
     backdrop-filter: blur(10px) !important;
     min-height: 60px !important;
