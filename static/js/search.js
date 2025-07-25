@@ -1695,6 +1695,251 @@ export const SearchModule = (function() {
                 console.error(message);
             }
         };
+
+        // ADD: To search.js or new places.js module
+
+        const PlacesSearchModule = {
+            selectedPlace: null,
+            searchTimeout: null,
+            
+            init() {
+                this.setupEventListeners();
+            },
+            
+            setupEventListeners() {
+                const searchInput = document.getElementById('placesSearchInput');
+                if (searchInput) {
+                    searchInput.addEventListener('input', (e) => {
+                        this.handleSearch(e.target.value);
+                    });
+                }
+            },
+            
+            openPlacesSearch(initialQuery = '') {
+                const modal = document.getElementById('placesSearchModal');
+                if (modal) {
+                    modal.style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                    
+                    const input = document.getElementById('placesSearchInput');
+                    if (input) {
+                        input.value = initialQuery;
+                        input.focus();
+                        
+                        if (initialQuery) {
+                            this.handleSearch(initialQuery);
+                        }
+                    }
+                }
+            },
+            
+            handleSearch(query) {
+                clearTimeout(this.searchTimeout);
+                
+                if (query.length < 3) {
+                    this.hideResults();
+                    return;
+                }
+                
+                this.searchTimeout = setTimeout(() => {
+                    this.searchOSM(query);
+                }, 300);
+            },
+            
+            async searchOSM(query) {
+                try {
+                    // Search for pubs, bars, restaurants in the UK
+                    const response = await fetch(
+                        `https://nominatim.openstreetmap.org/search?` +
+                        `q=${encodeURIComponent(query + ' UK')}` +
+                        `&format=json` +
+                        `&countrycodes=gb` +
+                        `&limit=10` +
+                        `&extratags=1` +
+                        `&namedetails=1`
+                    );
+                    
+                    const places = await response.json();
+                    
+                    // Filter for relevant venue types
+                    const relevantPlaces = places.filter(place => {
+                        const type = place.type?.toLowerCase() || '';
+                        const category = place.category?.toLowerCase() || '';
+                        const name = place.display_name?.toLowerCase() || '';
+                        
+                        return (
+                            category.includes('pub') ||
+                            category.includes('bar') ||
+                            category.includes('restaurant') ||
+                            category.includes('cafe') ||
+                            type.includes('pub') ||
+                            type.includes('bar') ||
+                            type.includes('restaurant') ||
+                            name.includes('pub') ||
+                            name.includes('bar') ||
+                            name.includes('club')
+                        );
+                    });
+                    
+                    this.displayResults(relevantPlaces);
+                    
+                } catch (error) {
+                    console.error('OSM search error:', error);
+                    this.showError('Search failed. Please try again.');
+                }
+            },
+            
+            displayResults(places) {
+                const resultsDiv = document.getElementById('placesResults');
+                if (!resultsDiv) return;
+                
+                if (places.length === 0) {
+                    resultsDiv.innerHTML = `
+                        <div class="no-places-found">
+                            <p>No venues found. Try a different search.</p>
+                            <small>Tip: Include the city name</small>
+                        </div>
+                    `;
+                    resultsDiv.style.display = 'block';
+                    return;
+                }
+                
+                resultsDiv.innerHTML = places.map(place => {
+                    const name = place.namedetails?.name || 
+                                 place.display_name.split(',')[0];
+                    const address = this.formatAddress(place);
+                    const type = this.getPlaceType(place);
+                    
+                    return `
+                        <div class="place-result" data-place='${JSON.stringify({
+                            name: name,
+                            address: address,
+                            lat: place.lat,
+                            lon: place.lon,
+                            type: type,
+                            osm_id: place.osm_id
+                        })}'>
+                            <div class="place-icon">${this.getPlaceIcon(type)}</div>
+                            <div class="place-info">
+                                <strong>${this.escapeHtml(name)}</strong>
+                                <small>${this.escapeHtml(address)}</small>
+                                <span class="place-type">${type}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                resultsDiv.style.display = 'block';
+                
+                // Add click handlers
+                resultsDiv.querySelectorAll('.place-result').forEach(el => {
+                    el.addEventListener('click', () => {
+                        const placeData = JSON.parse(el.dataset.place);
+                        this.selectPlace(placeData);
+                    });
+                });
+            },
+            
+            formatAddress(place) {
+                // Extract postcode and build clean address
+                const parts = place.display_name.split(',');
+                const postcode = place.extratags?.postcode || '';
+                
+                // Try to build: Street, City, Postcode
+                let address = parts.slice(1, 3).join(',').trim();
+                if (postcode && !address.includes(postcode)) {
+                    address += ', ' + postcode;
+                }
+                
+                return address;
+            },
+            
+            getPlaceType(place) {
+                const category = place.category?.toLowerCase() || '';
+                const type = place.type?.toLowerCase() || '';
+                
+                if (category.includes('pub') || type.includes('pub')) return 'Pub';
+                if (category.includes('bar') || type.includes('bar')) return 'Bar';
+                if (category.includes('restaurant')) return 'Restaurant';
+                if (category.includes('cafe')) return 'Café';
+                return 'Venue';
+            },
+            
+            getPlaceIcon(type) {
+                const icons = {
+                    'Pub': '🍺',
+                    'Bar': '🍹',
+                    'Restaurant': '🍽️',
+                    'Café': '☕',
+                    'Venue': '📍'
+                };
+                return icons[type] || '📍';
+            },
+            
+            selectPlace(placeData) {
+                this.selectedPlace = placeData;
+                
+                // Update preview
+                document.getElementById('selectedPlaceName').textContent = placeData.name;
+                document.getElementById('selectedPlaceAddress').textContent = placeData.address;
+                document.getElementById('selectedPlaceType').textContent = placeData.type;
+                document.getElementById('selectedPlacePreview').style.display = 'block';
+                
+                // Hide search results
+                this.hideResults();
+            },
+            
+            useSelectedPlace() {
+                if (!this.selectedPlace) return;
+                
+                // Close places modal
+                document.getElementById('placesSearchModal').style.display = 'none';
+                
+                // Open report modal with pre-filled data
+                if (window.ModalModule) {
+                    window.ModalModule.openReportModal({
+                        name: this.selectedPlace.name,
+                        address: this.selectedPlace.address,
+                        latitude: this.selectedPlace.lat,
+                        longitude: this.selectedPlace.lon,
+                        isNewPub: true
+                    });
+                }
+                
+                // Pre-fill the new pub fields
+                setTimeout(() => {
+                    document.getElementById('reportPubName').value = this.selectedPlace.name;
+                    
+                    // Try to extract postcode from address
+                    const postcodeMatch = this.selectedPlace.address.match(/[A-Z]{1,2}[0-9R][0-9A-Z]?\s?[0-9][A-Z]{2}/i);
+                    if (postcodeMatch) {
+                        document.getElementById('reportPostcode').value = postcodeMatch[0];
+                        // Remove postcode from address
+                        const cleanAddress = this.selectedPlace.address.replace(postcodeMatch[0], '').trim();
+                        document.getElementById('reportAddress').value = cleanAddress.replace(/,$/, '');
+                    } else {
+                        document.getElementById('reportAddress').value = this.selectedPlace.address;
+                    }
+                    
+                    // Show new pub fields
+                    document.getElementById('newPubFields').style.display = 'block';
+                    document.getElementById('pubSearchGroup').style.display = 'none';
+                }, 100);
+            },
+            
+            hideResults() {
+                const resultsDiv = document.getElementById('placesResults');
+                if (resultsDiv) {
+                    resultsDiv.style.display = 'none';
+                }
+            },
+            
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+        };
         
         return {
             init,
@@ -1747,6 +1992,7 @@ export const SearchModule = (function() {
         restoreAreaSearch,
         restoreBeerSearch,
         showPubDetails,
+        PlacesSearchModule,
         
         // Get current results
         getCurrentResults: () => {
