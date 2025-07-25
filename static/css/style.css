@@ -367,21 +367,22 @@ body {
    BOTTOM NAVIGATION
    ================================ */
 .bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: var(--bg-white);
-    border-top: 1px solid var(--border-light);
-    display: flex;
-    justify-content: space-around;
-    padding: var(--space-sm) 0;
-    z-index: 9999;
-    box-shadow: var(--shadow);
-    backdrop-filter: blur(10px);
-    min-height: 60px;
-    width: 100vw;
-    max-width: 100%;
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    background: rgba(255, 255, 255, 0.98) !important;
+    border-top: 2px solid #667eea !important; /* Make border more visible */
+    display: flex !important;
+    justify-content: space-around !important;
+    padding: var(--space-sm) 0 !important;
+    z-index: 999999 !important; /* Maximum z-index */
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15) !important;
+    backdrop-filter: blur(10px) !important;
+    min-height: 60px !important;
+    width: 100vw !important;
+    max-width: 100% !important;
+    visibility: visible !important;
 }
 
 .nav-item {
@@ -3556,4 +3557,28 @@ p {
         box-shadow: none;
         border: 1px solid #ccc;
     }
+}
+
+
+/* Fix overlays that might cover nav */
+.results-overlay,
+.pub-details-overlay,
+.map-overlay,
+.modal {
+    bottom: 60px !important; /* Leave space for nav */
+    height: calc(100vh - 60px) !important;
+    height: calc(100dvh - 60px) !important;
+}
+
+/* Ensure search section doesn't overflow */
+.search-section {
+    height: calc(100vh - 280px) !important; /* hero + nav space */
+    height: calc(100dvh - 280px) !important;
+    overflow: hidden !important;
+}
+
+/* Remove any transforms that might hide nav */
+.bottom-nav,
+.bottom-nav * {
+    transform: none !important;
 }
