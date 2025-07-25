@@ -4905,7 +4905,7 @@ p {
 
 
 /* ================================
-   BOTTOM NAVIGATION BAR
+   BOTTOM NAVIGATION BAR - ENHANCED
    ================================ */
 .bottom-nav {
     position: fixed !important;
@@ -4921,7 +4921,8 @@ p {
     box-shadow: var(--shadow) !important;
     backdrop-filter: blur(10px) !important;
     min-height: 60px !important;
-    width: 100% !important;
+    width: 100vw !important;
+    max-width: 100% !important;
 }
 
 .nav-item {
@@ -4934,12 +4935,12 @@ p {
     padding: var(--space-xs) !important;
     border-radius: var(--radius) !important;
     min-width: 60px !important;
-    font-size: var(--text-sm) !important;
+    cursor: pointer !important;
 }
 
 .nav-item:hover,
 .nav-item.active {
-    color: var(--primary-color, #667eea) !important;
+    color: #667eea !important;
     background: var(--hover-subtle) !important;
 }
 
@@ -4953,9 +4954,11 @@ p {
     font-size: var(--text-xs) !important;
     font-weight: 600 !important;
     line-height: 1 !important;
+    text-align: center !important;
 }
 
-/* Ensure body has space for nav */
+/* Ensure body has space for fixed nav */
 body {
     padding-bottom: 80px !important;
+    margin-bottom: 0 !important;
 }
