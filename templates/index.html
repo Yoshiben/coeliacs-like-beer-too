@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Coeliacs Like Beer Too! {{ cache_buster }}</title>
         
+        
         <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v={{ cache_buster }}">
         
         <!-- Leaflet CSS -->
@@ -12,6 +13,11 @@
         <!-- Leaflet MarkerCluster CSS -->
         <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
         <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+
+        <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+        <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32x32.png') }}">
+        <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon-16x16.png') }}">
+        <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
         
         <!------------------------------------------->
         <!-- Google Analytics with GDPR compliance -->
@@ -1098,15 +1104,31 @@
             
             // Performance monitoring
             window.addEventListener('load', function() {
-                // Log performance metrics
+                // Log performance metrics with better error handling
                 if (performance && performance.timing) {
-                    const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
-                    console.log(`⚡ Page load time: ${loadTime}ms`);
-                    
-                    // Track slow loads
-                    if (loadTime > 3000 && window.CoeliacsApp?.modules?.tracking) {
-                        window.CoeliacsApp.modules.tracking.trackEvent('slow_page_load', 'Performance', `${loadTime}ms`);
-                    }
+                    // Wait for loadEventEnd to be set
+                    setTimeout(() => {
+                        const timing = performance.timing;
+                        
+                        // Check if timing values are valid
+                        if (timing.loadEventEnd > 0 && timing.navigationStart > 0) {
+                            const loadTime = timing.loadEventEnd - timing.navigationStart;
+                            
+                            // Only log positive, reasonable values
+                            if (loadTime > 0 && loadTime < 60000) { // Less than 1 minute
+                                console.log(`⚡ Page load time: ${loadTime}ms`);
+                                
+                                // Track slow loads
+                                if (loadTime > 3000 && window.CoeliacsApp?.modules?.tracking) {
+                                    window.CoeliacsApp.modules.tracking.trackEvent('slow_page_load', 'Performance', `${loadTime}ms`);
+                                }
+                            } else {
+                                console.log('⚡ Page load time: Unable to calculate (timing issue)');
+                            }
+                        } else {
+                            console.log('⚡ Page load time: Performance timing not available');
+                        }
+                    }, 100); // Small delay to ensure timing is complete
                 }
             });
         </script>
