@@ -298,9 +298,9 @@ html {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
-    gap: var(--space-xl); /* Increased gap */
-    width: 85%; /* Take up more width */
-    height: 85%; /* Take up more height */
+    gap: var(--space-md); /* Increased gap */
+    width: 95%; /* Take up more width */
+    height: 95%; /* Take up more height */
     max-width: 700px;
     margin: auto; /* Center it */
 }   
