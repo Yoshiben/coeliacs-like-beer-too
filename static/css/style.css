@@ -377,71 +377,58 @@ html {
    ================================ */
 
 .bottom-nav {
-    position: fixed !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    background: rgba(255, 255, 255, 0.98) !important;
-    border-top: 1px solid var(--border-light) !important;
-    display: flex !important;
-    justify-content: space-around !important;
-    align-items: center !important;
-    padding: 8px 0 !important;
-    z-index: 9999 !important;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1) !important;
-    backdrop-filter: blur(10px) !important;
-    /* THESE ARE THE CRITICAL LINES */
-    min-height: 60px !important;
-    height: 60px !important;
-    max-height: 60px !important;
-    box-sizing: border-box !important;
-    /* END CRITICAL LINES */
-    width: 100vw !important;
-    max-width: 100% !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.98);
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 8px 0;
+    z-index: 9999;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    min-height: 60px;
+    height: 60px;
+    width: 100%;
 }
 
-/* Also ensure nav items have height */
 .nav-item {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    text-decoration: none !important;
-    color: var(--text-muted) !important;
-    transition: all var(--transition) !important;
-    padding: 4px 8px !important;
-    border-radius: var(--radius) !important;
-    min-width: 60px !important;
-    min-height: 44px !important; /* Ensure items have height */
-    cursor: pointer !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    color: var(--text-muted);
+    transition: all var(--transition);
+    padding: 4px 8px;
+    border-radius: var(--radius);
+    min-width: 60px;
+    cursor: pointer;
+    flex: 1;
+    max-width: 80px;
 }
 
 .nav-item:hover,
 .nav-item.active {
-    color: #667eea !important;
-    background: var(--hover-subtle) !important;
+    color: #667eea;
+    background: var(--hover-subtle);
 }
 
 .nav-icon {
-    font-size: var(--text-xl) !important;
-    margin-bottom: var(--space-xs) !important;
-    line-height: 1 !important;
-    display: block !important; /* Ensure it's visible */
+    font-size: 1.25rem;
+    margin-bottom: 2px;
+    line-height: 1;
 }
 
 .nav-label {
-    font-size: var(--text-xs) !important;
-    font-weight: 600 !important;
-    line-height: 1 !important;
-    text-align: center !important;
-    display: block !important; /* Ensure it's visible */
+    font-size: 0.7rem;
+    font-weight: 600;
+    line-height: 1;
+    text-align: center;
 }
-
-/* Fix any color issues */
-.bottom-nav * {
-    color: inherit !important;
-}
-
 
 
 
