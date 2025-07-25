@@ -1221,6 +1221,36 @@
             }
         };
         </script>
+
+    <script>
+    // TEMPORARY DEBUG - Remove once nav is working
+    document.addEventListener('DOMContentLoaded', function() {
+        const navBar = document.querySelector('.bottom-nav');
+        
+        if (navBar) {
+            console.log('🔍 Nav bar found!');
+            console.log('Nav bar styles:', {
+                display: getComputedStyle(navBar).display,
+                position: getComputedStyle(navBar).position,
+                bottom: getComputedStyle(navBar).bottom,
+                zIndex: getComputedStyle(navBar).zIndex,
+                visibility: getComputedStyle(navBar).visibility
+            });
+            
+            // Force it visible
+            navBar.style.display = 'flex';
+            navBar.style.visibility = 'visible';
+            navBar.style.bottom = '0';
+            navBar.style.zIndex = '99999';
+            navBar.style.position = 'fixed';
+            navBar.style.background = 'white';
+            
+            console.log('✅ Forced nav bar visible');
+        } else {
+            console.error('❌ Nav bar NOT found!');
+        }
+    });
+    </script>
         
     </body>
 </html>
