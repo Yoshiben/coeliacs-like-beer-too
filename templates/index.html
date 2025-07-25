@@ -1223,36 +1223,54 @@
         </script>
 
     <script>
-    // TEMPORARY DEBUG - Enhanced visual test
     document.addEventListener('DOMContentLoaded', function() {
         const navBar = document.querySelector('.bottom-nav');
         
         if (navBar) {
-            // Make it SUPER visible for testing
-            navBar.style.cssText = `
-                position: fixed !important;
-                bottom: 0 !important;
-                left: 0 !important;
-                right: 0 !important;
-                background: red !important; /* RED for visibility */
-                height: 80px !important;
-                z-index: 2147483647 !important; /* Maximum possible */
-                display: flex !important;
-                border-top: 5px solid yellow !important;
-            `;
+            console.log('🔍 Nav bar HTML:', navBar.innerHTML);
+            console.log('🔍 Nav bar children:', navBar.children.length);
             
-            console.log('🔴 Nav bar forced to RED - can you see it now?');
+            // Check if nav items exist
+            const navItems = navBar.querySelectorAll('.nav-item');
+            console.log('🔍 Nav items found:', navItems.length);
             
-            // Also check what might be covering it
-            const elements = document.elementsFromPoint(window.innerWidth / 2, window.innerHeight - 30);
-            console.log('Elements at bottom center:', elements.map(el => ({
-                tag: el.tagName,
-                class: el.className,
-                zIndex: getComputedStyle(el).zIndex
-            })));
+            if (navItems.length === 0) {
+                console.error('❌ NO NAV ITEMS FOUND!');
+                
+                // Let's add them manually to test
+                navBar.innerHTML = `
+                    <a href="/" class="nav-item active">
+                        <div class="nav-icon">🏠</div>
+                        <div class="nav-label">Home</div>
+                    </a>
+                    <a href="#" data-action="show-full-map" class="nav-item">
+                        <div class="nav-icon">🗺️</div>
+                        <div class="nav-label">Map</div>
+                    </a>
+                    <a href="/breweries" class="nav-item">
+                        <div class="nav-icon">🍺</div>
+                        <div class="nav-label">Breweries</div>
+                    </a>
+                    <a href="/about" class="nav-item">
+                        <div class="nav-icon">ℹ️</div>
+                        <div class="nav-label">About</div>
+                    </a>
+                    <a href="/more" class="nav-item">
+                        <div class="nav-icon">⋯</div>
+                        <div class="nav-label">More</div>
+                    </a>
+                `;
+                console.log('✅ Added nav items manually!');
+            }
+            
+            // Force visible styles
+            navBar.style.background = 'white';
+            navBar.style.borderTop = '2px solid #667eea';
+            navBar.style.display = 'flex';
+            navBar.style.zIndex = '999999';
         }
     });
     </script>
-        
+            
     </body>
 </html>
