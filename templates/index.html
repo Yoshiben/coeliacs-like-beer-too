@@ -1248,6 +1248,77 @@
         }
     });
     </script>
+
+    <!-- ADD this detective script to find the culprit -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const navBar = document.querySelector('.bottom-nav');
+        
+        if (navBar) {
+            // Get ALL computed styles
+            const styles = window.getComputedStyle(navBar);
+            
+            // Check what's setting the height
+            console.log('🔍 DETECTIVE MODE:');
+            console.log('Height:', styles.height);
+            console.log('Min-height:', styles.minHeight);
+            console.log('Max-height:', styles.maxHeight);
+            console.log('Display:', styles.display);
+            console.log('Position:', styles.position);
+            console.log('Box-sizing:', styles.boxSizing);
+            console.log('Overflow:', styles.overflow);
+            
+            // Try to find matching CSS rules
+            const sheets = document.styleSheets;
+            console.log('🔍 Checking stylesheets for .bottom-nav rules...');
+            
+            for (let sheet of sheets) {
+                try {
+                    const rules = sheet.cssRules || sheet.rules;
+                    for (let rule of rules) {
+                        if (rule.selectorText && rule.selectorText.includes('bottom-nav')) {
+                            console.log('📋 Found rule:', rule.selectorText);
+                            console.log('   Styles:', rule.style.cssText);
+                        }
+                        // Also check for * rules that might affect it
+                        if (rule.selectorText === '*') {
+                            console.log('⚠️ Universal selector rule:', rule.style.cssText);
+                        }
+                    }
+                } catch (e) {
+                    // Cross-origin stylesheets will throw errors
+                }
+            }
+            
+            // Nuclear option - inline style with max specificity
+            navBar.setAttribute('style', 
+                'position: fixed !important;' +
+                'bottom: 0 !important;' +
+                'left: 0 !important;' +
+                'right: 0 !important;' +
+                'height: 60px !important;' +
+                'min-height: 60px !important;' +
+                'max-height: 60px !important;' +
+                'background: white !important;' +
+                'border-top: 3px solid red !important;' +
+                'display: flex !important;' +
+                'z-index: 2147483647 !important;' +
+                'overflow: visible !important;' +
+                'visibility: visible !important;' +
+                'opacity: 1 !important;'
+            );
+            
+            console.log('💣 Nuclear option applied - checking results...');
+            setTimeout(() => {
+                const newRect = navBar.getBoundingClientRect();
+                console.log('📏 Final dimensions:', {
+                    height: newRect.height,
+                    computedHeight: getComputedStyle(navBar).height
+                });
+            }, 100);
+        }
+    });
+    </script>
             
     </body>
 </html>
