@@ -1556,8 +1556,9 @@ export const SearchModule = (function() {
                     window.showSuccessToast(`✅ ${window.newlyAddedPub.name} added successfully!`);
                 }
             }
-        }
-            
+        },
+        
+        preWorks() {
             // Pre-fill the form fields after a short delay
             setTimeout(() => {
                 const pubNameInput = document.getElementById('reportPubName');
@@ -1589,7 +1590,7 @@ export const SearchModule = (function() {
                 document.getElementById('newPubFields').style.display = 'block';
                 document.getElementById('pubSearchGroup').style.display = 'none';
             }, 100);
-        },
+        }
         
         hideResults() {
             const resultsDiv = document.getElementById('placesResults');
