@@ -4878,3 +4878,21 @@ p {
         min-width: 30px;
     }
 }
+
+/* Loading state for places search */
+.places-results .loading-state {
+    padding: var(--space-xl);
+    text-align: center;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+/* Search error styling */
+.places-results .search-error {
+    padding: var(--space-lg);
+    color: var(--error-color);
+    background: var(--error-bg);
+    border-radius: var(--radius);
+    margin: var(--space-sm);
+    text-align: center;
+}
