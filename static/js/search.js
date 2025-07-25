@@ -1590,7 +1590,7 @@ export const SearchModule = (function() {
                 document.getElementById('newPubFields').style.display = 'block';
                 document.getElementById('pubSearchGroup').style.display = 'none';
             }, 100);
-        }
+        },
         
         hideResults() {
             const resultsDiv = document.getElementById('placesResults');
