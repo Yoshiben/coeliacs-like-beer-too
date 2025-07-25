@@ -58,6 +58,7 @@
    --z-dropdown: 100;
    --z-search-suggestions: 150;
    --z-sticky: 200;
+   --z-navigation: 800;
    --z-toast: 900;
    --z-results-overlay: 1000;      /* Results overlay */
    --z-pub-details: 1100;           /* Pub details overlay */
@@ -4917,7 +4918,7 @@ p {
     display: flex !important;
     justify-content: space-around !important;
     padding: var(--space-sm) 0 !important;
-    z-index: var(--z-sticky) !important;
+    z-index: var(--z-navigation) !important;
     box-shadow: var(--shadow) !important;
     backdrop-filter: blur(10px) !important;
     min-height: 60px !important;
