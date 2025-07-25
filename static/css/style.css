@@ -288,19 +288,22 @@ html {
     flex: 1;
     display: flex;
     flex-direction: column;
-    padding: var(--space-lg);
+    padding: var(--space-xl) var(--space-lg); /* Adjust padding */
     min-height: 0;
+    justify-content: center; /* Center content vertically */
+    align-items: center; /* Center content horizontally */
 }
 
 .search-options {
-    flex: 1;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); /* Prevent overflow */
-    gap: var(--space-xl); /* More spacing */
-    width: 100%;
-    padding: var(--space-md); /* Add internal padding */
-}
+    grid-template-rows: 1fr 1fr;
+    gap: var(--space-xl); /* Increased gap */
+    width: 85%; /* Take up more width */
+    height: 85%; /* Take up more height */
+    max-width: 700px;
+    margin: auto; /* Center it */
+}   
 
 .search-option {
     border: 3px solid var(--border-light) !important;
@@ -3554,4 +3557,14 @@ p {
         box-shadow: none;
         border: 1px solid #ccc;
     }
+}
+
+/* Force hide map overlay on home page */
+#fullMapOverlay {
+    display: none !important;
+}
+
+/* Only show when it has the active class */
+#fullMapOverlay.active {
+    display: flex !important;
 }
