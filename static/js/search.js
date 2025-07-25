@@ -1197,24 +1197,47 @@ export const SearchModule = (function() {
     // ================================
     // PLACES SEARCH MODULE
     // ================================
+    // LOCATION: search.js - PlacesSearchModule
+    
     const PlacesSearchModule = {
         selectedPlace: null,
         searchTimeout: null,
+        isInitialized: false,
         
         init() {
+            if (this.isInitialized) return;
+            console.log('🔧 Initializing PlacesSearchModule...');
             this.setupEventListeners();
+            this.isInitialized = true;
+            console.log('✅ PlacesSearchModule initialized');
         },
         
         setupEventListeners() {
-            const searchInput = document.getElementById('placesSearchInput');
-            if (searchInput) {
-                searchInput.addEventListener('input', (e) => {
+            // Use event delegation for the search input since modal might not exist yet
+            document.addEventListener('input', (e) => {
+                if (e.target.id === 'placesSearchInput') {
                     this.handleSearch(e.target.value);
-                });
-            }
+                }
+            });
+            
+            // Also handle when modal opens
+            document.addEventListener('click', (e) => {
+                if (e.target.matches('[data-action="search-google-places"]')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.openPlacesSearch();
+                }
+                
+                if (e.target.matches('[data-action="use-selected-place"]')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.useSelectedPlace();
+                }
+            });
         },
         
         openPlacesSearch(initialQuery = '') {
+            console.log('🔍 Opening places search modal...');
             const modal = document.getElementById('placesSearchModal');
             if (modal) {
                 modal.style.display = 'flex';
@@ -1223,7 +1246,11 @@ export const SearchModule = (function() {
                 const input = document.getElementById('placesSearchInput');
                 if (input) {
                     input.value = initialQuery;
-                    input.focus();
+                    // Force focus after modal animation
+                    setTimeout(() => {
+                        input.focus();
+                        console.log('✅ Places search input focused');
+                    }, 100);
                     
                     if (initialQuery) {
                         this.handleSearch(initialQuery);
@@ -1233,6 +1260,7 @@ export const SearchModule = (function() {
         },
         
         handleSearch(query) {
+            console.log('🔍 Searching for:', query);
             clearTimeout(this.searchTimeout);
             
             if (query.length < 3) {
@@ -1240,11 +1268,19 @@ export const SearchModule = (function() {
                 return;
             }
             
+            // Show searching state
+            const resultsDiv = document.getElementById('placesResults');
+            if (resultsDiv) {
+                resultsDiv.innerHTML = '<div class="loading-state">Searching...</div>';
+                resultsDiv.style.display = 'block';
+            }
+            
             this.searchTimeout = setTimeout(() => {
                 this.searchOSM(query);
             }, 300);
         },
         
+        // Rest of the methods stay the same...
         async searchOSM(query) {
             try {
                 const response = await fetch(
@@ -1314,7 +1350,7 @@ export const SearchModule = (function() {
                         lon: place.lon,
                         type: type,
                         osm_id: place.osm_id
-                    })}'>
+                    }).replace(/'/g, '&apos;')}'>
                         <div class="place-icon">${this.getPlaceIcon(type)}</div>
                         <div class="place-info">
                             <strong>${this.escapeHtml(name)}</strong>
@@ -1327,6 +1363,7 @@ export const SearchModule = (function() {
             
             resultsDiv.style.display = 'block';
             
+            // Add click handlers to results
             resultsDiv.querySelectorAll('.place-result').forEach(el => {
                 el.addEventListener('click', () => {
                     const placeData = JSON.parse(el.dataset.place);
@@ -1383,9 +1420,13 @@ export const SearchModule = (function() {
         useSelectedPlace() {
             if (!this.selectedPlace) return;
             
+            console.log('✅ Using selected place:', this.selectedPlace);
+            
+            // Close places modal
             document.getElementById('placesSearchModal').style.display = 'none';
             
-            const modal = getModal();
+            // Open report modal with the selected place
+            const modal = window.App?.getModule('modal') || window.ModalModule;
             if (modal) {
                 modal.openReportModal({
                     name: this.selectedPlace.name,
@@ -1396,18 +1437,34 @@ export const SearchModule = (function() {
                 });
             }
             
+            // Pre-fill the form fields after a short delay
             setTimeout(() => {
-                document.getElementById('reportPubName').value = this.selectedPlace.name;
-                
-                const postcodeMatch = this.selectedPlace.address.match(/[A-Z]{1,2}[0-9R][0-9A-Z]?\s?[0-9][A-Z]{2}/i);
-                if (postcodeMatch) {
-                    document.getElementById('reportPostcode').value = postcodeMatch[0];
-                    const cleanAddress = this.selectedPlace.address.replace(postcodeMatch[0], '').trim();
-                    document.getElementById('reportAddress').value = cleanAddress.replace(/,$/, '');
-                } else {
-                    document.getElementById('reportAddress').value = this.selectedPlace.address;
+                const pubNameInput = document.getElementById('reportPubName');
+                if (pubNameInput) {
+                    pubNameInput.value = this.selectedPlace.name;
                 }
                 
+                // Extract postcode if available
+                const postcodeMatch = this.selectedPlace.address.match(/[A-Z]{1,2}[0-9R][0-9A-Z]?\s?[0-9][A-Z]{2}/i);
+                if (postcodeMatch) {
+                    const postcodeInput = document.getElementById('reportPostcode');
+                    if (postcodeInput) {
+                        postcodeInput.value = postcodeMatch[0];
+                    }
+                    
+                    const cleanAddress = this.selectedPlace.address.replace(postcodeMatch[0], '').trim();
+                    const addressInput = document.getElementById('reportAddress');
+                    if (addressInput) {
+                        addressInput.value = cleanAddress.replace(/,$/, '');
+                    }
+                } else {
+                    const addressInput = document.getElementById('reportAddress');
+                    if (addressInput) {
+                        addressInput.value = this.selectedPlace.address;
+                    }
+                }
+                
+                // Show new pub fields and hide search
                 document.getElementById('newPubFields').style.display = 'block';
                 document.getElementById('pubSearchGroup').style.display = 'none';
             }, 100);
