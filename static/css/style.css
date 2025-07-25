@@ -375,6 +375,7 @@ html {
 /* ================================
    BOTTOM NAVIGATION
    ================================ */
+
 .bottom-nav {
     position: fixed !important;
     bottom: 0 !important;
@@ -384,33 +385,35 @@ html {
     border-top: 1px solid var(--border-light) !important;
     display: flex !important;
     justify-content: space-around !important;
-    align-items: center !important; /* Add this */
-    padding: var(--space-sm) 0 !important;
-    z-index: 999999 !important;
+    align-items: center !important;
+    padding: 8px 0 !important;
+    z-index: 9999 !important;
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1) !important;
     backdrop-filter: blur(10px) !important;
+    /* THESE ARE THE CRITICAL LINES */
     min-height: 60px !important;
-    height: 60px !important; /* Fixed height */
+    height: 60px !important;
+    max-height: 60px !important;
+    box-sizing: border-box !important;
+    /* END CRITICAL LINES */
     width: 100vw !important;
     max-width: 100% !important;
-    visibility: visible !important;
-    opacity: 1 !important; /* Ensure it's not transparent */
 }
 
-/* ENSURE nav items are visible */
+/* Also ensure nav items have height */
 .nav-item {
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
+    justify-content: center !important;
     text-decoration: none !important;
     color: var(--text-muted) !important;
     transition: all var(--transition) !important;
-    padding: var(--space-xs) !important;
+    padding: 4px 8px !important;
     border-radius: var(--radius) !important;
     min-width: 60px !important;
+    min-height: 44px !important; /* Ensure items have height */
     cursor: pointer !important;
-    opacity: 1 !important; /* Ensure items aren't transparent */
-    visibility: visible !important;
 }
 
 .nav-item:hover,
