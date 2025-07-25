@@ -141,10 +141,10 @@ body {
 /*     padding-bottom: 80px; */
     overscroll-behavior: none;
     -webkit-overflow-scrolling: auto;
-    height: 100vh;
+     height: 100vh;
     height: 100dvh;
-    overflow: hidden; /* Prevent scrolling */
-    position: fixed; /* Lock in place */
+    overflow: hidden; /* Keep this */
+    position: relative; /* Change from fixed */
     width: 100%;
 }
 
@@ -290,22 +290,25 @@ html {
     flex-direction: column;
     padding: var(--space-lg);
     min-height: 0;
+    justify-content: center; /* Center vertically */
 }
 
 .search-options {
-    flex: 1;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); /* Prevent overflow */
-    gap: var(--space-xl); /* More spacing */
+    grid-template-rows: 1fr 1fr;
+    gap: var(--space-lg);
     width: 100%;
-    padding: var(--space-md); /* Add internal padding */
+    height: 90%; /* Take up most of the space */
+    max-width: 680px; /* Limit width for better proportions */
+    margin: 0 auto; /* Center horizontally */
 }
 
 .search-option {
+.search-option {
     border: 3px solid var(--border-light) !important;
     border-radius: var(--radius-xl) !important;
-    padding: var(--space-lg) !important;
+    padding: var(--space-xl) !important;
     cursor: pointer !important;
     transition: all var(--transition) !important;
     text-align: center !important;
@@ -315,8 +318,7 @@ html {
     flex-direction: column !important;
     justify-content: center !important;
     align-items: center !important;
-    min-height: 0 !important; /* Allow shrinking */
-    max-height: 100% !important; /* Prevent growing too tall */
+    height: 100% !important;
 }
 
 .search-option:hover {
