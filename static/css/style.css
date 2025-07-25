@@ -3557,27 +3557,3 @@ p {
         border: 1px solid #ccc;
     }
 }
-
-
-/* Fix overlays that might cover nav */
-.results-overlay,
-.pub-details-overlay,
-.map-overlay,
-.modal {
-    bottom: 60px !important; /* Leave space for nav */
-    height: calc(100vh - 60px) !important;
-    height: calc(100dvh - 60px) !important;
-}
-
-/* Ensure search section doesn't overflow */
-.search-section {
-    height: calc(100vh - 280px) !important; /* hero + nav space */
-    height: calc(100dvh - 280px) !important;
-    overflow: hidden !important;
-}
-
-/* Remove any transforms that might hide nav */
-.bottom-nav,
-.bottom-nav * {
-    transform: none !important;
-}
