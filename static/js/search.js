@@ -1432,25 +1432,131 @@ export const SearchModule = (function() {
             this.hideResults();
         },
         
+        // LOCATION: Add to your existing PlacesSearch object
+        // ACTION: REPLACE the useSelectedPlace method
+        
         useSelectedPlace() {
             if (!this.selectedPlace) return;
             
-            console.log('✅ Using selected place:', this.selectedPlace);
+            console.log('📝 Using selected place to add new pub');
+            
+            const place = this.selectedPlace;
+            const name = place.namedetails?.name || place.display_name.split(',')[0];
+            const parts = place.display_name.split(',');
+            
+            // Extract address components
+            let address = '';
+            let postcode = place.extratags?.postcode || '';
+            
+            // Try to build a clean address
+            if (parts.length > 1) {
+                // Remove postcode from parts if it exists
+                const cleanParts = parts.slice(1, 4).filter(part => {
+                    const trimmed = part.trim();
+                    return trimmed && !trimmed.match(/^[A-Z]{1,2}[0-9R][0-9A-Z]?\s?[0-9][A-Z]{2}$/i);
+                });
+                address = cleanParts.join(', ').trim();
+            }
+            
+            // If no postcode in extratags, try to extract from display_name
+            if (!postcode) {
+                const postcodeMatch = place.display_name.match(/[A-Z]{1,2}[0-9R][0-9A-Z]?\s?[0-9][A-Z]{2}/i);
+                if (postcodeMatch) {
+                    postcode = postcodeMatch[0];
+                }
+            }
+            
+            // Store the pub data with coordinates
+            const newPubData = {
+                name: name,
+                address: address,
+                postcode: postcode,
+                latitude: place.lat,
+                longitude: place.lon,
+                osm_id: place.osm_id,
+                osm_type: place.osm_type
+            };
+            
+            console.log('🏠 New pub data:', newPubData);
             
             // Close places modal
             document.getElementById('placesSearchModal').style.display = 'none';
+            document.body.style.overflow = '';
             
-            // Open report modal with the selected place
-            const modal = window.App?.getModule('modal') || window.ModalModule;
-            if (modal) {
-                modal.openReportModal({
-                    name: this.selectedPlace.name,
-                    address: this.selectedPlace.address,
-                    latitude: this.selectedPlace.lat,
-                    longitude: this.selectedPlace.lon,
-                    isNewPub: true
-                });
+            // Show loading
+            if (window.showLoadingToast) {
+                window.showLoadingToast('Adding new pub to database...');
             }
+            
+            // Submit the new pub
+            this.submitNewPub(newPubData);
+        },
+        
+        async submitNewPub(pubData) {
+            try {
+                const response = await fetch('/api/add-pub', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: pubData.name,
+                        address: pubData.address,
+                        postcode: pubData.postcode,
+                        latitude: pubData.latitude,
+                        longitude: pubData.longitude,
+                        osm_id: pubData.osm_id,
+                        source: 'user_submission',
+                        submitted_by: 'anonymous' // Could track user if logged in
+                    })
+                });
+                
+                if (window.hideLoadingToast) {
+                    window.hideLoadingToast();
+                }
+                
+                if (!response.ok) {
+                    throw new Error('Failed to add pub');
+                }
+                
+                const result = await response.json();
+                console.log('✅ Pub added:', result);
+                
+                // Store the new pub data
+                window.newlyAddedPub = {
+                    pub_id: result.pub_id,
+                    name: pubData.name,
+                    address: pubData.address,
+                    postcode: pubData.postcode,
+                    latitude: pubData.latitude,
+                    longitude: pubData.longitude
+                };
+                
+                // Show success and prompt for next action
+                this.showPubAddedPrompt(result);
+                
+            } catch (error) {
+                console.error('❌ Error adding pub:', error);
+                if (window.showSuccessToast) {
+                    window.showSuccessToast('❌ Failed to add pub. Please try again.');
+                }
+            }
+        },
+        
+        showPubAddedPrompt(result) {
+            // Create or show a modal asking what to do next
+            const promptModal = document.getElementById('pubAddedPromptModal');
+            if (promptModal) {
+                document.getElementById('addedPubName').textContent = window.newlyAddedPub.name;
+                promptModal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            } else {
+                // Fallback - just show success
+                if (window.showSuccessToast) {
+                    window.showSuccessToast(`✅ ${window.newlyAddedPub.name} added successfully!`);
+                }
+            }
+        }
             
             // Pre-fill the form fields after a short delay
             setTimeout(() => {
