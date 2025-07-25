@@ -5,7 +5,6 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Coeliacs Like Beer Too! {{ cache_buster }}</title>
         
-        
         <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v={{ cache_buster }}">
         
         <!-- Leaflet CSS -->
@@ -19,16 +18,8 @@
         <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon-16x16.png') }}">
         <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
         
-        <!------------------------------------------->
         <!-- Google Analytics with GDPR compliance -->
-        <!------------------------------------------->
-        
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-WSHR39KSXS"></script>
-        
-        <!--------------------------->
-        <!-- Basic analytics setup -->
-        <!--------------------------->
-        
         <script>
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
@@ -46,10 +37,7 @@
         </script>
     </head>
     <body>
-        <!----------------------->
-        <!-- HTML hero section -->
-        <!----------------------->
-        
+        <!-- Hero Section -->
         <div class="hero-section">
             <div class="hero-content">
                 <h1 class="hero-title">Coeliacs Like Beer Too!</h1>
@@ -68,38 +56,30 @@
             </div>
         </div>
     
-        <!------------------------->
-        <!-- HTML search section -->
-        <!------------------------->
-        
+        <!-- Search Section -->
         <div class="search-section" id="search">
             <div class="container">
                 <div class="search-card">
                     <div class="search-header">
-                        <h2 class="section-title">🔍 What are you searching for? 🍺
-                        </h2>
+                        <h2 class="section-title">🔍 What are you searching for? 🍺</h2>
                     </div>
                     <div class="search-body">
                         <div class="search-options">
-                            <!-- Top Left: Pubs Near Me -->
-                            <div class="search-option name" data-action="location-search">
+                            <div class="search-option location" data-action="location-search">
                                 <span class="search-icon">📍</span>
                                 <h3 class="search-title">Pubs Near Me</h3>
                                 <p class="search-description">Find pubs close to you, control the search distance.</p>
                             </div>
-                            <!-- Top Right: Pubs by Name -->      
-                            <div class="search-option location" data-modal="nameModal">
+                            <div class="search-option name" data-modal="nameModal">
                                 <span class="search-icon">🏠</span>
                                 <h3 class="search-title">Pubs by Name</h3>
                                 <p class="search-description">Search for a specific pub name - "Milestone" etc</p>
                             </div>
-                            <!-- Bottom Left: Pubs by Area -->
                             <div class="search-option area" data-modal="areaModal">
                                 <span class="search-icon">🗺️</span>
                                 <h3 class="search-title">Pubs by Area</h3>
                                 <p class="search-description">Explore pubs in regions, cities, or postcodes</p>
                             </div>
-                            <!-- Bottom Right: Pubs by Beer -->
                             <div class="search-option beer" data-modal="beerModal">
                                 <span class="search-icon">🍺</span>
                                 <h3 class="search-title">Pubs by Beer</h3>
@@ -111,10 +91,7 @@
             </div>
         </div>
     
-        <!------------------------------->
-        <!-- HTML search modal section -->
-        <!------------------------------->
-        
+        <!-- Search Modals -->
         <div id="nameModal" class="search-modal">
             <div class="modal-content">
                 <div class="modal-header">
@@ -135,8 +112,6 @@
                     <h3 class="modal-title">🗺️ Search by Area</h3>
                     <p class="modal-subtitle">Find pubs in a specific location</p>
                 </div>
-                
-                <!-- Search Type Selector -->
                 <div class="form-group">
                     <label class="form-label">Search by:</label>
                     <select id="areaSearchType" class="form-select" data-action="update-area-placeholder">
@@ -144,10 +119,7 @@
                         <option value="city">🏙️ City/Region</option>
                     </select>
                 </div>
-                
-                <!-- Search Input -->
                 <input type="text" class="form-input" placeholder="Enter postcode..." id="areaInput">
-                
                 <div class="modal-actions">
                     <button class="btn btn-secondary" data-action="close-modal">Cancel</button>
                     <button class="btn btn-primary" data-action="search-area">Search</button>
@@ -161,8 +133,6 @@
                     <h3 class="modal-title">🍺 Search by Beer</h3>
                     <p class="modal-subtitle">Find pubs serving specific gluten-free beers</p>
                 </div>
-                
-                <!-- Search Type Selector -->
                 <div class="form-group">
                     <label class="form-label">Search by:</label>
                     <select id="beerSearchType" class="form-select" data-action="update-beer-placeholder">
@@ -171,13 +141,10 @@
                         <option value="style">🎨 Beer Style</option>
                     </select>
                 </div>
-                
-                <!-- Search Input with Autocomplete -->
                 <div class="beer-search-container">
                     <input type="text" class="form-input" placeholder="Start typing brewery name..." id="beerInput">
                     <div id="beerSuggestions" class="suggestions beer-search-suggestions"></div>
                 </div>
-                
                 <div class="modal-actions">
                     <button class="btn btn-secondary" data-action="close-modal">Cancel</button>
                     <button class="btn btn-primary" data-action="search-beer">Search</button>
@@ -191,7 +158,6 @@
                 <div class="modal-header">
                     <h3 class="modal-title">📍 How far will you travel?</h3>
                 </div>
-               
                 <div class="distance-options">
                     <div class="distance-option" data-distance="1">
                         <div class="distance-number">1km</div>
@@ -201,7 +167,7 @@
                         <div class="distance-number">3km</div>
                         <div class="distance-label">Short journey</div>
                     </div>
-                    <div class="distance-option" data-distance="5">
+                    <div class="distance-option popular" data-distance="5">
                         <div class="distance-number">5km</div>
                         <div class="distance-label">Most popular</div>
                     </div>
@@ -214,61 +180,41 @@
                         <div class="distance-label">Day out</div>
                     </div>
                 </div>
-                
                 <div class="modal-actions">
                     <button class="btn btn-secondary" data-action="close-modal">Cancel</button>
                 </div>
             </div>
         </div>
     
-        <!---------------------------------------------->
-        <!-- HTML full screen results overlay section -->
-        <!---------------------------------------------->
+        <!-- Results Overlay -->
         <div id="resultsOverlay" class="results-overlay">
             <div class="results-container">
-                <!-- Results Header -->
                 <div class="results-nav">
-                    <button class="btn-nav-small" data-action="close-results">
-                        🏠 Home
-                    </button>
+                    <button class="btn-nav-small" data-action="close-results">🏠 Home</button>
                     <h2 class="results-title" id="resultsTitle">Search Results</h2>
-                    <button class="btn-nav-small" data-action="toggle-results-map">
-                        🗺️ <span id="resultsMapBtnText">Map</span>
-                    </button>
+                    <button class="btn-nav-small" data-action="toggle-results-map">🗺️ <span id="resultsMapBtnText">Map</span></button>
                 </div>
                 
-                <!-- Results Content -->
                 <div class="results-content">
                     <div class="results-list-container" id="resultsListContainer">
-                        <!-- Loading state -->
                         <div class="results-loading" id="resultsLoading">
                             <div class="loading-spinner"></div>
                             <div class="loading-text">Finding nearby GF beer...</div>
                         </div>
                         
-                        <!-- Results list -->
-                        <div class="results-list" id="resultsList" style="display: none;">
-                            <!-- Results will be populated here -->
-                        </div>
+                        <div class="results-list" id="resultsList" style="display: none;"></div>
                         
-                        <!-- REPLACE: The no-results-found div in index.html -->
                         <div class="no-results-found" id="noResultsFound" style="display: none;">
                             <div class="no-results-icon">🔍</div>
                             <div class="no-results-title">No pubs found</div>
                             <div class="no-results-text">Try expanding your search or check the spelling</div>
-                            
-                            <!-- ADD: Option to add new pub -->
                             <div class="no-results-actions">
-                                <button class="btn btn-primary" data-action="add-new-pub-from-results">
-                                    ➕ Add New Pub/Bar
-                                </button>
-                                <button class="btn btn-secondary" data-action="search-google-places">
-                                    🔍 Search Google Maps
-                                </button>
+                                <button class="btn btn-primary" data-action="add-new-pub-from-results">➕ Add New Pub/Bar</button>
+                                <button class="btn btn-secondary" data-action="search-google-places">🔍 Search Google Maps</button>
                             </div>
                         </div>
+                    </div>
                     
-                    <!-- Results Map (hidden by default) -->
                     <div class="results-map-container" id="resultsMapContainer" style="display: none;">
                         <div id="resultsMap" class="results-map"></div>
                     </div>
@@ -276,85 +222,13 @@
             </div>
         </div>
 
-        <!-- ADD: Google Places / OSM Search Modal -->
-        <div id="placesSearchModal" class="modal places-modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 class="modal-title">🔍 Find Your Venue</h2>
-                    <button class="modal-close" data-action="close-modal">&times;</button>
-                </div>
-                
-                <div class="modal-body">
-                    <p class="search-prompt">Search for bars, pubs, or restaurants:</p>
-                    
-                    <!-- Search Input -->
-                    <div class="places-search-container">
-                        <input type="text" 
-                               id="placesSearchInput" 
-                               class="form-input" 
-                               placeholder="e.g. Lawn Club Sheffield"
-                               autocomplete="off">
-                        <div id="placesResults" class="places-results"></div>
-                    </div>
-                    
-                    <div class="search-powered-by">
-                        <small>Powered by OpenStreetMap</small>
-                    </div>
-                    
-                    <!-- Selected Place Preview -->
-                    <div id="selectedPlacePreview" class="selected-place-preview" style="display: none;">
-                        <h4>Selected Venue:</h4>
-                        <div class="place-details">
-                            <strong id="selectedPlaceName"></strong>
-                            <div id="selectedPlaceAddress"></div>
-                            <div id="selectedPlaceType"></div>
-                        </div>
-                        <button class="btn btn-primary" data-action="use-selected-place">
-                            ✅ Use This Venue
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Pub Added Success Modal -->
-        <div id="pubAddedPromptModal" class="modal prompt-modal" style="display: none;">
-            <div class="modal-content">
-                <div class="modal-body" style="text-align: center;">
-                    <div class="success-icon" style="font-size: 4rem; margin-bottom: 20px;">🎉</div>
-                    <h3 style="margin-bottom: 10px;">Pub Added Successfully!</h3>
-                    <p style="margin-bottom: 20px;"><strong id="addedPubName"></strong> has been added to our database.</p>
-                    <p style="margin-bottom: 30px;">What would you like to do next?</p>
-                    
-                    <div class="modal-actions" style="display: flex; flex-direction: column; gap: 12px;">
-                        <button class="btn btn-primary" data-action="update-gf-status-new-pub">
-                            📊 Update GF Beer Status
-                        </button>
-                        <button class="btn btn-success" data-action="report-gf-beer-new-pub">
-                            🍺 Report GF Beer Available
-                        </button>
-                        <button class="btn btn-secondary" data-action="close-pub-added-modal">
-                            ✅ Done For Now
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>   
-    
-        <!-------------------------------------------------->
-        <!-- HTML full screen pub details overlay section -->
-        <!-------------------------------------------------->
+        <!-- Pub Details Overlay -->
         <div id="pubDetailsOverlay" class="pub-details-overlay">
             <div class="pub-details-container" id="pubContainer">
                 <div class="pub-details-card">
-                    <!-- NEW: Top navigation - ADD THIS -->
                     <div class="pub-nav-top">
-                        <button class="btn-nav-small" data-action="close-pub-details" onclick="event.stopPropagation();">
-                            🏠 Home
-                        </button>
-                        <button class="btn-nav-small" data-action="back-to-results" onclick="event.stopPropagation();">
-                            ← Back
-                        </button>
+                        <button class="btn-nav-small" data-action="close-pub-details">🏠 Home</button>
+                        <button class="btn-nav-small" data-action="back-to-results">← Back</button>
                     </div>
         
                     <div class="pub-header">
@@ -364,94 +238,190 @@
                     </div>
         
                     <div class="beer-section" id="beerSection" style="display: none;">
-                        <div class="beer-section-title">
-                            🍺 Available Gluten Free Beers
-                        </div>
-                        <div class="beer-status" id="pubDetailsBeer">
-                            <!-- Content will be populated by JavaScript -->
-                        </div>
+                        <div class="beer-section-title">🍺 Available Gluten Free Beers</div>
+                        <div class="beer-status" id="pubDetailsBeer"></div>
                     </div>
 
-                    <!-- REPLACE: In pub details card, after beer-section -->
                     <div class="gf-status-section">
                         <div class="status-card">
                             <h3 class="status-question">🍺 What's the GF beer situation here?</h3>
-                            
                             <div class="current-status" id="currentGFStatus">
                                 <span class="status-icon">❓</span>
                                 <span class="status-text">Not Sure</span>
                                 <span class="status-meta">Help us find out!</span>
                             </div>
-                            
-                            <button class="btn btn-secondary btn-sm" data-action="change-gf-status">
-                                ✏️ Change this
-                            </button>
+                            <button class="btn btn-secondary btn-sm" data-action="change-gf-status">✏️ Change this</button>
                         </div>
                     </div>
                             
                     <div class="pub-action-grid">
-                        <button class="btn btn-external" id="pubFindOnline">
-                            🔍 Find Online
-                        </button>
-                        <button class="btn btn-external" id="pubGetDirections">
-                            🧭 Get Directions
-                        </button>
-                        <button class="btn btn-toggle" id="pubToggleMap" data-action="toggle-pub-map">
-                            🗺️ <span id="pubMapBtnText">Show on Map</span>
-                        </button>
-                        <b<button class="btn btn-positive" data-action="report-beer">
-                            📝 Report GF Beer
-                        </button>
+                        <button class="btn btn-external" id="pubFindOnline">🔍 Find Online</button>
+                        <button class="btn btn-external" id="pubGetDirections">🧭 Get Directions</button>
+                        <button class="btn btn-toggle" id="pubToggleMap" data-action="toggle-pub-map">🗺️ <span id="pubMapBtnText">Show on Map</span></button>
+                        <button class="btn btn-positive" data-action="report-beer">📝 Report GF Beer</button>
                     </div>
                 </div>
         
                 <div class="pub-map-container" id="pubMapContainer">
-                    <div class="pub-map-placeholder">
-                        🗺️ Interactive Map Loading...
+                    <div class="pub-map-placeholder">🗺️ Interactive Map Loading...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Report Modal -->
+        <div id="reportModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">📸 Report GF Beer Find</h2>
+                    <button class="modal-close" data-action="close-modal" aria-label="Close report modal">&times;</button>
+                </div>
+                
+                <div class="modal-body">
+                    <form id="reportForm" class="modal-form" data-action="submit-report">
+                        <div class="form-group" id="pubSearchGroup">
+                            <label class="form-label">Find Your Pub *</label>
+                            <input type="text" id="reportPubSearch" class="form-input" placeholder="Start typing pub name..." autocomplete="off">
+                            <div id="pubSuggestions" class="suggestions"></div>
+                            <small style="color: var(--text-muted); font-size: 0.8rem;">Search for an existing pub first - we'll check our database!</small>
+                        </div>
+                        
+                        <div id="selectedPubInfo" class="selected-pub-info" style="display: none;">
+                            <div class="selected-pub-card">
+                                <strong id="selectedPubName"></strong>
+                                <div id="selectedPubAddress"></div>
+                                <button type="button" class="btn btn-secondary btn-sm" onclick="if(window.FormModule) FormModule.clearSelectedPub();">Choose Different Pub</button>
+                            </div>
+                        </div>
+                        
+                        <div id="newPubFields" class="new-pub-fields" style="display: none;">
+                            <h4>📍 Add New Pub</h4>
+                            <div class="form-group">
+                                <label class="form-label">Pub Name *</label>
+                                <input type="text" id="reportPubName" class="form-input" placeholder="The Red Lion">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Address *</label>
+                                <input type="text" id="reportAddress" class="form-input" placeholder="123 High Street">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Postcode *</label>
+                                <input type="text" id="reportPostcode" class="form-input" placeholder="SW1A 1AA">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Beer Format *</label>
+                            <select id="reportFormat" name="reportFormat" class="form-select" required>
+                                <option value="">Select format...</option>
+                                <option value="bottle">🍺 Bottle</option>
+                                <option value="tap">🚰 Tap</option>
+                                <option value="cask">🛢️ Cask</option>
+                                <option value="can">🥫 Can</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Brewery</label>
+                            <div class="brewery-dropdown-container">
+                                <input type="text" id="reportBrewery" name="reportBrewery" class="form-input" placeholder="Start typing brewery name..." autocomplete="off">
+                                <div id="breweryDropdown" class="suggestions brewery-suggestions"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Beer Name</label>
+                            <div class="beer-name-container">
+                                <input type="text" id="reportBeerName" name="reportBeerName" class="form-input" placeholder="Start typing beer name..." autocomplete="off">
+                                <div id="beerNameDropdown" class="suggestions beer-suggestions"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Beer Style</label>
+                            <div class="beer-style-container">
+                                <input type="text" id="reportBeerStyle" name="reportBeerStyle" class="form-input" placeholder="IPA, Lager, Stout..." autocomplete="off">
+                                <div id="beerStyleDropdown" class="suggestions style-suggestions"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">ABV (Alcohol %)</label>
+                            <input type="number" id="reportBeerABV" name="reportBeerABV" class="form-input" placeholder="4.5" step="0.1" min="0" max="20">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Photo (Optional)</label>
+                            <label for="reportPhoto" class="photo-upload-compact">
+                                <div class="photo-upload-icon">📷</div>
+                                <div class="photo-upload-text">
+                                    <strong>Add a photo</strong><br>
+                                    <small>Beer menu, bottle, or tap</small>
+                                </div>
+                                <input type="file" id="reportPhoto" name="reportPhoto" accept="image/*" style="display: none;">
+                            </label>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" data-action="close-modal">Cancel</button>
+                            <button type="submit" class="btn btn-success">Submit Report</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Other Modals -->
+        <div id="placesSearchModal" class="modal places-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">🔍 Find Your Venue</h2>
+                    <button class="modal-close" data-action="close-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p class="search-prompt">Search for bars, pubs, or restaurants:</p>
+                    <div class="places-search-container">
+                        <input type="text" id="placesSearchInput" class="form-input" placeholder="e.g. Lawn Club Sheffield" autocomplete="off">
+                        <div id="placesResults" class="places-results"></div>
+                    </div>
+                    <div class="search-powered-by"><small>Powered by OpenStreetMap</small></div>
+                    <div id="selectedPlacePreview" class="selected-place-preview" style="display: none;">
+                        <h4>Selected Venue:</h4>
+                        <div class="place-details">
+                            <strong id="selectedPlaceName"></strong>
+                            <div id="selectedPlaceAddress"></div>
+                            <div id="selectedPlaceType"></div>
+                        </div>
+                        <button class="btn btn-primary" data-action="use-selected-place">✅ Use This Venue</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Bottom Navigation Bar -->
-        <nav class="bottom-nav">
-            <a href="/" class="nav-item active">
-                <div class="nav-icon">🏠</div>
-                <div class="nav-label">Home</div>
-            </a>
-            
-            <a href="#" data-action="show-full-map" class="nav-item">
-                <div class="nav-icon">🗺️</div>
-                <div class="nav-label">Map</div>
-            </a>
-            
-            <a href="/breweries" class="nav-item">
-                <div class="nav-icon">🍺</div>
-                <div class="nav-label">Breweries</div>
-            </a>
-            
-            <a href="/about" class="nav-item">
-                <div class="nav-icon">ℹ️</div>
-                <div class="nav-label">About</div>
-            </a>
-            
-            <a href="/more" class="nav-item">
-                <div class="nav-icon">⋯</div>
-                <div class="nav-label">More</div>
-            </a>
-        </nav>
+        <div id="pubAddedPromptModal" class="modal prompt-modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-body" style="text-align: center;">
+                    <div class="success-icon" style="font-size: 4rem; margin-bottom: 20px;">🎉</div>
+                    <h3 style="margin-bottom: 10px;">Pub Added Successfully!</h3>
+                    <p style="margin-bottom: 20px;"><strong id="addedPubName"></strong> has been added to our database.</p>
+                    <p style="margin-bottom: 30px;">What would you like to do next?</p>
+                    <div class="modal-actions" style="display: flex; flex-direction: column; gap: 12px;">
+                        <button class="btn btn-primary" data-action="update-gf-status-new-pub">📊 Update GF Beer Status</button>
+                        <button class="btn btn-success" data-action="report-gf-beer-new-pub">🍺 Report GF Beer Available</button>
+                        <button class="btn btn-secondary" data-action="close-pub-added-modal">✅ Done For Now</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        <!-- ADD: Full-screen GF status modal -->
+        <!-- Status Modals -->
         <div id="gfStatusModal" class="modal status-modal">
             <div class="modal-content status-modal-content">
                 <div class="modal-header">
                     <h2 class="modal-title">Update GF Beer Status</h2>
                     <button class="modal-close" data-action="close-modal">&times;</button>
                 </div>
-                
                 <div class="modal-body">
                     <p class="status-prompt">Select the current GF beer situation at <strong id="statusPubName">this pub</strong>:</p>
-                    
                     <div class="status-options">
                         <button class="status-option always" data-status="always">
                             <div class="option-icon">⭐</div>
@@ -460,7 +430,6 @@
                                 <p>This pub always has GF beer on the menu</p>
                             </div>
                         </button>
-                        
                         <button class="status-option currently" data-status="currently">
                             <div class="option-icon">✅</div>
                             <div class="option-content">
@@ -468,7 +437,6 @@
                                 <p>GF beer is currently in stock</p>
                             </div>
                         </button>
-                        
                         <button class="status-option not-currently" data-status="not_currently">
                             <div class="option-icon">❌</div>
                             <div class="option-content">
@@ -476,7 +444,6 @@
                                 <p>No GF options right now</p>
                             </div>
                         </button>
-                        
                         <button class="status-option unknown" data-status="unknown">
                             <div class="option-icon">❓</div>
                             <div class="option-content">
@@ -489,22 +456,17 @@
             </div>
         </div>
         
-        <!-- ADD: Confirmation modal -->
         <div id="gfStatusConfirmModal" class="modal confirm-modal">
             <div class="modal-content confirm-modal-content">
                 <div class="modal-header">
                     <h2 class="modal-title">Confirm Status Change</h2>
                 </div>
-                
                 <div class="modal-body">
                     <div class="confirm-message">
                         <p>You're about to update the GF beer status to:</p>
-                        <div class="confirm-status" id="confirmStatus">
-                            <!-- Populated dynamically -->
-                        </div>
+                        <div class="confirm-status" id="confirmStatus"></div>
                         <p class="confirm-warning">This will be visible to all users. Are you sure?</p>
                     </div>
-                    
                     <div class="modal-actions">
                         <button class="btn btn-secondary" data-action="cancel-status">Cancel</button>
                         <button class="btn btn-primary" data-action="confirm-status">Yes, Update</button>
@@ -513,75 +475,45 @@
             </div>
         </div>
         
-        <!-- ADD: Beer details prompt modal -->
         <div id="beerDetailsPromptModal" class="modal prompt-modal">
             <div class="modal-content prompt-modal-content">
                 <div class="modal-body">
                     <div class="success-icon">🎉</div>
                     <h3>Thanks for the update!</h3>
                     <p>Would you like to tell us which GF beers are available?</p>
-                    
                     <div class="modal-actions">
                         <button class="btn btn-secondary" data-action="skip-details">Not Now</button>
-                        <button class="btn btn-primary" data-action="add-beer-details">
-                            📝 Add Beer Details
-                        </button>
+                        <button class="btn btn-primary" data-action="add-beer-details">📝 Add Beer Details</button>
                     </div>
                 </div>
             </div>
         </div>
-    
-        <!-- Dynamic Results Section - Pushed down when visible -->
-        <div id="results-section" style="display: none;">
-            <div class="results-header">
-                <h2 class="section-title">📍 Search Results</h2>
-            </div>
-            <ul id="results" class="results-list"></ul>
-        </div>
-    
-        <!-- Map Section (Hidden by Default, Smart Show) -->
-        <div class="map-container" id="mapContainer" style="display: none;">
-            <div class="map-section-header">
-                <h2 class="section-title">🗺️ Interactive Map</h2>
-            </div>
-            <div id="map"></div>
-        </div>
-    
-        <!-- Location Status -->
-        <div id="locationStatus" class="location-status location-loading" style="display: none;">
-            Finding your location...
-        </div>
-        
-        <!-- About Us Modal - UPDATED -->
+
+        <!-- Info Modals -->
         <div id="aboutModal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
                     <h2 class="modal-title">ℹ️ About Coeliacs Like Beer Too</h2>
                     <button class="modal-close" aria-label="Close about modal">&times;</button>
                 </div>
-                
                 <div class="modal-body">
                     <div class="about-content">
                         <div class="about-section">
                             <h3>🍺 Our Mission</h3>
                             <p>We believe that being coeliac shouldn't mean missing out on great beer experiences. Our mission is to create the UK's most comprehensive, community-driven guide to gluten free beer options across the country.</p>
                         </div>
-                        
                         <div class="about-section">
                             <h3>👥 Our Story</h3>
                             <p>Started by coeliacs, for coeliacs. We understand the frustration of walking into a pub and not knowing if they have any safe options. That's why we built this platform - to help our community find amazing gluten free beer wherever they are in the UK.</p>
                         </div>
-                        
                         <div class="about-section">
                             <h3>🤝 Community Driven</h3>
                             <p>Every beer report, every pub update, every photo comes from real people in the coeliac community. Together, we're building something that helps everyone discover new places and feel confident about their choices.</p>
                         </div>
-                        
                         <div class="about-section">
                             <h3>📈 Growing Together</h3>
                             <p>With thousands of pubs in our database and growing reports every day, we're becoming the go-to resource for gluten free beer discovery. Join us in making the UK more accessible for coeliacs!</p>
                         </div>
-                        
                         <div class="contact-info">
                             <h3>💬 Get in Touch</h3>
                             <p>Questions, suggestions, or partnership opportunities? We'd love to hear from you!</p>
@@ -592,14 +524,12 @@
             </div>
         </div>
         
-        <!-- GF Info Modal - UPDATED -->
         <div id="gfInfoModal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
                     <h2 class="modal-title">🔬 What is Gluten Free Beer?</h2>
                     <button data-action="close-modal" aria-label="Close GF info modal">&times;</button>
                 </div>
-                
                 <div class="modal-body">
                     <div class="gf-content">
                         <div class="gf-section">
@@ -619,7 +549,6 @@
                                 </div>
                             </div>
                         </div>
-                        
                         <div class="gf-section">
                             <h3>🏷️ Types of GF Beer</h3>
                             <div class="beer-types">
@@ -637,7 +566,6 @@
                                 </div>
                             </div>
                         </div>
-                        
                         <div class="gf-section">
                             <h3>⚠️ Important Notes</h3>
                             <ul class="safety-notes">
@@ -647,7 +575,6 @@
                                 <li><strong>When in doubt</strong>, choose certified gluten free options</li>
                             </ul>
                         </div>
-                        
                         <div class="disclaimer">
                             <p><strong>Disclaimer:</strong> This information is for guidance only. Always consult with healthcare professionals and verify product safety for your individual needs.</p>
                         </div>
@@ -655,217 +582,22 @@
                 </div>
             </div>
         </div>
-        
-        <!-- Smart Coordinate Modal - UPDATED -->
-        <div id="coordinateModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 class="modal-title" id="modalPubName">Help us locate this pub!</h2>
-                    <button class="modal-close" data-action="close-modal" aria-label="Close coordinate modal">&times;</button>
-                </div>
-                
-                <div class="modal-body">
-                    <p>We'll search near the postcode and you can click to pinpoint the exact location.</p>
-                    
-                    <div class="modal-instructions">
-                        <span id="modalInstructions">🗺️ Searching for the pub area...</span>
-                    </div>
-                    
-                    <div id="coordinateMap" class="modal-map"></div>
-                    
-                    <div id="selectedLocationInfo" class="selected-location" style="display: none;">
-                        <div>📍 Selected location:</div>
-                        <div class="coordinates" id="selectedCoordinates"></div>
-                    </div>
-                    
-                    <div class="form-actions">
-                        <button id="confirmLocation" class="btn btn-success">
-                            ✅ Confirm Location
-                        </button>
-                        <button id="cancelModal" class="btn btn-secondary" data-action="close-modal">
-                            ❌ Cancel
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    
-        <!-- REPLACE: The entire reportModal div in templates/index.html -->
-        <div id="reportModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 class="modal-title">📸 Report GF Beer Find</h2>
-                    <button class="modal-close" data-action="close-modal" aria-label="Close report modal">&times;</button>
-                </div>
-                
-                <div class="modal-body">
-                    <form id="reportForm" class="modal-form" data-action="submit-report">
-                        
-                        <!-- Pub Search Field (hidden when pre-populated) -->
-                        <div class="form-group" id="pubSearchGroup">
-                            <label class="form-label">Find Your Pub *</label>
-                            <input type="text" id="reportPubSearch" class="form-input" 
-                                   placeholder="Start typing pub name..." autocomplete="off">
-                            <div id="pubSuggestions" class="suggestions"></div>
-                            <small style="color: var(--text-muted); font-size: 0.8rem;">
-                                Search for an existing pub first - we'll check our database!
-                            </small>
-                        </div>
-                        
-                        <!-- Selected Pub Info (shown when pub selected) -->
-                        <div id="selectedPubInfo" class="selected-pub-info" style="display: none;">
-                            <div class="selected-pub-card">
-                                <strong id="selectedPubName"></strong>
-                                <div id="selectedPubAddress"></div>
-                                <button type="button" class="btn btn-secondary btn-sm" onclick="if(window.FormModule) FormModule.clearSelectedPub();">
-                                    Choose Different Pub
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- New Pub Fields (shown when adding new pub) -->
-                        <div id="newPubFields" class="new-pub-fields" style="display: none;">
-                            <h4>📍 Add New Pub</h4>
-                            <div class="form-group">
-                                <label class="form-label">Pub Name *</label>
-                                <input type="text" id="reportPubName" class="form-input" placeholder="The Red Lion">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Address *</label>
-                                <input type="text" id="reportAddress" class="form-input" placeholder="123 High Street">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Postcode *</label>
-                                <input type="text" id="reportPostcode" class="form-input" placeholder="SW1A 1AA">
-                            </div>
-                        </div>
-                        
-                        <!-- Beer Format (Required) -->
-                        <div class="form-group">
-                            <label class="form-label">Beer Format *</label>
-                            <select id="reportFormat" name="reportFormat" class="form-select" required>
-                                <option value="">Select format...</option>
-                                <option value="bottle">🍺 Bottle</option>
-                                <option value="tap">🚰 Tap</option>
-                                <option value="cask">🛢️ Cask</option>
-                                <option value="can">🥫 Can</option>
-                            </select>
-                        </div>
-                        
-                        <!-- Brewery (Dropdown with search) -->
-                        <div class="form-group">
-                            <label class="form-label">Brewery</label>
-                            <div class="brewery-dropdown-container">
-                                <input type="text" id="reportBrewery" name="reportBrewery" class="form-input" 
-                                       placeholder="Start typing brewery name..." 
-                                       autocomplete="off">
-                                <div id="breweryDropdown" class="suggestions brewery-suggestions"></div>
-                            </div>
-                        </div>
-                        
-                        <!-- Beer Name (Auto-complete based on brewery) -->
-                        <div class="form-group">
-                            <label class="form-label">Beer Name</label>
-                            <div class="beer-name-container">
-                                <input type="text" id="reportBeerName" name="reportBeerName" class="form-input" 
-                                       placeholder="Start typing beer name..." 
-                                       autocomplete="off">
-                                <div id="beerNameDropdown" class="suggestions beer-suggestions"></div>
-                            </div>
-                        </div>
-                        
-                        <!-- Beer Style (Auto-complete based on selected beer) -->
-                        <div class="form-group">
-                            <label class="form-label">Beer Style</label>
-                            <div class="beer-style-container">
-                                <input type="text" id="reportBeerStyle" name="reportBeerStyle" class="form-input" 
-                                       placeholder="IPA, Lager, Stout..." 
-                                       autocomplete="off">
-                                <div id="beerStyleDropdown" class="suggestions style-suggestions"></div>
-                            </div>
-                        </div>
-                        
-                        <!-- Beer ABV (Auto-complete based on selected beer) -->
-                        <div class="form-group">
-                            <label class="form-label">ABV (Alcohol %)</label>
-                            <input type="number" id="reportBeerABV" name="reportBeerABV" class="form-input" 
-                                   placeholder="4.5" step="0.1" min="0" max="20">
-                        </div>
-                        
-                        <!-- Compact Photo Upload -->
-                        <div class="form-group">
-                            <label class="form-label">Photo (Optional)</label>
-                            <label for="reportPhoto" class="photo-upload-compact">
-                                <div class="photo-upload-icon">📷</div>
-                                <div class="photo-upload-text">
-                                    <strong>Add a photo</strong><br>
-                                    <small>Beer menu, bottle, or tap</small>
-                                </div>
-                                <input type="file" id="reportPhoto" name="reportPhoto" 
-                                       accept="image/*" style="display: none;">
-                            </label>
-                        </div>
-                        
-                        <!-- Form Actions (Sticky at bottom) -->
-                        <div class="form-actions">
-                            <button type="button" class="btn btn-secondary" data-action="close-modal">
-                                Cancel
-                            </button>
-                            <button type="submit" class="btn btn-success">
-                                Submit Report
-                            </button>
-                        </div>
-                        
-                    </form>
-                </div>
-            </div>
-        </div>
-    
-        <template id="pub-result-template">
-            <div class="result-item">
-                <div class="result-header">
-                    <div class="result-main-info">
-                        <h3 class="result-title"></h3>
-                        <div class="result-distance"></div>
-                    </div>
-                    <div class="gf-indicator"></div>
-                </div>
-                
-                <div class="result-location">
-                    <div class="result-address"></div>
-                    <div class="result-postcode"></div>
-                    <div class="result-authority"></div>
-                </div>
-                
-                <div class="result-actions">
-                    <button class="btn btn-primary" data-action="view-pub">
-                        📍 View Details
-                    </button>
-                </div>
-            </div>
-        </template>
-    
-        <!-- Full UK Map Overlay -->
+
+        <!-- Map Overlay -->
         <div id="fullMapOverlay" class="map-overlay">
             <div class="map-overlay-container">
-                
-                <!-- Map Header -->
                 <div class="map-overlay-nav">
-                    <button class="btn-nav-small" data-action="close-full-map">
-                        🏠 Home
-                    </button>
+                    <button class="btn-nav-small" data-action="close-full-map">🏠 Home</button>
                     <h2 class="map-overlay-title">UK GF Beer Map</h2>
-                    <div style="width: 60px;"></div> <!-- Spacer to center title -->
+                    <div style="width: 60px;"></div>
                 </div>
-                
-                <!-- Map Content -->
                 <div class="map-overlay-content">
                     <div id="fullMap" class="full-map"></div>
                 </div>
             </div>
         </div>
         
-        <!-- Loading Toast - UPDATED -->
+        <!-- Toasts -->
         <div id="loadingToast" class="toast toast-loading" style="display: none;">
             <div class="toast-content">
                 <div class="spinner"></div>
@@ -873,7 +605,6 @@
             </div>
         </div>
         
-        <!-- Success Toast - UPDATED -->
         <div id="successToast" class="toast toast-success" style="display: none;">
             <div class="toast-content">
                 <span class="toast-icon">✅</span>
@@ -881,7 +612,7 @@
             </div>
         </div>
         
-        <!-- Cookie Consent Banner -->
+        <!-- Cookie Consent -->
         <div id="cookieConsent" class="cookie-consent" style="display: none;">
             <div class="cookie-content">
                 <div class="cookie-text">
@@ -896,14 +627,12 @@
             </div>
         </div>
         
-        <!-- Cookie Settings Modal -->
         <div id="cookieSettings" class="modal" style="display: none;">
             <div class="modal-content">
                 <div class="modal-header">
                     <h2 class="modal-title">🍪 Cookie Settings</h2>
                     <button class="modal-close" aria-label="Close cookie settings">&times;</button>
                 </div>
-                
                 <div class="modal-body">
                     <div class="cookie-settings-content">
                         <div class="cookie-category">
@@ -919,7 +648,6 @@
                                 <strong>Examples:</strong> Session management, search preferences, location consent
                             </div>
                         </div>
-                        
                         <div class="cookie-category">
                             <div class="cookie-category-header">
                                 <h3>Analytics Cookies</h3>
@@ -934,7 +662,6 @@
                                 <strong>Purpose:</strong> Usage statistics, popular features, performance monitoring
                             </div>
                         </div>
-                        
                         <div class="cookie-info">
                             <h4>📋 Your Rights</h4>
                             <ul>
@@ -945,7 +672,6 @@
                             </ul>
                         </div>
                     </div>
-                    
                     <div class="form-actions">
                         <button data-action="save-cookie-preferences" class="btn btn-primary">Save Preferences</button>
                         <button data-action="accept-all-from-settings" class="btn btn-success">Accept All</button>
@@ -954,25 +680,34 @@
             </div>
         </div>
         
-        <!-- Floating Cookie Settings Button (appears after consent given) -->
         <div id="cookieSettingsFloat" class="cookie-settings-float" style="display: none;">
-            <button data-action="show-cookie-settings" class="cookie-float-btn" title="Cookie Settings">
-                🍪
-            </button>
+            <button data-action="show-cookie-settings" class="cookie-float-btn" title="Cookie Settings">🍪</button>
         </div>
-    
-        <!-- ================================
-         MAP LEGEND TEMPLATE
-         🔧 ACTION: ADD to templates/index.html after existing templates
-         📍 LOCATION: Add before the closing </body> tag
-         ================================ -->
-    
-        <!-- Enhanced Map Legend Template -->
+
+        <!-- Templates -->
+        <template id="pub-result-template">
+            <div class="result-item">
+                <div class="result-header">
+                    <div class="result-main-info">
+                        <h3 class="result-title"></h3>
+                        <div class="result-distance"></div>
+                    </div>
+                    <div class="gf-indicator"></div>
+                </div>
+                <div class="result-location">
+                    <div class="result-address"></div>
+                    <div class="result-postcode"></div>
+                    <div class="result-authority"></div>
+                </div>
+                <div class="result-actions">
+                    <button class="btn btn-primary" data-action="view-pub">📍 View Details</button>
+                </div>
+            </div>
+        </template>
+
         <template id="map-legend-template">
             <div class="map-legend">
-                <div class="legend-title">
-                    🍺 GF Beer Status
-                </div>
+                <div class="legend-title">🍺 GF Beer Status</div>
                 <div class="legend-item">
                     <div class="legend-marker always-gf"></div>
                     <span class="legend-text">Always Has GF Beer</span>
@@ -996,7 +731,6 @@
             </div>
         </template>
         
-        <!-- Map Error State Template -->
         <template id="map-error-template">
             <div class="map-error-container">
                 <div class="map-error-icon">📍</div>
@@ -1005,7 +739,6 @@
             </div>
         </template>
         
-        <!-- Popup Content Template -->
         <template id="popup-content-template">
             <div class="popup-content">
                 <div class="popup-title" data-field="name"></div>
@@ -1013,44 +746,52 @@
                 <div class="popup-postcode" data-field="postcode"></div>
                 <div class="popup-distance" data-field="distance" style="display: none;"></div>
                 <div class="popup-gf-status" data-field="gf-status"></div>
-                <button class="popup-button" data-action="view-details">
-                    View Details
-                </button>
+                <button class="popup-button" data-action="view-details">View Details</button>
             </div>
         </template>
+    
+        <!-- NAVIGATION BAR - NOW OUTSIDE EVERYTHING ELSE -->
+        <nav class="bottom-nav">
+            <a href="/" class="nav-item active">
+                <div class="nav-icon">🏠</div>
+                <div class="nav-label">Home</div>
+            </a>
+            <a href="#" data-action="show-full-map" class="nav-item">
+                <div class="nav-icon">🗺️</div>
+                <div class="nav-label">Map</div>
+            </a>
+            <a href="/breweries" class="nav-item">
+                <div class="nav-icon">🍺</div>
+                <div class="nav-label">Breweries</div>
+            </a>
+            <a href="/about" class="nav-item">
+                <div class="nav-icon">ℹ️</div>
+                <div class="nav-label">About</div>
+            </a>
+            <a href="/more" class="nav-item">
+                <div class="nav-icon">⋯</div>
+                <div class="nav-label">More</div>
+            </a>
+        </nav>
         
-        <!---------------------------
-        LEAFLET.JS - Keep this external dependency
-        ---------------------------->
+        <!-- Scripts -->
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-        
-        <!-- Leaflet MarkerCluster JS -->
         <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
-        
-        <!---------------------------
-        SINGLE MODULE ENTRY POINT
-        All modules now load through main.js in proper order
-        ---------------------------->
         <script type="module" src="/static/js/main.js?v={{ cache_buster }}"></script>
         
-        <!---------------------------
-        LEGACY SUPPORT & INITIALIZATION
-        Essential functions and setup that can't be modularized yet
-        ---------------------------->
         <script>
-            // Wait for app to initialize before setting up remaining handlers
+            // Essential initialization
             document.addEventListener('DOMContentLoaded', function() {
                 console.log('🔧 Setting up legacy event handlers...');
                 
-                // Check if app initialized successfully after a delay
+                // Check app initialization
                 setTimeout(() => {
                     if (!window.CoeliacsApp?.initialized) {
                         console.warn('⚠️ App initialization may have failed');
-                        showInitializationFallback();
                     }
                 }, 3000);
                 
-                // Handle file upload preview for photo input
+                // Photo upload handler
                 const photoInput = document.getElementById('reportPhoto');
                 const photoLabel = document.querySelector('.photo-upload-compact');
                 
@@ -1064,10 +805,7 @@
                             
                             const textEl = photoLabel.querySelector('.photo-upload-text');
                             if (textEl) {
-                                textEl.innerHTML = `
-                                    <strong>📸 ${fileName}</strong><br>
-                                    <small>Click to change photo</small>
-                                `;
+                                textEl.innerHTML = `<strong>📸 ${fileName}</strong><br><small>Click to change photo</small>`;
                             }
                             photoLabel.classList.add('active');
                         }
@@ -1075,83 +813,33 @@
                 }
             });
             
-            // Fallback initialization if modules fail to load
-            function showInitializationFallback() {
-                const fallbackDiv = document.createElement('div');
-                fallbackDiv.className = 'initialization-fallback';
-                fallbackDiv.innerHTML = `
-                    <strong>⚠️ Slow Loading</strong>
-                    The app is taking longer than expected to load...
-                    <button onclick="location.reload()" class="fallback-btn">
-                        Refresh Page
-                    </button>
-                `;
-                document.body.appendChild(fallbackDiv);
-                
-                setTimeout(() => {
-                    fallbackDiv.remove();
-                }, 10000);
-            }
-            
-            // Debug helper - available globally
-            window.debugApp = function() {
-                console.log('🔍 App State:', window.AppState);
-                console.log('🔍 Available Modules:', Object.keys(window.CoeliacsApp?.modules || {}));
-                if (window.CoeliacsApp?.state) {
-                    console.log('🔍 Module Status:', window.CoeliacsApp.state.modules);
-                }
-            };
-            
             // Performance monitoring
             window.addEventListener('load', function() {
-                // Log performance metrics with better error handling
                 if (performance && performance.timing) {
-                    // Wait for loadEventEnd to be set
                     setTimeout(() => {
                         const timing = performance.timing;
-                        
-                        // Check if timing values are valid
                         if (timing.loadEventEnd > 0 && timing.navigationStart > 0) {
                             const loadTime = timing.loadEventEnd - timing.navigationStart;
-                            
-                            // Only log positive, reasonable values
-                            if (loadTime > 0 && loadTime < 60000) { // Less than 1 minute
+                            if (loadTime > 0 && loadTime < 60000) {
                                 console.log(`⚡ Page load time: ${loadTime}ms`);
-                                
-                                // Track slow loads
-                                if (loadTime > 3000 && window.CoeliacsApp?.modules?.tracking) {
-                                    window.CoeliacsApp.modules.tracking.trackEvent('slow_page_load', 'Performance', `${loadTime}ms`);
-                                }
-                            } else {
-                                console.log('⚡ Page load time: Unable to calculate (timing issue)');
                             }
-                        } else {
-                            console.log('⚡ Page load time: Performance timing not available');
                         }
-                    }, 100); // Small delay to ensure timing is complete
+                    }, 100);
                 }
             });
-        </script>
-        
-        <script>
-            // Cache-busting timestamp
-            console.log('🚀 CACHE BUSTER:', '{{ cache_buster }}');
             
-            // Environment info for debugging
+            // Cache buster logging
+            console.log('🚀 CACHE BUSTER:', '{{ cache_buster }}');
             console.log('📱 User Agent:', navigator.userAgent.substring(0, 50) + '...');
             console.log('📺 Viewport:', window.innerWidth + 'x' + window.innerHeight);
             console.log('🌐 Connection:', navigator.connection?.effectiveType || 'unknown');
         </script>
 
-        // LOCATION: index.html - Add this script block right before closing </body> tag
-        // ACTION: ADD this script after your existing legacy script blocks
-        
+        <!-- Places search handler -->
         <script>
-        // Direct places search handler - ensures it works immediately
         document.addEventListener('DOMContentLoaded', function() {
             console.log('🔧 Setting up places search handler...');
             
-            // Direct input handler for places search
             const placesInput = document.getElementById('placesSearchInput');
             if (placesInput) {
                 console.log('✅ Found places search input');
@@ -1160,12 +848,10 @@
                     const query = e.target.value;
                     console.log('🔍 Places search input:', query);
                     
-                    // Call the search module if available
                     if (window.SearchModule?.PlacesSearchModule?.handleSearch) {
                         window.SearchModule.PlacesSearchModule.handleSearch(query);
                     } else {
                         console.warn('❌ PlacesSearchModule not available yet');
-                        // Fallback: try again after a delay
                         setTimeout(() => {
                             if (window.SearchModule?.PlacesSearchModule?.handleSearch) {
                                 window.SearchModule.PlacesSearchModule.handleSearch(query);
@@ -1174,15 +860,12 @@
                     }
                 });
                 
-                // Also handle focus event
                 placesInput.addEventListener('focus', function() {
                     console.log('📍 Places search input focused');
                 });
-            } else {
-                console.warn('❌ Places search input not found');
             }
             
-            // Debug: Log when modal opens
+            // Monitor modal opening
             const observer = new MutationObserver(function(mutations) {
                 mutations.forEach(function(mutation) {
                     if (mutation.target.id === 'placesSearchModal' && 
@@ -1201,26 +884,6 @@
                 observer.observe(modal, { attributes: true, attributeFilter: ['style'] });
             }
         });
-        
-        // Test function to verify OpenStreetMap works
-        window.testOSMSearch = async function(query = 'lawn club manchester') {
-            console.log('🧪 Testing OSM search for:', query);
-            try {
-                const response = await fetch(
-                    `https://nominatim.openstreetmap.org/search?` +
-                    `q=${encodeURIComponent(query + ' UK')}` +
-                    `&format=json` +
-                    `&countrycodes=gb` +
-                    `&limit=10`
-                );
-                const data = await response.json();
-                console.log('✅ OSM Response:', data);
-                return data;
-            } catch (error) {
-                console.error('❌ OSM Error:', error);
-            }
-        };
         </script>
-            
     </body>
 </html>
