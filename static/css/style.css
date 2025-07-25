@@ -2,6 +2,9 @@
    DESIGN SYSTEM - CSS VARIABLES
    ================================ */
 :root {
+   /* Classic colours */
+   --white: #ffffff;
+   
    /* Brand Colors & Gradients */
    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
    --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
@@ -17,11 +20,11 @@
    --text-white: #ffffff;
    
    /* Background Colors */
-   --bg-white: rgba(255, 255, 255, 0.legend-item {
-    margin-bottom: var(--space-xs);
-    display: flex;
-    align-items: center;
-    gap: var(--space-xs);
+   --bg-white: rgba(255, 255, 255, 0.95);
+   --bg-glass: rgba(255, 255, 255, 0.1);
+   --bg-section: rgba(248, 250, 252, 0.8);
+   --bg-overlay: rgba(0, 0, 0, 0.8);
+   
 }
 
 .legend-item:last-child {
