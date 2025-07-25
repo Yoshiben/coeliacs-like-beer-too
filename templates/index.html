@@ -1271,6 +1271,73 @@
         }
     });
     </script>
+
+    <!-- ADD this test script to see what's blocking the nav -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const navBar = document.querySelector('.bottom-nav');
+        const body = document.body;
+        
+        console.log('🔍 Body styles:', {
+            position: getComputedStyle(body).position,
+            overflow: getComputedStyle(body).overflow,
+            height: getComputedStyle(body).height,
+            paddingBottom: getComputedStyle(body).paddingBottom
+        });
+        
+        // Check if nav is within viewport
+        const navRect = navBar.getBoundingClientRect();
+        console.log('🔍 Nav position:', {
+            top: navRect.top,
+            bottom: navRect.bottom,
+            height: navRect.height,
+            windowHeight: window.innerHeight,
+            isVisible: navRect.bottom <= window.innerHeight
+        });
+        
+        // Check computed styles on nav items
+        const firstNavItem = navBar.querySelector('.nav-item');
+        if (firstNavItem) {
+            console.log('🔍 Nav item styles:', {
+                color: getComputedStyle(firstNavItem).color,
+                display: getComputedStyle(firstNavItem).display,
+                opacity: getComputedStyle(firstNavItem).opacity,
+                fontSize: getComputedStyle(firstNavItem).fontSize
+            });
+        }
+        
+        // Force nav to top of everything
+        navBar.style.cssText = `
+            position: fixed !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            width: 100% !important;
+            height: 60px !important;
+            background: white !important;
+            border-top: 3px solid red !important;
+            z-index: 2147483647 !important;
+            display: flex !important;
+            justify-content: space-around !important;
+            align-items: center !important;
+        `;
+        
+        // Force all nav items to be visible
+        navBar.querySelectorAll('.nav-item').forEach(item => {
+            item.style.cssText = `
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                color: black !important;
+                text-decoration: none !important;
+                opacity: 1 !important;
+                font-size: 14px !important;
+            `;
+        });
+        
+        console.log('✅ Forced nav styles applied');
+    });
+    </script>
             
     </body>
 </html>
