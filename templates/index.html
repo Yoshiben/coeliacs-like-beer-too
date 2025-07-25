@@ -1222,120 +1222,30 @@
         };
         </script>
 
+    <!-- REPLACE your test script with this immediate fix -->
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         const navBar = document.querySelector('.bottom-nav');
         
         if (navBar) {
-            console.log('🔍 Nav bar HTML:', navBar.innerHTML);
-            console.log('🔍 Nav bar children:', navBar.children.length);
-            
-            // Check if nav items exist
-            const navItems = navBar.querySelectorAll('.nav-item');
-            console.log('🔍 Nav items found:', navItems.length);
-            
-            if (navItems.length === 0) {
-                console.error('❌ NO NAV ITEMS FOUND!');
-                
-                // Let's add them manually to test
-                navBar.innerHTML = `
-                    <a href="/" class="nav-item active">
-                        <div class="nav-icon">🏠</div>
-                        <div class="nav-label">Home</div>
-                    </a>
-                    <a href="#" data-action="show-full-map" class="nav-item">
-                        <div class="nav-icon">🗺️</div>
-                        <div class="nav-label">Map</div>
-                    </a>
-                    <a href="/breweries" class="nav-item">
-                        <div class="nav-icon">🍺</div>
-                        <div class="nav-label">Breweries</div>
-                    </a>
-                    <a href="/about" class="nav-item">
-                        <div class="nav-icon">ℹ️</div>
-                        <div class="nav-label">About</div>
-                    </a>
-                    <a href="/more" class="nav-item">
-                        <div class="nav-icon">⋯</div>
-                        <div class="nav-label">More</div>
-                    </a>
-                `;
-                console.log('✅ Added nav items manually!');
-            }
-            
-            // Force visible styles
+            // FORCE THE HEIGHT IMMEDIATELY
+            navBar.style.height = '60px';
+            navBar.style.minHeight = '60px';
+            navBar.style.maxHeight = '60px';
+            navBar.style.display = 'flex';
             navBar.style.background = 'white';
             navBar.style.borderTop = '2px solid #667eea';
-            navBar.style.display = 'flex';
-            navBar.style.zIndex = '999999';
-        }
-    });
-    </script>
-
-    <!-- ADD this test script to see what's blocking the nav -->
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const navBar = document.querySelector('.bottom-nav');
-        const body = document.body;
-        
-        console.log('🔍 Body styles:', {
-            position: getComputedStyle(body).position,
-            overflow: getComputedStyle(body).overflow,
-            height: getComputedStyle(body).height,
-            paddingBottom: getComputedStyle(body).paddingBottom
-        });
-        
-        // Check if nav is within viewport
-        const navRect = navBar.getBoundingClientRect();
-        console.log('🔍 Nav position:', {
-            top: navRect.top,
-            bottom: navRect.bottom,
-            height: navRect.height,
-            windowHeight: window.innerHeight,
-            isVisible: navRect.bottom <= window.innerHeight
-        });
-        
-        // Check computed styles on nav items
-        const firstNavItem = navBar.querySelector('.nav-item');
-        if (firstNavItem) {
-            console.log('🔍 Nav item styles:', {
-                color: getComputedStyle(firstNavItem).color,
-                display: getComputedStyle(firstNavItem).display,
-                opacity: getComputedStyle(firstNavItem).opacity,
-                fontSize: getComputedStyle(firstNavItem).fontSize
+            
+            console.log('🔧 Forced nav height to 60px');
+            
+            // Check new dimensions
+            const newRect = navBar.getBoundingClientRect();
+            console.log('📏 New nav dimensions:', {
+                height: newRect.height,
+                top: newRect.top,
+                bottom: newRect.bottom
             });
         }
-        
-        // Force nav to top of everything
-        navBar.style.cssText = `
-            position: fixed !important;
-            bottom: 0 !important;
-            left: 0 !important;
-            right: 0 !important;
-            width: 100% !important;
-            height: 60px !important;
-            background: white !important;
-            border-top: 3px solid red !important;
-            z-index: 2147483647 !important;
-            display: flex !important;
-            justify-content: space-around !important;
-            align-items: center !important;
-        `;
-        
-        // Force all nav items to be visible
-        navBar.querySelectorAll('.nav-item').forEach(item => {
-            item.style.cssText = `
-                display: flex !important;
-                flex-direction: column !important;
-                align-items: center !important;
-                color: black !important;
-                text-decoration: none !important;
-                opacity: 1 !important;
-                font-size: 14px !important;
-            `;
-        });
-        
-        console.log('✅ Forced nav styles applied');
     });
     </script>
             
