@@ -245,17 +245,67 @@
                             <!-- Results will be populated here -->
                         </div>
                         
-                        <!-- No results -->
+                        <!-- REPLACE: The no-results-found div in index.html -->
                         <div class="no-results-found" id="noResultsFound" style="display: none;">
                             <div class="no-results-icon">🔍</div>
                             <div class="no-results-title">No pubs found</div>
-                            <div class="no-results-text">Try expanding your search distance or removing filters</div>
+                            <div class="no-results-text">Try expanding your search or check the spelling</div>
+                            
+                            <!-- ADD: Option to add new pub -->
+                            <div class="no-results-actions">
+                                <button class="btn btn-primary" data-action="add-new-pub-from-results">
+                                    ➕ Add New Pub/Bar
+                                </button>
+                                <button class="btn btn-secondary" data-action="search-google-places">
+                                    🔍 Search Google Maps
+                                </button>
+                            </div>
                         </div>
-                    </div>
                     
                     <!-- Results Map (hidden by default) -->
                     <div class="results-map-container" id="resultsMapContainer" style="display: none;">
                         <div id="resultsMap" class="results-map"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ADD: Google Places / OSM Search Modal -->
+        <div id="placesSearchModal" class="modal places-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">🔍 Find Your Venue</h2>
+                    <button class="modal-close" data-action="close-modal">&times;</button>
+                </div>
+                
+                <div class="modal-body">
+                    <p class="search-prompt">Search for bars, pubs, or restaurants:</p>
+                    
+                    <!-- Search Input -->
+                    <div class="places-search-container">
+                        <input type="text" 
+                               id="placesSearchInput" 
+                               class="form-input" 
+                               placeholder="e.g. Lawn Club Sheffield"
+                               autocomplete="off">
+                        <div id="placesResults" class="places-results"></div>
+                    </div>
+                    
+                    <div class="search-powered-by">
+                        <small>Powered by OpenStreetMap</small>
+                    </div>
+                    
+                    <!-- Selected Place Preview -->
+                    <div id="selectedPlacePreview" class="selected-place-preview" style="display: none;">
+                        <h4>Selected Venue:</h4>
+                        <div class="place-details">
+                            <strong id="selectedPlaceName"></strong>
+                            <div id="selectedPlaceAddress"></div>
+                            <div id="selectedPlaceType"></div>
+                        </div>
+                        <button class="btn btn-primary" data-action="use-selected-place">
+                            ✅ Use This Venue
+                        </button>
                     </div>
                 </div>
             </div>
