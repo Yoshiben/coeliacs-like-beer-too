@@ -107,6 +107,16 @@
    --no-gf-border: #ffffff; var(--white);
    --unknown-gf-fill: #9ca3af; var(--light-grey);
    --unknown-gf-border: #ffffff; var(--white);
+
+   /* Transitions */
+   --transition-fast: 0.15s ease-out;
+   --transition: 0.25s ease-out;
+   --transition-slow: 0.4s ease-out;
+
+   /* Dividers, borders & hovers */
+   --divider-color: rgba(102, 126, 234, 0.1);
+   --border-light: rgba(0, 0, 0, 0.1);    
+   --hover-subtle: rgba(102, 126, 234, 0.05);
    
 }
 
