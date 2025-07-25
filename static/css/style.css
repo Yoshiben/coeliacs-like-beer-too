@@ -22,6 +22,7 @@
    --text-primary: rgba(45,55,72,1);
    --text-secondary: rgba(74,85,104,1);
    --text-muted: rgba(113,128,150,1);
+   --text-white: var(--white);
    
    /* Background Colors */
    --bg-white: rgba(255, 255, 255, 0.95);
