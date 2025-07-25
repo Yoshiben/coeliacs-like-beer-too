@@ -4673,6 +4673,7 @@ p {
     .status-toggle-btn small {
         display: none;
     }
+}
 
 #resultsOverlay { z-index: var(--z-results-overlay); }
 #pubDetailsOverlay { z-index: var(--z-pub-details); }
