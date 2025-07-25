@@ -798,6 +798,26 @@ const App = {
                     modalModuleReport.openReportModal(window.currentPubData);
                 }
                 break;
+
+            case 'add-new-pub-from-results':
+                console.log('➕ Adding new pub from no results');
+                // Open report modal in "new pub" mode
+                const modalModule = this.getModule('modal');
+                if (modalModule) {
+                    modalModule.openReportModal({ isNewPub: true });
+                }
+                break;
+            
+            case 'search-google-places':
+                console.log('🔍 Opening places search');
+                PlacesSearchModule.openPlacesSearch();
+                break;
+            
+            case 'use-selected-place':
+                console.log('✅ Using selected place');
+                PlacesSearchModule.useSelectedPlace();
+                break;
+            
                     }
     },
     
