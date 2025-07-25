@@ -1259,23 +1259,38 @@ export const SearchModule = (function() {
             }
         },
         
+        // LOCATION: search.js - PlacesSearchModule
+        // ACTION: REPLACE the handleSearch method (around line 1515)
+        
         handleSearch(query) {
-            console.log('🔍 Searching for:', query);
-            clearTimeout(this.searchTimeout);
+            console.log('🔍 PlacesSearchModule.handleSearch called with:', query);
             
-            if (query.length < 3) {
-                this.hideResults();
+            // Clear any existing timeout
+            if (this.searchTimeout) {
+                clearTimeout(this.searchTimeout);
+            }
+            
+            const resultsDiv = document.getElementById('placesResults');
+            if (!resultsDiv) {
+                console.error('❌ placesResults div not found');
                 return;
             }
             
-            // Show searching state
-            const resultsDiv = document.getElementById('placesResults');
-            if (resultsDiv) {
-                resultsDiv.innerHTML = '<div class="loading-state">Searching...</div>';
-                resultsDiv.style.display = 'block';
+            // Hide results if query too short
+            if (!query || query.length < 3) {
+                console.log('📝 Query too short, hiding results');
+                resultsDiv.style.display = 'none';
+                return;
             }
             
+            // Show loading state immediately
+            console.log('⏳ Showing loading state');
+            resultsDiv.innerHTML = '<div style="padding: 20px; text-align: center; color: #666;">Searching...</div>';
+            resultsDiv.style.display = 'block';
+            
+            // Debounce the actual search
             this.searchTimeout = setTimeout(() => {
+                console.log('🚀 Executing OSM search');
                 this.searchOSM(query);
             }, 300);
         },
