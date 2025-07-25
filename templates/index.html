@@ -1223,31 +1223,33 @@
         </script>
 
     <script>
-    // TEMPORARY DEBUG - Remove once nav is working
+    // TEMPORARY DEBUG - Enhanced visual test
     document.addEventListener('DOMContentLoaded', function() {
         const navBar = document.querySelector('.bottom-nav');
         
         if (navBar) {
-            console.log('🔍 Nav bar found!');
-            console.log('Nav bar styles:', {
-                display: getComputedStyle(navBar).display,
-                position: getComputedStyle(navBar).position,
-                bottom: getComputedStyle(navBar).bottom,
-                zIndex: getComputedStyle(navBar).zIndex,
-                visibility: getComputedStyle(navBar).visibility
-            });
+            // Make it SUPER visible for testing
+            navBar.style.cssText = `
+                position: fixed !important;
+                bottom: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                background: red !important; /* RED for visibility */
+                height: 80px !important;
+                z-index: 2147483647 !important; /* Maximum possible */
+                display: flex !important;
+                border-top: 5px solid yellow !important;
+            `;
             
-            // Force it visible
-            navBar.style.display = 'flex';
-            navBar.style.visibility = 'visible';
-            navBar.style.bottom = '0';
-            navBar.style.zIndex = '99999';
-            navBar.style.position = 'fixed';
-            navBar.style.background = 'white';
+            console.log('🔴 Nav bar forced to RED - can you see it now?');
             
-            console.log('✅ Forced nav bar visible');
-        } else {
-            console.error('❌ Nav bar NOT found!');
+            // Also check what might be covering it
+            const elements = document.elementsFromPoint(window.innerWidth / 2, window.innerHeight - 30);
+            console.log('Elements at bottom center:', elements.map(el => ({
+                tag: el.tagName,
+                class: el.className,
+                zIndex: getComputedStyle(el).zIndex
+            })));
         }
     });
     </script>
