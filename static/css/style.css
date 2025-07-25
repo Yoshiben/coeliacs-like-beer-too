@@ -9,7 +9,7 @@
    --warning-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
    --info-gradient: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
    --purple-gradient: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-    
+   
    /* Text Colors */
    --text-primary: #2d3748;
    --text-secondary: #4a5568;
@@ -222,40 +222,40 @@
    --legend-marker-border: 1px solid var(--text-white);
    --legend-user-marker-size: 10px;
    
-  /* Enhanced GF Status Colors */
-    --always-gf-fill: #FFD700;        /* Gold */
-    --always-gf-border: #FFA500;      /* Darker gold */
-    --currently-gf-fill: #10b981;       /* Green */
-    --currently-gf-border: #ffffff;
-    --no-gf-fill: #ef4444;            /* Red */
-    --no-gf-border: #ffffff;
-    --unknown-gf-fill: #9ca3af;          /* Grey */
-    --unknown-gf-border: #ffffff;
-
-    --status-always-bg: rgba(255, 215, 0, 0.1);      /* Gold bg */
-    --status-always-border: rgba(255, 215, 0, 0.3);  /* Gold border */
-    --status-always-text: #B8860B;                   /* Dark gold text */
-    
-    --status-current-bg: rgba(16, 185, 129, 0.1);    /* Green bg */
-    --status-current-border: rgba(16, 185, 129, 0.3);/* Green border */
-    --status-current-text: #059669;                  /* Dark green text */
-    
-    --status-no-bg: rgba(239, 68, 68, 0.1);          /* Red bg */
-    --status-no-border: rgba(239, 68, 68, 0.3);      /* Red border */
-    --status-no-text: #dc2626;                       /* Dark red text */
-    
-    --status-unknown-bg: rgba(156, 163, 175, 0.1);   /* Grey bg */
-    --status-unknown-border: rgba(156, 163, 175, 0.3);/* Grey border */
-    --status-unknown-text: #6b7280;                  /* Dark grey text */
-
+   /* Enhanced GF Status Colors */
+   --always-gf-fill: #FFD700;        /* Gold */
+   --always-gf-border: #FFA500;      /* Darker gold */
+   --currently-gf-fill: #10b981;       /* Green */
+   --currently-gf-border: #ffffff;
+   --no-gf-fill: #ef4444;            /* Red */
+   --no-gf-border: #ffffff;
+   --unknown-gf-fill: #9ca3af;          /* Grey */
+   --unknown-gf-border: #ffffff;
+   
+   --status-always-bg: rgba(255, 215, 0, 0.1);      /* Gold bg */
+   --status-always-border: rgba(255, 215, 0, 0.3);  /* Gold border */
+   --status-always-text: #B8860B;                   /* Dark gold text */
+   
+   --status-current-bg: rgba(16, 185, 129, 0.1);    /* Green bg */
+   --status-current-border: rgba(16, 185, 129, 0.3);/* Green border */
+   --status-current-text: #059669;                  /* Dark green text */
+   
+   --status-no-bg: rgba(239, 68, 68, 0.1);          /* Red bg */
+   --status-no-border: rgba(239, 68, 68, 0.3);      /* Red border */
+   --status-no-text: #dc2626;                       /* Dark red text */
+   
+   --status-unknown-bg: rgba(156, 163, 175, 0.1);   /* Grey bg */
+   --status-unknown-border: rgba(156, 163, 175, 0.3);/* Grey border */
+   --status-unknown-text: #6b7280;                  /* Dark grey text */
+   
    /* Gold star glow effect */
-    --gold-star-glow: 0 0 10px rgba(255, 215, 0, 0.6);
-
+   --gold-star-glow: 0 0 10px rgba(255, 215, 0, 0.6);
+   
    /* Cluster colors */
-    --cluster-bg: rgba(156, 163, 175, 0.6);
-    --cluster-bg-solid: rgba(156, 163, 175, 0.9);
-    --cluster-text: #ffffff;
-    --cluster-border: rgba(156, 163, 175, 0.3);
+   --cluster-bg: rgba(156, 163, 175, 0.6);
+   --cluster-bg-solid: rgba(156, 163, 175, 0.9);
+   --cluster-text: #ffffff;
+   --cluster-border: rgba(156, 163, 175, 0.3);
    
    /* Enhanced status backgrounds for UI */
    --status-always-gf-bg: rgba(16, 185, 129, 0.15);
@@ -283,11 +283,11 @@
    --popup-btn-padding: 4px var(--space-sm);
    --popup-btn-border-radius: var(--radius);
    --popup-btn-font-size: var(--text-xs);
-
+   
    /* Nav bar map animation durations */
-    --marker-pulse-duration: 1s;
-    --marker-pulse-count: 2;
-    --marker-pulse-total-duration: 2s; /* duration × count */
+   --marker-pulse-duration: 1s;
+   --marker-pulse-count: 2;
+   --marker-pulse-total-duration: 2s; /* duration × count */
 }
 
 /* ================================
@@ -2976,6 +2976,12 @@ p {
 @keyframes gentle-pulse {
     0%, 100% { opacity: 1; }
     50% { opacity: 0.6; }
+}
+
+/* Special effect for "always GF" pubs */
+.always-gf-marker {
+    filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.6));
+    animation: goldPulse 3s ease-in-out infinite;
 }
 
 /* Mobile adjustments */
