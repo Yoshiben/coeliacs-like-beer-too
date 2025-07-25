@@ -239,12 +239,12 @@ html {
    ================================ */
 
 .search-section {
-    height: calc(100vh - 260px);
-    height: calc(100dvh - 260px);
+    height: calc(100vh - 200px);
+    height: calc(100dvh - 200px);
     margin: -20px 0 0 0; /* Small overlap with hero */
     display: flex;
     align-items: stretch;
-/*     margin-bottom: 70px; /* Gap before nav bar */ */
+    margin-bottom: 40px; /* Gap before nav bar */
 }
 
 .search-card {
