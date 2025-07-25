@@ -372,51 +372,63 @@ body {
     left: 0 !important;
     right: 0 !important;
     background: rgba(255, 255, 255, 0.98) !important;
-    border-top: 2px solid #667eea !important; /* Make border more visible */
+    border-top: 1px solid var(--border-light) !important;
     display: flex !important;
     justify-content: space-around !important;
+    align-items: center !important; /* Add this */
     padding: var(--space-sm) 0 !important;
-    z-index: 999999 !important; /* Maximum z-index */
-    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15) !important;
+    z-index: 999999 !important;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1) !important;
     backdrop-filter: blur(10px) !important;
     min-height: 60px !important;
+    height: 60px !important; /* Fixed height */
     width: 100vw !important;
     max-width: 100% !important;
     visibility: visible !important;
+    opacity: 1 !important; /* Ensure it's not transparent */
 }
 
+/* ENSURE nav items are visible */
 .nav-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-decoration: none;
-    color: var(--text-muted);
-    transition: all var(--transition);
-    padding: var(--space-xs);
-    border-radius: var(--radius);
-    min-width: 60px;
-    cursor: pointer;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-decoration: none !important;
+    color: var(--text-muted) !important;
+    transition: all var(--transition) !important;
+    padding: var(--space-xs) !important;
+    border-radius: var(--radius) !important;
+    min-width: 60px !important;
+    cursor: pointer !important;
+    opacity: 1 !important; /* Ensure items aren't transparent */
+    visibility: visible !important;
 }
 
 .nav-item:hover,
 .nav-item.active {
-    color: #667eea;
-    background: var(--hover-subtle);
+    color: #667eea !important;
+    background: var(--hover-subtle) !important;
 }
 
 .nav-icon {
-    font-size: var(--text-xl);
-    margin-bottom: var(--space-xs);
-    line-height: 1;
+    font-size: var(--text-xl) !important;
+    margin-bottom: var(--space-xs) !important;
+    line-height: 1 !important;
+    display: block !important; /* Ensure it's visible */
 }
 
 .nav-label {
-    font-size: var(--text-xs);
-    font-weight: 600;
-    line-height: 1;
-    text-align: center;
+    font-size: var(--text-xs) !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+    text-align: center !important;
+    display: block !important; /* Ensure it's visible */
 }
 
+/* Fix any color issues */
+.bottom-nav * {
+    color: inherit !important;
+}
 
 
 
