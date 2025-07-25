@@ -1250,70 +1250,72 @@
     </script>
 
     <!-- ADD this detective script to find the culprit -->
+    <!-- REPLACE the detective script with this parent checker -->
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         const navBar = document.querySelector('.bottom-nav');
         
         if (navBar) {
-            // Get ALL computed styles
-            const styles = window.getComputedStyle(navBar);
+            console.log('🔍 PARENT ELEMENT CHECK:');
             
-            // Check what's setting the height
-            console.log('🔍 DETECTIVE MODE:');
-            console.log('Height:', styles.height);
-            console.log('Min-height:', styles.minHeight);
-            console.log('Max-height:', styles.maxHeight);
-            console.log('Display:', styles.display);
-            console.log('Position:', styles.position);
-            console.log('Box-sizing:', styles.boxSizing);
-            console.log('Overflow:', styles.overflow);
+            // Check all parent elements up to body
+            let parent = navBar.parentElement;
+            let level = 1;
             
-            // Try to find matching CSS rules
-            const sheets = document.styleSheets;
-            console.log('🔍 Checking stylesheets for .bottom-nav rules...');
-            
-            for (let sheet of sheets) {
-                try {
-                    const rules = sheet.cssRules || sheet.rules;
-                    for (let rule of rules) {
-                        if (rule.selectorText && rule.selectorText.includes('bottom-nav')) {
-                            console.log('📋 Found rule:', rule.selectorText);
-                            console.log('   Styles:', rule.style.cssText);
-                        }
-                        // Also check for * rules that might affect it
-                        if (rule.selectorText === '*') {
-                            console.log('⚠️ Universal selector rule:', rule.style.cssText);
-                        }
-                    }
-                } catch (e) {
-                    // Cross-origin stylesheets will throw errors
-                }
+            while (parent && parent !== document.body) {
+                const styles = getComputedStyle(parent);
+                console.log(`📦 Parent Level ${level}: ${parent.tagName}.${parent.className}`);
+                console.log(`   Position: ${styles.position}`);
+                console.log(`   Overflow: ${styles.overflow}`);
+                console.log(`   Height: ${styles.height}`);
+                console.log(`   Display: ${styles.display}`);
+                console.log(`   Clip: ${styles.clip}`);
+                console.log(`   ClipPath: ${styles.clipPath}`);
+                
+                parent = parent.parentElement;
+                level++;
             }
             
-            // Nuclear option - inline style with max specificity
+            // Check body too
+            const bodyStyles = getComputedStyle(document.body);
+            console.log('📦 BODY styles:');
+            console.log(`   Position: ${bodyStyles.position}`);
+            console.log(`   Overflow: ${bodyStyles.overflow}`);
+            console.log(`   Height: ${bodyStyles.height}`);
+            console.log(`   Clip: ${bodyStyles.clip}`);
+            console.log(`   ClipPath: ${bodyStyles.clipPath}`);
+            
+            // Try moving nav to be direct child of body
+            console.log('🚀 Moving nav to be direct child of body...');
+            document.body.appendChild(navBar);
+            
+            // Re-apply styles
             navBar.setAttribute('style', 
                 'position: fixed !important;' +
                 'bottom: 0 !important;' +
                 'left: 0 !important;' +
                 'right: 0 !important;' +
+                'width: 100% !important;' +
                 'height: 60px !important;' +
                 'min-height: 60px !important;' +
-                'max-height: 60px !important;' +
-                'background: white !important;' +
-                'border-top: 3px solid red !important;' +
+                'background: #667eea !important;' + // Purple so we can't miss it
                 'display: flex !important;' +
-                'z-index: 2147483647 !important;' +
-                'overflow: visible !important;' +
-                'visibility: visible !important;' +
-                'opacity: 1 !important;'
+                'justify-content: space-around !important;' +
+                'align-items: center !important;' +
+                'z-index: 2147483647 !important;'
             );
             
-            console.log('💣 Nuclear option applied - checking results...');
+            // Force nav items to be white
+            navBar.querySelectorAll('.nav-item').forEach(item => {
+                item.style.color = 'white !important';
+            });
+            
             setTimeout(() => {
-                const newRect = navBar.getBoundingClientRect();
-                console.log('📏 Final dimensions:', {
-                    height: newRect.height,
-                    computedHeight: getComputedStyle(navBar).height
+                const finalRect = navBar.getBoundingClientRect();
+                console.log('✅ After moving to body:', {
+                    height: finalRect.height,
+                    visible: finalRect.height > 0,
+                    parent: navBar.parentElement.tagName
                 });
             }, 100);
         }
