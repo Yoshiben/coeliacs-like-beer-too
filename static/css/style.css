@@ -3,7 +3,12 @@
    ================================ */
 :root {
    /* Classic colours */
-   --white: #ffffff;
+   --white: rgba(255, 255, 255, 1);
+   --gold: rgba(255,215,0,1);
+   --dark-gold: rgba(253,187,4,1);
+   --green: rgba(0,245,0,1);
+   --red: rgba(239,68,68,1);
+   --light-grey: rgba(156,163,175,1);
    
    /* Brand Colors & Gradients */
    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -14,16 +19,56 @@
    --purple-gradient: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
    
    /* Text Colors */
-   --text-primary: #2d3748;
-   --text-secondary: #4a5568;
-   --text-muted: #718096;
-   --text-white: #ffffff;
+   --text-primary: rgba(45,55,72,1);
+   --text-secondary: rgba(74,85,104,1);
+   --text-muted: rgba(113,128,150,1);
    
    /* Background Colors */
    --bg-white: rgba(255, 255, 255, 0.95);
    --bg-glass: rgba(255, 255, 255, 0.1);
    --bg-section: rgba(248, 250, 252, 0.8);
    --bg-overlay: rgba(0, 0, 0, 0.8);
+
+   /* Button System */
+   --btn-height: 44px;
+   --btn-height-sm: 36px;
+   --btn-height-lg: 56px;
+   --btn-padding: 12px 20px;
+   --btn-padding-sm: 8px 16px;
+   --btn-padding-lg: 16px 24px;
+   
+   /* Spacing System */
+   --space-xs: 4px;
+   --space-sm: 8px;
+   --space-md: 12px;
+   --space-lg: 16px;
+   --space-xl: 20px;
+   --space-2xl: 24px;
+   --space-3xl: 32px;
+   --space-4xl: 40px;
+   
+   /* Border Radius */
+   --radius-sm: 8px;
+   --radius: 12px;
+   --radius-lg: 15px;
+   --radius-xl: 20px;
+   --radius-pill: 25px;
+
+   /* Shadows */
+   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+   --shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+   --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.2);
+   --shadow-xl: 0 12px 40px rgba(0, 0, 0, 0.25);
+
+   /* GF Status Colors */
+   --always-gf-fill: var(--gold);
+   --always-gf-border: var(--dark-gold);
+   --currently-gf-fill: var(--green);
+   --currently-gf-border: var(--white);
+   --no-gf-fill: #ef4444; var(--red);
+   --no-gf-border: #ffffff; var(--white);
+   --unknown-gf-fill: #9ca3af; var(--light-grey);
+   --unknown-gf-border: #ffffff; var(--white);
    
 }
 
