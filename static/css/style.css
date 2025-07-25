@@ -244,7 +244,7 @@ html {
     margin: -20px 0 0 0; /* Small overlap with hero */
     display: flex;
     align-items: stretch;
-    margin-bottom: 70px; /* Gap before nav bar */
+/*     margin-bottom: 70px; /* Gap before nav bar */ */
 }
 
 .search-card {
