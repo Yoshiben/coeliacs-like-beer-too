@@ -141,10 +141,10 @@ body {
 /*     padding-bottom: 80px; */
     overscroll-behavior: none;
     -webkit-overflow-scrolling: auto;
-     height: 100vh;
+    height: 100vh;
     height: 100dvh;
-    overflow: hidden; /* Keep this */
-    position: relative; /* Change from fixed */
+    overflow: hidden; /* Prevent scrolling */
+    position: fixed; /* Lock in place */
     width: 100%;
 }
 
@@ -290,25 +290,22 @@ html {
     flex-direction: column;
     padding: var(--space-lg);
     min-height: 0;
-    justify-content: center; /* Center vertically */
 }
 
 .search-options {
+    flex: 1;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    gap: var(--space-lg);
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); /* Prevent overflow */
+    gap: var(--space-xl); /* More spacing */
     width: 100%;
-    height: 90%; /* Take up most of the space */
-    max-width: 680px; /* Limit width for better proportions */
-    margin: 0 auto; /* Center horizontally */
+    padding: var(--space-md); /* Add internal padding */
 }
 
 .search-option {
-.search-option {
     border: 3px solid var(--border-light) !important;
     border-radius: var(--radius-xl) !important;
-    padding: var(--space-xl) !important;
+    padding: var(--space-lg) !important;
     cursor: pointer !important;
     transition: all var(--transition) !important;
     text-align: center !important;
@@ -318,7 +315,8 @@ html {
     flex-direction: column !important;
     justify-content: center !important;
     align-items: center !important;
-    height: 100% !important;
+    min-height: 0 !important; /* Allow shrinking */
+    max-height: 100% !important; /* Prevent growing too tall */
 }
 
 .search-option:hover {
@@ -3556,4 +3554,21 @@ p {
         box-shadow: none;
         border: 1px solid #ccc;
     }
+}
+
+
+/* Fix overlays that might cover nav */
+.results-overlay,
+.pub-details-overlay,
+.map-overlay,
+.modal {
+    bottom: 60px !important; /* Leave space for nav */
+    height: calc(100vh - 60px) !important;
+    height: calc(100dvh - 60px) !important;
+}
+
+/* Remove any transforms that might hide nav */
+.bottom-nav,
+.bottom-nav * {
+    transform: none !important;
 }
