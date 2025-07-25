@@ -1096,6 +1096,85 @@
             console.log('📺 Viewport:', window.innerWidth + 'x' + window.innerHeight);
             console.log('🌐 Connection:', navigator.connection?.effectiveType || 'unknown');
         </script>
+
+        // LOCATION: index.html - Add this script block right before closing </body> tag
+        // ACTION: ADD this script after your existing legacy script blocks
+        
+        <script>
+        // Direct places search handler - ensures it works immediately
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔧 Setting up places search handler...');
+            
+            // Direct input handler for places search
+            const placesInput = document.getElementById('placesSearchInput');
+            if (placesInput) {
+                console.log('✅ Found places search input');
+                
+                placesInput.addEventListener('input', function(e) {
+                    const query = e.target.value;
+                    console.log('🔍 Places search input:', query);
+                    
+                    // Call the search module if available
+                    if (window.SearchModule?.PlacesSearchModule?.handleSearch) {
+                        window.SearchModule.PlacesSearchModule.handleSearch(query);
+                    } else {
+                        console.warn('❌ PlacesSearchModule not available yet');
+                        // Fallback: try again after a delay
+                        setTimeout(() => {
+                            if (window.SearchModule?.PlacesSearchModule?.handleSearch) {
+                                window.SearchModule.PlacesSearchModule.handleSearch(query);
+                            }
+                        }, 500);
+                    }
+                });
+                
+                // Also handle focus event
+                placesInput.addEventListener('focus', function() {
+                    console.log('📍 Places search input focused');
+                });
+            } else {
+                console.warn('❌ Places search input not found');
+            }
+            
+            // Debug: Log when modal opens
+            const observer = new MutationObserver(function(mutations) {
+                mutations.forEach(function(mutation) {
+                    if (mutation.target.id === 'placesSearchModal' && 
+                        mutation.target.style.display === 'flex') {
+                        console.log('🔍 Places search modal opened');
+                        const input = document.getElementById('placesSearchInput');
+                        if (input) {
+                            setTimeout(() => input.focus(), 100);
+                        }
+                    }
+                });
+            });
+            
+            const modal = document.getElementById('placesSearchModal');
+            if (modal) {
+                observer.observe(modal, { attributes: true, attributeFilter: ['style'] });
+            }
+        });
+        
+        // Test function to verify OpenStreetMap works
+        window.testOSMSearch = async function(query = 'lawn club manchester') {
+            console.log('🧪 Testing OSM search for:', query);
+            try {
+                const response = await fetch(
+                    `https://nominatim.openstreetmap.org/search?` +
+                    `q=${encodeURIComponent(query + ' UK')}` +
+                    `&format=json` +
+                    `&countrycodes=gb` +
+                    `&limit=10`
+                );
+                const data = await response.json();
+                console.log('✅ OSM Response:', data);
+                return data;
+            } catch (error) {
+                console.error('❌ OSM Error:', error);
+            }
+        };
+        </script>
         
     </body>
 </html>
