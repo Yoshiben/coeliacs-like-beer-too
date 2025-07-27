@@ -460,7 +460,7 @@ html {
     padding: var(--space-lg);
     background: rgba(255, 0, 0, 0.1); /* Temporary red background */
     width: 100%; /* Ensure full width */
-/*     background: transparent; /* Or use a subtle gradient */ */
+    position: relative;
 }
 
 /* Ensure the home button matches */
@@ -485,6 +485,7 @@ html {
     font-weight: 600;
     box-shadow: var(--shadow-sm);
     margin-left: auto !important;
+    position: absolute;
 }
 
 .map-overlay-content {
