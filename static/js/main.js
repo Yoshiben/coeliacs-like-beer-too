@@ -390,6 +390,29 @@ const App = {
                 const modal = element.closest('.modal, .search-modal');
                 if (modal) this.closeModal(modal.id);
             }
+
+            'go-to-my-location': () => {
+                console.log('📍 Go to my location clicked');
+                const mapModule = modules.map;
+                const currentLocation = window.App.state.userLocation;
+                
+                if (!currentLocation) {
+                    if (window.showSuccessToast) {
+                        window.showSuccessToast('📍 Location not available. Please enable location services.');
+                    }
+                    return;
+                }
+                
+                if (window.fullUKMap) {
+                    window.fullUKMap.setView([currentLocation.lat, currentLocation.lng], 14);
+                    
+                    if (window.fullUKMapUserMarker) {
+                        window.fullUKMapUserMarker.openPopup();
+                    }
+                    
+                    modules.tracking?.trackEvent('go_to_location', 'Map Interaction', 'button_click');
+                }
+            },
         };
         
         // Execute handler if exists
