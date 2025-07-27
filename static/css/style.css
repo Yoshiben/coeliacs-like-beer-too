@@ -484,7 +484,7 @@ html {
     border-radius: var(--radius-pill);
     font-weight: 600;
     box-shadow: var(--shadow-sm);
-    margin-left: auto;
+    margin-left: auto !important;
 }
 
 .map-overlay-content {
