@@ -462,7 +462,18 @@ html {
 }
 
 /* Ensure the home button matches */
-.map-overlay-nav .btn-nav-small {
+.map-overlay-nav .btn-home {
+    background: var(--bg-white);
+    color: var(--text-primary);
+    border: none;
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius-pill);
+    font-weight: 600;
+    box-shadow: var(--shadow-sm);
+}
+
+/* Ensure the home button matches */
+.map-overlay-nav .btn-location {
     background: var(--bg-white);
     color: var(--text-primary);
     border: none;
