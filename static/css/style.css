@@ -480,7 +480,7 @@ html {
     border-radius: var(--radius-xl);  /* Use your rounded corner variable */
     overflow: hidden;  /* IMPORTANT: Clips the map to the rounded shape */
     margin: 0;  /* Add some spacing around it */
-    padding: var(--space-sm) var(--space-sm);
+    padding: var(--space-md) var(--space-xs);
 }
 
 /* The actual map div also needs styling */
