@@ -443,6 +443,39 @@ html {
    FULL SCREEN MAP
    ================================ */
 
+/* Style the UK GF Beer Map title */
+.map-overlay-title {
+    background: var(--bg-white);
+    color: var(--text-primary);
+    padding: var(--space-md) var(--space-xl);
+    border-radius: var(--radius-pill);
+    font-size: var(--text-lg);
+    font-weight: 600;
+    box-shadow: var(--shadow-sm);
+    margin: 0;
+    display: inline-block;
+}
+
+/* Style the navigation bar container */
+.map-overlay-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-lg);
+    background: transparent; /* Or use a subtle gradient */
+}
+
+/* Ensure the home button matches */
+.map-overlay-nav .btn-nav-small {
+    background: var(--bg-white);
+    color: var(--text-primary);
+    border: none;
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius-pill);
+    font-weight: 600;
+    box-shadow: var(--shadow-sm);
+}
+
 .marker-cluster {
     background-color: transparent !important;
     border: none !important;
