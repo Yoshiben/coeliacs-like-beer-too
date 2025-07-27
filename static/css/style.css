@@ -138,7 +138,6 @@ body {
     color: var(--text-primary);
     line-height: 1.6;
     position: relative; /* Changed from fixed */
-/*     padding-bottom: 80px; */
     overscroll-behavior: none;
     -webkit-overflow-scrolling: auto;
     height: 100vh;
@@ -301,9 +300,6 @@ html {
     gap: var(--space-xs); /* Increased gap */
     width: 100%; /* Take up more width */
     height: 100%; /* Take up more height */
-/*     max-width: 700px; */
-/*     margin: auto;  */
-   /* Center it */
 }   
 
 .search-option {
@@ -443,8 +439,128 @@ html {
     text-align: center;
 }
 
+/* ================================
+   FULL SCREEN MAP
+   ================================ */
+
+.marker-cluster {
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.marker-cluster div {
+    background-color: var(--light-grey);
+    color: var(--text-white);
+    font-weight: bold;
+    text-align: center;
+    border-radius: 50%;
+}
+
+.marker-cluster-small div {
+    width: 15px;
+    height: 15px;
+    margin: 2.5px;
+    line-height: 15px;
+    font-size: 6px;
+}
+
+.marker-cluster-small {
+    width: 15px;
+    height: 15px;
+}
+
+.marker-cluster-medium div {
+    width: 20px;
+    height: 20px;
+    margin: 4px;
+    line-height: 20px;
+    font-size: 8px;
+}
+
+.marker-cluster-medium {
+    width: 20px;
+    height: 20px;
+}
+
+.marker-cluster-large div {
+    width: 30px;
+    height: 30px;
+    margin: 5px;
+    line-height: 30px;
+    font-size: 10px;
+}
+
+.marker-cluster-large {
+    width: 25px;
+    height: 25px;
+}
+
+/* ================================
+   MAP LOCATION BUTTON
+   ================================ */
+
+.map-location-btn {
+    background: var(--primary-gradient);
+    border: 2px solid var(--text-white);
+    border-radius: var(--radius);
+    padding: 8px 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--text-white);
+    transition: all var(--transition);
+    white-space: nowrap;
+    box-shadow: var(--shadow);
+}
+
+.map-location-btn:hover {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: var(--shadow-lg);
+}
+
+.location-icon {
+    font-size: 1.1rem;
+    line-height: 1;
+}
+
+.location-text {
+    display: none;
+}
+
+/* ================================
+   ZOOM HINT
+   ================================ */
+
+.zoom-hint-container {
+    background: var(--bg-white);
+    border-radius: var(--radius);
+    padding: 10px 16px;
+    box-shadow: var(--shadow);
+    border: 2px solid var(--primary-border);
+    margin: 10px;
+}
+
+.zoom-hint {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.zoom-hint-icon {
+    font-size: 1.2rem;
+    animation: gentle-pulse 2s ease-in-out infinite;
+}
+
 
 /* VALIDATED TO HERE */
+
 
 
 
@@ -641,121 +757,7 @@ html {
     box-shadow: var(--shadow-sm);
 }
 
-/* ================================
-   MAP CLUSTERS - CONSOLIDATED
-   ================================ */
-.marker-cluster {
-    background-color: transparent;
-    border: none;
-    box-shadow: none;
-}
 
-.marker-cluster div {
-    background-color: var(--cluster-bg-solid);
-    color: var(--cluster-text);
-    font-weight: bold;
-    text-align: center;
-    border-radius: 50%;
-}
-
-.marker-cluster-small div {
-    width: 15px;
-    height: 15px;
-    margin: 2.5px;
-    line-height: 15px;
-    font-size: 6px;
-}
-
-.marker-cluster-small {
-    width: 15px;
-    height: 15px;
-}
-
-.marker-cluster-medium div {
-    width: 20px;
-    height: 20px;
-    margin: 4px;
-    line-height: 20px;
-    font-size: 8px;
-}
-
-.marker-cluster-medium {
-    width: 20px;
-    height: 20px;
-}
-
-.marker-cluster-large div {
-    width: 30px;
-    height: 30px;
-    margin: 5px;
-    line-height: 30px;
-    font-size: 10px;
-}
-
-.marker-cluster-large {
-    width: 25px;
-    height: 25px;
-}
-
-/* ================================
-   MAP LOCATION BUTTON
-   ================================ */
-.map-location-btn {
-    background: var(--primary-gradient);
-    border: 2px solid var(--text-white);
-    border-radius: var(--radius);
-    padding: 8px 12px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: var(--text-sm);
-    font-weight: 600;
-    color: var(--text-white);
-    transition: all var(--transition);
-    white-space: nowrap;
-    box-shadow: var(--shadow);
-}
-
-.map-location-btn:hover {
-    transform: translateY(-2px) scale(1.05);
-    box-shadow: var(--shadow-lg);
-}
-
-.location-icon {
-    font-size: 1.1rem;
-    line-height: 1;
-}
-
-.location-text {
-    display: none;
-}
-
-/* ================================
-   ZOOM HINT
-   ================================ */
-.zoom-hint-container {
-    background: var(--bg-white);
-    border-radius: var(--radius);
-    padding: 10px 16px;
-    box-shadow: var(--shadow);
-    border: 2px solid var(--primary-border);
-    margin: 10px;
-}
-
-.zoom-hint {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: var(--text-sm);
-    color: var(--text-secondary);
-    font-weight: 500;
-}
-
-.zoom-hint-icon {
-    font-size: 1.2rem;
-    animation: gentle-pulse 2s ease-in-out infinite;
-}
 
 /* ================================
    REPORT MODAL - CONSOLIDATED
