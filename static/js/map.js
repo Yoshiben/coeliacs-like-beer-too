@@ -1091,9 +1091,6 @@ export const MapModule = (function() {
         // Add zoom hint
         addZoomHint(window.fullUKMap);
         
-        // Add "Go to My Location" button (even if no location yet)
-        addLocationButton(window.fullUKMap);
-        
         // Load and display all pubs
         await loadAllPubsOnMap();
         
