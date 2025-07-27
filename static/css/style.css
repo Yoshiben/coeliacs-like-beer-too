@@ -481,6 +481,7 @@ html {
     overflow: hidden;  /* IMPORTANT: Clips the map to the rounded shape */
     margin: 0;  /* Add some spacing around it */
     padding: var(--space-md) var(--space-xs);
+    background: transparent;
 }
 
 /* The actual map div also needs styling */
