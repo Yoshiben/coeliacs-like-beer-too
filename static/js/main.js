@@ -461,10 +461,11 @@ const App = {
     },
     
     showFullMap(modules) {
+        console.log('🗺️ Showing full UK map...');
         const mapOverlay = document.getElementById('fullMapOverlay');
         if (mapOverlay) {
             mapOverlay.classList.add('active');
-            mapOverlay.style.display = 'flex';
+            mapOverlay.style.display = 'flex';  // Force display
             document.body.style.overflow = 'hidden';
             
             if (modules.map?.initFullUKMap) {
@@ -472,6 +473,8 @@ const App = {
             }
             
             modules.tracking?.trackEvent('full_map_view', 'Navigation', 'nav_bar');
+        } else {
+            console.error('❌ Map overlay element not found!');
         }
     },
     
