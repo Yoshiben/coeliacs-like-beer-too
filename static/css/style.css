@@ -470,6 +470,7 @@ html {
     border-radius: var(--radius-pill);
     font-weight: 600;
     box-shadow: var(--shadow-sm);
+    margin-right: auto;
 }
 
 /* Ensure the home button matches */
@@ -481,6 +482,7 @@ html {
     border-radius: var(--radius-pill);
     font-weight: 600;
     box-shadow: var(--shadow-sm);
+    margin-left: auto;
 }
 
 .map-overlay-content {
