@@ -479,16 +479,16 @@ html {
 .map-overlay-content {
     border-radius: var(--radius-xl);  /* Use your rounded corner variable */
     overflow: hidden;  /* IMPORTANT: Clips the map to the rounded shape */
-    margin: 0;  /* Add some spacing around it */
-    padding: var(--space-md) var(--space-xs);
-    background: transparent;
+    margin: var(--spece-lg);  /* Add some spacing around it */
+/*     padding: var(--space-md) var(--space-xs); */
+    flex:1;
 }
 
 /* The actual map div also needs styling */
 #fullMap {
     width: 100%;
     height: 100%;
-    border-radius: var(--radius-xl);  /* Match the container */
+    border-radius: 0  /* Match the container */
 }
 
 .marker-cluster {
