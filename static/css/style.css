@@ -486,6 +486,7 @@ html {
     box-shadow: var(--shadow-sm);
     margin-left: auto !important;
     position: absolute;
+    right: var(--space-lg); /* THIS moves it to the right! */
 }
 
 .map-overlay-content {
