@@ -476,6 +476,19 @@ html {
     box-shadow: var(--shadow-sm);
 }
 
+.map-overlay-content {
+    border-radius: var(--radius-xl);  /* Use your rounded corner variable */
+    overflow: hidden;  /* IMPORTANT: Clips the map to the rounded shape */
+    margin: 0 var(--space-lg) var(--space-lg);  /* Add some spacing around it */
+}
+
+/* The actual map div also needs styling */
+#fullMap {
+    width: 100%;
+    height: 100%;
+    border-radius: var(--radius-xl);  /* Match the container */
+}
+
 .marker-cluster {
     background-color: transparent !important;
     border: none !important;
