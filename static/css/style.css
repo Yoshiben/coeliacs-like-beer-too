@@ -458,7 +458,6 @@ html {
     justify-content: space-between;
     align-items: center;
     padding: var(--space-lg);
-    background: rgba(255, 0, 0, 0.1); /* Temporary red background */
     width: 100%; /* Ensure full width */
     position: relative;
 }
@@ -492,7 +491,7 @@ html {
 .map-overlay-content {
     border-radius: var(--radius-xl);  /* Use your rounded corner variable */
     overflow: hidden;  /* IMPORTANT: Clips the map to the rounded shape */
-    margin: 0 0 var(--spece-sm) 0;  /* Add some spacing around it */
+    margin: 0 0 var(--spece-lg) 0;  /* Add some spacing around it */
 /*     padding: var(--space-md) var(--space-xs); */
     flex:1;
 }
