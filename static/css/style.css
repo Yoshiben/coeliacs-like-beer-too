@@ -444,17 +444,13 @@ html {
    ================================ */
 
 /* Style the UK GF Beer Map title */
-.map-overlay-title {
-/*     background: var(--bg-white); */
+/* .map-overlay-title {
     color: var(--text-white);
     padding: var(--space-md) var(--space-xl);
-/*     border-radius: var(--radius-pill); */
     font-size: var(--text-lg);
     font-weight: 600;
-/*     box-shadow: var(--shadow-sm); */
     margin: 0;
-/*     display: inline-block; */
-}
+} */
 
 /* Style the navigation bar container */
 .map-overlay-nav {
@@ -479,7 +475,7 @@ html {
 .map-overlay-content {
     border-radius: var(--radius-xl);  /* Use your rounded corner variable */
     overflow: hidden;  /* IMPORTANT: Clips the map to the rounded shape */
-    margin: var(--spece-lg);  /* Add some spacing around it */
+    margin: 0 0 var(--spece-xs) 0;  /* Add some spacing around it */
 /*     padding: var(--space-md) var(--space-xs); */
     flex:1;
 }
