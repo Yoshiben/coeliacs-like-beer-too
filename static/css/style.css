@@ -450,7 +450,7 @@ html {
 }
 
 .marker-cluster div {
-    background-color: var(--light-grey);
+    background-color: var(--light-grey) !important;
     color: var(--text-white);
     font-weight: bold;
     text-align: center;
