@@ -458,7 +458,9 @@ html {
     justify-content: space-between;
     align-items: center;
     padding: var(--space-lg);
-    background: transparent; /* Or use a subtle gradient */
+    background: rgba(255, 0, 0, 0.1); /* Temporary red background */
+    width: 100%; /* Ensure full width */
+/*     background: transparent; /* Or use a subtle gradient */ */
 }
 
 /* Ensure the home button matches */
