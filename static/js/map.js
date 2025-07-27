@@ -1107,61 +1107,6 @@ export const MapModule = (function() {
         console.log('✅ Full UK map initialized');
         return window.fullUKMap;
     };
-
-    // Add "Go to My Location" button to the map
-    const addLocationButton = (mapInstance) => {
-        // Create custom control
-        const LocationControl = L.Control.extend({
-            options: {
-                position: 'topleft'
-            },
-            
-            onAdd: function(map) {
-                const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
-                
-                const button = L.DomUtil.create('button', 'map-location-btn', container);
-                button.innerHTML = `
-                    <span class="location-icon">📍</span>
-                    <span class="location-text">Go to My Location</span>
-                `;
-                button.title = 'Click to center map on your location';
-                
-                // Prevent map click events
-                L.DomEvent.disableClickPropagation(button);
-                L.DomEvent.on(button, 'click', function(e) {
-                    L.DomEvent.preventDefault(e);
-                    
-                    // Check if we have location
-                    const currentLocation = getUserLocation();
-                    if (!currentLocation) {
-                        console.log('📍 No user location available');
-                        if (window.showSuccessToast) {
-                            window.showSuccessToast('📍 Location not available. Please enable location services.');
-                        }
-                        return;
-                    }
-                    
-                    // Center on location
-                    map.setView([currentLocation.lat, currentLocation.lng], 14);
-                    
-                    // Flash the user marker
-                    if (window.fullUKMapUserMarker) {
-                        window.fullUKMapUserMarker.openPopup();
-                    }
-                    
-                    // Track the action
-                    if (window.TrackingModule) {
-                        window.TrackingModule.trackEvent('go_to_location', 'Map Interaction', 'button_click');
-                    }
-                });
-                
-                return container;
-            }
-        });
-        
-        // Add the control to the map
-        mapInstance.addControl(new LocationControl());
-    };
     
     // Load all pubs from the API
     const loadAllPubsOnMap = async () => {
