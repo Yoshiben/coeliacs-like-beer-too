@@ -451,9 +451,9 @@ html {
 /*     border-radius: var(--radius-pill); */
     font-size: var(--text-lg);
     font-weight: 600;
-    box-shadow: var(--shadow-sm);
+/*     box-shadow: var(--shadow-sm); */
     margin: 0;
-    display: inline-block;
+/*     display: inline-block; */
 }
 
 /* Style the navigation bar container */
