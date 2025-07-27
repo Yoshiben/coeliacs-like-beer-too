@@ -23,7 +23,6 @@
    --green: rgba(0,245,0,1);
    --red: rgba(239,68,68,1);
    --light-grey: rgba(156,163,175,1);
-   --location-blue: rgba(102,126,234,1);
    
    /* Brand Colors & Gradients */
    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -473,8 +472,6 @@ html {
     font-weight: 600;
     box-shadow: var(--shadow-sm);
     margin-right: auto;
-    position: absolute;
-    left: var(--space-lg); /* THIS moves it to the right! */
 }
 
 /* Ensure the home button matches */
@@ -649,26 +646,6 @@ html {
     color: var(--text-primary);
     font-size: var(--text-xs);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /* ================================
    STATUS BADGES - USING CONSOLIDATED COLORS
@@ -1211,6 +1188,177 @@ html {
     background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
     background-clip: content-box;
 }95);
+   --bg-glass: rgba(255, 255, 255, 0.1);
+   --bg-section: rgba(248, 250, 252, 0.8);
+   --bg-overlay: rgba(0, 0, 0, 0.8);
+   
+   /* Button System */
+   --btn-height: 44px;
+   --btn-height-sm: 36px;
+   --btn-height-lg: 56px;
+   --btn-padding: 12px 20px;
+   --btn-padding-sm: 8px 16px;
+   --btn-padding-lg: 16px 24px;
+   
+   /* Spacing System */
+   --space-xs: 4px;
+   --space-sm: 8px;
+   --space-md: 12px;
+   --space-lg: 16px;
+   --space-xl: 20px;
+   --space-2xl: 24px;
+   --space-3xl: 32px;
+   --space-4xl: 40px;
+   
+   /* Border Radius */
+   --radius-sm: 8px;
+   --radius: 12px;
+   --radius-lg: 15px;
+   --radius-xl: 20px;
+   --radius-pill: 25px;
+   
+   /* Shadows */
+   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+   --shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+   --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.2);
+   --shadow-xl: 0 12px 40px rgba(0, 0, 0, 0.25);
+   
+   /* Z-Index Scale */
+   --z-base: 1;
+   --z-dropdown: 100;
+   --z-search-suggestions: 150;
+   --z-sticky: 200;
+   --z-navigation: 800;
+   --z-toast: 900;
+   --z-results-overlay: 1000;
+   --z-pub-details: 1100;
+   --z-modal-backdrop: 1200;
+   --z-modal-content: 1210;
+   --z-status-modals: 1300;
+   --z-cookie: 1400;
+   
+   /* Transitions */
+   --transition-fast: 0.15s ease-out;
+   --transition: 0.25s ease-out;
+   --transition-slow: 0.4s ease-out;
+   
+   /* Typography Scale */
+   --text-xs: 0.75rem;
+   --text-sm: 0.875rem;
+   --text-md: 1rem;
+   --text-lg: 1.125rem;
+   --text-xl: 1.25rem;
+   --text-2xl: 1.5rem;
+   --text-3xl: 1.875rem;
+   --text-4xl: 2.25rem;
+   
+   /* Container Widths */
+   --container-sm: 640px;
+   --container-md: 768px;
+   --container-lg: 1024px;
+   --container-xl: 1200px;
+   
+   /* Core UI Colors */
+   --divider-color: rgba(102, 126, 234, 0.1);
+   --border-light: rgba(0, 0, 0, 0.1);    
+   --hover-subtle: rgba(102, 126, 234, 0.05);
+   
+   /* CONSOLIDATED MAP MARKER COLORS - SINGLE SOURCE OF TRUTH */
+   --always-gf-fill: #FFD700;
+   --always-gf-border: #FFA500;
+   --currently-gf-fill: #10b981;
+   --currently-gf-border: #ffffff;
+   --no-gf-fill: #ef4444;
+   --no-gf-border: #ffffff;
+   --unknown-gf-fill: #9ca3af;
+   --unknown-gf-border: #ffffff;
+   --marker-user-fill: #667eea;
+   --marker-user-stroke: #ffffff;
+   
+   /* Map Settings */
+   --marker-radius: 8;
+   --marker-stroke-width: 2;
+   
+   /* Search Option Colors */
+   --search-location-bg: rgba(16, 185, 129, 0.1);
+   --search-location-border: rgba(16, 185, 129, 0.2);
+   --search-location-border-hover: rgba(16, 185, 129, 0.4);
+   
+   --search-name-bg: rgba(59, 130, 246, 0.1);
+   --search-name-border: rgba(59, 130, 246, 0.2);
+   --search-name-border-hover: rgba(59, 130, 246, 0.4);
+   
+   --search-beer-bg: rgba(245, 158, 11, 0.1);
+   --search-beer-border: rgba(245, 158, 11, 0.2);
+   --search-beer-border-hover: rgba(245, 158, 11, 0.4);
+   
+   --search-area-bg: rgba(139, 92, 246, 0.1);
+   --search-area-border: rgba(139, 92, 246, 0.2);
+   --search-area-border-hover: rgba(139, 92, 246, 0.4);
+   
+   /* Status UI Colors - Using Main Marker Colors */
+   --status-always-bg: rgba(255, 215, 0, 0.1);
+   --status-always-border: rgba(255, 215, 0, 0.3);
+   --status-always-text: #B8860B;
+   
+   --status-current-bg: rgba(16, 185, 129, 0.1);
+   --status-current-border: rgba(16, 185, 129, 0.3);
+   --status-current-text: #059669;
+   
+   --status-no-bg: rgba(239, 68, 68, 0.1);
+   --status-no-border: rgba(239, 68, 68, 0.3);
+   --status-no-text: #dc2626;
+   
+   --status-unknown-bg: rgba(156, 163, 175, 0.1);
+   --status-unknown-border: rgba(156, 163, 175, 0.3);
+   --status-unknown-text: #6b7280;
+   
+   /* Enhanced Brand Colors */
+   --primary-bg: rgba(102, 126, 234, 0.1);
+   --primary-border: rgba(102, 126, 234, 0.2);
+   --primary-shadow: rgba(102, 126, 234, 0.3);
+   
+   --success-bg: rgba(16, 185, 129, 0.1);
+   --success-border: rgba(16, 185, 129, 0.2);
+   --success-border-strong: rgba(16, 185, 129, 0.6);
+   --success-shadow: rgba(16, 185, 129, 0.3);
+   --success-text: #10b981;
+   
+   --purple-bg: rgba(139, 92, 246, 0.1);
+   --purple-border: rgba(139, 92, 246, 0.3);
+   --purple-shadow: rgba(139, 92, 246, 0.4);
+   --purple-text: #8b5cf6;
+   
+   /* Enhanced Shadows */
+   --shadow-primary: 0 4px 15px var(--primary-shadow);
+   --shadow-success: 0 4px 15px var(--success-shadow);
+   --shadow-purple: 0 4px 15px var(--purple-shadow);
+   --shadow-blue: 0 4px 15px rgba(59, 130, 246, 0.3);
+   
+   /* Glass Effects */
+   --glass-white: rgba(255, 255, 255, 0.9);
+   --glass-overlay: rgba(255, 255, 255, 0.2);
+   
+   /* Modal System */
+   --modal-backdrop: rgba(0, 0, 0, 0.8);
+   --modal-blur: blur(5px);
+   
+   /* Cluster Colors */
+   --cluster-bg-solid: rgba(156, 163, 175, 0.9);
+   --cluster-text: #ffffff;
+   
+   /* Special Effects */
+   --gold-star-glow: 0 0 10px rgba(255, 215, 0, 0.6);
+   
+   /* Legend System */
+   --legend-bg: rgba(255, 255, 255, 0.95);
+   --legend-marker-size: 12px;
+   --legend-user-marker-size: 10px;
+   
+   /* Animation Durations */
+   --marker-pulse-duration: 1s;
+   --marker-pulse-count: 2;
+}
 
 /* ================================
    RESET & BASE STYLES
