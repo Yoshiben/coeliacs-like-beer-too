@@ -445,10 +445,10 @@ html {
 
 /* Style the UK GF Beer Map title */
 .map-overlay-title {
-    background: var(--bg-white);
-    color: var(--text-primary);
+/*     background: var(--bg-white); */
+    color: var(--text-white);
     padding: var(--space-md) var(--space-xl);
-    border-radius: var(--radius-pill);
+/*     border-radius: var(--radius-pill); */
     font-size: var(--text-lg);
     font-weight: 600;
     box-shadow: var(--shadow-sm);
