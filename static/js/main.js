@@ -389,7 +389,7 @@ const App = {
             'close-modal': () => {
                 const modal = element.closest('.modal, .search-modal');
                 if (modal) this.closeModal(modal.id);
-            }
+            },
 
             'go-to-my-location': () => {
                 console.log('📍 Go to my location clicked');
@@ -412,7 +412,7 @@ const App = {
                     
                     modules.tracking?.trackEvent('go_to_location', 'Map Interaction', 'button_click');
                 }
-            },
+            }
         };
         
         // Execute handler if exists
