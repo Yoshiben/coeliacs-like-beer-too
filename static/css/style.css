@@ -475,7 +475,7 @@ html {
 .map-overlay-content {
     border-radius: var(--radius-xl);  /* Use your rounded corner variable */
     overflow: hidden;  /* IMPORTANT: Clips the map to the rounded shape */
-    margin: 0 0 var(--spece-xs) 0;  /* Add some spacing around it */
+    margin: 0 0 var(--spece-sm) 0;  /* Add some spacing around it */
 /*     padding: var(--space-md) var(--space-xs); */
     flex:1;
 }
