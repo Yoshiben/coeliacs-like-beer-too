@@ -489,7 +489,9 @@ html {
 #distanceModal,
 #nameModal,
 #areaModal,
-#beerModal {
+#beerModal,
+#resultsOverlay,
+#pubDetailsOverlay {
     display: none; /* Hidden by default */
 }
 
