@@ -951,6 +951,9 @@ export const SearchModule = (function() {
     // UI HELPERS
     // ================================
     const showResultsOverlay = (title) => {
+        console.log('🔍 showResultsOverlay called with:', title);
+        console.trace(); // This will show you what called it
+        // ... rest of function
         console.log('📋 Showing results overlay:', title);
         
         const resultsOverlay = document.getElementById('resultsOverlay');
