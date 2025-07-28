@@ -180,7 +180,7 @@ html {
 .hero-section {
     background: var(--primary-gradient);
     color: var(--text-white);
-    padding: var(--space-xs) var(--space-xl) var(--space-md);
+/*     padding: var(--space-xs) var(--space-xl) var(--space-md); */
     text-align: center;
     position: relative;
     overflow: hidden;
