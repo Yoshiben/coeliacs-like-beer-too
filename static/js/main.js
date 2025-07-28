@@ -114,14 +114,13 @@ const App = {
     
     async loadPhase4() {
         console.log('🔧 Phase 4: Loading Features...');
-        console.log('🔍 About to register search module');
-        this.registerModule('search', SearchModule);
-        console.log('🔍 Search module registered');
         
         const { MapModule } = await import('./map.js');
         const { SearchModule } = await import('./search.js');
         const { FormModule } = await import('./forms.js');
         
+        // NOW you can use the modules after the imports complete
+        console.log('🔍 About to register search module');
         this.registerModule('map', MapModule);
         this.registerModule('search', SearchModule);
         this.registerModule('form', FormModule);
