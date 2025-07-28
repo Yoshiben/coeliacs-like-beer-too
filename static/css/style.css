@@ -23,6 +23,7 @@
    --green: rgba(0,245,0,1);
    --red: rgba(239,68,68,1);
    --light-grey: rgba(156,163,175,1);
+   --light-blue: rba(102,126,234,1);
    
    /* Brand Colors & Gradients */
    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -113,10 +114,12 @@
    --always-gf-border: var(--dark-gold);
    --currently-gf-fill: var(--green);
    --currently-gf-border: var(--white);
-   --no-gf-fill: #ef4444; var(--red);
-   --no-gf-border: #ffffff; var(--white);
-   --unknown-gf-fill: #9ca3af; var(--light-grey);
-   --unknown-gf-border: #ffffff; var(--white);
+   --no-gf-fill: var(--red);
+   --no-gf-border: var(--white);
+   --unknown-gf-fill: var(--light-grey);
+   --unknown-gf-border: var(--white);
+   --my-location-fill: var(--light-blue);
+   --my-location-border: var(--white);
 
    /* Transitions */
    --transition-fast: 0.15s ease-out;
@@ -127,6 +130,12 @@
    --divider-color: rgba(102, 126, 234, 0.1);
    --border-light: rgba(0, 0, 0, 0.1);    
    --hover-subtle: rgba(102, 126, 234, 0.05);
+
+      /* Container Widths */
+   --container-sm: 640px;
+   --container-md: 768px;
+   --container-lg: 1024px;
+   --container-xl: 1200px;
    
 }
 
@@ -638,7 +647,7 @@ html {
 .legend-marker.user-location {
     width: var(--space-md);
     height: var(--space-md);
-    background: var(--location-blue);
+    background: var(--my-location-blue);
     border-color: var(--white);
 }
 
@@ -646,6 +655,24 @@ html {
     color: var(--text-primary);
     font-size: var(--text-xs);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* ================================
    STATUS BADGES - USING CONSOLIDATED COLORS
@@ -1187,98 +1214,8 @@ html {
 .modal::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
     background-clip: content-box;
-}95);
-   --bg-glass: rgba(255, 255, 255, 0.1);
-   --bg-section: rgba(248, 250, 252, 0.8);
-   --bg-overlay: rgba(0, 0, 0, 0.8);
-   
-   /* Button System */
-   --btn-height: 44px;
-   --btn-height-sm: 36px;
-   --btn-height-lg: 56px;
-   --btn-padding: 12px 20px;
-   --btn-padding-sm: 8px 16px;
-   --btn-padding-lg: 16px 24px;
-   
-   /* Spacing System */
-   --space-xs: 4px;
-   --space-sm: 8px;
-   --space-md: 12px;
-   --space-lg: 16px;
-   --space-xl: 20px;
-   --space-2xl: 24px;
-   --space-3xl: 32px;
-   --space-4xl: 40px;
-   
-   /* Border Radius */
-   --radius-sm: 8px;
-   --radius: 12px;
-   --radius-lg: 15px;
-   --radius-xl: 20px;
-   --radius-pill: 25px;
-   
-   /* Shadows */
-   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
-   --shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-   --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.2);
-   --shadow-xl: 0 12px 40px rgba(0, 0, 0, 0.25);
-   
-   /* Z-Index Scale */
-   --z-base: 1;
-   --z-dropdown: 100;
-   --z-search-suggestions: 150;
-   --z-sticky: 200;
-   --z-navigation: 800;
-   --z-toast: 900;
-   --z-results-overlay: 1000;
-   --z-pub-details: 1100;
-   --z-modal-backdrop: 1200;
-   --z-modal-content: 1210;
-   --z-status-modals: 1300;
-   --z-cookie: 1400;
-   
-   /* Transitions */
-   --transition-fast: 0.15s ease-out;
-   --transition: 0.25s ease-out;
-   --transition-slow: 0.4s ease-out;
-   
-   /* Typography Scale */
-   --text-xs: 0.75rem;
-   --text-sm: 0.875rem;
-   --text-md: 1rem;
-   --text-lg: 1.125rem;
-   --text-xl: 1.25rem;
-   --text-2xl: 1.5rem;
-   --text-3xl: 1.875rem;
-   --text-4xl: 2.25rem;
-   
-   /* Container Widths */
-   --container-sm: 640px;
-   --container-md: 768px;
-   --container-lg: 1024px;
-   --container-xl: 1200px;
-   
-   /* Core UI Colors */
-   --divider-color: rgba(102, 126, 234, 0.1);
-   --border-light: rgba(0, 0, 0, 0.1);    
-   --hover-subtle: rgba(102, 126, 234, 0.05);
-   
-   /* CONSOLIDATED MAP MARKER COLORS - SINGLE SOURCE OF TRUTH */
-   --always-gf-fill: #FFD700;
-   --always-gf-border: #FFA500;
-   --currently-gf-fill: #10b981;
-   --currently-gf-border: #ffffff;
-   --no-gf-fill: #ef4444;
-   --no-gf-border: #ffffff;
-   --unknown-gf-fill: #9ca3af;
-   --unknown-gf-border: #ffffff;
-   --marker-user-fill: #667eea;
-   --marker-user-stroke: #ffffff;
-   
-   /* Map Settings */
-   --marker-radius: 8;
-   --marker-stroke-width: 2;
-   
+}
+      
    /* Search Option Colors */
    --search-location-bg: rgba(16, 185, 129, 0.1);
    --search-location-border: rgba(16, 185, 129, 0.2);
