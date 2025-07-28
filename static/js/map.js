@@ -1113,7 +1113,6 @@ export const MapModule = (function() {
                 return;
             }
             
-            // Fetch all pubs in background
             fetch('/api/all-pubs')
                 .then(response => response.json())
                 .then(data => {
@@ -1127,15 +1126,23 @@ export const MapModule = (function() {
                     // Set up zoom handler
                     setupZoomHandler();
                     
+                    // Add markers immediately when data loads
+                    if (window.fullUKMap && window.allPubsData.length > 0) {
+                        requestAnimationFrame(() => {
+                            addFilteredPubMarkers(window.allPubsData, window.fullUKMap);
+                        });
+                    }
+                    
                     // Show toast notification
                     const gfCount = window.allPubsData.filter(p => 
                         p.gf_status === 'always' || p.gf_status === 'currently'
                     ).length;
                     
                     if (window.showSuccessToast) {
-                        window.showSuccessToast(`✅ ${gfCount} pubs with GF beer loaded!`);
+                        window.showSuccessToast(`✅ ${gfCount} pubs with GF beer ready!`);
                     }
                 })
+        })
                 .catch(error => {
                     console.error('❌ Error loading pubs:', error);
                 });
