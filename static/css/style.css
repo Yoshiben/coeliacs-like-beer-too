@@ -155,21 +155,7 @@ body {
    width: 100%;
    display: flex;
    flex-direction: column;
-/*    border: 5px solid red !important; */
 }
-
-/* body::before {
-    content: "MOBILE VIEW";
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: red;
-    color: white;
-    padding: 20px;
-    z-index: 99999;
-    font-size: 2rem;
-} */
 
 .home-page {
    flex: 1;
@@ -3015,29 +3001,15 @@ p {
    ================================ */
 @media (max-width: 768px) {
    body {
-      position: relative !important; /* Override fixed */
-      height: auto !important; /* Override 100dvh */
-      overflow-y: visible !important; /* Allow scroll */
     }
 
    .home-page {
-      min-height: 100vh;
-      padding-bottom: 100px; /* Extra space for nav + Samsung bar */
     }
 
    .bottom-nav {
-      position: fixed !important;
-      bottom: 48px !important; /* Height of Samsung nav bar */
-      left: 0 !important;
-      right: 0 !important;
-      background: white !important;
-      z-index: 999999 !important;
-      height: 60px !important;
-      display: flex !important;
     }
    
    .search-section {
-      min-height: 400px; /* Just ensure it's visible */
     }
    
    .search-options {
