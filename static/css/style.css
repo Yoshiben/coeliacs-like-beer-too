@@ -2995,17 +2995,28 @@ p {
    ================================ */
 @media (max-width: 768px) {
    body {
+      display: flex;
+      flex-direction: column;
       height: 100vh;
-      height: 100dvh;
-      height: -webkit-fill-available; /* Older Safari/Chrome */
-      max-height: -webkit-fill-available;
+      margin: 0;
+      overflow: hidden
    }
 
    .home-page {
-      height: 100vh;
-      height: 100dvh;
-      padding-bottom: env(safe-area-inset-bottom); /* For iPhone gesture bar */
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding-bottom: 100px; /* Extra padding for nav + Samsung bar */
     }
+
+   .bottom-nav {
+      position: fixed; /* Back to fixed on mobile */
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      /* Samsung bar is usually 48px, so nav sits at bottom:0 but visible above it */
+   }
    
    /* Search section styles */
     .search-section {
