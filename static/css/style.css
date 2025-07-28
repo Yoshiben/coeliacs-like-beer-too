@@ -178,12 +178,12 @@ html {
 }
 
 /* Hide other sections when on home */
-.footer,
+/* .footer,
 .map-section,
 .about-section,
 .any-other-section {
     display: none !important;
-}
+} */
 
 /* ================================
    HERO SECTION
