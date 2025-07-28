@@ -59,6 +59,25 @@ export const SearchModule = (function() {
             const modal = getModal();
             if (modal) modal.close('distanceModal');
             
+            // Hide everything and show overlay immediately
+            const heroSection = document.querySelector('.hero-section');
+            const searchSection = document.querySelector('.search-section');
+            if (heroSection) heroSection.style.display = 'none';
+            if (searchSection) searchSection.style.display = 'none';
+            
+            const resultsOverlay = document.getElementById('resultsOverlay');
+            if (resultsOverlay) {
+                resultsOverlay.style.display = 'flex';
+                resultsOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+            
+            // Set title
+            const resultsTitle = document.getElementById('resultsTitle');
+            if (resultsTitle) {
+                resultsTitle.textContent = `Pubs within ${radiusKm}km`;
+            }
+            
             showResultsOverlay(`Pubs within ${radiusKm}km`);
             showResultsLoading('📍 Getting precise location...');
             
