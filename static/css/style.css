@@ -491,7 +491,8 @@ html {
 #areaModal,
 #beerModal,
 #resultsOverlay,
-#pubDetailsOverlay {
+#pubDetailsOverlay,
+#fullMapOverlay {
     display: none; /* Hidden by default */
 }
 
