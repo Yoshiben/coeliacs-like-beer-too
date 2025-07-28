@@ -305,7 +305,7 @@ html {
 
 .search-section {
    height: calc(100vh - 25vh); 
-   height: calc(100dvh - 25vh); 
+   height: calc(100dvh - 25dvh); 
    /*     margin: -20px; /* Keep overlap with hero */ 
    display: flex;
    align-items: stretch;
