@@ -175,7 +175,7 @@ html {
    text-align: center;
    position: relative;
    overflow: hidden;
-   height: 20vh;
+   height: 17vh;
 }
 
 .hero-section::before {
@@ -187,7 +187,7 @@ html {
    right: -20px;
    z-index: var(--z-base);
    pointer-events: none;
-   height: 20vh;
+   height: 17vh;
 }
 
 .hero-content {
@@ -256,8 +256,8 @@ html {
    ================================ */
 
 .search-section {
-   height: calc(100vh - 25vh); 
-   height: calc(100dvh - 25dvh); 
+   height: calc(100vh - 20vh); 
+   height: calc(100dvh - 20dvh); 
    /*     margin: -20px; /* Keep overlap with hero */ 
    display: flex;
    align-items: stretch;
