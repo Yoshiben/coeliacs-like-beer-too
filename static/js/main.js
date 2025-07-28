@@ -657,17 +657,20 @@ document.addEventListener('DOMContentLoaded', () => {
         if (resultsOverlay) {
             console.log('Results overlay classes:', resultsOverlay.className);
             console.log('Results overlay display:', window.getComputedStyle(resultsOverlay).display);
-
             console.log('Results overlay inline style:', resultsOverlay.getAttribute('style'));
             console.log('Results overlay style.display:', resultsOverlay.style.display);
             
-            if (resultsOverlay.classList.contains('active')) {
-                resultsOverlay.classList.remove('active');
-                resultsOverlay.style.display = 'none';
-                console.log('✅ Removed active class from results overlay');
-            }
+            // ADD THIS NEW CHECK:
+            const checkRule = Array.from(document.styleSheets).some(sheet => {
+                try {
+                    return Array.from(sheet.cssRules || []).some(rule => 
+                        rule.selectorText === '.results-overlay'
+                    );
+                } catch(e) { return false; }
+            });
+            console.log('CSS rule .results-overlay exists?', checkRule);
         }
-    }, 1000); // Wait 1 second to see what happens after initialization
+    }, 1000);
 });
 
 console.log('🍺 Main module loaded - app will initialize when DOM ready...');
