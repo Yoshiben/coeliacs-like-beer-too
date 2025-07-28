@@ -1026,14 +1026,14 @@ export const MapModule = (function() {
             }
         }
         
-        // Determine initial view - prioritize user location if available
+        // Determine initial view - CHANGED: zoom closer when we have location
         let initialCenter = config.defaultCenter;
         let initialZoom = config.defaultZoom;
         
         if (window.App.state.userLocation) {
             initialCenter = [window.App.state.userLocation.lat, window.App.state.userLocation.lng];
-            initialZoom = config.defaultZoom; // Closer zoom when we have user location
-            console.log('📍 Centering map on user location:', initialCenter);
+            initialZoom = 14; // CHANGED: Much closer zoom for local view
+            console.log('📍 Centering map on user location with zoom:', initialZoom);
         } else {
             console.log('📍 No user location, using UK center');
         }
@@ -1101,82 +1101,90 @@ export const MapModule = (function() {
     
     // Load all pubs from the API
     const loadAllPubsOnMap = async () => {
-        console.log('📍 Loading all UK pubs for smart filtered map...');
+        console.log('📍 Loading UK pubs progressively...');
         
         try {
-            // Show loading state
-            const mapContainer = document.querySelector('.map-overlay-content');
-            if (mapContainer) {
-                const loadingDiv = document.createElement('div');
-                loadingDiv.className = 'map-loading-overlay';
-                loadingDiv.innerHTML = `
-                    <div class="loading-spinner"></div>
-                    <div class="loading-text">Loading GF beer venues across the UK <br> Please bear with us...</div>
-                `;
-                loadingDiv.style.cssText = `
-                    position: absolute;
-                    top: 0;
-                    left: 0;
-                    right: 0;
-                    bottom: 0;
-                    background: rgba(255, 255, 255, 0.9);
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                    z-index: 1000;
-                `;
-                mapContainer.appendChild(loadingDiv);
+            // Don't show loading overlay - load in background
+            
+            // Check if we already have the data
+            if (window.allPubsData && window.allPubsData.length > 0) {
+                console.log('✅ Using cached pub data');
+                setupZoomHandler();
+                return;
             }
             
-            // Fetch all pubs
-            const response = await fetch('/api/all-pubs');
-            const data = await response.json();
-            
-            if (!data.success) {
-                throw new Error(data.error || 'Failed to load pubs');
-            }
-            
-            window.allPubsData = data.pubs || [];
-            console.log(`📊 Got ${window.allPubsData.length} total pubs`);
-            
-            // Add initial filtered markers
-            if (window.fullUKMap) {
-                const markersShown = addFilteredPubMarkers(window.allPubsData, window.fullUKMap);
-                
-                // Set up zoom change handler
-                window.fullUKMap.on('zoomend', function() {
-                    console.log('🔍 Zoom changed, updating markers...');
-                    addFilteredPubMarkers(window.allPubsData, window.fullUKMap);
+            // Fetch all pubs in background
+            fetch('/api/all-pubs')
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        throw new Error(data.error || 'Failed to load pubs');
+                    }
+                    
+                    window.allPubsData = data.pubs || [];
+                    console.log(`📊 Loaded ${window.allPubsData.length} pubs in background`);
+                    
+                    // Set up zoom handler
+                    setupZoomHandler();
+                    
+                    // Show toast notification
+                    const gfCount = window.allPubsData.filter(p => 
+                        p.gf_status === 'always' || p.gf_status === 'currently'
+                    ).length;
+                    
+                    if (window.showSuccessToast) {
+                        window.showSuccessToast(`✅ ${gfCount} pubs with GF beer loaded!`);
+                    }
+                })
+                .catch(error => {
+                    console.error('❌ Error loading pubs:', error);
                 });
-            }
-            
-            // Remove loading overlay
-            const loadingOverlay = document.querySelector('.map-loading-overlay');
-            if (loadingOverlay) {
-                loadingOverlay.remove();
-            }
-            
-            // Show initial stats
-            const gfCount = window.allPubsData.filter(p => 
-                p.gf_status === 'always' || p.gf_status === 'currently'
-            ).length;
-            
-            if (window.showSuccessToast) {
-                window.showSuccessToast(`✅ Showing ${gfCount} pubs with GF beer!`);
-            }
             
         } catch (error) {
-            console.error('❌ Error loading pubs for map:', error);
-            
-            const loadingOverlay = document.querySelector('.map-loading-overlay');
-            if (loadingOverlay) {
-                loadingOverlay.remove();
-            }
-            
-            if (window.showSuccessToast) {
-                window.showSuccessToast('❌ Error loading pubs. Please try again.');
-            }
+            console.error('❌ Error in loadAllPubsOnMap:', error);
+        }
+    };
+    
+    // Add new function for zoom handling
+    const setupZoomHandler = () => {
+        if (!window.fullUKMap) return;
+        
+        // Clear any existing handlers
+        window.fullUKMap.off('zoomend');
+        
+        // Add debounced zoom handler
+        let zoomTimeout;
+        window.fullUKMap.on('zoomend', function() {
+            clearTimeout(zoomTimeout);
+            zoomTimeout = setTimeout(() => {
+                const zoom = window.fullUKMap.getZoom();
+                console.log(`🔍 Zoom level: ${zoom}`);
+                
+                // Only add markers when zoomed out enough and data is loaded
+                if (zoom < 10 && window.allPubsData && window.allPubsData.length > 0) {
+                    console.log('🔍 Adding pub markers...');
+                    requestAnimationFrame(() => {
+                        addFilteredPubMarkers(window.allPubsData, window.fullUKMap);
+                    });
+                } else if (zoom >= 10) {
+                    // Clear markers when zoomed in to reduce clutter
+                    console.log('🧹 Clearing markers (zoomed in)');
+                    if (window.gfPubsLayer) {
+                        window.gfPubsLayer.clearLayers();
+                    }
+                    if (window.clusteredPubsLayer) {
+                        window.clusteredPubsLayer.clearLayers();
+                    }
+                }
+            }, 300); // Debounce for 300ms
+        });
+        
+        // Trigger initial marker display if zoomed out
+        const currentZoom = window.fullUKMap.getZoom();
+        if (currentZoom < 10 && window.allPubsData && window.allPubsData.length > 0) {
+            requestAnimationFrame(() => {
+                addFilteredPubMarkers(window.allPubsData, window.fullUKMap);
+            });
         }
     };
     
