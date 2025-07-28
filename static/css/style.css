@@ -515,6 +515,12 @@ html {
    width: 100%;
    box-shadow: var(--shadow-lg);
    margin: 0;
+   z-index: var(--z-modal-content);
+   max-height: 92vh;
+   display: flex;
+   flex-direction: column;
+   overflow: hidden;
+   
 }
 
 .search-modal .modal-header {
@@ -612,7 +618,7 @@ html {
 }
 
 .map-overlay {
-   display:none;
+   display: none;
 }
 
 
@@ -802,22 +808,6 @@ html {
     padding: 8px;
     overflow-y: auto;
 }
-
-.modal-content {
-    position: relative;
-    background: var(--text-white);
-    border-radius: var(--radius-xl);
-    width: 100%;
-    box-shadow: var(--shadow-xl);
-    z-index: var(--z-modal-content);
-    max-width: 400px;
-    margin: 4vh auto;
-    max-height: 92vh;
-    display: none;
-    flex-direction: column;
-    overflow: hidden;
-}
-
 .modal-header {
     display: flex;
     justify-content: space-between;
