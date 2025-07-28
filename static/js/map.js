@@ -401,7 +401,7 @@ export const MapModule = (function() {
         window.gfPubsLayer = L.layerGroup().addTo(targetMap);
         window.clusteredPubsLayer = L.markerClusterGroup({
             maxClusterRadius: 40,  // Smaller radius for tighter clustering
-            disableClusteringAtZoom: 16,  // Show individual markers when very close
+            disableClusteringAtZoom: 12,  // Show individual markers when very close
             spiderfyOnMaxZoom: true,
             showCoverageOnHover: false,
             iconCreateFunction: function(cluster) {
@@ -1032,7 +1032,7 @@ export const MapModule = (function() {
         
         if (window.App.state.userLocation) {
             initialCenter = [window.App.state.userLocation.lat, window.App.state.userLocation.lng];
-            initialZoom = 14; // CHANGED: Much closer zoom for local view
+            initialZoom = 13; // CHANGED: Much closer zoom for local view
             console.log('📍 Centering map on user location with zoom:', initialZoom);
         } else {
             console.log('📍 No user location, using UK center');
