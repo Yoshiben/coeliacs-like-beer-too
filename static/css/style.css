@@ -349,6 +349,7 @@ html {
    box-shadow: var(--shadow-lg);
    backdrop-filter: blur(10px);
    overflow: hidden;
+   height: 100%;
 }
 
 .search-header {
