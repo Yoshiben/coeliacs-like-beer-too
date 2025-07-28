@@ -114,6 +114,9 @@ const App = {
     
     async loadPhase4() {
         console.log('🔧 Phase 4: Loading Features...');
+        console.log('🔍 About to register search module');
+        this.registerModule('search', SearchModule);
+        console.log('🔍 Search module registered');
         
         const { MapModule } = await import('./map.js');
         const { SearchModule } = await import('./search.js');
@@ -655,6 +658,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (resultsOverlay) {
             console.log('Results overlay classes:', resultsOverlay.className);
             console.log('Results overlay display:', window.getComputedStyle(resultsOverlay).display);
+
+            console.log('Results overlay inline style:', resultsOverlay.getAttribute('style'));
+            console.log('Results overlay style.display:', resultsOverlay.style.display);
             
             if (resultsOverlay.classList.contains('active')) {
                 resultsOverlay.classList.remove('active');
