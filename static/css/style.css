@@ -258,10 +258,10 @@ html {
    ================================ */
 
 .search-section {
-   height: calc(100vh - 260px); 
-   height: calc(100dvh - 260px); 
+/*    height: calc(100vh - 260px); 
+   height: calc(100dvh - 260px);  */
    /*     margin: -20px; /* Keep overlap with hero */ 
-   display: flex;
+   display: block;
    align-items: stretch;
    /*     position: relative;
    z-index: 10; */
@@ -3064,8 +3064,8 @@ p {
     
     /* Search section styles */
     .search-section {
-    height: calc(100vh - 220px);
-    height: calc(100dvh - 220px);
+/*     height: calc(100vh - 220px);
+    height: calc(100dvh - 220px); */
    }
    
    .search-options {
