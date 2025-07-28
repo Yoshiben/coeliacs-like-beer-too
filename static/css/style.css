@@ -175,7 +175,7 @@ html {
    text-align: center;
    position: relative;
    overflow: hidden;
-   height: 18vh;
+/*    height: 18vh; */
 }
 
 .hero-section::before {
@@ -187,7 +187,7 @@ html {
    right: -20px;
    z-index: var(--z-base);
    pointer-events: none;
-   height: 18vh;
+/*    height: 18vh; */
 }
 
 .hero-content {
@@ -201,7 +201,7 @@ html {
 .hero-title {
    font-size: clamp(1.75rem, 6vw, 2.75rem);
    font-weight: 700;
-   margin: var(--space-xs) 0;
+   margin: var(--space-md) 0 var(--space-xs);
 /*    margin-bottom: var(--space-xs); */
    text-shadow: var(--shadow-hero-title);
    letter-spacing: 0.5px;
