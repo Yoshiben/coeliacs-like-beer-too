@@ -1146,6 +1146,7 @@ export const MapModule = (function() {
     };
     
     // Add new function for zoom handling
+    // Add new function for zoom handling
     const setupZoomHandler = () => {
         if (!window.fullUKMap) return;
         
@@ -1160,32 +1161,72 @@ export const MapModule = (function() {
                 const zoom = window.fullUKMap.getZoom();
                 console.log(`🔍 Zoom level: ${zoom}`);
                 
-                // Only add markers when zoomed out enough and data is loaded
-                if (zoom < 10 && window.allPubsData && window.allPubsData.length > 0) {
-                    console.log('🔍 Adding pub markers...');
-                    requestAnimationFrame(() => {
-                        addFilteredPubMarkers(window.allPubsData, window.fullUKMap);
-                    });
-                } else if (zoom >= 10) {
-                    // Clear markers when zoomed in to reduce clutter
-                    console.log('🧹 Clearing markers (zoomed in)');
-                    if (window.gfPubsLayer) {
-                        window.gfPubsLayer.clearLayers();
-                    }
-                    if (window.clusteredPubsLayer) {
-                        window.clusteredPubsLayer.clearLayers();
+                if (window.allPubsData && window.allPubsData.length > 0) {
+                    if (zoom >= 10) {
+                        // When zoomed in, show ONLY GF pubs
+                        console.log('🔍 Showing only GF pubs (zoomed in)');
+                        showOnlyGFPubs();
+                    } else {
+                        // When zoomed out, show all pubs with clustering
+                        console.log('🔍 Showing all pubs with clustering');
+                        requestAnimationFrame(() => {
+                            addFilteredPubMarkers(window.allPubsData, window.fullUKMap);
+                        });
                     }
                 }
             }, 300); // Debounce for 300ms
         });
         
-        // Trigger initial marker display if zoomed out
+        // Initial display based on current zoom
         const currentZoom = window.fullUKMap.getZoom();
-        if (currentZoom < 10 && window.allPubsData && window.allPubsData.length > 0) {
-            requestAnimationFrame(() => {
-                addFilteredPubMarkers(window.allPubsData, window.fullUKMap);
-            });
+        if (window.allPubsData && window.allPubsData.length > 0) {
+            if (currentZoom >= 10) {
+                showOnlyGFPubs();
+            } else {
+                requestAnimationFrame(() => {
+                    addFilteredPubMarkers(window.allPubsData, window.fullUKMap);
+                });
+            }
         }
+    };
+
+    // Show only GF pubs when zoomed in
+    const showOnlyGFPubs = () => {
+        if (!window.fullUKMap || !window.allPubsData) return;
+        
+        // Clear existing layers
+        if (window.gfPubsLayer) {
+            window.fullUKMap.removeLayer(window.gfPubsLayer);
+        }
+        if (window.clusteredPubsLayer) {
+            window.fullUKMap.removeLayer(window.clusteredPubsLayer);
+        }
+        
+        // Create new layer for GF pubs only
+        window.gfPubsLayer = L.layerGroup().addTo(window.fullUKMap);
+        
+        // Filter and add only GF pubs
+        const gfPubs = window.allPubsData.filter(pub => 
+            pub.gf_status === 'always' || pub.gf_status === 'currently'
+        );
+        
+        console.log(`📍 Showing ${gfPubs.length} GF pubs`);
+        
+        gfPubs.forEach(pub => {
+            if (!pub.latitude || !pub.longitude) return;
+            
+            const lat = parseFloat(pub.latitude);
+            const lng = parseFloat(pub.longitude);
+            
+            const gfStatus = determineGFStatus(pub);
+            const markerStyle = getMarkerStyleForGFStatus(gfStatus);
+            
+            const marker = L.circleMarker([lat, lng], markerStyle);
+            const popupContent = createPubPopupContent(pub, gfStatus);
+            marker.bindPopup(popupContent);
+            
+            window.gfPubsLayer.addLayer(marker);
+        });
     };
     
     // Clean up full UK map
