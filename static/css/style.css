@@ -263,8 +263,6 @@ html {
    /*     margin: -20px; /* Keep overlap with hero */ 
    display: block;
    align-items: stretch;
-   /*     position: relative;
-   z-index: 10; */
 }
 
 .search-section.container {
@@ -288,7 +286,7 @@ html {
 
 .search-header {
    flex-shrink: 0;
-   padding: var(--space-xs) 0 var(--space-md);
+/*    padding: var(--space-xs) 0 var(--space-md); */
    text-align: center;
    border-bottom: 1px solid var(--border-light);
 }
@@ -297,7 +295,7 @@ html {
    font-size: var(--text-md);
    font-weight: 500;
    color: var(--text-secondary);
-   margin-bottom: var(--space-xs); /* Reduced spacing */
+/*    margin-bottom: var(--space-xs); */
    line-height: 1.1;
 }
 
