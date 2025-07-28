@@ -1440,7 +1440,7 @@ p {
     max-width: 400px;
     margin: 4vh auto;
     max-height: 92vh;
-    display: flex;
+    display: none;
     flex-direction: column;
     overflow: hidden;
 }
