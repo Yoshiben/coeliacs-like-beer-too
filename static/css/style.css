@@ -2994,6 +2994,45 @@ p {
    MOBILE - MAX 768PX
    ================================ */
 @media (max-width: 768px) {
+   body {
+      height: 100vh;
+      height: 100dvh;
+   }
+   /* Search section styles */
+    .search-section {
+   }
+   
+   .search-options {
+       gap: var(--space-lg);
+   }
+   
+   .search-option {
+       padding: var(--space-lg);
+   }
+   
+   .search-card {
+       border-radius: var(--radius-xl); /* Full radius on mobile */
+   }
+   
+   .search-body {
+       padding: var(--space-lg); /* Smaller padding on mobile */
+   }
+    
+    .search-icon {
+        font-size: var(--text-3xl); /* Slightly smaller on mobile */
+        margin-bottom: var(--space-md);
+    }
+    
+    .search-title {
+        font-size: var(--text-xl); /* Keep original size on mobile */
+        margin-bottom: var(--space-xs);
+    }
+    
+    .search-description {
+        font-size: var(--text-md); /* Smaller on mobile */
+        line-height: 1.3;
+        padding: 0 var(--space-sm);
+    }
     /* General mobile styles */
     .no-results-actions {
         max-width: 100%;
@@ -3073,43 +3112,7 @@ p {
         font-size: var(--text-lg);
     }
     
-    /* Search section styles */
-    .search-section {
-/*     height: calc(100vh - 220px);
-    height: calc(100dvh - 220px); */
-   }
-   
-   .search-options {
-       gap: var(--space-lg);
-   }
-   
-   .search-option {
-       padding: var(--space-lg);
-   }
-   
-   .search-card {
-       border-radius: var(--radius-xl); /* Full radius on mobile */
-   }
-   
-   .search-body {
-       padding: var(--space-lg); /* Smaller padding on mobile */
-   }
     
-    .search-icon {
-        font-size: var(--text-3xl); /* Slightly smaller on mobile */
-        margin-bottom: var(--space-md);
-    }
-    
-    .search-title {
-        font-size: var(--text-xl); /* Keep original size on mobile */
-        margin-bottom: var(--space-xs);
-    }
-    
-    .search-description {
-        font-size: var(--text-md); /* Smaller on mobile */
-        line-height: 1.3;
-        padding: 0 var(--space-sm);
-    }
     
     /* Split view mobile styles */
     .split-view .pub-details-container {
@@ -3427,11 +3430,6 @@ p {
         min-height: 36px;
         max-height: 36px;
         font-size: 0.7rem;
-    }
-    
-    /* Location styles */
-    body:has(.results-overlay.active) .search-section {
-        display: none;
     }
     
     .location-accuracy-indicator {
