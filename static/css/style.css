@@ -251,6 +251,11 @@ html {
     white-space: nowrap;
 }
 
+
+
+
+
+
 /* ================================
    SEARCH SECTION
    ================================ */
@@ -314,14 +319,14 @@ html {
 .search-option {
     border: 3px solid var(--border-light) !important;
     border-radius: var(--radius-xl) !important;
-    padding: var(--space-lg) !important;
+/*     padding: var(--space-lg) !important; */
     cursor: pointer !important;
     transition: all var(--transition) !important;
     text-align: center !important;
     position: relative !important;
     overflow: hidden !important;
     display: flex !important;
-    flex-direction: column !important;
+/*     flex-direction: column !important; */
     justify-content: center !important;
     align-items: center !important;
     min-height: 0 !important; /* Allow shrinking */
@@ -376,18 +381,18 @@ html {
 }
 
 .search-title {
-    font-size: var(--text-xl); /* Increased from text-lg */
+    font-size: var(--text-md);
     font-weight: 700;
     color: var(--text-primary);
-    margin-bottom: var(--space-md); /* Increased from space-xs */
-    line-height: 1.2;
+    margin-bottom: var(--space-xs); 
+    line-height: 1.1;
 }
 .search-description {
-    font-size: var(--text-md);
+    font-size: var(--text-sm);
     color: var(--text-secondary);
-    line-height: 1.4;
+    line-height: 1.2;
     text-align: center;
-    padding: 0 var(--space-md); /* Increased from space-xs */
+    padding: 0 var(--space-xs);
 }
 
 
