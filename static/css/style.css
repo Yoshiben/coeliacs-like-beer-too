@@ -3015,25 +3015,21 @@ p {
    ================================ */
 @media (max-width: 768px) {
    body {
-      height: 100%;  /* Not 100vh */
-      position: fixed;
-      width: 100%;
-      top: 0;
-      bottom: 0;
+      position: relative !important; /* Override fixed */
+      height: auto !important; /* Override 100dvh */
+      overflow-y: visible !important; /* Allow scroll */
     }
 
    .home-page {
-      display: block;
       min-height: 100vh;
-      padding-bottom: 80px; /* Space for nav */
+      padding-bottom: 100px; /* Extra space for nav + Samsung bar */
     }
 
    .bottom-nav {
-      position: fixed;
+      position: fixed !important; /* Change from relative */
       bottom: 0;
       left: 0;
       right: 0;
-      height: 60px;
     }
    
    .search-section {
