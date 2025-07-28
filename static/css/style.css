@@ -261,9 +261,9 @@ html {
    ================================ */
 
 .search-section {
-    height: calc(100vh - 200px); /* More height */
-    height: calc(100dvh - 200px);
-/*     margin: -20px; /* Keep overlap with hero */ */
+/*     height: calc(100vh - 200px); */
+/*     height: calc(100dvh - 200px); */
+/*     margin: -20px; /* Keep overlap with hero */ 
     display: flex;
     align-items: stretch;
 /*     position: relative;
@@ -278,7 +278,7 @@ html {
     display: flex;
     flex-direction: column;
     background: var(--bg-white);
-    border-radius: var(--radius-xl);
+/*     border-radius: var(--radius-xl); */
     box-shadow: var(--shadow-lg);
     backdrop-filter: blur(10px);
     overflow: hidden;
