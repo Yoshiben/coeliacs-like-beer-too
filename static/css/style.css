@@ -476,6 +476,101 @@ html {
 }
 
 
+/* VALIDATED TO HERE */
+
+
+
+
+
+
+
+
+.search-modal {
+   position: fixed;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100vh;
+   height: 100dvh;
+   background: var(--modal-backdrop);
+   backdrop-filter: var(--modal-blur);
+   align-items: center;
+   justify-content: center;
+   z-index: var(--z-modal-backdrop);
+   padding: var(--space-lg);
+   box-sizing: border-box;
+/*    display: none; */
+}
+
+.search-modal .modal-content {
+   background: var(--bg-white);
+   border-radius: var(--radius-xl);
+   padding: var(--space-xl);
+   max-width: 400px;
+   width: 100%;
+   box-shadow: var(--shadow-lg);
+   margin: 0;
+}
+
+.search-modal .modal-header {
+   text-align: center;
+   margin-bottom: var(--space-lg);
+}
+
+.search-modal .modal-title {
+   font-size: 1.2rem;
+   font-weight: 700;
+   color: var(--text-primary);
+   margin-bottom: var(--space-xs);
+}
+
+.search-modal .modal-subtitle {
+   color: var(--text-secondary);
+   font-size: 0.9rem;
+}
+
+.search-modal .form-input {
+   width: 100%;
+   padding: var(--space-lg);
+   border: 2px solid rgba(0, 0, 0, 0.1);
+   border-radius: var(--radius-lg);
+   font-size: 1rem;
+   margin-bottom: var(--space-xl);
+   transition: border-color 0.25s ease;
+}
+
+.search-modal .form-input:focus {
+   outline: none;
+   border-color: #667eea;
+   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -515,16 +610,6 @@ html {
    display:none;
 }
 
-
-
-
-/* Hide other sections when on home */
-/* .footer,
-.map-section,
-.about-section,
-.any-other-section {
-    display: none !important;
-} */
 
 
 
@@ -679,7 +764,7 @@ html {
 }
 
 
-/* VALIDATED TO HERE */
+
 
 
 
@@ -803,65 +888,7 @@ html {
    SEARCH MODALS
    ================================ */
 
-.search-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    height: 100dvh;
-    background: var(--modal-backdrop);
-    backdrop-filter: var(--modal-blur);
-    align-items: center;
-    justify-content: center;
-    z-index: var(--z-modal-backdrop);
-    padding: var(--space-lg);
-    box-sizing: border-box;
-    display: none;
-}
 
-.search-modal .modal-content {
-    background: var(--bg-white);
-    border-radius: var(--radius-xl);
-    padding: var(--space-xl);
-    max-width: 400px;
-    width: 100%;
-    box-shadow: var(--shadow-lg);
-    margin: 0;
-}
-
-.search-modal .modal-header {
-    text-align: center;
-    margin-bottom: var(--space-lg);
-}
-
-.search-modal .modal-title {
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: var(--space-xs);
-}
-
-.search-modal .modal-subtitle {
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-}
-
-.search-modal .form-input {
-    width: 100%;
-    padding: var(--space-lg);
-    border: 2px solid rgba(0, 0, 0, 0.1);
-    border-radius: var(--radius-lg);
-    font-size: 1rem;
-    margin-bottom: var(--space-xl);
-    transition: border-color 0.25s ease;
-}
-
-.search-modal .form-input:focus {
-    outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
 
 .modal-actions {
     display: flex;
