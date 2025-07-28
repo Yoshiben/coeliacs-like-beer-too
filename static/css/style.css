@@ -933,10 +933,22 @@ html {
    PUB DETAILS OVERLAY
    ================================ */
 
+.pub-details-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    background: var(--primary-gradient);
+    z-index: var(--z-pub-details);
+    overflow: hidden;
+}
+
 .pub-details-overlay.active {
-   display: flex;
-   flex-direction: column;
-   overflow: hidden;
+    display: flex !important;
+    flex-direction: column;
 }
 
 .pub-details-container {
