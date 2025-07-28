@@ -256,9 +256,9 @@ html {
    ================================ */
 
 .search-section {
-    height: calc(100vh - 200px); /* More height */
-    height: calc(100dvh - 200px);
-    margin: -20px 0 0 0; /* Keep overlap with hero */
+    height: calc(100vh - 260px); /* More height */
+    height: calc(100dvh - 260px);
+    margin: -20px; /* Keep overlap with hero */
     display: flex;
     align-items: stretch;
     position: relative;
@@ -286,7 +286,7 @@ html {
 }
 
 .section-title {
-    font-size: var(--text-lg);
+    font-size: var(--text-md);
     font-weight: 500;
     color: var(--text-secondary);
     margin: 0;
@@ -369,14 +369,14 @@ html {
     border-color: var(--search-beer-border-hover) !important;
 }
 .search-icon {
-    font-size: var(--text-4xl); /* Increased from text-2xl */
+    font-size: var(--text-2xl); /* Increased from text-2xl */
     margin-bottom: var(--space-lg); /* Increased from space-sm */
     display: block;
     line-height: 1;
 }
 
 .search-title {
-    font-size: var(--text-2xl); /* Increased from text-lg */
+    font-size: var(--text-xl); /* Increased from text-lg */
     font-weight: 700;
     color: var(--text-primary);
     margin-bottom: var(--space-md); /* Increased from space-xs */
@@ -389,6 +389,16 @@ html {
     text-align: center;
     padding: 0 var(--space-md); /* Increased from space-xs */
 }
+
+
+
+
+
+
+
+
+
+
 
 /* ================================
    BOTTOM NAVIGATION
@@ -1215,87 +1225,6 @@ html {
     background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
     background-clip: content-box;
 }
-      
-   /* Search Option Colors */
-   --search-location-bg: rgba(16, 185, 129, 0.1);
-   --search-location-border: rgba(16, 185, 129, 0.2);
-   --search-location-border-hover: rgba(16, 185, 129, 0.4);
-   
-   --search-name-bg: rgba(59, 130, 246, 0.1);
-   --search-name-border: rgba(59, 130, 246, 0.2);
-   --search-name-border-hover: rgba(59, 130, 246, 0.4);
-   
-   --search-beer-bg: rgba(245, 158, 11, 0.1);
-   --search-beer-border: rgba(245, 158, 11, 0.2);
-   --search-beer-border-hover: rgba(245, 158, 11, 0.4);
-   
-   --search-area-bg: rgba(139, 92, 246, 0.1);
-   --search-area-border: rgba(139, 92, 246, 0.2);
-   --search-area-border-hover: rgba(139, 92, 246, 0.4);
-   
-   /* Status UI Colors - Using Main Marker Colors */
-   --status-always-bg: rgba(255, 215, 0, 0.1);
-   --status-always-border: rgba(255, 215, 0, 0.3);
-   --status-always-text: #B8860B;
-   
-   --status-current-bg: rgba(16, 185, 129, 0.1);
-   --status-current-border: rgba(16, 185, 129, 0.3);
-   --status-current-text: #059669;
-   
-   --status-no-bg: rgba(239, 68, 68, 0.1);
-   --status-no-border: rgba(239, 68, 68, 0.3);
-   --status-no-text: #dc2626;
-   
-   --status-unknown-bg: rgba(156, 163, 175, 0.1);
-   --status-unknown-border: rgba(156, 163, 175, 0.3);
-   --status-unknown-text: #6b7280;
-   
-   /* Enhanced Brand Colors */
-   --primary-bg: rgba(102, 126, 234, 0.1);
-   --primary-border: rgba(102, 126, 234, 0.2);
-   --primary-shadow: rgba(102, 126, 234, 0.3);
-   
-   --success-bg: rgba(16, 185, 129, 0.1);
-   --success-border: rgba(16, 185, 129, 0.2);
-   --success-border-strong: rgba(16, 185, 129, 0.6);
-   --success-shadow: rgba(16, 185, 129, 0.3);
-   --success-text: #10b981;
-   
-   --purple-bg: rgba(139, 92, 246, 0.1);
-   --purple-border: rgba(139, 92, 246, 0.3);
-   --purple-shadow: rgba(139, 92, 246, 0.4);
-   --purple-text: #8b5cf6;
-   
-   /* Enhanced Shadows */
-   --shadow-primary: 0 4px 15px var(--primary-shadow);
-   --shadow-success: 0 4px 15px var(--success-shadow);
-   --shadow-purple: 0 4px 15px var(--purple-shadow);
-   --shadow-blue: 0 4px 15px rgba(59, 130, 246, 0.3);
-   
-   /* Glass Effects */
-   --glass-white: rgba(255, 255, 255, 0.9);
-   --glass-overlay: rgba(255, 255, 255, 0.2);
-   
-   /* Modal System */
-   --modal-backdrop: rgba(0, 0, 0, 0.8);
-   --modal-blur: blur(5px);
-   
-   /* Cluster Colors */
-   --cluster-bg-solid: rgba(156, 163, 175, 0.9);
-   --cluster-text: #ffffff;
-   
-   /* Special Effects */
-   --gold-star-glow: 0 0 10px rgba(255, 215, 0, 0.6);
-   
-   /* Legend System */
-   --legend-bg: rgba(255, 255, 255, 0.95);
-   --legend-marker-size: 12px;
-   --legend-user-marker-size: 10px;
-   
-   /* Animation Durations */
-   --marker-pulse-duration: 1s;
-   --marker-pulse-count: 2;
-}
 
 /* ================================
    RESET & BASE STYLES
@@ -1303,12 +1232,6 @@ html {
 *, *::before, *::after {
     box-sizing: border-box;
 }
-
-/* body.pub-details-open {
-    overflow: hidden;
-    position: fixed;
-    width: 100%;
-} */
 
 /* ================================
    TYPOGRAPHY SYSTEM
