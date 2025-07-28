@@ -2998,6 +2998,13 @@ p {
       height: 100vh;
       height: 100dvh;
    }
+
+   .home-page {
+      height: 100vh;
+      height: 100dvh;
+      padding-bottom: env(safe-area-inset-bottom); /* For iPhone gesture bar */
+    }
+   
    /* Search section styles */
     .search-section {
    }
