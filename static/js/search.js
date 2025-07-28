@@ -4,6 +4,7 @@
 // ================================================================================
 
 export const SearchModule = (function() {
+    console.log('🔍 SearchModule initializing...');
     'use strict';
     
     // ================================
