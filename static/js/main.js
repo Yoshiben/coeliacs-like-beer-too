@@ -648,4 +648,21 @@ if (document.readyState === 'loading') {
 window.CoeliacsApp = App;
 window.App = App;
 
+// ADD THIS DEBUG CODE HERE:
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        const resultsOverlay = document.getElementById('resultsOverlay');
+        if (resultsOverlay) {
+            console.log('Results overlay classes:', resultsOverlay.className);
+            console.log('Results overlay display:', window.getComputedStyle(resultsOverlay).display);
+            
+            if (resultsOverlay.classList.contains('active')) {
+                resultsOverlay.classList.remove('active');
+                resultsOverlay.style.display = 'none';
+                console.log('✅ Removed active class from results overlay');
+            }
+        }
+    }, 1000); // Wait 1 second to see what happens after initialization
+});
+
 console.log('🍺 Main module loaded - app will initialize when DOM ready...');
