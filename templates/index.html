@@ -12,11 +12,6 @@
         <!-- Leaflet MarkerCluster CSS -->
         <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
         <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
-
-        <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
-        <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon-32x32.png') }}">
-        <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon-16x16.png') }}">
-        <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
         
         <!-- Google Analytics with GDPR compliance -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=G-WSHR39KSXS"></script>
@@ -37,54 +32,79 @@
         </script>
     </head>
     <body>
-        <!-- Hero Section -->
-        <div class="hero-section">
-            <div class="hero-content">
-                <h1 class="hero-title">Coeliacs Like Beer Too!</h1>
-                <p class="hero-subtitle">The UK's largest community-driven guide to gluten free beer</p>
-                
-                <div class="hero-stats">
-                    <div class="stat-item">
-                        <span class="stat-number" id="totalPubs">Loading...</span>
-                        <span class="stat-label">Pubs in the UK</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number" id="gfPubs">Loading...</span>
-                        <span class="stat-label">Serving GF Beer</span>
+        <div class="home-page">
+            <!-- Hero Section -->
+            <div class="hero-section">
+                <div class="hero-content">
+                    <h1 class="hero-title">Coeliacs Like Beer Too!</h1>
+                    <p class="hero-subtitle">The UK's largest community-driven guide to gluten free beer</p>
+                    
+                    <div class="hero-stats">
+                        <div class="stat-item">
+                            <span class="stat-number" id="totalPubs">Loading...</span>
+                            <span class="stat-label">Pubs in the UK</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number" id="gfPubs">Loading...</span>
+                            <span class="stat-label">Serving GF Beer</span>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    
-        <!-- Search Section -->
-        <div class="search-section" id="search">
-            <div class="container">
-                <div class="search-card">
-                    <div class="search-header">
-                        <h2 class="section-title">🔍 What are you searching for? 🍺</h2>
-                    </div>
-                    <div class="search-body">
-                        <div class="search-options">
-                            <div class="search-option location" data-action="location-search">
-                                <span class="search-icon">📍</span>
-                                <h3 class="search-title">Pubs Near Me</h3>
-                                <p class="search-description">Find pubs close to you, control the search distance.</p>
+                
+            <nav class="bottom-nav">
+                <a href="/" class="nav-item active">
+                    <div class="nav-icon">🏠</div>
+                    <div class="nav-label">Home</div>
+                </a>
+                <a href="#" data-action="show-full-map" class="nav-item">
+                    <div class="nav-icon">🗺️</div>
+                    <div class="nav-label">Map</div>
+                </a>
+                <a href="/breweries" class="nav-item">
+                    <div class="nav-icon">🍺</div>
+                    <div class="nav-label">Breweries</div>
+                </a>
+                <a href="/about" class="nav-item">
+                    <div class="nav-icon">ℹ️</div>
+                    <div class="nav-label">About</div>
+                </a>
+                <a href="/more" class="nav-item">
+                    <div class="nav-icon">⋯</div>
+                    <div class="nav-label">More</div>
+                </a>
+            </nav>
+        
+            <!-- Search Section -->
+            <div class="search-section" id="search">
+                <div class="container">
+                    <div class="search-card">
+                        <div class="search-header">
+                            <h2 class="section-title">🔍 What are you searching for? 🍺</h2>
+                        </div>
+                        <div class="search-body">
+                            <div class="search-options">
+                                <div class="search-option location" data-action="location-search">
+                                    <span class="search-icon">📍</span>
+                                    <h3 class="search-title">Pubs Near Me</h3>
+                                    <p class="search-description">Find pubs close to you, control the search distance.</p>
+                                </div>
+                                <div class="search-option name" data-modal="nameModal">
+                                    <span class="search-icon">🏠</span>
+                                    <h3 class="search-title">Pubs by Name</h3>
+                                    <p class="search-description">Search for a specific pub name - "Milestone" etc</p>
+                                </div>
+                                <div class="search-option area" data-modal="areaModal">
+                                    <span class="search-icon">🗺️</span>
+                                    <h3 class="search-title">Pubs by Area</h3>
+                                    <p class="search-description">Explore pubs in regions, cities, or postcodes</p>
+                                </div>
+                                <div class="search-option beer" data-modal="beerModal">
+                                    <span class="search-icon">🍺</span>
+                                    <h3 class="search-title">Pubs by Beer</h3>
+                                    <p class="search-description">Find pubs serving specific GF beers - "Zapato", "IPA" etc.</p>
+                                </div>            
                             </div>
-                            <div class="search-option name" data-modal="nameModal">
-                                <span class="search-icon">🏠</span>
-                                <h3 class="search-title">Pubs by Name</h3>
-                                <p class="search-description">Search for a specific pub name - "Milestone" etc</p>
-                            </div>
-                            <div class="search-option area" data-modal="areaModal">
-                                <span class="search-icon">🗺️</span>
-                                <h3 class="search-title">Pubs by Area</h3>
-                                <p class="search-description">Explore pubs in regions, cities, or postcodes</p>
-                            </div>
-                            <div class="search-option beer" data-modal="beerModal">
-                                <span class="search-icon">🍺</span>
-                                <h3 class="search-title">Pubs by Beer</h3>
-                                <p class="search-description">Find pubs serving specific GF beers - "Zapato", "IPA" etc.</p>
-                            </div>            
                         </div>
                     </div>
                 </div>
@@ -750,30 +770,6 @@
                 <button class="popup-button" data-action="view-details">View Details</button>
             </div>
         </template>
-    
-        <!-- NAVIGATION BAR - NOW OUTSIDE EVERYTHING ELSE -->
-        <nav class="bottom-nav">
-            <a href="/" class="nav-item active">
-                <div class="nav-icon">🏠</div>
-                <div class="nav-label">Home</div>
-            </a>
-            <a href="#" data-action="show-full-map" class="nav-item">
-                <div class="nav-icon">🗺️</div>
-                <div class="nav-label">Map</div>
-            </a>
-            <a href="/breweries" class="nav-item">
-                <div class="nav-icon">🍺</div>
-                <div class="nav-label">Breweries</div>
-            </a>
-            <a href="/about" class="nav-item">
-                <div class="nav-icon">ℹ️</div>
-                <div class="nav-label">About</div>
-            </a>
-            <a href="/more" class="nav-item">
-                <div class="nav-icon">⋯</div>
-                <div class="nav-label">More</div>
-            </a>
-        </nav>
         
         <!-- Scripts -->
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
