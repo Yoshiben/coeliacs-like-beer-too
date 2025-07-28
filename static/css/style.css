@@ -192,7 +192,9 @@ html {
    box-sizing: border-box;
 }
 
-
+.map-overlay {
+   display:none;
+{
 
 
 
@@ -501,15 +503,6 @@ html {
 /* ================================
    FULL SCREEN MAP
    ================================ */
-
-/* Style the UK GF Beer Map title */
-/* .map-overlay-title {
-    color: var(--text-white);
-    padding: var(--space-md) var(--space-xl);
-    font-size: var(--text-lg);
-    font-weight: 600;
-    margin: 0;
-} */
 
 /* Style the navigation bar container */
 .map-overlay-nav {
