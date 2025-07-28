@@ -38,7 +38,7 @@
    --text-secondary: rgba(74,85,104,1);
    --text-muted: rgba(113,128,150,1);
    --text-white: var(--white);
-
+   
    /* Text Sizing */
    --text-xs: 0.75rem;
    --text-sm: 0.875rem;
@@ -54,7 +54,7 @@
    --bg-glass: rgba(255, 255, 255, 0.1);
    --bg-section: rgba(248, 250, 252, 0.8);
    --bg-overlay: rgba(0, 0, 0, 0.8);
-
+   
    /* Button System */
    --btn-height: 44px;
    --btn-height-sm: 36px;
@@ -79,7 +79,7 @@
    --radius-lg: 15px;
    --radius-xl: 20px;
    --radius-pill: 25px;
-
+   
    /* Shadows */
    --shadow-xs: 0 2px 4px rgba(0, 0, 0, 0.2);
    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -87,7 +87,7 @@
    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.2);
    --shadow-xl: 0 12px 40px rgba(0, 0, 0, 0.25);
    --shadow-hero-title: 0 2px 4px rgba(0, 0, 0, 0.3);
-
+   
    /* Search option colors */
    --search-location-bg: rgba(16, 185, 129, 0.1);
    --search-location-bg-light: rgba(5, 150, 105, 0.05);
@@ -108,7 +108,7 @@
    --search-area-bg-light: rgba(124, 58, 237, 0.05);
    --search-area-border: rgba(139, 92, 246, 0.2);
    --search-area-border-hover: rgba(139, 92, 246, 0.4);
-
+   
    /* GF Status Colors */
    --always-gf-fill: var(--gold);
    --always-gf-border: var(--dark-gold);
@@ -120,49 +120,61 @@
    --unknown-gf-border: var(--white);
    --my-location-fill: var(--light-blue);
    --my-location-border: var(--white);
-
+   
    /* Transitions */
    --transition-fast: 0.15s ease-out;
    --transition: 0.25s ease-out;
    --transition-slow: 0.4s ease-out;
-
+   
    /* Dividers, borders & hovers */
    --divider-color: rgba(102, 126, 234, 0.1);
    --border-light: rgba(0, 0, 0, 0.1);    
    --hover-subtle: rgba(102, 126, 234, 0.05);
-
-      /* Container Widths */
+   
+   /* Container Widths */
    --container-sm: 640px;
    --container-md: 768px;
    --container-lg: 1024px;
    --container-xl: 1200px;
-   
 }
 
 body {
-    background: var(--primary-gradient);
-    min-height: 100vh;
-    margin: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: var(--text-primary);
-    line-height: 1.6;
-    position: relative; /* Changed from fixed */
-    overscroll-behavior: none;
-    -webkit-overflow-scrolling: auto;
-    height: 100vh;
-    height: 100dvh;
-    overflow: hidden; /* Prevent scrolling */
-    position: fixed; /* Lock in place */
-    width: 100%;
+   background: var(--primary-gradient);
+   min-height: 100vh;
+   margin: 0;
+   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+   color: var(--text-primary);
+   line-height: 1.6;
+   position: relative; /* Changed from fixed */
+   overscroll-behavior: none;
+   -webkit-overflow-scrolling: auto;
+   height: 100vh;
+   height: 100dvh;
+   overflow: hidden; /* Prevent scrolling */
+   position: fixed; /* Lock in place */
+   width: 100%;
 }
 
 /* Ensure html doesn't have conflicting styles */
 html {
-    scroll-behavior: smooth;
-    font-size: clamp(14px, 2.5vw, 16px);
-    overflow-x: hidden; /* Changed from overflow: hidden */
-    overflow-y: auto; /* Allow scroll */
-    height: 100%; /* Changed from 100vh */
+   scroll-behavior: smooth;
+   font-size: clamp(14px, 2.5vw, 16px);
+   overflow-x: hidden; /* Changed from overflow: hidden */
+   overflow-y: auto; /* Allow scroll */
+   height: 100%; /* Changed from 100vh */
+}
+
+.results-overlay {
+   position: fixed;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100vh;
+   height: 100dvh;
+   background: var(--primary-gradient);
+   z-index: var(--z-modal-backdrop);
+   display: none;
+   overflow: hidden;
 }
 
 /* Hide other sections when on home */
@@ -1710,23 +1722,11 @@ p {
     margin: 0;
 }
 
-
-
 /* ================================
    RESULTS OVERLAY
    ================================ */
-.results-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    height: 100dvh;
-    background: var(--primary-gradient);
-    z-index: var(--z-modal-backdrop);
-    display: none;
-    overflow: hidden;
-}
+
+
 
 .results-overlay.active {
     display: flex;
@@ -2003,6 +2003,7 @@ p {
 /* ================================
    RESULTS MAP
    ================================ */
+
 .results-map-container {
     flex: 1;
     position: relative;
@@ -2012,16 +2013,7 @@ p {
     background: var(--bg-white);
     border-radius: 0 0 var(--radius-xl) var(--radius-xl);
     overflow: hidden;
-}
-
-.results-map-container[style*="display: none"] {
     display: none;
-}
-
-.results-map-container[style*="display: block"] {
-    display: block;
-    flex: 1;
-    height: 100%;
 }
 
 .results-map-container #resultsMap {
@@ -2041,6 +2033,7 @@ p {
 /* ================================
    PUB DETAILS OVERLAY
    ================================ */
+
 .pub-details-overlay {
     position: fixed;
     top: 0;
