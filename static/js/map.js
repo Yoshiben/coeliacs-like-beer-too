@@ -643,12 +643,6 @@ export const MapModule = (function() {
         return createBasicPopupContent(pub, gfStatus);
     };
     
-    // ================================
-    // 🔧 REPLACE: In map.js - Fix createBasicPopupContent function
-    // LOCATION: Find the createBasicPopupContent function 
-    // ACTION: Replace the entire function
-    // ================================
-    
     const createBasicPopupContent = (pub, gfStatus) => {
         let content = `<div class="popup-content">`;
         content += `<div class="popup-title">${escapeHtml(pub.name)}</div>`;
@@ -663,21 +657,21 @@ export const MapModule = (function() {
         }
         
         // GF status with appropriate class
-        if (gfStatus === 'gf_available') {
+        if (gfStatus === 'always' || gfStatus === 'currently') {
             let gfOptions = [];
             if (pub.bottle) gfOptions.push('🍺');
             if (pub.tap) gfOptions.push('🚰');
             if (pub.cask) gfOptions.push('🛢️');
             if (pub.can) gfOptions.push('🥫');
             content += `<div class="popup-gf-status available">✅ GF Available: ${gfOptions.join(' ')}</div>`;
-        } else if (gfStatus === 'no_gf') {
+        } else if (gfStatus === 'not_currently') {
             content += `<div class="popup-gf-status not-available">❌ No GF Options Known</div>`;
         } else {
             content += `<div class="popup-gf-status unknown">❓ GF Status Unknown</div>`;
         }
         
-        // Fixed button with proper action
-        content += `<button class="popup-button" data-action="view-pub" data-pub-id="${pub.pub_id}">View Details</button>`;
+        // Fixed button with proper action and onclick handler
+        content += `<button class="popup-button" data-action="view-pub" data-pub-id="${pub.pub_id}" onclick="window.App.handleAction('view-pub', this, event)">View Details</button>`;
         content += `</div>`;
         
         return content;
