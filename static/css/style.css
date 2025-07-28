@@ -155,6 +155,7 @@ body {
    width: 100%;
    display: flex;
    flex-direction: column;
+   border: 5px solid red !important;
 }
 
 .home-page {
