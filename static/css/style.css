@@ -335,10 +335,18 @@ html {
    height: 100%;
 }
 
-.search-section.container {
+.search-section .container {
    width:100%;
+   max-width: 100%;
    height:100%;
+   padding: 0;
 }
+
+/* .container {
+    width: 100%;
+    max-width: var(--container-xl);
+    margin: 0 auto;
+    padding: 0 var(--space-lg); */
 
 .search-card {
    width: 100%;
@@ -1705,11 +1713,7 @@ p {
 /* ================================
    LAYOUT SYSTEM
    ================================ */
-.container {
-    width: 100%;
-    max-width: var(--container-xl);
-    margin: 0 auto;
-    padding: 0 var(--space-lg);
+
 }
 
 .card {
