@@ -269,7 +269,7 @@ html {
    bottom: 0;
    left: 0;
    right: 0;
-   background: var(--red);
+   background: var(--primary-gradient);
    border-top: 1px solid var(--border-light);
    display: flex;
    justify-content: space-around;
@@ -277,8 +277,8 @@ html {
    z-index: var(--z-navigation);
    box-shadow: var(--shadow);
    backdrop-filter: blur(10px);
-   height: 6vh;
-   height: 6dvh;
+   height: 8vh;
+   height: 8dvh;
    width: 100%;
    flex-shrink:0;
 }
