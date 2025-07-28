@@ -3010,17 +3010,20 @@ p {
     }
 
    .bottom-nav {
-      position: fixed; /* Back to fixed on mobile */
+      position: fixed; !important;
       bottom: 0;
       left: 0;
       right: 0;
       height: 60px;
+      z-index: 99999;
       /* Samsung bar is usually 48px, so nav sits at bottom:0 but visible above it */
    }
    
-   /* Search section styles */
-    .search-section {
-   }
+   .search-section {
+      flex: 1;
+      display: flex;
+      min-height: 0; /* Important for mobile flex */
+    }
    
    .search-options {
        gap: var(--space-lg);
