@@ -2997,6 +2997,8 @@ p {
    body {
       height: 100vh;
       height: 100dvh;
+      height: -webkit-fill-available; /* Older Safari/Chrome */
+      max-height: -webkit-fill-available;
    }
 
    .home-page {
