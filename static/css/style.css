@@ -157,6 +157,13 @@ body {
    flex-direction: column;
 }
 
+.home-page {
+   flex: 1;
+   display: flex;
+   flex-direction: column;
+   overflow: hidden;
+}
+
 /* Ensure html doesn't have conflicting styles */
 html {
    scroll-behavior: smooth;
@@ -309,9 +316,6 @@ html {
    line-height: 1;
    text-align: center;
 }
-
-
-
 
 
 
