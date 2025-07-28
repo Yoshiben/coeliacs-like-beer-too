@@ -644,18 +644,35 @@ export const SearchModule = (function() {
         window.currentPubData = pub;
         resetPubDetailsView();
         
+        // Hide results overlay if visible
         const resultsOverlay = document.getElementById('resultsOverlay');
         if (resultsOverlay) {
             resultsOverlay.style.display = 'none';
             resultsOverlay.classList.remove('active');
         }
         
-        const overlay = document.getElementById('pubDetailsOverlay');
-        if (!overlay) return;
+        // Hide map overlay if visible
+        const mapOverlay = document.getElementById('fullMapOverlay');
+        if (mapOverlay) {
+            mapOverlay.style.display = 'none';
+            mapOverlay.classList.remove('active');
+        }
         
-        overlay.style.display = 'flex';
+        // Show pub details overlay
+        const overlay = document.getElementById('pubDetailsOverlay');
+        if (!overlay) {
+            console.error('❌ Pub details overlay not found!');
+            return;
+        }
+        
+        // Force display
+        overlay.style.removeProperty('display');
         overlay.classList.add('active');
+        overlay.style.display = 'flex';
         document.body.style.overflow = 'hidden';
+        
+        console.log('📊 Pub details overlay display:', overlay.style.display);
+        console.log('📊 Pub details overlay classes:', overlay.className);
         
         // Populate content
         const elements = {
