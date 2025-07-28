@@ -266,7 +266,7 @@ html {
    display: flex;
    justify-content: space-around;
    align-items: center;
-   padding: 8px 0;
+/*    padding: 8px 0; */
    z-index: var(--z-navigation);
    box-shadow: var(--shadow);
    backdrop-filter: blur(10px);
