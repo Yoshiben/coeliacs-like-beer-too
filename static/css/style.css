@@ -3015,12 +3015,12 @@ p {
    ================================ */
 @media (max-width: 768px) {
    body {
-      display: block; /* Not flex */
-      height: auto;
-      margin: 0;
-      padding: 0;
-      overflow-y: auto; /* Allow scrolling */
-   }
+      height: 100%;  /* Not 100vh */
+      position: fixed;
+      width: 100%;
+      top: 0;
+      bottom: 0;
+    }
 
    .home-page {
       display: block;
