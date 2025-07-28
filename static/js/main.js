@@ -650,27 +650,4 @@ if (document.readyState === 'loading') {
 window.CoeliacsApp = App;
 window.App = App;
 
-// ADD THIS DEBUG CODE HERE:
-document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => {
-        const resultsOverlay = document.getElementById('resultsOverlay');
-        if (resultsOverlay) {
-            console.log('Results overlay classes:', resultsOverlay.className);
-            console.log('Results overlay display:', window.getComputedStyle(resultsOverlay).display);
-            console.log('Results overlay inline style:', resultsOverlay.getAttribute('style'));
-            console.log('Results overlay style.display:', resultsOverlay.style.display);
-            
-            // ADD THIS NEW CHECK:
-            const checkRule = Array.from(document.styleSheets).some(sheet => {
-                try {
-                    return Array.from(sheet.cssRules || []).some(rule => 
-                        rule.selectorText === '.results-overlay'
-                    );
-                } catch(e) { return false; }
-            });
-            console.log('CSS rule .results-overlay exists?', checkRule);
-        }
-    }, 1000);
-});
-
 console.log('🍺 Main module loaded - app will initialize when DOM ready...');
