@@ -3026,10 +3026,14 @@ p {
     }
 
    .bottom-nav {
-      position: fixed !important; /* Change from relative */
-      bottom: 0;
-      left: 0;
-      right: 0;
+      position: fixed !important;
+      bottom: 48px !important; /* Height of Samsung nav bar */
+      left: 0 !important;
+      right: 0 !important;
+      background: white !important;
+      z-index: 999999 !important;
+      height: 60px !important;
+      display: flex !important;
     }
    
    .search-section {
