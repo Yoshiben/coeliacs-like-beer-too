@@ -1387,6 +1387,7 @@ html {
    padding: var(--space-lg);
    width: 100%; /* Ensure full width */
    position: relative;
+   box-sizing: border-box; /* Important for padding */
 }
 
 /* Ensure the home button matches */
@@ -1398,7 +1399,6 @@ html {
    border-radius: var(--radius-pill);
    font-weight: 600;
    box-shadow: var(--shadow-sm);
-   margin-right: auto;
 }
 
 /* Ensure the home button matches */
@@ -1410,10 +1410,6 @@ html {
    border-radius: var(--radius-pill);
    font-weight: 600;
    box-shadow: var(--shadow-sm);
-   margin-left: auto !important;
-   position: absolute;
-   right: var(--space-lg); 
-   overflow: hidden;
 }
 
 .map-overlay-content {
@@ -3226,8 +3222,15 @@ p {
         padding: var(--space-xs);
     }
     
-    .map-overlay-nav {
-        padding: var(--space-sm);
+   .map-overlay-nav {
+      padding: var(--space-md);
+      gap: var(--space-md);
+    }
+
+   .map-overlay-nav .btn-home,
+   .map-overlay-nav .btn-location {
+      padding: var(--space-sm) var(--space-md);
+      font-size: var(--text-sm);
     }
     
     .map-overlay-title {
