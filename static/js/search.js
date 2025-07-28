@@ -969,29 +969,34 @@ export const SearchModule = (function() {
     // UI HELPERS
     // ================================
     const showResultsOverlay = (title) => {
-        console.log('🔍 showResultsOverlay called with:', title);
-        console.trace(); // This will show you what called it
-        // ... rest of function
         console.log('📋 Showing results overlay:', title);
         
-        const resultsOverlay = document.getElementById('resultsOverlay');
-        if (resultsOverlay) {
-            resultsOverlay.classList.add('active');
-            resultsOverlay.style.display = 'flex';
-        }
-        
-        const resultsTitle = document.getElementById('resultsTitle');
-        if (resultsTitle) {
-            resultsTitle.textContent = title;
-        }
-        
+        // Hide home content FIRST
         const searchSection = document.querySelector('.search-section');
-        if (searchSection) searchSection.style.display = 'none';
-        
         const heroSection = document.querySelector('.hero-section');
-        if (heroSection) heroSection.style.display = 'none';
         
-        document.body.style.overflow = 'hidden';
+        if (searchSection) {
+            searchSection.style.display = 'none';
+        }
+        if (heroSection) {
+            heroSection.style.display = 'none';
+        }
+        
+        // Small delay to ensure home content is hidden
+        setTimeout(() => {
+            const resultsOverlay = document.getElementById('resultsOverlay');
+            if (resultsOverlay) {
+                resultsOverlay.classList.add('active');
+                resultsOverlay.style.display = 'flex';
+            }
+            
+            const resultsTitle = document.getElementById('resultsTitle');
+            if (resultsTitle) {
+                resultsTitle.textContent = title;
+            }
+            
+            document.body.style.overflow = 'hidden';
+        }, 50); // 50ms delay
     };
     
     const showResultsLoading = (message) => {
