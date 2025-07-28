@@ -140,7 +140,7 @@
 
 body {
    background: var(--primary-gradient);
-   min-height: 100vh;
+/*    min-height: 100vh; */
    margin: 0;
    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
    color: var(--text-primary);
@@ -171,7 +171,7 @@ html {
    font-size: clamp(14px, 2.5vw, 16px);
    overflow-x: hidden; /* Changed from overflow: hidden */
    overflow-y: auto; /* Allow scroll */
-   height: 100%; /* Changed from 100vh */
+/*    height: 100%;  */
 }
 
 /* ================================
@@ -275,7 +275,7 @@ html {
    z-index: var(--z-navigation);
    box-shadow: var(--shadow);
    backdrop-filter: blur(10px);
-   height: 6vh;
+   height: 100px;
    width: 100%;
    flex-shrink:0;
 }
