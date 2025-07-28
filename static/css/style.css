@@ -162,6 +162,7 @@ body {
    display: flex;
    flex-direction: column;
    overflow: hidden;
+   justify-content: space-between;
 }
 
 /* Ensure html doesn't have conflicting styles */
@@ -180,12 +181,10 @@ html {
 .hero-section {
    background: var(--primary-gradient);
    color: var(--text-white);
-   /*     padding: 0 var(--space-xl) var(--space-md); */
    text-align: center;
    position: relative;
    overflow: hidden;
    flex-shrink: 0;
-/*    height: 18vh; */
 }
 
 .hero-section::before {
@@ -273,7 +272,6 @@ html {
    display: flex;
    justify-content: space-around;
    align-items: center;
-/*    padding: 8px 0; */
    z-index: var(--z-navigation);
    box-shadow: var(--shadow);
    backdrop-filter: blur(10px);
@@ -327,13 +325,10 @@ html {
    ================================ */
 
 .search-section {
-/*    height: calc(100vh - 260px); 
-   height: calc(100dvh - 260px);  */
-   /*     margin: -20px; /* Keep overlap with hero */ 
    display: flex;
    align-items: stretch;
-   flex: 1;
-   min-height: 0;
+/*    flex: 1;
+   min-height: 0; */
 }
 
 .search-section.container {
