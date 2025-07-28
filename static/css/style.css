@@ -164,49 +164,6 @@ html {
    height: 100%; /* Changed from 100vh */
 }
 
-.results-overlay {
-   position: fixed;
-   top: 0;
-   left: 0;
-   width: 100%;
-   height: 100vh;
-   height: 100dvh;
-   background: var(--primary-gradient);
-   z-index: var(--z-modal-backdrop);
-   display: none;
-   overflow: hidden;
-}
-
-.pub-details-overlay {
-   position: fixed;
-   top: 0;
-   left: 0;
-   width: 100%;
-   height: 100vh;
-   height: 100dvh;
-   background: var(--primary-gradient);
-   z-index: var(--z-modal-backdrop);
-   display: none;
-   overflow: hidden;
-   padding: 0;
-   box-sizing: border-box;
-}
-
-.map-overlay {
-   display:none;
-}
-
-
-
-
-/* Hide other sections when on home */
-/* .footer,
-.map-section,
-.about-section,
-.any-other-section {
-    display: none !important;
-} */
-
 /* ================================
    HERO SECTION
    ================================ */
@@ -218,6 +175,7 @@ html {
    text-align: center;
    position: relative;
    overflow: hidden;
+   height: 200px;
 }
 
 .hero-section::before {
@@ -229,6 +187,7 @@ html {
    right: -20px;
    z-index: var(--z-base);
    pointer-events: none;
+   height: 200px;
 }
 
 .hero-content {
@@ -290,18 +249,68 @@ html {
 
 
 
+
+
+
+.results-overlay {
+   position: fixed;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100vh;
+   height: 100dvh;
+   background: var(--primary-gradient);
+   z-index: var(--z-modal-backdrop);
+   display: none;
+   overflow: hidden;
+}
+
+.pub-details-overlay {
+   position: fixed;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100vh;
+   height: 100dvh;
+   background: var(--primary-gradient);
+   z-index: var(--z-modal-backdrop);
+   display: none;
+   overflow: hidden;
+   padding: 0;
+   box-sizing: border-box;
+}
+
+.map-overlay {
+   display:none;
+}
+
+
+
+
+/* Hide other sections when on home */
+/* .footer,
+.map-section,
+.about-section,
+.any-other-section {
+    display: none !important;
+} */
+
+
+
+
+
 /* ================================
    SEARCH SECTION
    ================================ */
 
 .search-section {
-/*     height: calc(100vh - 200px); */
-/*     height: calc(100dvh - 200px); */
-/*     margin: -20px; /* Keep overlap with hero */ 
-    display: flex;
-    align-items: stretch;
-/*     position: relative;
-    z-index: 10; */
+   height: calc(100vh - 260px); 
+   height: calc(100dvh - 260px); 
+   /*     margin: -20px; /* Keep overlap with hero */ 
+   display: flex;
+   align-items: stretch;
+   /*     position: relative;
+   z-index: 10; */
 }
 
 .search-card {
