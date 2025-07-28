@@ -286,7 +286,7 @@ html {
 
 .search-header {
     flex-shrink: 0;
-/*     padding: var(--space-xl) var(--space-xl) var(--space-lg); */
+    padding: 0 0 var(--space-lg);
     text-align: center;
     border-bottom: 1px solid var(--border-light);
 }
