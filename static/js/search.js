@@ -5,7 +5,7 @@
 
 export const SearchModule = (function() {
     'use strict';
-    console.log('🔍 SearchModule initializing...');
+    // console.log('🔍 SearchModule initializing...');
     
     // ================================
     // PRIVATE STATE
