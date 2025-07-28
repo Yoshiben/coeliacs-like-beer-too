@@ -136,6 +136,13 @@
    --container-md: 768px;
    --container-lg: 1024px;
    --container-xl: 1200px;
+
+   /* Modal Variables */
+   --modal-backdrop: rgba(0, 0, 0, 0.8);
+   --modal-blur: blur(5px);
+   --modal-padding-mobile: var(--space-lg);
+   --modal-padding-top: 15vh;
+   --modal-border-radius: var(--radius-xl);
 }
 
 body {
@@ -341,12 +348,6 @@ html {
    height:100%;
    padding: 0;
 }
-
-/* .container {
-    width: 100%;
-    max-width: var(--container-xl);
-    margin: 0 auto;
-    padding: 0 var(--space-lg); */
 
 .search-card {
    width: 100%;
@@ -801,6 +802,7 @@ html {
 /* ================================
    SEARCH MODALS
    ================================ */
+
 .search-modal {
     position: fixed;
     top: 0;
