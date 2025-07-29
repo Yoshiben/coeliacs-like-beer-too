@@ -550,6 +550,7 @@ html {
    font-size: 1rem;
    margin: var(--space-xl);
    transition: border-color 0.25s ease;
+   overflow: hidden;
 }
 
 .search-modal .form-input:focus {
