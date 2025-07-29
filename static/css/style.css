@@ -1366,10 +1366,10 @@ html {
    right: 0;
    display: flex;
    justify-content: space-between;
-   align-items: center;
+   align-items: stretch;
    padding: var(--space-md);
    background: transparent;
-/*    height: 60px; */
+   height: 60px;
    z-index: 10;
    flex-shrink: 0;
 }
