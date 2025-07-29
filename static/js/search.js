@@ -985,8 +985,8 @@ export const SearchModule = (function() {
         });
     };
 
-    // UPDATE the showLocationPermissionUI function in search.js to use proper event delegation:
-
+    // REPLACE the showLocationPermissionUI function in search.js with:
+    
     const showLocationPermissionUI = (resolve, reject) => {
         // Use the modal that's already in the HTML
         const modal = document.getElementById('locationPermissionModal');
@@ -1000,13 +1000,13 @@ export const SearchModule = (function() {
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
         
-        // Create handlers
-        const allowHandler = () => {
-            console.log('📍 Allow location clicked');
+        // Set up event listeners for custom events from main.js
+        const grantedHandler = () => {
+            console.log('📍 Location permission granted event received');
             
-            // Hide modal
-            modal.style.display = 'none';
-            document.body.style.overflow = '';
+            // Clean up listeners
+            document.removeEventListener('locationPermissionGranted', grantedHandler);
+            document.removeEventListener('locationPermissionDenied', deniedHandler);
             
             // Show loading state
             if (window.showLoadingToast) {
@@ -1026,46 +1026,30 @@ export const SearchModule = (function() {
                 if (window.hideLoadingToast) {
                     window.hideLoadingToast();
                 }
-                modal.style.display = 'none';
                 reject(error);
             });
         };
         
-        const denyHandler = () => {
-            console.log('📍 Deny location clicked');
+        const deniedHandler = () => {
+            console.log('📍 Location permission denied event received');
             
-            // Hide modal
-            modal.style.display = 'none';
-            document.body.style.overflow = '';
+            // Clean up listeners
+            document.removeEventListener('locationPermissionGranted', grantedHandler);
+            document.removeEventListener('locationPermissionDenied', deniedHandler);
             
             reject(new Error('Location permission denied by user'));
         };
         
-        // Get the actual buttons
-        const allowBtn = modal.querySelector('[data-action="allow-location"]');
-        const denyBtn = modal.querySelector('[data-action="deny-location"]');
-        
-        // Add direct click handlers to the buttons
-        if (allowBtn) {
-            allowBtn.onclick = (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                allowHandler();
-            };
-        }
-        
-        if (denyBtn) {
-            denyBtn.onclick = (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                denyHandler();
-            };
-        }
+        // Listen for custom events from main.js
+        document.addEventListener('locationPermissionGranted', grantedHandler);
+        document.addEventListener('locationPermissionDenied', deniedHandler);
         
         // Also handle clicking outside the modal
         modal.onclick = (e) => {
             if (e.target === modal) {
-                denyHandler();
+                modal.style.display = 'none';
+                document.body.style.overflow = '';
+                deniedHandler();
             }
         };
     };
