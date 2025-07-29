@@ -84,7 +84,7 @@ export const SearchModule = (function() {
             // Get user location
             if (!window.App.state.userLocation) {
                 try {
-                    window.App.state.userLocation = await getUserLocation();
+                    window.App.state.userLocation = await requestLocationWithUI();
                     
                     // Show accuracy feedback
                     if (window.App.state.userLocation.accuracy) {
@@ -959,6 +959,111 @@ export const SearchModule = (function() {
                     maximumAge: 30000
                 }
             );
+        });
+    };
+
+    const requestLocationWithUI = () => {
+        return new Promise((resolve, reject) => {
+            // Check if we already have permission
+            if (navigator.permissions) {
+                navigator.permissions.query({ name: 'geolocation' }).then(result => {
+                    if (result.state === 'granted') {
+                        // Already have permission, just get location
+                        getUserLocation().then(resolve).catch(reject);
+                    } else {
+                        // Need to show permission UI
+                        showLocationPermissionUI(resolve, reject);
+                    }
+                }).catch(() => {
+                    // Permissions API not supported, show UI anyway
+                    showLocationPermissionUI(resolve, reject);
+                });
+            } else {
+                // Permissions API not supported, show UI anyway
+                showLocationPermissionUI(resolve, reject);
+            }
+        });
+    };
+
+    // REPLACE the showLocationPermissionUI function in search.js with:
+
+    // REPLACE the showLocationPermissionUI function in search.js with:
+
+    const showLocationPermissionUI = (resolve, reject) => {
+        // Use the modal that's already in the HTML
+        const modal = document.getElementById('locationPermissionModal');
+        if (!modal) {
+            console.error('Location permission modal not found');
+            reject(new Error('Permission UI not available'));
+            return;
+        }
+        
+        // Show the modal
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        
+        // Handle allow button
+        const allowHandler = () => {
+            // Hide modal
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+            
+            // Clean up listeners
+            document.removeEventListener('click', clickHandler);
+            
+            // Show loading state
+            if (window.showLoadingToast) {
+                window.showLoadingToast('📍 Getting your location...');
+            }
+            
+            // Request location
+            getUserLocation().then(location => {
+                if (window.hideLoadingToast) {
+                    window.hideLoadingToast();
+                }
+                if (window.showSuccessToast) {
+                    window.showSuccessToast('📍 Location found!');
+                }
+                resolve(location);
+            }).catch(error => {
+                if (window.hideLoadingToast) {
+                    window.hideLoadingToast();
+                }
+                reject(error);
+            });
+        };
+        
+        // Handle deny button
+        const denyHandler = () => {
+            // Hide modal
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+            
+            // Clean up listeners
+            document.removeEventListener('click', clickHandler);
+            
+            reject(new Error('Location permission denied by user'));
+        };
+        
+        // Click handler using event delegation
+        const clickHandler = (e) => {
+            const action = e.target.closest('[data-action]')?.dataset.action;
+            
+            if (action === 'allow-location') {
+                allowHandler();
+            } else if (action === 'deny-location') {
+                denyHandler();
+            }
+        };
+        
+        // Add event listener
+        document.addEventListener('click', clickHandler);
+        
+        // Also handle clicking outside the modal
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                denyHandler();
+            }
         });
     };
     
@@ -1920,6 +2025,7 @@ export const SearchModule = (function() {
         // Location search
         startLocationSearch,
         searchNearbyWithDistance,
+        requestLocationWithUI,  // ADD THIS LINE
         
         // Search methods
         searchByName,
@@ -1932,6 +2038,7 @@ export const SearchModule = (function() {
         
         // Navigation
         goBackToResults,
+        handleResultsMapToggle,
         
         // UI helpers
         displayResultsInOverlay,
@@ -1940,8 +2047,6 @@ export const SearchModule = (function() {
         // Sub-modules
         PlacesSearchModule,
         GFStatusModule,
-
-        handleResultsMapToggle ,
         
         // State getters
         getCurrentResults: () => state.currentSearchPubs || window.currentSearchResults || [],
