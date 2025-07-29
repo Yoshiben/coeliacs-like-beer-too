@@ -1012,9 +1012,16 @@ html {
 }
 
 .btn-nav-small {
-   background: var(--glass-white);
+/*    background: var(--glass-white);
    backdrop-filter: blur(10px);
    border: 2px solid var(--primary-border);
+   box-shadow: var(--shadow-sm); */
+   background: var(--bg-white);
+   color: var(--text-primary);
+   border: none;
+   padding: var(--space-sm) var(--space-lg);
+   border-radius: var(--radius-pill);
+   font-weight: 600;
    box-shadow: var(--shadow-sm);
 }
 
