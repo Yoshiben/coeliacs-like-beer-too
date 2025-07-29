@@ -558,16 +558,6 @@ const App = {
         } else {
             console.log(`❓ Unhandled action: ${action}`);
         }
-    }
-        
-        
-        // Execute handler if exists
-        const handler = actionHandlers[action];
-        if (handler) {
-            handler();
-        } else {
-            console.log(`❓ Unhandled action: ${action}`);
-        }
     },
     
     togglePubDetailMap(mapModule) {
