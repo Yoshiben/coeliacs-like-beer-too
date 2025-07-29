@@ -967,12 +967,8 @@ export const FormModule = (function() {
         selectStatus(status) {
             this.selectedStatus = status;
             
-            // Close the status selection modal
-            if (window.ModalModule) {
-                window.ModalModule.close('gfStatusModal');
-            } else {
-                this.closeModal('gfStatusModal');
-            }
+            // Close the status selection modal immediately
+            this.closeModal('gfStatusModal');
             
             // Show confirmation
             const confirmStatusEl = document.getElementById('confirmStatus');
@@ -987,7 +983,10 @@ export const FormModule = (function() {
                 confirmStatusEl.innerHTML = statusLabels[status] || status;
             }
             
-            this.openModal('gfStatusConfirmModal');
+            // Small delay to ensure first modal is closed
+            setTimeout(() => {
+                this.openModal('gfStatusConfirmModal');
+            }, 100);
         },
         
         async confirmStatusUpdate() {
