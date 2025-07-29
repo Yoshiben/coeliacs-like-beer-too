@@ -3001,7 +3001,7 @@ p {
         border-radius: 50%;
         background: rgba(255, 255, 255, 0.3);
         transform: translate(-50%, -50%);
-        transition: width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
+        transition: width 0.1s ease, height 0.1s ease, opacity 0.1s ease;
         opacity: 0;
         pointer-events: none;
     }
