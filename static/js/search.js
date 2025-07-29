@@ -763,11 +763,28 @@ export const SearchModule = (function() {
     // ================================
     // BACK TO RESULTS
     // ================================
+    // REPLACE the goBackToResults function in search.js (around line 767)
+
     const goBackToResults = () => {
         console.log('🔙 Going back to results...');
         
+        // FIRST: Close the pub details overlay
+        const pubDetailsOverlay = document.getElementById('pubDetailsOverlay');
+        if (pubDetailsOverlay) {
+            pubDetailsOverlay.style.display = 'none';
+            pubDetailsOverlay.classList.remove('active');
+            console.log('✅ Closed pub details overlay');
+        }
+        
+        // THEN: Check if we have search state to restore
         if (!state.lastSearchState) {
             console.log('❌ No previous search state');
+            // Just show the results overlay with existing results
+            const resultsOverlay = document.getElementById('resultsOverlay');
+            if (resultsOverlay) {
+                resultsOverlay.style.display = 'flex';
+                resultsOverlay.classList.add('active');
+            }
             return false;
         }
         
@@ -779,13 +796,29 @@ export const SearchModule = (function() {
         
         console.log('✅ Restoring search state:', state.lastSearchState);
         
-        // Close pub details
-        const helpers = getUI();
-        if (helpers?.closePubDetails) {
-            helpers.closePubDetails();
+        // Show results overlay
+        const resultsOverlay = document.getElementById('resultsOverlay');
+        if (resultsOverlay) {
+            resultsOverlay.style.display = 'flex';
+            resultsOverlay.classList.add('active');
         }
         
-        // Restore search
+        // If we have cached results, just display them without re-searching
+        if (state.currentSearchPubs && state.currentSearchPubs.length > 0) {
+            console.log('📋 Using cached results');
+            const title = state.lastSearchState.type === 'nearby' ? 
+                `Pubs within ${state.lastSearchState.radius}km` : 
+                state.lastSearchState.query;
+            displayResultsInOverlay(state.currentSearchPubs, title);
+            
+            const tracking = getTracking();
+            if (tracking) {
+                tracking.trackEvent('back_to_results_cached', 'Navigation', state.lastSearchState.type);
+            }
+            return true;
+        }
+        
+        // Otherwise restore the search
         switch (state.lastSearchState.type) {
             case 'nearby':
                 restoreNearbySearch(state.lastSearchState);
