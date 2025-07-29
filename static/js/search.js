@@ -662,6 +662,47 @@ export const SearchModule = (function() {
         
         window.currentPubData = pub;
         resetPubDetailsView();
+
+        // Also set the nav title
+        const navTitle = document.getElementById('pubNavTitle');
+        if (navTitle) navTitle.textContent = pub.name;
+
+        // UPDATE the split-view handling in setupMapButtonHandler (around line 620)
+        // When showing/hiding the map, update container classes:
+        
+        const setupMapButtonHandler = (pub) => {
+            const mapBtn = document.getElementById('pubToggleMap');
+            if (!mapBtn) return;
+            
+            mapBtn.onclick = () => {
+                console.log('🗺️ Map button clicked');
+                
+                const mapContainer = document.getElementById('pubMapContainer');
+                const btnText = document.getElementById('pubMapBtnText');
+                const pubDetailsContainer = document.querySelector('.pub-details-container');
+                
+                if (!mapContainer || !btnText) return;
+                
+                if (mapContainer.style.display === 'none' || !mapContainer.style.display) {
+                    // Show map
+                    mapContainer.style.display = 'block';
+                    btnText.textContent = 'Hide Map';
+                    if (pubDetailsContainer) pubDetailsContainer.classList.add('split-view');
+                    
+                    if (pub.latitude && pub.longitude) {
+                        const mapModule = getMap();
+                        if (mapModule?.initPubDetailMap) {
+                            mapModule.initPubDetailMap(pub);
+                        }
+                    }
+                } else {
+                    // Hide map
+                    mapContainer.style.display = 'none';
+                    btnText.textContent = 'Show on Map';
+                    if (pubDetailsContainer) pubDetailsContainer.classList.remove('split-view');
+                }
+            };
+        };
         
         // Hide results overlay if visible
         const resultsOverlay = document.getElementById('resultsOverlay');
