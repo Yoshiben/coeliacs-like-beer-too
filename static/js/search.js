@@ -1182,6 +1182,8 @@ export const SearchModule = (function() {
         }
     };
     
+    // REPLACE the entire handleResultsMapToggle function in search.js (around line 1180)
+
     const handleResultsMapToggle = () => {
         console.log('🗺️ Toggling results map...');
         
@@ -1192,6 +1194,13 @@ export const SearchModule = (function() {
         };
         
         if (!elements.list || !elements.map || !elements.btnText) return;
+        
+        // DEBUG: Before toggle
+        console.log('🔍 DEBUG: Before toggle');
+        console.log('List display:', elements.list?.style.display);
+        console.log('Map display:', elements.map?.style.display);
+        console.log('Map computed display:', window.getComputedStyle(elements.map)?.display);
+        console.log('Map dimensions:', elements.map?.offsetWidth, 'x', elements.map?.offsetHeight);
         
         const mapModule = getMap();
         
@@ -1209,9 +1218,23 @@ export const SearchModule = (function() {
             elements.map.style.height = '100%';
             elements.btnText.textContent = 'List';
             
+            // DEBUG: After setting map to display block
+            console.log('🔍 DEBUG: After setting map to display block');
+            console.log('Map display:', elements.map?.style.display);
+            console.log('Map dimensions NOW:', elements.map?.offsetWidth, 'x', elements.map?.offsetHeight);
+            console.log('Map container innerHTML length:', elements.map?.innerHTML.length);
+            
             setTimeout(() => {
                 if (mapModule?.initResultsMap) {
                     const map = mapModule.initResultsMap(state.currentSearchPubs);
+                    
+                    // DEBUG: After map initialization
+                    console.log('🔍 DEBUG: After map initialization');
+                    const mapEl = document.getElementById('resultsMap');
+                    console.log('Leaflet container exists:', !!mapEl);
+                    console.log('Leaflet container dimensions:', mapEl?.offsetWidth, 'x', mapEl?.offsetHeight);
+                    console.log('Leaflet container children:', mapEl?.children.length);
+                    
                     if (map) {
                         setTimeout(() => map.invalidateSize(), 200);
                         setTimeout(() => map.invalidateSize(), 500);
