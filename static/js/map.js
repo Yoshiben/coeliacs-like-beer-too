@@ -1032,7 +1032,7 @@ export const MapModule = (function() {
         
         if (window.App.state.userLocation) {
             initialCenter = [window.App.state.userLocation.lat, window.App.state.userLocation.lng];
-            initialZoom = 13; // CHANGED: Much closer zoom for local view
+            initialZoom = 12; // CHANGED: Much closer zoom for local view
             console.log('📍 Centering map on user location with zoom:', initialZoom);
         } else {
             console.log('📍 No user location, using UK center');
