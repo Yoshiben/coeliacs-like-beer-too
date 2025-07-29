@@ -372,7 +372,7 @@ html {
    font-size: var(--text-md);
    font-weight: 500;
    color: var(--text-secondary);
-/*    margin-bottom: var(--space-xs); */
+   margin-top: var(--space-sm);
    line-height: 1.1;
 }
 
