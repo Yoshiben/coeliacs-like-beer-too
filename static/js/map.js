@@ -671,7 +671,7 @@ export const MapModule = (function() {
         }
         
         // Fixed button with proper action and onclick handler
-        content += `<button class="popup-button" data-action="view-pub" data-pub-id="${pub.pub_id}" onclick="window.App.handleAction('view-pub', this, event)">View Details</button>`;
+        content += `<button class="popup-button" data-action="view-pub-from-map" data-pub-id="${pub.pub_id}">View Details</button>`;
         content += `</div>`;
         
         return content;
