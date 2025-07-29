@@ -287,16 +287,7 @@ const App = {
             
             'toggle-results-map': () => {
                 console.log('🗺️ Toggling results map...');
-                
-                // Delegate to search module which owns the results UI
-                const searchModule = modules.search;
-                if (searchModule?.handleResultsMapToggle) {
-                    searchModule.handleResultsMapToggle();
-                } else {
-                    console.error('❌ Search module or handleResultsMapToggle not available');
-                    // Fallback
-                    this.toggleResultsMapFallback();
-                }
+                modules.map?.toggleSearchResultsFullMap?.() || this.toggleResultsMapFallback();
             },
             
             'toggle-pub-map': () => {
@@ -494,12 +485,30 @@ const App = {
         modules.tracking?.trackEvent('report_beer_click', 'User Action', pubData?.name || 'unknown_pub');
     },
     
-    showFullMap(modules) {
+    async showFullMap(modules) {
         console.log('🗺️ Showing full UK map...');
+        
+        // Check if we need location first
+        if (!window.App.state.userLocation) {
+            try {
+                if (modules.search?.requestLocationWithUI) {
+                    console.log('📍 Requesting location for map...');
+                    window.App.state.userLocation = await modules.search.requestLocationWithUI();
+                    
+                    if (modules.map?.setUserLocation) {
+                        modules.map.setUserLocation(window.App.state.userLocation);
+                    }
+                }
+            } catch (error) {
+                console.log('📍 User declined location or error:', error);
+                // Continue anyway
+            }
+        }
+        
         const mapOverlay = document.getElementById('fullMapOverlay');
         if (mapOverlay) {
             mapOverlay.classList.add('active');
-            mapOverlay.style.display = 'flex';  // Force display
+            mapOverlay.style.display = 'flex';
             document.body.style.overflow = 'hidden';
             
             if (modules.map?.initFullUKMap) {
@@ -581,13 +590,32 @@ const App = {
     },
     
     // Fallback methods
-    toggleResultsMapFallback() {
+    // UPDATE the toggleResultsMapFallback method in main.js to handle location:
+
+    async toggleResultsMapFallback() {
         const listContainer = document.getElementById('resultsListContainer');
         const mapContainer = document.getElementById('resultsMapContainer');
         const mapBtnText = document.getElementById('resultsMapBtnText');
         
         if (mapContainer && listContainer && mapBtnText) {
             if (mapContainer.style.display === 'none' || !mapContainer.style.display) {
+                // Check for location before showing map
+                if (!window.App.state.userLocation) {
+                    try {
+                        const modules = this.modules;
+                        if (modules.search?.requestLocationWithUI) {
+                            console.log('📍 Requesting location for results map...');
+                            window.App.state.userLocation = await modules.search.requestLocationWithUI();
+                            
+                            if (modules.map?.setUserLocation) {
+                                modules.map.setUserLocation(window.App.state.userLocation);
+                            }
+                        }
+                    } catch (error) {
+                        console.log('📍 User declined location or error:', error);
+                    }
+                }
+                
                 listContainer.style.display = 'none';
                 mapContainer.style.display = 'block';
                 mapBtnText.textContent = 'List';
@@ -597,6 +625,12 @@ const App = {
                 mapBtnText.textContent = 'Map';
             }
         }
+    },
+    
+    // LEAVE the action exactly as you have it:
+    'toggle-results-map': () => {
+        console.log('🗺️ Toggling results map...');
+        modules.map?.toggleSearchResultsFullMap?.() || this.toggleResultsMapFallback();
     },
     
     fallbackBackToResults() {
