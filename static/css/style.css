@@ -130,6 +130,7 @@
    --divider-color: rgba(102, 126, 234, 0.1);
    --border-light: rgba(0, 0, 0, 0.1);    
    --hover-subtle: rgba(102, 126, 234, 0.05);
+   --modal-line: rgba(226,232,240);
    
    /* Container Widths */
    --container-sm: 640px;
@@ -494,8 +495,9 @@ html {
 
 
 /* ================================
-   MODAL SYSTEM
+   GENERIC MODAL ATTRIBUTES
    ================================ */
+
 .modal {
     position: fixed;
     top: 0;
@@ -514,7 +516,7 @@ html {
     justify-content: space-between;
     align-items: center;
     border-bottom: 1px solid #e2e8f0;
-    padding: 16px 20px 12px;
+/*     padding: 16px 20px 12px; */
     flex-shrink: 0;
 }
 
@@ -593,6 +595,10 @@ html {
 
 
 
+/* ================================
+   SEARCH MODAL ATTRIBUTES
+   ================================ */
+
 .search-modal {
    position: fixed;
    top: 0;
@@ -615,12 +621,12 @@ html {
    border-radius: var(--radius-xl);
    padding: var(--space-xl);
    max-width: 400px;
-   max-height: 300px;
+/*    max-height: 400px; */
    width: 100%;
    box-shadow: var(--shadow-lg);
    margin: 0;
    z-index: var(--z-modal-content);
-/*    max-height: 92vh; */
+   max-height: 92vh;
    display: flex;
    flex-direction: column;
    overflow: hidden;
