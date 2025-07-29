@@ -1080,48 +1080,63 @@ html {
    width: 100%;
    padding: var(--space-sm);
    box-sizing: border-box;
-/*    flex: 1;
-   display: flex;
-   flex-direction: column;
-   height: calc(100vh - 16px);
-   height: calc(100dvh - 16px);
-   max-height: calc(100vh - 16px);
-   max-height: calc(100dvh - 16px);
-   padding: var(--space-sm);
-   transition: all 0.3s ease;
-   overflow: hidden;
-   box-sizing: border-box; */
 }
 
+/* UPDATE: Card styling */
 .pub-details-card {
-   background: var(--bg-white);
-   border-radius: var(--radius-xl);
-   backdrop-filter: blur(10px);
-   box-shadow: var(--shadow-lg);
-   padding: var(--space-lg);
-   flex: 1;
-   display: flex;
-   flex-direction: column;
-   overflow: hidden;
-   min-height: 0;
-   box-sizing: border-box;
+    background: var(--bg-white);
+    border-radius: var(--radius-xl);
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-lg);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
 }
 
+/* UPDATE: Content area with scroll */
+.pub-details-content {
+    flex: 1;
+    padding: var(--space-xl);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* REMOVE: Old nav-top as it's now in the purple bar */
 .pub-nav-top {
-   display:none;
-/*    display: flex;
-   justify-content: space-between;
-   align-items: center;
-   padding: var(--space-md);
-   background: rgba(255, 255, 255, 0.1);
-   border-radius: var(--radius-lg);
-   margin-bottom: var(--space-sm);
-   backdrop-filter: blur(10px); */
-/*    display: flex;
-   justify-content: space-between;
-   align-items: center;
-   margin-bottom: var(--space-lg);
-   flex-shrink: 0; */
+    display: none;
+}
+
+/* ADD: Purple navigation bar like results */
+.pub-details-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-md);
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-sm);
+    backdrop-filter: blur(10px);
+}
+
+
+/* UPDATE: Make buttons match results style */
+.pub-details-nav .btn-nav-small {
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--text-primary);
+    border: none;
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius-pill);
+    font-weight: 600;
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition);
+}
+
+.pub-details-nav .btn-nav-small:hover {
+    background: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
 }
 
 .btn-nav-small {
@@ -1142,39 +1157,44 @@ html {
    box-shadow: var(--shadow-primary);
 }
 
+/* UPDATE: Header styling - remove nav buttons from here */
 .pub-header {
-   text-align: center;
-   margin-bottom: var(--space-xl);
-   padding-bottom: var(--space-lg);
-   border-bottom: 2px solid var(--divider-color);
+    text-align: center;
+    margin-bottom: var(--space-xl);
+    padding-bottom: var(--space-xl);
+    border-bottom: 2px solid var(--divider-color);
 }
 
 .pub-title {
-   font-size: 1.5rem;
-   font-weight: 800;
-   color: var(--text-primary);
-   margin-bottom: var(--space-sm);
-   line-height: 1.2;
-   background: var(--primary-gradient);
-   -webkit-background-clip: text;
-   -webkit-text-fill-color: transparent;
-   background-clip: text;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: var(--space-md);
+    line-height: 1.2;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
+
+/* UPDATE: Address styling */
 .pub-address {
-   color: var(--text-secondary);
-   font-size: 1rem;
-   margin-bottom: var(--space-xs);
-   font-weight: 500;
+    color: var(--text-secondary);
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-xs);
+    font-weight: 500;
 }
 
 .pub-location {
-   color: var(--text-muted);
-   font-size: 0.9rem;
-   font-weight: 600;
-   text-transform: uppercase;
-   letter-spacing: 0.5px;
+    color: var(--text-muted);
+    font-size: var(--text-md);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
+
+
 
 .beer-section {
    background: linear-gradient(135deg, var(--success-bg) 0%, var(--success-bg) 100%);
@@ -1227,14 +1247,14 @@ html {
 }
 
 .pub-action-grid {
-   display: grid;
-   grid-template-columns: 1fr 1fr;
-   grid-template-rows: 1fr 1fr;
-   gap: 12px;
-   width: 100%;
-   margin-top: auto;
-   padding: 16px 0;
-   box-sizing: border-box;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 12px;
+    padding: var(--space-xl);
+    background: var(--bg-white);
+    border-top: 1px solid var(--divider-color);
+    margin-top: auto;
 }
 
 .pub-action-grid .btn {
@@ -1322,6 +1342,12 @@ html {
    display: block;
    flex: 1;
 }
+
+
+
+
+
+
 
 
 
@@ -1542,6 +1568,10 @@ html {
 
 
 
+
+
+
+
 /* ================================
    MAP TOGGLE SWITCH - PROPER TOGGLE
    ================================ */
@@ -1618,6 +1648,9 @@ html {
 
 
 
+
+
+
 /* FULL MAP CLUSTERS */
 
 .marker-cluster {
@@ -1674,34 +1707,6 @@ html {
    width: 25px;
    height: 25px;
 }
-
-/* ================================
-   ZOOM HINT
-   ================================ */
-
-/* .zoom-hint-container {
-   background: var(--bg-white);
-   border-radius: var(--radius);
-   padding: 10px 16px;
-   box-shadow: var(--shadow);
-   border: 2px solid var(--primary-border);
-   margin: 10px;
-}
-
-.zoom-hint {
-   display: flex;
-   align-items: center;
-   gap: 8px;
-   font-size: var(--text-sm);
-   color: var(--text-secondary);
-   font-weight: 500;
-}
-
-.zoom-hint-icon {
-   font-size: 1.2rem;
-   animation: gentle-pulse 2s ease-in-out infinite;
-} */
-
 
 
 
@@ -1865,6 +1870,16 @@ html {
 
 
 
+
+
+
+
+
+
+
+
+
+
 /* ================================
    STATUS BADGES - USING CONSOLIDATED COLORS
    ================================ */
@@ -1908,6 +1923,190 @@ html {
     content: '⭐';
     font-size: var(--text-lg);
 }
+
+
+
+
+
+
+
+
+/* REPLACE the location permission overlay styles with: */
+
+/* ================================
+   LOCATION PERMISSION MODAL
+   ================================ */
+
+.location-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    background: var(--bg-overlay);
+    backdrop-filter: blur(5px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: var(--z-modal-backdrop);
+    padding: var(--space-lg);
+}
+
+.location-modal .location-permission-card {
+    background: var(--bg-white);
+    border-radius: var(--radius-xl);
+    padding: var(--space-3xl);
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+    box-shadow: var(--shadow-xl);
+    animation: slideInUp 0.3s ease-out;
+}
+
+/* Rest of the styles stay the same but remove .location-permission-overlay */
+
+.permission-icon {
+    font-size: 4rem;
+    margin-bottom: var(--space-xl);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.permission-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-lg);
+}
+
+.permission-text {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: var(--space-2xl);
+}
+
+.permission-benefits {
+    background: var(--bg-section);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    margin-bottom: var(--space-2xl);
+}
+
+.benefit-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-md);
+    text-align: left;
+}
+
+.benefit-item:last-child {
+    margin-bottom: 0;
+}
+
+.benefit-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.benefit-item span:last-child {
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.permission-actions {
+    display: flex;
+    gap: var(--space-md);
+    margin-bottom: var(--space-xl);
+}
+
+.permission-actions .btn {
+    flex: 1;
+    min-height: 48px;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.permission-note {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* ================================
+   ANIMATIONS
+   ================================ */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideInUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* ================================
+   MOBILE OPTIMIZATIONS
+   ================================ */
+@media (max-width: 480px) {
+    .location-permission-card {
+        padding: var(--space-xl);
+    }
+    
+    .permission-icon {
+        font-size: 3rem;
+    }
+    
+    .permission-title {
+        font-size: 1.5rem;
+    }
+    
+    .permission-text {
+        font-size: 1rem;
+    }
+    
+    .permission-actions {
+        flex-direction: column;
+    }
+    
+    .permission-actions .btn {
+        width: 100%;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* ================================
    POPUP STYLES - USING CONSOLIDATED COLORS
@@ -3781,112 +3980,12 @@ p {
 
 
 
-/* ADD: Purple navigation bar like results */
-.pub-details-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--space-md);
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: var(--radius-lg);
-    margin-bottom: var(--space-sm);
-    backdrop-filter: blur(10px);
-}
 
-/* UPDATE: Make buttons match results style */
-.pub-details-nav .btn-nav-small {
-    background: rgba(255, 255, 255, 0.9);
-    color: var(--text-primary);
-    border: none;
-    padding: var(--space-sm) var(--space-lg);
-    border-radius: var(--radius-pill);
-    font-weight: 600;
-    box-shadow: var(--shadow-sm);
-    transition: all var(--transition);
-}
 
-.pub-details-nav .btn-nav-small:hover {
-    background: white;
-    transform: translateY(-2px);
-    box-shadow: var(--shadow);
-}
 
-/* ADD: Pub name in nav bar */
-.pub-nav-title {
-    color: white;
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin: 0;
-    text-align: center;
-    flex: 1;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    padding: 0 var(--space-md);
-}
 
-/* UPDATE: Card styling */
-.pub-details-card {
-    background: var(--bg-white);
-    border-radius: var(--radius-xl);
-    backdrop-filter: blur(10px);
-    box-shadow: var(--shadow-lg);
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    min-height: 0;
-}
 
-/* UPDATE: Content area with scroll */
-.pub-details-content {
-    flex: 1;
-    padding: var(--space-xl);
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-}
 
-/* UPDATE: Header styling - remove nav buttons from here */
-.pub-header {
-    text-align: center;
-    margin-bottom: var(--space-xl);
-    padding-bottom: var(--space-xl);
-    border-bottom: 2px solid var(--divider-color);
-}
-
-/* REMOVE: Old nav-top as it's now in the purple bar */
-.pub-nav-top {
-    display: none;
-}
-
-/* UPDATE: Title with better styling */
-.pub-title {
-    font-size: 1.8rem;
-    font-weight: 800;
-    color: var(--text-primary);
-    margin-bottom: var(--space-md);
-    line-height: 1.2;
-    background: var(--primary-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-/* UPDATE: Address styling */
-.pub-address {
-    color: var(--text-secondary);
-    font-size: 1.1rem;
-    margin-bottom: var(--space-xs);
-    font-weight: 500;
-}
-
-.pub-location {
-    color: var(--text-muted);
-    font-size: 0.95rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
 
 /* UPDATE: GF Status section with better design */
 .gf-status-section {
@@ -3964,16 +4063,7 @@ p {
 }
 
 /* UPDATE: Action buttons - keep sticky at bottom */
-.pub-action-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    gap: 12px;
-    padding: var(--space-xl);
-    background: var(--bg-white);
-    border-top: 1px solid var(--divider-color);
-    margin-top: auto;
-}
+
 
 /* ================================
    MOBILE OPTIMIZATIONS
