@@ -150,26 +150,14 @@ const App = {
         console.log('🔧 Setting up event delegation...');
         
         // Main click handler
-        document.addEventListener('click', (e) => {
-            const target = e.target.closest('[data-action], [data-modal], [data-distance]');
-            if (!target) return;
+        document.addEventListener('input', (e) => {
+            const target = e.target;
             
-            e.preventDefault();
-            e.stopPropagation();
-            
-            // Modal triggers
-            if (target.dataset.modal) {
-                this.openModal(target.dataset.modal);
-            }
-            
-            // Action handlers
-            if (target.dataset.action) {
-                this.handleAction(target.dataset.action, target, e);
-            }
-            
-            // Distance selection
-            if (target.dataset.distance) {
-                this.handleDistanceSelection(parseInt(target.dataset.distance));
+            if (target.id === 'placesSearchInput') {
+                const searchModule = this.getModule('search');
+                if (searchModule?.PlacesSearchModule?.handleSearch) {
+                    searchModule.PlacesSearchModule.handleSearch(target.value);
+                }
             }
         }, true);
         
@@ -391,6 +379,123 @@ const App = {
             'close-modal': () => {
                 const modal = element.closest('.modal, .search-modal');
                 if (modal) this.closeModal(modal.id);
+            },
+
+            'clear-selected-pub': () => {
+                console.log('🗑️ Clearing selected pub...');
+                const form = modules.form;
+                if (form?.clearSelectedPub) {
+                    form.clearSelectedPub();
+                } else {
+                    // Fallback
+                    if (window.FormModule?.clearSelectedPub) {
+                        window.FormModule.clearSelectedPub();
+                    }
+                }
+            },
+            
+            'reload-page': () => {
+                console.log('🔄 Reloading page...');
+                location.reload();
+            },
+            
+            'view-pub-from-map': () => {
+                console.log('🗺️ Viewing pub from map popup...');
+                const pubId = element.dataset.pubId;
+                if (pubId && modules.search?.showPubDetails) {
+                    modules.search.showPubDetails(pubId);
+                }
+            },
+            
+            // Also update the places search input handler:
+            'search-places-input': () => {
+                const query = element.value;
+                console.log('🔍 Places search input:', query);
+                
+                if (modules.search?.PlacesSearchModule?.handleSearch) {
+                    modules.search.PlacesSearchModule.handleSearch(query);
+                }
+            },
+
+            'find-pub-online': () => {
+                console.log('🔍 Finding pub online...');
+                const pub = window.App.state.currentPub || window.currentPubData;
+                if (pub) {
+                    const searchQuery = encodeURIComponent(`${pub.name} ${pub.postcode} pub`);
+                    window.open(`https://www.google.com/search?q=${searchQuery}`, '_blank');
+                    
+                    const tracking = modules.tracking;
+                    if (tracking) {
+                        tracking.trackExternalLink('google_search', pub.name);
+                    }
+                }
+            },
+            
+            'get-pub-directions': () => {
+                console.log('🧭 Getting directions to pub...');
+                const pub = window.App.state.currentPub || window.currentPubData;
+                if (pub) {
+                    const destination = encodeURIComponent(`${pub.name}, ${pub.address}, ${pub.postcode}`);
+                    window.open(`https://www.google.com/maps/dir/?api=1&destination=${destination}`, '_blank');
+                    
+                    const tracking = modules.tracking;
+                    if (tracking) {
+                        tracking.trackExternalLink('google_maps_directions', pub.name);
+                    }
+                }
+            },
+
+            // LOCATION: main.js - handleAction method
+            // ACTION: ADD these final action handlers
+            
+            // Add to actionHandlers object:
+            
+            'select-place': () => {
+                console.log('📍 Selecting place from search...');
+                const placeData = element.dataset.place;
+                if (placeData && modules.search?.PlacesSearchModule?.selectPlace) {
+                    const place = JSON.parse(placeData);
+                    modules.search.PlacesSearchModule.selectPlace(place);
+                }
+            },
+            
+            'update-area-placeholder': () => {
+                console.log('📝 Updating area search placeholder...');
+                const modal = modules.modal;
+                if (modal?.updateAreaPlaceholder) {
+                    modal.updateAreaPlaceholder();
+                }
+            },
+            
+            'update-beer-placeholder': () => {
+                console.log('🍺 Updating beer search placeholder...');
+                const modal = modules.modal;
+                if (modal?.updateBeerPlaceholder) {
+                    modal.updateBeerPlaceholder();
+                }
+            },
+            
+            // Cookie actions (if not already present):
+            'accept-all-cookies': () => {
+                console.log('🍪 Accepting all cookies...');
+                this.handleCookieConsent(true);
+            },
+            
+            'accept-essential-cookies': () => {
+                console.log('🍪 Accepting essential cookies only...');
+                this.handleCookieConsent(false);
+            },
+            
+            'save-cookie-preferences': () => {
+                console.log('🍪 Saving cookie preferences...');
+                const analyticsConsent = document.getElementById('analyticsConsent')?.checked;
+                this.handleCookieConsent(analyticsConsent);
+                this.closeModal('cookieSettings');
+            },
+            
+            'show-cookie-settings': () => {
+                console.log('🍪 Showing cookie settings...');
+                this.openModal('cookieSettings');
             },
 
             'allow-location': () => {
