@@ -1489,7 +1489,7 @@ html {
     }
     
    .map-overlay-nav button {
-      padding: var(--space-sm) var(--space-md);
+      padding: var(--space-sm) var(--space-xs);
       font-size: var(--text-sm);
     }
 }
