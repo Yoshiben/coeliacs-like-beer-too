@@ -544,11 +544,11 @@ html {
 
 .search-modal .form-input {
    width: 100%;
-   padding: var(--space-lg);
+   /*    padding: var(--space-lg); */
    border: 2px solid rgba(0, 0, 0, 0.1);
    border-radius: var(--radius-lg);
    font-size: 1rem;
-   margin-bottom: var(--space-xl);
+   margin: var(--space-xl);
    transition: border-color 0.25s ease;
 }
 
