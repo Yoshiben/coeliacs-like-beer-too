@@ -907,6 +907,25 @@ export const FormModule = (function() {
                 if (e.target.closest('[data-action="change-gf-status"]')) {
                     this.openStatusModal();
                 }
+
+                if (e.target.closest('.status-option[data-status]')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const option = e.target.closest('.status-option[data-status]');
+                    const status = option.dataset.status;
+                    
+                    // Store the current pub data
+                    this.currentPub = window.currentPubData;
+                    
+                    // Close the status modal and select status
+                    const statusModal = document.getElementById('gfStatusModal');
+                    if (statusModal) {
+                        statusModal.style.display = 'none';
+                        statusModal.classList.remove('active');
+                    }
+                    
+                    this.selectStatus(status);
+                }
                 
                 // Status option selection
                 if (e.target.closest('.status-option')) {
@@ -940,7 +959,7 @@ export const FormModule = (function() {
         
         openStatusModal() {
             console.log('🔍 openStatusModal called');
-            // CHANGE: Use window.currentPubData directly
+            // CHANGE: Use window.currentPubData directly and store it
             this.currentPub = window.currentPubData;
             console.log('🏠 Current pub:', this.currentPub);
             
