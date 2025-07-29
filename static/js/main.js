@@ -393,6 +393,18 @@ const App = {
                 if (modal) this.closeModal(modal.id);
             },
 
+            'allow-location': () => {
+                console.log('📍 User allowed location access');
+                // The actual handling is done by the search module's event listener
+                // This is just here to prevent the "unhandled action" warning
+            },
+            
+            'deny-location': () => {
+                console.log('📍 User denied location access');
+                // The actual handling is done by the search module's event listener
+                // This is just here to prevent the "unhandled action" warning
+            },
+
             'go-to-my-location': () => {
                 console.log('📍 Go to my location clicked');
                 const mapModule = modules.map;
