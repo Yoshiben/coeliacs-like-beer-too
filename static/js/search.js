@@ -13,7 +13,8 @@ export const SearchModule = (function() {
     const state = {
         lastSearchState: null,
         currentSearchPubs: [],
-        userLocation: null
+        userLocation: null,
+        locationRequestInProgress: false
     };
     
     // ================================
@@ -113,7 +114,33 @@ export const SearchModule = (function() {
                     
                 } catch (locationError) {
                     console.error('❌ Location error:', locationError);
-                    showNoResults(`${locationError.message} Please try again or search by area instead.`);
+                    
+                    // Hide the results overlay since we have no results
+                    const resultsOverlay = document.getElementById('resultsOverlay');
+                    if (resultsOverlay) {
+                        resultsOverlay.style.display = 'none';
+                        resultsOverlay.classList.remove('active');
+                    }
+                    
+                    // Show home sections again
+                    const heroSection = document.querySelector('.hero-section');
+                    const searchSection = document.querySelector('.search-section');
+                    if (heroSection) heroSection.style.display = 'block';
+                    if (searchSection) searchSection.style.display = 'flex';
+                    
+                    // Show helpful toast with action
+                    if (window.showSuccessToast) {
+                        window.showSuccessToast('📍 Location needed for nearby search. Try searching by area instead!');
+                    }
+                    
+                    // Automatically open the area search modal after a short delay
+                    setTimeout(() => {
+                        const modal = getModal();
+                        if (modal) {
+                            modal.open('areaModal');
+                        }
+                    }, 1000);
+                    
                     return;
                 }
             }
@@ -963,24 +990,56 @@ export const SearchModule = (function() {
     };
 
     const requestLocationWithUI = () => {
+        // Prevent multiple simultaneous requests
+        if (state.locationRequestInProgress) {
+            console.log('📍 Location request already in progress, skipping...');
+            return Promise.reject(new Error('Location request already in progress'));
+        }
+        
+        state.locationRequestInProgress = true;
+        
         return new Promise((resolve, reject) => {
             // Check if we already have permission
             if (navigator.permissions) {
                 navigator.permissions.query({ name: 'geolocation' }).then(result => {
                     if (result.state === 'granted') {
                         // Already have permission, just get location
-                        getUserLocation().then(resolve).catch(reject);
+                        getUserLocation().then(location => {
+                            state.locationRequestInProgress = false;
+                            resolve(location);
+                        }).catch(error => {
+                            state.locationRequestInProgress = false;
+                            reject(error);
+                        });
                     } else {
                         // Need to show permission UI
-                        showLocationPermissionUI(resolve, reject);
+                        showLocationPermissionUI((location) => {
+                            state.locationRequestInProgress = false;
+                            resolve(location);
+                        }, (error) => {
+                            state.locationRequestInProgress = false;
+                            reject(error);
+                        });
                     }
                 }).catch(() => {
                     // Permissions API not supported, show UI anyway
-                    showLocationPermissionUI(resolve, reject);
+                    showLocationPermissionUI((location) => {
+                        state.locationRequestInProgress = false;
+                        resolve(location);
+                    }, (error) => {
+                        state.locationRequestInProgress = false;
+                        reject(error);
+                    });
                 });
             } else {
                 // Permissions API not supported, show UI anyway
-                showLocationPermissionUI(resolve, reject);
+                showLocationPermissionUI((location) => {
+                    state.locationRequestInProgress = false;
+                    resolve(location);
+                }, (error) => {
+                    state.locationRequestInProgress = false;
+                    reject(error);
+                });
             }
         });
     };
