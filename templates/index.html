@@ -612,12 +612,13 @@
                     <button class="btn-nav-small btn-home" data-action="close-full-map">🏠 Home</button>
 
                     <div class="map-toggle-switch">
-                        <label class="toggle-label">
-                            <input type="checkbox" id="mapPubToggle" checked>
-                            <span class="toggle-slider">
-                                <span class="toggle-text" data-on="GF Pubs" data-off="All Pubs"></span>
-                            </span>
-                        </label>
+                        <div class="toggle-container" id="mapToggleContainer">
+                            <div class="toggle-track">
+                                <div class="toggle-thumb" id="toggleThumb"></div>
+                                <div class="toggle-option active" data-value="gf">GF Pubs</div>
+                                <div class="toggle-option" data-value="all">All Pubs</div>
+                            </div>
+                        </div>
                     </div>
 
                     <button class="btn-nav-small btn-location" data-action="go-to-my-location">📍 My Location</button>
