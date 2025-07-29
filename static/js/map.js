@@ -1142,14 +1142,10 @@ export const MapModule = (function() {
                         window.showSuccessToast(`✅ ${gfCount} pubs with GF beer ready!`);
                     }
                 })
-        })
-                .catch(error => {
-                    console.error('❌ Error loading pubs:', error);
-                });
             
-        } catch (error) {
-            console.error('❌ Error in loadAllPubsOnMap:', error);
-        }
+            } catch (error) {
+                console.error('❌ Error in loadAllPubsOnMap:', error);
+                }
     };
     
     // Add new function for zoom handling
