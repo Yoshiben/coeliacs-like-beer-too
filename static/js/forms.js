@@ -966,7 +966,13 @@ export const FormModule = (function() {
         
         selectStatus(status) {
             this.selectedStatus = status;
-            this.closeModal('gfStatusModal');
+            
+            // Close the status selection modal
+            if (window.ModalModule) {
+                window.ModalModule.close('gfStatusModal');
+            } else {
+                this.closeModal('gfStatusModal');
+            }
             
             // Show confirmation
             const confirmStatusEl = document.getElementById('confirmStatus');
@@ -1006,9 +1012,10 @@ export const FormModule = (function() {
                 return;
             }
             
-            // Close modal first
+            // Close BOTH modals first
             if (window.ModalModule) {
                 window.ModalModule.close('gfStatusConfirmModal');
+                window.ModalModule.close('gfStatusModal'); // ADD THIS LINE
             }
             
             try {
@@ -1022,12 +1029,11 @@ export const FormModule = (function() {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        pub_id: pubToUpdate.pub_id,  // Use pubToUpdate here
+                        pub_id: pubToUpdate.pub_id,
                         status: this.selectedStatus
                     })
                 });
-
-                // ADD THIS PART - error logging
+        
                 if (!response.ok) {
                     const errorText = await response.text();
                     console.error('Server response:', errorText);
