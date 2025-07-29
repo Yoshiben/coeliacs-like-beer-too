@@ -770,42 +770,42 @@ export const FormModule = (function() {
     // EVENT LISTENERS
     // ================================
     
-    const setupEventListeners = () => {
-        // Handle dropdown item clicks
-        document.addEventListener('click', (e) => {
-            const action = e.target.closest('[data-action]');
+    // const setupEventListeners = () => {
+    //     // Handle dropdown item clicks
+    //     document.addEventListener('click', (e) => {
+    //         const action = e.target.closest('[data-action]');
             
-            if (!action) return;
+    //         if (!action) return;
             
-            switch(action.dataset.action) {
-                case 'select-pub':
-                    selectPub(action);
-                    break;
-                case 'add-new-pub':
-                    showNewPubFields();
-                    break;
-                case 'select-beer':
-                    selectBeer(action.dataset.beerData);
-                    break;
-                case 'add-new-beer':
-                    document.getElementById('reportBeerName').value = '';
-                    document.getElementById('reportBeerName').focus();
-                    hideDropdown('beerNameDropdown');
-                    break;
-                case 'use-beer-name':
-                    hideDropdown('beerNameDropdown');
-                    document.getElementById('reportBeerStyle').focus();
-                    break;
-                case 'focus-beer-name':
-                    hideDropdown('beerNameDropdown');
-                    document.getElementById('reportBeerName').focus();
-                    showSuccess(`🎉 Adding first beer for ${state.currentBrewery}!`);
-                    break;
-                case 'select-style':
-                    selectStyle(action.dataset.style);
-                    break;
-            }
-        });
+    //         switch(action.dataset.action) {
+    //             case 'select-pub':
+    //                 selectPub(action);
+    //                 break;
+    //             case 'add-new-pub':
+    //                 showNewPubFields();
+    //                 break;
+    //             case 'select-beer':
+    //                 selectBeer(action.dataset.beerData);
+    //                 break;
+    //             case 'add-new-beer':
+    //                 document.getElementById('reportBeerName').value = '';
+    //                 document.getElementById('reportBeerName').focus();
+    //                 hideDropdown('beerNameDropdown');
+    //                 break;
+    //             case 'use-beer-name':
+    //                 hideDropdown('beerNameDropdown');
+    //                 document.getElementById('reportBeerStyle').focus();
+    //                 break;
+    //             case 'focus-beer-name':
+    //                 hideDropdown('beerNameDropdown');
+    //                 document.getElementById('reportBeerName').focus();
+    //                 showSuccess(`🎉 Adding first beer for ${state.currentBrewery}!`);
+    //                 break;
+    //             case 'select-style':
+    //                 selectStyle(action.dataset.style);
+    //                 break;
+    //         }
+    //     });
         
         // Hide dropdowns when clicking outside
         document.addEventListener('click', (e) => {
