@@ -1109,15 +1109,17 @@ export const MapModule = (function() {
         console.log('📍 Loading UK pubs progressively...');
         
         try {
-            // Don't show loading overlay - load in background
-            
             // Check if we already have the data
             if (window.allPubsData && window.allPubsData.length > 0) {
                 console.log('✅ Using cached pub data');
-                setupZoomHandler();
+                // Initialize toggle with cached data
+                setTimeout(() => {
+                    initMapToggle();
+                }, 100);
                 return;
             }
             
+            // Fetch all pubs in background
             fetch('/api/all-pubs')
                 .then(response => response.json())
                 .then(data => {
@@ -1128,15 +1130,10 @@ export const MapModule = (function() {
                     window.allPubsData = data.pubs || [];
                     console.log(`📊 Loaded ${window.allPubsData.length} pubs in background`);
                     
-                    // Set up zoom handler
-                    setupZoomHandler();
-                    
-                    // Add markers immediately when data loads
-                    if (window.fullUKMap && window.allPubsData.length > 0) {
-                        requestAnimationFrame(() => {
-                            addFilteredPubMarkers(window.allPubsData, window.fullUKMap);
-                        });
-                    }
+                    // Initialize toggle functionality AFTER data is loaded
+                    setTimeout(() => {
+                        initMapToggle();
+                    }, 100);
                     
                     // Show toast notification
                     const gfCount = window.allPubsData.filter(p => 
@@ -1147,10 +1144,16 @@ export const MapModule = (function() {
                         window.showSuccessToast(`✅ ${gfCount} pubs with GF beer ready!`);
                     }
                 })
+                .catch(error => {
+                    console.error('❌ Error loading pubs:', error);
+                    if (window.showSuccessToast) {
+                        window.showSuccessToast('❌ Error loading pubs. Please try again.');
+                    }
+                });
             
-            } catch (error) {
-                console.error('❌ Error in loadAllPubsOnMap:', error);
-                }
+        } catch (error) {
+            console.error('❌ Error loading pubs for map:', error);
+        }
     };
 
     // Initialize map toggle functionality
