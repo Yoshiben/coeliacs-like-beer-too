@@ -985,9 +985,7 @@ export const SearchModule = (function() {
         });
     };
 
-    // REPLACE the showLocationPermissionUI function in search.js with:
-
-    // REPLACE the showLocationPermissionUI function in search.js with:
+    // UPDATE the showLocationPermissionUI function in search.js to use proper event delegation:
 
     const showLocationPermissionUI = (resolve, reject) => {
         // Use the modal that's already in the HTML
@@ -1002,14 +1000,13 @@ export const SearchModule = (function() {
         modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
         
-        // Handle allow button
+        // Create handlers
         const allowHandler = () => {
+            console.log('📍 Allow location clicked');
+            
             // Hide modal
             modal.style.display = 'none';
             document.body.style.overflow = '';
-            
-            // Clean up listeners
-            document.removeEventListener('click', clickHandler);
             
             // Show loading state
             if (window.showLoadingToast) {
@@ -1029,42 +1026,48 @@ export const SearchModule = (function() {
                 if (window.hideLoadingToast) {
                     window.hideLoadingToast();
                 }
+                modal.style.display = 'none';
                 reject(error);
             });
         };
         
-        // Handle deny button
         const denyHandler = () => {
+            console.log('📍 Deny location clicked');
+            
             // Hide modal
             modal.style.display = 'none';
             document.body.style.overflow = '';
             
-            // Clean up listeners
-            document.removeEventListener('click', clickHandler);
-            
             reject(new Error('Location permission denied by user'));
         };
         
-        // Click handler using event delegation
-        const clickHandler = (e) => {
-            const action = e.target.closest('[data-action]')?.dataset.action;
-            
-            if (action === 'allow-location') {
-                allowHandler();
-            } else if (action === 'deny-location') {
-                denyHandler();
-            }
-        };
+        // Get the actual buttons
+        const allowBtn = modal.querySelector('[data-action="allow-location"]');
+        const denyBtn = modal.querySelector('[data-action="deny-location"]');
         
-        // Add event listener
-        document.addEventListener('click', clickHandler);
+        // Add direct click handlers to the buttons
+        if (allowBtn) {
+            allowBtn.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                allowHandler();
+            };
+        }
+        
+        if (denyBtn) {
+            denyBtn.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                denyHandler();
+            };
+        }
         
         // Also handle clicking outside the modal
-        modal.addEventListener('click', (e) => {
+        modal.onclick = (e) => {
             if (e.target === modal) {
                 denyHandler();
             }
-        });
+        };
     };
     
     const attemptFallbackLocation = (resolve, reject, previousLocation = null, originalError = null) => {
