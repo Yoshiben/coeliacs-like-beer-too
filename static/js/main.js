@@ -285,9 +285,18 @@ const App = {
                 modules.tracking?.trackEvent('close_results', 'Navigation', 'home_button');
             },
             
-            'toggle-results-map': () => {
+            toggle-results-map': () => {
                 console.log('🗺️ Toggling results map...');
-                modules.map?.toggleSearchResultsFullMap?.() || this.toggleResultsMapFallback();
+                
+                // Delegate to search module which owns the results UI
+                const searchModule = modules.search;
+                if (searchModule?.handleResultsMapToggle) {
+                    searchModule.handleResultsMapToggle();
+                } else {
+                    console.error('❌ Search module or handleResultsMapToggle not available');
+                    // Fallback
+                    this.toggleResultsMapFallback();
+                }
             },
             
             'toggle-pub-map': () => {
