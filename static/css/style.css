@@ -1055,25 +1055,32 @@ html {
    ================================ */
 
 .pub-details-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    height: 100dvh;
-    background: var(--primary-gradient);
-    z-index: var(--z-pub-details);
-    overflow: hidden;
+   display: none;
+   position: fixed;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100vh;
+   height: 100dvh;
+   background: var(--primary-gradient);
+   z-index: var(--z-pub-details);
+   overflow: hidden;
 }
 
 .pub-details-overlay.active {
-    display: flex !important;
-    flex-direction: column;
+   display: flex !important;
+   flex-direction: column;
 }
 
 .pub-details-container {
    flex: 1;
+   display: flex;
+   flex-direction: column;
+   height: 100%;
+   width: 100%;
+   padding: var(--space-sm);
+   box-sizing: border-box;
+/*    flex: 1;
    display: flex;
    flex-direction: column;
    height: calc(100vh - 16px);
@@ -1083,7 +1090,7 @@ html {
    padding: var(--space-sm);
    transition: all 0.3s ease;
    overflow: hidden;
-   box-sizing: border-box;
+   box-sizing: border-box; */
 }
 
 .pub-details-card {
@@ -1101,14 +1108,15 @@ html {
 }
 
 .pub-nav-top {
-   display: flex;
+   display:none;
+/*    display: flex;
    justify-content: space-between;
    align-items: center;
    padding: var(--space-md);
    background: rgba(255, 255, 255, 0.1);
    border-radius: var(--radius-lg);
    margin-bottom: var(--space-sm);
-   backdrop-filter: blur(10px);
+   backdrop-filter: blur(10px); */
 /*    display: flex;
    justify-content: space-between;
    align-items: center;
@@ -3761,5 +3769,262 @@ p {
     .card {
         box-shadow: none;
         border: 1px solid #ccc;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+/* ADD: Purple navigation bar like results */
+.pub-details-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-md);
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-sm);
+    backdrop-filter: blur(10px);
+}
+
+/* UPDATE: Make buttons match results style */
+.pub-details-nav .btn-nav-small {
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--text-primary);
+    border: none;
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius-pill);
+    font-weight: 600;
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition);
+}
+
+.pub-details-nav .btn-nav-small:hover {
+    background: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+/* ADD: Pub name in nav bar */
+.pub-nav-title {
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+    text-align: center;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0 var(--space-md);
+}
+
+/* UPDATE: Card styling */
+.pub-details-card {
+    background: var(--bg-white);
+    border-radius: var(--radius-xl);
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-lg);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+}
+
+/* UPDATE: Content area with scroll */
+.pub-details-content {
+    flex: 1;
+    padding: var(--space-xl);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* UPDATE: Header styling - remove nav buttons from here */
+.pub-header {
+    text-align: center;
+    margin-bottom: var(--space-xl);
+    padding-bottom: var(--space-xl);
+    border-bottom: 2px solid var(--divider-color);
+}
+
+/* REMOVE: Old nav-top as it's now in the purple bar */
+.pub-nav-top {
+    display: none;
+}
+
+/* UPDATE: Title with better styling */
+.pub-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: var(--space-md);
+    line-height: 1.2;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* UPDATE: Address styling */
+.pub-address {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    margin-bottom: var(--space-xs);
+    font-weight: 500;
+}
+
+.pub-location {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* UPDATE: GF Status section with better design */
+.gf-status-section {
+    margin: var(--space-xl) 0;
+}
+
+.status-card {
+    background: linear-gradient(135deg, var(--purple-bg) 0%, rgba(139, 92, 246, 0.05) 100%);
+    border: 2px solid var(--purple-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-xl);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.status-card::before {
+    content: '🍺';
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    font-size: 5rem;
+    opacity: 0.1;
+    transform: rotate(-15deg);
+}
+
+.status-question {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+}
+
+.current-status {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-lg);
+}
+
+.current-status .status-icon {
+    font-size: 3rem;
+    line-height: 1;
+}
+
+.current-status .status-text {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.current-status .status-meta {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+/* UPDATE: Change status button */
+.status-card .btn-sm {
+    background: var(--purple-gradient);
+    color: white;
+    border: none;
+    padding: var(--space-sm) var(--space-xl);
+    font-weight: 600;
+    box-shadow: var(--shadow-sm);
+}
+
+.status-card .btn-sm:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+/* UPDATE: Action buttons - keep sticky at bottom */
+.pub-action-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 12px;
+    padding: var(--space-xl);
+    background: var(--bg-white);
+    border-top: 1px solid var(--divider-color);
+    margin-top: auto;
+}
+
+/* ================================
+   MOBILE OPTIMIZATIONS
+   ================================ */
+@media (max-width: 768px) {
+    .pub-details-container {
+        padding: 4px;
+    }
+    
+    .pub-details-nav {
+        padding: var(--space-sm);
+        margin-bottom: 4px;
+    }
+    
+    .pub-nav-title {
+        font-size: 1rem;
+    }
+    
+    .pub-details-nav .btn-nav-small {
+        padding: var(--space-sm) var(--space-md);
+        font-size: var(--text-sm);
+    }
+    
+    .pub-details-content {
+        padding: var(--space-lg);
+    }
+    
+    .pub-title {
+        font-size: 1.5rem;
+    }
+    
+    .pub-action-grid {
+        padding: var(--space-lg);
+    }
+}
+
+@media (max-width: 480px) {
+    .pub-nav-title {
+        font-size: 0.9rem;
+        padding: 0 var(--space-xs);
+    }
+    
+    .pub-details-content {
+        padding: var(--space-md);
+    }
+    
+    .pub-title {
+        font-size: 1.3rem;
+    }
+    
+    .status-question {
+        font-size: 1.1rem;
     }
 }
