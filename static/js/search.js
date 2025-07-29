@@ -1374,19 +1374,6 @@ export const SearchModule = (function() {
         console.log('🔧 Results navigation now handled by main.js data-action');
         // That's it - delete everything else inside this function
     };
-        
-        // Map toggle button
-        const mapBtn = document.querySelector('[data-action="toggle-results-map"]');
-        if (mapBtn) {
-            mapBtn.onclick = null;
-            mapBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                handleResultsMapToggle();
-            });
-        }
-    };
     
     // REPLACE the entire handleResultsMapToggle function in search.js (around line 1180)
 
