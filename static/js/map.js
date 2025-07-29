@@ -996,33 +996,41 @@ export const MapModule = (function() {
         
         if (!window.App.state.userLocation) {
             try {
-                console.log('📍 No existing location, requesting from user...');
+                console.log('📍 No existing location, showing permission UI...');
                 
-                // Request location using the browser API
-                await new Promise((resolve, reject) => {
-                    navigator.geolocation.getCurrentPosition(
-                        (position) => {
-                            window.App.state.userLocation = {
-                                lat: position.coords.latitude,
-                                lng: position.coords.longitude,
-                                accuracy: position.coords.accuracy
-                            };
-                            console.log('✅ Got user location:', window.App.state.userLocation);
-                            resolve();
-                        },
-                        (error) => {
-                            console.log('❌ Location error:', error);
-                            reject(error);
-                        },
-                        {
-                            enableHighAccuracy: true,
-                            timeout: 10000,
-                            maximumAge: 30000
-                        }
-                    );
-                });
+                // Check if search module is available
+                if (window.SearchModule?.requestLocationWithUI) {
+                    window.App.state.userLocation = await window.SearchModule.requestLocationWithUI();
+                    console.log('✅ Got user location via UI:', window.App.state.userLocation);
+                } else {
+                    // Fallback to basic browser prompt
+                    console.log('📍 Using fallback browser location request...');
+                    await new Promise((resolve, reject) => {
+                        navigator.geolocation.getCurrentPosition(
+                            (position) => {
+                                window.App.state.userLocation = {
+                                    lat: position.coords.latitude,
+                                    lng: position.coords.longitude,
+                                    accuracy: position.coords.accuracy
+                                };
+                                console.log('✅ Got user location:', window.App.state.userLocation);
+                                resolve();
+                            },
+                            (error) => {
+                                console.log('❌ Location error:', error);
+                                reject(error);
+                            },
+                            {
+                                enableHighAccuracy: true,
+                                timeout: 10000,
+                                maximumAge: 30000
+                            }
+                        );
+                    });
+                }
             } catch (error) {
                 console.log('📍 Could not get user location:', error);
+                // Continue without location - map will still work
             }
         }
         
