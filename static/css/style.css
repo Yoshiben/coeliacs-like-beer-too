@@ -1563,7 +1563,7 @@ html {
    ZOOM HINT
    ================================ */
 
-.zoom-hint-container {
+/* .zoom-hint-container {
    background: var(--bg-white);
    border-radius: var(--radius);
    padding: 10px 16px;
@@ -1584,7 +1584,7 @@ html {
 .zoom-hint-icon {
    font-size: 1.2rem;
    animation: gentle-pulse 2s ease-in-out infinite;
-}
+} */
 
 
 
@@ -2230,9 +2230,9 @@ html {
     }
 }
 
-.pulsing-marker {
+/* .pulsing-marker {
     animation: pulse 2s infinite;
-}
+} */
 
 .always-gf-marker {
     filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.6));
