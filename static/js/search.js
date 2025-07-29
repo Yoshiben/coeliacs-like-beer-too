@@ -1190,71 +1190,124 @@ export const SearchModule = (function() {
         const elements = {
             list: document.getElementById('resultsListContainer'),
             map: document.getElementById('resultsMapContainer'),
-            btnText: document.getElementById('resultsMapBtnText')
+            btnText: document.getElementById('resultsMapBtnText'),
+            resultsContent: document.querySelector('.results-content')
         };
         
-        if (!elements.list || !elements.map || !elements.btnText) return;
+        if (!elements.list || !elements.map || !elements.btnText) {
+            console.error('❌ Required elements not found:', {
+                list: !!elements.list,
+                map: !!elements.map,
+                btnText: !!elements.btnText
+            });
+            return;
+        }
         
         // DEBUG: Before toggle
         console.log('🔍 DEBUG: Before toggle');
-        console.log('List display:', elements.list?.style.display);
-        console.log('Map display:', elements.map?.style.display);
-        console.log('Map computed display:', window.getComputedStyle(elements.map)?.display);
-        console.log('Map dimensions:', elements.map?.offsetWidth, 'x', elements.map?.offsetHeight);
+        console.log('List display:', elements.list.style.display);
+        console.log('Map display:', elements.map.style.display);
+        console.log('Map computed display:', window.getComputedStyle(elements.map).display);
+        console.log('Map container dimensions:', elements.map.offsetWidth, 'x', elements.map.offsetHeight);
+        console.log('Results content dimensions:', elements.resultsContent?.offsetWidth, 'x', elements.resultsContent?.offsetHeight);
         
         const mapModule = getMap();
         
         if (elements.map.style.display === 'none' || !elements.map.style.display) {
             // Show map
-            console.log('🗺️ Showing map view...');
+            console.log('🗺️ Switching to map view...');
             
+            // Clean up any existing map first
             if (mapModule?.cleanupResultsMap) {
                 mapModule.cleanupResultsMap();
             }
             
+            // Hide list
             elements.list.style.display = 'none';
+            
+            // Show map with explicit styles
             elements.map.style.display = 'block';
             elements.map.style.flex = '1';
             elements.map.style.height = '100%';
+            elements.map.style.minHeight = '400px';
+            elements.map.style.width = '100%';
+            elements.map.style.position = 'relative';
+            
+            // Update button
             elements.btnText.textContent = 'List';
             
-            // DEBUG: After setting map to display block
-            console.log('🔍 DEBUG: After setting map to display block');
-            console.log('Map display:', elements.map?.style.display);
-            console.log('Map dimensions NOW:', elements.map?.offsetWidth, 'x', elements.map?.offsetHeight);
-            console.log('Map container innerHTML length:', elements.map?.innerHTML.length);
+            // Force layout recalculation
+            elements.map.offsetHeight;
             
+            // DEBUG: After setting display
+            console.log('🔍 DEBUG: After setting map to display block');
+            console.log('Map display now:', elements.map.style.display);
+            console.log('Map dimensions now:', elements.map.offsetWidth, 'x', elements.map.offsetHeight);
+            console.log('Map innerHTML length:', elements.map.innerHTML.length);
+            console.log('Map children count:', elements.map.children.length);
+            
+            // Initialize map with delay
             setTimeout(() => {
+                console.log('🗺️ Initializing map...');
+                
                 if (mapModule?.initResultsMap) {
-                    const map = mapModule.initResultsMap(state.currentSearchPubs);
+                    const pubs = state.currentSearchPubs || window.currentSearchResults || [];
+                    console.log(`📍 Passing ${pubs.length} pubs to map`);
                     
-                    // DEBUG: After map initialization
+                    const mapInstance = mapModule.initResultsMap(pubs);
+                    
+                    // DEBUG: After initialization
                     console.log('🔍 DEBUG: After map initialization');
                     const mapEl = document.getElementById('resultsMap');
-                    console.log('Leaflet container exists:', !!mapEl);
-                    console.log('Leaflet container dimensions:', mapEl?.offsetWidth, 'x', mapEl?.offsetHeight);
-                    console.log('Leaflet container children:', mapEl?.children.length);
+                    console.log('Map element exists:', !!mapEl);
+                    console.log('Map element dimensions:', mapEl?.offsetWidth, 'x', mapEl?.offsetHeight);
+                    console.log('Map element children:', mapEl?.children.length);
+                    console.log('Map element parent:', mapEl?.parentElement?.id);
                     
-                    if (map) {
-                        setTimeout(() => map.invalidateSize(), 200);
-                        setTimeout(() => map.invalidateSize(), 500);
+                    if (mapInstance) {
+                        // Multiple invalidations to ensure proper rendering
+                        setTimeout(() => {
+                            mapInstance.invalidateSize();
+                            console.log('🔄 Map invalidated (1st)');
+                        }, 100);
+                        
+                        setTimeout(() => {
+                            mapInstance.invalidateSize();
+                            console.log('🔄 Map invalidated (2nd)');
+                            
+                            // Final debug check
+                            const finalMapEl = document.getElementById('resultsMap');
+                            console.log('📏 Final map dimensions:', finalMapEl?.offsetWidth, 'x', finalMapEl?.offsetHeight);
+                        }, 300);
+                    } else {
+                        console.error('❌ Map instance not returned');
                     }
+                } else {
+                    console.error('❌ mapModule.initResultsMap not available');
                 }
-            }, 100);
+            }, 50);
+            
         } else {
             // Show list
-            console.log('📋 Showing list view...');
+            console.log('📋 Switching to list view...');
             
+            // Clean up map
             if (mapModule?.cleanupResultsMap) {
                 mapModule.cleanupResultsMap();
             }
             
+            // Show list
             elements.list.style.display = 'block';
             elements.list.style.flex = '1';
+            
+            // Hide map
             elements.map.style.display = 'none';
+            
+            // Update button
             elements.btnText.textContent = 'Map';
         }
         
+        // Track event
         const tracking = getTracking();
         if (tracking) {
             tracking.trackEvent('results_map_toggle', 'Map Interaction', 
@@ -1813,6 +1866,8 @@ export const SearchModule = (function() {
         // Sub-modules
         PlacesSearchModule,
         GFStatusModule,
+
+        handleResultsMapToggle ,
         
         // State getters
         getCurrentResults: () => state.currentSearchPubs || window.currentSearchResults || [],
