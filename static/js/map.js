@@ -1057,13 +1057,13 @@ export const MapModule = (function() {
         if (window.App.state.userLocation) {
             const styles = getMapStyles();
             const userMarker = L.circleMarker([window.App.state.userLocation.lat, window.App.state.userLocation.lng], {
-                radius: 12, // Larger for emphasis
+                radius: 10, // Larger for emphasis
                 fillColor: styles.userFillColor || '#667eea',
                 color: styles.userStrokeColor || '#ffffff',
                 weight: 3,
                 opacity: 1,
                 fillOpacity: 0.9,
-                className: 'pulsing-marker',
+                // className: 'pulsing-marker',
                 zIndexOffset: 1000 // Start with high z-index// For animation
             }).addTo(window.fullUKMap);
             
