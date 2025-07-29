@@ -1386,7 +1386,7 @@ html {
    background: var(--primary-gradient);
 /*    height: 60px; */
    flex-shrink: 0;
-   gap: var(--space-md);
+/*    gap: var(--space-md); */
 }
 
 .map-overlay-nav button {
@@ -1394,6 +1394,7 @@ html {
 }
 
 .map-overlay-nav .btn-home {
+   order: 1;
    background: var(--bg-white);
    color: var(--text-primary);
    border: none;
@@ -1404,6 +1405,7 @@ html {
 }
 
 .map-overlay-nav .btn-location {
+   order: 3;
    background: var(--bg-white);
    color: var(--text-primary);
    border: none;
@@ -1428,6 +1430,7 @@ html {
    ================================ */
 
 .map-toggle-switch {
+   order: 2;
    display: flex;
    align-items: center;
 }
