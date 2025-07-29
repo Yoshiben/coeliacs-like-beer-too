@@ -543,13 +543,23 @@ const App = {
                     modules.tracking?.trackEvent('go_to_location', 'Map Interaction', 'button_click');
                 }
             }
-
-            if (!actionHandlers[action]) {
-                console.error(`❌ No handler found for action: "${action}"`);
-                console.log('Available actions:', Object.keys(actionHandlers));
-                return;
-            }
         };
+
+        if (!actionHandlers[action]) {
+            console.error(`❌ No handler found for action: "${action}"`);
+            console.log('Available actions:', Object.keys(actionHandlers));
+            return;
+        }
+        
+        // 5. FIFTH: Execute the handler
+        const handler = actionHandlers[action];
+        if (handler) {
+            handler();
+        } else {
+            console.log(`❓ Unhandled action: ${action}`);
+        }
+    }
+        
         
         // Execute handler if exists
         const handler = actionHandlers[action];
