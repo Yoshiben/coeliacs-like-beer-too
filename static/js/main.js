@@ -285,7 +285,7 @@ const App = {
                 modules.tracking?.trackEvent('close_results', 'Navigation', 'home_button');
             },
             
-            toggle-results-map': () => {
+            'toggle-results-map': () => {
                 console.log('🗺️ Toggling results map...');
                 
                 // Delegate to search module which owns the results UI
