@@ -186,7 +186,7 @@ const App = {
                 this.handleDistanceSelection(parseInt(target.dataset.distance));
             }
         }, true); // <-- Make sure this 'true' is here for capture phase
-    }
+    },
     
     setupGlobalFunctions() {
         const helpers = this.getModule('helpers');
