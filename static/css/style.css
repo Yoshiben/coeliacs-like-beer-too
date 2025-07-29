@@ -523,9 +523,7 @@ html {
 .modal-title {
     font-weight: 700;
     color: var(--text-primary);
-/*     margin: 0; */
     font-size: var(--text-xl);
-/*     line-height: 1.3; */
 }
 
 .modal-subtitle {
@@ -613,6 +611,7 @@ html {
    z-index: var(--z-modal-backdrop);
    padding: var(--space-lg);
    box-sizing: border-box;
+   overflow: hidden;
 /*    display: none; */
 }
 
@@ -638,32 +637,19 @@ html {
 /*    margin-bottom: var(--space-lg); */
 }
 
-/* .search-modal .modal-title {
-   font-size: var(--text-xl);
-   font-weight: 700;
-   color: var(--text-primary);
-   margin-bottom: var(--space-xs);
-} */
-
-/* .search-modal .modal-subtitle {
-   color: var(--text-secondary);
-   font-size: 0.9rem;
-} */
-
 .search-modal .form-input {
    width: 100%;
-   /*    padding: var(--space-lg); */
    border: 2px solid rgba(0, 0, 0, 0.1);
    border-radius: var(--radius-lg);
-   font-size: 1rem;
-   margin: var(--space-xl);
+   font-size: var(--text-md);
+   margin: var(--space-xl) 0;
    transition: border-color 0.25s ease;
    overflow: hidden;
 }
 
 .search-modal .form-input:focus {
    outline: none;
-   border-color: #667eea;
+   border-color: var(--light-blue);
    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
