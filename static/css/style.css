@@ -1104,15 +1104,19 @@ html {
    display: flex;
    justify-content: space-between;
    align-items: center;
+   padding: var(--space-md);
+   background: rgba(255, 255, 255, 0.1);
+   border-radius: var(--radius-lg);
+   margin-bottom: var(--space-sm);
+   backdrop-filter: blur(10px);
+/*    display: flex;
+   justify-content: space-between;
+   align-items: center;
    margin-bottom: var(--space-lg);
-   flex-shrink: 0;
+   flex-shrink: 0; */
 }
 
 .btn-nav-small {
-/*    background: var(--glass-white);
-   backdrop-filter: blur(10px);
-   border: 2px solid var(--primary-border);
-   box-shadow: var(--shadow-sm); */
    background: var(--bg-white);
    color: var(--text-primary);
    border: none;
