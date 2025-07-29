@@ -23,7 +23,7 @@
    --green: rgba(0,245,0,1);
    --red: rgba(239,68,68,1);
    --light-grey: rgba(156,163,175,1);
-   --light-blue: rba(102,126,234,1);
+   --light-blue: rgba(102,126,234,1);
    
    /* Brand Colors & Gradients */
    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -1367,7 +1367,7 @@ html {
    display: flex;
    justify-content: space-between;
    align-items: stretch;
-   padding: var(--space-md);
+   padding: var(--space-md) var)--space-xs);
    background: transparent;
 /*    height: 60px; */
    z-index: 10;
@@ -1761,6 +1761,13 @@ html {
    display: flex;
    align-items: center;
    gap: var(--space-xs);
+}
+
+.legend-item {
+    margin-bottom: var(--space-xs);
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
 }
 
 .legend-item:last-child {
