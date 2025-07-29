@@ -1368,6 +1368,9 @@ html {
    flex: 1;
    position: relative;
    overflow: hidden;
+   width: 100%;
+   height: 100%;
+   margin-top: 60px; /* Space for nav bar */
 }
 
 #fullMap {
@@ -1381,6 +1384,7 @@ html {
    top: 0;
    left: 0;
    right: 0;
+   flex: 1;
    display: flex;
    justify-content: space-between;
    align-items: flex-start;
@@ -1413,17 +1417,15 @@ html {
    box-shadow: var(--shadow-sm);
 }
 
-.map-overlay-content {
-   flex: 1;
-   position: relative;
-   width: 100%;
-   height: 100%;
-}
 
-#fullMap {
-   width: 100%;
-   height: 100%;
-}
+
+
+
+
+
+
+
+
 
 /* FULL MAP CLUSTERS */
 
