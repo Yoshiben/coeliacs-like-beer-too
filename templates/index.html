@@ -245,37 +245,46 @@
         </div>
 
         <!-- Pub Details Overlay -->
-        <div id="pubDetailsOverlay" class="pub-details-overlay">
-            <div class="pub-details-container" id="pubContainer">
-                <div class="pub-details-card">
-                    <div class="pub-nav-top">
-                        <button class="btn-nav-small" data-action="close-pub-details">🏠 Home</button>
-                        <button class="btn-nav-small" data-action="back-to-results">← Back</button>
-                    </div>
-        
-                    <div class="pub-header">
-                        <h1 class="pub-title" id="pubDetailsTitle">Pub Name</h1>
-                        <div class="pub-address" id="pubDetailsAddress">Address</div>
-                        <div class="pub-location" id="pubDetailsLocation">Location</div>
-                    </div>
-        
-                    <div class="beer-section" id="beerSection" style="display: none;">
-                        <div class="beer-section-title">🍺 Available Gluten Free Beers</div>
-                        <div class="beer-status" id="pubDetailsBeer"></div>
-                    </div>
+        <!-- REPLACE the entire Pub Details Overlay section in index.html -->
 
-                    <div class="gf-status-section">
-                        <div class="status-card">
-                            <h3 class="status-question">🍺 What's the GF beer situation here?</h3>
-                            <div class="current-status" id="currentGFStatus">
-                                <span class="status-icon">❓</span>
-                                <span class="status-text">Not Sure</span>
-                                <span class="status-meta">Help us find out!</span>
+        <!-- Pub Details Overlay -->
+        <div id="pubDetailsOverlay" class="pub-details-overlay">
+            <div class="pub-details-container">
+                <!-- Purple navigation bar -->
+                <div class="pub-details-nav">
+                    <button class="btn-nav-small" data-action="close-pub-details">🏠 Home</button>
+                    <h2 class="pub-nav-title" id="pubNavTitle">Pub Details</h2>
+                    <button class="btn-nav-small" data-action="back-to-results">← Back</button>
+                </div>
+                
+                <!-- Main content card -->
+                <div class="pub-details-card">
+                    <div class="pub-details-content">
+                        <div class="pub-header">
+                            <h1 class="pub-title" id="pubDetailsTitle">Pub Name</h1>
+                            <div class="pub-address" id="pubDetailsAddress">Address</div>
+                            <div class="pub-location" id="pubDetailsLocation">Location</div>
+                        </div>
+        
+                        <div class="beer-section" id="beerSection" style="display: none;">
+                            <div class="beer-section-title">🍺 Available Gluten Free Beers</div>
+                            <div class="beer-status" id="pubDetailsBeer"></div>
+                        </div>
+        
+                        <div class="gf-status-section">
+                            <div class="status-card">
+                                <h3 class="status-question">🍺 What's the GF beer situation here?</h3>
+                                <div class="current-status" id="currentGFStatus">
+                                    <span class="status-icon">❓</span>
+                                    <span class="status-text">Not Sure</span>
+                                    <span class="status-meta">Help us find out!</span>
+                                </div>
+                                <button class="btn btn-sm" data-action="change-gf-status">✏️ Change this</button>
                             </div>
-                            <button class="btn btn-secondary btn-sm" data-action="change-gf-status">✏️ Change this</button>
                         </div>
                     </div>
-                            
+                    
+                    <!-- Action buttons stick to bottom -->
                     <div class="pub-action-grid">
                         <button class="btn btn-external" id="pubFindOnline">🔍 Find Online</button>
                         <button class="btn btn-external" id="pubGetDirections">🧭 Get Directions</button>
@@ -283,7 +292,8 @@
                         <button class="btn btn-positive" data-action="report-beer">📝 Report GF Beer</button>
                     </div>
                 </div>
-        
+                
+                <!-- Map container for split view -->
                 <div class="pub-map-container" id="pubMapContainer">
                     <div class="pub-map-placeholder">🗺️ Interactive Map Loading...</div>
                 </div>
