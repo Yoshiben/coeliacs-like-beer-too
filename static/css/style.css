@@ -1363,25 +1363,9 @@ html {
    flex-direction: column;
 }
 
-.map-overlay-content {
-   position: absolute;
-   top: 0;
-   left: 0;
-   right: 0;
-   bottom: 0;
-   width: 100%;
-   height: 100%;
-   flex: 1;
-}
-
-#fullMap {
-   width: 100%;
-   height: 100%;
-}
-
 /* Style the navigation bar container */
 .map-overlay-nav {
-   position: absolute;
+/*    position: absolute; */
    top: 0;
    left: 0;
    right: 0;
@@ -1394,6 +1378,22 @@ html {
    z-index: 10;
    flex-shrink: 0;
 }
+
+.map-overlay-content {
+/*    position: absolute; */
+/*    top: 0;
+   left: 0;
+   right: 0;
+   bottom: 0; */
+   width: 100%;
+   height: 100%;
+   flex: 1;
+}
+
+/* #fullMap {
+   width: 100%;
+   height: 100%;
+} */
 
 .map-overlay-nav button {
    pointer-events: auto; /* But buttons are clickable */
