@@ -320,7 +320,7 @@
                             <div class="selected-pub-card">
                                 <strong id="selectedPubName"></strong>
                                 <div id="selectedPubAddress"></div>
-                                <button type="button" class="btn btn-secondary btn-sm" onclick="if(window.FormModule) FormModule.clearSelectedPub();">Choose Different Pub</button>
+                                <button type="button" class="btn btn-secondary btn-sm" data-action="clear-selected-pub">Choose Different Pub</button>
                             </div>
                         </div>
                         
@@ -886,62 +886,5 @@
             console.log('📺 Viewport:', window.innerWidth + 'x' + window.innerHeight);
             console.log('🌐 Connection:', navigator.connection?.effectiveType || 'unknown');
         </script>
-
-        <!-- Places search handler -->
-        <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🔧 Setting up places search handler...');
-            
-            const placesInput = document.getElementById('placesSearchInput');
-            if (placesInput) {
-                console.log('✅ Found places search input');
-                
-                placesInput.addEventListener('input', function(e) {
-                    const query = e.target.value;
-                    console.log('🔍 Places search input:', query);
-                    
-                    if (window.SearchModule?.PlacesSearchModule?.handleSearch) {
-                        window.SearchModule.PlacesSearchModule.handleSearch(query);
-                    } else {
-                        console.warn('❌ PlacesSearchModule not available yet');
-                        setTimeout(() => {
-                            if (window.SearchModule?.PlacesSearchModule?.handleSearch) {
-                                window.SearchModule.PlacesSearchModule.handleSearch(query);
-                            }
-                        }, 500);
-                    }
-                });
-                
-                placesInput.addEventListener('focus', function() {
-                    console.log('📍 Places search input focused');
-                });
-            }
-            
-            // Monitor modal opening
-            const observer = new MutationObserver(function(mutations) {
-                mutations.forEach(function(mutation) {
-                    if (mutation.target.id === 'placesSearchModal' && 
-                        mutation.target.style.display === 'flex') {
-                        console.log('🔍 Places search modal opened');
-                        const input = document.getElementById('placesSearchInput');
-                        if (input) {
-                            setTimeout(() => input.focus(), 100);
-                        }
-                    }
-                });
-            });
-            
-            const modal = document.getElementById('placesSearchModal');
-            if (modal) {
-                observer.observe(modal, { attributes: true, attributeFilter: ['style'] });
-            }
-        });
-        </script>
-
-<!--         <style>
-            #resultsOverlay {
-                display: none !important;
-            }
-        </style> -->
     </body>
 </html>
