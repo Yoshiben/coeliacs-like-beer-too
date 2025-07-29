@@ -1345,8 +1345,8 @@ html {
    top: 0;
    left: 0;
    width: 100%;
-   height: 100vh;
-   height: 100dvh;
+   height: 100%;
+/*    height: 100dvh; */
    z-index: var(--z-modal-backdrop);
    background: var(--primary-gradient);
 }
@@ -1356,8 +1356,9 @@ html {
 }
 
 .map-overlay-container {
-   width: 100%;
-   height: 100%;
+/*    width: 100%;
+   height: 100%; */
+   flex: 1;
    display: flex;
    flex-direction: column;
 }
@@ -1383,7 +1384,7 @@ html {
    align-items: center;
    padding: var(--space-md);
    background: var(--primary-gradient);
-   height: 60px;
+/*    height: 60px; */
    flex-shrink: 0;
    gap: var(--space-md);
 }
