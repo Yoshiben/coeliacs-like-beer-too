@@ -610,7 +610,16 @@
             <div class="map-overlay-container">
                 <div class="map-overlay-nav">
                     <button class="btn-nav-small btn-home" data-action="close-full-map">🏠 Home</button>
-<!--                     <span>&nbsp;</span> -->
+
+                    <div class="map-toggle-switch">
+                        <label class="toggle-label">
+                            <input type="checkbox" id="mapPubToggle" checked>
+                            <span class="toggle-slider">
+                                <span class="toggle-text" data-on="GF Pubs" data-off="All Pubs"></span>
+                            </span>
+                        </label>
+                    </div>
+
                     <button class="btn-nav-small btn-location" data-action="go-to-my-location">📍 My Location</button>
                     <div style="width: 60px;"></div>
                 </div>
