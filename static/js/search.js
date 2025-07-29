@@ -1370,29 +1370,10 @@ export const SearchModule = (function() {
     };
     
     const setupResultsNavigationHandlers = () => {
-        console.log('🔧 Setting up results navigation handlers...');
-        
-        // Home button
-        const homeBtn = document.querySelector('[data-action="close-results"]');
-        if (homeBtn) {
-            homeBtn.onclick = null;
-            homeBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                const ui = getUI();
-                if (ui?.closeResults) {
-                    ui.closeResults();
-                } else {
-                    window.HelpersModule?.closeAllOverlaysAndGoHome?.();
-                }
-                
-                const tracking = getTracking();
-                if (tracking) {
-                    tracking.trackEvent('close_results', 'Navigation', 'home_button');
-                }
-            });
-        }
+        // This whole function can be emptied
+        console.log('🔧 Results navigation now handled by main.js data-action');
+        // That's it - delete everything else inside this function
+    };
         
         // Map toggle button
         const mapBtn = document.querySelector('[data-action="toggle-results-map"]');
@@ -1698,20 +1679,18 @@ export const SearchModule = (function() {
                 return;
             }
             
-            resultsDiv.innerHTML = places.map(place => {
+            // STEP 1: Store the place data in the module (not in HTML)
+            this.searchResults = places;
+            
+            // STEP 2: Create HTML with just an index reference
+            resultsDiv.innerHTML = places.map((place, index) => {
                 const name = place.namedetails?.name || place.display_name.split(',')[0];
                 const address = this.formatAddress(place);
                 const type = this.getPlaceType(place);
                 
+                // Just store the index in the HTML, not the whole data
                 return `
-                    <div class="place-result" data-place='${JSON.stringify({
-                        name: name,
-                        address: address,
-                        lat: place.lat,
-                        lon: place.lon,
-                        type: type,
-                        osm_id: place.osm_id
-                    }).replace(/'/g, '&apos;')}'>
+                    <div class="place-result" data-action="select-place" data-place-index="${index}">
                         <div class="place-icon">${this.getPlaceIcon(type)}</div>
                         <div class="place-info">
                             <strong>${this.escapeHtml(name)}</strong>
@@ -1723,14 +1702,6 @@ export const SearchModule = (function() {
             }).join('');
             
             resultsDiv.style.display = 'block';
-            
-            // Add click handlers to results
-            resultsDiv.querySelectorAll('.place-result').forEach(el => {
-                el.addEventListener('click', () => {
-                    const placeData = JSON.parse(el.dataset.place);
-                    this.selectPlace(placeData);
-                });
-            });
         },
         
         formatAddress(place) {
@@ -1767,12 +1738,26 @@ export const SearchModule = (function() {
             return icons[type] || '📍';
         },
         
-        selectPlace(placeData) {
-            this.selectedPlace = placeData;
+        selectPlace(placeOrIndex) {
+            // Handle both direct place object or index
+            const place = typeof placeOrIndex === 'number' 
+                ? this.searchResults[placeOrIndex]
+                : placeOrIndex;
+                
+            if (!place) return;
             
-            document.getElementById('selectedPlaceName').textContent = placeData.name;
-            document.getElementById('selectedPlaceAddress').textContent = placeData.address;
-            document.getElementById('selectedPlaceType').textContent = placeData.type;
+            this.selectedPlace = {
+                name: place.namedetails?.name || place.display_name.split(',')[0],
+                address: this.formatAddress(place),
+                lat: place.lat,
+                lon: place.lon,
+                type: this.getPlaceType(place),
+                osm_id: place.osm_id
+            };
+            
+            document.getElementById('selectedPlaceName').textContent = this.selectedPlace.name;
+            document.getElementById('selectedPlaceAddress').textContent = this.selectedPlace.address;
+            document.getElementById('selectedPlaceType').textContent = this.selectedPlace.type;
             document.getElementById('selectedPlacePreview').style.display = 'block';
             
             this.hideResults();
