@@ -637,6 +637,41 @@
                 </div>
             </div>
         </div>
+
+        <!-- ADD this to index.html after the other modals (before the Toasts section) -->
+
+        <!-- Location Permission Modal -->
+        <div id="locationPermissionModal" class="modal location-modal" style="display: none;">
+            <div class="modal-content location-permission-card">
+                <div class="permission-icon">📍</div>
+                <h2 class="permission-title">Enable Location Services</h2>
+                <p class="permission-text">
+                    To find pubs near you, we need access to your location. 
+                    Your location data stays on your device and is never stored.
+                </p>
+                <div class="permission-benefits">
+                    <div class="benefit-item">
+                        <span class="benefit-icon">🎯</span>
+                        <span>Find the closest pubs with GF beer</span>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="benefit-icon">📏</span>
+                        <span>See accurate distances</span>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="benefit-icon">🗺️</span>
+                        <span>Get directions from your location</span>
+                    </div>
+                </div>
+                <div class="permission-actions">
+                    <button class="btn btn-secondary" data-action="deny-location">Not Now</button>
+                    <button class="btn btn-primary" data-action="allow-location">Enable Location</button>
+                </div>
+                <p class="permission-note">
+                    You can change this anytime in your browser settings
+                </p>
+            </div>
+        </div>
         
         <!-- Toasts -->
         <div id="loadingToast" class="toast toast-loading" style="display: none;">
