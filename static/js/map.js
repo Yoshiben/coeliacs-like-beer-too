@@ -1155,97 +1155,118 @@ export const MapModule = (function() {
 
     // Initialize map toggle functionality
     const initMapToggle = () => {
-        const toggle = document.getElementById('mapPubToggle');
-        if (!toggle) return;
+        const container = document.getElementById('mapToggleContainer');
+        if (!container) return;
         
-        toggle.addEventListener('change', (e) => {
-            const showGFOnly = e.target.checked;
-            console.log(`🍺 Toggle changed: ${showGFOnly ? 'GF Pubs Only' : 'All Pubs'}`);
-            
-            if (!window.fullUKMap || !window.allPubsData) return;
-            
-            // Clear existing layers
-            if (window.gfPubsLayer) {
-                window.fullUKMap.removeLayer(window.gfPubsLayer);
+        const options = container.querySelectorAll('.toggle-option');
+        const thumb = document.getElementById('toggleThumb');
+        let currentMode = 'gf'; // Start with GF pubs
+        
+        // Set initial thumb position
+        const updateThumb = () => {
+            const activeOption = container.querySelector('.toggle-option.active');
+            if (activeOption && thumb) {
+                thumb.style.width = `${activeOption.offsetWidth}px`;
+                thumb.style.transform = `translateX(${activeOption.offsetLeft}px)`;
             }
-            if (window.clusteredPubsLayer) {
-                window.fullUKMap.removeLayer(window.clusteredPubsLayer);
-            }
-            
-            if (showGFOnly) {
-                // Show only GF pubs
-                window.gfPubsLayer = L.layerGroup().addTo(window.fullUKMap);
+        };
+        
+        // Initial position
+        setTimeout(updateThumb, 100);
+        
+        // Handle clicks
+        options.forEach(option => {
+            option.addEventListener('click', () => {
+                const value = option.dataset.value;
+                if (value === currentMode) return;
                 
-                const gfPubs = window.allPubsData.filter(pub => 
-                    pub.gf_status === 'always' || pub.gf_status === 'currently'
-                );
+                // Update active state
+                options.forEach(opt => opt.classList.remove('active'));
+                option.classList.add('active');
+                currentMode = value;
                 
-                console.log(`📍 Showing ${gfPubs.length} GF pubs only`);
+                // Update thumb position
+                updateThumb();
                 
-                gfPubs.forEach(pub => {
-                    if (!pub.latitude || !pub.longitude) return;
-                    
-                    const lat = parseFloat(pub.latitude);
-                    const lng = parseFloat(pub.longitude);
-                    const gfStatus = determineGFStatus(pub);
-                    const markerStyle = getMarkerStyleForGFStatus(gfStatus);
-                    
-                    const marker = L.circleMarker([lat, lng], markerStyle);
-                    const popupContent = createPubPopupContent(pub, gfStatus);
-                    marker.bindPopup(popupContent);
-                    
-                    window.gfPubsLayer.addLayer(marker);
-                });
-                
-                if (window.showSuccessToast) {
-                    window.showSuccessToast(`🍺 Showing ${gfPubs.length} pubs with GF beer`);
-                }
-            } else {
-                // Show all pubs
-                addFilteredPubMarkers(window.allPubsData, window.fullUKMap);
-                
-                if (window.showSuccessToast) {
-                    window.showSuccessToast(`📍 Showing all ${window.allPubsData.length} pubs`);
-                }
-            }
+                // Update map
+                updateMapDisplay(value === 'gf');
+            });
         });
         
-        // Start with GF only view
-        toggle.checked = true;
-        toggle.dispatchEvent(new Event('change'));
+        // Show initial GF pubs
+        updateMapDisplay(true);
+        
+        // Set up zoom handler for dynamic updates
+        setupZoomHandler(currentMode);
     };
     
-    // Add new function for zoom handling
-    const setupZoomHandler = () => {
+    // Update map display based on mode
+    const updateMapDisplay = (showGFOnly) => {
+        if (!window.fullUKMap || !window.allPubsData) return;
+        
+        console.log(`🍺 Updating map: ${showGFOnly ? 'GF Pubs Only' : 'All Pubs'}`);
+        
+        // Clear existing layers
+        if (window.gfPubsLayer) {
+            window.fullUKMap.removeLayer(window.gfPubsLayer);
+        }
+        if (window.clusteredPubsLayer) {
+            window.fullUKMap.removeLayer(window.clusteredPubsLayer);
+        }
+        
+        if (showGFOnly) {
+            // Show only GF pubs
+            window.gfPubsLayer = L.layerGroup().addTo(window.fullUKMap);
+            
+            const gfPubs = window.allPubsData.filter(pub => 
+                pub.gf_status === 'always' || pub.gf_status === 'currently'
+            );
+            
+            console.log(`📍 Showing ${gfPubs.length} GF pubs only`);
+            
+            gfPubs.forEach(pub => {
+                if (!pub.latitude || !pub.longitude) return;
+                
+                const lat = parseFloat(pub.latitude);
+                const lng = parseFloat(pub.longitude);
+                const gfStatus = determineGFStatus(pub);
+                const markerStyle = getMarkerStyleForGFStatus(gfStatus);
+                
+                const marker = L.circleMarker([lat, lng], markerStyle);
+                const popupContent = createPubPopupContent(pub, gfStatus);
+                marker.bindPopup(popupContent);
+                
+                window.gfPubsLayer.addLayer(marker);
+            });
+            
+        } else {
+            // Show all pubs with clustering
+            addFilteredPubMarkers(window.allPubsData, window.fullUKMap);
+        }
+    };
+    
+    // Keep the zoom handler for performance
+    const setupZoomHandler = (mode) => {
         if (!window.fullUKMap) return;
         
-        // Clear any existing handlers
+        // Clear existing handlers
         window.fullUKMap.off('zoomend');
         
-        // Add debounced zoom handler
+        // Add zoom handler for refresh on zoom changes
         let zoomTimeout;
         window.fullUKMap.on('zoomend', function() {
             clearTimeout(zoomTimeout);
             zoomTimeout = setTimeout(() => {
                 const zoom = window.fullUKMap.getZoom();
-                console.log(`🔍 Zoom level: ${zoom}`);
+                console.log(`🔍 Zoom level: ${zoom}, refreshing markers`);
                 
-                // Always show all pubs at all zoom levels
-                if (window.allPubsData && window.allPubsData.length > 0) {
-                    console.log('🔍 Refreshing pub markers...');
-                    requestAnimationFrame(() => {
-                        addFilteredPubMarkers(window.allPubsData, window.fullUKMap);
-                    });
-                }
-            }, 300); // Debounce for 300ms
+                // Get current mode from toggle
+                const activeOption = document.querySelector('.toggle-option.active');
+                const currentMode = activeOption?.dataset.value || 'gf';
+                
+                updateMapDisplay(currentMode === 'gf');
+            }, 300);
         });
-        
-        // Initial display
-        if (window.allPubsData && window.allPubsData.length > 0) {
-            requestAnimationFrame(() => {
-                addFilteredPubMarkers(window.allPubsData, window.fullUKMap);
-            });
-        }
     };
     
     // Clean up full UK map
