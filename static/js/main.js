@@ -146,70 +146,47 @@ const App = {
         }
     },
     
+    // LOCATION: main.js - setupEventDelegation method
+    // CHECK: Make sure you have this structure
+    
     setupEventDelegation() {
         console.log('🔧 Setting up event delegation...');
         
         // Main click handler
-        document.addEventListener('input', (e) => {
-            const target = e.target;
-            
-            if (target.id === 'placesSearchInput') {
-                const searchModule = this.getModule('search');
-                if (searchModule?.PlacesSearchModule?.handleSearch) {
-                    searchModule.PlacesSearchModule.handleSearch(target.value);
-                }
-            }
-        }, true);
-        
-        // Modal close handlers
         document.addEventListener('click', (e) => {
-            if (e.target.classList.contains('modal') || 
-                e.target.classList.contains('search-modal') ||
-                e.target.classList.contains('results-overlay')) {
-                this.closeModal(e.target.id);
+            // Debug what was clicked
+            console.log('🖱️ Click detected:', e.target);
+            
+            const target = e.target.closest('[data-action], [data-modal], [data-distance]');
+            if (!target) {
+                console.log('❌ No data-action found on clicked element');
+                return;
             }
             
-            if (e.target.classList.contains('modal-close') || 
-                e.target.closest('.modal-close') ||
-                e.target.dataset.action === 'close-modal') {
-                const modal = e.target.closest('.modal, .search-modal, .results-overlay');
-                if (modal) this.closeModal(modal.id);
+            console.log('✅ Found action element:', target.dataset);
+            
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Modal triggers
+            if (target.dataset.modal) {
+                console.log('🔲 Opening modal:', target.dataset.modal);
+                this.openModal(target.dataset.modal);
             }
-        });
-        
-        // Escape key handler
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                const openModals = document.querySelectorAll('.modal[style*="display: flex"], .modal.active');
-                if (openModals.length > 0) {
-                    this.closeModal(openModals[openModals.length - 1].id);
-                }
+            
+            // Action handlers
+            if (target.dataset.action) {
+                console.log('🎯 Handling action:', target.dataset.action);
+                this.handleAction(target.dataset.action, target, e);
             }
-        });
-        
-        // Form submission handler
-        document.addEventListener('submit', (e) => {
-            const form = e.target;
-            if (form.dataset.action) {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                if (form.dataset.action === 'submit-report') {
-                    const formModule = this.getModule('form');
-                    if (formModule?.handleReportSubmission) {
-                        formModule.handleReportSubmission(e);
-                    } else {
-                        console.error('❌ Form module not available');
-                        if (window.showSuccessToast) {
-                            window.showSuccessToast('❌ Unable to submit report. Please try again.');
-                        }
-                    }
-                }
+            
+            // Distance selection
+            if (target.dataset.distance) {
+                console.log('📏 Distance selected:', target.dataset.distance);
+                this.handleDistanceSelection(parseInt(target.dataset.distance));
             }
-        });
-        
-        console.log('✅ Event delegation setup complete');
-    },
+        }, true); // <-- Make sure this 'true' is here for capture phase
+    }
     
     setupGlobalFunctions() {
         const helpers = this.getModule('helpers');
@@ -225,6 +202,13 @@ const App = {
     },
     
     handleAction(action, element, event) {
+        console.log(`🎬 ACTION TRIGGERED: "${action}"`, {
+            element: element,
+            hasSearchModule: !!this.getModule('search'),
+            hasModalModule: !!this.getModule('modal'),
+            hasFormModule: !!this.getModule('form'),
+            availableModules: Object.keys(this.modules)
+        });
         console.log(`🎬 Processing action: ${action}`);
         
         // Get all modules once
@@ -236,6 +220,15 @@ const App = {
             form: this.getModule('form'),
             tracking: this.getModule('tracking')
         };
+
+        console.log('📦 Modules loaded:', {
+            search: !!modules.search,
+            modal: !!modules.modal,
+            helpers: !!modules.helpers,
+            map: !!modules.map,
+            form: !!modules.form,
+            tracking: !!modules.tracking
+        });
         
         // Define action handlers
         const actionHandlers = {
@@ -549,6 +542,12 @@ const App = {
                     
                     modules.tracking?.trackEvent('go_to_location', 'Map Interaction', 'button_click');
                 }
+            }
+
+            if (!actionHandlers[action]) {
+                console.error(`❌ No handler found for action: "${action}"`);
+                console.log('Available actions:', Object.keys(actionHandlers));
+                return;
             }
         };
         
