@@ -108,6 +108,13 @@ export const ModalModule = (function() {
     
     const open = (modalId, data = null) => {
         console.log(`🔓 Opening modal: ${modalId}`, data);
+
+        if (modalId === 'placesSearchModal') {
+            setTimeout(() => {
+                const input = document.getElementById('placesSearchInput');
+                if (input) input.focus();
+            }, 150);
+        }
         
         const modal = document.getElementById(modalId);
         if (!modal) {
