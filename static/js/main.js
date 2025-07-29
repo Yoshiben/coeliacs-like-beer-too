@@ -395,14 +395,32 @@ const App = {
 
             'allow-location': () => {
                 console.log('📍 User allowed location access');
-                // The actual handling is done by the search module's event listener
-                // This is just here to prevent the "unhandled action" warning
+                
+                // Hide the modal
+                const modal = document.getElementById('locationPermissionModal');
+                if (modal) {
+                    modal.style.display = 'none';
+                    document.body.style.overflow = '';
+                }
+                
+                // Trigger the location permission flow in search module
+                const event = new CustomEvent('locationPermissionGranted');
+                document.dispatchEvent(event);
             },
             
             'deny-location': () => {
                 console.log('📍 User denied location access');
-                // The actual handling is done by the search module's event listener
-                // This is just here to prevent the "unhandled action" warning
+                
+                // Hide the modal
+                const modal = document.getElementById('locationPermissionModal');
+                if (modal) {
+                    modal.style.display = 'none';
+                    document.body.style.overflow = '';
+                }
+                
+                // Trigger the denial in search module
+                const event = new CustomEvent('locationPermissionDenied');
+                document.dispatchEvent(event);
             },
 
             'go-to-my-location': () => {
