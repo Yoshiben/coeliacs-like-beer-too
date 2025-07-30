@@ -1,11 +1,13 @@
 // ================================================================================
-// SEARCH.JS - Cleaned and Optimized Version
+// SEARCH.JS - Complete Refactor with STATE_KEYS
 // Handles: Location search, name search, area search, beer search, pub details
 // ================================================================================
 
+import { Constants } from './constants.js';
+const STATE_KEYS = Constants.STATE_KEYS;
+
 export const SearchModule = (function() {
     'use strict';
-    // console.log('🔍 SearchModule initializing...');
     
     // ================================
     // PRIVATE STATE
@@ -13,18 +15,60 @@ export const SearchModule = (function() {
     const state = {
         lastSearchState: null,
         currentSearchPubs: [],
-        userLocation: null,
         locationRequestInProgress: false
     };
     
     // ================================
-    // MODULE GETTERS
+    // MODULE GETTERS - Centralized
     // ================================
-    const getAPI = () => window.App?.getModule('api');
-    const getMap = () => window.App?.getModule('map');
-    const getModal = () => window.App?.getModule('modal');
-    const getTracking = () => window.App?.getModule('tracking');
-    const getUI = () => window.App?.getModule('ui');
+    const modules = {
+        get api() { return window.App?.getModule('api'); },
+        get map() { return window.App?.getModule('map'); },
+        get modal() { return window.App?.getModule('modal'); },
+        get tracking() { return window.App?.getModule('tracking'); },
+        get ui() { return window.App?.getModule('ui'); }
+    };
+    
+    // ================================
+    // UTILITIES
+    // ================================
+    const utils = {
+        getUserLocation() {
+            return window.App.getState(STATE_KEYS.USER_LOCATION);
+        },
+        
+        setUserLocation(location) {
+            window.App.setState(STATE_KEYS.USER_LOCATION, location);
+            window.App.setState(STATE_KEYS.LOCATION_TIMESTAMP, Date.now());
+            window.App.setState(STATE_KEYS.LOCATION_ACCURACY, location.accuracy);
+        },
+        
+        getCurrentPub() {
+            return window.App.getState(STATE_KEYS.CURRENT_PUB);
+        },
+        
+        setCurrentPub(pub) {
+            window.App.setState(STATE_KEYS.CURRENT_PUB, pub);
+        },
+        
+        showToast(message, type = 'success') {
+            if (window.showSuccessToast) {
+                window.showSuccessToast(message);
+            }
+        },
+        
+        showLoadingToast(message) {
+            if (window.showLoadingToast) {
+                window.showLoadingToast(message);
+            }
+        },
+        
+        hideLoadingToast() {
+            if (window.hideLoadingToast) {
+                window.hideLoadingToast();
+            }
+        }
+    };
     
     // ================================
     // LOCATION SEARCH
@@ -32,18 +76,12 @@ export const SearchModule = (function() {
     const startLocationSearch = () => {
         console.log('🎯 Starting location search...');
         
-        const tracking = getTracking();
-        if (tracking) {
-            tracking.trackEvent('location_search_start', 'Search', 'distance_modal');
-        }
+        modules.tracking?.trackEvent('location_search_start', 'Search', 'distance_modal');
         
-        const modal = getModal();
-        if (modal) {
-            console.log('✅ Opening distance modal via modal module');
-            modal.open('distanceModal');
+        if (modules.modal) {
+            modules.modal.open('distanceModal');
         } else {
             // Fallback
-            console.log('⚠️ Using fallback modal opening');
             const distanceModal = document.getElementById('distanceModal');
             if (distanceModal) {
                 distanceModal.style.display = 'flex';
@@ -56,112 +94,46 @@ export const SearchModule = (function() {
         console.log(`🎯 Searching within ${radiusKm}km...`);
         
         try {
-            // Close modal
-            const modal = getModal();
-            if (modal) modal.close('distanceModal');
-            
-            // Hide everything and show overlay immediately
-            const heroSection = document.querySelector('.hero-section');
-            const searchSection = document.querySelector('.search-section');
-            if (heroSection) heroSection.style.display = 'none';
-            if (searchSection) searchSection.style.display = 'none';
-            
-            const resultsOverlay = document.getElementById('resultsOverlay');
-            if (resultsOverlay) {
-                resultsOverlay.style.display = 'flex';
-                resultsOverlay.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            }
-            
-            // Set title
-            const resultsTitle = document.getElementById('resultsTitle');
-            if (resultsTitle) {
-                resultsTitle.textContent = `Pubs within ${radiusKm}km`;
-            }
+            modules.modal?.close('distanceModal');
             
             showResultsOverlay(`Pubs within ${radiusKm}km`);
             showResultsLoading('📍 Getting precise location...');
             
             // Get user location
-            if (!window.App.getState('userLocation')) {
+            let userLocation = utils.getUserLocation();
+            if (!userLocation) {
                 try {
-                    const location = await requestLocationWithUI();
-                    window.App.setState('userLocation', location);
-                    window.App.setState('locationTimestamp', Date.now());
-                    window.App.setState('locationAccuracy', location.accuracy);
-                    
-                    // Show accuracy feedback
-                    const accuracy = window.App.getState('userLocation.accuracy');
-                    if (accuracy) {
-                        let message = '📍 Location found - finding nearby GF beer...';
-                        
-                        if (accuracy <= 100) {
-                            message = '🎯 Excellent location accuracy - finding nearby GF beer...';
-                        } else if (accuracy <= 500) {
-                            message = '📍 Good location accuracy - finding nearby GF beer...';
-                        } else if (accuracy <= 1000) {
-                            message = '📍 Reasonable location accuracy - finding nearby GF beer...';
-                        } else {
-                            message = '📍 Location found (low accuracy) - finding nearby GF beer...';
-                            if (window.showSuccessToast) {
-                                window.showSuccessToast(`⚠️ Location accuracy: ±${Math.round(accuracy)}m`);
-                            }
-                        }
-                        showResultsLoading(message);
-                    }
-                    
-                    const mapModule = getMap();
-                    if (mapModule?.setUserLocation) {
-                        mapModule.setUserLocation(window.App.getState('userLocation'));
-                    }
-                    
+                    userLocation = await requestLocationWithUI();
+                    utils.setUserLocation(userLocation);
+                    modules.map?.setUserLocation(userLocation);
                 } catch (locationError) {
                     console.error('❌ Location error:', locationError);
+                    hideResultsAndShowHome();
+                    utils.showToast('📍 Location needed for nearby search. Try searching by area instead!');
                     
-                    // Hide the results overlay since we have no results
-                    const resultsOverlay = document.getElementById('resultsOverlay');
-                    if (resultsOverlay) {
-                        resultsOverlay.style.display = 'none';
-                        resultsOverlay.classList.remove('active');
-                    }
-                    
-                    // Show home sections again
-                    const heroSection = document.querySelector('.hero-section');
-                    const searchSection = document.querySelector('.search-section');
-                    if (heroSection) heroSection.style.display = 'block';
-                    if (searchSection) searchSection.style.display = 'flex';
-                    
-                    // Show helpful toast with action
-                    if (window.showSuccessToast) {
-                        window.showSuccessToast('📍 Location needed for nearby search. Try searching by area instead!');
-                    }
-                    
-                    // Automatically open the area search modal after a short delay
                     setTimeout(() => {
-                        const modal = getModal();
-                        if (modal) {
-                            modal.open('areaModal');
-                        }
+                        modules.modal?.open('areaModal');
                     }, 1000);
-                    
                     return;
                 }
             }
+            
+            // Show accuracy feedback
+            showLocationAccuracyFeedback(userLocation.accuracy);
             
             // Save search state
             state.lastSearchState = {
                 type: 'nearby',
                 radius: radiusKm,
-                userLocation: window.App.getState('userLocation'),
+                userLocation: userLocation,
                 timestamp: Date.now()
             };
             
             // Perform search
             showResultsLoading('🔍 Searching for GF beer options...');
-            const api = getAPI();
-            const pubs = await api.findNearbyPubs(
-                window.App.getState('userLocation').lat, 
-                window.App.getState('userLocation').lng, 
+            const pubs = await modules.api.findNearbyPubs(
+                userLocation.lat, 
+                userLocation.lng, 
                 radiusKm, 
                 false
             );
@@ -175,15 +147,12 @@ export const SearchModule = (function() {
             
             state.currentSearchPubs = pubs;
             
-            const accuracyText = window.App.getState('userLocation').accuracy && window.App.getState('userLocation').accuracy > 500 ? 
-                ` (±${Math.round(window.App.getState('userLocation').accuracy)}m accuracy)` : '';
+            const accuracyText = userLocation.accuracy > 500 ? 
+                ` (±${Math.round(userLocation.accuracy)}m accuracy)` : '';
             
             displayResultsInOverlay(pubs, `${pubs.length} pubs within ${radiusKm}km${accuracyText}`);
             
-            const tracking = getTracking();
-            if (tracking) {
-                tracking.trackSearch(`nearby_${radiusKm}km`, 'location', pubs.length);
-            }
+            modules.tracking?.trackSearch(`nearby_${radiusKm}km`, 'location', pubs.length);
             
         } catch (error) {
             console.error('❌ Error in nearby search:', error);
@@ -192,72 +161,99 @@ export const SearchModule = (function() {
     };
     
     // ================================
-    // NAME SEARCH
+    // TEXT SEARCHES - Consolidated
     // ================================
+    const performTextSearch = async (type, query, searchConfig) => {
+        try {
+            // Try to get user location for distance sorting
+            let userLocation = utils.getUserLocation();
+            if (!userLocation) {
+                userLocation = await tryGetUserLocation();
+            }
+            
+            // Perform search
+            const results = await modules.api.searchPubs({
+                query: query,
+                searchType: searchConfig.searchType || 'all',
+                page: 1
+            });
+            
+            let pubs = Array.isArray(results) ? results : results.pubs;
+            
+            if (pubs.length === 0) {
+                showNoResults(searchConfig.noResultsMessage);
+                return;
+            }
+            
+            // Sort by distance if we have location
+            if (userLocation) {
+                pubs = sortPubsByDistance(pubs, userLocation);
+            }
+            
+            // Save state
+            state.lastSearchState = {
+                type: type,
+                query: searchConfig.stateQuery || query,
+                results: pubs,
+                timestamp: Date.now()
+            };
+            
+            state.currentSearchPubs = pubs;
+            
+            // Display results
+            const title = userLocation ? 
+                searchConfig.titleWithLocation(pubs.length) :
+                searchConfig.titleWithoutLocation(pubs.length);
+                
+            displayResultsInOverlay(pubs, title);
+            
+            utils.showToast(`✅ Found ${pubs.length} ${searchConfig.successMessage}`);
+            modules.tracking?.trackSearch(query, type, pubs.length);
+            
+        } catch (error) {
+            console.error(`❌ Error in ${type} search:`, error);
+            showNoResults(searchConfig.errorMessage);
+        }
+    };
+    
     const searchByName = async () => {
         const query = document.getElementById('nameInput')?.value.trim();
         
         if (!query) {
-            if (window.showSuccessToast) {
-                window.showSuccessToast('Please enter a pub name to search');
-            }
+            utils.showToast('Please enter a pub name to search');
             return;
         }
         
         console.log('🏠 Searching for pub name:', query);
-        
-        const modal = getModal();
-        if (modal) {
-            modal.close('nameModal');
-        } else {
-            // Fallback
-            const nameModal = document.getElementById('nameModal');
-            if (nameModal) {
-                nameModal.style.display = 'none';
-                nameModal.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-        }
+        modules.modal?.close('nameModal');
         
         showResultsOverlay(`Pub name: "${query}"`);
         showResultsLoading('Searching for pubs...');
         
-        await performNameSearch(query);
+        await performTextSearch('name', query, {
+            searchType: 'name',
+            noResultsMessage: `No pubs found matching "${query}"`,
+            stateQuery: query,
+            titleWithLocation: (count) => `${count} pubs matching "${query}" (nearest first)`,
+            titleWithoutLocation: (count) => `${count} pubs matching "${query}"`,
+            successMessage: `pubs matching "${query}"`,
+            errorMessage: `Error searching for "${query}". Please try again.`
+        });
         
-        const tracking = getTracking();
-        if (tracking) {
-            tracking.trackEvent('search_by_name', 'Search', query);
-        }
+        modules.tracking?.trackEvent('search_by_name', 'Search', query);
     };
     
-    // ================================
-    // AREA SEARCH
-    // ================================
     const searchByArea = async () => {
         const query = document.getElementById('areaInput')?.value.trim();
         const searchType = document.getElementById('areaSearchType')?.value;
         
         if (!query) {
-            if (window.showSuccessToast) {
-                window.showSuccessToast('Please enter a location to search');
-            }
+            utils.showToast('Please enter a location to search');
             return;
         }
         
         console.log(`🗺️ Searching by ${searchType}:`, query);
-        
-        const modal = getModal();
-        if (modal) {
-            modal.close('areaModal');
-        } else {
-            // Fallback
-            const areaModal = document.getElementById('areaModal');
-            if (areaModal) {
-                areaModal.style.display = 'none';
-                areaModal.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-        }
+        modules.modal?.close('areaModal');
         
         const searchTypeText = searchType === 'postcode' ? 'postcode' : 'area';
         showResultsOverlay(`${searchTypeText}: "${query}"`);
@@ -266,125 +262,30 @@ export const SearchModule = (function() {
         if (searchType === 'postcode') {
             await performPostcodeSearch(query);
         } else {
-            await performCitySearch(query);
-        }
-        
-        const tracking = getTracking();
-        if (tracking) {
-            tracking.trackEvent('search_by_area', 'Search', `${searchType}:${query}`);
-        }
-    };
-    
-    // ================================
-    // BEER SEARCH
-    // ================================
-    const searchByBeer = async () => {
-        const query = document.getElementById('beerInput')?.value.trim();
-        const searchType = document.getElementById('beerSearchType')?.value;
-        
-        if (!query) {
-            if (window.showSuccessToast) {
-                window.showSuccessToast('Please enter something to search for');
-            }
-            return;
-        }
-        
-        console.log(`🍺 Searching by ${searchType}:`, query);
-        
-        const modal = getModal();
-        if (modal) {
-            modal.close('beerModal');
-        } else {
-            // Fallback
-            const beerModal = document.getElementById('beerModal');
-            if (beerModal) {
-                beerModal.style.display = 'none';
-                beerModal.classList.remove('active');
-                document.body.style.overflow = '';
-            }
-        }
-        
-        const searchTypeText = searchType === 'brewery' ? 'brewery' : 
-                             searchType === 'beer' ? 'beer' : 'style';
-        showResultsOverlay(`${searchTypeText}: "${query}"`);
-        showResultsLoading('Finding pubs with this beer...');
-        
-        await performBeerSearch(query, searchType);
-        
-        const tracking = getTracking();
-        if (tracking) {
-            tracking.trackEvent('search_by_beer', 'Search', `${searchType}:${query}`);
-        }
-    };
-    
-    // ================================
-    // SEARCH IMPLEMENTATIONS
-    // ================================
-    const performNameSearch = async (query) => {
-        try {
-            if (!window.App.getState('userLocation')) {
-                window.App.getState('userLocation')= await tryGetUserLocation();
-            }
-            
-            const api = getAPI();
-            const results = await api.searchPubs({
-                query: query,
-                searchType: 'name',
-                page: 1
+            await performTextSearch('area', query, {
+                searchType: 'area',
+                noResultsMessage: `No pubs found in "${query}"`,
+                stateQuery: `${query} (city)`,
+                titleWithLocation: (count) => `${count} pubs in ${query} (nearest first)`,
+                titleWithoutLocation: (count) => `${count} pubs in ${query}`,
+                successMessage: `pubs in ${query}`,
+                errorMessage: `Error searching for "${query}"`
             });
-            
-            let pubs = Array.isArray(results) ? results : results.pubs;
-            
-            if (pubs.length === 0) {
-                showNoResults(`No pubs found matching "${query}"`);
-                return;
-            }
-            
-            if (window.App.getState('userLocation')) {
-                pubs = sortPubsByDistance(pubs, window.App.getState('userLocation'));
-            }
-            
-            state.lastSearchState = {
-                type: 'name',
-                query: query,
-                results: pubs,
-                timestamp: Date.now()
-            };
-            
-            state.currentSearchPubs = pubs;
-            
-            const title = window.App.getState('userLocation') ? 
-                `${pubs.length} pubs matching "${query}" (nearest first)` :
-                `${pubs.length} pubs matching "${query}"`;
-                
-            displayResultsInOverlay(pubs, title);
-            
-            if (window.showSuccessToast) {
-                window.showSuccessToast(`✅ Found ${pubs.length} pubs matching "${query}"`);
-            }
-            
-            const tracking = getTracking();
-            if (tracking) {
-                tracking.trackSearch(query, 'name', pubs.length);
-            }
-            
-        } catch (error) {
-            console.error('❌ Error searching by name:', error);
-            showNoResults(`Error searching for "${query}". Please try again.`);
         }
+        
+        modules.tracking?.trackEvent('search_by_area', 'Search', `${searchType}:${query}`);
     };
     
     const performPostcodeSearch = async (postcode) => {
         try {
             showResultsLoading('Finding postcode location...');
-            const api = getAPI();
-            const location = await api.geocodePostcode(postcode);
+            const location = await modules.api.geocodePostcode(postcode);
             
             console.log(`✅ Postcode geocoded to: ${location.lat}, ${location.lng}`);
             
             showResultsLoading('Finding pubs near this postcode...');
             const radius = 5;
-            const pubs = await api.findNearbyPubs(location.lat, location.lng, radius);
+            const pubs = await modules.api.findNearbyPubs(location.lat, location.lng, radius);
             
             if (pubs.length === 0) {
                 showNoResults(`No pubs found within ${radius}km of ${postcode}`);
@@ -401,15 +302,8 @@ export const SearchModule = (function() {
             state.currentSearchPubs = pubs;
             
             displayResultsInOverlay(pubs, `${pubs.length} pubs near ${postcode} (${radius}km radius)`);
-            
-            if (window.showSuccessToast) {
-                window.showSuccessToast(`✅ Found ${pubs.length} pubs near ${postcode}`);
-            }
-            
-            const tracking = getTracking();
-            if (tracking) {
-                tracking.trackSearch(postcode, 'postcode', pubs.length);
-            }
+            utils.showToast(`✅ Found ${pubs.length} pubs near ${postcode}`);
+            modules.tracking?.trackSearch(postcode, 'postcode', pubs.length);
             
         } catch (error) {
             console.error('❌ Error searching by postcode:', error);
@@ -417,77 +311,43 @@ export const SearchModule = (function() {
         }
     };
     
-    const performCitySearch = async (city) => {
-        try {
-            if (!window.App.getState('userLocation')) {
-                window.App.getState('userLocation') = await tryGetUserLocation();
-            }
-            
-            const api = getAPI();
-            const results = await api.searchPubs({
-                query: city,
-                searchType: 'area',
-                page: 1
-            });
-            
-            let pubs = Array.isArray(results) ? results : results.pubs;
-            
-            if (pubs.length === 0) {
-                showNoResults(`No pubs found in "${city}"`);
-                return;
-            }
-            
-            if (window.App.getState('userLocation')) {
-                pubs = sortPubsByDistance(pubs, window.App.getState('userLocation'));
-            }
-            
-            state.lastSearchState = {
-                type: 'area',
-                query: `${city} (city)`,
-                results: pubs,
-                timestamp: Date.now()
-            };
-            
-            state.currentSearchPubs = pubs;
-            
-            const title = window.App.getState('userLocation') ? 
-                `${pubs.length} pubs in ${city} (nearest first)` :
-                `${pubs.length} pubs in ${city}`;
-                
-            displayResultsInOverlay(pubs, title);
-            
-            if (window.showSuccessToast) {
-                window.showSuccessToast(`✅ Found ${pubs.length} pubs in ${city}`);
-            }
-            
-            const tracking = getTracking();
-            if (tracking) {
-                tracking.trackSearch(city, 'city', pubs.length);
-            }
-            
-        } catch (error) {
-            console.error('❌ Error searching by city:', error);
-            showNoResults(`Error searching for "${city}"`);
+    const searchByBeer = async () => {
+        const query = document.getElementById('beerInput')?.value.trim();
+        const searchType = document.getElementById('beerSearchType')?.value;
+        
+        if (!query) {
+            utils.showToast('Please enter something to search for');
+            return;
         }
+        
+        console.log(`🍺 Searching by ${searchType}:`, query);
+        modules.modal?.close('beerModal');
+        
+        const searchTypeText = searchType === 'brewery' ? 'brewery' : 
+                             searchType === 'beer' ? 'beer' : 'style';
+        showResultsOverlay(`${searchTypeText}: "${query}"`);
+        showResultsLoading('Finding pubs with this beer...');
+        
+        await performBeerSearch(query, searchType);
+        
+        modules.tracking?.trackEvent('search_by_beer', 'Search', `${searchType}:${query}`);
     };
     
     const performBeerSearch = async (query, searchType) => {
         try {
             console.log(`🍺 Performing beer search: "${query}" (${searchType})`);
             
-            if (!window.App.getState('userLocation')) {
-                window.App.getState('userLocation') = await tryGetUserLocation();
+            let userLocation = utils.getUserLocation();
+            if (!userLocation) {
+                userLocation = await tryGetUserLocation();
             }
             
-            const api = getAPI();
+            // Get results
             let results;
-            
-            if (api.searchPubsByBeer) {
-                console.log('🍺 Using enhanced beer search API');
-                results = await api.searchPubsByBeer(query, searchType);
+            if (modules.api.searchPubsByBeer) {
+                results = await modules.api.searchPubsByBeer(query, searchType);
             } else {
-                console.log('🍺 Using fallback search method');
-                results = await api.searchPubs({
+                results = await modules.api.searchPubs({
                     query: query,
                     searchType: 'all',
                     page: 1
@@ -498,54 +358,23 @@ export const SearchModule = (function() {
             console.log(`📊 Got ${allPubs.length} pubs from API`);
             
             // Filter based on beer search criteria
-            const searchQuery = query.toLowerCase().trim();
-            let filteredPubs = [];
-            
-            if (searchType === 'brewery') {
-                filteredPubs = allPubs.filter(pub => {
-                    if (!pub.beer_details) return false;
-                    const beerDetails = pub.beer_details.toLowerCase();
-                    return beerDetails.includes(` ${searchQuery} `) || 
-                           beerDetails.startsWith(searchQuery) ||
-                           beerDetails.includes(`${searchQuery} `) ||
-                           beerDetails.includes(` ${searchQuery}`);
-                });
-            } else if (searchType === 'beer') {
-                filteredPubs = allPubs.filter(pub => {
-                    if (!pub.beer_details) return false;
-                    return pub.beer_details.toLowerCase().includes(searchQuery);
-                });
-            } else if (searchType === 'style') {
-                filteredPubs = allPubs.filter(pub => {
-                    if (!pub.beer_details) return false;
-                    const beerDetails = pub.beer_details.toLowerCase();
-                    return beerDetails.includes(searchQuery) ||
-                           beerDetails.includes(`(${searchQuery})`) ||
-                           beerDetails.includes(`${searchQuery} `) ||
-                           beerDetails.includes(` ${searchQuery}`);
-                });
-            }
-            
-            console.log(`🔍 Filtered to ${filteredPubs.length} pubs`);
-            
-            // Try looser matching if no results
-            if (filteredPubs.length === 0 && searchQuery.length > 3) {
-                console.log('🔍 Trying looser matching...');
-                filteredPubs = allPubs.filter(pub => {
-                    if (!pub.beer_details) return false;
-                    return pub.beer_details.toLowerCase().includes(searchQuery.substring(0, 4));
-                });
-            }
+            const filteredPubs = filterPubsByBeerCriteria(allPubs, query, searchType);
             
             if (filteredPubs.length === 0) {
                 showNoResults(`No pubs found serving "${query}". Try searching for a brewery name or beer style.`);
                 return;
             }
             
-            if (window.App.getState('userLocation')) {
-                filteredPubs = sortPubsByDistance(filteredPubs, window.App.getState('userLocation'));
+            // Sort by distance if location available
+            if (userLocation) {
+                filteredPubs.sort((a, b) => {
+                    const distA = calculateDistance(userLocation, a);
+                    const distB = calculateDistance(userLocation, b);
+                    return distA - distB;
+                });
             }
             
+            // Save state and display
             state.lastSearchState = {
                 type: 'beer',
                 query: `${query} (${searchType})`,
@@ -555,20 +384,13 @@ export const SearchModule = (function() {
             
             state.currentSearchPubs = filteredPubs;
             
-            const title = window.App.getState('userLocation') ? 
+            const title = userLocation ? 
                 `${filteredPubs.length} pubs serving "${query}" (nearest first)` :
                 `${filteredPubs.length} pubs serving "${query}"`;
                 
             displayResultsInOverlay(filteredPubs, title);
-            
-            if (window.showSuccessToast) {
-                window.showSuccessToast(`✅ Found ${filteredPubs.length} pubs serving "${query}"`);
-            }
-            
-            const tracking = getTracking();
-            if (tracking) {
-                tracking.trackSearch(query, `beer_${searchType}`, filteredPubs.length);
-            }
+            utils.showToast(`✅ Found ${filteredPubs.length} pubs serving "${query}"`);
+            modules.tracking?.trackSearch(query, `beer_${searchType}`, filteredPubs.length);
             
         } catch (error) {
             console.error('❌ Error in beer search:', error);
@@ -576,177 +398,74 @@ export const SearchModule = (function() {
         }
     };
     
+    const filterPubsByBeerCriteria = (pubs, query, searchType) => {
+        const searchQuery = query.toLowerCase().trim();
+        
+        return pubs.filter(pub => {
+            if (!pub.beer_details) return false;
+            const beerDetails = pub.beer_details.toLowerCase();
+            
+            switch (searchType) {
+                case 'brewery':
+                    return beerDetails.includes(` ${searchQuery} `) || 
+                           beerDetails.startsWith(searchQuery) ||
+                           beerDetails.includes(`${searchQuery} `) ||
+                           beerDetails.includes(` ${searchQuery}`);
+                           
+                case 'beer':
+                    return beerDetails.includes(searchQuery);
+                    
+                case 'style':
+                    return beerDetails.includes(searchQuery) ||
+                           beerDetails.includes(`(${searchQuery})`) ||
+                           beerDetails.includes(`${searchQuery} `) ||
+                           beerDetails.includes(` ${searchQuery}`);
+                           
+                default:
+                    return false;
+            }
+        });
+    };
+    
     // ================================
     // PUB DETAILS
     // ================================
-    const showPubDetails = (pubId) => {
+    const showPubDetails = async (pubId) => {
         console.log('🏠 Showing pub details:', pubId);
-        searchSpecificPub(pubId);
-    };
-    
-    const searchSpecificPub = async (pubId) => {
-        console.log('🔍 Searching for specific pub:', pubId);
         
         try {
-            if (window.showLoadingToast) {
-                window.showLoadingToast('Loading pub details...');
-            }
+            utils.showLoadingToast('Loading pub details...');
             
-            const api = getAPI();
-            const results = await api.searchPubs({ pubId: pubId });
+            const results = await modules.api.searchPubs({ pubId: pubId });
             const pubs = Array.isArray(results) ? results : results.pubs;
             
-            if (window.hideLoadingToast) {
-                window.hideLoadingToast();
-            }
+            utils.hideLoadingToast();
             
             if (pubs && pubs.length > 0) {
                 const pub = pubs[0];
+                utils.setCurrentPub(pub);
                 
-                // Store pub data globally
-                window.App.setState('currentPub', pub);
-                console.log('💾 Stored pub data globally:', pub.name);
-                
-                // Reset split-view state
-                resetPubDetailsView();
-                
-                // Set up map button handler
-                setupMapButtonHandler(pub);
-                
-                // Display pub details
-                const ui = getUI();
-                if (ui?.displayPubDetailsOverlay) {
-                    console.log('✅ Using UI module to display pub details');
-                    ui.displayPubDetailsOverlay(pub);
-                } else {
-                    console.log('🔧 Using fallback display');
-                    displayPubDetailsFallback(pub);
-                }
-                
+                displayPubDetails(pub);
                 return pub;
             } else {
-                if (window.showSuccessToast) {
-                    window.showSuccessToast('Pub not found.');
-                }
+                utils.showToast('Pub not found.');
                 return null;
             }
             
         } catch (error) {
             console.error('❌ Error loading pub:', error);
-            if (window.hideLoadingToast) {
-                window.hideLoadingToast();
-            }
-            if (window.showSuccessToast) {
-                window.showSuccessToast('Error loading pub details.');
-            }
+            utils.hideLoadingToast();
+            utils.showToast('Error loading pub details.');
             return null;
         }
     };
     
-    const resetPubDetailsView = () => {
-        const pubContainer = document.getElementById('pubContainer');
-        const pubMapContainer = document.getElementById('pubMapContainer');
-        const mapBtnText = document.getElementById('pubMapBtnText');
-        
-        if (pubContainer) pubContainer.classList.remove('split-view');
-        if (pubMapContainer) pubMapContainer.style.display = 'none';
-        if (mapBtnText) mapBtnText.textContent = 'Show on Map';
-    };
-    
-    const setupMapButtonHandler = (pub) => {
-        const mapBtn = document.getElementById('pubToggleMap');
-        if (!mapBtn) return;
-        
-        mapBtn.onclick = () => {
-            console.log('🗺️ Map button clicked');
-            
-            const mapContainer = document.getElementById('pubMapContainer');
-            const btnText = document.getElementById('pubMapBtnText');
-            const pubContainer = document.getElementById('pubContainer');
-            
-            if (!mapContainer || !btnText) return;
-            
-            if (mapContainer.style.display === 'none' || !mapContainer.style.display) {
-                // Show map
-                mapContainer.style.display = 'block';
-                btnText.textContent = 'Hide Map';
-                if (pubContainer) pubContainer.classList.add('split-view');
-                
-                if (pub.latitude && pub.longitude) {
-                    const mapModule = getMap();
-                    if (mapModule?.initPubDetailMap) {
-                        mapModule.initPubDetailMap(pub);
-                    }
-                }
-            } else {
-                // Hide map
-                mapContainer.style.display = 'none';
-                btnText.textContent = 'Show on Map';
-                if (pubContainer) pubContainer.classList.remove('split-view');
-            }
-        };
-    };
-    
-    const displayPubDetailsFallback = (pub) => {
-        console.log('🔧 Using fallback pub details display');
-        
-        window.App.setState('currentPub', pub);
+    const displayPubDetails = (pub) => {
+        // Reset split-view state
         resetPubDetailsView();
-
-        // Also set the nav title
-        const navTitle = document.getElementById('pubNavTitle');
-        if (navTitle) navTitle.textContent = pub.name;
-
-        // UPDATE the split-view handling in setupMapButtonHandler (around line 620)
-        // When showing/hiding the map, update container classes:
         
-        const setupMapButtonHandler = (pub) => {
-            const mapBtn = document.getElementById('pubToggleMap');
-            if (!mapBtn) return;
-            
-            mapBtn.onclick = () => {
-                console.log('🗺️ Map button clicked');
-                
-                const mapContainer = document.getElementById('pubMapContainer');
-                const btnText = document.getElementById('pubMapBtnText');
-                const pubDetailsContainer = document.querySelector('.pub-details-container');
-                
-                if (!mapContainer || !btnText) return;
-                
-                if (mapContainer.style.display === 'none' || !mapContainer.style.display) {
-                    // Show map
-                    mapContainer.style.display = 'block';
-                    btnText.textContent = 'Hide Map';
-                    if (pubDetailsContainer) pubDetailsContainer.classList.add('split-view');
-                    
-                    if (pub.latitude && pub.longitude) {
-                        const mapModule = getMap();
-                        if (mapModule?.initPubDetailMap) {
-                            mapModule.initPubDetailMap(pub);
-                        }
-                    }
-                } else {
-                    // Hide map
-                    mapContainer.style.display = 'none';
-                    btnText.textContent = 'Show on Map';
-                    if (pubDetailsContainer) pubDetailsContainer.classList.remove('split-view');
-                }
-            };
-        };
-        
-        // Hide results overlay if visible
-        const resultsOverlay = document.getElementById('resultsOverlay');
-        if (resultsOverlay) {
-            resultsOverlay.style.display = 'none';
-            resultsOverlay.classList.remove('active');
-        }
-        
-        // Hide map overlay if visible
-        const mapOverlay = document.getElementById('fullMapOverlay');
-        if (mapOverlay) {
-            mapOverlay.style.display = 'none';
-            mapOverlay.classList.remove('active');
-        }
+        // Hide other overlays
+        hideOverlays(['resultsOverlay', 'fullMapOverlay']);
         
         // Show pub details overlay
         const overlay = document.getElementById('pubDetailsOverlay');
@@ -755,16 +474,23 @@ export const SearchModule = (function() {
             return;
         }
         
-        // Force display
-        overlay.style.removeProperty('display');
-        overlay.classList.add('active');
         overlay.style.display = 'flex';
+        overlay.classList.add('active');
         document.body.style.overflow = 'hidden';
         
-        console.log('📊 Pub details overlay display:', overlay.style.display);
-        console.log('📊 Pub details overlay classes:', overlay.className);
+        // Update navigation title
+        const navTitle = document.getElementById('pubNavTitle');
+        if (navTitle) navTitle.textContent = pub.name;
         
         // Populate content
+        populatePubDetails(pub);
+        setupPubButtons(pub);
+        setupMapButtonHandler(pub);
+        
+        modules.tracking?.trackPubView(pub.name);
+    };
+    
+    const populatePubDetails = (pub) => {
         const elements = {
             title: document.getElementById('pubDetailsTitle'),
             address: document.getElementById('pubDetailsAddress'),
@@ -777,7 +503,7 @@ export const SearchModule = (function() {
         if (elements.location) elements.location.textContent = `${pub.postcode} • ${pub.local_authority}`;
         
         setupBeerDetails(pub, elements.beer);
-        setupPubButtons(pub);
+        setupGFStatusDisplay(pub);
     };
     
     const setupBeerDetails = (pub, beerEl) => {
@@ -789,7 +515,7 @@ export const SearchModule = (function() {
         if (hasGFOptions) {
             beerSection.style.display = 'block';
             
-            let formats = [];
+            const formats = [];
             if (pub.bottle) formats.push('🍺 Bottles');
             if (pub.tap) formats.push('🚰 Tap');
             if (pub.cask) formats.push('🛢️ Cask');
@@ -806,161 +532,163 @@ export const SearchModule = (function() {
         }
     };
     
-    const setupPubButtons = (pub) => {
-        const buttons = {
-            findOnline: document.getElementById('pubFindOnline'),
-            directions: document.getElementById('pubGetDirections'),
-            map: document.getElementById('pubToggleMap'),
-            report: document.querySelector('[data-action="report-beer"]'),
-            back: document.querySelector('[data-action="back-to-results"]'),
-            home: document.querySelector('[data-action="close-pub-details"]')
+    const setupGFStatusDisplay = (pub) => {
+        const statusEl = document.getElementById('currentGFStatus');
+        if (!statusEl) return;
+        
+        const displays = {
+            'always': {
+                icon: '⭐',
+                text: 'Always Available',
+                meta: 'Permanent GF options!'
+            },
+            'currently': {
+                icon: '✅',
+                text: 'Available Now',
+                meta: 'GF beer in stock'
+            },
+            'not_currently': {
+                icon: '❌',
+                text: 'Not Available',
+                meta: 'No GF options currently'
+            },
+            'unknown': {
+                icon: '❓',
+                text: 'Not Sure',
+                meta: 'Help us find out!'
+            }
         };
         
-        if (buttons.findOnline) {
-            buttons.findOnline.onclick = () => {
-                const searchQuery = encodeURIComponent(`${pub.name} ${pub.postcode} pub`);
-                window.open(`https://www.google.com/search?q=${searchQuery}`, '_blank');
-            };
-        }
+        const status = pub.gf_status || 'unknown';
+        const display = displays[status] || displays.unknown;
         
-        if (buttons.directions) {
-            buttons.directions.onclick = () => {
-                const destination = encodeURIComponent(`${pub.name}, ${pub.address}, ${pub.postcode}`);
-                window.open(`https://www.google.com/maps/dir/?api=1&destination=${destination}`, '_blank');
-            };
+        statusEl.innerHTML = `
+            <span class="status-icon">${display.icon}</span>
+            <span class="status-text">${display.text}</span>
+            <span class="status-meta">${display.meta}</span>
+        `;
+    };
+    
+    const setupPubButtons = (pub) => {
+        // Buttons are now handled by data-action in main.js
+        // Just ensure the pub data is available globally
+        utils.setCurrentPub(pub);
+    };
+    
+    const setupMapButtonHandler = (pub) => {
+        // This is now handled by data-action="toggle-pub-map" in main.js
+        // Just ensure pub has coordinates
+        if (!pub.latitude || !pub.longitude) {
+            const mapBtn = document.querySelector('[data-action="toggle-pub-map"]');
+            if (mapBtn) {
+                mapBtn.disabled = true;
+                mapBtn.textContent = '🗺️ No Location';
+            }
         }
     };
     
+    const resetPubDetailsView = () => {
+        const pubContainer = document.getElementById('pubContainer');
+        const pubMapContainer = document.getElementById('pubMapContainer');
+        const mapBtnText = document.getElementById('pubMapBtnText');
+        
+        if (pubContainer) pubContainer.classList.remove('split-view');
+        if (pubMapContainer) pubMapContainer.style.display = 'none';
+        if (mapBtnText) mapBtnText.textContent = 'Show on Map';
+    };
+    
     // ================================
-    // BACK TO RESULTS
+    // NAVIGATION
     // ================================
-    // REPLACE the goBackToResults function in search.js (around line 767)
-
     const goBackToResults = () => {
         console.log('🔙 Going back to results...');
         
-        // FIRST: Close the pub details overlay
-        const pubDetailsOverlay = document.getElementById('pubDetailsOverlay');
-        if (pubDetailsOverlay) {
-            pubDetailsOverlay.style.display = 'none';
-            pubDetailsOverlay.classList.remove('active');
-            console.log('✅ Closed pub details overlay');
-        }
+        // Close pub details
+        hideOverlays(['pubDetailsOverlay']);
         
-        // THEN: Check if we have search state to restore
-        if (!state.lastSearchState) {
-            console.log('❌ No previous search state');
-            // Just show the results overlay with existing results
-            const resultsOverlay = document.getElementById('resultsOverlay');
-            if (resultsOverlay) {
-                resultsOverlay.style.display = 'flex';
-                resultsOverlay.classList.add('active');
-            }
-            return false;
-        }
-        
-        const thirtyMinutes = 30 * 60 * 1000;
-        if (Date.now() - state.lastSearchState.timestamp > thirtyMinutes) {
-            console.log('⏰ Search state too old');
-            return false;
-        }
-        
-        console.log('✅ Restoring search state:', state.lastSearchState);
-        
-        // Show results overlay
+        // Show results
         const resultsOverlay = document.getElementById('resultsOverlay');
         if (resultsOverlay) {
             resultsOverlay.style.display = 'flex';
             resultsOverlay.classList.add('active');
         }
         
-        // If we have cached results, just display them without re-searching
+        // Restore cached results if available
         if (state.currentSearchPubs && state.currentSearchPubs.length > 0) {
             console.log('📋 Using cached results');
-            const title = state.lastSearchState.type === 'nearby' ? 
+            const title = state.lastSearchState?.type === 'nearby' ? 
                 `Pubs within ${state.lastSearchState.radius}km` : 
-                state.lastSearchState.query;
+                state.lastSearchState?.query || 'Search Results';
             displayResultsInOverlay(state.currentSearchPubs, title);
             
-            const tracking = getTracking();
-            if (tracking) {
-                tracking.trackEvent('back_to_results_cached', 'Navigation', state.lastSearchState.type);
-            }
+            modules.tracking?.trackEvent('back_to_results_cached', 'Navigation', state.lastSearchState?.type);
             return true;
         }
         
-        // Otherwise restore the search
-        switch (state.lastSearchState.type) {
-            case 'nearby':
-                restoreNearbySearch(state.lastSearchState);
-                break;
-            case 'name':
-            case 'area':
-            case 'beer':
-                restoreTextSearch(state.lastSearchState);
-                break;
-            default:
-                console.log('❌ Unknown search type');
-                return false;
-        }
-        
-        const tracking = getTracking();
-        if (tracking) {
-            tracking.trackEvent('back_to_results', 'Navigation', state.lastSearchState.type);
-        }
-        
-        return true;
-    };
-    
-    const restoreNearbySearch = async (searchState) => {
-        console.log('🔄 Restoring nearby search...');
-        
-        if (searchState.userLocation) {
-            window.App.getState('userLocation') = searchState.userLocation;
-            const mapModule = getMap();
-            if (mapModule?.setUserLocation) {
-                mapModule.setUserLocation(searchState.userLocation);
-            }
-        }
-        
-        showResultsOverlay(`Pubs within ${searchState.radius}km`);
-        showResultsLoading('Restoring your search...');
-        
-        try {
-            await searchNearbyWithDistance(searchState.radius);
-            if (window.showSuccessToast) {
-                window.showSuccessToast('📍 Restored your search results!');
-            }
-        } catch (error) {
-            console.error('❌ Error restoring search:', error);
-            showNoResults('Could not restore search. Please try again.');
-        }
-    };
-    
-    const restoreTextSearch = (searchState) => {
-        showResultsOverlay(searchState.query);
-        
-        if (searchState.results && searchState.results.length > 0) {
-            state.currentSearchPubs = searchState.results;
-            displayResultsInOverlay(searchState.results, `${searchState.results.length} results for "${searchState.query}"`);
-        } else {
-            showNoResults('Previous results not available');
-        }
+        return false;
     };
     
     // ================================
     // LOCATION UTILITIES
     // ================================
+    const requestLocationWithUI = () => {
+        if (state.locationRequestInProgress) {
+            console.log('📍 Location request already in progress');
+            return Promise.reject(new Error('Location request already in progress'));
+        }
+        
+        state.locationRequestInProgress = true;
+        
+        return new Promise((resolve, reject) => {
+            if (navigator.permissions) {
+                navigator.permissions.query({ name: 'geolocation' }).then(result => {
+                    if (result.state === 'granted') {
+                        getUserLocation().then(location => {
+                            state.locationRequestInProgress = false;
+                            resolve(location);
+                        }).catch(error => {
+                            state.locationRequestInProgress = false;
+                            reject(error);
+                        });
+                    } else {
+                        showLocationPermissionUI((location) => {
+                            state.locationRequestInProgress = false;
+                            resolve(location);
+                        }, (error) => {
+                            state.locationRequestInProgress = false;
+                            reject(error);
+                        });
+                    }
+                }).catch(() => {
+                    showLocationPermissionUI((location) => {
+                        state.locationRequestInProgress = false;
+                        resolve(location);
+                    }, (error) => {
+                        state.locationRequestInProgress = false;
+                        reject(error);
+                    });
+                });
+            } else {
+                showLocationPermissionUI((location) => {
+                    state.locationRequestInProgress = false;
+                    resolve(location);
+                }, (error) => {
+                    state.locationRequestInProgress = false;
+                    reject(error);
+                });
+            }
+        });
+    };
+    
     const getUserLocation = () => {
         return new Promise((resolve, reject) => {
             if (!navigator.geolocation) {
-                reject(new Error('📍 Geolocation not supported by this browser'));
+                reject(new Error('📍 Geolocation not supported'));
                 return;
             }
             
             console.log('📍 Requesting high-accuracy location...');
             
-            // First attempt: High accuracy GPS
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     const location = {
@@ -990,130 +718,6 @@ export const SearchModule = (function() {
                 }
             );
         });
-    };
-
-    const requestLocationWithUI = () => {
-        // Prevent multiple simultaneous requests
-        if (state.locationRequestInProgress) {
-            console.log('📍 Location request already in progress, skipping...');
-            return Promise.reject(new Error('Location request already in progress'));
-        }
-        
-        state.locationRequestInProgress = true;
-        
-        return new Promise((resolve, reject) => {
-            // Check if we already have permission
-            if (navigator.permissions) {
-                navigator.permissions.query({ name: 'geolocation' }).then(result => {
-                    if (result.state === 'granted') {
-                        // Already have permission, just get location
-                        getUserLocation().then(location => {
-                            state.locationRequestInProgress = false;
-                            resolve(location);
-                        }).catch(error => {
-                            state.locationRequestInProgress = false;
-                            reject(error);
-                        });
-                    } else {
-                        // Need to show permission UI
-                        showLocationPermissionUI((location) => {
-                            state.locationRequestInProgress = false;
-                            resolve(location);
-                        }, (error) => {
-                            state.locationRequestInProgress = false;
-                            reject(error);
-                        });
-                    }
-                }).catch(() => {
-                    // Permissions API not supported, show UI anyway
-                    showLocationPermissionUI((location) => {
-                        state.locationRequestInProgress = false;
-                        resolve(location);
-                    }, (error) => {
-                        state.locationRequestInProgress = false;
-                        reject(error);
-                    });
-                });
-            } else {
-                // Permissions API not supported, show UI anyway
-                showLocationPermissionUI((location) => {
-                    state.locationRequestInProgress = false;
-                    resolve(location);
-                }, (error) => {
-                    state.locationRequestInProgress = false;
-                    reject(error);
-                });
-            }
-        });
-    };
-
-    // REPLACE the showLocationPermissionUI function in search.js with:
-    
-    const showLocationPermissionUI = (resolve, reject) => {
-        // Use the modal that's already in the HTML
-        const modal = document.getElementById('locationPermissionModal');
-        if (!modal) {
-            console.error('Location permission modal not found');
-            reject(new Error('Permission UI not available'));
-            return;
-        }
-        
-        // Show the modal
-        modal.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-        
-        // Set up event listeners for custom events from main.js
-        const grantedHandler = () => {
-            console.log('📍 Location permission granted event received');
-            
-            // Clean up listeners
-            document.removeEventListener('locationPermissionGranted', grantedHandler);
-            document.removeEventListener('locationPermissionDenied', deniedHandler);
-            
-            // Show loading state
-            if (window.showLoadingToast) {
-                window.showLoadingToast('📍 Getting your location...');
-            }
-            
-            // Request location
-            getUserLocation().then(location => {
-                if (window.hideLoadingToast) {
-                    window.hideLoadingToast();
-                }
-                if (window.showSuccessToast) {
-                    window.showSuccessToast('📍 Location found!');
-                }
-                resolve(location);
-            }).catch(error => {
-                if (window.hideLoadingToast) {
-                    window.hideLoadingToast();
-                }
-                reject(error);
-            });
-        };
-        
-        const deniedHandler = () => {
-            console.log('📍 Location permission denied event received');
-            
-            // Clean up listeners
-            document.removeEventListener('locationPermissionGranted', grantedHandler);
-            document.removeEventListener('locationPermissionDenied', deniedHandler);
-            
-            reject(new Error('Location permission denied by user'));
-        };
-        
-        // Listen for custom events from main.js
-        document.addEventListener('locationPermissionGranted', grantedHandler);
-        document.addEventListener('locationPermissionDenied', deniedHandler);
-        
-        // Also handle clicking outside the modal
-        modal.onclick = (e) => {
-            if (e.target === modal) {
-                modal.style.display = 'none';
-                document.body.style.overflow = '';
-                deniedHandler();
-            }
-        };
     };
     
     const attemptFallbackLocation = (resolve, reject, previousLocation = null, originalError = null) => {
@@ -1170,46 +774,71 @@ export const SearchModule = (function() {
         );
     };
     
+    const showLocationPermissionUI = (resolve, reject) => {
+        const modal = document.getElementById('locationPermissionModal');
+        if (!modal) {
+            console.error('Location permission modal not found');
+            reject(new Error('Permission UI not available'));
+            return;
+        }
+        
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        
+        const grantedHandler = () => {
+            console.log('📍 Location permission granted');
+            document.removeEventListener('locationPermissionGranted', grantedHandler);
+            document.removeEventListener('locationPermissionDenied', deniedHandler);
+            
+            utils.showLoadingToast('📍 Getting your location...');
+            
+            getUserLocation().then(location => {
+                utils.hideLoadingToast();
+                utils.showToast('📍 Location found!');
+                resolve(location);
+            }).catch(error => {
+                utils.hideLoadingToast();
+                reject(error);
+            });
+        };
+        
+        const deniedHandler = () => {
+            console.log('📍 Location permission denied');
+            document.removeEventListener('locationPermissionGranted', grantedHandler);
+            document.removeEventListener('locationPermissionDenied', deniedHandler);
+            reject(new Error('Location permission denied by user'));
+        };
+        
+        document.addEventListener('locationPermissionGranted', grantedHandler);
+        document.addEventListener('locationPermissionDenied', deniedHandler);
+        
+        modal.onclick = (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = '';
+                deniedHandler();
+            }
+        };
+    };
+    
     const tryGetUserLocation = async () => {
-        const cachedLocation = window.App.getState('userLocation');
-        const locationTimestamp = window.App.getState('locationTimestamp');
-        if (cachedLocation && locationTimestamp && 
-            Date.now() - locationTimestamp < 300000) {
+        const cachedLocation = utils.getUserLocation();
+        const locationTimestamp = window.App.getState(STATE_KEYS.LOCATION_TIMESTAMP);
+        
+        if (cachedLocation && locationTimestamp && Date.now() - locationTimestamp < 300000) {
             console.log('📍 Using cached location');
             return cachedLocation;
         }
         
         try {
             const location = await getUserLocation();
-            location.timestamp = Date.now();
-            window.App.getState('userLocation') = location;
-            
-            const mapModule = getMap();
-            if (mapModule?.setUserLocation) {
-                mapModule.setUserLocation(location);
-            }
-            
+            utils.setUserLocation(location);
+            modules.map?.setUserLocation(location);
             return location;
         } catch (error) {
             console.log('📍 Could not get location:', error.message);
             return null;
         }
-    };
-    
-    const sortPubsByDistance = (pubs, location) => {
-        const mapModule = getMap();
-        
-        return pubs.map(pub => {
-            if (pub.latitude && pub.longitude && mapModule?.calculateDistance) {
-                pub.distance = mapModule.calculateDistance(
-                    location.lat, location.lng,
-                    parseFloat(pub.latitude), parseFloat(pub.longitude)
-                );
-            } else {
-                pub.distance = 999;
-            }
-            return pub;
-        }).sort((a, b) => a.distance - b.distance);
     };
     
     // ================================
@@ -1218,18 +847,9 @@ export const SearchModule = (function() {
     const showResultsOverlay = (title) => {
         console.log('📋 Showing results overlay:', title);
         
-        // Hide home content FIRST
-        const searchSection = document.querySelector('.search-section');
-        const heroSection = document.querySelector('.hero-section');
+        // Hide home content
+        hideOverlays(['hero-section', 'search-section'], false);
         
-        if (searchSection) {
-            searchSection.style.display = 'none';
-        }
-        if (heroSection) {
-            heroSection.style.display = 'none';
-        }
-        
-        // Small delay to ensure home content is hidden
         setTimeout(() => {
             const resultsOverlay = document.getElementById('resultsOverlay');
             if (resultsOverlay) {
@@ -1243,7 +863,7 @@ export const SearchModule = (function() {
             }
             
             document.body.style.overflow = 'hidden';
-        }, 50); // 50ms delay
+        }, 50);
     };
     
     const showResultsLoading = (message) => {
@@ -1300,7 +920,7 @@ export const SearchModule = (function() {
             elements.list.innerHTML = '';
             
             pubs.forEach(pub => {
-                const resultItem = createResultItemForOverlay(pub);
+                const resultItem = createResultItem(pub);
                 elements.list.appendChild(resultItem);
             });
         }
@@ -1309,37 +929,10 @@ export const SearchModule = (function() {
         const titleEl = document.getElementById('resultsTitle');
         if (titleEl) titleEl.textContent = title;
         
-        // Setup navigation handlers
-        setupResultsNavigationHandlers();
-        
         console.log(`✅ Displayed ${pubs.length} results`);
     };
     
-    const resetResultsMapState = () => {
-        const elements = {
-            list: document.getElementById('resultsListContainer'),
-            map: document.getElementById('resultsMapContainer'),
-            btnText: document.getElementById('resultsMapBtnText'),
-            overlay: document.getElementById('resultsOverlay')
-        };
-        
-        if (elements.list) {
-            elements.list.style.display = 'block';
-            elements.list.style.flex = '1';
-        }
-        if (elements.map) {
-            elements.map.style.display = 'none';
-            elements.map.classList.remove('split-view');
-        }
-        if (elements.btnText) {
-            elements.btnText.textContent = 'Map';
-        }
-        if (elements.overlay) {
-            elements.overlay.classList.remove('split-view');
-        }
-    };
-    
-    const createResultItemForOverlay = (pub) => {
+    const createResultItem = (pub) => {
         const template = document.getElementById('pub-result-template');
         const clone = template.content.cloneNode(true);
         
@@ -1371,185 +964,114 @@ export const SearchModule = (function() {
         return clone;
     };
     
-    const setupResultsNavigationHandlers = () => {
-        // This whole function can be emptied
-        console.log('🔧 Results navigation now handled by main.js data-action');
-        // That's it - delete everything else inside this function
-    };
-    
-    // REPLACE the entire handleResultsMapToggle function in search.js (around line 1180)
-
-    const handleResultsMapToggle = () => {
-        console.log('🗺️ Toggling results map...');
-        
+    const resetResultsMapState = () => {
         const elements = {
             list: document.getElementById('resultsListContainer'),
             map: document.getElementById('resultsMapContainer'),
             btnText: document.getElementById('resultsMapBtnText'),
-            resultsContent: document.querySelector('.results-content')
+            overlay: document.getElementById('resultsOverlay')
         };
         
-        if (!elements.list || !elements.map || !elements.btnText) {
-            console.error('❌ Required elements not found:', {
-                list: !!elements.list,
-                map: !!elements.map,
-                btnText: !!elements.btnText
-            });
-            return;
-        }
-        
-        // DEBUG: Before toggle
-        console.log('🔍 DEBUG: Before toggle');
-        console.log('List display:', elements.list.style.display);
-        console.log('Map display:', elements.map.style.display);
-        console.log('Map computed display:', window.getComputedStyle(elements.map).display);
-        console.log('Map container dimensions:', elements.map.offsetWidth, 'x', elements.map.offsetHeight);
-        console.log('Results content dimensions:', elements.resultsContent?.offsetWidth, 'x', elements.resultsContent?.offsetHeight);
-        
-        const mapModule = getMap();
-        
-        if (elements.map.style.display === 'none' || !elements.map.style.display) {
-            // Show map
-            console.log('🗺️ Switching to map view...');
-            
-            // Clean up any existing map first
-            if (mapModule?.cleanupResultsMap) {
-                mapModule.cleanupResultsMap();
-            }
-            
-            // Hide list
-            elements.list.style.display = 'none';
-            
-            // Show map with explicit styles
-            elements.map.style.display = 'block';
-            elements.map.style.flex = '1';
-            elements.map.style.height = '100%';
-            elements.map.style.minHeight = '400px';
-            elements.map.style.width = '100%';
-            elements.map.style.position = 'relative';
-            
-            // Update button
-            elements.btnText.textContent = 'List';
-            
-            // Force layout recalculation
-            elements.map.offsetHeight;
-            
-            // DEBUG: After setting display
-            console.log('🔍 DEBUG: After setting map to display block');
-            console.log('Map display now:', elements.map.style.display);
-            console.log('Map dimensions now:', elements.map.offsetWidth, 'x', elements.map.offsetHeight);
-            console.log('Map innerHTML length:', elements.map.innerHTML.length);
-            console.log('Map children count:', elements.map.children.length);
-            
-            // Initialize map with delay
-            setTimeout(() => {
-                console.log('🗺️ Initializing map...');
-                
-                if (mapModule?.initResultsMap) {
-                    const pubs = state.currentSearchPubs || window.currentSearchResults || [];
-                    console.log(`📍 Passing ${pubs.length} pubs to map`);
-                    
-                    const mapInstance = mapModule.initResultsMap(pubs);
-                    
-                    // DEBUG: After initialization
-                    console.log('🔍 DEBUG: After map initialization');
-                    const mapEl = document.getElementById('resultsMap');
-                    console.log('Map element exists:', !!mapEl);
-                    console.log('Map element dimensions:', mapEl?.offsetWidth, 'x', mapEl?.offsetHeight);
-                    console.log('Map element children:', mapEl?.children.length);
-                    console.log('Map element parent:', mapEl?.parentElement?.id);
-                    
-                    if (mapInstance) {
-                        // Multiple invalidations to ensure proper rendering
-                        setTimeout(() => {
-                            mapInstance.invalidateSize();
-                            console.log('🔄 Map invalidated (1st)');
-                        }, 100);
-                        
-                        setTimeout(() => {
-                            mapInstance.invalidateSize();
-                            console.log('🔄 Map invalidated (2nd)');
-                            
-                            // Final debug check
-                            const finalMapEl = document.getElementById('resultsMap');
-                            console.log('📏 Final map dimensions:', finalMapEl?.offsetWidth, 'x', finalMapEl?.offsetHeight);
-                        }, 300);
-                    } else {
-                        console.error('❌ Map instance not returned');
-                    }
-                } else {
-                    console.error('❌ mapModule.initResultsMap not available');
-                }
-            }, 50);
-            
-        } else {
-            // Show list
-            console.log('📋 Switching to list view...');
-            
-            // Clean up map
-            if (mapModule?.cleanupResultsMap) {
-                mapModule.cleanupResultsMap();
-            }
-            
-            // Show list
+        if (elements.list) {
             elements.list.style.display = 'block';
             elements.list.style.flex = '1';
-            
-            // Hide map
+        }
+        if (elements.map) {
             elements.map.style.display = 'none';
-            
-            // Update button
+            elements.map.classList.remove('split-view');
+        }
+        if (elements.btnText) {
             elements.btnText.textContent = 'Map';
         }
-        
-        // Track event
-        const tracking = getTracking();
-        if (tracking) {
-            tracking.trackEvent('results_map_toggle', 'Map Interaction', 
-                elements.map.style.display === 'block' ? 'show_fullscreen' : 'hide');
+        if (elements.overlay) {
+            elements.overlay.classList.remove('split-view');
         }
     };
     
-    // ================================
-    // PLACES SEARCH MODULE
-    // ================================
-    // LOCATION: search.js - PlacesSearchModule
+    const hideResultsAndShowHome = () => {
+        const resultsOverlay = document.getElementById('resultsOverlay');
+        if (resultsOverlay) {
+            resultsOverlay.style.display = 'none';
+            resultsOverlay.classList.remove('active');
+        }
+        
+        const heroSection = document.querySelector('.hero-section');
+        const searchSection = document.querySelector('.search-section');
+        if (heroSection) heroSection.style.display = 'block';
+        if (searchSection) searchSection.style.display = 'flex';
+        
+        document.body.style.overflow = '';
+    };
     
+    const hideOverlays = (overlayIds, useQuerySelector = true) => {
+        overlayIds.forEach(id => {
+            const element = useQuerySelector ? 
+                document.querySelector(`.${id}`) : 
+                document.getElementById(id);
+            if (element) {
+                element.style.display = 'none';
+                element.classList.remove('active');
+            }
+        });
+    };
+    
+    const showLocationAccuracyFeedback = (accuracy) => {
+        let message = '📍 Location found - finding nearby GF beer...';
+        
+        if (accuracy <= 100) {
+            message = '🎯 Excellent location accuracy - finding nearby GF beer...';
+        } else if (accuracy <= 500) {
+            message = '📍 Good location accuracy - finding nearby GF beer...';
+        } else if (accuracy <= 1000) {
+            message = '📍 Reasonable location accuracy - finding nearby GF beer...';
+        } else {
+            message = '📍 Location found (low accuracy) - finding nearby GF beer...';
+            utils.showToast(`⚠️ Location accuracy: ±${Math.round(accuracy)}m`);
+        }
+        
+        showResultsLoading(message);
+    };
+    
+    // ================================
+    // HELPERS
+    // ================================
+    const sortPubsByDistance = (pubs, location) => {
+        return pubs.map(pub => {
+            if (pub.latitude && pub.longitude) {
+                pub.distance = calculateDistance(location, pub);
+            } else {
+                pub.distance = 999;
+            }
+            return pub;
+        }).sort((a, b) => a.distance - b.distance);
+    };
+    
+    const calculateDistance = (location, pub) => {
+        const lat1 = location.lat;
+        const lon1 = location.lng;
+        const lat2 = parseFloat(pub.latitude);
+        const lon2 = parseFloat(pub.longitude);
+        
+        const R = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                  Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
+    };
+    
+    // ================================
+    // SUB-MODULES (Simplified)
+    // ================================
     const PlacesSearchModule = {
         selectedPlace: null,
         searchTimeout: null,
-        isInitialized: false,
+        searchResults: [],
         
         init() {
-            if (this.isInitialized) return;
             console.log('🔧 Initializing PlacesSearchModule...');
-            this.setupEventListeners();
-            this.isInitialized = true;
-            console.log('✅ PlacesSearchModule initialized');
-        },
-        
-        setupEventListeners() {
-            // Use event delegation for the search input since modal might not exist yet
-            document.addEventListener('input', (e) => {
-                if (e.target.id === 'placesSearchInput') {
-                    this.handleSearch(e.target.value);
-                }
-            });
-            
-            // Also handle when modal opens
-            document.addEventListener('click', (e) => {
-                if (e.target.matches('[data-action="search-google-places"]')) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    this.openPlacesSearch();
-                }
-                
-                if (e.target.matches('[data-action="use-selected-place"]')) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    this.useSelectedPlace();
-                }
-            });
         },
         
         openPlacesSearch(initialQuery = '') {
@@ -1562,11 +1084,7 @@ export const SearchModule = (function() {
                 const input = document.getElementById('placesSearchInput');
                 if (input) {
                     input.value = initialQuery;
-                    // Force focus after modal animation
-                    setTimeout(() => {
-                        input.focus();
-                        console.log('✅ Places search input focused');
-                    }, 100);
+                    setTimeout(() => input.focus(), 100);
                     
                     if (initialQuery) {
                         this.handleSearch(initialQuery);
@@ -1575,53 +1093,31 @@ export const SearchModule = (function() {
             }
         },
         
-        // LOCATION: search.js - PlacesSearchModule
-        // ACTION: REPLACE the handleSearch method (around line 1515)
-        
         handleSearch(query) {
-            console.log('🔍 PlacesSearchModule.handleSearch called with:', query);
-            
-            // Clear any existing timeout
-            if (this.searchTimeout) {
-                clearTimeout(this.searchTimeout);
-            }
+            clearTimeout(this.searchTimeout);
             
             const resultsDiv = document.getElementById('placesResults');
-            if (!resultsDiv) {
-                console.error('❌ placesResults div not found');
-                return;
-            }
+            if (!resultsDiv) return;
             
-            // Hide results if query too short
             if (!query || query.length < 3) {
-                console.log('📝 Query too short, hiding results');
                 resultsDiv.style.display = 'none';
                 return;
             }
             
-            // Show loading state immediately
-            console.log('⏳ Showing loading state');
             resultsDiv.innerHTML = '<div style="padding: 20px; text-align: center; color: #666;">Searching...</div>';
             resultsDiv.style.display = 'block';
             
-            // Debounce the actual search
             this.searchTimeout = setTimeout(() => {
-                console.log('🚀 Executing OSM search');
                 this.searchOSM(query);
             }, 300);
         },
         
-        // Rest of the methods stay the same...
         async searchOSM(query) {
             try {
                 const response = await fetch(
                     `https://nominatim.openstreetmap.org/search?` +
                     `q=${encodeURIComponent(query + ' UK')}` +
-                    `&format=json` +
-                    `&countrycodes=gb` +
-                    `&limit=10` +
-                    `&extratags=1` +
-                    `&namedetails=1`
+                    `&format=json&countrycodes=gb&limit=10&extratags=1&namedetails=1`
                 );
                 
                 const places = await response.json();
@@ -1631,18 +1127,11 @@ export const SearchModule = (function() {
                     const category = place.category?.toLowerCase() || '';
                     const name = place.display_name?.toLowerCase() || '';
                     
-                    return (
-                        category.includes('pub') ||
-                        category.includes('bar') ||
-                        category.includes('restaurant') ||
-                        category.includes('cafe') ||
-                        type.includes('pub') ||
-                        type.includes('bar') ||
-                        type.includes('restaurant') ||
-                        name.includes('pub') ||
-                        name.includes('bar') ||
-                        name.includes('club')
-                    );
+                    return category.includes('pub') || category.includes('bar') ||
+                           category.includes('restaurant') || category.includes('cafe') ||
+                           type.includes('pub') || type.includes('bar') ||
+                           type.includes('restaurant') || name.includes('pub') ||
+                           name.includes('bar') || name.includes('club');
                 });
                 
                 this.displayResults(relevantPlaces);
@@ -1668,16 +1157,13 @@ export const SearchModule = (function() {
                 return;
             }
             
-            // STEP 1: Store the place data in the module (not in HTML)
             this.searchResults = places;
             
-            // STEP 2: Create HTML with just an index reference
             resultsDiv.innerHTML = places.map((place, index) => {
                 const name = place.namedetails?.name || place.display_name.split(',')[0];
                 const address = this.formatAddress(place);
                 const type = this.getPlaceType(place);
                 
-                // Just store the index in the HTML, not the whole data
                 return `
                     <div class="place-result" data-action="select-place" data-place-index="${index}">
                         <div class="place-icon">${this.getPlaceIcon(type)}</div>
@@ -1691,6 +1177,137 @@ export const SearchModule = (function() {
             }).join('');
             
             resultsDiv.style.display = 'block';
+        },
+        
+        selectPlace(placeOrIndex) {
+            const place = typeof placeOrIndex === 'number' 
+                ? this.searchResults[placeOrIndex]
+                : placeOrIndex;
+                
+            if (!place) return;
+            
+            this.selectedPlace = {
+                name: place.namedetails?.name || place.display_name.split(',')[0],
+                address: this.formatAddress(place),
+                lat: place.lat,
+                lon: place.lon,
+                type: this.getPlaceType(place),
+                osm_id: place.osm_id,
+                display_name: place.display_name,
+                extratags: place.extratags,
+                namedetails: place.namedetails,
+                osm_type: place.osm_type
+            };
+            
+            document.getElementById('selectedPlaceName').textContent = this.selectedPlace.name;
+            document.getElementById('selectedPlaceAddress').textContent = this.selectedPlace.address;
+            document.getElementById('selectedPlaceType').textContent = this.selectedPlace.type;
+            document.getElementById('selectedPlacePreview').style.display = 'block';
+            
+            this.hideResults();
+        },
+        
+        useSelectedPlace() {
+            if (!this.selectedPlace) return;
+            
+            console.log('📝 Using selected place to add new pub');
+            
+            const place = this.selectedPlace;
+            const name = place.namedetails?.name || place.display_name.split(',')[0];
+            const parts = place.display_name.split(',');
+            
+            let address = '';
+            let postcode = place.extratags?.postcode || '';
+            
+            if (parts.length > 1) {
+                const cleanParts = parts.slice(1, 4).filter(part => {
+                    const trimmed = part.trim();
+                    return trimmed && !trimmed.match(/^[A-Z]{1,2}[0-9R][0-9A-Z]?\s?[0-9][A-Z]{2}$/i);
+                });
+                address = cleanParts.join(', ').trim();
+            }
+            
+            if (!postcode) {
+                const postcodeMatch = place.display_name.match(/[A-Z]{1,2}[0-9R][0-9A-Z]?\s?[0-9][A-Z]{2}/i);
+                if (postcodeMatch) {
+                    postcode = postcodeMatch[0];
+                }
+            }
+            
+            const newPubData = {
+                name: name,
+                address: address,
+                postcode: postcode,
+                latitude: place.lat,
+                longitude: place.lon,
+                osm_id: place.osm_id,
+                osm_type: place.osm_type
+            };
+            
+            console.log('🏠 New pub data:', newPubData);
+            
+            document.getElementById('placesSearchModal').style.display = 'none';
+            document.body.style.overflow = '';
+            
+            utils.showLoadingToast('Adding new pub to database...');
+            
+            this.submitNewPub(newPubData);
+        },
+        
+        async submitNewPub(pubData) {
+            try {
+                const response = await fetch('/api/add-pub', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: pubData.name,
+                        address: pubData.address,
+                        postcode: pubData.postcode,
+                        latitude: pubData.latitude,
+                        longitude: pubData.longitude,
+                        osm_id: pubData.osm_id,
+                        source: 'user_submission',
+                        submitted_by: 'anonymous'
+                    })
+                });
+                
+                utils.hideLoadingToast();
+                
+                if (!response.ok) {
+                    throw new Error('Failed to add pub');
+                }
+                
+                const result = await response.json();
+                console.log('✅ Pub added:', result);
+                
+                window.newlyAddedPub = {
+                    pub_id: result.pub_id,
+                    name: pubData.name,
+                    address: pubData.address,
+                    postcode: pubData.postcode,
+                    latitude: pubData.latitude,
+                    longitude: pubData.longitude
+                };
+                
+                this.showPubAddedPrompt(result);
+                
+            } catch (error) {
+                console.error('❌ Error adding pub:', error);
+                utils.showToast('❌ Failed to add pub. Please try again.');
+            }
+        },
+        
+        showPubAddedPrompt(result) {
+            const promptModal = document.getElementById('pubAddedPromptModal');
+            if (promptModal) {
+                document.getElementById('addedPubName').textContent = window.newlyAddedPub.name;
+                promptModal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            } else {
+                utils.showToast(`✅ ${window.newlyAddedPub.name} added successfully!`);
+            }
         },
         
         formatAddress(place) {
@@ -1727,191 +1344,6 @@ export const SearchModule = (function() {
             return icons[type] || '📍';
         },
         
-        selectPlace(placeOrIndex) {
-            // Handle both direct place object or index
-            const place = typeof placeOrIndex === 'number' 
-                ? this.searchResults[placeOrIndex]
-                : placeOrIndex;
-                
-            if (!place) return;
-            
-            this.selectedPlace = {
-                name: place.namedetails?.name || place.display_name.split(',')[0],
-                address: this.formatAddress(place),
-                lat: place.lat,
-                lon: place.lon,
-                type: this.getPlaceType(place),
-                osm_id: place.osm_id
-            };
-            
-            document.getElementById('selectedPlaceName').textContent = this.selectedPlace.name;
-            document.getElementById('selectedPlaceAddress').textContent = this.selectedPlace.address;
-            document.getElementById('selectedPlaceType').textContent = this.selectedPlace.type;
-            document.getElementById('selectedPlacePreview').style.display = 'block';
-            
-            this.hideResults();
-        },
-        
-        // LOCATION: Add to your existing PlacesSearch object
-        // ACTION: REPLACE the useSelectedPlace method
-        
-        useSelectedPlace() {
-            if (!this.selectedPlace) return;
-            
-            console.log('📝 Using selected place to add new pub');
-            
-            const place = this.selectedPlace;
-            const name = place.namedetails?.name || place.display_name.split(',')[0];
-            const parts = place.display_name.split(',');
-            
-            // Extract address components
-            let address = '';
-            let postcode = place.extratags?.postcode || '';
-            
-            // Try to build a clean address
-            if (parts.length > 1) {
-                // Remove postcode from parts if it exists
-                const cleanParts = parts.slice(1, 4).filter(part => {
-                    const trimmed = part.trim();
-                    return trimmed && !trimmed.match(/^[A-Z]{1,2}[0-9R][0-9A-Z]?\s?[0-9][A-Z]{2}$/i);
-                });
-                address = cleanParts.join(', ').trim();
-            }
-            
-            // If no postcode in extratags, try to extract from display_name
-            if (!postcode) {
-                const postcodeMatch = place.display_name.match(/[A-Z]{1,2}[0-9R][0-9A-Z]?\s?[0-9][A-Z]{2}/i);
-                if (postcodeMatch) {
-                    postcode = postcodeMatch[0];
-                }
-            }
-            
-            // Store the pub data with coordinates
-            const newPubData = {
-                name: name,
-                address: address,
-                postcode: postcode,
-                latitude: place.lat,
-                longitude: place.lon,
-                osm_id: place.osm_id,
-                osm_type: place.osm_type
-            };
-            
-            console.log('🏠 New pub data:', newPubData);
-            
-            // Close places modal
-            document.getElementById('placesSearchModal').style.display = 'none';
-            document.body.style.overflow = '';
-            
-            // Show loading
-            if (window.showLoadingToast) {
-                window.showLoadingToast('Adding new pub to database...');
-            }
-            
-            // Submit the new pub
-            this.submitNewPub(newPubData);
-        },
-        
-        async submitNewPub(pubData) {
-            try {
-                const response = await fetch('/api/add-pub', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        name: pubData.name,
-                        address: pubData.address,
-                        postcode: pubData.postcode,
-                        latitude: pubData.latitude,
-                        longitude: pubData.longitude,
-                        osm_id: pubData.osm_id,
-                        source: 'user_submission',
-                        submitted_by: 'anonymous' // Could track user if logged in
-                    })
-                });
-                
-                if (window.hideLoadingToast) {
-                    window.hideLoadingToast();
-                }
-                
-                if (!response.ok) {
-                    throw new Error('Failed to add pub');
-                }
-                
-                const result = await response.json();
-                console.log('✅ Pub added:', result);
-                
-                // Store the new pub data
-                window.newlyAddedPub = {
-                    pub_id: result.pub_id,
-                    name: pubData.name,
-                    address: pubData.address,
-                    postcode: pubData.postcode,
-                    latitude: pubData.latitude,
-                    longitude: pubData.longitude
-                };
-                
-                // Show success and prompt for next action
-                this.showPubAddedPrompt(result);
-                
-            } catch (error) {
-                console.error('❌ Error adding pub:', error);
-                if (window.showSuccessToast) {
-                    window.showSuccessToast('❌ Failed to add pub. Please try again.');
-                }
-            }
-        },
-        
-        showPubAddedPrompt(result) {
-            // Create or show a modal asking what to do next
-            const promptModal = document.getElementById('pubAddedPromptModal');
-            if (promptModal) {
-                document.getElementById('addedPubName').textContent = window.newlyAddedPub.name;
-                promptModal.style.display = 'flex';
-                document.body.style.overflow = 'hidden';
-            } else {
-                // Fallback - just show success
-                if (window.showSuccessToast) {
-                    window.showSuccessToast(`✅ ${window.newlyAddedPub.name} added successfully!`);
-                }
-            }
-        },
-        
-        preWorks() {
-            // Pre-fill the form fields after a short delay
-            setTimeout(() => {
-                const pubNameInput = document.getElementById('reportPubName');
-                if (pubNameInput) {
-                    pubNameInput.value = this.selectedPlace.name;
-                }
-                
-                // Extract postcode if available
-                const postcodeMatch = this.selectedPlace.address.match(/[A-Z]{1,2}[0-9R][0-9A-Z]?\s?[0-9][A-Z]{2}/i);
-                if (postcodeMatch) {
-                    const postcodeInput = document.getElementById('reportPostcode');
-                    if (postcodeInput) {
-                        postcodeInput.value = postcodeMatch[0];
-                    }
-                    
-                    const cleanAddress = this.selectedPlace.address.replace(postcodeMatch[0], '').trim();
-                    const addressInput = document.getElementById('reportAddress');
-                    if (addressInput) {
-                        addressInput.value = cleanAddress.replace(/,$/, '');
-                    }
-                } else {
-                    const addressInput = document.getElementById('reportAddress');
-                    if (addressInput) {
-                        addressInput.value = this.selectedPlace.address;
-                    }
-                }
-                
-                // Show new pub fields and hide search
-                document.getElementById('newPubFields').style.display = 'block';
-                document.getElementById('pubSearchGroup').style.display = 'none';
-            }, 100);
-        },
-        
         hideResults() {
             const resultsDiv = document.getElementById('placesResults');
             if (resultsDiv) {
@@ -1935,107 +1367,10 @@ export const SearchModule = (function() {
     };
     
     // ================================
-    // GF STATUS MODULE
-    // ================================
-    const GFStatusModule = {
-        currentPubId: null,
-        currentStatus: 'unknown',
-        
-        init() {
-            this.setupEventListeners();
-        },
-        
-        setupEventListeners() {
-            document.addEventListener('click', (e) => {
-                const statusBtn = e.target.closest('.status-toggle-btn');
-                if (statusBtn) {
-                    this.handleStatusToggle(statusBtn);
-                }
-            });
-        },
-        
-        async handleStatusToggle(button) {
-            const newStatus = button.dataset.status;
-            const pubId = window.App.getState('currentPub')?.pub_id;
-            
-            if (!pubId) {
-                console.error('No pub selected');
-                return;
-            }
-            
-            document.querySelectorAll('.status-toggle-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            button.classList.add('active');
-            
-            const detailsForm = document.getElementById('gfDetailsForm');
-            if (detailsForm) {
-                detailsForm.style.display = 
-                    (newStatus === 'always' || newStatus === 'currently') ? 'block' : 'none';
-            }
-            
-            try {
-                const response = await fetch('/api/update-gf-status', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        pub_id: pubId,
-                        status: newStatus,
-                        timestamp: new Date().toISOString()
-                    })
-                });
-                
-                if (response.ok) {
-                    if (window.showSuccessToast) {
-                        window.showSuccessToast(`✅ Status updated to: ${this.getStatusLabel(newStatus)}`);
-                    }
-                    this.currentStatus = newStatus;
-                    
-                    const tracking = getTracking();
-                    if (tracking) {
-                        tracking.trackEvent('gf_status_update', 'User Action', newStatus);
-                    }
-                } else {
-                    if (window.showSuccessToast) {
-                        window.showSuccessToast('❌ Failed to update status');
-                    }
-                }
-            } catch (error) {
-                console.error('Error updating status:', error);
-                if (window.showSuccessToast) {
-                    window.showSuccessToast('❌ Network error');
-                }
-            }
-        },
-        
-        getStatusLabel(status) {
-            const labels = {
-                'always': 'Always has GF beer',
-                'currently': 'Currently has GF beer',
-                'not_currently': 'No GF beer currently',
-                'unknown': 'Unknown status'
-            };
-            return labels[status] || status;
-        },
-        
-        setCurrentPub(pubId, status) {
-            this.currentPubId = pubId;
-            this.currentStatus = status || 'unknown';
-            
-            document.querySelectorAll('.status-toggle-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.status === this.currentStatus);
-            });
-        }
-    };
-    
-    // ================================
     // INITIALIZATION
     // ================================
     document.addEventListener('DOMContentLoaded', () => {
         PlacesSearchModule.init();
-        GFStatusModule.init();
     });
     
     // ================================
@@ -2045,7 +1380,7 @@ export const SearchModule = (function() {
         // Location search
         startLocationSearch,
         searchNearbyWithDistance,
-        requestLocationWithUI,  // ADD THIS LINE
+        requestLocationWithUI,
         
         // Search methods
         searchByName,
@@ -2054,22 +1389,15 @@ export const SearchModule = (function() {
         
         // Pub details
         showPubDetails,
-        searchSpecificPub,
         
         // Navigation
         goBackToResults,
-        handleResultsMapToggle,
-        
-        // UI helpers
-        displayResultsInOverlay,
-        createResultItemForOverlay,
         
         // Sub-modules
         PlacesSearchModule,
-        GFStatusModule,
         
         // State getters
-        getCurrentResults: () => state.currentSearchPubs || window.currentSearchResults || [],
+        getCurrentResults: () => state.currentSearchPubs,
         getLastSearchState: () => state.lastSearchState
     };
 })();
