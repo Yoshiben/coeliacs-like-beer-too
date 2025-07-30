@@ -12,6 +12,18 @@ export const MapModule = (function() {
     let pubDetailMap = null;
     let pubMarkers = [];
     let mapVisible = false;
+    let clusteredPubsLayer = null;
+    let isToggleInitialized = false;
+
+    const STATE_KEYS = {
+        FULL_UK_MAP: 'mapData.fullUKMapInstance',
+        GF_PUBS_LAYER: 'mapData.gfPubsLayer', 
+        CLUSTERED_PUBS_LAYER: 'mapData.clusteredPubsLayer',
+        ALL_PUBS: 'mapData.allPubs',
+        USER_MARKER: 'mapData.userMarker',
+        USER_LOCATION: 'userLocation',
+        LOCATION_TIMESTAMP: 'locationTimestamp'
+    };    
     
     // Configuration
     const config = {
@@ -61,7 +73,7 @@ export const MapModule = (function() {
         }).addTo(map);
         
         // Add user location if available
-        const userLocation = window.App.getState('userLocation');
+        const userLocation = window.App.getState(STATE_KEYS.USER_LOCATION);
         if (userLocation) {
             addUserMarker(userLocation);
         }
@@ -111,7 +123,7 @@ export const MapModule = (function() {
         // Small delay to ensure DOM is clean
         setTimeout(() => {
             try {
-                const userLocation = window.App.getState('userLocation');
+                const userLocation = window.App.getState(STATE_KEYS.USER_LOCATION);
                 const centerPoint = userLocation ? 
                     [userLocation.lat, userLocation.lng] : 
                     config.defaultCenter;
@@ -249,7 +261,7 @@ export const MapModule = (function() {
             pubMarker.bindPopup(popupContent).openPopup();
             
             // Add user location if available
-            const userLocation = window.App.getState('userLocation');
+            const userLocation = window.App.getState(STATE_KEYS.USER_LOCATION);
             if (userLocation) {
                 L.circleMarker([userLocation.lat, userLocation.lng], {
                     radius: 8,
@@ -287,13 +299,13 @@ export const MapModule = (function() {
     
     // Add user location marker
     const addUserMarker = (location) => {
-        const fullUKMap = window.App.getState('mapData.fullUKMapInstance');
+        const fullUKMap = window.App.getState(STATE_KEYS.FULL_UK_MAP);
         if (!fullUKMap) return;
         
         const styles = getMapStyles();
         
         // Remove existing user marker
-        const existingMarker = window.App.getState('mapData.userMarker');
+        const existingMarker = window.App.getState(STATE_KEYS.USER_MARKER);
         if (existingMarker && fullUKMap) {
             fullUKMap.removeLayer(existingMarker);
         }
@@ -309,7 +321,7 @@ export const MapModule = (function() {
         }).addTo(fullUKMap);
         
         userMarker.bindPopup('📍 You are here!');
-        window.App.setState('mapData.userMarker', userMarker);
+        window.App.setState(STATE_KEYS.USER_MARKER, userMarker);
         
         console.log('📍 User marker added to map');
     };
@@ -379,19 +391,19 @@ export const MapModule = (function() {
         console.log(`🎯 Adding hybrid markers: GF individual, others clustered...`);
         
         // Clear existing layers
-        const gfPubsLayer = window.App.getState('mapData.gfPubsLayer');
+        const gfPubsLayer = window.App.getState(STATE_KEYS.GF_PUBS_LAYER);
         if (gfPubsLayer && targetMap) {
             targetMap.removeLayer(gfPubsLayer);
         }
         
-        const clusteredPubsLayer = window.App.getState('mapData.clusteredPubsLayer');
+        const clusteredPubsLayer = window.App.getState(STATE_KEYS.CLUSTERED_PUBS_LAYER);
         if (clusteredPubsLayer && targetMap) {
             targetMap.removeLayer(clusteredPubsLayer);
         }
         
         // Create new layer groups
         const newGfPubsLayer = L.layerGroup().addTo(targetMap);
-        window.App.setState('mapData.gfPubsLayer', newGfPubsLayer);
+        window.App.setState(STATE_KEYS.GF_PUBS_LAYER, newGfPubsLayer);
         
         const newClusteredPubsLayer = L.markerClusterGroup({
             maxClusterRadius: 40,
@@ -412,7 +424,7 @@ export const MapModule = (function() {
                 });
             }
         }).addTo(targetMap);
-        window.App.setState('mapData.clusteredPubsLayer', newClusteredPubsLayer);
+        window.App.setState(STATE_KEYS.CLUSTERED_PUBS_LAYER, newClusteredPubsLayer);
         
         // Separate pubs by GF status
         let gfPubs = [];
@@ -675,21 +687,21 @@ export const MapModule = (function() {
         }
         
         // Clean up any existing map
-        const existingMap = window.App.getState('mapData.fullUKMapInstance');
+        const existingMap = window.App.getState(STATE_KEYS.FULL_UK_MAP);
         if (existingMap) {
             existingMap.remove();
-            window.App.setState('mapData.fullUKMapInstance', null);
+            window.App.setState(STATE_KEYS.FULL_UK_MAP, null);
         }
         
         // Try to get user location if not available
-        let userLocation = window.App.getState('userLocation');
+        let userLocation = window.App.getState(STATE_KEYS.USER_LOCATION);
         if (!userLocation) {
             try {
                 console.log('📍 No existing location, trying to get it...');
                 
                 if (window.SearchModule?.requestLocationWithUI) {
                     userLocation = await window.SearchModule.requestLocationWithUI();
-                    window.App.setState('userLocation', userLocation);
+                    window.App.setState(STATE_KEYS.USER_LOCATION, userLocation);
                     console.log('✅ Got user location via UI:', userLocation);
                 }
             } catch (error) {
@@ -716,7 +728,7 @@ export const MapModule = (function() {
             touchZoom: true
         }).setView(initialCenter, initialZoom);
         
-        window.App.setState('mapData.fullUKMapInstance', fullUKMap);
+        window.App.setState(STATE_KEYS.FULL_UK_MAP, fullUKMap);
         
         // Add tile layer
         L.tileLayer(config.tileLayer, {
@@ -738,7 +750,7 @@ export const MapModule = (function() {
             }).addTo(fullUKMap);
             
             userMarker.bindPopup('📍 You are here!').openPopup();
-            window.App.setState('mapData.userMarker', userMarker);
+            window.App.setState(STATE_KEYS.USER_MARKER, userMarker);
         }
         
         addMapLegend(fullUKMap);
@@ -749,7 +761,7 @@ export const MapModule = (function() {
         
         // Ensure proper rendering
         setTimeout(() => {
-            const map = window.App.getState('mapData.fullUKMapInstance');
+            const map = window.App.getState(STATE_KEYS.FULL_UK_MAP);
             if (map) {
                 map.invalidateSize();
             }
@@ -770,7 +782,7 @@ export const MapModule = (function() {
         
         try {
             // Check if we already have the data
-            const cachedPubs = window.App.getState('mapData.allPubs');
+            const cachedPubs = window.App.getState(STATE_KEYS.ALL_PUBS);
             if (cachedPubs && cachedPubs.length > 0) {
                 console.log('✅ Using cached pub data');
                 setTimeout(() => {
@@ -787,9 +799,9 @@ export const MapModule = (function() {
                         throw new Error(data.error || 'Failed to load pubs');
                     }
                     
-                    window.App.setState('mapData.allPubs', data.pubs || []);
+                    window.App.setState(STATE_KEYS.ALL_PUBS, data.pubs || []);
                     
-                    const allPubs = window.App.getState('mapData.allPubs');
+                    const allPubs = window.App.getState(STATE_KEYS.ALL_PUBS);
                     console.log(`📊 Loaded ${allPubs.length} pubs in background`);
                     
                     // Initialize toggle functionality AFTER data is loaded
@@ -857,19 +869,19 @@ export const MapModule = (function() {
     
     // Update map display based on mode
     const updateMapDisplay = (showGFOnly) => {
-        const fullUKMap = window.App.getState('mapData.fullUKMapInstance');
-        const allPubs = window.App.getState('mapData.allPubs');
+        const fullUKMap = window.App.getState(STATE_KEYS.FULL_UK_MAP);
+        const allPubs = window.App.getState(STATE_KEYS.ALL_PUBS);
         if (!fullUKMap || !allPubs) return;
         
         console.log(`🍺 Updating map: ${showGFOnly ? 'GF Pubs Only' : 'All Pubs'}`);
         
         // Clear existing layers
-        const gfPubsLayer = window.App.getState('mapData.gfPubsLayer');
+        const gfPubsLayer = window.App.getState(STATE_KEYS.GF_PUBS_LAYER);
         if (gfPubsLayer && fullUKMap) {
             fullUKMap.removeLayer(gfPubsLayer);
         }
         
-        const clusteredPubsLayer = window.App.getState('mapData.clusteredPubsLayer');
+        const clusteredPubsLayer = window.App.getState(STATE_KEYS.CLUSTERED_PUBS_LAYER);
         if (clusteredPubsLayer && fullUKMap) {
             fullUKMap.removeLayer(clusteredPubsLayer);
         }
@@ -877,7 +889,7 @@ export const MapModule = (function() {
         if (showGFOnly) {
             // Show only GF pubs
             const gfPubsLayer = L.layerGroup().addTo(fullUKMap);
-            window.App.setState('mapData.gfPubsLayer', gfPubsLayer);
+            window.App.setState(STATE_KEYS.GF_PUBS_LAYER, gfPubsLayer);
             
             const gfPubs = allPubs.filter(pub => 
                 pub.gf_status === 'always' || pub.gf_status === 'currently'
@@ -908,7 +920,7 @@ export const MapModule = (function() {
     
     // Setup zoom handler
     const setupZoomHandler = (mode) => {
-        const fullUKMap = window.App.getState('mapData.fullUKMapInstance');
+        const fullUKMap = window.App.getState(STATE_KEYS.FULL_UK_MAP);
         if (!fullUKMap) return;
         
         fullUKMap.off('zoomend');
@@ -980,19 +992,19 @@ export const MapModule = (function() {
     
     // Set user location
     const setUserLocation = (location) => {
-        window.App.setState('userLocation', location);
-        window.App.setState('locationTimestamp', Date.now());
+        window.App.setState(STATE_KEYS.USER_LOCATION, location);
+        window.App.setState(STATE_KEYS.LOCATION_TIMESTAMP, Date.now());
         if (map) {
             addUserMarker(location);
         }
     };
     
     // Get user location
-    const getUserLocation = () => window.App.getState('userLocation');
+    const getUserLocation = () => window.App.getState(STATE_KEYS.USER_LOCATION);
     
     // Center map on location
     const centerOnLocation = (location = null) => {
-        const targetLocation = location || window.App.getState('userLocation');
+        const targetLocation = location || window.App.getState(STATE_KEYS.USER_LOCATION);
         if (targetLocation && map) {
             map.setView([targetLocation.lat, targetLocation.lng], 14);
             console.log('🎯 Map centered on location');
@@ -1058,14 +1070,14 @@ export const MapModule = (function() {
     const cleanupFullUKMap = () => {
         console.log('🧹 Cleaning up full UK map...');
         
-        const fullUKMap = window.App.getState('mapData.fullUKMapInstance');
+        const fullUKMap = window.App.getState(STATE_KEYS.FULL_UK_MAP);
         if (fullUKMap) {
             try {
                 fullUKMap.remove();
-                window.App.setState('mapData.fullUKMapInstance', null);
+                window.App.setState(STATE_KEYS.FULL_UK_MAP, null);
             } catch (error) {
                 console.warn('Warning cleaning up full UK map:', error);
-                window.App.setState('mapData.fullUKMapInstance', null);
+                window.App.setState(STATE_KEYS.FULL_UK_MAP, null);
             }
         }
     };
