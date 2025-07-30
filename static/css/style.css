@@ -1041,7 +1041,7 @@ html {
    justify-content: space-between;
    align-items: center;
    padding: var(--space-sm);
-   background: rgba(255, 255, 255, 0.1);
+   background: var(--bg-glass);
    border-radius: var(--radius-lg);
    margin-bottom: var(--space-sm);
 }
@@ -1736,18 +1736,18 @@ html {
    display: flex !important;
 }
 
-.map-overlay-container {
+.map-container {
    flex: 1;
    display: flex;
    flex-direction: column;
 }
 
-.map-overlay-nav {
+.map-nav {
    display: flex;
    justify-content: space-between;
    align-items: center;
    padding: var(--space-sm);
-   background: rgba(255, 255, 255, 0.1);
+   background: var(--bg-glass);
    border-radius: var(--radius-lg);
    margin-bottom: var(--space-sm);
 }
