@@ -1,148 +1,153 @@
 // ================================================================================
-// MAIN.JS - Cleaned and Optimized Version
+// MAIN.JS - Complete Refactor with STATE_KEYS and Modern Patterns
+// Central app initialization and coordination
 // ================================================================================
 
 import { Constants } from './constants.js';
+const STATE_KEYS = Constants.STATE_KEYS;
 
 // ================================
-// EVENT BUS - Central Communication Hub
+// EVENT BUS
 // ================================
 class EventBus extends EventTarget {
-    emit(eventName, data) {
+    emit = (eventName, data) => {
         this.dispatchEvent(new CustomEvent(eventName, { detail: data }));
-    }
+    };
     
-    on(eventName, handler) {
+    on = (eventName, handler) => {
         this.addEventListener(eventName, handler);
-    }
+    };
     
-    off(eventName, handler) {
+    off = (eventName, handler) => {
         this.removeEventListener(eventName, handler);
-    }
+    };
 }
 
 // ================================
-// GLOBAL NAMESPACE - Single Source of Truth
+// APP NAMESPACE
 // ================================
 const App = {
     initialized: false,
     modules: {},
     events: new EventBus(),
-
-    // NEW: Complete state definition
+    
+    // ================================
+    // STATE MANAGEMENT
+    // ================================
     state: {
-        // Navigation state
         currentView: 'home',
         activeOverlays: new Set(),
-        
-        // Location state
         userLocation: null,
         locationTimestamp: null,
         locationAccuracy: null,
-        
-        // Search state
         lastSearch: {
-            type: null,      // 'nearby', 'name', 'area', 'beer'
+            type: null,
             query: null,
             radius: null,
             timestamp: null
         },
         searchResults: [],
-        
-        // Current selections
-        currentPub: null,        // Replaces window.currentPubData
-        selectedPubForReport: null,  // Replaces window.selectedPubData
-        
-        // Map state
+        currentPub: null,
+        selectedPubForReport: null,
         mapData: {
-            allPubs: [],         // Replaces window.allPubsData
-            fullUKMapInstance: null,  // Replaces window.fullUKMap
+            allPubs: [],
+            fullUKMapInstance: null,
             resultsMapInstance: null,
             pubDetailMapInstance: null,
-            userMarker: null     // Replaces window.fullUKMapUserMarker
+            userMarker: null,
+            gfPubsLayer: null,
+            clusteredPubsLayer: null
         },
-        
-        // Form state
         currentBrewery: null,
         reportFormData: {},
-        
-        // UI state
         activeModals: [],
         toastQueue: [],
-        mapViewMode: 'gf'  // 'gf' or 'all'
+        mapViewMode: 'gf'
     },
     
-    // Add state management methods
-    setState(path, value) {
+    // State management methods
+    setState: (path, value) => {
         const keys = path.split('.');
-        let current = this.state;
+        let current = App.state;
         
         for (let i = 0; i < keys.length - 1; i++) {
             if (!current[keys[i]]) current[keys[i]] = {};
             current = current[keys[i]];
         }
         
+        const oldValue = current[keys[keys.length - 1]];
         current[keys[keys.length - 1]] = value;
+        
+        // Emit state change event
+        App.events.emit('stateChanged', { path, oldValue, newValue: value });
+        
         console.log(`📊 State updated: ${path} =`, value);
     },
     
-    getState(path) {
+    getState: (path) => {
         const keys = path.split('.');
-        let current = this.state;
+        let current = App.state;
         
         for (const key of keys) {
-            current = current[key];
+            current = current?.[key];
             if (current === undefined) return null;
         }
         
         return current;
     },
     
-    // Register module
-    registerModule(name, module) {
-        this.modules[name] = module;
-        this.events.emit('module-registered', { name, module });
+    // ================================
+    // MODULE MANAGEMENT
+    // ================================
+    registerModule: (name, module) => {
+        App.modules[name] = module;
+        App.events.emit('moduleRegistered', { name, module });
+        console.log(`📦 Module registered: ${name}`);
     },
     
-    // Get module safely
-    getModule(name) {
-        return this.modules[name] || null;
-    },
-
-    // Convenience getter for form module
-    getForm() {
-        return this.getModule('form');
+    getModule: (name) => {
+        return App.modules[name] || null;
     },
     
-    // Initialize app in phases
-    async initialize() {
+    // ================================
+    // INITIALIZATION
+    // ================================
+    initialize: async () => {
         console.log('🚀 Initializing App...');
         
         try {
-            await this.loadPhase1(); // Core utilities
-            await this.loadPhase2(); // API & Data
-            await this.loadPhase3(); // UI Components
-            await this.loadPhase4(); // Features
+            // Check dependencies
+            if (!window.L || !window.L.map) {
+                throw new Error('Leaflet not loaded');
+            }
             
-            this.initialized = true;
-            this.events.emit('app-initialized');
+            // Initialize in phases
+            await App.initPhase1(); // Core utilities
+            await App.initPhase2(); // Data layer
+            await App.initPhase3(); // UI layer
+            await App.initPhase4(); // Features
+            await App.initPhase5(); // Final setup
+            
+            App.initialized = true;
+            App.events.emit('appInitialized');
+            
             console.log('✅ App initialization complete!');
             
         } catch (error) {
             console.error('❌ App initialization failed:', error);
-            this.showFallback(error);
+            App.showInitError(error);
         }
     },
     
-    async loadPhase1() {
-        console.log('🔧 Phase 1: Loading Core Utilities...');
+    initPhase1: async () => {
+        console.log('🔧 Phase 1: Core Utilities...');
         
         const { HelpersModule } = await import('./helpers.js');
-        this.registerModule('helpers', HelpersModule);
-        this.registerModule('ui', HelpersModule); // Legacy support
-        this.registerModule('utils', HelpersModule); // Legacy support
+        App.registerModule('helpers', HelpersModule);
+        App.registerModule('ui', HelpersModule);     // Legacy alias
+        App.registerModule('utils', HelpersModule);  // Legacy alias
         
-        // Make essential functions globally available
+        // Make critical functions globally available
         window.showLoadingToast = HelpersModule.showLoadingToast;
         window.hideLoadingToast = HelpersModule.hideLoadingToast;
         window.showSuccessToast = HelpersModule.showSuccessToast;
@@ -150,514 +155,501 @@ const App = {
         window.closeResults = HelpersModule.closeResults;
     },
     
-    async loadPhase2() {
-        console.log('🔧 Phase 2: Loading Data Layer...');
+    initPhase2: async () => {
+        console.log('🔧 Phase 2: Data Layer...');
         
-        const { APIModule } = await import('./api.js');
-        const { TrackingModule } = await import('./tracking.js');
+        const [{ APIModule }, { TrackingModule }] = await Promise.all([
+            import('./api.js'),
+            import('./tracking.js')
+        ]);
         
-        this.registerModule('api', APIModule);
-        this.registerModule('tracking', TrackingModule);
+        App.registerModule('api', APIModule);
+        App.registerModule('tracking', TrackingModule);
         
         // Load initial stats
-        await this.loadStats();
+        await App.loadInitialStats();
     },
     
-    async loadPhase3() {
-        console.log('🔧 Phase 3: Loading UI Layer...');
+    initPhase3: async () => {
+        console.log('🔧 Phase 3: UI Layer...');
         
         const { ModalModule } = await import('./modals.js');
-        this.registerModule('modal', ModalModule);
+        App.registerModule('modal', ModalModule);
         
-        // Set up UI event delegation
-        this.setupEventDelegation();
+        // Initialize modals
+        ModalModule.init();
     },
     
-    async loadPhase4() {
-        console.log('🔧 Phase 4: Loading Features...');
+    initPhase4: async () => {
+        console.log('🔧 Phase 4: Features...');
         
-        const { MapModule } = await import('./map.js');
-        const { SearchModule } = await import('./search.js');
-        const { FormModule } = await import('./forms.js');
+        const [{ MapModule }, { SearchModule }, { FormModule }] = await Promise.all([
+            import('./map.js'),
+            import('./search.js'),
+            import('./forms.js')
+        ]);
         
-        // NOW you can use the modules after the imports complete
-        console.log('🔍 About to register search module');
-        this.registerModule('map', MapModule);
-        this.registerModule('search', SearchModule);
-        this.registerModule('form', FormModule);
+        App.registerModule('map', MapModule);
+        App.registerModule('search', SearchModule);
+        App.registerModule('form', FormModule);
+        
+        // Initialize forms
+        FormModule.init();
+    },
+    
+    initPhase5: async () => {
+        console.log('🔧 Phase 5: Final Setup...');
+        
+        // Set up event delegation
+        App.setupEventDelegation();
         
         // Set up global functions
-        this.setupGlobalFunctions();
+        App.setupGlobalFunctions();
+        
+        // Check cookie consent
+        App.checkCookieConsent();
+        
+        // Track session start
+        const tracking = App.getModule('tracking');
+        if (tracking) {
+            tracking.trackSessionStart();
+        }
     },
     
-    async loadStats() {
+    // ================================
+    // DATA LOADING
+    // ================================
+    loadInitialStats: async () => {
         try {
-            const api = this.getModule('api');
+            const api = App.getModule('api');
             if (!api) return;
             
             const stats = await api.getStats();
-            const helpers = this.getModule('helpers');
+            const helpers = App.getModule('helpers');
             
-            if (helpers) {
+            if (helpers && stats) {
                 helpers.animateNumber('totalPubs', stats.total_pubs);
                 helpers.animateNumber('gfPubs', stats.gf_pubs);
             }
         } catch (error) {
             console.error('Failed to load stats:', error);
+            // Use fallback values
+            const helpers = App.getModule('helpers');
+            if (helpers) {
+                helpers.animateNumber('totalPubs', Constants.DEFAULTS.TOTAL_PUBS);
+                helpers.animateNumber('gfPubs', Constants.DEFAULTS.GF_PUBS);
+            }
         }
     },
     
-    // LOCATION: main.js - setupEventDelegation method
-    // CHECK: Make sure you have this structure
-    
-    setupEventDelegation() {
+    // ================================
+    // EVENT DELEGATION
+    // ================================
+    setupEventDelegation: () => {
         console.log('🔧 Setting up event delegation...');
         
         // Main click handler
-        document.addEventListener('click', (e) => {
-            // Debug what was clicked
-            console.log('🖱️ Click detected:', e.target);
-            
-            const target = e.target.closest('[data-action], [data-modal], [data-distance]');
-            if (!target) {
-                console.log('❌ No data-action found on clicked element');
-                return;
-            }
-            
-            console.log('✅ Found action element:', target.dataset);
-            
+        document.addEventListener('click', App.handleGlobalClick, true);
+        
+        // Form submission
+        document.addEventListener('submit', App.handleFormSubmit, true);
+        
+        // Input events for search modals
+        document.addEventListener('input', App.handleGlobalInput, true);
+        
+        // Change events for selects
+        document.addEventListener('change', App.handleGlobalChange, true);
+    },
+    
+    handleGlobalClick: (e) => {
+        const target = e.target.closest('[data-action], [data-modal], [data-distance], [data-status]');
+        if (!target) return;
+        
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Handle different click types
+        if (target.dataset.action) {
+            App.handleAction(target.dataset.action, target, e);
+        }
+        
+        if (target.dataset.modal) {
+            App.getModule('modal')?.open(target.dataset.modal);
+        }
+        
+        if (target.dataset.distance) {
+            App.handleDistanceSelection(parseInt(target.dataset.distance));
+        }
+        
+        if (target.dataset.status) {
+            App.getModule('form')?.GFStatusFlow?.selectStatus(target.dataset.status);
+        }
+    },
+    
+    handleFormSubmit: (e) => {
+        if (e.target.id === 'reportForm') {
             e.preventDefault();
-            e.stopPropagation();
-            
-            // Modal triggers
-            if (target.dataset.modal) {
-                console.log('🔲 Opening modal:', target.dataset.modal);
-                this.openModal(target.dataset.modal);
+            const form = App.getModule('form');
+            if (form?.handleReportSubmission) {
+                form.handleReportSubmission(e);
             }
-            
-            // Action handlers
-            if (target.dataset.action) {
-                console.log('🎯 Handling action:', target.dataset.action);
-                this.handleAction(target.dataset.action, target, e);
-            }
-            
-            // Distance selection
-            if (target.dataset.distance) {
-                console.log('📏 Distance selected:', target.dataset.distance);
-                this.handleDistanceSelection(parseInt(target.dataset.distance));
-            }
-        }, true); // <-- Make sure this 'true' is here for capture phase
+        }
     },
     
-    setupGlobalFunctions() {
-        const helpers = this.getModule('helpers');
+    handleGlobalInput: (e) => {
+        // Delegate to appropriate handlers
+        const inputHandlers = {
+            'placesSearchInput': () => {
+                const search = App.getModule('search');
+                search?.PlacesSearchModule?.handleSearch(e.target.value);
+            }
+        };
         
-        window.closeResults = () => helpers?.closeResults?.();
-        window.showPubDetails = (pubId) => this.getModule('search')?.showPubDetails?.(pubId);
-        window.toggleSearchResultsFullMap = () => this.getModule('map')?.toggleSearchResultsFullMap?.();
-        window.closePubDetails = () => helpers?.closePubDetails?.();
-        
-        // Cookie functions
-        window.acceptAllCookies = () => this.handleCookieConsent(true);
-        window.acceptEssentialOnly = () => this.handleCookieConsent(false);
+        const handler = inputHandlers[e.target.id];
+        if (handler) handler();
     },
     
-    handleAction(action, element, event) {
-        console.log(`🎬 ACTION TRIGGERED: "${action}"`, {
-            element: element,
-            hasSearchModule: !!this.getModule('search'),
-            hasModalModule: !!this.getModule('modal'),
-            hasFormModule: !!this.getModule('form'),
-            availableModules: Object.keys(this.modules)
-        });
-        console.log(`🎬 Processing action: ${action}`);
+    handleGlobalChange: (e) => {
+        // Handle select changes
+        const changeHandlers = {
+            'areaSearchType': () => {
+                const modal = App.getModule('modal');
+                modal?.updateAreaPlaceholder?.();
+            },
+            'beerSearchType': () => {
+                const modal = App.getModule('modal');
+                modal?.updateBeerPlaceholder?.();
+            }
+        };
         
-        // Get all modules once
+        const handler = changeHandlers[e.target.id];
+        if (handler) handler();
+    },
+    
+    // ================================
+    // ACTION HANDLERS
+    // ================================
+    handleAction: (action, element, event) => {
+        console.log(`🎬 Action: ${action}`);
+        
+        // Get all modules
         const modules = {
-            search: this.getModule('search'),
-            modal: this.getModule('modal'),
-            helpers: this.getModule('helpers'),
-            map: this.getModule('map'),
-            form: this.getModule('form'),
-            tracking: this.getModule('tracking')
+            search: App.getModule('search'),
+            modal: App.getModule('modal'),
+            helpers: App.getModule('helpers'),
+            map: App.getModule('map'),
+            form: App.getModule('form'),
+            tracking: App.getModule('tracking')
         };
-
-        console.log('📦 Modules loaded:', {
-            search: !!modules.search,
-            modal: !!modules.modal,
-            helpers: !!modules.helpers,
-            map: !!modules.map,
-            form: !!modules.form,
-            tracking: !!modules.tracking
-        });
         
-        // Define action handlers
-        const actionHandlers = {
-            'location-search': () => {
-                console.log('📍 Starting location search...');
-                modules.search?.startLocationSearch?.();
-            },
-            
-            'view-details': () => {
-                console.log('🏠 Viewing pub details...');
-                const pubId = element.dataset.pubId || element.closest('[data-pub-id]')?.dataset.pubId;
-                if (pubId && modules.search?.showPubDetails) {
-                    modules.search.showPubDetails(pubId);
-                }
-            },
-            
-            'search-name': () => {
-                console.log('🔍 Performing name search...');
-                modules.search?.searchByName?.();
-            },
-            
-            'search-area': () => {
-                console.log('🔍 Performing area search...');
-                modules.search?.searchByArea?.();
-            },
-            
-            'search-beer': () => {
-                console.log('🔍 Performing beer search...');
-                modules.search?.searchByBeer?.();
-            },
-            
-            'close-results': () => {
-                console.log('🏠 Closing results...');
-                modules.helpers?.closeAllOverlaysAndGoHome?.();
-                modules.tracking?.trackEvent('close_results', 'Navigation', 'home_button');
-            },
-            
-            'toggle-results-map': () => {
-                console.log('🗺️ Toggling results map...');
-                modules.map?.toggleSearchResultsFullMap?.() || this.toggleResultsMapFallback();
-            },
-            
-            'toggle-pub-map': () => {
-                console.log('🗺️ Toggling pub detail map...');
-                this.togglePubDetailMap(modules.map);
-            },
-            
-            'view-pub': () => {
-                const pubId = element.dataset.pubId;
-                if (pubId) modules.search?.showPubDetails?.(pubId);
-            },
-            
-            'back-to-results': () => {
-                console.log('🔙 Going back to results...');
-                if (!modules.search?.goBackToResults?.()) {
-                    this.fallbackBackToResults();
-                }
-            },
-            
-            'close-pub-details': () => {
-                console.log('🏠 Closing pub details...');
-                modules.helpers?.closeAllOverlaysAndGoHome?.();
-            },
-            
-            'submit-report': () => {
-                console.log('📝 Submit report triggered');
-                const reportForm = document.getElementById('reportForm');
-                if (reportForm) {
-                    reportForm.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
-                }
-            },
-            
-            'report-beer': () => {
-                console.log('📝 Report beer action triggered');
-                this.handleReportBeer(modules);
-            },
-            
-            'show-full-map': () => {
-                console.log('🗺️ Showing full UK map...');
-                this.showFullMap(modules);
-            },
-            
-            'close-full-map': () => {
-                console.log('🏠 Closing full UK map...');
-                this.closeFullMap(modules);
-            },
-            
-            'change-gf-status': () => {
-                console.log('📊 Opening GF status modal...');
-                this.openModal('gfStatusModal');
-            },
-            
-            'select-status': () => {
-                const status = element.dataset.status;
-                modules.form?.GFStatusFlow?.selectStatus?.(status);
-            },
-            
-            'confirm-status': () => {
-                modules.form?.GFStatusFlow?.confirmStatusUpdate?.();
-            },
-            
-            'cancel-status': () => {
-                this.closeModal('gfStatusConfirmModal');
-            },
-            
-            'skip-details': () => {
-                this.closeModal('beerDetailsPromptModal');
-                window.showSuccessToast?.('✅ Status updated successfully!');
-            },
-            
-            'add-beer-details': () => {
-                this.closeModal('beerDetailsPromptModal');
-                modules.modal?.openReportModal?.(window.currentPubData);
-            },
-            
-            'add-new-pub-from-results': () => {
-                console.log('➕ Adding new pub from no results');
-                modules.modal?.openReportModal?.({ isNewPub: true });
-            },
-            
-            'search-google-places': () => {
-                console.log('🔍 Opening places search');
-                modules.search?.PlacesSearchModule?.openPlacesSearch?.();
-            },
-            
-            'use-selected-place': () => {
-                console.log('✅ Using selected place');
-                modules.search?.PlacesSearchModule?.useSelectedPlace?.();
-            },
-            
-            'select-brewery': () => {
-                const brewery = element.dataset.brewery;
-                if (brewery) modules.form?.selectBrewery?.(brewery);
-            },
-            
-            'select-beer': () => {
-                const beerData = element.dataset.beerData;
-                if (beerData) modules.form?.selectBeer?.(beerData);
-            },
-            
-            'close-modal': () => {
-                const modal = element.closest('.modal, .search-modal');
-                if (modal) this.closeModal(modal.id);
-            },
-
-            'clear-selected-pub': () => {
-                console.log('🗑️ Clearing selected pub...');
-                const form = modules.form;
-                if (form?.clearSelectedPub) {
-                    form.clearSelectedPub();
-                } else {
-                    // Fallback
-                    if (window.FormModule?.clearSelectedPub) {
-                        window.FormModule.clearSelectedPub();
-                    }
-                }
-            },
-            
-            'reload-page': () => {
-                console.log('🔄 Reloading page...');
-                location.reload();
-            },
-            
-            'view-pub-from-map': () => {
-                console.log('🗺️ Viewing pub from map popup...');
-                const pubId = element.dataset.pubId;
-                if (pubId && modules.search?.showPubDetails) {
-                    modules.search.showPubDetails(pubId);
-                }
-            },
-            
-            // Also update the places search input handler:
-            'search-places-input': () => {
-                const query = element.value;
-                console.log('🔍 Places search input:', query);
-                
-                if (modules.search?.PlacesSearchModule?.handleSearch) {
-                    modules.search.PlacesSearchModule.handleSearch(query);
-                }
-            },
-
-            'find-pub-online': () => {
-                console.log('🔍 Finding pub online...');
-                const pub = window.App.getState('currentPub');
-                if (pub) {
-                    const searchQuery = encodeURIComponent(`${pub.name} ${pub.postcode} pub`);
-                    window.open(`https://www.google.com/search?q=${searchQuery}`, '_blank');
-                    
-                    const tracking = modules.tracking;
-                    if (tracking) {
-                        tracking.trackExternalLink('google_search', pub.name);
-                    }
-                }
-            },
-            
-            'get-pub-directions': () => {
-                console.log('🧭 Getting directions to pub...');
-                const pub = window.App.getState('currentPub');
-                if (pub) {
-                    const destination = encodeURIComponent(`${pub.name}, ${pub.address}, ${pub.postcode}`);
-                    window.open(`https://www.google.com/maps/dir/?api=1&destination=${destination}`, '_blank');
-                    
-                    const tracking = modules.tracking;
-                    if (tracking) {
-                        tracking.trackExternalLink('google_maps_directions', pub.name);
-                    }
-                }
-            },
-
-            // LOCATION: main.js - handleAction method
-            // ACTION: ADD these final action handlers
-            
-            // Add to actionHandlers object:
-            
-            'select-place': () => {
-                console.log('📍 Selecting place from search...');
-                const placeData = element.dataset.place;
-                if (placeData && modules.search?.PlacesSearchModule?.selectPlace) {
-                    const place = JSON.parse(placeData);
-                    modules.search.PlacesSearchModule.selectPlace(place);
-                }
-            },
-            
-            'update-area-placeholder': () => {
-                console.log('📝 Updating area search placeholder...');
-                const modal = modules.modal;
-                if (modal?.updateAreaPlaceholder) {
-                    modal.updateAreaPlaceholder();
-                }
-            },
-            
-            'update-beer-placeholder': () => {
-                console.log('🍺 Updating beer search placeholder...');
-                const modal = modules.modal;
-                if (modal?.updateBeerPlaceholder) {
-                    modal.updateBeerPlaceholder();
-                }
-            },
-            
-            // Cookie actions (if not already present):
-            'accept-all-cookies': () => {
-                console.log('🍪 Accepting all cookies...');
-                this.handleCookieConsent(true);
-            },
-            
-            'accept-essential-cookies': () => {
-                console.log('🍪 Accepting essential cookies only...');
-                this.handleCookieConsent(false);
-            },
-            
-            'save-cookie-preferences': () => {
-                console.log('🍪 Saving cookie preferences...');
-                const analyticsConsent = document.getElementById('analyticsConsent')?.checked;
-                this.handleCookieConsent(analyticsConsent);
-                this.closeModal('cookieSettings');
-            },
-            
-            'show-cookie-settings': () => {
-                console.log('🍪 Showing cookie settings...');
-                this.openModal('cookieSettings');
-            },
-
-            'allow-location': () => {
-                console.log('📍 User allowed location access');
-                
-                // Hide the modal
-                const modal = document.getElementById('locationPermissionModal');
-                if (modal) {
-                    modal.style.display = 'none';
-                    document.body.style.overflow = '';
-                }
-                
-                // Trigger the location permission flow in search module
-                const event = new CustomEvent('locationPermissionGranted');
-                document.dispatchEvent(event);
-            },
-            
-            'deny-location': () => {
-                console.log('📍 User denied location access');
-                
-                // Hide the modal
-                const modal = document.getElementById('locationPermissionModal');
-                if (modal) {
-                    modal.style.display = 'none';
-                    document.body.style.overflow = '';
-                }
-                
-                // Trigger the denial in search module
-                const event = new CustomEvent('locationPermissionDenied');
-                document.dispatchEvent(event);
-            },
-
-            'go-to-my-location': () => {
-                console.log('📍 Go to my location clicked');
-                const mapModule = modules.map;
-                const currentLocation = window.App.getState('userLocation');
-                
-                if (!currentLocation) {
-                    if (window.showSuccessToast) {
-                        window.showSuccessToast('📍 Location not available. Please enable location services.');
-                    }
-                    return;
-                }
-                
-                if (window.fullUKMap) {
-                    window.fullUKMap.setView([currentLocation.lat, currentLocation.lng], 14);
-                    
-                    if (window.fullUKMapUserMarker) {
-                        window.fullUKMapUserMarker.openPopup();
-                    }
-                    
-                    modules.tracking?.trackEvent('go_to_location', 'Map Interaction', 'button_click');
-                }
-            }
-        };
-
-        if (!actionHandlers[action]) {
-            console.error(`❌ No handler found for action: "${action}"`);
-            console.log('Available actions:', Object.keys(actionHandlers));
-            return;
-        }
-        
-        // 5. FIFTH: Execute the handler
-        const handler = actionHandlers[action];
+        // Route to appropriate handler
+        const handler = App.actionHandlers[action];
         if (handler) {
-            handler();
+            handler(element, modules, event);
         } else {
-            console.log(`❓ Unhandled action: ${action}`);
+            console.warn(`❓ Unhandled action: ${action}`);
         }
     },
     
-    togglePubDetailMap(mapModule) {
-        const currentPub = window.currentPubData || this.state?.selectedPub;
+    // Action handler map - split into logical groups
+    actionHandlers: {
+        // Search actions
+        'location-search': (el, modules) => {
+            modules.search?.startLocationSearch?.();
+        },
+        'search-name': (el, modules) => {
+            modules.search?.searchByName?.();
+        },
+        'search-area': (el, modules) => {
+            modules.search?.searchByArea?.();
+        },
+        'search-beer': (el, modules) => {
+            modules.search?.searchByBeer?.();
+        },
+        
+        // Navigation actions
+        'close-results': (el, modules) => {
+            modules.helpers?.closeAllOverlaysAndGoHome?.();
+            modules.tracking?.trackEvent('close_results', 'Navigation', 'button');
+        },
+        'close-pub-details': (el, modules) => {
+            modules.helpers?.closeAllOverlaysAndGoHome?.();
+        },
+        'back-to-results': (el, modules) => {
+            modules.search?.goBackToResults?.();
+        },
+        'close-modal': (el, modules) => {
+            const modal = el.closest('.modal, .search-modal');
+            if (modal?.id) modules.modal?.close(modal.id);
+        },
+        
+        // Pub actions
+        'view-pub': (el, modules) => {
+            const pubId = el.dataset.pubId || el.closest('[data-pub-id]')?.dataset.pubId;
+            if (pubId) modules.search?.showPubDetails?.(pubId);
+        },
+        'view-pub-from-map': (el, modules) => {
+            const pubId = el.dataset.pubId;
+            if (pubId) modules.search?.showPubDetails?.(pubId);
+        },
+        'find-pub-online': (el, modules) => {
+            App.openPubExternalSearch(modules);
+        },
+        'get-pub-directions': (el, modules) => {
+            App.openPubDirections(modules);
+        },
+        
+        // Map actions
+        'toggle-results-map': (el, modules) => {
+            modules.map?.toggleSearchResultsFullMap?.();
+        },
+        'toggle-pub-map': (el, modules) => {
+            App.togglePubDetailMap(modules);
+        },
+        'show-full-map': (el, modules) => {
+            App.showFullMap(modules);
+        },
+        'close-full-map': (el, modules) => {
+            App.closeFullMap(modules);
+        },
+        'go-to-my-location': (el, modules) => {
+            App.goToUserLocation(modules);
+        },
+        
+        // Form actions
+        'report-beer': (el, modules) => {
+            App.handleReportBeer(modules);
+        },
+        'submit-report': (el, modules) => {
+            const form = document.getElementById('reportForm');
+            if (form) form.dispatchEvent(new Event('submit', { bubbles: true }));
+        },
+        'clear-selected-pub': (el, modules) => {
+            modules.form?.clearSelectedPub?.();
+        },
+        
+        // Status actions
+        'change-gf-status': (el, modules) => {
+            modules.form?.GFStatusFlow?.openStatusModal?.();
+        },
+        'confirm-status': (el, modules) => {
+            modules.form?.GFStatusFlow?.confirmStatusUpdate?.();
+        },
+        'cancel-status': (el, modules) => {
+            modules.modal?.close('gfStatusConfirmModal');
+        },
+        'skip-details': (el, modules) => {
+            modules.modal?.close('beerDetailsPromptModal');
+            modules.helpers?.showSuccessToast?.('✅ Status updated successfully!');
+        },
+        'add-beer-details': (el, modules) => {
+            modules.modal?.close('beerDetailsPromptModal');
+            const currentPub = App.getState(STATE_KEYS.CURRENT_PUB);
+            modules.modal?.openReportModal?.(currentPub);
+        },
+        
+        // Places search actions
+        'add-new-pub-from-results': (el, modules) => {
+            modules.modal?.openReportModal?.({ isNewPub: true });
+        },
+        'search-google-places': (el, modules) => {
+            modules.search?.PlacesSearchModule?.openPlacesSearch?.();
+        },
+        'use-selected-place': (el, modules) => {
+            modules.search?.PlacesSearchModule?.useSelectedPlace?.();
+        },
+        'select-place': (el, modules) => {
+            const placeIndex = el.dataset.placeIndex;
+            if (placeIndex) {
+                modules.search?.PlacesSearchModule?.selectPlace?.(parseInt(placeIndex));
+            }
+        },
+        
+        // Location permission actions
+        'allow-location': (el, modules) => {
+            App.handleLocationPermission(true);
+        },
+        'deny-location': (el, modules) => {
+            App.handleLocationPermission(false);
+        },
+        
+        // Cookie actions
+        'accept-all-cookies': (el, modules) => {
+            App.handleCookieConsent(true);
+        },
+        'accept-essential-cookies': (el, modules) => {
+            App.handleCookieConsent(false);
+        },
+        'save-cookie-preferences': (el, modules) => {
+            const analyticsConsent = document.getElementById('analyticsConsent')?.checked;
+            App.handleCookieConsent(analyticsConsent);
+            modules.modal?.close('cookieSettings');
+        },
+        'show-cookie-settings': (el, modules) => {
+            modules.modal?.open('cookieSettings');
+        },
+        
+        // Misc actions
+        'reload-page': () => {
+            location.reload();
+        }
+    },
+    
+    // ================================
+    // SPECIALIZED HANDLERS
+    // ================================
+    handleDistanceSelection: (distance) => {
+        console.log(`📍 Distance selected: ${distance}km`);
+        
+        const modal = App.getModule('modal');
+        const search = App.getModule('search');
+        
+        modal?.close('distanceModal');
+        search?.searchNearbyWithDistance?.(distance);
+    },
+    
+    handleLocationPermission: (granted) => {
+        const modal = document.getElementById('locationPermissionModal');
+        if (modal) {
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+        
+        const event = new CustomEvent(granted ? 'locationPermissionGranted' : 'locationPermissionDenied');
+        document.dispatchEvent(event);
+    },
+    
+    handleCookieConsent: (analyticsAllowed) => {
+        const helpers = App.getModule('helpers');
+        const tracking = App.getModule('tracking');
+        
+        if (!helpers || !tracking) return;
+        
+        helpers.Storage.set('cookieConsent', true);
+        helpers.Storage.set('analyticsConsent', analyticsAllowed);
+        
+        tracking.updateConsent(analyticsAllowed);
+        
+        // Hide banner, show float button
+        const banner = document.getElementById('cookieConsent');
+        const floatBtn = document.getElementById('cookieSettingsFloat');
+        
+        if (banner) banner.style.display = 'none';
+        if (floatBtn) floatBtn.style.display = 'block';
+        
+        helpers.showSuccessToast('✅ Cookie preferences saved!');
+    },
+    
+    checkCookieConsent: () => {
+        const helpers = App.getModule('helpers');
+        const hasConsent = helpers?.Storage.get('cookieConsent');
+        
+        if (!hasConsent) {
+            const banner = document.getElementById('cookieConsent');
+            if (banner) banner.style.display = 'block';
+        } else {
+            const floatBtn = document.getElementById('cookieSettingsFloat');
+            if (floatBtn) floatBtn.style.display = 'block';
+        }
+    },
+    
+    // ================================
+    // MAP HANDLERS
+    // ================================
+    togglePubDetailMap: (modules) => {
+        const currentPub = App.getState(STATE_KEYS.CURRENT_PUB);
         const mapContainer = document.getElementById('pubMapContainer');
         const mapBtnText = document.getElementById('pubMapBtnText');
         const pubContainer = document.getElementById('pubContainer');
         
-        if (!mapContainer || !mapBtnText) {
-            console.error('❌ Map elements not found');
-            return;
-        }
+        if (!mapContainer || !mapBtnText) return;
         
-        if (mapContainer.style.display === 'none' || !mapContainer.style.display) {
+        const isHidden = mapContainer.style.display === 'none' || !mapContainer.style.display;
+        
+        if (isHidden) {
             // Show map
-            console.log('🗺️ Activating split-screen view...');
-            
             mapContainer.style.display = 'block';
             mapBtnText.textContent = 'Hide Map';
             if (pubContainer) pubContainer.classList.add('split-view');
             
-            if (currentPub && currentPub.latitude && currentPub.longitude && mapModule) {
-                mapModule.initPubDetailMap?.(currentPub);
+            if (currentPub?.latitude && currentPub?.longitude && modules.map) {
+                modules.map.initPubDetailMap?.(currentPub);
             }
         } else {
             // Hide map
-            console.log('🗺️ Deactivating split-screen view...');
-            
             mapContainer.style.display = 'none';
             mapBtnText.textContent = 'Show on Map';
             if (pubContainer) pubContainer.classList.remove('split-view');
         }
         
-        this.getModule('tracking')?.trackEvent('pub_map_toggle', 'Map Interaction', 
-            mapContainer.style.display === 'block' ? 'show' : 'hide');
+        modules.tracking?.trackEvent('pub_map_toggle', 'Map', isHidden ? 'show' : 'hide');
     },
     
-    handleReportBeer(modules) {
-        const pubData = window.App.getState('currentPub');
+    showFullMap: async (modules) => {
+        console.log('🗺️ Showing full UK map...');
+        
+        // Check for location if needed
+        if (!App.getState(STATE_KEYS.USER_LOCATION)) {
+            try {
+                const location = await modules.search?.requestLocationWithUI?.();
+                if (location) {
+                    App.setState(STATE_KEYS.USER_LOCATION, location);
+                    modules.map?.setUserLocation?.(location);
+                }
+            } catch (error) {
+                console.log('📍 Location not available:', error);
+            }
+        }
+        
+        const mapOverlay = document.getElementById('fullMapOverlay');
+        if (mapOverlay) {
+            mapOverlay.classList.add('active');
+            mapOverlay.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            
+            setTimeout(() => modules.map?.initFullUKMap?.(), 100);
+            
+            modules.tracking?.trackEvent('full_map_view', 'Navigation', 'nav_bar');
+        }
+    },
+    
+    closeFullMap: (modules) => {
+        const mapOverlay = document.getElementById('fullMapOverlay');
+        if (mapOverlay) {
+            mapOverlay.classList.remove('active');
+            mapOverlay.style.display = 'none';
+            document.body.style.overflow = '';
+            
+            modules.map?.cleanupFullUKMap?.();
+        }
+    },
+    
+    goToUserLocation: (modules) => {
+        const location = App.getState(STATE_KEYS.USER_LOCATION);
+        const map = App.getState(STATE_KEYS.MAP_DATA.FULL_UK_MAP);
+        const marker = App.getState(STATE_KEYS.MAP_DATA.USER_MARKER);
+        
+        if (!location) {
+            modules.helpers?.showSuccessToast?.('📍 Location not available. Please enable location services.');
+            return;
+        }
+        
+        if (map && window.L) {
+            map.setView([location.lat, location.lng], 14);
+            
+            if (marker) {
+                marker.openPopup();
+            }
+            
+            modules.tracking?.trackEvent('go_to_location', 'Map', 'button_click');
+        }
+    },
+    
+    // ================================
+    // PUB ACTIONS
+    // ================================
+    handleReportBeer: (modules) => {
+        const pubData = App.getState(STATE_KEYS.CURRENT_PUB);
         
         // Close overlays
         ['pubDetailsOverlay', 'resultsOverlay'].forEach(id => {
@@ -671,221 +663,84 @@ const App = {
         document.body.style.overflow = '';
         
         // Open report modal
-        if (modules.modal?.openReportModal) {
-            modules.modal.openReportModal(pubData);
-        } else {
-            this.fallbackOpenReportModal(pubData);
-        }
+        modules.modal?.openReportModal?.(pubData);
         
-        modules.tracking?.trackEvent('report_beer_click', 'User Action', pubData?.name || 'unknown_pub');
+        modules.tracking?.trackEvent('report_beer_click', 'User Action', pubData?.name || 'unknown');
     },
     
-    async showFullMap(modules) {
-        console.log('🗺️ Showing full UK map...');
+    openPubExternalSearch: (modules) => {
+        const pub = App.getState(STATE_KEYS.CURRENT_PUB);
+        if (!pub) return;
         
-        // Check if we need location first
-        if (!window.App.getState('userLocation')) {
-            try {
-                if (modules.search?.requestLocationWithUI) {
-                    console.log('📍 Requesting location for map...');
-                    window.App.getState('userLocation') = await modules.search.requestLocationWithUI();
-                    
-                    if (modules.map?.setUserLocation) {
-                        modules.map.setUserLocation(window.App.getState('userLocation'));
-                    }
-                }
-            } catch (error) {
-                console.log('📍 User declined location or error:', error);
-                // Continue anyway
-            }
-        }
+        const searchQuery = encodeURIComponent(`${pub.name} ${pub.postcode} pub`);
+        window.open(Constants.EXTERNAL.GOOGLE_SEARCH + searchQuery, '_blank');
         
-        const mapOverlay = document.getElementById('fullMapOverlay');
-        if (mapOverlay) {
-            mapOverlay.classList.add('active');
-            mapOverlay.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-            
-            if (modules.map?.initFullUKMap) {
-                setTimeout(() => modules.map.initFullUKMap(), 100);
-            }
-            
-            modules.tracking?.trackEvent('full_map_view', 'Navigation', 'nav_bar');
-        } else {
-            console.error('❌ Map overlay element not found!');
-        }
+        modules.tracking?.trackExternalLink?.('google_search', pub.name);
     },
     
-    closeFullMap(modules) {
-        const fullMapOverlay = document.getElementById('fullMapOverlay');
-        if (fullMapOverlay) {
-            fullMapOverlay.classList.remove('active');
-            fullMapOverlay.style.display = 'none';
-            document.body.style.overflow = '';
-            
-            modules.map?.cleanupFullUKMap?.();
-        }
+    openPubDirections: (modules) => {
+        const pub = App.getState(STATE_KEYS.CURRENT_PUB);
+        if (!pub) return;
+        
+        const destination = encodeURIComponent(`${pub.name}, ${pub.address}, ${pub.postcode}`);
+        window.open(Constants.EXTERNAL.GOOGLE_MAPS_DIRECTIONS + destination, '_blank');
+        
+        modules.tracking?.trackExternalLink?.('google_maps_directions', pub.name);
     },
     
-    handleDistanceSelection(distance) {
-        console.log(`📍 Distance ${distance}km selected`);
-        
-        this.closeModal('distanceModal');
-        
-        const search = this.getModule('search');
-        if (search) {
-            search.searchNearbyWithDistance(distance);
-        } else {
-            console.error('❌ Search module not available');
-        }
+    // ================================
+    // GLOBAL FUNCTIONS
+    // ================================
+    setupGlobalFunctions: () => {
+        // Legacy support - these should eventually be removed
+        window.closeResults = () => App.getModule('helpers')?.closeResults?.();
+        window.showPubDetails = (pubId) => App.getModule('search')?.showPubDetails?.(pubId);
+        window.toggleSearchResultsFullMap = () => App.getModule('map')?.toggleSearchResultsFullMap?.();
+        window.acceptAllCookies = () => App.handleCookieConsent(true);
+        window.acceptEssentialOnly = () => App.handleCookieConsent(false);
     },
     
-    handleCookieConsent(analyticsAllowed) {
-        const helpers = this.getModule('helpers');
-        const tracking = this.getModule('tracking');
+    // ================================
+    // ERROR HANDLING
+    // ================================
+    showInitError: (error) => {
+        console.error('❌ Initialization error:', error);
         
-        if (!helpers || !tracking) return;
-        
-        helpers.Storage.set('cookieConsent', true);
-        helpers.Storage.set('analyticsConsent', analyticsAllowed);
-        
-        tracking.updateConsent(analyticsAllowed);
-        
-        const banner = document.getElementById('cookieConsent');
-        if (banner) banner.style.display = 'none';
-        
-        const floatBtn = document.getElementById('cookieSettingsFloat');
-        if (floatBtn) floatBtn.style.display = 'block';
-        
-        helpers.showSuccessToast('✅ Cookie preferences saved!');
-    },
-    
-    openModal(modalId) {
-        const modal = document.getElementById(modalId);
-        if (modal) {
-            modal.style.display = 'flex';
-            modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-            console.log(`✅ Modal ${modalId} opened`);
-        } else {
-            console.error(`❌ Modal ${modalId} not found`);
-        }
-    },
-    
-    closeModal(modalId) {
-        if (!modalId) return;
-        
-        const modal = document.getElementById(modalId);
-        if (modal) {
-            modal.style.display = 'none';
-            modal.classList.remove('active');
-            document.body.style.overflow = '';
-            console.log(`✅ Modal ${modalId} closed`);
-        }
-    },
-    
-    // Fallback methods
-    // UPDATE the toggleResultsMapFallback method in main.js to handle location:
-
-    async toggleResultsMapFallback() {
-        const listContainer = document.getElementById('resultsListContainer');
-        const mapContainer = document.getElementById('resultsMapContainer');
-        const mapBtnText = document.getElementById('resultsMapBtnText');
-        
-        if (mapContainer && listContainer && mapBtnText) {
-            if (mapContainer.style.display === 'none' || !mapContainer.style.display) {
-                // Check for location before showing map
-                if (!window.App.getState('userLocation')) {
-                    try {
-                        const modules = this.modules;
-                        if (modules.search?.requestLocationWithUI) {
-                            console.log('📍 Requesting location for results map...');
-                            window.App.getState('userLocation') = await modules.search.requestLocationWithUI();
-                            
-                            if (modules.map?.setUserLocation) {
-                                modules.map.setUserLocation(window.App.getState('userLocation'));
-                            }
-                        }
-                    } catch (error) {
-                        console.log('📍 User declined location or error:', error);
-                    }
-                }
-                
-                listContainer.style.display = 'none';
-                mapContainer.style.display = 'block';
-                mapBtnText.textContent = 'List';
-            } else {
-                listContainer.style.display = 'block';
-                mapContainer.style.display = 'none';
-                mapBtnText.textContent = 'Map';
-            }
-        }
-    },
-    
-    // LEAVE the action exactly as you have it:
-    'toggle-results-map': () => {
-        console.log('🗺️ Toggling results map...');
-        modules.map?.toggleSearchResultsFullMap?.() || this.toggleResultsMapFallback();
-    },
-    
-    fallbackBackToResults() {
-        const resultsOverlay = document.getElementById('resultsOverlay');
-        const pubDetailsOverlay = document.getElementById('pubDetailsOverlay');
-        if (resultsOverlay && pubDetailsOverlay) {
-            pubDetailsOverlay.style.display = 'none';
-            pubDetailsOverlay.classList.remove('active');
-            resultsOverlay.style.display = 'flex';
-            resultsOverlay.classList.add('active');
-        }
-    },
-    
-    fallbackOpenReportModal(pubData) {
-        const reportModal = document.getElementById('reportModal');
-        if (reportModal) {
-            window.selectedPubData = pubData;
-            reportModal.style.display = 'flex';
-            reportModal.classList.add('active');
-            document.body.style.overflow = 'hidden';
-            
-            if (pubData?.name) {
-                const modalTitle = reportModal.querySelector('.modal-title');
-                if (modalTitle) {
-                    modalTitle.innerHTML = `📸 Report GF Beer Find<br><small style="color: var(--text-secondary); font-weight: 400;">at ${pubData.name}</small>`;
-                }
-                
-                const pubSearchGroup = document.getElementById('pubSearchGroup');
-                if (pubSearchGroup) pubSearchGroup.style.display = 'none';
-            }
-        }
-    },
-    
-    showFallback(error) {
         const fallbackDiv = document.createElement('div');
-        fallbackDiv.className = 'initialization-fallback';
+        fallbackDiv.className = 'init-error';
         fallbackDiv.innerHTML = `
-            <strong>⚠️ Loading Error</strong>
-            Something went wrong. Please refresh the page.<br>
-            <button onclick="location.reload()" class="fallback-btn">
-                Refresh Page
-            </button>
+            <div class="error-content">
+                <h2>⚠️ Loading Error</h2>
+                <p>Something went wrong. Please refresh the page.</p>
+                <button onclick="location.reload()" class="btn btn-primary">
+                    Refresh Page
+                </button>
+                <details>
+                    <summary>Error details</summary>
+                    <pre>${error.stack || error.message}</pre>
+                </details>
+            </div>
         `;
         document.body.appendChild(fallbackDiv);
-        
-        setTimeout(() => fallbackDiv.remove(), 10000);
     }
 };
 
 // ================================
 // INITIALIZATION
 // ================================
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => App.initialize());
-} else {
-    App.initialize();
-}
+const initializeApp = () => {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => App.initialize());
+    } else {
+        App.initialize();
+    }
+};
+
+// Start initialization
+initializeApp();
 
 // Export for global access
 window.CoeliacsApp = App;
 window.App = App;
 
-console.log('🍺 Main module loaded - app will initialize when DOM ready...');
+console.log('🍺 App module loaded - initialization will begin when DOM is ready');
