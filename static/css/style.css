@@ -180,11 +180,17 @@
     box-shadow: var(--shadow);
 }
 
+.btn-primary:hover {
+   transform: translateY(-1px);
+   box-shadow: var(--shadow);
+}
+
 .btn-secondary {
-    background: var(--bg-white);
-    color: var(--text-secondary);
-    box-shadow: var(--shadow-sm);
-    backdrop-filter: blur(10px);
+   background: var(--bg-white);
+   color: var(--text-secondary);
+   box-shadow: var(--shadow-sm);
+   backdrop-filter: blur(10px);
+   border: 2px solid var(--border-light);
 }
 
 .btn-secondary:hover {
@@ -203,6 +209,18 @@
     background: linear-gradient(135deg, #059669 0%, #047857 100%);
     transform: translateY(-2px);
     box-shadow: var(--shadow-lg);
+}
+
+.btn-danger {
+   background: var(--error-gradient);
+   color: var(--text-white);
+   box-shadow: var(--shadow);
+}
+
+.btn-danger:hover {
+   background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+   transform: translateY(-2px);
+   box-shadow: var(--shadow-lg);
 }
 
 .btn-nav-small {
@@ -1262,28 +1280,6 @@ html {
    cursor: pointer;
 }
 
-.result-actions .btn-primary {
-   background: var(--primary-gradient);
-   color: white;
-}
-
-.result-actions .btn-primary:hover {
-   transform: translateY(-1px);
-   box-shadow: var(--shadow);
-}
-
-.result-actions .btn-secondary {
-   background: var(--bg-white);
-   color: var(--text-secondary);
-   border: 2px solid var(--border-light);
-}
-
-.result-actions .btn-secondary:hover {
-   background: var(--hover-subtle);
-   border-color: #667eea;
-   color: #667eea;
-}
-
 .no-results-found {
    display: flex;
    flex-direction: column;
@@ -2123,17 +2119,6 @@ html {
     transition: all 0.25s ease;
 }
 
-/* .modal-actions .btn-secondary {
-    background: rgba(0, 0, 0, 0.1);
-    color: var(--text-secondary);
-} */
-
-.modal-actions .btn-secondary:hover {
-    background: rgba(0, 0, 0, 0.15);
-}
-
-
-
 
 
 
@@ -2739,43 +2724,6 @@ p {
     font-size: var(--text-lg);
 }
 
-.btn-primary:hover {
-    background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
-}
-
-.btn-success {
-    background: var(--success-gradient);
-    color: var(--text-white);
-    box-shadow: var(--shadow);
-}
-
-.btn-success:hover {
-    background: linear-gradient(135deg, #059669 0%, #047857 100%);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
-}
-
-
-
-.btn-secondary:hover {
-    background: var(--text-white);
-    transform: translateY(-1px);
-    box-shadow: var(--shadow);
-}
-
-.btn-danger {
-    background: var(--error-gradient);
-    color: var(--text-white);
-    box-shadow: var(--shadow);
-}
-
-.btn-danger:hover {
-    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
-}
 
 .card {
     background: var(--bg-white);
