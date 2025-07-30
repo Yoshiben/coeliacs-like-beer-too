@@ -91,8 +91,8 @@ export const SearchModule = (function() {
                     window.App.setState('locationAccuracy', location.accuracy);
                     
                     // Show accuracy feedback
-                    if (window.App.getState('userLocation.accuracy') {
-                        const accuracy = window.App.state.userLocation.accuracy;
+                    const accuracy = window.App.getState('userLocation.accuracy');
+                    if (accuracy) {
                         let message = '📍 Location found - finding nearby GF beer...';
                         
                         if (accuracy <= 100) {
@@ -152,7 +152,7 @@ export const SearchModule = (function() {
             state.lastSearchState = {
                 type: 'nearby',
                 radius: radiusKm,
-                userLocation: window.App.state.userLocation,
+                userLocation: window.App.getState('userLocation'),
                 timestamp: Date.now()
             };
             
@@ -160,8 +160,8 @@ export const SearchModule = (function() {
             showResultsLoading('🔍 Searching for GF beer options...');
             const api = getAPI();
             const pubs = await api.findNearbyPubs(
-                window.App.state.userLocation.lat, 
-                window.App.state.userLocation.lng, 
+                window.App.getState('userLocation').lat, 
+                window.App.getState('userLocation').lng, 
                 radiusKm, 
                 false
             );
@@ -175,8 +175,8 @@ export const SearchModule = (function() {
             
             state.currentSearchPubs = pubs;
             
-            const accuracyText = window.App.state.userLocation.accuracy && window.App.state.userLocation.accuracy > 500 ? 
-                ` (±${Math.round(window.App.state.userLocation.accuracy)}m accuracy)` : '';
+            const accuracyText = window.App.getState('userLocation').accuracy && window.App.getState('userLocation').accuracy > 500 ? 
+                ` (±${Math.round(window.App.getState('userLocation').accuracy)}m accuracy)` : '';
             
             displayResultsInOverlay(pubs, `${pubs.length} pubs within ${radiusKm}km${accuracyText}`);
             
@@ -322,8 +322,8 @@ export const SearchModule = (function() {
     // ================================
     const performNameSearch = async (query) => {
         try {
-            if (!window.App.state.userLocation) {
-                window.App.state.userLocation = await tryGetUserLocation();
+            if (!window.App.getState('userLocation')) {
+                window.App.getState('userLocation')= await tryGetUserLocation();
             }
             
             const api = getAPI();
@@ -340,8 +340,8 @@ export const SearchModule = (function() {
                 return;
             }
             
-            if (window.App.state.userLocation) {
-                pubs = sortPubsByDistance(pubs, window.App.state.userLocation);
+            if (window.App.getState('userLocation')) {
+                pubs = sortPubsByDistance(pubs, window.App.getState('userLocation'));
             }
             
             state.lastSearchState = {
@@ -353,7 +353,7 @@ export const SearchModule = (function() {
             
             state.currentSearchPubs = pubs;
             
-            const title = window.App.state.userLocation ? 
+            const title = window.App.getState('userLocation') ? 
                 `${pubs.length} pubs matching "${query}" (nearest first)` :
                 `${pubs.length} pubs matching "${query}"`;
                 
@@ -419,8 +419,8 @@ export const SearchModule = (function() {
     
     const performCitySearch = async (city) => {
         try {
-            if (!window.App.state.userLocation) {
-                window.App.state.userLocation = await tryGetUserLocation();
+            if (!window.App.getState('userLocation')) {
+                window.App.getState('userLocation') = await tryGetUserLocation();
             }
             
             const api = getAPI();
@@ -437,8 +437,8 @@ export const SearchModule = (function() {
                 return;
             }
             
-            if (window.App.state.userLocation) {
-                pubs = sortPubsByDistance(pubs, window.App.state.userLocation);
+            if (window.App.getState('userLocation')) {
+                pubs = sortPubsByDistance(pubs, window.App.getState('userLocation'));
             }
             
             state.lastSearchState = {
@@ -450,7 +450,7 @@ export const SearchModule = (function() {
             
             state.currentSearchPubs = pubs;
             
-            const title = window.App.state.userLocation ? 
+            const title = window.App.getState('userLocation') ? 
                 `${pubs.length} pubs in ${city} (nearest first)` :
                 `${pubs.length} pubs in ${city}`;
                 
@@ -475,8 +475,8 @@ export const SearchModule = (function() {
         try {
             console.log(`🍺 Performing beer search: "${query}" (${searchType})`);
             
-            if (!window.App.state.userLocation) {
-                window.App.state.userLocation = await tryGetUserLocation();
+            if (!window.App.getState('userLocation')) {
+                window.App.getState('userLocation') = await tryGetUserLocation();
             }
             
             const api = getAPI();
@@ -542,8 +542,8 @@ export const SearchModule = (function() {
                 return;
             }
             
-            if (window.App.state.userLocation) {
-                filteredPubs = sortPubsByDistance(filteredPubs, window.App.state.userLocation);
+            if (window.App.getState('userLocation')) {
+                filteredPubs = sortPubsByDistance(filteredPubs, window.App.getState('userLocation'));
             }
             
             state.lastSearchState = {
@@ -555,7 +555,7 @@ export const SearchModule = (function() {
             
             state.currentSearchPubs = filteredPubs;
             
-            const title = window.App.state.userLocation ? 
+            const title = window.App.getState('userLocation') ? 
                 `${filteredPubs.length} pubs serving "${query}" (nearest first)` :
                 `${filteredPubs.length} pubs serving "${query}"`;
                 
@@ -916,7 +916,7 @@ export const SearchModule = (function() {
         console.log('🔄 Restoring nearby search...');
         
         if (searchState.userLocation) {
-            window.App.state.userLocation = searchState.userLocation;
+            window.App.getState('userLocation') = searchState.userLocation;
             const mapModule = getMap();
             if (mapModule?.setUserLocation) {
                 mapModule.setUserLocation(searchState.userLocation);
@@ -1182,7 +1182,7 @@ export const SearchModule = (function() {
         try {
             const location = await getUserLocation();
             location.timestamp = Date.now();
-            window.App.state.userLocation = location;
+            window.App.getState('userLocation') = location;
             
             const mapModule = getMap();
             if (mapModule?.setUserLocation) {
@@ -1278,7 +1278,6 @@ export const SearchModule = (function() {
     
     const displayResultsInOverlay = (pubs, title) => {
         state.currentSearchPubs = pubs;
-        window.currentSearchResults = pubs;
         
         console.log('💾 Stored search results:', pubs.length, 'pubs');
         
