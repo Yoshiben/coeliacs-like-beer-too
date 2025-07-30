@@ -48,19 +48,28 @@ export const FormModule = (function() {
         
         console.log('📋 Form data collected:', reportData);
         
-        // Add pub data
         const selectedPub = window.App.getState('selectedPubForReport');
         if (selectedPub) {
             reportData.pub_id = selectedPub.pub_id;
             reportData.pub_name = selectedPub.name;
-        }
-            console.log('🏠 Using pre-populated pub:', pubData.name);
+            console.log('🏠 Using pre-populated pub:', selectedPub.name);  // FIXED: Use selectedPub
             console.log('🔍 DEBUG - Pub data being sent:', {
                 pub_id: reportData.pub_id,
                 pub_name: reportData.pub_name,
                 has_pub_id: !!reportData.pub_id
             });
         } else {
+            // Use searched/entered pub data
+            reportData.pub_name = formData.get('reportPubName') || document.getElementById('reportPubName').value || 'Unknown Pub';
+            reportData.address = formData.get('reportAddress') || document.getElementById('reportAddress').value || '';
+            reportData.postcode = formData.get('reportPostcode') || document.getElementById('reportPostcode').value || '';
+            console.log('🏠 Using manual pub data');
+            console.log('🔍 DEBUG - Manual pub data:', {
+                pub_name: reportData.pub_name,
+                address: reportData.address,
+                postcode: reportData.postcode
+            });
+        }
             // Use searched/entered pub data
             reportData.pub_name = formData.get('reportPubName') || document.getElementById('reportPubName').value || 'Unknown Pub';
             reportData.address = formData.get('reportAddress') || document.getElementById('reportAddress').value || '';
