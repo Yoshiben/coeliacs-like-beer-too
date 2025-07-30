@@ -1,31 +1,27 @@
 // ================================================================================
-// MAP.JS - All map functionality in one place
+// MAP.JS - Complete Refactor with STATE_KEYS
 // Handles: Map initialization, markers, user location, pub locations
 // ================================================================================
+
+import { Constants } from './constants.js';
+const STATE_KEYS = Constants.STATE_KEYS;
 
 export const MapModule = (function() {
     'use strict';
     
-    // Private state - NO MORE GLOBALS!
-    let map = null;
-    let resultsMap = null;
-    let pubDetailMap = null;
-    let pubMarkers = [];
-    let mapVisible = false;
-    let clusteredPubsLayer = null;
-    let isToggleInitialized = false;
-
-    const STATE_KEYS = {
-        FULL_UK_MAP: 'mapData.fullUKMapInstance',
-        GF_PUBS_LAYER: 'mapData.gfPubsLayer', 
-        CLUSTERED_PUBS_LAYER: 'mapData.clusteredPubsLayer',
-        ALL_PUBS: 'mapData.allPubs',
-        USER_MARKER: 'mapData.userMarker',
-        USER_LOCATION: 'userLocation',
-        LOCATION_TIMESTAMP: 'locationTimestamp'
-    };    
+    // This module is registered with App.registerModule('map', MapModule)
+    // Access other modules via: window.App.getModule('moduleName')
+    // Never use window.ModuleName directly
     
-    // Configuration
+    // ================================
+    // PRIVATE STATE
+    // ================================
+    const maps = {
+        main: null,
+        results: null,
+        pubDetail: null
+    };
+    
     const config = {
         defaultCenter: [54.5, -3], // UK center
         defaultZoom: 6,
@@ -33,58 +29,205 @@ export const MapModule = (function() {
         pubMarkerRadius: 8,
         userMarkerRadius: 8,
         tileLayer: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        clusterConfig: {
+            maxClusterRadius: 40,
+            disableClusteringAtZoom: 12,
+            spiderfyOnMaxZoom: true,
+            showCoverageOnHover: false
+        }
     };
     
-    // Get CSS variables for consistent styling
-    const getMapStyles = () => {
-        const rootStyles = getComputedStyle(document.documentElement);
-        return {
-            pubFillColor: rootStyles.getPropertyValue('--marker-pub-fill').trim() || '#4CAF50',
-            pubStrokeColor: rootStyles.getPropertyValue('--marker-pub-stroke').trim() || '#ffffff',
-            userFillColor: rootStyles.getPropertyValue('--marker-user-fill').trim() || '#667eea',
-            userStrokeColor: rootStyles.getPropertyValue('--marker-user-stroke').trim() || '#ffffff'
-        };
+    // Cache DOM queries
+    let cachedStyles = null;
+    
+    // ================================
+    // MODULE GETTERS
+    // ================================
+    const modules = {
+        get api() { return window.App?.getModule('api'); },
+        get search() { return window.App?.getModule('search'); },
+        get tracking() { return window.App?.getModule('tracking'); }
     };
     
-    // Initialize main map
-    const initMainMap = (containerId = 'map') => {
-        console.log('🗺️ Initializing main map...');
+    // ================================
+    // UTILITIES
+    // ================================
+    const utils = {
+        getUserLocation() {
+            return window.App.getState(STATE_KEYS.USER_LOCATION);
+        },
         
+        setUserLocation(location) {
+            window.App.setState(STATE_KEYS.USER_LOCATION, location);
+            window.App.setState(STATE_KEYS.LOCATION_TIMESTAMP, Date.now());
+            
+            // Update all active maps with user location
+            Object.values(maps).forEach(map => {
+                if (map) this.addUserMarkerToMap(map, location);
+            });
+        },
+        
+        addUserMarkerToMap(map, location) {
+            if (!map || !location) return;
+            
+            const styles = getMapStyles();
+            L.circleMarker([location.lat, location.lng], {
+                radius: config.userMarkerRadius,
+                fillColor: styles.userFillColor,
+                color: styles.userStrokeColor,
+                weight: 2,
+                opacity: 1,
+                fillOpacity: 0.8,
+                zIndexOffset: 1000
+            }).addTo(map).bindPopup('📍 You are here!');
+        },
+        
+        calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        },
+        
+        escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        },
+        
+        cleanupMap(mapInstance) {
+            if (mapInstance) {
+                try {
+                    mapInstance.remove();
+                } catch (error) {
+                    console.warn('Error cleaning up map:', error);
+                }
+            }
+        }
+    };
+    
+    // ================================
+    // STYLE MANAGEMENT
+    // ================================
+    function getMapStyles() {
+        if (!cachedStyles) {
+            const rootStyles = getComputedStyle(document.documentElement);
+            cachedStyles = {
+                pubFillColor: rootStyles.getPropertyValue('--marker-pub-fill').trim() || '#4CAF50',
+                pubStrokeColor: rootStyles.getPropertyValue('--marker-pub-stroke').trim() || '#ffffff',
+                userFillColor: rootStyles.getPropertyValue('--marker-user-fill').trim() || '#667eea',
+                userStrokeColor: rootStyles.getPropertyValue('--marker-user-stroke').trim() || '#ffffff',
+                alwaysGfFill: rootStyles.getPropertyValue('--always-gf-fill').trim(),
+                alwaysGfBorder: rootStyles.getPropertyValue('--always-gf-border').trim(),
+                currentlyGfFill: rootStyles.getPropertyValue('--currently-gf-fill').trim(),
+                currentlyGfBorder: rootStyles.getPropertyValue('--currently-gf-border').trim(),
+                noGfFill: rootStyles.getPropertyValue('--no-gf-fill').trim(),
+                noGfBorder: rootStyles.getPropertyValue('--no-gf-border').trim(),
+                unknownGfFill: rootStyles.getPropertyValue('--unknown-gf-fill').trim(),
+                unknownGfBorder: rootStyles.getPropertyValue('--unknown-gf-border').trim()
+            };
+        }
+        return cachedStyles;
+    }
+    
+    function getMarkerStyleForGFStatus(gfStatus) {
+        const styles = getMapStyles();
+        const baseStyle = {
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.9,
+            radius: config.pubMarkerRadius
+        };
+        
+        const statusStyles = {
+            'always': {
+                fillColor: styles.alwaysGfFill,
+                color: styles.alwaysGfBorder,
+                radius: 10,
+                weight: 3,
+                className: 'always-gf-marker'
+            },
+            'currently': {
+                fillColor: styles.currentlyGfFill,
+                color: styles.currentlyGfBorder
+            },
+            'not_currently': {
+                fillColor: styles.noGfFill,
+                color: styles.noGfBorder,
+                fillOpacity: 0.7
+            },
+            'unknown': {
+                fillColor: styles.unknownGfFill,
+                color: styles.unknownGfBorder,
+                fillOpacity: 0.6
+            }
+        };
+        
+        return { ...baseStyle, ...(statusStyles[gfStatus] || statusStyles.unknown) };
+    }
+    
+    // ================================
+    // MAP INITIALIZATION
+    // ================================
+    function createMap(containerId, options = {}) {
         const mapElement = document.getElementById(containerId);
         if (!mapElement) {
-            console.error('Map container not found:', containerId);
+            console.error(`Map container '${containerId}' not found`);
             return null;
         }
         
-        // Clear any existing map
-        if (map) {
-            map.remove();
-            map = null;
-        }
+        const userLocation = utils.getUserLocation();
+        const center = options.center || (userLocation ? [userLocation.lat, userLocation.lng] : config.defaultCenter);
+        const zoom = options.zoom || (userLocation ? 12 : config.defaultZoom);
         
-        // Create new map
-        map = L.map(containerId).setView(config.defaultCenter, config.defaultZoom);
+        const map = L.map(containerId, {
+            zoomControl: true,
+            attributionControl: true,
+            scrollWheelZoom: true,
+            doubleClickZoom: true,
+            touchZoom: true,
+            ...options.mapOptions
+        }).setView(center, zoom);
         
-        // Add tile layer
         L.tileLayer(config.tileLayer, {
             maxZoom: config.maxZoom,
             attribution: config.attribution
         }).addTo(map);
         
-        // Add user location if available
-        const userLocation = window.App.getState(STATE_KEYS.USER_LOCATION);
-        if (userLocation) {
-            addUserMarker(userLocation);
+        if (userLocation && options.showUserLocation !== false) {
+            utils.addUserMarkerToMap(map, userLocation);
         }
         
-        console.log('✅ Main map initialized');
         return map;
+    }
+    
+    // ================================
+    // MAIN MAP
+    // ================================
+    const initMainMap = (containerId = 'map') => {
+        console.log('🗺️ Initializing main map...');
+        
+        utils.cleanupMap(maps.main);
+        maps.main = createMap(containerId);
+        
+        if (maps.main) {
+            console.log('✅ Main map initialized');
+        }
+        
+        return maps.main;
     };
     
-    // Initialize results overlay map    
+    // ================================
+    // RESULTS MAP
+    // ================================
     const initResultsMap = (pubsData = null) => {
-        console.log('🗺️ Initializing FULL-SCREEN results map...');
+        console.log('🗺️ Initializing results map...');
         
         const mapElement = document.getElementById('resultsMap');
         if (!mapElement) {
@@ -93,98 +236,51 @@ export const MapModule = (function() {
         }
         
         // Clean up existing map
-        if (resultsMap) {
-            console.log('🔄 Map already exists, cleaning up...');
-            try {
-                resultsMap.remove();
-                resultsMap = null;
-            } catch (error) {
-                console.warn('Warning cleaning up existing map:', error);
-                resultsMap = null;
-            }
-        }
-        
-        // Clear the container
+        utils.cleanupMap(maps.results);
         mapElement.innerHTML = '';
-        mapElement.classList.remove('split-view');
         
-        // Ensure parent containers are in full-screen mode
-        const resultsMapContainer = document.getElementById('resultsMapContainer');
-        if (resultsMapContainer) {
-            resultsMapContainer.classList.remove('split-view');
-            resultsMapContainer.style.height = '100%';
-        }
+        // Reset container classes
+        const containers = {
+            map: document.getElementById('resultsMapContainer'),
+            overlay: document.getElementById('resultsOverlay')
+        };
         
-        const resultsOverlay = document.getElementById('resultsOverlay');
-        if (resultsOverlay) {
-            resultsOverlay.classList.remove('split-view');
-        }
+        Object.values(containers).forEach(container => {
+            if (container) container.classList.remove('split-view');
+        });
         
-        // Small delay to ensure DOM is clean
+        // Create map with slight delay for DOM
         setTimeout(() => {
             try {
-                const userLocation = window.App.getState(STATE_KEYS.USER_LOCATION);
-                const centerPoint = userLocation ? 
-                    [userLocation.lat, userLocation.lng] : 
-                    config.defaultCenter;
-                const zoomLevel = userLocation ? 12 : config.defaultZoom;
+                maps.results = createMap('resultsMap');
                 
-                // Create new map
-                resultsMap = L.map('resultsMap', {
-                    zoomControl: true,
-                    attributionControl: true,
-                    scrollWheelZoom: true,
-                    doubleClickZoom: true,
-                    touchZoom: true,
-                    boxZoom: true,
-                    keyboard: true
-                }).setView(centerPoint, zoomLevel);
-                
-                // Add tile layer
-                L.tileLayer(config.tileLayer, {
-                    maxZoom: config.maxZoom,
-                    attribution: config.attribution
-                }).addTo(resultsMap);
-                
-                // Add user location if available
-                if (userLocation) {
-                    const styles = getMapStyles();
-                    L.circleMarker([userLocation.lat, userLocation.lng], {
-                        radius: config.userMarkerRadius,
-                        fillColor: styles.userFillColor,
-                        color: styles.userStrokeColor,
-                        weight: 2,
-                        opacity: 1,
-                        fillOpacity: 0.8
-                    }).addTo(resultsMap).bindPopup('📍 Your location');
+                if (!maps.results) {
+                    throw new Error('Failed to create results map');
                 }
                 
                 // Add pubs
                 let pubs = pubsData;
-                if (!pubs && window.App?.getModule('search')?.getCurrentResults) {
-                    pubs = window.App.getModule('search').getCurrentResults();
-                    console.log('🍺 Got pubs from search module:', pubs?.length || 0);
+                if (!pubs) {
+                    const searchModule = modules.search;
+                    pubs = searchModule?.getCurrentResults() || [];
                 }
                 
-                if (pubs && pubs.length > 0) {
-                    const markersAdded = addPubMarkers(pubs, resultsMap);
-                    console.log(`✅ Added ${markersAdded} pub markers to results map`);
-                } else {
-                    console.log('ℹ️ No pubs data available for results map');
+                if (pubs.length > 0) {
+                    addPubMarkers(pubs, maps.results);
+                    console.log(`✅ Added ${pubs.length} pub markers`);
                 }
                 
                 // Add legend
-                addMapLegend(resultsMap);
+                addMapLegend(maps.results);
                 
-                // Force proper rendering
+                // Force render
                 setTimeout(() => {
-                    if (resultsMap) {
-                        resultsMap.invalidateSize();
-                        console.log('🔄 Results map size invalidated');
+                    if (maps.results) {
+                        maps.results.invalidateSize();
                     }
                 }, 100);
                 
-                console.log('✅ Results map initialized successfully');
+                console.log('✅ Results map initialized');
                 
             } catch (error) {
                 console.error('❌ Error creating results map:', error);
@@ -192,154 +288,106 @@ export const MapModule = (function() {
             }
         }, 50);
         
-        return resultsMap;
+        return maps.results;
     };
     
-    // Initialize pub detail map (split view)
+    const cleanupResultsMap = () => {
+        console.log('🧹 Cleaning up results map...');
+        utils.cleanupMap(maps.results);
+        maps.results = null;
+        
+        const mapElement = document.getElementById('resultsMap');
+        if (mapElement) mapElement.innerHTML = '';
+    };
+    
+    // ================================
+    // PUB DETAIL MAP
+    // ================================
     const initPubDetailMap = (pub) => {
         console.log('🗺️ Initializing pub detail map for:', pub.name);
         
         const mapContainer = document.querySelector('.pub-map-placeholder');
         if (!mapContainer) {
-            console.error('❌ Pub map container (.pub-map-placeholder) not found');
+            console.error('❌ Pub map container not found');
             return null;
         }
         
         if (!pub.latitude || !pub.longitude) {
-            console.warn('⚠️ No coordinates available for pub:', pub.name);
-            mapContainer.innerHTML = `
-                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 20px; text-align: center; color: var(--text-secondary);">
-                    <div style="font-size: 2rem; margin-bottom: 10px;">📍</div>
-                    <div style="font-weight: 600; margin-bottom: 5px;">Location coordinates not available</div>
-                    <div style="font-size: 0.9rem; opacity: 0.7;">Help us by reporting the exact location!</div>
-                </div>
-            `;
+            showNoLocationMessage(mapContainer, pub.name);
             return null;
         }
         
-        console.log('🗺️ Creating map with coordinates:', pub.latitude, pub.longitude);
-        
-        // Clear and create map container
+        // Create map container
         mapContainer.innerHTML = '<div id="pubMapLeaflet" style="width: 100%; height: 100%; border-radius: 0 0 var(--radius-xl) var(--radius-xl);"></div>';
         
         try {
-            // Clean up existing map
-            if (pubDetailMap) {
-                pubDetailMap.remove();
-                pubDetailMap = null;
+            utils.cleanupMap(maps.pubDetail);
+            
+            maps.pubDetail = createMap('pubMapLeaflet', {
+                center: [parseFloat(pub.latitude), parseFloat(pub.longitude)],
+                zoom: 16
+            });
+            
+            if (!maps.pubDetail) {
+                throw new Error('Failed to create pub detail map');
             }
             
-            pubDetailMap = L.map('pubMapLeaflet', {
-                zoomControl: true,
-                attributionControl: true,
-                scrollWheelZoom: true,
-                doubleClickZoom: true,
-                touchZoom: true
-            }).setView([parseFloat(pub.latitude), parseFloat(pub.longitude)], 16);
-            
-            // Add tile layer
-            L.tileLayer(config.tileLayer, {
-                maxZoom: config.maxZoom,
-                attribution: config.attribution
-            }).addTo(pubDetailMap);
-            
-            // Get styles
-            const styles = getMapStyles();
-            
-            // Determine GF status
+            // Add pub marker
             const gfStatus = determineGFStatus(pub);
             const markerStyle = getMarkerStyleForGFStatus(gfStatus);
             
-            // Add pub marker
-            const pubMarker = L.circleMarker([parseFloat(pub.latitude), parseFloat(pub.longitude)], {
-                ...markerStyle,
-                radius: 12
-            }).addTo(pubDetailMap);
+            const pubMarker = L.circleMarker(
+                [parseFloat(pub.latitude), parseFloat(pub.longitude)], 
+                { ...markerStyle, radius: 12 }
+            ).addTo(maps.pubDetail);
             
-            // Create popup content
             const popupContent = createPubPopupContent(pub, gfStatus);
             pubMarker.bindPopup(popupContent).openPopup();
             
-            // Add user location if available
-            const userLocation = window.App.getState(STATE_KEYS.USER_LOCATION);
-            if (userLocation) {
-                L.circleMarker([userLocation.lat, userLocation.lng], {
-                    radius: 8,
-                    fillColor: styles.userFillColor || '#667eea',
-                    color: styles.userStrokeColor || '#ffffff',
-                    weight: 2,
-                    opacity: 1,
-                    fillOpacity: 0.8
-                }).addTo(pubDetailMap).bindPopup('📍 Your location');
-            }
-            
-            // Ensure proper rendering
+            // Force render
             setTimeout(() => {
-                if (pubDetailMap) {
-                    pubDetailMap.invalidateSize();
-                    console.log('🔄 Map size invalidated');
+                if (maps.pubDetail) {
+                    maps.pubDetail.invalidateSize();
                 }
             }, 150);
             
-            console.log('✅ Pub detail map initialized successfully');
-            return pubDetailMap;
+            console.log('✅ Pub detail map initialized');
+            return maps.pubDetail;
             
         } catch (error) {
             console.error('❌ Error creating pub detail map:', error);
-            mapContainer.innerHTML = `
-                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 20px; text-align: center; color: var(--text-secondary);">
-                    <div style="font-size: 2rem; margin-bottom: 10px;">⚠️</div>
-                    <div style="font-weight: 600; margin-bottom: 5px;">Map Error</div>
-                    <div style="font-size: 0.9rem; opacity: 0.7;">${error.message}</div>
-                </div>
-            `;
+            showMapError(mapContainer, error.message);
             return null;
         }
     };
     
-    // Add user location marker
-    const addUserMarker = (location) => {
-        const fullUKMap = window.App.getState(STATE_KEYS.FULL_UK_MAP);
-        if (!fullUKMap) return;
-        
-        const styles = getMapStyles();
-        
-        // Remove existing user marker
-        const existingMarker = window.App.getState(STATE_KEYS.USER_MARKER);
-        if (existingMarker && fullUKMap) {
-            fullUKMap.removeLayer(existingMarker);
-        }
-        
-        // Add new user marker
-        const userMarker = L.circleMarker([location.lat, location.lng], {
-            radius: config.userMarkerRadius,
-            fillColor: styles.userFillColor,
-            color: styles.userStrokeColor,
-            weight: 2,
-            opacity: 1,
-            fillOpacity: 0.8
-        }).addTo(fullUKMap);
-        
-        userMarker.bindPopup('📍 You are here!');
-        window.App.setState(STATE_KEYS.USER_MARKER, userMarker);
-        
-        console.log('📍 User marker added to map');
-    };
+    function showNoLocationMessage(container, pubName) {
+        container.innerHTML = `
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 20px; text-align: center; color: var(--text-secondary);">
+                <div style="font-size: 2rem; margin-bottom: 10px;">📍</div>
+                <div style="font-weight: 600; margin-bottom: 5px;">Location coordinates not available</div>
+                <div style="font-size: 0.9rem; opacity: 0.7;">Help us by reporting the exact location!</div>
+            </div>
+        `;
+    }
     
-    // Add pub markers to map
-    const addPubMarkers = (pubs, mapInstance = null) => {
-        const targetMap = mapInstance || map;
-        if (!targetMap) {
-            console.error('No map instance available');
-            return 0;
-        }
+    function showMapError(container, errorMessage) {
+        container.innerHTML = `
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 20px; text-align: center; color: var(--text-secondary);">
+                <div style="font-size: 2rem; margin-bottom: 10px;">⚠️</div>
+                <div style="font-weight: 600; margin-bottom: 5px;">Map Error</div>
+                <div style="font-size: 0.9rem; opacity: 0.7;">${errorMessage}</div>
+            </div>
+        `;
+    }
+    
+    // ================================
+    // MARKER MANAGEMENT
+    // ================================
+    function addPubMarkers(pubs, mapInstance) {
+        if (!mapInstance || !pubs || pubs.length === 0) return 0;
         
-        console.log(`📍 Adding ${pubs.length} pub markers with GF color coding...`);
-        
-        // Clear existing pub markers if using main map
-        if (!mapInstance) {
-            clearPubMarkers();
-        }
+        console.log(`📍 Adding ${pubs.length} pub markers...`);
         
         const bounds = [];
         let markersAdded = 0;
@@ -352,18 +400,12 @@ export const MapModule = (function() {
                 const lat = parseFloat(pub.latitude);
                 const lng = parseFloat(pub.longitude);
                 
-                // Determine marker color and size based on GF availability
                 const gfStatus = determineGFStatus(pub);
                 const markerStyle = getMarkerStyleForGFStatus(gfStatus);
                 
-                const marker = L.circleMarker([lat, lng], markerStyle).addTo(targetMap);
-                
+                const marker = L.circleMarker([lat, lng], markerStyle).addTo(mapInstance);
                 const popupContent = createPubPopupContent(pub, gfStatus);
                 marker.bindPopup(popupContent);
-                
-                if (!mapInstance) {
-                    pubMarkers.push(marker);
-                }
                 
                 bounds.push([lat, lng]);
                 markersAdded++;
@@ -373,237 +415,213 @@ export const MapModule = (function() {
         // Auto-zoom to show all markers
         if (markersAdded > 0 && bounds.length > 0) {
             if (bounds.length === 1) {
-                targetMap.setView(bounds[0], 15);
+                mapInstance.setView(bounds[0], 15);
             } else {
-                targetMap.fitBounds(bounds, { padding: [20, 20] });
+                mapInstance.fitBounds(bounds, { padding: [20, 20] });
             }
         }
         
-        console.log(`✅ Added ${markersAdded} GF-color-coded pub markers to map`);
         return markersAdded;
-    };
-
-    // Add filtered pub markers (hybrid clustering)
-    const addFilteredPubMarkers = (pubs, mapInstance) => {
-        const targetMap = mapInstance || map;
-        if (!targetMap) return 0;
-        
-        console.log(`🎯 Adding hybrid markers: GF individual, others clustered...`);
-        
-        // Clear existing layers
-        const gfPubsLayer = window.App.getState(STATE_KEYS.GF_PUBS_LAYER);
-        if (gfPubsLayer && targetMap) {
-            targetMap.removeLayer(gfPubsLayer);
-        }
-        
-        const clusteredPubsLayer = window.App.getState(STATE_KEYS.CLUSTERED_PUBS_LAYER);
-        if (clusteredPubsLayer && targetMap) {
-            targetMap.removeLayer(clusteredPubsLayer);
-        }
-        
-        // Create new layer groups
-        const newGfPubsLayer = L.layerGroup().addTo(targetMap);
-        window.App.setState(STATE_KEYS.GF_PUBS_LAYER, newGfPubsLayer);
-        
-        const newClusteredPubsLayer = L.markerClusterGroup({
-            maxClusterRadius: 40,
-            disableClusteringAtZoom: 12,
-            spiderfyOnMaxZoom: true,
-            showCoverageOnHover: false,
-            iconCreateFunction: function(cluster) {
-                const count = cluster.getChildCount();
-                let size = 'small';
-                
-                if (count > 1000) size = 'large';
-                else if (count > 100) size = 'medium';
-                
-                return L.divIcon({
-                    html: `<div><span>${count}</span></div>`,
-                    className: `marker-cluster marker-cluster-${size}`,
-                    iconSize: L.point(30, 30)
-                });
-            }
-        }).addTo(targetMap);
-        window.App.setState(STATE_KEYS.CLUSTERED_PUBS_LAYER, newClusteredPubsLayer);
-        
-        // Separate pubs by GF status
-        let gfPubs = [];
-        let otherPubs = [];
-        
-        pubs.forEach(pub => {
-            if (!pub.latitude || !pub.longitude) return;
-            
-            const gfStatus = determineGFStatus(pub);
-            
-            if (gfStatus === 'always' || gfStatus === 'currently') {
-                gfPubs.push(pub);
-            } else {
-                otherPubs.push(pub);
-            }
-        });
-        
-        console.log(`📊 GF Pubs (individual): ${gfPubs.length}, Others (clustered): ${otherPubs.length}`);
-        
-        // Add GF pubs as individual markers
-        gfPubs.forEach(pub => {
-            const lat = parseFloat(pub.latitude);
-            const lng = parseFloat(pub.longitude);
-            
-            const gfStatus = determineGFStatus(pub);
-            const markerStyle = getMarkerStyleForGFStatus(gfStatus);
-            
-            const marker = L.circleMarker([lat, lng], markerStyle);
-            const popupContent = createPubPopupContent(pub, gfStatus);
-            marker.bindPopup(popupContent);
-            
-            newGfPubsLayer.addLayer(marker);
-        });
-        
-        // Add other pubs to cluster layer
-        otherPubs.forEach(pub => {
-            const lat = parseFloat(pub.latitude);
-            const lng = parseFloat(pub.longitude);
-            
-            const gfStatus = determineGFStatus(pub);
-            const markerStyle = getMarkerStyleForGFStatus(gfStatus);
-            
-            const marker = L.marker([lat, lng], {
-                icon: L.divIcon({
-                    className: 'clusterable-marker',
-                    html: `<div style="
-                        width: ${markerStyle.radius * 2}px;
-                        height: ${markerStyle.radius * 2}px;
-                        background: ${markerStyle.fillColor};
-                        border: ${markerStyle.weight}px solid ${markerStyle.color};
-                        border-radius: 50%;
-                        opacity: ${markerStyle.fillOpacity};
-                    "></div>`,
-                    iconSize: [markerStyle.radius * 2, markerStyle.radius * 2]
-                })
-            });
-            
-            const popupContent = createPubPopupContent(pub, gfStatus);
-            marker.bindPopup(popupContent);
-            
-            newClusteredPubsLayer.addLayer(marker);
-        });
-        
-        return pubs.length;
-    };
+    }
     
-    // Clear all pub markers
-    const clearPubMarkers = () => {
-        pubMarkers.forEach(marker => {
-            if (map) {
-                map.removeLayer(marker);
-            }
-        });
-        pubMarkers = [];
-        console.log('🧹 Cleared all pub markers');
-    };
-
-    // Determine GF status
-    const determineGFStatus = (pub) => {
-        if (pub.gf_status) {
-            return pub.gf_status;
-        }
-        
-        // Fallback for older data
-        if (pub.bottle || pub.tap || pub.cask || pub.can) {
-            return 'currently';
-        }
-        
+    function determineGFStatus(pub) {
+        if (pub.gf_status) return pub.gf_status;
+        if (pub.bottle || pub.tap || pub.cask || pub.can) return 'currently';
         return 'unknown';
-    };
+    }
     
-    // Get marker style for GF status
-    const getMarkerStyleForGFStatus = (gfStatus) => {
-        const rootStyles = getComputedStyle(document.documentElement);
-        
-        const baseStyle = {
-            weight: 2,
-            opacity: 1,
-            fillOpacity: 0.9,
-            radius: 8
-        };
-        
-        switch(gfStatus) {
-            case 'always':
-                return {
-                    ...baseStyle,
-                    fillColor: rootStyles.getPropertyValue('--always-gf-fill').trim(),
-                    color: rootStyles.getPropertyValue('--always-gf-border').trim(),
-                    radius: 10,
-                    weight: 3,
-                    className: 'always-gf-marker'
-                };
-                
-            case 'currently':
-                return {
-                    ...baseStyle,
-                    fillColor: rootStyles.getPropertyValue('--currently-gf-fill').trim(),
-                    color: rootStyles.getPropertyValue('--currently-gf-border').trim()
-                };
-                
-            case 'not_currently':
-                return {
-                    ...baseStyle,
-                    fillColor: rootStyles.getPropertyValue('--no-gf-fill').trim(),
-                    color: rootStyles.getPropertyValue('--no-gf-border').trim(),
-                    fillOpacity: 0.7
-                };
-                
-            case 'unknown':
-            default:
-                return {
-                    ...baseStyle,
-                    fillColor: rootStyles.getPropertyValue('--unknown-gf-fill').trim(),
-                    color: rootStyles.getPropertyValue('--unknown-gf-border').trim(),
-                    fillOpacity: 0.6
-                };
-        }
-    };
-    
-    // Create pub popup content
-    const createPubPopupContent = (pub, gfStatus = null) => {
-        if (!gfStatus) {
-            gfStatus = determineGFStatus(pub);
-        }
+    function createPubPopupContent(pub, gfStatus = null) {
+        if (!gfStatus) gfStatus = determineGFStatus(pub);
         
         let content = `<div class="popup-content">`;
-        content += `<div class="popup-title">${escapeHtml(pub.name)}</div>`;
+        content += `<div class="popup-title">${utils.escapeHtml(pub.name)}</div>`;
         
         if (pub.address) {
-            content += `<div class="popup-address">${escapeHtml(pub.address)}</div>`;
+            content += `<div class="popup-address">${utils.escapeHtml(pub.address)}</div>`;
         }
-        content += `<div class="popup-postcode">${escapeHtml(pub.postcode)}</div>`;
+        content += `<div class="popup-postcode">${utils.escapeHtml(pub.postcode)}</div>`;
         
         if (pub.distance !== undefined) {
             content += `<div class="popup-distance">${pub.distance.toFixed(1)}km away</div>`;
         }
         
         // GF status
-        if (gfStatus === 'always' || gfStatus === 'currently') {
-            let gfOptions = [];
-            if (pub.bottle) gfOptions.push('🍺');
-            if (pub.tap) gfOptions.push('🚰');
-            if (pub.cask) gfOptions.push('🛢️');
-            if (pub.can) gfOptions.push('🥫');
-            content += `<div class="popup-gf-status available">✅ GF Available: ${gfOptions.join(' ')}</div>`;
-        } else if (gfStatus === 'not_currently') {
-            content += `<div class="popup-gf-status not-available">❌ No GF Options Known</div>`;
-        } else {
-            content += `<div class="popup-gf-status unknown">❓ GF Status Unknown</div>`;
+        const statusMessages = {
+            'always': '✅ Always has GF beer',
+            'currently': '✅ GF Available',
+            'not_currently': '❌ No GF Options',
+            'unknown': '❓ GF Status Unknown'
+        };
+        
+        const statusClasses = {
+            'always': 'always-gf',
+            'currently': 'current-gf',
+            'not_currently': 'no-gf',
+            'unknown': 'unknown'
+        };
+        
+        content += `<div class="popup-gf-status ${statusClasses[gfStatus]}">${statusMessages[gfStatus]}</div>`;
+        
+        if ((gfStatus === 'always' || gfStatus === 'currently') && (pub.bottle || pub.tap || pub.cask || pub.can)) {
+            const formats = [];
+            if (pub.bottle) formats.push('🍺');
+            if (pub.tap) formats.push('🚰');
+            if (pub.cask) formats.push('🛢️');
+            if (pub.can) formats.push('🥫');
+            content += `<div class="popup-formats">${formats.join(' ')}</div>`;
         }
         
-        content += `<button class="popup-button" data-action="view-pub" data-pub-id="${pub.pub_id}">View Details</button>`;
+        content += `<button class="popup-button" data-action="view-pub-from-map" data-pub-id="${pub.pub_id}">View Details</button>`;
         content += `</div>`;
         
         return content;
+    }
+    
+    // ================================
+    // FULL UK MAP
+    // ================================
+    const initFullUKMap = async () => {
+        console.log('🗺️ Initializing full UK map...');
+        
+        const mapElement = document.getElementById('fullMap');
+        if (!mapElement) {
+            console.error('Full map element not found');
+            return null;
+        }
+        
+        // Clean up existing map
+        const existingMap = window.App.getState(STATE_KEYS.MAP_DATA.FULL_UK_MAP);
+        if (existingMap) {
+            utils.cleanupMap(existingMap);
+            window.App.setState(STATE_KEYS.MAP_DATA.FULL_UK_MAP, null);
+        }
+        
+        // Get or request user location
+        let userLocation = utils.getUserLocation();
+        if (!userLocation) {
+            try {
+                const searchModule = modules.search;
+                if (searchModule?.requestLocationWithUI) {
+                    userLocation = await searchModule.requestLocationWithUI();
+                    utils.setUserLocation(userLocation);
+                }
+            } catch (error) {
+                console.log('📍 Could not get user location:', error);
+            }
+        }
+        
+        // Create map
+        const fullUKMap = createMap('fullMap', {
+            center: userLocation ? [userLocation.lat, userLocation.lng] : config.defaultCenter,
+            zoom: userLocation ? 12 : config.defaultZoom
+        });
+        
+        if (!fullUKMap) {
+            console.error('Failed to create full UK map');
+            return null;
+        }
+        
+        // Store map instance
+        window.App.setState(STATE_KEYS.MAP_DATA.FULL_UK_MAP, fullUKMap);
+        
+        // Add user marker if location available
+        if (userLocation) {
+            const styles = getMapStyles();
+            const userMarker = L.circleMarker([userLocation.lat, userLocation.lng], {
+                radius: 10,
+                fillColor: styles.userFillColor,
+                color: styles.userStrokeColor,
+                weight: 3,
+                opacity: 1,
+                fillOpacity: 0.9,
+                zIndexOffset: 1000
+            }).addTo(fullUKMap);
+            
+            userMarker.bindPopup('📍 You are here!').openPopup();
+            window.App.setState(STATE_KEYS.MAP_DATA.USER_MARKER, userMarker);
+        }
+        
+        // Add controls
+        addMapLegend(fullUKMap);
+        addZoomHint(fullUKMap);
+        
+        // Load pubs
+        await loadAllPubsOnMap();
+        
+        // Initialize toggle
+        setTimeout(() => {
+            initMapToggle();
+        }, 500);
+        
+        // Force render
+        setTimeout(() => {
+            const map = window.App.getState(STATE_KEYS.MAP_DATA.FULL_UK_MAP);
+            if (map) map.invalidateSize();
+        }, 150);
+        
+        console.log('✅ Full UK map initialized');
+        return fullUKMap;
     };
     
-    // Add map legend
-    const addMapLegend = (mapInstance) => {
+    const loadAllPubsOnMap = async () => {
+        console.log('📍 Loading UK pubs...');
+        
+        try {
+            // Check cache
+            const cachedPubs = window.App.getState(STATE_KEYS.MAP_DATA.ALL_PUBS);
+            if (cachedPubs && cachedPubs.length > 0) {
+                console.log('✅ Using cached pub data');
+                updateMapDisplay(true);
+                return;
+            }
+            
+            // Fetch data
+            const response = await fetch('/api/all-pubs');
+            const data = await response.json();
+            
+            if (!data.success) {
+                throw new Error(data.error || 'Failed to load pubs');
+            }
+            
+            window.App.setState(STATE_KEYS.MAP_DATA.ALL_PUBS, data.pubs || []);
+            
+            const allPubs = window.App.getState(STATE_KEYS.MAP_DATA.ALL_PUBS);
+            console.log(`📊 Loaded ${allPubs.length} pubs`);
+            
+            // Update display
+            updateMapDisplay(true);
+            
+            // Show notification
+            const gfCount = allPubs.filter(p => 
+                p.gf_status === 'always' || p.gf_status === 'currently'
+            ).length;
+            
+            if (window.showSuccessToast) {
+                window.showSuccessToast(`✅ ${gfCount} pubs with GF beer ready!`);
+            }
+            
+        } catch (error) {
+            console.error('❌ Error loading pubs:', error);
+            if (window.showSuccessToast) {
+                window.showSuccessToast('❌ Error loading pubs. Please try again.');
+            }
+        }
+    };
+    
+    const cleanupFullUKMap = () => {
+        console.log('🧹 Cleaning up full UK map...');
+        
+        const fullUKMap = window.App.getState(STATE_KEYS.MAP_DATA.FULL_UK_MAP);
+        if (fullUKMap) {
+            utils.cleanupMap(fullUKMap);
+            window.App.setState(STATE_KEYS.MAP_DATA.FULL_UK_MAP, null);
+        }
+    };
+    
+    // ================================
+    // MAP CONTROLS
+    // ================================
+    function addMapLegend(mapInstance) {
         const legend = L.control({ position: 'bottomright' });
         
         legend.onAdd = function(map) {
@@ -639,14 +657,11 @@ export const MapModule = (function() {
         };
         
         legend.addTo(mapInstance);
-    };
-
-    // Add zoom hint
-    const addZoomHint = (mapInstance) => {
+    }
+    
+    function addZoomHint(mapInstance) {
         const hintControl = L.Control.extend({
-            options: {
-                position: 'topright'
-            },
+            options: { position: 'topright' },
             
             onAdd: function(map) {
                 const container = L.DomUtil.create('div', 'zoom-hint-container');
@@ -658,12 +673,7 @@ export const MapModule = (function() {
                 `;
                 
                 const updateHintVisibility = () => {
-                    const zoom = map.getZoom();
-                    if (zoom < 9) {
-                        container.style.display = 'block';
-                    } else {
-                        container.style.display = 'none';
-                    }
+                    container.style.display = map.getZoom() < 9 ? 'block' : 'none';
                 };
                 
                 updateHintVisibility();
@@ -674,164 +684,12 @@ export const MapModule = (function() {
         });
         
         mapInstance.addControl(new hintControl());
-    };
+    }
     
-    // Initialize full UK map
-    const initFullUKMap = async () => {
-        console.log('🗺️ Initializing full UK map with all pubs...');
-        
-        const mapElement = document.getElementById('fullMap');
-        if (!mapElement) {
-            console.error('Full map element not found');
-            return null;
-        }
-        
-        // Clean up any existing map
-        const existingMap = window.App.getState(STATE_KEYS.FULL_UK_MAP);
-        if (existingMap) {
-            existingMap.remove();
-            window.App.setState(STATE_KEYS.FULL_UK_MAP, null);
-        }
-        
-        // Try to get user location if not available
-        let userLocation = window.App.getState(STATE_KEYS.USER_LOCATION);
-        if (!userLocation) {
-            try {
-                console.log('📍 No existing location, trying to get it...');
-                
-                if (window.SearchModule?.requestLocationWithUI) {
-                    userLocation = await window.SearchModule.requestLocationWithUI();
-                    window.App.setState(STATE_KEYS.USER_LOCATION, userLocation);
-                    console.log('✅ Got user location via UI:', userLocation);
-                }
-            } catch (error) {
-                console.log('📍 Could not get user location:', error);
-            }
-        }
-        
-        // Determine initial view
-        let initialCenter = config.defaultCenter;
-        let initialZoom = config.defaultZoom;
-        
-        if (userLocation) {
-            initialCenter = [userLocation.lat, userLocation.lng];
-            initialZoom = 12;
-            console.log('📍 Centering map on user location with zoom:', initialZoom);
-        }
-        
-        // Create new map
-        const fullUKMap = L.map('fullMap', {
-            zoomControl: true,
-            attributionControl: true,
-            scrollWheelZoom: true,
-            doubleClickZoom: true,
-            touchZoom: true
-        }).setView(initialCenter, initialZoom);
-        
-        window.App.setState(STATE_KEYS.FULL_UK_MAP, fullUKMap);
-        
-        // Add tile layer
-        L.tileLayer(config.tileLayer, {
-            maxZoom: config.maxZoom,
-            attribution: config.attribution
-        }).addTo(fullUKMap);
-        
-        // Add user location marker if available
-        if (userLocation) {
-            const styles = getMapStyles();
-            const userMarker = L.circleMarker([userLocation.lat, userLocation.lng], {
-                radius: 10,
-                fillColor: styles.userFillColor || '#667eea',
-                color: styles.userStrokeColor || '#ffffff',
-                weight: 3,
-                opacity: 1,
-                fillOpacity: 0.9,
-                zIndexOffset: 1000
-            }).addTo(fullUKMap);
-            
-            userMarker.bindPopup('📍 You are here!').openPopup();
-            window.App.setState(STATE_KEYS.USER_MARKER, userMarker);
-        }
-        
-        addMapLegend(fullUKMap);
-        addZoomHint(fullUKMap);
-        
-        // Load and display all pubs
-        await loadAllPubsOnMap();
-        
-        // Ensure proper rendering
-        setTimeout(() => {
-            const map = window.App.getState(STATE_KEYS.FULL_UK_MAP);
-            if (map) {
-                map.invalidateSize();
-            }
-        }, 150);
-
-        // Initialize toggle after map is ready
-        setTimeout(() => {
-            initMapToggle();
-        }, 500);
-        
-        console.log('✅ Full UK map initialized');
-        return fullUKMap;
-    };
-    
-    // Load all pubs from API
-    const loadAllPubsOnMap = async () => {
-        console.log('📍 Loading UK pubs progressively...');
-        
-        try {
-            // Check if we already have the data
-            const cachedPubs = window.App.getState(STATE_KEYS.ALL_PUBS);
-            if (cachedPubs && cachedPubs.length > 0) {
-                console.log('✅ Using cached pub data');
-                setTimeout(() => {
-                    initMapToggle();
-                }, 100);
-                return;
-            }
-            
-            // Fetch all pubs
-            fetch('/api/all-pubs')
-                .then(response => response.json())
-                .then(data => {
-                    if (!data.success) {
-                        throw new Error(data.error || 'Failed to load pubs');
-                    }
-                    
-                    window.App.setState(STATE_KEYS.ALL_PUBS, data.pubs || []);
-                    
-                    const allPubs = window.App.getState(STATE_KEYS.ALL_PUBS);
-                    console.log(`📊 Loaded ${allPubs.length} pubs in background`);
-                    
-                    // Initialize toggle functionality AFTER data is loaded
-                    setTimeout(() => {
-                        initMapToggle();
-                    }, 100);
-                    
-                    // Show toast notification
-                    const gfCount = allPubs.filter(p => 
-                        p.gf_status === 'always' || p.gf_status === 'currently'
-                    ).length;
-                    
-                    if (window.showSuccessToast) {
-                        window.showSuccessToast(`✅ ${gfCount} pubs with GF beer ready!`);
-                    }
-                })
-                .catch(error => {
-                    console.error('❌ Error loading pubs:', error);
-                    if (window.showSuccessToast) {
-                        window.showSuccessToast('❌ Error loading pubs. Please try again.');
-                    }
-                });
-            
-        } catch (error) {
-            console.error('❌ Error loading pubs for map:', error);
-        }
-    };
-
-    // Initialize map toggle
-    const initMapToggle = () => {
+    // ================================
+    // MAP TOGGLE FUNCTIONALITY
+    // ================================
+    function initMapToggle() {
         const container = document.getElementById('mapToggleContainer');
         if (!container) return;
         
@@ -860,67 +718,157 @@ export const MapModule = (function() {
                 
                 updateThumb();
                 updateMapDisplay(value === 'gf');
+                
+                const trackingModule = modules.tracking;
+                if (trackingModule) {
+                    trackingModule.trackEvent('map_toggle', 'Map Interaction', value);
+                }
             });
         });
         
         updateMapDisplay(true);
-        setupZoomHandler(currentMode);
-    };
+        setupZoomHandler();
+    }
     
-    // Update map display based on mode
-    const updateMapDisplay = (showGFOnly) => {
-        const fullUKMap = window.App.getState(STATE_KEYS.FULL_UK_MAP);
-        const allPubs = window.App.getState(STATE_KEYS.ALL_PUBS);
+    function updateMapDisplay(showGFOnly) {
+        const fullUKMap = window.App.getState(STATE_KEYS.MAP_DATA.FULL_UK_MAP);
+        const allPubs = window.App.getState(STATE_KEYS.MAP_DATA.ALL_PUBS);
         if (!fullUKMap || !allPubs) return;
         
         console.log(`🍺 Updating map: ${showGFOnly ? 'GF Pubs Only' : 'All Pubs'}`);
         
         // Clear existing layers
-        const gfPubsLayer = window.App.getState(STATE_KEYS.GF_PUBS_LAYER);
-        if (gfPubsLayer && fullUKMap) {
-            fullUKMap.removeLayer(gfPubsLayer);
-        }
-        
-        const clusteredPubsLayer = window.App.getState(STATE_KEYS.CLUSTERED_PUBS_LAYER);
-        if (clusteredPubsLayer && fullUKMap) {
-            fullUKMap.removeLayer(clusteredPubsLayer);
-        }
+        clearMapLayers(fullUKMap);
         
         if (showGFOnly) {
-            // Show only GF pubs
-            const gfPubsLayer = L.layerGroup().addTo(fullUKMap);
-            window.App.setState(STATE_KEYS.GF_PUBS_LAYER, gfPubsLayer);
+            displayGFPubsOnly(fullUKMap, allPubs);
+        } else {
+            displayAllPubsClustered(fullUKMap, allPubs);
+        }
+    }
+    
+    function clearMapLayers(map) {
+        const layers = {
+            gf: window.App.getState(STATE_KEYS.MAP_DATA.GF_PUBS_LAYER),
+            clustered: window.App.getState(STATE_KEYS.MAP_DATA.CLUSTERED_PUBS_LAYER)
+        };
+        
+        Object.values(layers).forEach(layer => {
+            if (layer && map) map.removeLayer(layer);
+        });
+    }
+    
+    function displayGFPubsOnly(map, allPubs) {
+        const gfPubsLayer = L.layerGroup().addTo(map);
+        window.App.setState(STATE_KEYS.MAP_DATA.GF_PUBS_LAYER, gfPubsLayer);
+        
+        const gfPubs = allPubs.filter(pub => 
+            pub.gf_status === 'always' || pub.gf_status === 'currently'
+        );
+        
+        console.log(`📍 Showing ${gfPubs.length} GF pubs only`);
+        
+        gfPubs.forEach(pub => {
+            if (!pub.latitude || !pub.longitude) return;
             
-            const gfPubs = allPubs.filter(pub => 
-                pub.gf_status === 'always' || pub.gf_status === 'currently'
-            );
+            const lat = parseFloat(pub.latitude);
+            const lng = parseFloat(pub.longitude);
+            const gfStatus = determineGFStatus(pub);
+            const markerStyle = getMarkerStyleForGFStatus(gfStatus);
             
-            console.log(`📍 Showing ${gfPubs.length} GF pubs only`);
+            const marker = L.circleMarker([lat, lng], markerStyle);
+            const popupContent = createPubPopupContent(pub, gfStatus);
+            marker.bindPopup(popupContent);
             
-            gfPubs.forEach(pub => {
-                if (!pub.latitude || !pub.longitude) return;
+            gfPubsLayer.addLayer(marker);
+        });
+    }
+    
+    function displayAllPubsClustered(map, allPubs) {
+        const gfPubsLayer = L.layerGroup().addTo(map);
+        window.App.setState(STATE_KEYS.MAP_DATA.GF_PUBS_LAYER, gfPubsLayer);
+        
+        const clusteredPubsLayer = L.markerClusterGroup({
+            ...config.clusterConfig,
+            iconCreateFunction: function(cluster) {
+                const count = cluster.getChildCount();
+                let size = 'small';
                 
-                const lat = parseFloat(pub.latitude);
-                const lng = parseFloat(pub.longitude);
-                const gfStatus = determineGFStatus(pub);
-                const markerStyle = getMarkerStyleForGFStatus(gfStatus);
+                if (count > 1000) size = 'large';
+                else if (count > 100) size = 'medium';
                 
-                const marker = L.circleMarker([lat, lng], markerStyle);
-                const popupContent = createPubPopupContent(pub, gfStatus);
-                marker.bindPopup(popupContent);
-                
-                gfPubsLayer.addLayer(marker);
+                return L.divIcon({
+                    html: `<div><span>${count}</span></div>`,
+                    className: `marker-cluster marker-cluster-${size}`,
+                    iconSize: L.point(30, 30)
+                });
+            }
+        }).addTo(map);
+        
+        window.App.setState(STATE_KEYS.MAP_DATA.CLUSTERED_PUBS_LAYER, clusteredPubsLayer);
+        
+        // Separate GF and other pubs
+        const gfPubs = [];
+        const otherPubs = [];
+        
+        allPubs.forEach(pub => {
+            if (!pub.latitude || !pub.longitude) return;
+            
+            const gfStatus = determineGFStatus(pub);
+            if (gfStatus === 'always' || gfStatus === 'currently') {
+                gfPubs.push(pub);
+            } else {
+                otherPubs.push(pub);
+            }
+        });
+        
+        console.log(`📊 GF Pubs: ${gfPubs.length}, Others: ${otherPubs.length}`);
+        
+        // Add GF pubs as individual markers
+        gfPubs.forEach(pub => {
+            const lat = parseFloat(pub.latitude);
+            const lng = parseFloat(pub.longitude);
+            const gfStatus = determineGFStatus(pub);
+            const markerStyle = getMarkerStyleForGFStatus(gfStatus);
+            
+            const marker = L.circleMarker([lat, lng], markerStyle);
+            const popupContent = createPubPopupContent(pub, gfStatus);
+            marker.bindPopup(popupContent);
+            
+            gfPubsLayer.addLayer(marker);
+        });
+        
+        // Add other pubs to cluster
+        otherPubs.forEach(pub => {
+            const lat = parseFloat(pub.latitude);
+            const lng = parseFloat(pub.longitude);
+            const gfStatus = determineGFStatus(pub);
+            const markerStyle = getMarkerStyleForGFStatus(gfStatus);
+            
+            const marker = L.marker([lat, lng], {
+                icon: L.divIcon({
+                    className: 'clusterable-marker',
+                    html: `<div style="
+                        width: ${markerStyle.radius * 2}px;
+                        height: ${markerStyle.radius * 2}px;
+                        background: ${markerStyle.fillColor};
+                        border: ${markerStyle.weight}px solid ${markerStyle.color};
+                        border-radius: 50%;
+                        opacity: ${markerStyle.fillOpacity};
+                    "></div>`,
+                    iconSize: [markerStyle.radius * 2, markerStyle.radius * 2]
+                })
             });
             
-        } else {
-            // Show all pubs with clustering
-            addFilteredPubMarkers(allPubs, fullUKMap);
-        }
-    };
+            const popupContent = createPubPopupContent(pub, gfStatus);
+            marker.bindPopup(popupContent);
+            
+            clusteredPubsLayer.addLayer(marker);
+        });
+    }
     
-    // Setup zoom handler
-    const setupZoomHandler = (mode) => {
-        const fullUKMap = window.App.getState(STATE_KEYS.FULL_UK_MAP);
+    function setupZoomHandler() {
+        const fullUKMap = window.App.getState(STATE_KEYS.MAP_DATA.FULL_UK_MAP);
         if (!fullUKMap) return;
         
         fullUKMap.off('zoomend');
@@ -930,7 +878,7 @@ export const MapModule = (function() {
             clearTimeout(zoomTimeout);
             zoomTimeout = setTimeout(() => {
                 const zoom = fullUKMap.getZoom();
-                console.log(`🔍 Zoom level: ${zoom}, refreshing markers`);
+                console.log(`🔍 Zoom level: ${zoom}`);
                 
                 const activeOption = document.querySelector('.toggle-option.active');
                 const currentMode = activeOption?.dataset.value || 'gf';
@@ -938,170 +886,96 @@ export const MapModule = (function() {
                 updateMapDisplay(currentMode === 'gf');
             }, 300);
         });
-    };
+    }
     
-    // Helper functions
-    const escapeHtml = (text) => {
-        if (!text) return '';
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    };
-    
-    const calculateDistance = (lat1, lon1, lat2, lon2) => {
-        const R = 6371;
-        const dLat = (lat2 - lat1) * Math.PI / 180;
-        const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                  Math.sin(dLon/2) * Math.sin(dLon/2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        return R * c;
-    };
-    
-    // Toggle map visibility
-    const toggleMap = () => {
-        mapVisible = !mapVisible;
-        const mapContainer = document.getElementById('mapContainer');
-        const toggleBtn = document.getElementById('toggleMapBtn');
-        
-        if (mapVisible) {
-            mapContainer.style.display = 'block';
-            toggleBtn.innerHTML = '🗺️ Hide Map';
-            
-            if (!map) {
-                initMainMap();
-            }
-            
-            setTimeout(() => {
-                if (map) {
-                    map.invalidateSize();
-                }
-            }, 100);
-            
-            setTimeout(() => {
-                mapContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 150);
-        } else {
-            mapContainer.style.display = 'none';
-            toggleBtn.innerHTML = '🗺️ Show Map';
-        }
-        
-        return mapVisible;
-    };
-    
-    // Set user location
-    const setUserLocation = (location) => {
-        window.App.setState(STATE_KEYS.USER_LOCATION, location);
-        window.App.setState(STATE_KEYS.LOCATION_TIMESTAMP, Date.now());
-        if (map) {
-            addUserMarker(location);
-        }
-    };
-    
-    // Get user location
-    const getUserLocation = () => window.App.getState(STATE_KEYS.USER_LOCATION);
-    
-    // Center map on location
-    const centerOnLocation = (location = null) => {
-        const targetLocation = location || window.App.getState(STATE_KEYS.USER_LOCATION);
-        if (targetLocation && map) {
-            map.setView([targetLocation.lat, targetLocation.lng], 14);
-            console.log('🎯 Map centered on location');
-        }
-    };
-
-    // Toggle search results map
+    // ================================
+    // TOGGLE RESULTS MAP
+    // ================================
     const toggleSearchResultsFullMap = () => {
-        const listContainer = document.getElementById('resultsListContainer');
-        const mapContainer = document.getElementById('resultsMapContainer');
-        const mapBtnText = document.getElementById('resultsMapBtnText');
+        const elements = {
+            list: document.getElementById('resultsListContainer'),
+            map: document.getElementById('resultsMapContainer'),
+            btnText: document.getElementById('resultsMapBtnText')
+        };
         
-        if (mapContainer.style.display === 'none' || !mapContainer.style.display) {
-            listContainer.style.display = 'none';
-            mapContainer.style.display = 'block';
-            mapBtnText.textContent = 'List';
+        if (!elements.list || !elements.map || !elements.btnText) {
+            console.error('❌ Required elements not found');
+            return;
+        }
+        
+        if (elements.map.style.display === 'none' || !elements.map.style.display) {
+            // Show map
+            cleanupResultsMap();
             
+            elements.list.style.display = 'none';
+            elements.map.style.display = 'block';
+            elements.map.style.flex = '1';
+            elements.map.style.height = '100%';
+            elements.map.style.minHeight = '400px';
+            elements.map.style.width = '100%';
+            elements.map.style.position = 'relative';
+            
+            elements.btnText.textContent = 'List';
+            
+            // Force layout
+            elements.map.offsetHeight;
+            
+            // Initialize map
             setTimeout(() => {
-                initResultsMap();
-            }, 100);
+                const searchModule = modules.search;
+                const pubs = searchModule?.getCurrentResults() || [];
+                initResultsMap(pubs);
+            }, 50);
             
-            if (window.TrackingModule) {
-                window.TrackingModule.trackEvent('results_map_toggle', 'Map Interaction', 'show');
+            // Track event
+            const trackingModule = modules.tracking;
+            if (trackingModule) {
+                trackingModule.trackEvent('results_map_toggle', 'Map Interaction', 'show');
             }
         } else {
-            listContainer.style.display = 'block';
-            mapContainer.style.display = 'none';
-            mapBtnText.textContent = 'Map';
+            // Show list
+            cleanupResultsMap();
             
-            if (window.TrackingModule) {
-                window.TrackingModule.trackEvent('results_map_toggle', 'Map Interaction', 'hide');
-            }
-        }
-    };
-
-    // Cleanup results map
-    const cleanupResultsMap = () => {
-        console.log('🧹 Cleaning up results map instance...');
-        
-        if (resultsMap) {
-            try {
-                resultsMap.remove();
-                resultsMap = null;
-                console.log('✅ Results map cleaned up successfully');
-            } catch (error) {
-                console.warn('Warning cleaning up results map:', error);
-                resultsMap = null;
-            }
-        }
-        
-        const mapElement = document.getElementById('resultsMap');
-        if (mapElement) {
-            mapElement.innerHTML = '';
-        }
-        
-        const resultsMapContainer = document.getElementById('resultsMapContainer');
-        if (resultsMapContainer) {
-            resultsMapContainer.classList.remove('split-view');
-        }
-    };
-    
-    // Cleanup full UK map
-    const cleanupFullUKMap = () => {
-        console.log('🧹 Cleaning up full UK map...');
-        
-        const fullUKMap = window.App.getState(STATE_KEYS.FULL_UK_MAP);
-        if (fullUKMap) {
-            try {
-                fullUKMap.remove();
-                window.App.setState(STATE_KEYS.FULL_UK_MAP, null);
-            } catch (error) {
-                console.warn('Warning cleaning up full UK map:', error);
-                window.App.setState(STATE_KEYS.FULL_UK_MAP, null);
+            elements.list.style.display = 'block';
+            elements.list.style.flex = '1';
+            elements.map.style.display = 'none';
+            elements.btnText.textContent = 'Map';
+            
+            // Track event
+            const trackingModule = modules.tracking;
+            if (trackingModule) {
+                trackingModule.trackEvent('results_map_toggle', 'Map Interaction', 'hide');
             }
         }
     };
     
-    // Public API
+    // ================================
+    // PUBLIC API
+    // ================================
     return {
+        // Main maps
         initMainMap,
         initResultsMap,
         initPubDetailMap,
-        addPubMarkers,
-        clearPubMarkers,
-        toggleMap,
-        setUserLocation,
-        getUserLocation,
-        centerOnLocation,
         initFullUKMap,
-        loadAllPubsOnMap,
-        cleanupFullUKMap,
-        toggleSearchResultsFullMap,
+        
+        // Cleanup
         cleanupResultsMap,
-        isMapVisible: () => mapVisible,
-        calculateDistance
+        cleanupFullUKMap,
+        
+        // Markers
+        addPubMarkers,
+        
+        // Location
+        setUserLocation: utils.setUserLocation,
+        getUserLocation: utils.getUserLocation,
+        
+        // UI
+        toggleSearchResultsFullMap,
+        
+        // Utilities
+        calculateDistance: utils.calculateDistance
     };
 })();
 
-// Make it globally available
-window.MapModule = MapModule;
+// DO NOT add window.MapModule = MapModule here!
