@@ -801,12 +801,6 @@ html {
     position: relative;
 }
 
-.form-label {
-    font-weight: 600;
-    color: var(--text-secondary);
-    font-size: var(--text-sm);
-}
-
 .form-actions {
     display: flex;
     gap: var(--space-lg);
@@ -848,7 +842,6 @@ html {
    padding: var(--space-lg);
    box-sizing: border-box;
    overflow: hidden;
-/*    display: none; */
 }
 
 .search-modal .modal-content {
@@ -863,8 +856,7 @@ html {
    max-height: 92vh;
    display: flex;
    flex-direction: column;
-   overflow: hidden;
-   
+   overflow: hidden;   
 }
 
 .search-modal .modal-header {
@@ -877,7 +869,7 @@ html {
    border: 2px solid rgba(0, 0, 0, 0.1);
    border-radius: var(--radius-lg);
    font-size: var(--text-md);
-   margin: var(--space-xl) 0;
+   margin: var(--space-xs) 0;
    transition: border-color 0.25s ease;
    overflow: hidden;
    padding: var(--space-md);
@@ -901,6 +893,24 @@ html {
    border-color: var(--light-blue);
    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
+
+.search-modal .form-label {
+   font-weight: 600;
+   color: var(--text-secondary);
+   font-size: var(--text-sm);
+   padding: var(--space-md) 0 0 var(--space-xs);  
+}
+
+
+
+
+
+
+
+
+
+
+
 
 
 
