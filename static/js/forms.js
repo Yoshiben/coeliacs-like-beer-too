@@ -1,5 +1,5 @@
 // ================================================================================
-// FORMS.JS - Complete Refactor with STATE_KEYS and Consistency Fixes
+// FORMS.JS - Complete Refactor with STATE_KEYS, Arrow Functions and Consistency Fixes
 // Handles: All form operations, validation, autocomplete, GF status updates
 // ================================================================================
 
@@ -9,7 +9,7 @@ import { Constants } from './constants.js';
 
 const STATE_KEYS = Constants.STATE_KEYS;
 
-export const FormModule = (function() {
+export const FormModule = (() => {
     'use strict';
     
     // ================================
@@ -46,27 +46,17 @@ export const FormModule = (function() {
     // UTILITIES
     // ================================
     const utils = {
-        getSelectedPub() {
-            return window.App.getState(STATE_KEYS.SELECTED_PUB_FOR_REPORT);
-        },
+        getSelectedPub: () => window.App.getState(STATE_KEYS.SELECTED_PUB_FOR_REPORT),
         
-        setSelectedPub(pubData) {
-            window.App.setState(STATE_KEYS.SELECTED_PUB_FOR_REPORT, pubData);
-        },
+        setSelectedPub: (pubData) => window.App.setState(STATE_KEYS.SELECTED_PUB_FOR_REPORT, pubData),
         
-        getCurrentPub() {
-            return window.App.getState(STATE_KEYS.CURRENT_PUB);
-        },
+        getCurrentPub: () => window.App.getState(STATE_KEYS.CURRENT_PUB),
         
-        getCurrentBrewery() {
-            return window.App.getState(STATE_KEYS.CURRENT_BREWERY);
-        },
+        getCurrentBrewery: () => window.App.getState(STATE_KEYS.CURRENT_BREWERY),
         
-        setCurrentBrewery(brewery) {
-            window.App.setState(STATE_KEYS.CURRENT_BREWERY, brewery);
-        },
+        setCurrentBrewery: (brewery) => window.App.setState(STATE_KEYS.CURRENT_BREWERY, brewery),
         
-        showToast(message, type = 'success') {
+        showToast: (message, type = 'success') => {
             if (window.showSuccessToast) {
                 window.showSuccessToast(message);
             } else {
@@ -74,28 +64,28 @@ export const FormModule = (function() {
             }
         },
         
-        showLoadingToast(message) {
+        showLoadingToast: (message) => {
             if (window.showLoadingToast) {
                 window.showLoadingToast(message);
             }
         },
         
-        hideLoadingToast() {
+        hideLoadingToast: () => {
             if (window.hideLoadingToast) {
                 window.hideLoadingToast();
             }
         },
         
-        escapeHtml(text) {
+        escapeHtml: (text) => {
             if (!text) return '';
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         },
         
-        debounce(func, wait) {
+        debounce: (func, wait) => {
             let timeout;
-            return function executedFunction(...args) {
+            return (...args) => {
                 const later = () => {
                     clearTimeout(timeout);
                     func(...args);
@@ -109,7 +99,7 @@ export const FormModule = (function() {
     // ================================
     // REPORT FORM SUBMISSION
     // ================================
-    async function handleReportSubmission(event) {
+    const handleReportSubmission = async (event) => {
         event.preventDefault();
         console.log('📝 Handling report submission...');
         
@@ -146,9 +136,9 @@ export const FormModule = (function() {
         } finally {
             state.currentSubmission = null;
         }
-    }
+    };
     
-    function collectReportData(formData) {
+    const collectReportData = (formData) => {
         const reportData = {
             beer_format: formData.get('reportFormat') || document.getElementById('reportFormat')?.value,
             brewery: formData.get('reportBrewery') || document.getElementById('reportBrewery')?.value,
@@ -173,9 +163,9 @@ export const FormModule = (function() {
         }
         
         return reportData;
-    }
+    };
     
-    function validateReportForm(data) {
+    const validateReportForm = (data) => {
         const errors = [];
         
         if (!data.beer_format) errors.push('Beer Format');
@@ -185,11 +175,11 @@ export const FormModule = (function() {
         
         return {
             isValid: errors.length === 0,
-            errors: errors
+            errors
         };
-    }
+    };
     
-    function handleSubmissionSuccess(result) {
+    const handleSubmissionSuccess = (result) => {
         utils.showToast('🎉 Beer report submitted successfully! Thanks for contributing!');
         
         // Close modal properly using ModalModule
@@ -203,9 +193,9 @@ export const FormModule = (function() {
         
         // Track success
         modules.tracking?.trackEvent('beer_report_submitted', 'Form', 'success');
-    }
+    };
     
-    function returnToHomeView() {
+    const returnToHomeView = () => {
         // Close any overlays
         ['pubDetailsOverlay', 'resultsOverlay'].forEach(id => {
             const overlay = document.getElementById(id);
@@ -223,9 +213,9 @@ export const FormModule = (function() {
         if (searchSection) searchSection.style.display = 'flex';
         
         document.body.style.overflow = '';
-    }
+    };
     
-    function resetReportForm() {
+    const resetReportForm = () => {
         const form = document.getElementById('reportForm');
         if (form) form.reset();
         
@@ -243,9 +233,9 @@ export const FormModule = (function() {
         
         // Reset photo upload
         resetPhotoUpload();
-    }
+    };
     
-    function resetPhotoUpload() {
+    const resetPhotoUpload = () => {
         const photoLabel = document.querySelector('.photo-upload-compact');
         if (photoLabel) {
             photoLabel.classList.remove('active');
@@ -257,7 +247,7 @@ export const FormModule = (function() {
                 `;
             }
         }
-    }
+    };
     
     // ================================
     // PUB SEARCH & SELECTION
@@ -287,25 +277,25 @@ export const FormModule = (function() {
         }
     }, config.debounceDelay);
     
-    function displayNoResultsOption(container, query) {
+    const displayNoResultsOption = (container, query) => {
         container.innerHTML = `
             <div class="suggestion-item add-new" data-action="add-new-pub">
                 <strong>➕ Add "${utils.escapeHtml(query)}" as new pub</strong>
                 <small>Can't find it? Add it to our database!</small>
             </div>
         `;
-    }
+    };
     
-    function displayPubSuggestions(container, suggestions) {
+    const displayPubSuggestions = (container, suggestions) => {
         container.innerHTML = suggestions.map(pub => `
             <div class="suggestion-item" data-pub-id="${pub.pub_id}" data-action="select-pub">
                 <strong>${utils.escapeHtml(pub.name)}</strong>
                 <small>${utils.escapeHtml(pub.address)}, ${utils.escapeHtml(pub.postcode)}</small>
             </div>
         `).join('');
-    }
+    };
     
-    function selectPub(pubElement) {
+    const selectPub = (pubElement) => {
         const pubId = pubElement.dataset.pubId;
         const pubName = pubElement.querySelector('strong').textContent;
         const pubDetails = pubElement.querySelector('small').textContent;
@@ -314,8 +304,8 @@ export const FormModule = (function() {
         const pubData = {
             pub_id: parseInt(pubId),
             name: pubName,
-            address: address,
-            postcode: postcode
+            address,
+            postcode
         };
         
         utils.setSelectedPub(pubData);
@@ -323,32 +313,32 @@ export const FormModule = (function() {
         hideDropdown('pubSuggestions');
         
         modules.tracking?.trackEvent('pub_selected', 'Form', pubName);
-    }
+    };
     
-    function updateSelectedPubUI(pubData) {
+    const updateSelectedPubUI = (pubData) => {
         document.getElementById('selectedPubInfo').style.display = 'block';
         document.getElementById('selectedPubName').textContent = pubData.name;
         document.getElementById('selectedPubAddress').textContent = `${pubData.address}, ${pubData.postcode}`;
         document.getElementById('pubSearchGroup').style.display = 'none';
-    }
+    };
     
-    function showNewPubFields() {
+    const showNewPubFields = () => {
         document.getElementById('newPubFields').style.display = 'block';
         document.getElementById('pubSearchGroup').style.display = 'none';
         document.getElementById('reportPubName').value = document.getElementById('reportPubSearch').value;
         
         hideDropdown('pubSuggestions');
         document.getElementById('reportAddress').focus();
-    }
+    };
     
-    function clearSelectedPub() {
+    const clearSelectedPub = () => {
         utils.setSelectedPub(null);
         
         document.getElementById('selectedPubInfo').style.display = 'none';
         document.getElementById('pubSearchGroup').style.display = 'block';
         document.getElementById('reportPubSearch').value = '';
         document.getElementById('reportPubSearch').focus();
-    }
+    };
     
     // ================================
     // BREWERY AUTOCOMPLETE
@@ -373,7 +363,7 @@ export const FormModule = (function() {
         }
     }, config.debounceDelay);
     
-    function displayBreweryDropdown(breweries, totalCount, searchQuery = null) {
+    const displayBreweryDropdown = (breweries, totalCount, searchQuery = null) => {
         const dropdown = document.getElementById('breweryDropdown');
         if (!dropdown || breweries.length === 0) {
             hideDropdown('breweryDropdown');
@@ -397,9 +387,9 @@ export const FormModule = (function() {
         });
         
         showDropdown('breweryDropdown');
-    }
+    };
     
-    async function selectBrewery(brewery) {
+    const selectBrewery = async (brewery) => {
         console.log('🍺 Brewery selected:', brewery);
         
         document.getElementById('reportBrewery').value = brewery;
@@ -417,16 +407,16 @@ export const FormModule = (function() {
         }
         
         modules.tracking?.trackEvent('brewery_selected', 'Form', brewery);
-    }
+    };
     
-    function clearBeerFields() {
+    const clearBeerFields = () => {
         ['reportBeerName', 'reportBeerStyle', 'reportBeerABV'].forEach(id => {
             const element = document.getElementById(id);
             if (element) element.value = '';
         });
-    }
+    };
     
-    async function loadBreweryBeers(brewery) {
+    const loadBreweryBeers = async (brewery) => {
         const beerNameInput = document.getElementById('reportBeerName');
         if (!beerNameInput) return;
         
@@ -451,7 +441,7 @@ export const FormModule = (function() {
             console.error('Error loading brewery beers:', error);
             beerNameInput.placeholder = 'Enter beer name...';
         }
-    }
+    };
     
     // ================================
     // BEER NAME AUTOCOMPLETE
@@ -488,7 +478,7 @@ export const FormModule = (function() {
         }
     }, config.debounceDelay);
     
-    function displayBeerDropdown(beers, brewery, searchQuery = null) {
+    const displayBeerDropdown = (beers, brewery, searchQuery = null) => {
         const dropdown = document.getElementById('beerNameDropdown');
         if (!dropdown) return;
         
@@ -517,9 +507,9 @@ export const FormModule = (function() {
         });
         
         showDropdown('beerNameDropdown');
-    }
+    };
     
-    function createBeerItem(beer) {
+    const createBeerItem = (beer) => {
         const item = document.createElement('div');
         item.className = 'suggestion-item beer-item';
         item.innerHTML = `
@@ -532,9 +522,9 @@ export const FormModule = (function() {
         item.dataset.action = 'select-beer';
         item.dataset.beerData = JSON.stringify(beer);
         return item;
-    }
+    };
     
-    function displayAddNewBeerOption(query, brewery) {
+    const displayAddNewBeerOption = (query, brewery) => {
         const dropdown = document.getElementById('beerNameDropdown');
         if (!dropdown) return;
         
@@ -548,9 +538,9 @@ export const FormModule = (function() {
         `;
         
         showDropdown('beerNameDropdown');
-    }
+    };
     
-    function showAddNewBeerDropdown(brewery) {
+    const showAddNewBeerDropdown = (brewery) => {
         const dropdown = document.getElementById('beerNameDropdown');
         if (!dropdown) return;
         
@@ -567,9 +557,9 @@ export const FormModule = (function() {
         dropdown.appendChild(addItem);
         
         showDropdown('beerNameDropdown');
-    }
+    };
     
-    function selectBeer(beerData) {
+    const selectBeer = (beerData) => {
         const beer = JSON.parse(beerData);
         
         // Fill fields
@@ -588,7 +578,7 @@ export const FormModule = (function() {
         focusNextEmptyField(['reportFormat', 'reportPhoto']);
         
         modules.tracking?.trackEvent('beer_selected', 'Form', beer.name);
-    }
+    };
     
     // ================================
     // BEER STYLE AUTOCOMPLETE
@@ -607,7 +597,7 @@ export const FormModule = (function() {
         displayStyleDropdown(dropdown, filtered);
     }, config.debounceDelay);
     
-    function displayStyleDropdown(dropdown, styles) {
+    const displayStyleDropdown = (dropdown, styles) => {
         if (styles.length === 0) {
             hideDropdown('beerStyleDropdown');
             return;
@@ -618,13 +608,13 @@ export const FormModule = (function() {
         ).join('');
         
         showDropdown('beerStyleDropdown');
-    }
+    };
     
-    function selectStyle(style) {
+    const selectStyle = (style) => {
         document.getElementById('reportBeerStyle').value = style;
         hideDropdown('beerStyleDropdown');
         modules.tracking?.trackEvent('style_selected', 'Form', style);
-    }
+    };
     
     // ================================
     // GF STATUS FLOW
@@ -773,38 +763,38 @@ export const FormModule = (function() {
     // ================================
     // DROPDOWN HELPERS
     // ================================
-    function showDropdown(dropdownId) {
+    const showDropdown = (dropdownId) => {
         const dropdown = document.getElementById(dropdownId);
         if (dropdown) {
             dropdown.style.display = 'block';
             state.dropdownsOpen.add(dropdownId);
         }
-    }
+    };
     
-    function hideDropdown(dropdownId) {
+    const hideDropdown = (dropdownId) => {
         const dropdown = document.getElementById(dropdownId);
         if (dropdown) {
             dropdown.style.display = 'none';
             state.dropdownsOpen.delete(dropdownId);
         }
-    }
+    };
     
-    function hideAllDropdowns() {
+    const hideAllDropdowns = () => {
         ['breweryDropdown', 'beerNameDropdown', 'beerStyleDropdown', 'pubSuggestions']
             .forEach(id => hideDropdown(id));
-    }
+    };
     
     // ================================
     // UI HELPERS
     // ================================
-    function createDropdownHeader(text) {
+    const createDropdownHeader = (text) => {
         const header = document.createElement('div');
         header.className = 'dropdown-header';
         header.innerHTML = text;
         return header;
-    }
+    };
     
-    function createSuggestionItem(text, action, data = {}) {
+    const createSuggestionItem = (text, action, data = {}) => {
         const item = document.createElement('div');
         item.className = 'suggestion-item';
         item.innerHTML = `<strong>${utils.escapeHtml(text)}</strong>`;
@@ -813,9 +803,9 @@ export const FormModule = (function() {
             item.dataset[key] = value;
         });
         return item;
-    }
+    };
     
-    function createAddNewItem(title, subtitle, action) {
+    const createAddNewItem = (title, subtitle, action) => {
         const item = document.createElement('div');
         item.className = 'suggestion-item add-new-item';
         item.innerHTML = `
@@ -824,9 +814,9 @@ export const FormModule = (function() {
         `;
         item.dataset.action = action;
         return item;
-    }
+    };
     
-    function addAutoFillAnimation(fieldIds) {
+    const addAutoFillAnimation = (fieldIds) => {
         fieldIds.forEach(id => {
             const element = document.getElementById(id);
             if (element) {
@@ -834,9 +824,9 @@ export const FormModule = (function() {
                 setTimeout(() => element.classList.remove('auto-filled'), 2000);
             }
         });
-    }
+    };
     
-    function focusNextEmptyField(fieldIds) {
+    const focusNextEmptyField = (fieldIds) => {
         for (const id of fieldIds) {
             const field = document.getElementById(id);
             if (field && !field.value) {
@@ -844,20 +834,20 @@ export const FormModule = (function() {
                 break;
             }
         }
-    }
+    };
     
     // ================================
     // EVENT DELEGATION
     // ================================
-    function setupEventDelegation() {
+    const setupEventDelegation = () => {
         // Main click handler for all form actions
         document.addEventListener('click', handleFormAction);
         
         // Hide dropdowns when clicking outside
         document.addEventListener('click', handleOutsideClick, true);
-    }
+    };
     
-    function handleFormAction(e) {
+    const handleFormAction = (e) => {
         const action = e.target.closest('[data-action]');
         if (!action) return;
         
@@ -905,9 +895,9 @@ export const FormModule = (function() {
         if (handler) {
             handler();
         }
-    }
+    };
     
-    function handleOutsideClick(e) {
+    const handleOutsideClick = (e) => {
         // Check each dropdown
         const dropdownChecks = [
             { input: 'reportBrewery', dropdown: 'breweryDropdown', container: '.brewery-dropdown-container' },
@@ -925,12 +915,12 @@ export const FormModule = (function() {
                 hideDropdown(dropdown);
             }
         });
-    }
+    };
     
     // ================================
     // INPUT LISTENERS
     // ================================
-    function setupInputListeners() {
+    const setupInputListeners = () => {
         // Pub search
         const pubSearchInput = document.getElementById('reportPubSearch');
         if (pubSearchInput) {
@@ -972,12 +962,12 @@ export const FormModule = (function() {
         if (beerStyleInput) {
             beerStyleInput.addEventListener('input', (e) => searchBeerStyles(e.target.value));
         }
-    }
+    };
     
     // ================================
     // PHOTO UPLOAD
     // ================================
-    function initializePhotoUpload() {
+    const initializePhotoUpload = () => {
         const photoInput = document.getElementById('reportPhoto');
         const photoLabel = document.querySelector('.photo-upload-compact');
         
@@ -1002,12 +992,12 @@ export const FormModule = (function() {
                 modules.tracking?.trackEvent('photo_selected', 'Form', 'photo_upload');
             }
         });
-    }
+    };
     
     // ================================
     // INITIALIZATION
     // ================================
-    function init() {
+    const init = () => {
         console.log('🔧 Initializing Form Module');
         
         setupEventDelegation();
@@ -1021,13 +1011,13 @@ export const FormModule = (function() {
         }
         
         console.log('✅ Form Module initialized');
-    }
+    };
     
-    function initReportDropdowns() {
+    const initReportDropdowns = () => {
         console.log('🔧 Initializing report form dropdowns');
         hideAllDropdowns();
         initializePhotoUpload();
-    }
+    };
     
     // ================================
     // PUBLIC API
