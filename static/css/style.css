@@ -9,12 +9,12 @@
    --z-sticky: 200;
    --z-navigation: 800;
    --z-toast: 900;
-   --z-results-overlay: 1000;      /* Results overlay */
-   --z-pub-details: 1100;           /* Pub details overlay */
-   --z-modal-backdrop: 1200;        /* Regular modals */
-   --z-modal-content: 1210;         /* Modal content */
-   --z-status-modals: 1300;         /* Status modals (above pub details) */
-   --z-cookie: 1400;                /* Cookie banner */
+   --z-results-overlay: 1000;
+   --z-pub-details: 1100;           
+   --z-modal-backdrop: 1200;        
+   --z-modal-content: 1210;        
+   --z-status-modals: 1300;         
+   --z-cookie: 1400;               
    
    /* Classic colours */
    --white: rgba(255, 255, 255, 1);
@@ -512,7 +512,7 @@ html {
    height: 100%;
 }
 
-.search-section .container {
+.search-container {
    width:100%;
    max-width: 100%;
    height:100%;
@@ -820,6 +820,7 @@ html {
    margin: var(--space-xl) 0;
    transition: border-color 0.25s ease;
    overflow: hidden;
+   padding: var(--
 }
 
 .search-modal .form-input:focus {
