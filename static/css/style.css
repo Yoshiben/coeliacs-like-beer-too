@@ -2022,8 +2022,6 @@ html {
     animation: slideInUp 0.3s ease-out;
 }
 
-/* Rest of the styles stay the same but remove .location-permission-overlay */
-
 .permission-icon {
     font-size: 4rem;
     margin-bottom: var(--space-xl);
@@ -2064,32 +2062,33 @@ html {
 }
 
 .benefit-icon {
-    font-size: 1.5rem;
-    flex-shrink: 0;
+   font-size: 1.5rem;
+   flex-shrink: 0;
 }
 
 .benefit-item span:last-child {
-    color: var(--text-primary);
-    font-weight: 500;
+   color: var(--text-primary);
+   font-weight: 500;
 }
 
 .permission-actions {
-    display: flex;
-    gap: var(--space-md);
-    margin-bottom: var(--space-xl);
+   display: flex;
+   gap: var(--space-md);
+   margin-bottom: var(--space-xl);
+   overflow:hidden;
 }
 
 .permission-actions .btn {
-    flex: 1;
-    min-height: 48px;
-    font-size: 1rem;
-    font-weight: 600;
+   flex: 1;
+   min-height: 48px;
+   font-size: 1rem;
+   font-weight: 600;
 }
 
 .permission-note {
-    font-size: 0.9rem;
-    color: var(--text-muted);
-    margin: 0;
+   font-size: 0.9rem;
+   color: var(--text-muted);
+   margin: 0;
 }
 
 /* ================================
@@ -2166,10 +2165,8 @@ html {
 
 
 
-/* ================================
-   POPUP STYLES - USING CONSOLIDATED COLORS
-   ================================ */
-.leaflet-popup-content-wrapper {
+
+/* .leaflet-popup-content-wrapper {
     background: var(--bg-white);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
@@ -2216,7 +2213,6 @@ html {
     border-radius: var(--radius-sm);
 }
 
-/* USING CONSOLIDATED STATUS COLORS */
 .popup-gf-status.always-gf {
     color: var(--always-gf-fill);
     background: var(--status-always-bg);
@@ -2261,9 +2257,6 @@ html {
 
 
 
-/* ================================
-   REPORT MODAL - CONSOLIDATED
-   ================================ */
 #reportModal .modal-content {
     background: rgba(255, 255, 255, 0.98);
     border: 1px solid var(--divider-color);
@@ -2295,7 +2288,7 @@ html {
 
 #reportModal .form-input,
 #reportModal .form-select {
-    font-size: 16px; /* Prevents zoom on iOS */
+    font-size: 16px; 
     min-height: 44px;
     padding: var(--space-md) var(--space-lg);
     border: 2px solid var(--border-light);
@@ -2377,20 +2370,6 @@ html {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-/* ================================
-   PLACES SEARCH - CONSOLIDATED
-   ================================ */
 .no-results-actions {
     margin-top: var(--space-2xl);
     display: flex;
@@ -2458,11 +2437,6 @@ html {
     margin-bottom: var(--space-xs);
 }
 
-
-
-/* ================================
-   ANIMATIONS
-   ================================ */
 @keyframes spin {
     to { transform: rotate(360deg); }
 }
@@ -2518,10 +2492,6 @@ html {
     }
 }
 
-/* .pulsing-marker {
-    animation: pulse 2s infinite;
-} */
-
 .always-gf-marker {
     filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.6));
     animation: goldPulse 3s ease-in-out infinite;
@@ -2531,9 +2501,6 @@ html {
     animation: markerPulse var(--marker-pulse-duration) ease-in-out var(--marker-pulse-count);
 }
 
-/* ================================
-   UTILITY CLASSES
-   ================================ */
 .sr-only {
     position: absolute;
     width: 1px;
@@ -2554,9 +2521,7 @@ html {
 .items-center { align-items: center; }
 .justify-center { justify-content: center; }
 
-/* ================================
-   FOCUS MANAGEMENT
-   ================================ */
+
 *:focus {
     outline: none;
 }
@@ -2566,9 +2531,6 @@ html {
     outline-offset: 2px;
 }
 
-/* ================================
-   CUSTOM SCROLLBAR
-   ================================ */
 .suggestions::-webkit-scrollbar,
 .modal::-webkit-scrollbar {
     width: 8px;
@@ -2594,16 +2556,10 @@ html {
     background-clip: content-box;
 }
 
-/* ================================
-   RESET & BASE STYLES
-   ================================ */
 *, *::before, *::after {
     box-sizing: border-box;
 }
 
-/* ================================
-   TYPOGRAPHY SYSTEM
-   ================================ */
 h1, h2, h3, h4, h5, h6 {
     margin: 0 0 var(--space-lg) 0;
     line-height: 1.2;
@@ -2621,9 +2577,6 @@ p {
     margin: 0 0 var(--space-lg) 0;
 }
 
-/* ================================
-   BUTTON SYSTEM
-   ================================ */
 .btn {
     display: inline-flex;
     align-items: center;
@@ -2708,12 +2661,6 @@ p {
     box-shadow: var(--shadow-lg);
 }
 
-/* ================================
-   LAYOUT SYSTEM
-   ================================ */
-
-}
-
 .card {
     background: var(--bg-white);
     border-radius: var(--radius-xl);
@@ -2726,10 +2673,6 @@ p {
     padding: var(--space-xl);
 }
 
-
-/* ================================
-   FORM CONTROLS
-   ================================ */
 .form-select,
 .form-input {
     width: 100%;
@@ -2769,12 +2712,6 @@ p {
     margin: 0;
 }
 
-
-
-/* ================================
-   RESULTS MAP
-   ================================ */
-
 .results-map-container {
    flex: 1;
    position: relative;
@@ -2796,8 +2733,8 @@ p {
    min-height: 400px;
    border: none;
    border-radius: 0 0 var(--radius-xl) var(--radius-xl);
-   position: relative; /* ADD: Ensure proper positioning */
-   z-index: 1; /* ADD: Ensure it's above background */
+   position: relative; 
+   z-index: 1;
 }
 
 .results-map-container .leaflet-container {
@@ -2810,10 +2747,6 @@ p {
    display: none !important;
 }
 
-
-/* ================================
-   AUTOCOMPLETE SUGGESTIONS
-   ================================ */
 .suggestions {
     position: absolute;
     top: 100%;
@@ -2849,9 +2782,6 @@ p {
     border-radius: 0 0 var(--radius-lg) var(--radius-lg);
 }
 
-/* ================================
-   TOAST NOTIFICATIONS
-   ================================ */
 .toast {
     position: fixed;
     bottom: var(--space-xl);
@@ -2895,9 +2825,6 @@ p {
     animation: spin 1s ease-in-out infinite;
 }
 
-/* ================================
-   LOCATION COMPONENTS
-   ================================ */
 .location-status {
     text-align: center;
     margin: var(--space-xl) auto;
@@ -3027,9 +2954,6 @@ p {
     font-size: var(--text-sm);
 }
 
-/* ================================
-   COOKIE CONSENT
-   ================================ */
 .cookie-consent {
     position: fixed;
     bottom: 0;
@@ -3147,9 +3071,6 @@ p {
     box-shadow: var(--shadow-lg);
 }
 
-/* ================================
-   FOOTER
-   ================================ */
 .footer {
     background: var(--primary-gradient);
     color: var(--text-white);
@@ -3251,6 +3172,33 @@ p {
     border-radius: var(--radius);
     backdrop-filter: blur(5px);
 }
+ */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* ================================
    MOBILE TOUCH FEEDBACK
