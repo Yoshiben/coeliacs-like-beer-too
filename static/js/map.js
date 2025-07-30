@@ -416,9 +416,6 @@ export const MapModule = (function() {
             }
         }).addTo(targetMap);
         
-        // REPLACE WITH THIS:
-        const fullUKMap = window.App.getState('mapData.fullUKMapInstance');
-        
         // Create and store GF pubs layer
         const gfPubsLayer = L.layerGroup().addTo(fullUKMap);
         window.App.setState('mapData.gfPubsLayer', gfPubsLayer);
