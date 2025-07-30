@@ -83,9 +83,12 @@ export const SearchModule = (function() {
             showResultsLoading('📍 Getting precise location...');
             
             // Get user location
-            if (!window.App.state.userLocation) {
+            if (!window.App.getState('userLocation')) {
                 try {
-                    window.App.state.userLocation = await requestLocationWithUI();
+                    const location = await requestLocationWithUI();
+                    window.App.setState('userLocation', location);
+                    window.App.setState('locationTimestamp', Date.now());
+                    window.App.setState('locationAccuracy', location.accuracy);
                     
                     // Show accuracy feedback
                     if (window.App.state.userLocation.accuracy) {
@@ -601,7 +604,7 @@ export const SearchModule = (function() {
                 const pub = pubs[0];
                 
                 // Store pub data globally
-                window.currentPubData = pub;
+                window.App.setState('currentPub', pub);
                 console.log('💾 Stored pub data globally:', pub.name);
                 
                 // Reset split-view state
@@ -687,7 +690,7 @@ export const SearchModule = (function() {
     const displayPubDetailsFallback = (pub) => {
         console.log('🔧 Using fallback pub details display');
         
-        window.currentPubData = pub;
+        window.App.setState('currentPub', pub);
         resetPubDetailsView();
 
         // Also set the nav title
@@ -1168,12 +1171,12 @@ export const SearchModule = (function() {
     };
     
     const tryGetUserLocation = async () => {
-        if (window.App.state.userLocation) {
-            if (window.App.state.userLocation.timestamp && 
-                Date.now() - window.App.state.userLocation.timestamp < 300000) {
-                console.log('📍 Using cached location');
-                return window.App.state.userLocation;
-            }
+        const cachedLocation = window.App.getState('userLocation');
+        const locationTimestamp = window.App.getState('locationTimestamp');
+        if (cachedLocation && locationTimestamp && 
+            Date.now() - locationTimestamp < 300000) {
+            console.log('📍 Using cached location');
+            return cachedLocation;
         }
         
         try {
@@ -1954,7 +1957,7 @@ export const SearchModule = (function() {
         
         async handleStatusToggle(button) {
             const newStatus = button.dataset.status;
-            const pubId = window.currentPubData?.pub_id;
+            const pubId = window.App.getState('currentPub')?.pub_id;
             
             if (!pubId) {
                 console.error('No pub selected');
