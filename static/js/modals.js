@@ -275,19 +275,19 @@ export const ModalModule = (function() {
             modalTitle.innerHTML = `📸 Report GF Beer Find<br><small style="color: var(--text-secondary); font-weight: 400;">at ${pubData.name}</small>`;
             
             // Store pub data globally for form submission
-            window.selectedPubData = {
+            window.App.setState('selectedPubForReport', {
                 pub_id: pubData.pub_id || pubData.id,
                 name: pubData.name,
                 address: pubData.address,
                 postcode: pubData.postcode
-            };
+            });
         } else {
             // Normal flow
             if (pubSearchGroup) {
                 pubSearchGroup.style.display = 'block';
             }
             modalTitle.innerHTML = '📸 Report GF Beer Find';
-            window.selectedPubData = null;
+            window.App.setState('selectedPubForReport', null);
         }
     
         // Reset form
@@ -329,7 +329,7 @@ export const ModalModule = (function() {
         }
         
         // Reset selected pub
-        window.selectedPubData = null;
+        window.App.setState('selectedPubForReport', null);
         document.getElementById('selectedPubInfo').style.display = 'none';
         document.getElementById('newPubFields').style.display = 'none';
         
