@@ -1043,7 +1043,7 @@ html {
    padding: var(--space-sm);
    background: rgba(255, 255, 255, 0.1);
    border-radius: var(--radius-lg);
-   margin: var(--space-sm);
+   margin-bottom: var(--space-sm);
 }
 
 .results-title {
@@ -1742,28 +1742,14 @@ html {
    flex-direction: column;
 }
 
-/* Style the navigation bar container */
-/* .map-overlay-nav {
-   top: 0;
-   left: 0;
-   right: 0;
-   display: flex;
-   justify-content: space-between;
-   align-items: stretch;
-   padding: var(--space-md) var(--space-xs);
-   background: transparent;
-   z-index: 10;
-   flex-shrink: 0;
-} */
-
 .map-overlay-nav {
    display: flex;
    justify-content: space-between;
    align-items: center;
-   padding: var(--space-xs) var(--space-sm);
-   background: var(--bg-glass);
+   padding: var(--space-sm);
+   background: rgba(255, 255, 255, 0.1);
    border-radius: var(--radius-lg);
-   margin: var(--space-sm);
+   margin-bottom: var(--space-sm);
 }
 
 .map-overlay-content {
