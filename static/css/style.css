@@ -169,7 +169,9 @@
     display: none; /* Hidden by default */
 }
 
-/* Generic Buttons */
+/* ================================
+   BUTTONS
+   ================================ */
 
 .btn-primary {
     background: var(--primary-gradient);
@@ -182,6 +184,24 @@
     color: var(--text-secondary);
     box-shadow: var(--shadow-sm);
     backdrop-filter: blur(10px);
+}
+
+.btn-nav-small {
+   background: var(--bg-white);
+   color: var(--text-primary);
+   border: none;
+   padding: var(--space-sm) var(--space-lg);
+   border-radius: var(--radius-pill);
+   font-weight: 600;
+   box-shadow: var(--shadow-sm);
+}
+
+.btn-nav-small:hover {
+   background: var(--primary-gradient);
+   color: var(--text-white);
+   border-color: transparent;
+   transform: translateY(-2px);
+   box-shadow: var(--shadow-primary);
 }
 
 /* Holistic CSS */
@@ -1339,7 +1359,7 @@ html {
 
 
 /* UPDATE: Make buttons match results style */
-.pub-details-nav .btn-nav-small {
+/* .pub-details-nav .btn-nav-small {
     background: rgba(255, 255, 255, 0.9);
     color: var(--text-primary);
     border: none;
@@ -1347,32 +1367,15 @@ html {
     border-radius: var(--radius-pill);
     font-weight: 600;
     box-shadow: var(--shadow-sm);
-    transition: all var(--transition);
+    transition: all var(--transition); */
 }
 
-.pub-details-nav .btn-nav-small:hover {
+/* .pub-details-nav .btn-nav-small:hover {
     background: white;
     transform: translateY(-2px);
     box-shadow: var(--shadow);
-}
+} */
 
-.btn-nav-small {
-   background: var(--bg-white);
-   color: var(--text-primary);
-   border: none;
-   padding: var(--space-sm) var(--space-lg);
-   border-radius: var(--radius-pill);
-   font-weight: 600;
-   box-shadow: var(--shadow-sm);
-}
-
-.btn-nav-small:hover {
-   background: var(--primary-gradient);
-   color: var(--text-white);
-   border-color: transparent;
-   transform: translateY(-2px);
-   box-shadow: var(--shadow-primary);
-}
 
 /* UPDATE: Header styling - remove nav buttons from here */
 .pub-header {
