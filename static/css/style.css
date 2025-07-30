@@ -1018,11 +1018,10 @@ html {
    display: flex;
    justify-content: space-between;
    align-items: center;
-   padding: var(--space-md);
+   padding: var(--space-sm);
    background: rgba(255, 255, 255, 0.1);
    border-radius: var(--radius-lg);
-   margin-bottom: var(--space-sm);
-   backdrop-filter: blur(10px);
+   margin: var(--space-sm);
 }
 
 .results-title {
@@ -1351,7 +1350,7 @@ html {
     justify-content: space-between;
     align-items: center;
     padding: var(--space-md);
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--bg-glass);
     border-radius: var(--radius-lg);
     margin-bottom: var(--space-sm);
     backdrop-filter: blur(10px);
@@ -1739,13 +1738,10 @@ html {
    display: flex;
    justify-content: space-between;
    align-items: center;
-   padding: var(--space-md);
-   background: rgba(255, 255, 255, 0.1);
+   padding: var(--space-xs) var(--space-sm);
+   background: var(--bg-glass);
    border-radius: var(--radius-lg);
-   margin-bottom: var(--space-sm);
-   backdrop-filter: blur(10px);
-   z-index: 10;
-   flex-shrink: 0;
+   margin: var(--space-sm);
 }
 
 .map-overlay-content {
@@ -1808,9 +1804,9 @@ html {
    MAP TOGGLE SWITCH - PROPER TOGGLE
    ================================ */
 
-.map-toggle-switch {
+/* .map-toggle-switch {
    flex: 0 0 auto;
-}
+} */
 
 .toggle-container {
    background: rgba(255, 255, 255, 0.2);
