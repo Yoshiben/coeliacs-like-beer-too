@@ -1214,7 +1214,6 @@ export const MapModule = (function() {
         console.log(`🍺 Updating map: ${showGFOnly ? 'GF Pubs Only' : 'All Pubs'}`);
         
         // Clear existing layers
-        const fullUKMap = window.App.getState('mapData.fullUKMapInstance');
         const gfPubsLayer = window.App.getState('mapData.gfPubsLayer');
         if (fullUKMap && gfPubsLayer) {
             fullUKMap.removeLayer(gfPubsLayer);
