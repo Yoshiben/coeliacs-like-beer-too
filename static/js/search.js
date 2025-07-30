@@ -631,6 +631,9 @@ export const SearchModule = (function() {
     // ================================
     // LOCATION UTILITIES
     // ================================
+    // UPDATE the requestLocationWithUI function in search.js
+    // Replace the existing function with this updated version:
+    
     const requestLocationWithUI = () => {
         if (state.locationRequestInProgress) {
             console.log('📍 Location request already in progress');
@@ -655,9 +658,9 @@ export const SearchModule = (function() {
                             reject(error);
                         });
                     } else if (result.state === 'denied') {
-                        // Permission was denied, show instructions
+                        // Permission was denied, show blocked modal
                         state.locationRequestInProgress = false;
-                        utils.showToast('📍 Location access blocked. Please enable it in browser settings.', 'error');
+                        showLocationBlockedModal();
                         reject(new Error('Location permission denied in browser settings'));
                     } else {
                         // Permission is prompt, show our UI
@@ -690,6 +693,57 @@ export const SearchModule = (function() {
                 });
             }
         });
+    };
+    
+    // ADD this new function after the showLocationPermissionUI function:
+    
+    // UPDATE the showLocationBlockedModal function in search.js:
+
+    const showLocationBlockedModal = () => {
+        const modal = document.getElementById('locationBlockedModal');
+        if (!modal) {
+            console.error('Location blocked modal not found');
+            utils.showToast('📍 Location blocked. Enable in browser settings and refresh.', 'error');
+            return;
+        }
+        
+        // Detect browser and show relevant instructions
+        const userAgent = navigator.userAgent.toLowerCase();
+        let browser = 'generic';
+        
+        if (userAgent.includes('chrome') && !userAgent.includes('edge')) {
+            browser = 'chrome';
+        } else if (userAgent.includes('firefox')) {
+            browser = 'firefox';
+        } else if (userAgent.includes('safari') && !userAgent.includes('chrome')) {
+            browser = 'safari';
+        } else if (userAgent.includes('edge')) {
+            browser = 'edge';
+        }
+        
+        // Hide all instructions first
+        const allInstructions = modal.querySelectorAll('.instruction-set');
+        allInstructions.forEach(inst => inst.classList.remove('active'));
+        
+        // Show the relevant one
+        const relevantInstruction = modal.querySelector(`[data-browser="${browser}"]`);
+        if (relevantInstruction) {
+            relevantInstruction.style.display = 'block';
+        } else {
+            // Fallback to generic
+            modal.querySelector('[data-browser="generic"]').style.display = 'block';
+        }
+        
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        
+        // Close on background click
+        modal.onclick = (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        };
     };
     
     const getUserLocation = () => {
