@@ -1752,6 +1752,10 @@ html {
    margin-bottom: var(--space-sm);
 }
 
+.map-nav button {
+   pointer-events: auto; /* But buttons are clickable */
+}
+
 .map-overlay-content {
 /*    position: absolute; */
    top: 0;
@@ -1770,9 +1774,7 @@ html {
    flex-shrink: 0;
 }
 
-.map-overlay-nav button {
-   pointer-events: auto; /* But buttons are clickable */
-}
+
 
 
 
@@ -1830,8 +1832,11 @@ html {
    box-shadow: var(--shadow-sm);
 }
 
+
+
+
 @media (max-width: 480px) {
-   .map-overlay-nav {
+/*    .map-overlay-nav {
       padding: var(--space-sm);
     }
     
@@ -1839,7 +1844,7 @@ html {
       padding: var(--space-sm) var(--space-xs);
       font-size: var(--text-sm);
     }
-}
+} */
 
 
 
@@ -3597,7 +3602,7 @@ p {
         padding: var(--space-xs);
     }
     
-   .map-overlay-nav {
+/*    .map-overlay-nav {
       padding: var(--space-md);
       gap: var(--space-md);
     }
@@ -3606,7 +3611,7 @@ p {
    .map-overlay-nav .btn-location {
       padding: var(--space-sm) var(--space-md);
       font-size: var(--text-sm);
-    }
+    } */
     
     .map-overlay-title {
         font-size: var(--text-lg);
