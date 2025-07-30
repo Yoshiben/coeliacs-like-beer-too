@@ -1,6 +1,6 @@
 // ================================================================================
 // CONSTANTS.JS - App-wide Constants and Configuration
-// Handles: API endpoints, search types, default values, feature flags
+// Handles: API endpoints, search types, default values, feature flags, STATE KEYS
 // ================================================================================
 
 export const Constants = {
@@ -15,6 +15,9 @@ export const Constants = {
         BREWERIES: '/api/breweries',
         BREWERY_BEERS: '/api/brewery/:brewery/beers',
         SUBMIT_BEER: '/api/submit_beer_update',
+        UPDATE_GF_STATUS: '/api/update-gf-status',
+        ALL_PUBS: '/api/all-pubs',
+        ADD_PUB: '/api/add-pub',
         ADMIN: {
             VALIDATION_STATS: '/api/admin/validation-stats',
             PENDING_REVIEWS: '/api/admin/pending-manual-reviews',
@@ -24,6 +27,54 @@ export const Constants = {
             REJECT: '/api/admin/reject-submission',
             APPROVE_SOFT: '/api/admin/approve-soft-validation'
         }
+    },
+    
+    // ================================
+    // STATE KEYS - Centralized state paths
+    // ================================
+    STATE_KEYS: {
+        // Navigation state
+        CURRENT_VIEW: 'currentView',
+        ACTIVE_OVERLAYS: 'activeOverlays',
+        
+        // Location state
+        USER_LOCATION: 'userLocation',
+        LOCATION_TIMESTAMP: 'locationTimestamp',
+        LOCATION_ACCURACY: 'locationAccuracy',
+        
+        // Search state
+        LAST_SEARCH: {
+            ROOT: 'lastSearch',
+            TYPE: 'lastSearch.type',
+            QUERY: 'lastSearch.query',
+            RADIUS: 'lastSearch.radius',
+            TIMESTAMP: 'lastSearch.timestamp'
+        },
+        SEARCH_RESULTS: 'searchResults',
+        
+        // Current selections
+        CURRENT_PUB: 'currentPub',
+        SELECTED_PUB_FOR_REPORT: 'selectedPubForReport',
+        
+        // Map state
+        MAP_DATA: {
+            ALL_PUBS: 'mapData.allPubs',
+            FULL_UK_MAP: 'mapData.fullUKMapInstance',
+            RESULTS_MAP: 'mapData.resultsMapInstance',
+            PUB_DETAIL_MAP: 'mapData.pubDetailMapInstance',
+            USER_MARKER: 'mapData.userMarker',
+            GF_PUBS_LAYER: 'mapData.gfPubsLayer',
+            CLUSTERED_PUBS_LAYER: 'mapData.clusteredPubsLayer'
+        },
+        
+        // Form state
+        CURRENT_BREWERY: 'currentBrewery',
+        REPORT_FORM_DATA: 'reportFormData',
+        
+        // UI state
+        ACTIVE_MODALS: 'activeModals',
+        TOAST_QUEUE: 'toastQueue',
+        MAP_VIEW_MODE: 'mapViewMode'
     },
     
     // ================================
@@ -144,12 +195,12 @@ export const Constants = {
         GOOGLE_MAPS_SEARCH: 'https://www.google.com/maps/search/?api=1&query=',
         GOOGLE_MAPS_DIRECTIONS: 'https://www.google.com/maps/dir/?api=1&destination=',
         GOOGLE_SEARCH: 'https://www.google.com/search?q=',
-    
-        // 🔧 ENHANCED: Much better location settings for accuracy
+        
+        // Location settings for accuracy
         LOCATION_SETTINGS: {
             // High-accuracy GPS attempt
-            HIGH_ACCURACY_TIMEOUT: 20000,        // 20 seconds for GPS (was 15)
-            HIGH_ACCURACY_MAX_AGE: 30000,        // 30 seconds cache (was 5 minutes!)
+            HIGH_ACCURACY_TIMEOUT: 20000,        // 20 seconds for GPS
+            HIGH_ACCURACY_MAX_AGE: 30000,        // 30 seconds cache
             
             // Network fallback attempt  
             FALLBACK_TIMEOUT: 10000,             // 10 seconds for network positioning
@@ -179,7 +230,8 @@ export const Constants = {
             BEER_REPORT: 'beer_report_submitted',
             LOCATION_SEARCH: 'location_search_start',
             MAP_TOGGLE: 'map_toggle',
-            EXTERNAL_LINK: 'external_navigation'
+            EXTERNAL_LINK: 'external_navigation',
+            GF_STATUS_UPDATE: 'gf_status_update'
         }
     },
     
@@ -211,7 +263,7 @@ export const Constants = {
         ENABLE_PHOTO_UPLOAD: true,
         ENABLE_ADMIN_DASHBOARD: true,
         ENABLE_BEER_AUTOCOMPLETE: true,
-        ENABLE_MAP_CLUSTERING: false, // Future feature
+        ENABLE_MAP_CLUSTERING: true,
         ENABLE_SOCIAL_SHARING: false, // Future feature
         ENABLE_USER_ACCOUNTS: false, // Future feature
         ENABLE_REVIEWS: false // Future feature
@@ -229,7 +281,9 @@ export const Constants = {
         NO_RESULTS: 'No results found.',
         INVALID_POSTCODE: 'Please enter a valid UK postcode.',
         REQUIRED_FIELDS: 'Please fill in all required fields.',
-        SUBMISSION_FAILED: 'Failed to submit report. Please try again.'
+        SUBMISSION_FAILED: 'Failed to submit report. Please try again.',
+        PUB_NOT_FOUND: 'Pub not found.',
+        MAP_LOAD_ERROR: 'Error loading map. Please try again.'
     },
     
     // ================================
@@ -240,12 +294,31 @@ export const Constants = {
         LOCATION_FOUND: '📍 Location found!',
         RESULTS_FOUND: '✅ Found {count} results',
         COPIED_TO_CLIPBOARD: '📋 Copied to clipboard!',
-        PREFERENCES_SAVED: '✅ Preferences saved successfully'
+        PREFERENCES_SAVED: '✅ Preferences saved successfully',
+        STATUS_UPDATED: '✅ Status updated successfully!',
+        PUB_ADDED: '✅ {name} added successfully!'
     }
 };
 
 // Freeze the constants to prevent accidental modification
 Object.freeze(Constants);
+Object.freeze(Constants.API);
+Object.freeze(Constants.STATE_KEYS);
+Object.freeze(Constants.SEARCH);
+Object.freeze(Constants.MAP);
+Object.freeze(Constants.UI);
+Object.freeze(Constants.BEER_FORMATS);
+Object.freeze(Constants.VALIDATION);
+Object.freeze(Constants.EXTERNAL);
+Object.freeze(Constants.ANALYTICS);
+Object.freeze(Constants.DEFAULTS);
+Object.freeze(Constants.FEATURES);
+Object.freeze(Constants.ERRORS);
+Object.freeze(Constants.SUCCESS);
+
+// Deep freeze the nested STATE_KEYS objects
+Object.freeze(Constants.STATE_KEYS.LAST_SEARCH);
+Object.freeze(Constants.STATE_KEYS.MAP_DATA);
 
 // Make it globally available
 window.Constants = Constants;
