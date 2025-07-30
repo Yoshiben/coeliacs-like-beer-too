@@ -674,6 +674,86 @@
                 </p>
             </div>
         </div>
+
+        <!-- ADD this modal after the locationPermissionModal in index.html -->
+
+        <!-- Location Blocked Modal -->
+        <div id="locationBlockedModal" class="modal location-modal">
+            <div class="modal-content location-permission-card">
+                <div class="permission-icon blocked">🚫</div>
+                <h2 class="permission-title">Location Access Blocked</h2>
+                <p class="permission-text">
+                    Your browser is currently blocking location access for this website. 
+                    To find pubs near you, you'll need to update your browser settings.
+                </p>
+                
+                <div class="permission-benefits blocked-instructions">
+                    <h4>How to enable location:</h4>
+                    
+                    <div class="browser-instructions" id="browserInstructions">
+                        <!-- Chrome -->
+                        <div class="instruction-set" data-browser="chrome">
+                            <strong>Chrome:</strong>
+                            <ol>
+                                <li>Click the lock icon 🔒 in the address bar</li>
+                                <li>Find "Location" and change it to "Allow"</li>
+                                <li>Refresh the page and try again</li>
+                            </ol>
+                        </div>
+                        
+                        <!-- Firefox -->
+                        <div class="instruction-set" data-browser="firefox">
+                            <strong>Firefox:</strong>
+                            <ol>
+                                <li>Click the lock icon 🔒 in the address bar</li>
+                                <li>Click "Clear permissions and reload"</li>
+                                <li>When prompted, click "Allow location access"</li>
+                            </ol>
+                        </div>
+                        
+                        <!-- Safari -->
+                        <div class="instruction-set" data-browser="safari">
+                            <strong>Safari:</strong>
+                            <ol>
+                                <li>Go to Safari → Preferences → Websites</li>
+                                <li>Click "Location" in the sidebar</li>
+                                <li>Find coeliacslikebeer.co.uk and change to "Allow"</li>
+                            </ol>
+                        </div>
+                        
+                        <!-- Edge -->
+                        <div class="instruction-set" data-browser="edge">
+                            <strong>Edge:</strong>
+                            <ol>
+                                <li>Click the lock icon 🔒 in the address bar</li>
+                                <li>Click "Permissions for this site"</li>
+                                <li>Find "Location" and change to "Allow"</li>
+                            </ol>
+                        </div>
+                        
+                        <!-- Generic -->
+                        <div class="instruction-set" data-browser="generic">
+                            <strong>Most browsers:</strong>
+                            <ol>
+                                <li>Look for a lock icon 🔒 in your address bar</li>
+                                <li>Click it and find location settings</li>
+                                <li>Change location access to "Allow"</li>
+                                <li>Refresh the page and try again</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="permission-actions">
+                    <button class="btn btn-secondary" data-action="close-location-blocked">Search by Area Instead</button>
+                    <button class="btn btn-primary" data-action="reload-page">I've Updated Settings</button>
+                </div>
+                
+                <p class="permission-note">
+                    Don't worry - your location data is never stored or shared
+                </p>
+            </div>
+        </div>
         
         <!-- Toasts -->
         <div id="loadingToast" class="toast toast-loading" style="display: none;">
