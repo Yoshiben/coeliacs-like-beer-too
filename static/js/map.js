@@ -6,6 +6,13 @@
 export const MapModule = (function() {
     'use strict';
     
+    // Private state - NO MORE GLOBALS!
+    let map = null;
+    let resultsMap = null;
+    let pubDetailMap = null;
+    let pubMarkers = [];
+    let mapVisible = false;
+    
     // Configuration
     const config = {
         defaultCenter: [54.5, -3], // UK center
@@ -13,8 +20,6 @@ export const MapModule = (function() {
         maxZoom: 19,
         pubMarkerRadius: 8,
         userMarkerRadius: 8,
-        // markerPulseDuration: 1000, // ms
-        // markerPulseCount: 4,
         tileLayer: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
         attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     };
@@ -56,7 +61,8 @@ export const MapModule = (function() {
         }).addTo(map);
         
         // Add user location if available
-        if (window.App.state.userLocation) {
+        const userLocation = window.App.getState('userLocation');
+        if (userLocation) {
             addUserMarker(userLocation);
         }
         
@@ -74,11 +80,11 @@ export const MapModule = (function() {
             return null;
         }
         
-        // 🔧 FIX: Check if map already exists and clean it up properly
+        // Clean up existing map
         if (resultsMap) {
             console.log('🔄 Map already exists, cleaning up...');
             try {
-                resultsMap.remove(); // Properly destroy the existing map
+                resultsMap.remove();
                 resultsMap = null;
             } catch (error) {
                 console.warn('Warning cleaning up existing map:', error);
@@ -86,15 +92,15 @@ export const MapModule = (function() {
             }
         }
         
-        // 🔧 FIX: Clear the container completely
+        // Clear the container
         mapElement.innerHTML = '';
-        mapElement.classList.remove('split-view'); // Remove split-screen mode
+        mapElement.classList.remove('split-view');
         
-        // 🔧 FIX: Ensure parent containers are NOT in split-screen mode
+        // Ensure parent containers are in full-screen mode
         const resultsMapContainer = document.getElementById('resultsMapContainer');
         if (resultsMapContainer) {
             resultsMapContainer.classList.remove('split-view');
-            resultsMapContainer.style.height = '100%'; // Force full height
+            resultsMapContainer.style.height = '100%';
         }
         
         const resultsOverlay = document.getElementById('resultsOverlay');
@@ -102,10 +108,16 @@ export const MapModule = (function() {
             resultsOverlay.classList.remove('split-view');
         }
         
-        // 🔧 FIX: Small delay to ensure DOM is clean before recreating
+        // Small delay to ensure DOM is clean
         setTimeout(() => {
             try {
-                // Create new map with full-screen configuration
+                const userLocation = window.App.getState('userLocation');
+                const centerPoint = userLocation ? 
+                    [userLocation.lat, userLocation.lng] : 
+                    config.defaultCenter;
+                const zoomLevel = userLocation ? 12 : config.defaultZoom;
+                
+                // Create new map
                 resultsMap = L.map('resultsMap', {
                     zoomControl: true,
                     attributionControl: true,
@@ -114,10 +126,7 @@ export const MapModule = (function() {
                     touchZoom: true,
                     boxZoom: true,
                     keyboard: true
-                }).setView(
-                    window.App.state.userLocation ? [window.App.state.userLocation.lat, window.App.state.userLocation.lng] : config.defaultCenter,
-                    window.App.state.userLocation ? 12 : config.defaultZoom // Closer zoom for results
-                );
+                }).setView(centerPoint, zoomLevel);
                 
                 // Add tile layer
                 L.tileLayer(config.tileLayer, {
@@ -126,9 +135,9 @@ export const MapModule = (function() {
                 }).addTo(resultsMap);
                 
                 // Add user location if available
-                if (window.App.state.userLocation) {
+                if (userLocation) {
                     const styles = getMapStyles();
-                    L.circleMarker([window.App.state.userLocation.lat, window.App.state.userLocation.lng], {
+                    L.circleMarker([userLocation.lat, userLocation.lng], {
                         radius: config.userMarkerRadius,
                         fillColor: styles.userFillColor,
                         color: styles.userStrokeColor,
@@ -138,7 +147,7 @@ export const MapModule = (function() {
                     }).addTo(resultsMap).bindPopup('📍 Your location');
                 }
                 
-                // Add pubs if provided or get from search module
+                // Add pubs
                 let pubs = pubsData;
                 if (!pubs && window.App?.getModule('search')?.getCurrentResults) {
                     pubs = window.App.getModule('search').getCurrentResults();
@@ -147,36 +156,29 @@ export const MapModule = (function() {
                 
                 if (pubs && pubs.length > 0) {
                     const markersAdded = addPubMarkers(pubs, resultsMap);
-                    console.log(`✅ Added ${markersAdded} pub markers to FULL-SCREEN results map`);
+                    console.log(`✅ Added ${markersAdded} pub markers to results map`);
                 } else {
                     console.log('ℹ️ No pubs data available for results map');
                 }
                 
-                // 🔧 FIX: Add legend for full-screen map
+                // Add legend
                 addMapLegend(resultsMap);
                 
-                // 🔧 FIX: Force proper rendering with multiple invalidation calls
+                // Force proper rendering
                 setTimeout(() => {
                     if (resultsMap) {
                         resultsMap.invalidateSize();
-                        console.log('🔄 Results map size invalidated (first)');
+                        console.log('🔄 Results map size invalidated');
                     }
                 }, 100);
                 
-                setTimeout(() => {
-                    if (resultsMap) {
-                        resultsMap.invalidateSize();
-                        console.log('🔄 Results map size invalidated (second)');
-                    }
-                }, 300);
-                
-                console.log('✅ FULL-SCREEN results map initialized successfully');
+                console.log('✅ Results map initialized successfully');
                 
             } catch (error) {
                 console.error('❌ Error creating results map:', error);
                 mapElement.innerHTML = '<div style="padding: 20px; text-align: center;">Error loading map. Please try again.</div>';
             }
-        }, 50); // Small delay to ensure DOM cleanup
+        }, 50);
         
         return resultsMap;
     };
@@ -209,7 +211,7 @@ export const MapModule = (function() {
         mapContainer.innerHTML = '<div id="pubMapLeaflet" style="width: 100%; height: 100%; border-radius: 0 0 var(--radius-xl) var(--radius-xl);"></div>';
         
         try {
-            // Create map
+            // Clean up existing map
             if (pubDetailMap) {
                 pubDetailMap.remove();
                 pubDetailMap = null;
@@ -232,30 +234,24 @@ export const MapModule = (function() {
             // Get styles
             const styles = getMapStyles();
             
+            // Determine GF status
+            const gfStatus = determineGFStatus(pub);
+            const markerStyle = getMarkerStyleForGFStatus(gfStatus);
+            
             // Add pub marker
             const pubMarker = L.circleMarker([parseFloat(pub.latitude), parseFloat(pub.longitude)], {
-                radius: 12,
-                fillColor: styles.pubFillColor || '#4CAF50',
-                color: styles.pubStrokeColor || '#ffffff',
-                weight: 3,
-                opacity: 1,
-                fillOpacity: 0.9
+                ...markerStyle,
+                radius: 12
             }).addTo(pubDetailMap);
             
             // Create popup content
-            const popupContent = createPubPopupContent ? createPubPopupContent(pub) : `
-                <div style="text-align: center;">
-                    <div style="font-weight: 600; margin-bottom: 5px;">${pub.name}</div>
-                    <div style="font-size: 0.9rem; color: #666;">${pub.address || ''}</div>
-                    <div style="font-size: 0.9rem; color: #666;">${pub.postcode || ''}</div>
-                </div>
-            `;
-            
+            const popupContent = createPubPopupContent(pub, gfStatus);
             pubMarker.bindPopup(popupContent).openPopup();
             
             // Add user location if available
-            if (window.App.state.userLocation) {
-                L.circleMarker([window.App.state.userLocation.lat, window.App.state.userLocation.lng], {
+            const userLocation = window.App.getState('userLocation');
+            if (userLocation) {
+                L.circleMarker([userLocation.lat, userLocation.lng], {
                     radius: 8,
                     fillColor: styles.userFillColor || '#667eea',
                     color: styles.userStrokeColor || '#ffffff',
@@ -291,18 +287,15 @@ export const MapModule = (function() {
     
     // Add user location marker
     const addUserMarker = (location) => {
-        const map = window.App.getState('mapData.fullUKMapInstance');
-        if (!map) return;
-        
-        window.App.setState('userLocation', location);
-        window.App.setState('locationTimestamp', Date.now());
+        const fullUKMap = window.App.getState('mapData.fullUKMapInstance');
+        if (!fullUKMap) return;
         
         const styles = getMapStyles();
         
         // Remove existing user marker
         const existingMarker = window.App.getState('mapData.userMarker');
-        if (existingMarker && map) {
-            map.removeLayer(existingMarker);
+        if (existingMarker && fullUKMap) {
+            fullUKMap.removeLayer(existingMarker);
         }
         
         // Add new user marker
@@ -313,7 +306,7 @@ export const MapModule = (function() {
             weight: 2,
             opacity: 1,
             fillOpacity: 0.8
-        }).addTo(map);
+        }).addTo(fullUKMap);
         
         userMarker.bindPopup('📍 You are here!');
         window.App.setState('mapData.userMarker', userMarker);
@@ -378,25 +371,29 @@ export const MapModule = (function() {
         return markersAdded;
     };
 
-    // Add hybrid clustering - GF pubs individual, others clustered
-    const addFilteredPubMarkers = (pubs, mapInstance = null) => {
+    // Add filtered pub markers (hybrid clustering)
+    const addFilteredPubMarkers = (pubs, mapInstance) => {
         const targetMap = mapInstance || map;
         if (!targetMap) return 0;
         
         console.log(`🎯 Adding hybrid markers: GF individual, others clustered...`);
         
         // Clear existing layers
-        if (window.App.getState('mapData.gfPubsLayer')) {
-            targetMap.removeLayer(window.App.getState('mapData.gfPubsLayer'));
-        }
-        if (window.clusteredPubsLayer) {
-            targetMap.removeLayer(window.clusteredPubsLayer);
+        const gfPubsLayer = window.App.getState('mapData.gfPubsLayer');
+        if (gfPubsLayer && targetMap) {
+            targetMap.removeLayer(gfPubsLayer);
         }
         
-        // Create layer groups
-        const fullUKMap = window.App.getState('mapData.fullUKMapInstance');
-        window.App.getState('mapData.gfPubsLayer') = L.layerGroup().addTo(fullUKMap);
-        window.clusteredPubsLayer = L.markerClusterGroup({
+        const clusteredPubsLayer = window.App.getState('mapData.clusteredPubsLayer');
+        if (clusteredPubsLayer && targetMap) {
+            targetMap.removeLayer(clusteredPubsLayer);
+        }
+        
+        // Create new layer groups
+        const newGfPubsLayer = L.layerGroup().addTo(targetMap);
+        window.App.setState('mapData.gfPubsLayer', newGfPubsLayer);
+        
+        const newClusteredPubsLayer = L.markerClusterGroup({
             maxClusterRadius: 40,
             disableClusteringAtZoom: 12,
             spiderfyOnMaxZoom: true,
@@ -415,44 +412,16 @@ export const MapModule = (function() {
                 });
             }
         }).addTo(targetMap);
-        
-        // Create and store GF pubs layer
-        const gfPubsLayer = L.layerGroup().addTo(fullUKMap);
-        window.App.setState('mapData.gfPubsLayer', gfPubsLayer);
-        
-        // Create and store clustered pubs layer
-        const clusteredPubsLayer = L.markerClusterGroup({
-            maxClusterRadius: 40,
-            disableClusteringAtZoom: 12,
-            spiderfyOnMaxZoom: true,
-            showCoverageOnHover: false,
-            iconCreateFunction: function(cluster) {
-                const count = cluster.getChildCount();
-                let size = 'small';
-                
-                if (count > 1000) size = 'large';
-                else if (count > 100) size = 'medium';
-                
-                return L.divIcon({
-                    html: `<div><span>${count}</span></div>`,
-                    className: `marker-cluster marker-cluster-${size}`,
-                    iconSize: L.point(30, 30)
-                });
-            }
-        }).addTo(targetMap);
-        window.App.setState('mapData.clusteredPubsLayer', clusteredPubsLayer);
-
+        window.App.setState('mapData.clusteredPubsLayer', newClusteredPubsLayer);
         
         // Separate pubs by GF status
         let gfPubs = [];
         let otherPubs = [];
-        let counts = { always: 0, currently: 0, unknown: 0, no_gf: 0 };
         
         pubs.forEach(pub => {
             if (!pub.latitude || !pub.longitude) return;
             
             const gfStatus = determineGFStatus(pub);
-            counts[gfStatus]++;
             
             if (gfStatus === 'always' || gfStatus === 'currently') {
                 gfPubs.push(pub);
@@ -463,7 +432,7 @@ export const MapModule = (function() {
         
         console.log(`📊 GF Pubs (individual): ${gfPubs.length}, Others (clustered): ${otherPubs.length}`);
         
-        // Add GF pubs as individual markers (never clustered)
+        // Add GF pubs as individual markers
         gfPubs.forEach(pub => {
             const lat = parseFloat(pub.latitude);
             const lng = parseFloat(pub.longitude);
@@ -475,7 +444,7 @@ export const MapModule = (function() {
             const popupContent = createPubPopupContent(pub, gfStatus);
             marker.bindPopup(popupContent);
             
-            window.App.getState('mapData.gfPubsLayer').addLayer(marker);
+            newGfPubsLayer.addLayer(marker);
         });
         
         // Add other pubs to cluster layer
@@ -486,7 +455,6 @@ export const MapModule = (function() {
             const gfStatus = determineGFStatus(pub);
             const markerStyle = getMarkerStyleForGFStatus(gfStatus);
             
-            // Use regular markers for clustering (not circleMarkers)
             const marker = L.marker([lat, lng], {
                 icon: L.divIcon({
                     className: 'clusterable-marker',
@@ -505,7 +473,7 @@ export const MapModule = (function() {
             const popupContent = createPubPopupContent(pub, gfStatus);
             marker.bindPopup(popupContent);
             
-            window.clusteredPubsLayer.addLayer(marker);
+            newClusteredPubsLayer.addLayer(marker);
         });
         
         return pubs.length;
@@ -522,14 +490,13 @@ export const MapModule = (function() {
         console.log('🧹 Cleared all pub markers');
     };
 
+    // Determine GF status
     const determineGFStatus = (pub) => {
-        // If we have the explicit status field, use it
         if (pub.gf_status) {
             return pub.gf_status;
         }
         
-        // Fallback for older data without the status field
-        // This maintains backwards compatibility
+        // Fallback for older data
         if (pub.bottle || pub.tap || pub.cask || pub.can) {
             return 'currently';
         }
@@ -537,6 +504,7 @@ export const MapModule = (function() {
         return 'unknown';
     };
     
+    // Get marker style for GF status
     const getMarkerStyleForGFStatus = (gfStatus) => {
         const rootStyles = getComputedStyle(document.documentElement);
         
@@ -553,16 +521,16 @@ export const MapModule = (function() {
                     ...baseStyle,
                     fillColor: rootStyles.getPropertyValue('--always-gf-fill').trim(),
                     color: rootStyles.getPropertyValue('--always-gf-border').trim(),
-                    radius: 10, // Slightly larger
-                    weight: 3,  // Thicker border
-                    className: 'always-gf-marker' // For special effects
+                    radius: 10,
+                    weight: 3,
+                    className: 'always-gf-marker'
                 };
                 
             case 'currently':
                 return {
                     ...baseStyle,
-                    fillColor: rootStyles.getPropertyValue('--current-gf-fill').trim(),
-                    color: rootStyles.getPropertyValue('--current-gf-border').trim()
+                    fillColor: rootStyles.getPropertyValue('--currently-gf-fill').trim(),
+                    color: rootStyles.getPropertyValue('--currently-gf-border').trim()
                 };
                 
             case 'not_currently':
@@ -570,7 +538,7 @@ export const MapModule = (function() {
                     ...baseStyle,
                     fillColor: rootStyles.getPropertyValue('--no-gf-fill').trim(),
                     color: rootStyles.getPropertyValue('--no-gf-border').trim(),
-                    fillOpacity: 0.7 // Slightly faded
+                    fillOpacity: 0.7
                 };
                 
             case 'unknown':
@@ -579,92 +547,17 @@ export const MapModule = (function() {
                     ...baseStyle,
                     fillColor: rootStyles.getPropertyValue('--unknown-gf-fill').trim(),
                     color: rootStyles.getPropertyValue('--unknown-gf-border').trim(),
-                    fillOpacity: 0.6 // More faded
+                    fillOpacity: 0.6
                 };
         }
     };
     
+    // Create pub popup content
     const createPubPopupContent = (pub, gfStatus = null) => {
         if (!gfStatus) {
             gfStatus = determineGFStatus(pub);
         }
         
-        // Try to get the popup template first
-        const template = document.getElementById('popup-content-template');
-        if (template) {
-            const clone = template.content.cloneNode(true);
-            
-            // Fill in the template data
-            const nameEl = clone.querySelector('[data-field="name"]');
-            if (nameEl) nameEl.textContent = pub.name;
-            
-            const addressEl = clone.querySelector('[data-field="address"]');
-            if (addressEl) {
-                if (pub.address) {
-                    addressEl.textContent = pub.address;
-                } else {
-                    addressEl.style.display = 'none';
-                }
-            }
-            
-            const postcodeEl = clone.querySelector('[data-field="postcode"]');
-            if (postcodeEl) postcodeEl.textContent = pub.postcode;
-            
-            // Add distance if available
-            const distanceEl = clone.querySelector('[data-field="distance"]');
-            if (distanceEl && pub.distance !== undefined) {
-                distanceEl.textContent = `${pub.distance.toFixed(1)}km away`;
-                distanceEl.style.display = 'block';
-            }
-            
-            // Set enhanced GF status
-            const gfStatusEl = clone.querySelector('[data-field="gf-status"]');
-            if (gfStatusEl) {
-                switch(gfStatus) {
-                    case 'always_gf':
-                        gfStatusEl.innerHTML = '🟢 <strong>Always Has GF Beer!</strong>';
-                        gfStatusEl.className = 'popup-gf-status always-gf';
-                        break;
-                        
-                    case 'current_gf':
-                        let gfOptions = [];
-                        if (pub.bottle) gfOptions.push('🍺');
-                        if (pub.tap) gfOptions.push('🚰');
-                        if (pub.cask) gfOptions.push('🛢️');
-                        if (pub.can) gfOptions.push('🥫');
-                        gfStatusEl.innerHTML = `✅ GF Available: ${gfOptions.join(' ')}`;
-                        gfStatusEl.className = 'popup-gf-status current-gf';
-                        break;
-                        
-                    case 'no_gf_currently':
-                        gfStatusEl.innerHTML = '🔴 No GF Options Currently';
-                        gfStatusEl.className = 'popup-gf-status no-gf';
-                        break;
-                        
-                    default:
-                        gfStatusEl.innerHTML = '⚪ GF Status Unknown';
-                        gfStatusEl.className = 'popup-gf-status unknown';
-                }
-            }
-            
-            // Fix the button
-            const button = clone.querySelector('[data-action="view-details"]');
-            if (button) {
-                button.setAttribute('data-action', 'view-pub');
-                button.setAttribute('data-pub-id', pub.pub_id);
-            }
-            
-            // Return the HTML string for Leaflet
-            const div = document.createElement('div');
-            div.appendChild(clone);
-            return div.innerHTML;
-        }
-        
-        // Fallback to basic content if template not found
-        return createBasicPopupContent(pub, gfStatus);
-    };
-    
-    const createBasicPopupContent = (pub, gfStatus) => {
         let content = `<div class="popup-content">`;
         content += `<div class="popup-title">${escapeHtml(pub.name)}</div>`;
         
@@ -677,7 +570,7 @@ export const MapModule = (function() {
             content += `<div class="popup-distance">${pub.distance.toFixed(1)}km away</div>`;
         }
         
-        // GF status with appropriate class
+        // GF status
         if (gfStatus === 'always' || gfStatus === 'currently') {
             let gfOptions = [];
             if (pub.bottle) gfOptions.push('🍺');
@@ -691,49 +584,44 @@ export const MapModule = (function() {
             content += `<div class="popup-gf-status unknown">❓ GF Status Unknown</div>`;
         }
         
-        // Fixed button with proper action and onclick handler
         content += `<button class="popup-button" data-action="view-pub" data-pub-id="${pub.pub_id}">View Details</button>`;
         content += `</div>`;
         
         return content;
     };
     
+    // Add map legend
     const addMapLegend = (mapInstance) => {
-        // Create legend control
         const legend = L.control({ position: 'bottomright' });
         
         legend.onAdd = function(map) {
             const div = L.DomUtil.create('div', 'legend-container');
             
-            // Get the legend template
-            const template = document.getElementById('map-legend-template');
-            if (template) {
-                const clone = template.content.cloneNode(true);
-                div.appendChild(clone);
-            } else {
-                // Fallback legend
-                div.innerHTML = `
-                    <div class="map-legend">
-                        <div class="legend-title">🍺 GF Beer Status</div>
-                        <div class="legend-item">
-                            <div class="legend-marker gf-available"></div>
-                            <span class="legend-text">GF Available</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-marker no-gf"></div>
-                            <span class="legend-text">No GF Options</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-marker unknown"></div>
-                            <span class="legend-text">Unknown</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-marker user-location"></div>
-                            <span class="legend-text">Your Location</span>
-                        </div>
+            div.innerHTML = `
+                <div class="map-legend">
+                    <div class="legend-title">🍺 GF Beer Status</div>
+                    <div class="legend-item">
+                        <div class="legend-marker always-gf"></div>
+                        <span class="legend-text">Always Has GF Beer</span>
                     </div>
-                `;
-            }
+                    <div class="legend-item">
+                        <div class="legend-marker current-gf"></div>
+                        <span class="legend-text">Currently Has GF Beer</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-marker no-gf"></div>
+                        <span class="legend-text">No GF Currently</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-marker unknown"></div>
+                        <span class="legend-text">Unknown Status</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-marker user-location"></div>
+                        <span class="legend-text">Your Location</span>
+                    </div>
+                </div>
+            `;
             
             return div;
         };
@@ -741,7 +629,7 @@ export const MapModule = (function() {
         legend.addTo(mapInstance);
     };
 
-    // Add zoom hint to map
+    // Add zoom hint
     const addZoomHint = (mapInstance) => {
         const hintControl = L.Control.extend({
             options: {
@@ -757,7 +645,6 @@ export const MapModule = (function() {
                     </div>
                 `;
                 
-                // Update visibility based on zoom
                 const updateHintVisibility = () => {
                     const zoom = map.getZoom();
                     if (zoom < 9) {
@@ -767,10 +654,7 @@ export const MapModule = (function() {
                     }
                 };
                 
-                // Initial check
                 updateHintVisibility();
-                
-                // Update on zoom
                 map.on('zoomend', updateHintVisibility);
                 
                 return container;
@@ -780,227 +664,7 @@ export const MapModule = (function() {
         mapInstance.addControl(new hintControl());
     };
     
-    const initPubDetailsSplitMap = (pub) => {
-        console.log('🗺️ Initializing SPLIT-SCREEN pub details map for:', pub.name);
-        
-        const mapContainer = document.querySelector('.pub-map-placeholder');
-        if (!mapContainer) {
-            console.error('Pub map container not found');
-            return null;
-        }
-        
-        if (!pub.latitude || !pub.longitude) {
-            // Use template for error state
-            const template = document.getElementById('map-error-template');
-            if (template) {
-                const clone = template.content.cloneNode(true);
-                mapContainer.innerHTML = '';
-                mapContainer.appendChild(clone);
-            } else {
-                mapContainer.className = 'map-error-container';
-                mapContainer.innerHTML = `
-                    <div class="map-error-icon">📍</div>
-                    <div class="map-error-title">Location coordinates not available</div>
-                    <div class="map-error-text">Help us by reporting the exact location!</div>
-                `;
-            }
-            return null;
-        }
-        
-        // Create split-screen map container
-        mapContainer.innerHTML = '<div id="pubMapLeaflet" style="width: 100%; height: 100%; border-radius: 0 0 var(--radius-xl) var(--radius-xl);"></div>';
-        
-        // Create map optimized for split-screen view
-        pubDetailMap = L.map('pubMapLeaflet', {
-            zoomControl: true,
-            attributionControl: false,
-            scrollWheelZoom: true,
-            doubleClickZoom: true,
-            touchZoom: true,
-            boxZoom: false,
-            keyboard: false
-        }).setView([pub.latitude, pub.longitude], 16);
-        
-        // Add tile layer
-        L.tileLayer(config.tileLayer, {
-            maxZoom: config.maxZoom,
-            attribution: config.attribution
-        }).addTo(pubDetailMap);
-        
-        // Determine GF status and get appropriate marker style
-        const gfStatus = determineGFStatus(pub);
-        const markerStyle = getMarkerStyleForGFStatus(gfStatus);
-        
-        // Add pub marker with GF status color
-        const pubMarker = L.circleMarker([pub.latitude, pub.longitude], {
-            ...markerStyle,
-            radius: 14
-        }).addTo(pubDetailMap);
-        
-        // Create popup content using template
-        const popupContent = createPubPopupContent(pub, gfStatus);
-        pubMarker.bindPopup(popupContent).openPopup();
-        
-        // Add user location if available
-        if (window.App.state.userLocation) {
-            L.circleMarker([window.App.state.userLocation.lat, window.App.state.userLocation.lng], {
-                radius: 8,
-                fillColor: 'var(--marker-user-fill)',
-                color: 'var(--marker-user-stroke)',
-                weight: 2,
-                opacity: 1,
-                fillOpacity: 0.8
-            }).addTo(pubDetailMap).bindPopup('Your location');
-        }
-        
-        // Ensure proper rendering for split-screen
-        setTimeout(() => {
-            pubDetailMap.invalidateSize();
-        }, 150);
-        
-        console.log('✅ Split-screen pub detail map initialized with GF status colors');
-        return pubDetailMap;
-    };
-    
-    // Helper function for HTML escaping
-    const escapeHtml = (text) => {
-        if (!text) return '';
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    };
-    
-    // Calculate distance between two points
-    const calculateDistance = (lat1, lon1, lat2, lon2) => {
-        const R = 6371; // Earth's radius in kilometers
-        const dLat = (lat2 - lat1) * Math.PI / 180;
-        const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                  Math.sin(dLon/2) * Math.sin(dLon/2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        return R * c;
-    };
-    
-    // Toggle map visibility
-    const toggleMap = () => {
-        mapVisible = !mapVisible;
-        const mapContainer = document.getElementById('mapContainer');
-        const toggleBtn = document.getElementById('toggleMapBtn');
-        
-        if (mapVisible) {
-            mapContainer.style.display = 'block';
-            toggleBtn.innerHTML = '🗺️ Hide Map';
-            
-            // Initialize map if not already done
-            if (!map) {
-                initMainMap();
-            }
-            
-            // Ensure map renders properly
-            setTimeout(() => {
-                if (map) {
-                    map.invalidateSize();
-                }
-            }, 100);
-            
-            // Scroll to map
-            setTimeout(() => {
-                mapContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 150);
-        } else {
-            mapContainer.style.display = 'none';
-            toggleBtn.innerHTML = '🗺️ Show Map';
-        }
-        
-        return mapVisible;
-    };
-    
-    // Show pub from map popup
-    const showPubFromMap = (pubId) => {
-        console.log('🗺️ Showing pub from map:', pubId);
-        // This will be wired up to the main app's showPubDetails function
-        if (window.showPubDetails) {
-            window.showPubDetails(pubId);
-        }
-    };
-    
-    // Set user location
-    const setUserLocation = (location) => {
-        window.App.setState('userLocation', location);
-        window.App.setState('locationTimestamp', Date.now());
-        if (map) {
-            addUserMarker(location);
-        }
-    };
-    
-    // Get user location
-    const getUserLocation = () => window.App.state.userLocation;
-    
-    // Center map on location
-    const centerOnLocation = (location = null) => {
-        const targetLocation = location || window.App.state.userLocation;
-        if (targetLocation && map) {
-            map.setView([targetLocation.lat, targetLocation.lng], 14);
-            console.log('🎯 Map centered on location');
-        }
-    };
-
-    const toggleSearchResultsFullMap = () => {
-        const listContainer = document.getElementById('resultsListContainer');
-        const mapContainer = document.getElementById('resultsMapContainer');
-        const mapBtnText = document.getElementById('resultsMapBtnText');
-        
-        if (mapContainer.style.display === 'none' || !mapContainer.style.display) {
-            // Show map
-            listContainer.style.display = 'none';
-            mapContainer.style.display = 'block';
-            mapBtnText.textContent = 'List';
-            
-            // Initialize the results map
-            setTimeout(() => {
-                initResultsMap();
-            }, 100);
-            
-            TrackingModule.trackEvent('results_map_toggle', 'Map Interaction', 'show');
-        } else {
-            // Show list
-            listContainer.style.display = 'block';
-            mapContainer.style.display = 'none';
-            mapBtnText.textContent = 'Map';
-            
-            TrackingModule.trackEvent('results_map_toggle', 'Map Interaction', 'hide');
-        }
-    };
-
-    const cleanupResultsMap = () => {
-        console.log('🧹 Cleaning up results map instance...');
-        
-        if (resultsMap) {
-            try {
-                resultsMap.remove();
-                resultsMap = null;
-                console.log('✅ Results map cleaned up successfully');
-            } catch (error) {
-                console.warn('Warning cleaning up results map:', error);
-                resultsMap = null;
-            }
-        }
-        
-        // Clear the map container
-        const mapElement = document.getElementById('resultsMap');
-        if (mapElement) {
-            mapElement.innerHTML = '';
-        }
-        
-        // Reset container classes
-        const resultsMapContainer = document.getElementById('resultsMapContainer');
-        if (resultsMapContainer) {
-            resultsMapContainer.classList.remove('split-view');
-        }
-    };
-
-    // Initialize full UK map with all pubs
+    // Initialize full UK map
     const initFullUKMap = async () => {
         console.log('🗺️ Initializing full UK map with all pubs...');
         
@@ -1017,56 +681,30 @@ export const MapModule = (function() {
             window.App.setState('mapData.fullUKMapInstance', null);
         }
         
-        if (!window.App.state.userLocation) {
+        // Try to get user location if not available
+        let userLocation = window.App.getState('userLocation');
+        if (!userLocation) {
             try {
-                console.log('📍 No existing location, showing permission UI...');
+                console.log('📍 No existing location, trying to get it...');
                 
-                // Check if search module is available
                 if (window.SearchModule?.requestLocationWithUI) {
-                    window.App.state.userLocation = await window.SearchModule.requestLocationWithUI();
-                    console.log('✅ Got user location via UI:', window.App.state.userLocation);
-                } else {
-                    // Fallback to basic browser prompt
-                    console.log('📍 Using fallback browser location request...');
-                    await new Promise((resolve, reject) => {
-                        navigator.geolocation.getCurrentPosition(
-                            (position) => {
-                                window.App.state.userLocation = {
-                                    lat: position.coords.latitude,
-                                    lng: position.coords.longitude,
-                                    accuracy: position.coords.accuracy
-                                };
-                                console.log('✅ Got user location:', window.App.state.userLocation);
-                                resolve();
-                            },
-                            (error) => {
-                                console.log('❌ Location error:', error);
-                                reject(error);
-                            },
-                            {
-                                enableHighAccuracy: true,
-                                timeout: 10000,
-                                maximumAge: 30000
-                            }
-                        );
-                    });
+                    userLocation = await window.SearchModule.requestLocationWithUI();
+                    window.App.setState('userLocation', userLocation);
+                    console.log('✅ Got user location via UI:', userLocation);
                 }
             } catch (error) {
                 console.log('📍 Could not get user location:', error);
-                // Continue without location - map will still work
             }
         }
         
-        // Determine initial view - CHANGED: zoom closer when we have location
+        // Determine initial view
         let initialCenter = config.defaultCenter;
         let initialZoom = config.defaultZoom;
         
-        if (window.App.state.userLocation) {
-            initialCenter = [window.App.state.userLocation.lat, window.App.state.userLocation.lng];
-            initialZoom = 12; // CHANGED: Much closer zoom for local view
+        if (userLocation) {
+            initialCenter = [userLocation.lat, userLocation.lng];
+            initialZoom = 12;
             console.log('📍 Centering map on user location with zoom:', initialZoom);
-        } else {
-            console.log('📍 No user location, using UK center');
         }
         
         // Create new map
@@ -1077,6 +715,7 @@ export const MapModule = (function() {
             doubleClickZoom: true,
             touchZoom: true
         }).setView(initialCenter, initialZoom);
+        
         window.App.setState('mapData.fullUKMapInstance', fullUKMap);
         
         // Add tile layer
@@ -1085,34 +724,34 @@ export const MapModule = (function() {
             attribution: config.attribution
         }).addTo(fullUKMap);
         
-        // Add user location marker if available - with emphasis
-        if (window.App.state.userLocation) {
+        // Add user location marker if available
+        if (userLocation) {
             const styles = getMapStyles();
-            const userMarker = L.circleMarker([window.App.state.userLocation.lat, window.App.state.userLocation.lng], {
-                radius: 10, // Larger for emphasis
+            const userMarker = L.circleMarker([userLocation.lat, userLocation.lng], {
+                radius: 10,
                 fillColor: styles.userFillColor || '#667eea',
                 color: styles.userStrokeColor || '#ffffff',
                 weight: 3,
                 opacity: 1,
                 fillOpacity: 0.9,
-                // className: 'pulsing-marker',
-                zIndexOffset: 1000 // Start with high z-index// For animation
+                zIndexOffset: 1000
             }).addTo(fullUKMap);
             
             userMarker.bindPopup('📍 You are here!').openPopup();
             window.App.setState('mapData.userMarker', userMarker);
         }
         
-        addMapLegend(fullUKMap);  // Use the local variable from earlier in the function
-        addZoomHint(fullUKMap);   // Same here
+        addMapLegend(fullUKMap);
+        addZoomHint(fullUKMap);
         
         // Load and display all pubs
         await loadAllPubsOnMap();
         
         // Ensure proper rendering
         setTimeout(() => {
-            if (window.fullUKMap) {
-                window.fullUKMap.invalidateSize();
+            const map = window.App.getState('mapData.fullUKMapInstance');
+            if (map) {
+                map.invalidateSize();
             }
         }, 150);
 
@@ -1122,10 +761,10 @@ export const MapModule = (function() {
         }, 500);
         
         console.log('✅ Full UK map initialized');
-        return window.fullUKMap;
+        return fullUKMap;
     };
     
-    // Load all pubs from the API
+    // Load all pubs from API
     const loadAllPubsOnMap = async () => {
         console.log('📍 Loading UK pubs progressively...');
         
@@ -1140,7 +779,7 @@ export const MapModule = (function() {
                 return;
             }
             
-            // Fetch all pubs in background
+            // Fetch all pubs
             fetch('/api/all-pubs')
                 .then(response => response.json())
                 .then(data => {
@@ -1149,7 +788,9 @@ export const MapModule = (function() {
                     }
                     
                     window.App.setState('mapData.allPubs', data.pubs || []);
-                    console.log(`📊 Loaded ${window.allPubsData.length} pubs in background`);
+                    
+                    const allPubs = window.App.getState('mapData.allPubs');
+                    console.log(`📊 Loaded ${allPubs.length} pubs in background`);
                     
                     // Initialize toggle functionality AFTER data is loaded
                     setTimeout(() => {
@@ -1157,7 +798,7 @@ export const MapModule = (function() {
                     }, 100);
                     
                     // Show toast notification
-                    const gfCount = window.allPubsData.filter(p => 
+                    const gfCount = allPubs.filter(p => 
                         p.gf_status === 'always' || p.gf_status === 'currently'
                     ).length;
                     
@@ -1177,16 +818,15 @@ export const MapModule = (function() {
         }
     };
 
-    // Initialize map toggle functionality
+    // Initialize map toggle
     const initMapToggle = () => {
         const container = document.getElementById('mapToggleContainer');
         if (!container) return;
         
         const options = container.querySelectorAll('.toggle-option');
         const thumb = document.getElementById('toggleThumb');
-        let currentMode = 'gf'; // Start with GF pubs
+        let currentMode = 'gf';
         
-        // Set initial thumb position
         const updateThumb = () => {
             const activeOption = container.querySelector('.toggle-option.active');
             if (activeOption && thumb) {
@@ -1195,32 +835,23 @@ export const MapModule = (function() {
             }
         };
         
-        // Initial position
         setTimeout(updateThumb, 100);
         
-        // Handle clicks
         options.forEach(option => {
             option.addEventListener('click', () => {
                 const value = option.dataset.value;
                 if (value === currentMode) return;
                 
-                // Update active state
                 options.forEach(opt => opt.classList.remove('active'));
                 option.classList.add('active');
                 currentMode = value;
                 
-                // Update thumb position
                 updateThumb();
-                
-                // Update map
                 updateMapDisplay(value === 'gf');
             });
         });
         
-        // Show initial GF pubs
         updateMapDisplay(true);
-        
-        // Set up zoom handler for dynamic updates
         setupZoomHandler(currentMode);
     };
     
@@ -1234,18 +865,18 @@ export const MapModule = (function() {
         
         // Clear existing layers
         const gfPubsLayer = window.App.getState('mapData.gfPubsLayer');
-        if (fullUKMap && gfPubsLayer) {
+        if (gfPubsLayer && fullUKMap) {
             fullUKMap.removeLayer(gfPubsLayer);
         }
+        
         const clusteredPubsLayer = window.App.getState('mapData.clusteredPubsLayer');
         if (clusteredPubsLayer && fullUKMap) {
             fullUKMap.removeLayer(clusteredPubsLayer);
         }
-        }
         
         if (showGFOnly) {
             // Show only GF pubs
-            const gfPubsLayer = L.layerGroup().addTo(targetMap);
+            const gfPubsLayer = L.layerGroup().addTo(fullUKMap);
             window.App.setState('mapData.gfPubsLayer', gfPubsLayer);
             
             const gfPubs = allPubs.filter(pub => 
@@ -1271,30 +902,24 @@ export const MapModule = (function() {
             
         } else {
             // Show all pubs with clustering
-            const allPubs = window.App.getState('mapData.allPubs');
-            const fullUKMap = window.App.getState('mapData.fullUKMapInstance');
-            if (allPubs && fullUKMap) {
-                addFilteredPubMarkers(allPubs, fullUKMap);
-            }
+            addFilteredPubMarkers(allPubs, fullUKMap);
         }
-    }
+    };
     
-    // Keep the zoom handler for performance
+    // Setup zoom handler
     const setupZoomHandler = (mode) => {
-        if (!window.fullUKMap) return;
+        const fullUKMap = window.App.getState('mapData.fullUKMapInstance');
+        if (!fullUKMap) return;
         
-        // Clear existing handlers
-        window.fullUKMap.off('zoomend');
+        fullUKMap.off('zoomend');
         
-        // Add zoom handler for refresh on zoom changes
         let zoomTimeout;
-        window.fullUKMap.on('zoomend', function() {
+        fullUKMap.on('zoomend', function() {
             clearTimeout(zoomTimeout);
             zoomTimeout = setTimeout(() => {
-                const zoom = window.fullUKMap.getZoom();
+                const zoom = fullUKMap.getZoom();
                 console.log(`🔍 Zoom level: ${zoom}, refreshing markers`);
                 
-                // Get current mode from toggle
                 const activeOption = document.querySelector('.toggle-option.active');
                 const currentMode = activeOption?.dataset.value || 'gf';
                 
@@ -1303,22 +928,147 @@ export const MapModule = (function() {
         });
     };
     
-    // Clean up full UK map
+    // Helper functions
+    const escapeHtml = (text) => {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    };
+    
+    const calculateDistance = (lat1, lon1, lat2, lon2) => {
+        const R = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                  Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
+    };
+    
+    // Toggle map visibility
+    const toggleMap = () => {
+        mapVisible = !mapVisible;
+        const mapContainer = document.getElementById('mapContainer');
+        const toggleBtn = document.getElementById('toggleMapBtn');
+        
+        if (mapVisible) {
+            mapContainer.style.display = 'block';
+            toggleBtn.innerHTML = '🗺️ Hide Map';
+            
+            if (!map) {
+                initMainMap();
+            }
+            
+            setTimeout(() => {
+                if (map) {
+                    map.invalidateSize();
+                }
+            }, 100);
+            
+            setTimeout(() => {
+                mapContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 150);
+        } else {
+            mapContainer.style.display = 'none';
+            toggleBtn.innerHTML = '🗺️ Show Map';
+        }
+        
+        return mapVisible;
+    };
+    
+    // Set user location
+    const setUserLocation = (location) => {
+        window.App.setState('userLocation', location);
+        window.App.setState('locationTimestamp', Date.now());
+        if (map) {
+            addUserMarker(location);
+        }
+    };
+    
+    // Get user location
+    const getUserLocation = () => window.App.getState('userLocation');
+    
+    // Center map on location
+    const centerOnLocation = (location = null) => {
+        const targetLocation = location || window.App.getState('userLocation');
+        if (targetLocation && map) {
+            map.setView([targetLocation.lat, targetLocation.lng], 14);
+            console.log('🎯 Map centered on location');
+        }
+    };
+
+    // Toggle search results map
+    const toggleSearchResultsFullMap = () => {
+        const listContainer = document.getElementById('resultsListContainer');
+        const mapContainer = document.getElementById('resultsMapContainer');
+        const mapBtnText = document.getElementById('resultsMapBtnText');
+        
+        if (mapContainer.style.display === 'none' || !mapContainer.style.display) {
+            listContainer.style.display = 'none';
+            mapContainer.style.display = 'block';
+            mapBtnText.textContent = 'List';
+            
+            setTimeout(() => {
+                initResultsMap();
+            }, 100);
+            
+            if (window.TrackingModule) {
+                window.TrackingModule.trackEvent('results_map_toggle', 'Map Interaction', 'show');
+            }
+        } else {
+            listContainer.style.display = 'block';
+            mapContainer.style.display = 'none';
+            mapBtnText.textContent = 'Map';
+            
+            if (window.TrackingModule) {
+                window.TrackingModule.trackEvent('results_map_toggle', 'Map Interaction', 'hide');
+            }
+        }
+    };
+
+    // Cleanup results map
+    const cleanupResultsMap = () => {
+        console.log('🧹 Cleaning up results map instance...');
+        
+        if (resultsMap) {
+            try {
+                resultsMap.remove();
+                resultsMap = null;
+                console.log('✅ Results map cleaned up successfully');
+            } catch (error) {
+                console.warn('Warning cleaning up results map:', error);
+                resultsMap = null;
+            }
+        }
+        
+        const mapElement = document.getElementById('resultsMap');
+        if (mapElement) {
+            mapElement.innerHTML = '';
+        }
+        
+        const resultsMapContainer = document.getElementById('resultsMapContainer');
+        if (resultsMapContainer) {
+            resultsMapContainer.classList.remove('split-view');
+        }
+    };
+    
+    // Cleanup full UK map
     const cleanupFullUKMap = () => {
         console.log('🧹 Cleaning up full UK map...');
         
         const fullUKMap = window.App.getState('mapData.fullUKMapInstance');
-            if (fullUKMap) {
-                try {
-                    fullUKMap.remove();
-                    window.App.setState('mapData.fullUKMapInstance', null);
-                } catch (error) {
-                    console.warn('Warning cleaning up full UK map:', error);
-                    window.App.setState('mapData.fullUKMapInstance', null);
-                }
+        if (fullUKMap) {
+            try {
+                fullUKMap.remove();
+                window.App.setState('mapData.fullUKMapInstance', null);
+            } catch (error) {
+                console.warn('Warning cleaning up full UK map:', error);
+                window.App.setState('mapData.fullUKMapInstance', null);
+            }
         }
     };
-
     
     // Public API
     return {
@@ -1334,7 +1084,6 @@ export const MapModule = (function() {
         initFullUKMap,
         loadAllPubsOnMap,
         cleanupFullUKMap,
-        showPubFromMap,
         toggleSearchResultsFullMap,
         cleanupResultsMap,
         isMapVisible: () => mapVisible,
@@ -1342,5 +1091,5 @@ export const MapModule = (function() {
     };
 })();
 
-// Make it globally available for onclick handlers
+// Make it globally available
 window.MapModule = MapModule;
