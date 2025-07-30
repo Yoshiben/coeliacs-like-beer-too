@@ -91,7 +91,7 @@ export const SearchModule = (function() {
                     window.App.setState('locationAccuracy', location.accuracy);
                     
                     // Show accuracy feedback
-                    if (window.App.state.userLocation.accuracy) {
+                    if (window.App.getState('userLocation.accuracy') {
                         const accuracy = window.App.state.userLocation.accuracy;
                         let message = '📍 Location found - finding nearby GF beer...';
                         
@@ -112,7 +112,7 @@ export const SearchModule = (function() {
                     
                     const mapModule = getMap();
                     if (mapModule?.setUserLocation) {
-                        mapModule.setUserLocation(window.App.state.userLocation);
+                        mapModule.setUserLocation(window.App.getState('userLocation'));
                     }
                     
                 } catch (locationError) {
@@ -2074,6 +2074,3 @@ export const SearchModule = (function() {
         getLastSearchState: () => state.lastSearchState
     };
 })();
-
-// Make it globally available
-window.SearchModule = SearchModule;
