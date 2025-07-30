@@ -302,7 +302,8 @@ export const MapModule = (function() {
     const addUserMarker = (location) => {
         if (!map) return;
         
-        window.App.state.userLocation = location;
+        window.App.setState('userLocation', location);
+        window.App.setState('locationTimestamp', Date.now());
         const styles = getMapStyles();
         
         // Remove existing user marker
@@ -398,7 +399,8 @@ export const MapModule = (function() {
         }
         
         // Create layer groups
-        window.gfPubsLayer = L.layerGroup().addTo(targetMap);
+        const fullUKMap = window.App.getState('mapData.fullUKMapInstance');
+        window.gfPubsLayer = L.layerGroup().addTo(fullUKMap);
         window.clusteredPubsLayer = L.markerClusterGroup({
             maxClusterRadius: 40,  // Smaller radius for tighter clustering
             disableClusteringAtZoom: 12,  // Show individual markers when very close
@@ -906,7 +908,8 @@ export const MapModule = (function() {
     
     // Set user location
     const setUserLocation = (location) => {
-        window.App.state.userLocation = location;
+        window.App.setState('userLocation', location);
+        window.App.setState('locationTimestamp', Date.now());
         if (map) {
             addUserMarker(location);
         }
@@ -989,9 +992,10 @@ export const MapModule = (function() {
         }
         
         // Clean up any existing map
-        if (window.fullUKMap) {
-            window.fullUKMap.remove();
-            window.fullUKMap = null;
+        const existingMap = window.App.getState('mapData.fullUKMapInstance');
+        if (existingMap) {
+            existingMap.remove();
+            window.App.setState('mapData.fullUKMapInstance', null);
         }
         
         if (!window.App.state.userLocation) {
@@ -1047,19 +1051,20 @@ export const MapModule = (function() {
         }
         
         // Create new map
-        window.fullUKMap = L.map('fullMap', {
+        const fullUKMap = L.map('fullMap', {
             zoomControl: true,
             attributionControl: true,
             scrollWheelZoom: true,
             doubleClickZoom: true,
             touchZoom: true
         }).setView(initialCenter, initialZoom);
+        window.App.setState('mapData.fullUKMapInstance', fullUKMap);
         
         // Add tile layer
         L.tileLayer(config.tileLayer, {
             maxZoom: config.maxZoom,
             attribution: config.attribution
-        }).addTo(window.fullUKMap);
+        }).addTo(fullUKMap);
         
         // Add user location marker if available - with emphasis
         if (window.App.state.userLocation) {
@@ -1073,25 +1078,14 @@ export const MapModule = (function() {
                 fillOpacity: 0.9,
                 // className: 'pulsing-marker',
                 zIndexOffset: 1000 // Start with high z-index// For animation
-            }).addTo(window.fullUKMap);
+            }).addTo(fullUKMap);
             
             userMarker.bindPopup('📍 You are here!').openPopup();
-            window.fullUKMapUserMarker = userMarker;
-            // Bring to front after animation completes (2 seconds for 2 pulses)
-            // Remove pulsing class and bring to front after animation
-            // setTimeout(() => {
-            //    if (window.fullUKMapUserMarker && window.fullUKMapUserMarker._path) {
-            //        L.DomUtil.removeClass(window.fullUKMapUserMarker._path, 'pulsing-marker');
-            //        window.fullUKMapUserMarker.bringToFront();
-            //    }
-            // }, config.markerPulseDuration * config.markerPulseCount);
+            window.App.setState('mapData.userMarker', userMarker);
         }
         
-        // Add legend (permanent, no toggle)
-        addMapLegend(window.fullUKMap);
-
-        // Add zoom hint
-        addZoomHint(window.fullUKMap);
+        addMapLegend(fullUKMap);  // Use the local variable from earlier in the function
+        addZoomHint(fullUKMap);   // Same here
         
         // Load and display all pubs
         await loadAllPubsOnMap();
@@ -1118,9 +1112,9 @@ export const MapModule = (function() {
         
         try {
             // Check if we already have the data
-            if (window.allPubsData && window.allPubsData.length > 0) {
+            const cachedPubs = window.App.getState('mapData.allPubs');
+            if (cachedPubs && cachedPubs.length > 0) {
                 console.log('✅ Using cached pub data');
-                // Initialize toggle with cached data
                 setTimeout(() => {
                     initMapToggle();
                 }, 100);
@@ -1135,7 +1129,7 @@ export const MapModule = (function() {
                         throw new Error(data.error || 'Failed to load pubs');
                     }
                     
-                    window.allPubsData = data.pubs || [];
+                    window.App.setState('mapData.allPubs', data.pubs || []);
                     console.log(`📊 Loaded ${window.allPubsData.length} pubs in background`);
                     
                     // Initialize toggle functionality AFTER data is loaded
@@ -1213,13 +1207,17 @@ export const MapModule = (function() {
     
     // Update map display based on mode
     const updateMapDisplay = (showGFOnly) => {
-        if (!window.fullUKMap || !window.allPubsData) return;
+        const fullUKMap = window.App.getState('mapData.fullUKMapInstance');
+        const allPubs = window.App.getState('mapData.allPubs');
+        if (!fullUKMap || !allPubs) return;
         
         console.log(`🍺 Updating map: ${showGFOnly ? 'GF Pubs Only' : 'All Pubs'}`);
         
         // Clear existing layers
-        if (window.gfPubsLayer) {
-            window.fullUKMap.removeLayer(window.gfPubsLayer);
+        const fullUKMap = window.App.getState('mapData.fullUKMapInstance');
+        const gfPubsLayer = window.App.getState('mapData.gfPubsLayer');
+        if (fullUKMap && gfPubsLayer) {
+            fullUKMap.removeLayer(gfPubsLayer);
         }
         if (window.clusteredPubsLayer) {
             window.fullUKMap.removeLayer(window.clusteredPubsLayer);
@@ -1229,7 +1227,7 @@ export const MapModule = (function() {
             // Show only GF pubs
             window.gfPubsLayer = L.layerGroup().addTo(window.fullUKMap);
             
-            const gfPubs = window.allPubsData.filter(pub => 
+            const gfPubs = allPubs.filter(pub => 
                 pub.gf_status === 'always' || pub.gf_status === 'currently'
             );
             
@@ -1284,15 +1282,15 @@ export const MapModule = (function() {
     const cleanupFullUKMap = () => {
         console.log('🧹 Cleaning up full UK map...');
         
-        if (window.fullUKMap) {
-            try {
-                window.fullUKMap.remove();
-                window.fullUKMap = null;
-                console.log('✅ Full UK map cleaned up');
-            } catch (error) {
-                console.warn('Warning cleaning up full UK map:', error);
-                window.fullUKMap = null;
-            }
+        const fullUKMap = window.App.getState('mapData.fullUKMapInstance');
+            if (fullUKMap) {
+                try {
+                    fullUKMap.remove();
+                    window.App.setState('mapData.fullUKMapInstance', null);
+                } catch (error) {
+                    console.warn('Warning cleaning up full UK map:', error);
+                    window.App.setState('mapData.fullUKMapInstance', null);
+                }
         }
     };
 
@@ -1313,7 +1311,7 @@ export const MapModule = (function() {
         cleanupFullUKMap,
         showPubFromMap,
         toggleSearchResultsFullMap,
-        cleanupResultsMap, // 🔧 ADD this line
+        cleanupResultsMap,
         isMapVisible: () => mapVisible,
         calculateDistance
     };
