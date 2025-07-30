@@ -640,9 +640,13 @@ export const SearchModule = (function() {
         state.locationRequestInProgress = true;
         
         return new Promise((resolve, reject) => {
+            // First check if we already have permission
             if (navigator.permissions) {
                 navigator.permissions.query({ name: 'geolocation' }).then(result => {
+                    console.log('📍 Current permission state:', result.state);
+                    
                     if (result.state === 'granted') {
+                        // We already have permission, just get location
                         getUserLocation().then(location => {
                             state.locationRequestInProgress = false;
                             resolve(location);
@@ -650,7 +654,13 @@ export const SearchModule = (function() {
                             state.locationRequestInProgress = false;
                             reject(error);
                         });
+                    } else if (result.state === 'denied') {
+                        // Permission was denied, show instructions
+                        state.locationRequestInProgress = false;
+                        utils.showToast('📍 Location access blocked. Please enable it in browser settings.', 'error');
+                        reject(new Error('Location permission denied in browser settings'));
                     } else {
+                        // Permission is prompt, show our UI
                         showLocationPermissionUI((location) => {
                             state.locationRequestInProgress = false;
                             resolve(location);
@@ -660,6 +670,7 @@ export const SearchModule = (function() {
                         });
                     }
                 }).catch(() => {
+                    // Permissions API not available, show our UI
                     showLocationPermissionUI((location) => {
                         state.locationRequestInProgress = false;
                         resolve(location);
@@ -669,6 +680,7 @@ export const SearchModule = (function() {
                     });
                 });
             } else {
+                // No permissions API, show our UI
                 showLocationPermissionUI((location) => {
                     state.locationRequestInProgress = false;
                     resolve(location);
@@ -863,66 +875,6 @@ export const SearchModule = (function() {
     
     // ALSO REPLACE the requestLocationWithUI function (around line 608)
     
-    const requestLocationWithUI = () => {
-        if (state.locationRequestInProgress) {
-            console.log('📍 Location request already in progress');
-            return Promise.reject(new Error('Location request already in progress'));
-        }
-        
-        state.locationRequestInProgress = true;
-        
-        return new Promise((resolve, reject) => {
-            // First check if we already have permission
-            if (navigator.permissions) {
-                navigator.permissions.query({ name: 'geolocation' }).then(result => {
-                    console.log('📍 Current permission state:', result.state);
-                    
-                    if (result.state === 'granted') {
-                        // We already have permission, just get location
-                        getUserLocation().then(location => {
-                            state.locationRequestInProgress = false;
-                            resolve(location);
-                        }).catch(error => {
-                            state.locationRequestInProgress = false;
-                            reject(error);
-                        });
-                    } else if (result.state === 'denied') {
-                        // Permission was denied, show instructions
-                        state.locationRequestInProgress = false;
-                        utils.showToast('📍 Location access blocked. Please enable it in browser settings.', 'error');
-                        reject(new Error('Location permission denied in browser settings'));
-                    } else {
-                        // Permission is prompt, show our UI
-                        showLocationPermissionUI((location) => {
-                            state.locationRequestInProgress = false;
-                            resolve(location);
-                        }, (error) => {
-                            state.locationRequestInProgress = false;
-                            reject(error);
-                        });
-                    }
-                }).catch(() => {
-                    // Permissions API not available, show our UI
-                    showLocationPermissionUI((location) => {
-                        state.locationRequestInProgress = false;
-                        resolve(location);
-                    }, (error) => {
-                        state.locationRequestInProgress = false;
-                        reject(error);
-                    });
-                });
-            } else {
-                // No permissions API, show our UI
-                showLocationPermissionUI((location) => {
-                    state.locationRequestInProgress = false;
-                    resolve(location);
-                }, (error) => {
-                    state.locationRequestInProgress = false;
-                    reject(error);
-                });
-            }
-        });
-    };
     
     const tryGetUserLocation = async () => {
         const cachedLocation = utils.getUserLocation();
