@@ -1711,6 +1711,85 @@ html {
    padding-bottom: var(--space-2xl);
 }
 
+.report-modal .form-group {
+    margin-bottom: var(--space-lg);
+}
+
+.report-modal .form-input,
+.report-modal .form-select {
+    font-size: 16px; 
+    min-height: 44px;
+    padding: var(--space-md) var(--space-lg);
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    background: var(--bg-white);
+    transition: all var(--transition);
+}
+
+.report-modal .form-input:focus,
+.report-modal .form-select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    background: var(--bg-white);
+}
+
+.report-modal .form-actions {
+    margin-top: var(--space-2xl);
+    padding-top: var(--space-xl);
+    border-top: 2px solid var(--divider-color);
+    background: var(--bg-white);
+    position: sticky;
+    bottom: 0;
+    margin-bottom: 0;
+}
+
+.photo-upload-compact {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    padding: var(--space-lg);
+    border: 2px dashed var(--border-light);
+    border-radius: var(--radius-lg);
+    background: var(--bg-section);
+    cursor: pointer;
+    transition: all var(--transition);
+    min-height: 60px;
+}
+
+.photo-upload-compact:hover {
+    border-color: #667eea;
+    background: var(--hover-subtle);
+    transform: translateY(-1px);
+}
+
+.photo-upload-compact.active {
+    border-color: var(--success-border);
+    background: var(--success-bg);
+}
+
+.photo-upload-icon {
+    font-size: 1.5rem;
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+.photo-upload-text {
+    flex: 1;
+    color: var(--text-secondary);
+}
+
+.photo-upload-text strong {
+    color: var(--text-primary);
+    font-weight: 600;
+    display: block;
+    margin-bottom: var(--space-xs);
+}
+
+.photo-upload-text small {
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+}
+
 
 
 
@@ -2389,84 +2468,7 @@ html {
 
 
 
-#reportModal .form-group {
-    margin-bottom: var(--space-lg);
-}
 
-#reportModal .form-input,
-#reportModal .form-select {
-    font-size: 16px; 
-    min-height: 44px;
-    padding: var(--space-md) var(--space-lg);
-    border: 2px solid var(--border-light);
-    border-radius: var(--radius-lg);
-    background: var(--bg-white);
-    transition: all var(--transition);
-}
-
-#reportModal .form-input:focus,
-#reportModal .form-select:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    background: var(--bg-white);
-}
-
-#reportModal .form-actions {
-    margin-top: var(--space-2xl);
-    padding-top: var(--space-xl);
-    border-top: 2px solid var(--divider-color);
-    background: var(--bg-white);
-    position: sticky;
-    bottom: 0;
-    margin-bottom: 0;
-}
-
-.photo-upload-compact {
-    display: flex;
-    align-items: center;
-    gap: var(--space-lg);
-    padding: var(--space-lg);
-    border: 2px dashed var(--border-light);
-    border-radius: var(--radius-lg);
-    background: var(--bg-section);
-    cursor: pointer;
-    transition: all var(--transition);
-    min-height: 60px;
-}
-
-.photo-upload-compact:hover {
-    border-color: #667eea;
-    background: var(--hover-subtle);
-    transform: translateY(-1px);
-}
-
-.photo-upload-compact.active {
-    border-color: var(--success-border);
-    background: var(--success-bg);
-}
-
-.photo-upload-icon {
-    font-size: 1.5rem;
-    color: var(--text-muted);
-    flex-shrink: 0;
-}
-
-.photo-upload-text {
-    flex: 1;
-    color: var(--text-secondary);
-}
-
-.photo-upload-text strong {
-    color: var(--text-primary);
-    font-weight: 600;
-    display: block;
-    margin-bottom: var(--space-xs);
-}
-
-.photo-upload-text small {
-    color: var(--text-muted);
-    font-size: var(--text-xs);
-}
 
 
 
