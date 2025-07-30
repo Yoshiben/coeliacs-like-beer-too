@@ -187,6 +187,24 @@
     backdrop-filter: blur(10px);
 }
 
+.btn-secondary:hover {
+    background: var(--text-white);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
+}
+
+.btn-success {
+    background: var(--success-gradient);
+    color: var(--text-white);
+    box-shadow: var(--shadow);
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
 .btn-nav-small {
    background: var(--bg-white);
    color: var(--text-primary);
@@ -4185,5 +4203,431 @@ p {
     
     .status-question {
         font-size: 1.1rem;
+    }
+}
+
+
+
+/* ================================
+   REPORT MODAL STYLES - UPDATE
+   Add these styles to your existing CSS
+   ================================ */
+
+/* Report Modal Base */
+.report-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    background: var(--modal-backdrop);
+    backdrop-filter: var(--modal-blur);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: var(--z-modal-backdrop);
+    padding: var(--space-lg);
+    overflow-y: auto;
+}
+
+.report-modal .modal-content {
+    background: var(--bg-white);
+    border-radius: var(--radius-xl);
+    max-width: 500px;
+    width: 100%;
+    max-height: 92vh;
+    max-height: 92dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-xl);
+}
+
+.report-modal .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-xl) var(--space-xl) var(--space-lg);
+    border-bottom: 2px solid var(--divider-color);
+    flex-shrink: 0;
+    background: linear-gradient(135deg, var(--purple-bg) 0%, rgba(139, 92, 246, 0.05) 100%);
+}
+
+.report-modal .modal-title {
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: var(--text-xl);
+    line-height: 1.2;
+}
+
+.report-modal .modal-body {
+    flex: 1;
+    padding: var(--space-xl);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Form Groups */
+.report-modal .form-group {
+    margin-bottom: var(--space-xl);
+}
+
+.report-modal .form-label {
+    font-weight: 600;
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-sm);
+    display: block;
+}
+
+/* Inputs and Selects */
+.report-modal .form-input,
+.report-modal .form-select {
+    width: 100%;
+    font-size: 16px; /* Prevents zoom on iOS */
+    min-height: 44px;
+    padding: var(--space-md) var(--space-lg);
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    background: var(--bg-white);
+    transition: all var(--transition);
+    box-sizing: border-box;
+}
+
+.report-modal .form-input:focus,
+.report-modal .form-select:focus {
+    outline: none;
+    border-color: var(--purple-border);
+    box-shadow: 0 0 0 3px var(--purple-shadow);
+    background: var(--bg-white);
+}
+
+/* Dropdown Containers with Purple Theme */
+.brewery-dropdown-container,
+.beer-name-container,
+.beer-style-container {
+    position: relative;
+}
+
+/* Suggestion Dropdowns */
+.report-modal .suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 300px;
+    overflow-y: auto;
+    background: var(--bg-white);
+    border: 2px solid var(--purple-border);
+    border-top: none;
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    display: none;
+    z-index: var(--z-dropdown);
+    margin-top: -2px;
+}
+
+/* Dropdown Header */
+.suggestions .dropdown-header {
+    padding: var(--space-md) var(--space-lg);
+    background: linear-gradient(135deg, var(--purple-bg) 0%, rgba(139, 92, 246, 0.05) 100%);
+    border-bottom: 1px solid var(--purple-border);
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: var(--text-sm);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+/* Suggestion Items */
+.suggestions .suggestion-item {
+    padding: var(--space-lg);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    border-bottom: 1px solid var(--divider-color);
+    background: var(--bg-white);
+}
+
+.suggestions .suggestion-item:hover {
+    background: var(--purple-bg);
+    border-left: 4px solid var(--purple-border);
+    padding-left: calc(var(--space-lg) - 4px);
+}
+
+.suggestions .suggestion-item:last-child {
+    border-bottom: none;
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+.suggestions .suggestion-item strong {
+    color: var(--text-primary);
+    display: block;
+    margin-bottom: var(--space-xs);
+}
+
+.suggestions .suggestion-item small {
+    color: var(--text-muted);
+    font-size: var(--text-xs);
+    line-height: 1.3;
+}
+
+/* Add New Item Style */
+.suggestions .add-new-item {
+    background: linear-gradient(135deg, var(--purple-bg) 0%, rgba(139, 92, 246, 0.05) 100%);
+    border-left: 4px solid var(--purple-border);
+    padding-left: calc(var(--space-lg) - 4px);
+}
+
+.suggestions .add-new-item:hover {
+    background: var(--purple-gradient);
+    color: var(--text-white);
+}
+
+.suggestions .add-new-item:hover strong,
+.suggestions .add-new-item:hover small {
+    color: var(--text-white);
+}
+
+/* Beer Item Specific */
+.suggestions .beer-item small {
+    display: block;
+    margin-top: var(--space-xs);
+}
+
+/* Selected Pub Info */
+.selected-pub-info {
+    margin-bottom: var(--space-xl);
+}
+
+.selected-pub-card {
+    background: linear-gradient(135deg, var(--purple-bg) 0%, rgba(139, 92, 246, 0.05) 100%);
+    border: 2px solid var(--purple-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    position: relative;
+}
+
+.selected-pub-card strong {
+    display: block;
+    color: var(--text-primary);
+    font-size: var(--text-md);
+    margin-bottom: var(--space-xs);
+}
+
+.selected-pub-card div {
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-md);
+}
+
+.selected-pub-card .btn-sm {
+    background: var(--purple-gradient);
+    color: white;
+    border: none;
+    padding: var(--space-sm) var(--space-md);
+    font-size: var(--text-sm);
+}
+
+/* New Pub Fields */
+.new-pub-fields {
+    background: var(--bg-section);
+    border: 2px dashed var(--purple-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    margin-bottom: var(--space-xl);
+}
+
+.new-pub-fields h4 {
+    color: var(--text-primary);
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+/* Photo Upload with Purple Theme */
+.photo-upload-compact {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    padding: var(--space-lg);
+    border: 2px dashed var(--purple-border);
+    border-radius: var(--radius-lg);
+    background: var(--purple-bg);
+    cursor: pointer;
+    transition: all var(--transition);
+    min-height: 60px;
+}
+
+.photo-upload-compact:hover {
+    border-color: var(--purple-border);
+    background: linear-gradient(135deg, var(--purple-bg) 0%, rgba(139, 92, 246, 0.1) 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px var(--purple-shadow);
+}
+
+.photo-upload-compact.active {
+    border-style: solid;
+    background: var(--purple-gradient);
+    color: var(--text-white);
+}
+
+.photo-upload-compact.active .photo-upload-icon,
+.photo-upload-compact.active .photo-upload-text strong,
+.photo-upload-compact.active .photo-upload-text small {
+    color: var(--text-white);
+}
+
+/* Form Actions */
+.report-modal .form-actions {
+    margin-top: var(--space-2xl);
+    padding-top: var(--space-xl);
+    border-top: 2px solid var(--divider-color);
+    background: var(--bg-white);
+    position: sticky;
+    bottom: 0;
+    display: flex;
+    gap: var(--space-lg);
+    justify-content: flex-end;
+}
+
+/* Auto-filled Animation */
+.report-modal .auto-filled {
+    animation: autoFillPulse 2s ease-out;
+}
+
+@keyframes autoFillPulse {
+    0% {
+        background: var(--purple-bg);
+        border-color: var(--purple-border);
+    }
+    50% {
+        background: linear-gradient(135deg, var(--purple-bg) 0%, rgba(139, 92, 246, 0.2) 100%);
+        border-color: var(--purple-gradient);
+        box-shadow: 0 0 0 3px var(--purple-shadow);
+    }
+    100% {
+        background: var(--bg-white);
+        border-color: var(--purple-border);
+    }
+}
+
+/* Scrollbar Styling */
+.report-modal .suggestions::-webkit-scrollbar {
+    width: 8px;
+}
+
+.report-modal .suggestions::-webkit-scrollbar-track {
+    background: var(--bg-section);
+    border-radius: 4px;
+}
+
+.report-modal .suggestions::-webkit-scrollbar-thumb {
+    background: var(--purple-gradient);
+    border-radius: 4px;
+}
+
+.report-modal .suggestions::-webkit-scrollbar-thumb:hover {
+    background: var(--purple-border);
+}
+
+/* ================================
+   MOBILE OPTIMIZATIONS
+   ================================ */
+@media (max-width: 768px) {
+    .report-modal {
+        padding: var(--space-sm);
+    }
+    
+    .report-modal .modal-content {
+        max-height: 98vh;
+        max-height: 98dvh;
+        margin: 1vh auto;
+        margin: 1dvh auto;
+        border-radius: var(--radius-lg);
+    }
+    
+    .report-modal .modal-header {
+        padding: var(--space-lg) var(--space-lg) var(--space-md);
+    }
+    
+    .report-modal .modal-title {
+        font-size: var(--text-lg);
+    }
+    
+    .report-modal .modal-body {
+        padding: var(--space-lg);
+    }
+    
+    .report-modal .form-group {
+        margin-bottom: var(--space-lg);
+    }
+    
+    .report-modal .suggestions {
+        max-height: 250px;
+    }
+    
+    .suggestions .suggestion-item {
+        padding: var(--space-md);
+    }
+    
+    .photo-upload-compact {
+        padding: var(--space-md);
+        min-height: 50px;
+    }
+    
+    .photo-upload-icon {
+        font-size: 1.2rem;
+    }
+    
+    .photo-upload-text strong {
+        font-size: var(--text-sm);
+    }
+    
+    .photo-upload-text small {
+        font-size: var(--text-xs);
+    }
+    
+    .report-modal .form-actions {
+        padding: var(--space-md);
+        gap: var(--space-md);
+    }
+}
+
+@media (max-width: 480px) {
+    .report-modal .modal-content {
+        border-radius: var(--radius) var(--radius) 0 0;
+        max-height: 100vh;
+        max-height: 100dvh;
+        margin: 0;
+    }
+    
+    .report-modal .modal-header {
+        padding: var(--space-md);
+    }
+    
+    .report-modal .modal-body {
+        padding: var(--space-md);
+    }
+    
+    .report-modal .form-input,
+    .report-modal .form-select {
+        min-height: 40px;
+        padding: var(--space-sm) var(--space-md);
+    }
+    
+    .new-pub-fields {
+        padding: var(--space-md);
+    }
+    
+    .report-modal .form-actions {
+        flex-direction: column-reverse;
+    }
+    
+    .report-modal .form-actions .btn {
+        width: 100%;
     }
 }
