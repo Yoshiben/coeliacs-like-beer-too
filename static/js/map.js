@@ -1277,7 +1277,7 @@ export const MapModule = (function() {
                 addFilteredPubMarkers(allPubs, fullUKMap);
             }
         }
-    };
+    }
     
     // Keep the zoom handler for performance
     const setupZoomHandler = (mode) => {
