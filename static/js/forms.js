@@ -1,23 +1,31 @@
 // ================================================================================
-// FORMS.JS - Form Handling, Validation & Autocomplete
-// Handles: All form operations, dropdown management, autocomplete functionality
+// FORMS.JS - Complete Refactor with STATE_KEYS and Consistency Fixes
+// Handles: All form operations, validation, autocomplete, GF status updates
 // ================================================================================
 
 import { APIModule } from './api.js';
 import { ModalModule } from './modals.js';
+import { Constants } from './constants.js';
+
+const STATE_KEYS = Constants.STATE_KEYS;
 
 export const FormModule = (function() {
     'use strict';
     
-    // NEW: Just keep searchTimeouts as a private const
-    const searchTimeouts = {
-        brewery: null,
-        beer: null,
-        style: null,
-        pub: null
+    // ================================
+    // PRIVATE STATE
+    // ================================
+    const state = {
+        searchTimeouts: {
+            brewery: null,
+            beer: null,
+            style: null,
+            pub: null
+        },
+        dropdownsOpen: new Set(),
+        currentSubmission: null
     };
     
-    // Configuration
     const config = {
         debounceDelay: 300,
         minSearchLength: 2,
@@ -26,127 +34,148 @@ export const FormModule = (function() {
     };
     
     // ================================
-    // REPORT FORM HANDLING
+    // MODULE GETTERS
     // ================================
+    const modules = {
+        get api() { return window.App?.getModule('api') || APIModule; },
+        get modal() { return window.App?.getModule('modal') || ModalModule; },
+        get tracking() { return window.App?.getModule('tracking'); }
+    };
     
-    const handleReportSubmission = async (event) => {
+    // ================================
+    // UTILITIES
+    // ================================
+    const utils = {
+        getSelectedPub() {
+            return window.App.getState(STATE_KEYS.SELECTED_PUB_FOR_REPORT);
+        },
+        
+        setSelectedPub(pubData) {
+            window.App.setState(STATE_KEYS.SELECTED_PUB_FOR_REPORT, pubData);
+        },
+        
+        getCurrentPub() {
+            return window.App.getState(STATE_KEYS.CURRENT_PUB);
+        },
+        
+        getCurrentBrewery() {
+            return window.App.getState(STATE_KEYS.CURRENT_BREWERY);
+        },
+        
+        setCurrentBrewery(brewery) {
+            window.App.setState(STATE_KEYS.CURRENT_BREWERY, brewery);
+        },
+        
+        showToast(message, type = 'success') {
+            if (window.showSuccessToast) {
+                window.showSuccessToast(message);
+            } else {
+                console.log(type === 'success' ? '✅' : '❌', message);
+            }
+        },
+        
+        showLoadingToast(message) {
+            if (window.showLoadingToast) {
+                window.showLoadingToast(message);
+            }
+        },
+        
+        hideLoadingToast() {
+            if (window.hideLoadingToast) {
+                window.hideLoadingToast();
+            }
+        },
+        
+        escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        },
+        
+        debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+    };
+    
+    // ================================
+    // REPORT FORM SUBMISSION
+    // ================================
+    async function handleReportSubmission(event) {
         event.preventDefault();
         console.log('📝 Handling report submission...');
         
         const form = event.target;
         const formData = new FormData(form);
         
-        // Collect form data
-        const reportData = {
-            beer_format: formData.get('reportFormat') || document.getElementById('reportFormat').value,
-            brewery: formData.get('reportBrewery') || document.getElementById('reportBrewery').value,
-            beer_name: formData.get('reportBeerName') || document.getElementById('reportBeerName').value,
-            beer_style: formData.get('reportBeerStyle') || document.getElementById('reportBeerStyle').value,
-            beer_abv: formData.get('reportBeerABV') || document.getElementById('reportBeerABV').value,
-            notes: formData.get('reportNotes') || ''
-        };
-        
-        console.log('📋 Form data collected:', reportData);
-        
-        const selectedPub = window.App.getState('selectedPubForReport');
-        if (selectedPub) {
-            reportData.pub_id = selectedPub.pub_id;
-            reportData.pub_name = selectedPub.name;
-            console.log('🏠 Using pre-populated pub:', selectedPub.name);  // FIXED: Use selectedPub
-            console.log('🔍 DEBUG - Pub data being sent:', {
-                pub_id: reportData.pub_id,
-                pub_name: reportData.pub_name,
-                has_pub_id: !!reportData.pub_id
-            });
-        } else {
-            // Use searched/entered pub data
-            reportData.pub_name = formData.get('reportPubName') || document.getElementById('reportPubName').value || 'Unknown Pub';
-            reportData.address = formData.get('reportAddress') || document.getElementById('reportAddress').value || '';
-            reportData.postcode = formData.get('reportPostcode') || document.getElementById('reportPostcode').value || '';
-            console.log('🏠 Using manual pub data');
-            console.log('🔍 DEBUG - Manual pub data:', {
-                pub_name: reportData.pub_name,
-                address: reportData.address,
-                postcode: reportData.postcode
-            });
-        }
-        
-        console.log('🔍 DEBUG - Full reportData before API call:', reportData);
-        
-        // Validate required fields
+        // Collect and validate form data
+        const reportData = collectReportData(formData);
         const validation = validateReportForm(reportData);
+        
         if (!validation.isValid) {
-            showValidationError(validation.errors);
+            utils.showToast(`❌ Please fill in: ${validation.errors.join(', ')}`, 'error');
             return;
         }
         
-        // Submit the report
+        // Show loading state
+        utils.showLoadingToast('Submitting beer report...');
+        state.currentSubmission = reportData;
+        
         try {
-            const result = await APIModule.submitBeerReport(reportData);
+            const result = await modules.api.submitBeerReport(reportData);
+            
+            utils.hideLoadingToast();
             
             if (result.success) {
-                showSuccess('🎉 Beer report submitted successfully! Thanks for contributing!');
-
-                // Debug: Log what's happening
-                console.log('🔍 Before modal close - checking hero visibility');
-                const heroSection = document.querySelector('.hero-section');
-                console.log('Hero section display:', heroSection?.style.display);
-                
-                // Close modal and reset form
-                ModalModule.close('reportModal');
-                resetReportForm();
-                
-                // Force return to home view
-                // Close any open overlays and show home sections
-                const pubDetailsOverlay = document.getElementById('pubDetailsOverlay');
-                if (pubDetailsOverlay) {
-                    pubDetailsOverlay.style.display = 'none';
-                    pubDetailsOverlay.classList.remove('active');
-                }
-                
-                const resultsOverlay = document.getElementById('resultsOverlay');
-                if (resultsOverlay) {
-                    resultsOverlay.style.display = 'none';
-                    resultsOverlay.classList.remove('active');
-                }
-                
-                // Restore body scroll
-                document.body.style.overflow = '';
-                
-                // Show home sections
-                // const heroSection = document.querySelector('.hero-section');
-                const searchSection = document.querySelector('.search-section');
-                if (heroSection) {
-                    heroSection.style.display = 'block';
-                    console.log('✅ Hero section restored after form submission');
-                }
-                if (searchSection) {
-                    searchSection.style.display = 'flex';
-                    console.log('✅ Search section restored after form submission');
-                }
-                
-                // Track success
-                trackFormSubmission('beer_report', reportData);
-
-                // Debug: Check after modal close
-                setTimeout(() => {
-                    console.log('🔍 After modal close - checking hero visibility');
-                    const heroSectionAfter = document.querySelector('.hero-section');
-                    console.log('Hero section display after:', heroSectionAfter?.style.display);
-                }, 500);
-                
-                // Track success
-                trackFormSubmission('beer_report', reportData);
+                handleSubmissionSuccess(result);
             } else {
-                showError(result.message || 'Failed to submit report');
+                utils.showToast(result.message || 'Failed to submit report', 'error');
             }
         } catch (error) {
             console.error('❌ Error submitting report:', error);
-            showError('Error submitting report. Please try again.');
+            utils.hideLoadingToast();
+            utils.showToast('Error submitting report. Please try again.', 'error');
+        } finally {
+            state.currentSubmission = null;
         }
-    };
+    }
     
-    const validateReportForm = (data) => {
+    function collectReportData(formData) {
+        const reportData = {
+            beer_format: formData.get('reportFormat') || document.getElementById('reportFormat')?.value,
+            brewery: formData.get('reportBrewery') || document.getElementById('reportBrewery')?.value,
+            beer_name: formData.get('reportBeerName') || document.getElementById('reportBeerName')?.value,
+            beer_style: formData.get('reportBeerStyle') || document.getElementById('reportBeerStyle')?.value,
+            beer_abv: formData.get('reportBeerABV') || document.getElementById('reportBeerABV')?.value,
+            notes: formData.get('reportNotes') || ''
+        };
+        
+        // Add pub data
+        const selectedPub = utils.getSelectedPub();
+        if (selectedPub) {
+            reportData.pub_id = selectedPub.pub_id;
+            reportData.pub_name = selectedPub.name;
+            console.log('🏠 Using selected pub:', selectedPub.name);
+        } else {
+            // Manual pub entry
+            reportData.pub_name = formData.get('reportPubName') || document.getElementById('reportPubName')?.value || 'Unknown Pub';
+            reportData.address = formData.get('reportAddress') || document.getElementById('reportAddress')?.value || '';
+            reportData.postcode = formData.get('reportPostcode') || document.getElementById('reportPostcode')?.value || '';
+            console.log('🏠 Using manual pub data');
+        }
+        
+        return reportData;
+    }
+    
+    function validateReportForm(data) {
         const errors = [];
         
         if (!data.beer_format) errors.push('Beer Format');
@@ -158,41 +187,65 @@ export const FormModule = (function() {
             isValid: errors.length === 0,
             errors: errors
         };
-    };
+    }
     
-    const showValidationError = (errors) => {
-        const message = `❌ Please fill in: ${errors.join(', ')}`;
-        if (window.showSuccessToast) {
-            window.showSuccessToast(message);
-        } else {
-            alert(message);
-        }
-    };
+    function handleSubmissionSuccess(result) {
+        utils.showToast('🎉 Beer report submitted successfully! Thanks for contributing!');
+        
+        // Close modal properly using ModalModule
+        modules.modal.close('reportModal');
+        
+        // Reset form
+        resetReportForm();
+        
+        // Return to home view
+        returnToHomeView();
+        
+        // Track success
+        modules.tracking?.trackEvent('beer_report_submitted', 'Form', 'success');
+    }
     
-    const resetReportForm = () => {
+    function returnToHomeView() {
+        // Close any overlays
+        ['pubDetailsOverlay', 'resultsOverlay'].forEach(id => {
+            const overlay = document.getElementById(id);
+            if (overlay) {
+                overlay.style.display = 'none';
+                overlay.classList.remove('active');
+            }
+        });
+        
+        // Show home sections
+        const heroSection = document.querySelector('.hero-section');
+        const searchSection = document.querySelector('.search-section');
+        
+        if (heroSection) heroSection.style.display = 'block';
+        if (searchSection) searchSection.style.display = 'flex';
+        
+        document.body.style.overflow = '';
+    }
+    
+    function resetReportForm() {
         const form = document.getElementById('reportForm');
-        if (form) {
-            form.reset();
-        }
+        if (form) form.reset();
         
         // Clear state
-        state.selectedPubData = null;
-        window.App.setState('selectedPubForReport', null);
-        state.currentBrewery = null;
+        utils.setSelectedPub(null);
+        utils.setCurrentBrewery(null);
         
-        // Reset UI elements
+        // Reset UI
         document.getElementById('selectedPubInfo').style.display = 'none';
         document.getElementById('newPubFields').style.display = 'none';
         document.getElementById('pubSearchGroup').style.display = 'block';
         
-        // Clear all dropdowns
+        // Clear dropdowns
         hideAllDropdowns();
         
         // Reset photo upload
         resetPhotoUpload();
-    };
+    }
     
-    const resetPhotoUpload = () => {
+    function resetPhotoUpload() {
         const photoLabel = document.querySelector('.photo-upload-compact');
         if (photoLabel) {
             photoLabel.classList.remove('active');
@@ -204,30 +257,12 @@ export const FormModule = (function() {
                 `;
             }
         }
-    };
+    }
     
     // ================================
-    // PUB SEARCH & AUTOCOMPLETE
+    // PUB SEARCH & SELECTION
     // ================================
-    
-    const initializePubSearch = async () => {
-        const pubSearchInput = document.getElementById('reportPubSearch');
-        if (!pubSearchInput) return;
-        
-        // Debounced search
-        pubSearchInput.addEventListener('input', debounce((e) => {
-            searchPubs(e.target.value);
-        }, config.debounceDelay));
-        
-        // Show suggestions on focus if has value
-        pubSearchInput.addEventListener('focus', (e) => {
-            if (e.target.value.length >= config.minSearchLength) {
-                searchPubs(e.target.value);
-            }
-        });
-    };
-    
-    const searchPubs = async (query) => {
+    const searchPubs = utils.debounce(async (query) => {
         const suggestionsDiv = document.getElementById('pubSuggestions');
         if (!suggestionsDiv) return;
         
@@ -237,24 +272,12 @@ export const FormModule = (function() {
         }
         
         try {
-            const suggestions = await APIModule.getPubSuggestions(query, 'name', false);
+            const suggestions = await modules.api.getPubSuggestions(query, 'name', false);
             
             if (suggestions.length === 0) {
-                // Show "add new pub" option
-                suggestionsDiv.innerHTML = `
-                    <div class="suggestion-item add-new" data-action="add-new-pub">
-                        <strong>➕ Add "${query}" as new pub</strong>
-                        <small>Can't find it? Add it to our database!</small>
-                    </div>
-                `;
+                displayNoResultsOption(suggestionsDiv, query);
             } else {
-                // Show pub suggestions
-                suggestionsDiv.innerHTML = suggestions.map(pub => `
-                    <div class="suggestion-item" data-pub-id="${pub.pub_id}" data-action="select-pub">
-                        <strong>${escapeHtml(pub.name)}</strong>
-                        <small>${escapeHtml(pub.address)}, ${escapeHtml(pub.postcode)}</small>
-                    </div>
-                `).join('');
+                displayPubSuggestions(suggestionsDiv, suggestions);
             }
             
             showDropdown('pubSuggestions');
@@ -262,9 +285,27 @@ export const FormModule = (function() {
             console.error('Error searching pubs:', error);
             hideDropdown('pubSuggestions');
         }
-    };
+    }, config.debounceDelay);
     
-    const selectPub = (pubElement) => {
+    function displayNoResultsOption(container, query) {
+        container.innerHTML = `
+            <div class="suggestion-item add-new" data-action="add-new-pub">
+                <strong>➕ Add "${utils.escapeHtml(query)}" as new pub</strong>
+                <small>Can't find it? Add it to our database!</small>
+            </div>
+        `;
+    }
+    
+    function displayPubSuggestions(container, suggestions) {
+        container.innerHTML = suggestions.map(pub => `
+            <div class="suggestion-item" data-pub-id="${pub.pub_id}" data-action="select-pub">
+                <strong>${utils.escapeHtml(pub.name)}</strong>
+                <small>${utils.escapeHtml(pub.address)}, ${utils.escapeHtml(pub.postcode)}</small>
+            </div>
+        `).join('');
+    }
+    
+    function selectPub(pubElement) {
         const pubId = pubElement.dataset.pubId;
         const pubName = pubElement.querySelector('strong').textContent;
         const pubDetails = pubElement.querySelector('small').textContent;
@@ -276,131 +317,97 @@ export const FormModule = (function() {
             address: address,
             postcode: postcode
         };
-        window.App.setState('selectedPubForReport', pubData);
         
-        // Update UI
-        document.getElementById('selectedPubInfo').style.display = 'block';
-        document.getElementById('selectedPubName').textContent = pubName;
-        document.getElementById('selectedPubAddress').textContent = pubDetails;
-        document.getElementById('pubSearchGroup').style.display = 'none';
-        
+        utils.setSelectedPub(pubData);
+        updateSelectedPubUI(pubData);
         hideDropdown('pubSuggestions');
-        trackEvent('pub_selected', 'Form', pubName);
-    };
+        
+        modules.tracking?.trackEvent('pub_selected', 'Form', pubName);
+    }
     
-    const showNewPubFields = () => {
+    function updateSelectedPubUI(pubData) {
+        document.getElementById('selectedPubInfo').style.display = 'block';
+        document.getElementById('selectedPubName').textContent = pubData.name;
+        document.getElementById('selectedPubAddress').textContent = `${pubData.address}, ${pubData.postcode}`;
+        document.getElementById('pubSearchGroup').style.display = 'none';
+    }
+    
+    function showNewPubFields() {
         document.getElementById('newPubFields').style.display = 'block';
         document.getElementById('pubSearchGroup').style.display = 'none';
         document.getElementById('reportPubName').value = document.getElementById('reportPubSearch').value;
         
         hideDropdown('pubSuggestions');
         document.getElementById('reportAddress').focus();
-    };
+    }
     
-    const clearSelectedPub = () => {
-        state.selectedPubData = null;
-        window.App.setState('selectedPubForReport', null);
+    function clearSelectedPub() {
+        utils.setSelectedPub(null);
         
         document.getElementById('selectedPubInfo').style.display = 'none';
         document.getElementById('pubSearchGroup').style.display = 'block';
         document.getElementById('reportPubSearch').value = '';
         document.getElementById('reportPubSearch').focus();
-    };
+    }
     
     // ================================
     // BREWERY AUTOCOMPLETE
     // ================================
-    
-    const searchBreweries = async (query) => {
-        clearTimeout(searchTimeouts.brewery);
+    const searchBreweries = utils.debounce(async (query) => {
         const dropdown = document.getElementById('breweryDropdown');
         if (!dropdown) return;
         
-        // Show all breweries on empty/short query
-        if (query.length < 1) {
-            state.searchTimeouts.brewery = setTimeout(async () => {
-                try {
-                    const breweries = await APIModule.getBreweries();
-                    displayBreweryDropdown(breweries.slice(0, 100), breweries.length);
-                } catch (error) {
-                    console.error('Error loading breweries:', error);
-                    hideDropdown('breweryDropdown');
-                }
-            }, 100);
-            return;
+        try {
+            const breweries = query.length < 1 ? 
+                await modules.api.getBreweries() : 
+                await modules.api.getBreweries(query);
+            
+            displayBreweryDropdown(
+                breweries.slice(0, query.length < 1 ? 100 : 50), 
+                breweries.length, 
+                query
+            );
+        } catch (error) {
+            console.error('Error searching breweries:', error);
+            hideDropdown('breweryDropdown');
         }
-        
-        // Search for specific breweries
-        state.searchTimeouts.brewery = setTimeout(async () => {
-            try {
-                const breweries = await APIModule.getBreweries(query);
-                displayBreweryDropdown(breweries.slice(0, 50), breweries.length, query);
-            } catch (error) {
-                console.error('Error searching breweries:', error);
-                hideDropdown('breweryDropdown');
-            }
-        }, config.debounceDelay);
-    };
+    }, config.debounceDelay);
     
-    const displayBreweryDropdown = (breweries, totalCount, searchQuery = null) => {
+    function displayBreweryDropdown(breweries, totalCount, searchQuery = null) {
         const dropdown = document.getElementById('breweryDropdown');
-        if (!dropdown) return;
-        
-        dropdown.innerHTML = '';
-        
-        if (breweries.length === 0) {
+        if (!dropdown || breweries.length === 0) {
             hideDropdown('breweryDropdown');
             return;
         }
         
-        // Add header
-        const header = document.createElement('div');
-        header.className = 'dropdown-header';
-        header.innerHTML = searchQuery ? 
-            `🔍 ${totalCount} matches for "${searchQuery}"` :
-            `🍺 ${totalCount} Breweries Available`;
+        dropdown.innerHTML = '';
+        
+        // Header
+        const header = createDropdownHeader(
+            searchQuery ? 
+                `🔍 ${totalCount} matches for "${searchQuery}"` :
+                `🍺 ${totalCount} Breweries Available`
+        );
         dropdown.appendChild(header);
         
-        // Add brewery items
+        // Items
         breweries.forEach(brewery => {
-            const item = document.createElement('div');
-            item.className = 'suggestion-item brewery-item';
-            item.innerHTML = `<strong>${escapeHtml(brewery)}</strong>`;
-            item.dataset.action = 'select-brewery';
-            item.dataset.brewery = brewery;
+            const item = createSuggestionItem(brewery, 'select-brewery', { brewery });
             dropdown.appendChild(item);
         });
         
         showDropdown('breweryDropdown');
-    };
+    }
     
-    const selectBrewery = async (brewery) => {
+    async function selectBrewery(brewery) {
         console.log('🍺 Brewery selected:', brewery);
         
-        if (!brewery) {
-            console.error('❌ No brewery provided to selectBrewery');
-            return;
-        }
-        
-        // Set brewery field
-        const breweryInput = document.getElementById('reportBrewery');
-        if (breweryInput) {
-            breweryInput.value = brewery;
-        }
-        
-        window.App.setState('currentBrewery', brewery);
-        
-        // Hide brewery dropdown immediately
+        document.getElementById('reportBrewery').value = brewery;
+        utils.setCurrentBrewery(brewery);
         hideDropdown('breweryDropdown');
         
         // Clear dependent fields
-        const beerNameInput = document.getElementById('reportBeerName');
-        const beerStyleInput = document.getElementById('reportBeerStyle');
-        const beerABVInput = document.getElementById('reportBeerABV');
-        
-        if (beerNameInput) beerNameInput.value = '';
-        if (beerStyleInput) beerStyleInput.value = '';
-        if (beerABVInput) beerABVInput.value = '';
+        clearBeerFields();
         
         // Load beers for this brewery
         try {
@@ -409,49 +416,52 @@ export const FormModule = (function() {
             console.error('❌ Error loading brewery beers:', error);
         }
         
-        trackEvent('brewery_selected', 'Form', brewery);
-    };
+        modules.tracking?.trackEvent('brewery_selected', 'Form', brewery);
+    }
     
-    const loadBreweryBeers = async (brewery) => {
+    function clearBeerFields() {
+        ['reportBeerName', 'reportBeerStyle', 'reportBeerABV'].forEach(id => {
+            const element = document.getElementById(id);
+            if (element) element.value = '';
+        });
+    }
+    
+    async function loadBreweryBeers(brewery) {
         const beerNameInput = document.getElementById('reportBeerName');
         if (!beerNameInput) return;
         
         console.log(`🍺 Loading beers for ${brewery}...`);
         
         try {
-            const beers = await APIModule.getBreweryBeers(brewery);
+            const beers = await modules.api.getBreweryBeers(brewery);
             
             if (beers.length === 0) {
                 beerNameInput.placeholder = `Add new beer for ${brewery}`;
-                showSuccess(`📝 No existing beers for ${brewery}. Add a new one!`);
+                utils.showToast(`📝 No existing beers for ${brewery}. Add a new one!`);
                 showAddNewBeerDropdown(brewery);
             } else {
                 beerNameInput.placeholder = `Choose from ${beers.length} ${brewery} beers...`;
-                showSuccess(`🍺 Found ${beers.length} beers from ${brewery}!`);
+                utils.showToast(`🍺 Found ${beers.length} beers from ${brewery}!`);
                 displayBeerDropdown(beers, brewery);
             }
             
-            // Focus beer name field
             setTimeout(() => beerNameInput.focus(), 200);
             
         } catch (error) {
             console.error('Error loading brewery beers:', error);
             beerNameInput.placeholder = 'Enter beer name...';
         }
-    };
+    }
     
     // ================================
     // BEER NAME AUTOCOMPLETE
     // ================================
-    
-    const searchBeerNames = async (query) => {
-        clearTimeout(searchTimeouts.beer);
+    const searchBeerNames = utils.debounce(async (query) => {
         const dropdown = document.getElementById('beerNameDropdown');
         const brewery = document.getElementById('reportBrewery').value;
         
         if (!dropdown) return;
         
-        // Show brewery beers on empty query
         if (query.length < 1 && brewery) {
             await loadBreweryBeers(brewery);
             return;
@@ -462,78 +472,75 @@ export const FormModule = (function() {
             return;
         }
         
-        state.searchTimeouts.beer = setTimeout(async () => {
-            try {
-                let beers;
-                if (brewery) {
-                    beers = await APIModule.getBreweryBeers(brewery, query);
-                } else {
-                    // Global beer search - would need new API endpoint
-                    beers = [];
-                }
-                
-                if (beers.length === 0) {
-                    displayAddNewBeerOption(query, brewery);
-                } else {
-                    displayBeerDropdown(beers, brewery, query);
-                }
-            } catch (error) {
-                console.error('Error searching beers:', error);
-                hideDropdown('beerNameDropdown');
+        try {
+            const beers = brewery ? 
+                await modules.api.getBreweryBeers(brewery, query) : 
+                [];
+            
+            if (beers.length === 0) {
+                displayAddNewBeerOption(query, brewery);
+            } else {
+                displayBeerDropdown(beers, brewery, query);
             }
-        }, config.debounceDelay);
-    };
+        } catch (error) {
+            console.error('Error searching beers:', error);
+            hideDropdown('beerNameDropdown');
+        }
+    }, config.debounceDelay);
     
-    const displayBeerDropdown = (beers, brewery, searchQuery = null) => {
+    function displayBeerDropdown(beers, brewery, searchQuery = null) {
         const dropdown = document.getElementById('beerNameDropdown');
         if (!dropdown) return;
         
         dropdown.innerHTML = '';
         
         // Header
-        const header = document.createElement('div');
-        header.className = 'dropdown-header';
-        header.innerHTML = searchQuery ? 
-            `🔍 ${beers.length} matches for "${searchQuery}"` :
-            `🍺 ${beers.length} ${brewery} Beers`;
+        const header = createDropdownHeader(
+            searchQuery ? 
+                `🔍 ${beers.length} matches for "${searchQuery}"` :
+                `🍺 ${beers.length} ${brewery} Beers`
+        );
         dropdown.appendChild(header);
         
         // Add new beer option
-        const addNewItem = document.createElement('div');
-        addNewItem.className = 'suggestion-item add-new-item';
-        addNewItem.innerHTML = `
-            <strong>➕ Add New Beer for ${brewery}</strong><br>
-            <small style="color: var(--text-muted);">Add a beer not in our database</small>
-        `;
-        addNewItem.dataset.action = 'add-new-beer';
+        const addNewItem = createAddNewItem(
+            `➕ Add New Beer for ${brewery}`,
+            'Add a beer not in our database',
+            'add-new-beer'
+        );
         dropdown.appendChild(addNewItem);
         
         // Beer items
         beers.forEach(beer => {
-            const item = document.createElement('div');
-            item.className = 'suggestion-item beer-item';
-            item.innerHTML = `
-                <strong>${escapeHtml(beer.name)}</strong><br>
-                <small style="color: var(--text-muted);">
-                    ${escapeHtml(beer.style || 'Unknown style')} • ${beer.abv || '?'}% ABV
-                    ${beer.gluten_status ? ' • ' + beer.gluten_status.replace('_', ' ') : ''}
-                </small>
-            `;
-            item.dataset.action = 'select-beer';
-            item.dataset.beerData = JSON.stringify(beer);
+            const item = createBeerItem(beer);
             dropdown.appendChild(item);
         });
         
         showDropdown('beerNameDropdown');
-    };
+    }
     
-    const displayAddNewBeerOption = (query, brewery) => {
+    function createBeerItem(beer) {
+        const item = document.createElement('div');
+        item.className = 'suggestion-item beer-item';
+        item.innerHTML = `
+            <strong>${utils.escapeHtml(beer.name)}</strong><br>
+            <small style="color: var(--text-muted);">
+                ${utils.escapeHtml(beer.style || 'Unknown style')} • ${beer.abv || '?'}% ABV
+                ${beer.gluten_status ? ' • ' + beer.gluten_status.replace('_', ' ') : ''}
+            </small>
+        `;
+        item.dataset.action = 'select-beer';
+        item.dataset.beerData = JSON.stringify(beer);
+        return item;
+    }
+    
+    function displayAddNewBeerOption(query, brewery) {
         const dropdown = document.getElementById('beerNameDropdown');
         if (!dropdown) return;
         
         dropdown.innerHTML = `
             <div class="suggestion-item add-new-item" data-action="use-beer-name">
-                <strong>➕ Add "${query}" as new beer</strong>
+                <strong>➕ Add "${utils.escapeHtml(query)}" as new beer</strong>
                 <small style="color: var(--text-muted);">
                     ${brewery ? 'for ' + brewery : "We'll add this to our database"}
                 </small>
@@ -541,24 +548,28 @@ export const FormModule = (function() {
         `;
         
         showDropdown('beerNameDropdown');
-    };
+    }
     
-    const showAddNewBeerDropdown = (brewery) => {
+    function showAddNewBeerDropdown(brewery) {
         const dropdown = document.getElementById('beerNameDropdown');
         if (!dropdown) return;
         
-        dropdown.innerHTML = `
-            <div class="dropdown-header">📝 No ${brewery} Beers in Database</div>
-            <div class="suggestion-item add-new-item" data-action="focus-beer-name">
-                <strong>➕ Add First Beer for ${brewery}</strong><br>
-                <small style="color: var(--text-muted);">Be the first to add a ${brewery} beer!</small>
-            </div>
-        `;
+        dropdown.innerHTML = '';
+        
+        const header = createDropdownHeader(`📝 No ${brewery} Beers in Database`);
+        dropdown.appendChild(header);
+        
+        const addItem = createAddNewItem(
+            `➕ Add First Beer for ${brewery}`,
+            `Be the first to add a ${brewery} beer!`,
+            'focus-beer-name'
+        );
+        dropdown.appendChild(addItem);
         
         showDropdown('beerNameDropdown');
-    };
+    }
     
-    const selectBeer = (beerData) => {
+    function selectBeer(beerData) {
         const beer = JSON.parse(beerData);
         
         // Fill fields
@@ -566,404 +577,69 @@ export const FormModule = (function() {
         document.getElementById('reportBeerStyle').value = beer.style || '';
         document.getElementById('reportBeerABV').value = beer.abv || '';
         
-        // Hide dropdown
         hideDropdown('beerNameDropdown');
         
-        // Add visual feedback
-        ['reportBeerName', 'reportBeerStyle', 'reportBeerABV'].forEach(id => {
-            const element = document.getElementById(id);
-            if (element) {
-                element.classList.add('auto-filled');
-                setTimeout(() => element.classList.remove('auto-filled'), 2000);
-            }
-        });
+        // Visual feedback
+        addAutoFillAnimation(['reportBeerName', 'reportBeerStyle', 'reportBeerABV']);
         
-        showSuccess(`✅ Selected: ${beer.name} (${beer.abv}% ${beer.style})!`);
+        utils.showToast(`✅ Selected: ${beer.name} (${beer.abv}% ${beer.style})!`);
         
         // Focus next empty field
         focusNextEmptyField(['reportFormat', 'reportPhoto']);
         
-        trackEvent('beer_selected', 'Form', beer.name);
-    };
+        modules.tracking?.trackEvent('beer_selected', 'Form', beer.name);
+    }
     
     // ================================
     // BEER STYLE AUTOCOMPLETE
     // ================================
-    
-    const searchBeerStyles = (query) => {
-        clearTimeout(searchTimeouts.style);
+    const searchBeerStyles = utils.debounce((query) => {
         const dropdown = document.getElementById('beerStyleDropdown');
-        
-        if (!dropdown) return;
-        
-        if (query.length < 2) {
+        if (!dropdown || query.length < 2) {
             hideDropdown('beerStyleDropdown');
             return;
         }
         
-        // Common beer styles
-        const commonStyles = [
-            'IPA', 'Pale Ale', 'Lager', 'Pilsner', 'Stout', 'Porter',
-            'Wheat Beer', 'Saison', 'Amber Ale', 'Brown Ale', 'Bitter',
-            'Session IPA', 'Double IPA', 'Hazy IPA', 'Sour', 'Gose',
-            'Belgian Ale', 'Blonde Ale', 'Red Ale', 'Mild', 'Best Bitter'
-        ];
-        
-        const filtered = commonStyles.filter(style => 
+        const filtered = Constants.BEER_STYLES.filter(style => 
             style.toLowerCase().includes(query.toLowerCase())
         );
         
-        dropdown.innerHTML = '';
-        
-        if (filtered.length === 0) {
+        displayStyleDropdown(dropdown, filtered);
+    }, config.debounceDelay);
+    
+    function displayStyleDropdown(dropdown, styles) {
+        if (styles.length === 0) {
             hideDropdown('beerStyleDropdown');
             return;
         }
         
-        filtered.forEach(style => {
-            const item = document.createElement('div');
-            item.className = 'suggestion-item';
-            item.textContent = style;
-            item.dataset.action = 'select-style';
-            item.dataset.style = style;
-            dropdown.appendChild(item);
-        });
+        dropdown.innerHTML = styles.map(style => 
+            `<div class="suggestion-item" data-action="select-style" data-style="${style}">${style}</div>`
+        ).join('');
         
         showDropdown('beerStyleDropdown');
-    };
+    }
     
-    const selectStyle = (style) => {
+    function selectStyle(style) {
         document.getElementById('reportBeerStyle').value = style;
         hideDropdown('beerStyleDropdown');
-        trackEvent('style_selected', 'Form', style);
-    };
+        modules.tracking?.trackEvent('style_selected', 'Form', style);
+    }
     
     // ================================
-    // DROPDOWN MANAGEMENT
+    // GF STATUS FLOW
     // ================================
-
-    const dropdownsOpen = new Set();
-    
-    const showDropdown = (dropdownId) => {
-        const dropdown = document.getElementById(dropdownId);
-        if (dropdown) {
-            dropdown.style.display = 'block';
-            dropdownsOpen.add(dropdownId);
-        }
-    };
-    
-    const hideDropdown = (dropdownId) => {
-        const dropdown = document.getElementById(dropdownId);
-        if (dropdown) {
-            dropdown.style.display = 'none';
-            dropdownsOpen.delete(dropdownId);
-        }
-    };
-    
-    const hideAllDropdowns = () => {
-        const dropdownIds = [
-            'breweryDropdown', 
-            'beerNameDropdown', 
-            'beerStyleDropdown', 
-            'pubSuggestions'
-        ];
-        dropdownIds.forEach(id => hideDropdown(id));
-    };
-    
-    // ================================
-    // PHOTO UPLOAD
-    // ================================
-    
-    const initializePhotoUpload = () => {
-        const photoInput = document.getElementById('reportPhoto');
-        const photoLabel = document.querySelector('.photo-upload-compact');
-        
-        if (!photoInput || !photoLabel) return;
-        
-        photoInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const fileName = file.name.length > 20 ? 
-                    file.name.substring(0, 17) + '...' : 
-                    file.name;
-                
-                photoLabel.classList.add('active');
-                const textEl = photoLabel.querySelector('.photo-upload-text');
-                if (textEl) {
-                    textEl.innerHTML = `
-                        <strong>📸 ${fileName}</strong><br>
-                        <small>Click to change photo</small>
-                    `;
-                }
-                
-                trackEvent('photo_selected', 'Form', 'photo_upload');
-            }
-        });
-    };
-    
-    // ================================
-    // HELPER FUNCTIONS
-    // ================================
-    
-    const debounce = (func, wait) => {
-        let timeout;
-        return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
-            clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
-        };
-    };
-    
-    const escapeHtml = (text) => {
-        const div = document.createElement('div');
-        div.textContent = text || '';
-        return div.innerHTML;
-    };
-    
-    const focusNextEmptyField = (fieldIds) => {
-        for (const id of fieldIds) {
-            const field = document.getElementById(id);
-            if (field && !field.value) {
-                field.focus();
-                break;
-            }
-        }
-    };
-    
-    const showSuccess = (message) => {
-        if (window.showSuccessToast) {
-            window.showSuccessToast(message);
-        } else {
-            console.log('✅', message);
-        }
-    };
-    
-    const showError = (message) => {
-        if (window.showSuccessToast) {
-            window.showSuccessToast(`❌ ${message}`);
-        } else {
-            console.error('❌', message);
-        }
-    };
-    
-    const trackEvent = (action, category, label) => {
-        if (window.TrackingModule) {
-            window.TrackingModule.trackEvent(action, category, label);
-        }
-    };
-    
-    const trackFormSubmission = (formName, data) => {
-        if (window.TrackingModule) {
-            window.TrackingModule.trackEvent('form_submission', 'Form', formName);
-        }
-    };
-    
-    // ================================
-    // EVENT LISTENERS
-    // ================================
-    
-    const setupEventListeners = () => {
-        // Handle dropdown item clicks
-        document.addEventListener('click', (e) => {
-            const action = e.target.closest('[data-action]');
-            
-            if (!action) return;
-            
-            switch(action.dataset.action) {
-                case 'select-pub':
-                    selectPub(action);
-                    break;
-                case 'add-new-pub':
-                    showNewPubFields();
-                    break;
-                case 'select-beer':
-                    selectBeer(action.dataset.beerData);
-                    break;
-                case 'add-new-beer':
-                    document.getElementById('reportBeerName').value = '';
-                    document.getElementById('reportBeerName').focus();
-                    hideDropdown('beerNameDropdown');
-                    break;
-                case 'use-beer-name':
-                    hideDropdown('beerNameDropdown');
-                    document.getElementById('reportBeerStyle').focus();
-                    break;
-                case 'focus-beer-name':
-                    hideDropdown('beerNameDropdown');
-                    document.getElementById('reportBeerName').focus();
-                    const currentBrewery = window.App.getState('currentBrewery');
-                    showSuccess(`🎉 Adding first beer for ${currentBrewery}!`);
-                    break;
-                case 'select-style':
-                    selectStyle(action.dataset.style);
-                    break;
-            }
-        });
-        
-        // Hide dropdowns when clicking outside
-        document.addEventListener('click', (e) => {
-            // Check if click is outside brewery dropdown
-            if (!e.target.closest('.brewery-dropdown-container') && 
-                !e.target.closest('#breweryDropdown') &&
-                !e.target.closest('#reportBrewery')) {
-                hideDropdown('breweryDropdown');
-            }
-            
-            // Check if click is outside beer name dropdown
-            if (!e.target.closest('.beer-name-container') && 
-                !e.target.closest('#beerNameDropdown') &&
-                !e.target.closest('#reportBeerName')) {
-                hideDropdown('beerNameDropdown');
-            }
-            
-            // Check if click is outside beer style dropdown
-            if (!e.target.closest('.beer-style-container') && 
-                !e.target.closest('#beerStyleDropdown') &&
-                !e.target.closest('#reportBeerStyle')) {
-                hideDropdown('beerStyleDropdown');
-            }
-            
-            // Check if click is outside pub suggestions
-            if (!e.target.closest('#reportPubSearch') && 
-                !e.target.closest('#pubSuggestions')) {
-                hideDropdown('pubSuggestions');
-            }
-        }, true);
-
-        // Brewery autocomplete
-        const breweryInput = document.getElementById('reportBrewery');
-        if (breweryInput) {
-            const newBreweryInput = breweryInput.cloneNode(true);
-            breweryInput.parentNode.replaceChild(newBreweryInput, breweryInput);
-            
-            newBreweryInput.addEventListener('input', debounce((e) => {
-                searchBreweries(e.target.value);
-            }, config.debounceDelay));
-            
-            newBreweryInput.addEventListener('focus', (e) => {
-                if (!e.target.value) {
-                    searchBreweries('');
-                }
-            });
-            
-            newBreweryInput.addEventListener('click', (e) => {
-                e.stopPropagation();
-                if (!e.target.value) {
-                    searchBreweries('');
-                }
-            });
-        }
-        
-        // Beer name autocomplete
-        const beerNameInput = document.getElementById('reportBeerName');
-        if (beerNameInput) {
-            const newBeerNameInput = beerNameInput.cloneNode(true);
-            beerNameInput.parentNode.replaceChild(newBeerNameInput, beerNameInput);
-            
-            newBeerNameInput.addEventListener('input', debounce((e) => {
-                searchBeerNames(e.target.value);
-            }, config.debounceDelay));
-            
-            newBeerNameInput.addEventListener('focus', (e) => {
-                const brewery = document.getElementById('reportBrewery').value;
-                if (brewery && !e.target.value) {
-                    loadBreweryBeers(brewery);
-                }
-            });
-        }
-        
-        // Beer style autocomplete
-        const beerStyleInput = document.getElementById('reportBeerStyle');
-        if (beerStyleInput) {
-            const newBeerStyleInput = beerStyleInput.cloneNode(true);
-            beerStyleInput.parentNode.replaceChild(newBeerStyleInput, beerStyleInput);
-            
-            newBeerStyleInput.addEventListener('input', debounce((e) => {
-                searchBeerStyles(e.target.value);
-            }, config.debounceDelay));
-        }
-    };
-
-    // ADD: Complete GF Status flow handler
-
     const GFStatusFlow = {
         currentPub: null,
         selectedStatus: null,
         
-        init() {
-            this.setupEventListeners();
-        },
-        
-        setupEventListeners() {
-            // Change status button
-            document.addEventListener('click', (e) => {
-                if (e.target.closest('[data-action="change-gf-status"]')) {
-                    this.openStatusModal();
-                }
-
-                if (e.target.closest('.status-option[data-status]')) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const option = e.target.closest('.status-option[data-status]');
-                    const status = option.dataset.status;
-                    
-                    // Store the current pub data
-                    this.currentPub = window.App.getState('currentPub');
-                    
-                    // Close the status modal and select status
-                    const statusModal = document.getElementById('gfStatusModal');
-                    if (statusModal) {
-                        statusModal.style.display = 'none';
-                        statusModal.classList.remove('active');
-                    }
-                    
-                    this.selectStatus(status);
-                }
-                
-                // Status option selection
-                if (e.target.closest('.status-option')) {
-                    const option = e.target.closest('.status-option');
-                    this.selectStatus(option.dataset.status);
-                }
-                
-                // Confirm status
-                if (e.target.matches('[data-action="confirm-status"]')) {
-                    this.confirmStatusUpdate();
-                }
-                
-                // Cancel status
-                if (e.target.matches('[data-action="cancel-status"]')) {
-                    this.closeModal('gfStatusConfirmModal');
-                }
-                
-                // Skip details
-                if (e.target.matches('[data-action="skip-details"]')) {
-                    this.closeModal('beerDetailsPromptModal');
-                    this.showSuccessMessage();
-                }
-                
-                // Add beer details
-                if (e.target.matches('[data-action="add-beer-details"]')) {
-                    this.closeModal('beerDetailsPromptModal');
-                    this.openBeerReportModal();
-                }
-            });
-        },
-        
         openStatusModal() {
-            console.log('🔍 openStatusModal called');
-            // CHANGE: Use window.currentPubData directly and store it
-            this.currentPub = window.App.getState('currentPub');
-            console.log('🏠 Current pub:', this.currentPub);
+            console.log('🔍 Opening GF status modal');
+            this.currentPub = utils.getCurrentPub();
             
             if (!this.currentPub) {
                 console.error('❌ No current pub data');
-                if (window.showSuccessToast) {
-                    window.showSuccessToast('❌ No pub selected');
-                }
+                utils.showToast('❌ No pub selected', 'error');
                 return;
             }
             
@@ -973,19 +649,16 @@ export const FormModule = (function() {
                 pubNameEl.textContent = this.currentPub.name;
             }
             
-            // Open modal using ModalModule
-            if (window.ModalModule) {
-                window.ModalModule.open('gfStatusModal');
-            }
+            modules.modal.open('gfStatusModal');
         },
         
         selectStatus(status) {
             this.selectedStatus = status;
             
-            // Close the status selection modal immediately
-            this.closeModal('gfStatusModal');
+            // Close status selection modal
+            modules.modal.close('gfStatusModal');
             
-            // Show confirmation
+            // Update confirmation display
             const confirmStatusEl = document.getElementById('confirmStatus');
             const statusLabels = {
                 'always': '⭐ Always Available',
@@ -998,47 +671,35 @@ export const FormModule = (function() {
                 confirmStatusEl.innerHTML = statusLabels[status] || status;
             }
             
-            // Small delay to ensure first modal is closed
+            // Show confirmation modal
             setTimeout(() => {
-                this.openModal('gfStatusConfirmModal');
+                modules.modal.open('gfStatusConfirmModal');
             }, 100);
         },
         
         async confirmStatusUpdate() {
-            console.log('🔍 confirmStatusUpdate called');
-            console.log('Current pub:', this.currentPub);
-            console.log('Selected status:', this.selectedStatus);
-            console.log('Window currentPubData:', window.currentPubData);
+            console.log('🔍 Confirming status update');
             
-            // Safety check
-            const pubToUpdate = this.currentPub || window.App.getState('currentPub');
+            const pubToUpdate = this.currentPub || utils.getCurrentPub();
             if (!pubToUpdate || !pubToUpdate.pub_id) {
-                console.error('❌ No pub data available for update');
-                if (window.showSuccessToast) {
-                    window.showSuccessToast('❌ Error: No pub selected');
-                }
+                console.error('❌ No pub data available');
+                utils.showToast('❌ Error: No pub selected', 'error');
                 return;
             }
             
-            // Make sure we have a status
             if (!this.selectedStatus) {
                 console.error('❌ No status selected');
                 return;
             }
             
-            // Close BOTH modals first
-            if (window.ModalModule) {
-                window.ModalModule.close('gfStatusConfirmModal');
-                window.ModalModule.close('gfStatusModal'); // ADD THIS LINE
-            }
+            // Close modals
+            modules.modal.close('gfStatusConfirmModal');
+            modules.modal.close('gfStatusModal');
+            
+            // Show loading
+            utils.showLoadingToast('Updating status...');
             
             try {
-                // Show loading
-                if (window.showLoadingToast) {
-                    window.showLoadingToast('Updating status...');
-                }
-                
-                // Send update
                 const response = await fetch('/api/update-gf-status', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -1047,37 +708,27 @@ export const FormModule = (function() {
                         status: this.selectedStatus
                     })
                 });
-        
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error('Server response:', errorText);
-                    console.error('Request data was:', {
-                        pub_id: pubToUpdate.pub_id,
-                        status: this.selectedStatus
-                    });
-                }
+                
+                utils.hideLoadingToast();
                 
                 if (response.ok) {
-                    // Update UI
                     this.updateStatusDisplay(this.selectedStatus);
                     
-                    // Hide loading
-                    if (window.hideLoadingToast) {
-                        window.hideLoadingToast();
+                    // Show appropriate follow-up
+                    if (this.selectedStatus === 'always' || this.selectedStatus === 'currently') {
+                        modules.modal.open('beerDetailsPromptModal');
+                    } else {
+                        utils.showToast('✅ Status updated successfully!');
                     }
                     
-                    // Show beer details prompt for positive statuses
-                    if (this.selectedStatus === 'always' || this.selectedStatus === 'currently') {
-                        this.openModal('beerDetailsPromptModal');
-                    } else {
-                        this.showSuccessMessage();
-                    }
+                    modules.tracking?.trackEvent('gf_status_updated', 'Form', this.selectedStatus);
+                } else {
+                    throw new Error('Failed to update status');
                 }
             } catch (error) {
                 console.error('Error updating status:', error);
-                if (window.showSuccessToast) {
-                    window.showSuccessToast('❌ Failed to update status');
-                }
+                utils.hideLoadingToast();
+                utils.showToast('❌ Failed to update status', 'error');
             }
         },
         
@@ -1116,84 +767,271 @@ export const FormModule = (function() {
                 <span class="status-text">${display.text}</span>
                 <span class="status-meta">${display.meta}</span>
             `;
-        },
-        
-        openBeerReportModal() {
-            // Use existing report modal
-            if (window.ModalModule) {
-                window.ModalModule.openReportModal(this.currentPub);
+        }
+    };
+    
+    // ================================
+    // DROPDOWN HELPERS
+    // ================================
+    function showDropdown(dropdownId) {
+        const dropdown = document.getElementById(dropdownId);
+        if (dropdown) {
+            dropdown.style.display = 'block';
+            state.dropdownsOpen.add(dropdownId);
+        }
+    }
+    
+    function hideDropdown(dropdownId) {
+        const dropdown = document.getElementById(dropdownId);
+        if (dropdown) {
+            dropdown.style.display = 'none';
+            state.dropdownsOpen.delete(dropdownId);
+        }
+    }
+    
+    function hideAllDropdowns() {
+        ['breweryDropdown', 'beerNameDropdown', 'beerStyleDropdown', 'pubSuggestions']
+            .forEach(id => hideDropdown(id));
+    }
+    
+    // ================================
+    // UI HELPERS
+    // ================================
+    function createDropdownHeader(text) {
+        const header = document.createElement('div');
+        header.className = 'dropdown-header';
+        header.innerHTML = text;
+        return header;
+    }
+    
+    function createSuggestionItem(text, action, data = {}) {
+        const item = document.createElement('div');
+        item.className = 'suggestion-item';
+        item.innerHTML = `<strong>${utils.escapeHtml(text)}</strong>`;
+        item.dataset.action = action;
+        Object.entries(data).forEach(([key, value]) => {
+            item.dataset[key] = value;
+        });
+        return item;
+    }
+    
+    function createAddNewItem(title, subtitle, action) {
+        const item = document.createElement('div');
+        item.className = 'suggestion-item add-new-item';
+        item.innerHTML = `
+            <strong>${title}</strong><br>
+            <small style="color: var(--text-muted);">${subtitle}</small>
+        `;
+        item.dataset.action = action;
+        return item;
+    }
+    
+    function addAutoFillAnimation(fieldIds) {
+        fieldIds.forEach(id => {
+            const element = document.getElementById(id);
+            if (element) {
+                element.classList.add('auto-filled');
+                setTimeout(() => element.classList.remove('auto-filled'), 2000);
             }
-        },
-        
-        showSuccessMessage() {
-            if (window.showSuccessToast) {
-                window.showSuccessToast('✅ Status updated successfully!');
-            }
-        },
-        
-        openModal(modalId) {
-            const modal = document.getElementById(modalId);
-            if (modal) {
-                // Force it to the absolute top
-                modal.style.cssText = `
-                    display: flex !important;
-                    z-index: 999999 !important;
-                    position: fixed !important;
-                    top: 0 !important;
-                    left: 0 !important;
-                    width: 100% !important;
-                    height: 100% !important;
-                `;
-                document.body.style.overflow = 'hidden';
-            }
-        },
-        
-        closeModal(modalId) {
-            const modal = document.getElementById(modalId);
-            if (modal) {
-                modal.style.display = 'none';
-                document.body.style.overflow = '';
-            }
-            
-            // Restore pub overlay
-            const pubOverlay = document.getElementById('pubDetailsOverlay');
-            if (pubOverlay) {
-                pubOverlay.style.display = 'flex';
+        });
+    }
+    
+    function focusNextEmptyField(fieldIds) {
+        for (const id of fieldIds) {
+            const field = document.getElementById(id);
+            if (field && !field.value) {
+                field.focus();
+                break;
             }
         }
     }
     
-    // Initialize when ready
-    // document.addEventListener('DOMContentLoaded', () => GFStatusFlow.init());
+    // ================================
+    // EVENT DELEGATION
+    // ================================
+    function setupEventDelegation() {
+        // Main click handler for all form actions
+        document.addEventListener('click', handleFormAction);
+        
+        // Hide dropdowns when clicking outside
+        document.addEventListener('click', handleOutsideClick, true);
+    }
+    
+    function handleFormAction(e) {
+        const action = e.target.closest('[data-action]');
+        if (!action) return;
+        
+        // Prevent default for all form actions
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const actionHandlers = {
+            'select-pub': () => selectPub(action),
+            'add-new-pub': () => showNewPubFields(),
+            'clear-selected-pub': () => clearSelectedPub(),
+            'select-brewery': () => selectBrewery(action.dataset.brewery),
+            'select-beer': () => selectBeer(action.dataset.beerData),
+            'add-new-beer': () => {
+                document.getElementById('reportBeerName').value = '';
+                document.getElementById('reportBeerName').focus();
+                hideDropdown('beerNameDropdown');
+            },
+            'use-beer-name': () => {
+                hideDropdown('beerNameDropdown');
+                document.getElementById('reportBeerStyle').focus();
+            },
+            'focus-beer-name': () => {
+                hideDropdown('beerNameDropdown');
+                document.getElementById('reportBeerName').focus();
+                const brewery = utils.getCurrentBrewery();
+                utils.showToast(`🎉 Adding first beer for ${brewery}!`);
+            },
+            'select-style': () => selectStyle(action.dataset.style),
+            'change-gf-status': () => GFStatusFlow.openStatusModal(),
+            'select-status': () => GFStatusFlow.selectStatus(action.dataset.status),
+            'confirm-status': () => GFStatusFlow.confirmStatusUpdate(),
+            'cancel-status': () => modules.modal.close('gfStatusConfirmModal'),
+            'skip-details': () => {
+                modules.modal.close('beerDetailsPromptModal');
+                utils.showToast('✅ Status updated successfully!');
+            },
+            'add-beer-details': () => {
+                modules.modal.close('beerDetailsPromptModal');
+                modules.modal.openReportModal(GFStatusFlow.currentPub);
+            }
+        };
+        
+        const handler = actionHandlers[action.dataset.action];
+        if (handler) {
+            handler();
+        }
+    }
+    
+    function handleOutsideClick(e) {
+        // Check each dropdown
+        const dropdownChecks = [
+            { input: 'reportBrewery', dropdown: 'breweryDropdown', container: '.brewery-dropdown-container' },
+            { input: 'reportBeerName', dropdown: 'beerNameDropdown', container: '.beer-name-container' },
+            { input: 'reportBeerStyle', dropdown: 'beerStyleDropdown', container: '.beer-style-container' },
+            { input: 'reportPubSearch', dropdown: 'pubSuggestions', container: null }
+        ];
+        
+        dropdownChecks.forEach(({ input, dropdown, container }) => {
+            const clickedInside = e.target.closest(`#${input}`) || 
+                                 e.target.closest(`#${dropdown}`) ||
+                                 (container && e.target.closest(container));
+            
+            if (!clickedInside) {
+                hideDropdown(dropdown);
+            }
+        });
+    }
+    
+    // ================================
+    // INPUT LISTENERS
+    // ================================
+    function setupInputListeners() {
+        // Pub search
+        const pubSearchInput = document.getElementById('reportPubSearch');
+        if (pubSearchInput) {
+            pubSearchInput.addEventListener('input', (e) => searchPubs(e.target.value));
+            pubSearchInput.addEventListener('focus', (e) => {
+                if (e.target.value.length >= config.minSearchLength) {
+                    searchPubs(e.target.value);
+                }
+            });
+        }
+        
+        // Brewery input
+        const breweryInput = document.getElementById('reportBrewery');
+        if (breweryInput) {
+            breweryInput.addEventListener('input', (e) => searchBreweries(e.target.value));
+            breweryInput.addEventListener('focus', (e) => {
+                if (!e.target.value) searchBreweries('');
+            });
+            breweryInput.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (!e.target.value) searchBreweries('');
+            });
+        }
+        
+        // Beer name input
+        const beerNameInput = document.getElementById('reportBeerName');
+        if (beerNameInput) {
+            beerNameInput.addEventListener('input', (e) => searchBeerNames(e.target.value));
+            beerNameInput.addEventListener('focus', (e) => {
+                const brewery = document.getElementById('reportBrewery').value;
+                if (brewery && !e.target.value) {
+                    loadBreweryBeers(brewery);
+                }
+            });
+        }
+        
+        // Beer style input
+        const beerStyleInput = document.getElementById('reportBeerStyle');
+        if (beerStyleInput) {
+            beerStyleInput.addEventListener('input', (e) => searchBeerStyles(e.target.value));
+        }
+    }
+    
+    // ================================
+    // PHOTO UPLOAD
+    // ================================
+    function initializePhotoUpload() {
+        const photoInput = document.getElementById('reportPhoto');
+        const photoLabel = document.querySelector('.photo-upload-compact');
+        
+        if (!photoInput || !photoLabel) return;
+        
+        photoInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const fileName = file.name.length > 20 ? 
+                    file.name.substring(0, 17) + '...' : 
+                    file.name;
+                
+                photoLabel.classList.add('active');
+                const textEl = photoLabel.querySelector('.photo-upload-text');
+                if (textEl) {
+                    textEl.innerHTML = `
+                        <strong>📸 ${fileName}</strong><br>
+                        <small>Click to change photo</small>
+                    `;
+                }
+                
+                modules.tracking?.trackEvent('photo_selected', 'Form', 'photo_upload');
+            }
+        });
+    }
     
     // ================================
     // INITIALIZATION
     // ================================
-    
-    const init = () => {
+    function init() {
         console.log('🔧 Initializing Form Module');
         
-        setupEventListeners();
-        initializePubSearch();
+        setupEventDelegation();
+        setupInputListeners();
         initializePhotoUpload();
-        GFStatusFlow.init(); // ADD THIS LINE
         
-        window.initReportDropdowns = initReportDropdowns;
+        // Expose report form handler globally for the form submit
+        const reportForm = document.getElementById('reportForm');
+        if (reportForm) {
+            reportForm.addEventListener('submit', handleReportSubmission);
+        }
         
         console.log('✅ Form Module initialized');
-    };
+    }
     
-    const initReportDropdowns = () => {
+    function initReportDropdowns() {
         console.log('🔧 Initializing report form dropdowns');
-        
         hideAllDropdowns();
         initializePhotoUpload();
-    };
+    }
     
     // ================================
     // PUBLIC API
     // ================================
-    
     return {
         init,
         handleReportSubmission,
@@ -1205,18 +1043,19 @@ export const FormModule = (function() {
         clearSelectedPub,
         initReportDropdowns,
         resetReportForm,
-        setupEventListeners,
         GFStatusFlow,
         
-        // For external access if needed
-        getSelectedPub: () => state.selectedPubData,
-        getCurrentBrewery: () => state.currentBrewery
+        // Expose for external access if needed
+        getSelectedPub: utils.getSelectedPub,
+        getCurrentBrewery: utils.getCurrentBrewery
     };
 })();
 
-// Auto-initialize when DOM is ready
+// Initialize when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', FormModule.init);
 } else {
     FormModule.init();
 }
+
+// DO NOT add window.FormModule = FormModule here!
