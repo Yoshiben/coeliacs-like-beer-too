@@ -9,17 +9,12 @@ import { ModalModule } from './modals.js';
 export const FormModule = (function() {
     'use strict';
     
-    // Private state
-    const state = {
-        selectedPubData: null,
-        currentBrewery: null,
-        searchTimeouts: {
-            brewery: null,
-            beer: null,
-            style: null,
-            pub: null
-        },
-        dropdownsOpen: new Set()
+    // NEW: Just keep searchTimeouts as a private const
+    const searchTimeouts = {
+        brewery: null,
+        beer: null,
+        style: null,
+        pub: null
     };
     
     // Configuration
@@ -54,10 +49,11 @@ export const FormModule = (function() {
         console.log('📋 Form data collected:', reportData);
         
         // Add pub data
-        if (window.selectedPubData || state.selectedPubData) {
-            const pubData = window.selectedPubData || state.selectedPubData;
-            reportData.pub_id = pubData.pub_id;
-            reportData.pub_name = pubData.name;
+        const selectedPub = window.App.getState('selectedPubForReport');
+        if (selectedPub) {
+            reportData.pub_id = selectedPub.pub_id;
+            reportData.pub_name = selectedPub.name;
+        }
             console.log('🏠 Using pre-populated pub:', pubData.name);
             console.log('🔍 DEBUG - Pub data being sent:', {
                 pub_id: reportData.pub_id,
@@ -183,7 +179,7 @@ export const FormModule = (function() {
         
         // Clear state
         state.selectedPubData = null;
-        window.selectedPubData = null;
+        window.App.setState('selectedPubForReport', null);
         state.currentBrewery = null;
         
         // Reset UI elements
@@ -276,14 +272,13 @@ export const FormModule = (function() {
         const pubDetails = pubElement.querySelector('small').textContent;
         const [address, postcode] = pubDetails.split(', ');
         
-        // Store selected pub data
-        state.selectedPubData = {
+        const pubData = {
             pub_id: parseInt(pubId),
             name: pubName,
             address: address,
             postcode: postcode
         };
-        window.selectedPubData = state.selectedPubData;
+        window.App.setState('selectedPubForReport', pubData);
         
         // Update UI
         document.getElementById('selectedPubInfo').style.display = 'block';
@@ -306,7 +301,7 @@ export const FormModule = (function() {
     
     const clearSelectedPub = () => {
         state.selectedPubData = null;
-        window.selectedPubData = null;
+        window.App.setState('selectedPubForReport', null);
         
         document.getElementById('selectedPubInfo').style.display = 'none';
         document.getElementById('pubSearchGroup').style.display = 'block';
@@ -319,7 +314,7 @@ export const FormModule = (function() {
     // ================================
     
     const searchBreweries = async (query) => {
-        clearTimeout(state.searchTimeouts.brewery);
+        clearTimeout(searchTimeouts.brewery);
         const dropdown = document.getElementById('breweryDropdown');
         if (!dropdown) return;
         
@@ -395,7 +390,7 @@ export const FormModule = (function() {
             breweryInput.value = brewery;
         }
         
-        state.currentBrewery = brewery;
+        window.App.setState('currentBrewery', brewery);
         
         // Hide brewery dropdown immediately
         hideDropdown('breweryDropdown');
@@ -452,7 +447,7 @@ export const FormModule = (function() {
     // ================================
     
     const searchBeerNames = async (query) => {
-        clearTimeout(state.searchTimeouts.beer);
+        clearTimeout(searchTimeouts.beer);
         const dropdown = document.getElementById('beerNameDropdown');
         const brewery = document.getElementById('reportBrewery').value;
         
@@ -598,7 +593,7 @@ export const FormModule = (function() {
     // ================================
     
     const searchBeerStyles = (query) => {
-        clearTimeout(state.searchTimeouts.style);
+        clearTimeout(searchTimeouts.style);
         const dropdown = document.getElementById('beerStyleDropdown');
         
         if (!dropdown) return;
@@ -648,12 +643,14 @@ export const FormModule = (function() {
     // ================================
     // DROPDOWN MANAGEMENT
     // ================================
+
+    const dropdownsOpen = new Set();
     
     const showDropdown = (dropdownId) => {
         const dropdown = document.getElementById(dropdownId);
         if (dropdown) {
             dropdown.style.display = 'block';
-            state.dropdownsOpen.add(dropdownId);
+            dropdownsOpen.add(dropdownId);
         }
     };
     
@@ -661,7 +658,7 @@ export const FormModule = (function() {
         const dropdown = document.getElementById(dropdownId);
         if (dropdown) {
             dropdown.style.display = 'none';
-            state.dropdownsOpen.delete(dropdownId);
+            dropdownsOpen.delete(dropdownId);
         }
     };
     
@@ -799,7 +796,8 @@ export const FormModule = (function() {
                 case 'focus-beer-name':
                     hideDropdown('beerNameDropdown');
                     document.getElementById('reportBeerName').focus();
-                    showSuccess(`🎉 Adding first beer for ${state.currentBrewery}!`);
+                    const currentBrewery = window.App.getState('currentBrewery');
+                    showSuccess(`🎉 Adding first beer for ${currentBrewery}!`);
                     break;
                 case 'select-style':
                     selectStyle(action.dataset.style);
@@ -915,7 +913,7 @@ export const FormModule = (function() {
                     const status = option.dataset.status;
                     
                     // Store the current pub data
-                    this.currentPub = window.currentPubData;
+                    this.currentPub = window.App.getState('currentPub');
                     
                     // Close the status modal and select status
                     const statusModal = document.getElementById('gfStatusModal');
