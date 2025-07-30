@@ -1,275 +1,307 @@
 // ================================================================================
-// HELPERS.JS - Consolidated UI and Utils Module
-// Combines functionality from ui.js and utils.js, removing redundancy
+// HELPERS.JS - Complete Refactor with STATE_KEYS
+// Handles: UI utilities, storage, animations, overlays, responsive helpers
 // ================================================================================
+
+import { Constants } from './constants.js';
+const STATE_KEYS = Constants.STATE_KEYS;
 
 export const HelpersModule = (function() {
     'use strict';
     
-    // Private state
+    // ================================
+    // PRIVATE STATE
+    // ================================
     const state = {
-        activeOverlays: new Set(),
-        isLoading: false,
-        currentView: 'home'
+        activeToasts: new Set(),
+        loadingToastId: null,
+        resizeTimeout: null,
+        scrollPositions: new Map()
+    };
+    
+    const config = {
+        toast: {
+            duration: Constants.UI.TOAST_DURATION,
+            animationDuration: Constants.UI.ANIMATION_DURATION
+        },
+        animation: {
+            numberDuration: Constants.UI.NUMBER_ANIMATION_DURATION
+        },
+        debounce: {
+            resize: 250,
+            scroll: 150
+        }
+    };
+    
+    // ================================
+    // MODULE GETTERS
+    // ================================
+    const modules = {
+        get tracking() { return window.App?.getModule('tracking'); }
     };
     
     // ================================
     // INITIALIZATION
     // ================================
-    
-    function init() {
+    const init = () => {
         console.log('🔧 Initializing Helpers Module');
-        setupUIListeners();
-        updateNavigationState();
+        
+        setupEventListeners();
+        initializeViewport();
+        
         console.log('✅ Helpers Module initialized');
-    }
+    };
     
     // ================================
-    // TOAST NOTIFICATION SYSTEM
+    // TOAST SYSTEM
     // ================================
-    
-    const showLoadingToast = (message = 'Loading...') => {
-        const toast = document.getElementById('loadingToast');
-        if (!toast) {
-            console.warn('Loading toast element not found');
-            return;
+    const showToast = (message, type = 'info', duration = config.toast.duration) => {
+        const toastId = `toast-${Date.now()}`;
+        const toast = createToastElement(toastId, message, type);
+        
+        document.body.appendChild(toast);
+        state.activeToasts.add(toastId);
+        
+        // Force reflow then animate in
+        toast.offsetHeight;
+        toast.classList.add('show');
+        
+        if (duration > 0) {
+            setTimeout(() => hideToast(toastId), duration);
         }
         
-        const messageEl = document.getElementById('loadingMessage');
-        if (messageEl) messageEl.textContent = message;
+        return toastId;
+    };
+    
+    const showLoadingToast = (message = 'Loading...') => {
+        if (state.loadingToastId) {
+            updateToastMessage(state.loadingToastId, message);
+            return state.loadingToastId;
+        }
         
-        toast.style.display = 'block';
-        toast.style.animation = 'slideInUp 0.3s ease-out';
+        state.loadingToastId = showToast(message, 'loading', 0);
+        return state.loadingToastId;
     };
     
     const hideLoadingToast = () => {
-        const toast = document.getElementById('loadingToast');
+        if (state.loadingToastId) {
+            hideToast(state.loadingToastId);
+            state.loadingToastId = null;
+        }
+    };
+    
+    const showSuccessToast = (message) => {
+        return showToast(message, 'success');
+    };
+    
+    const showErrorToast = (message) => {
+        return showToast(message, 'error');
+    };
+    
+    const hideToast = (toastId) => {
+        const toast = document.getElementById(toastId);
         if (!toast) return;
         
-        toast.style.animation = 'slideOutDown 0.3s ease-in';
+        toast.classList.remove('show');
+        toast.classList.add('hide');
+        
         setTimeout(() => {
-            toast.style.display = 'none';
-        }, 300);
+            toast.remove();
+            state.activeToasts.delete(toastId);
+        }, config.toast.animationDuration);
     };
     
-    const showSuccessToast = (message = 'Success!') => {
-        const toast = document.getElementById('successToast');
-        if (!toast) {
-            console.warn('Success toast element not found');
-            console.log('✅', message);
-            return;
+    const updateToastMessage = (toastId, message) => {
+        const toast = document.getElementById(toastId);
+        if (toast) {
+            const messageEl = toast.querySelector('.toast-message');
+            if (messageEl) messageEl.textContent = message;
+        }
+    };
+    
+    const createToastElement = (id, message, type) => {
+        const toast = document.createElement('div');
+        toast.id = id;
+        toast.className = `toast toast-${type}`;
+        
+        const icon = getToastIcon(type);
+        toast.innerHTML = `
+            <div class="toast-content">
+                ${icon ? `<span class="toast-icon">${icon}</span>` : ''}
+                <span class="toast-message">${escapeHtml(message)}</span>
+            </div>
+        `;
+        
+        return toast;
+    };
+    
+    const getToastIcon = (type) => {
+        const icons = {
+            loading: '<div class="spinner"></div>',
+            success: '✅',
+            error: '❌',
+            info: 'ℹ️',
+            warning: '⚠️'
+        };
+        return icons[type] || '';
+    };
+    
+    // ================================
+    // OVERLAY MANAGEMENT
+    // ================================
+    const showOverlay = (overlayId, options = {}) => {
+        const overlay = document.getElementById(overlayId);
+        if (!overlay) {
+            console.error(`Overlay not found: ${overlayId}`);
+            return false;
         }
         
-        const messageEl = document.getElementById('successMessage');
-        if (messageEl) messageEl.textContent = message;
+        // Store scroll position
+        if (options.preserveScroll) {
+            state.scrollPositions.set(overlayId, window.scrollY);
+        }
         
-        toast.style.display = 'block';
-        toast.style.animation = 'slideInUp 0.3s ease-out';
+        // Update state
+        const activeOverlays = window.App.getState(STATE_KEYS.ACTIVE_OVERLAYS) || new Set();
+        activeOverlays.add(overlayId);
+        window.App.setState(STATE_KEYS.ACTIVE_OVERLAYS, activeOverlays);
         
-        setTimeout(() => {
-            toast.style.animation = 'slideOutDown 0.3s ease-in';
-            setTimeout(() => {
-                toast.style.display = 'none';
-            }, 300);
-        }, 3000);
-    };
-    
-    // ================================
-    // OVERLAY MANAGEMENT (from ui.js)
-    // ================================
-    
-    function showOverlay(overlayId, options = {}) {
-        const overlay = document.getElementById(overlayId);
-        if (!overlay) return false;
-        
-        state.activeOverlays.add(overlayId);
-        overlay.classList.add('active');
+        // Show overlay
         overlay.style.display = 'flex';
+        overlay.classList.add('active');
         
+        // Lock body scroll if needed
         if (options.lockScroll !== false) {
             document.body.style.overflow = 'hidden';
         }
         
+        // Update current view if specified
         if (options.view) {
-            state.currentView = options.view;
+            window.App.setState(STATE_KEYS.CURRENT_VIEW, options.view);
+        }
+        
+        // Track event
+        if (modules.tracking) {
+            modules.tracking.trackEvent('overlay_show', 'UI', overlayId);
         }
         
         return true;
-    }
+    };
     
-    function hideOverlay(overlayId) {
+    const hideOverlay = (overlayId) => {
         const overlay = document.getElementById(overlayId);
         if (!overlay) return false;
         
-        state.activeOverlays.delete(overlayId);
-        overlay.classList.remove('active');
-        overlay.style.display = 'none';
+        // Update state
+        const activeOverlays = window.App.getState(STATE_KEYS.ACTIVE_OVERLAYS) || new Set();
+        activeOverlays.delete(overlayId);
+        window.App.setState(STATE_KEYS.ACTIVE_OVERLAYS, activeOverlays);
         
-        if (state.activeOverlays.size === 0) {
+        // Hide overlay
+        overlay.style.display = 'none';
+        overlay.classList.remove('active');
+        
+        // Restore scroll if needed
+        const scrollPos = state.scrollPositions.get(overlayId);
+        if (scrollPos !== undefined) {
+            window.scrollTo(0, scrollPos);
+            state.scrollPositions.delete(overlayId);
+        }
+        
+        // Unlock body scroll if no overlays active
+        if (activeOverlays.size === 0) {
             document.body.style.overflow = '';
         }
         
         return true;
-    }
+    };
     
-    function hideAllOverlays() {
-        state.activeOverlays.forEach(overlayId => {
-            hideOverlay(overlayId);
-        });
+    const hideAllOverlays = () => {
+        const activeOverlays = window.App.getState(STATE_KEYS.ACTIVE_OVERLAYS) || new Set();
+        activeOverlays.forEach(overlayId => hideOverlay(overlayId));
         
-        state.currentView = 'home';
-        updateNavigationState();
-    }
-    
-    // ================================
-    // CENTRALIZED OVERLAY MANAGEMENT (from utils.js)
-    // ================================
-    
-    const closeAllOverlaysAndGoHome = () => {
-        console.log('🏠 Closing all overlays and returning to home');
-        
-        const pubDetailsOverlay = document.getElementById('pubDetailsOverlay');
-        if (pubDetailsOverlay && pubDetailsOverlay.classList.contains('active')) {
-            pubDetailsOverlay.style.display = 'none';
-            pubDetailsOverlay.classList.remove('active');
-            console.log('✅ Pub details overlay closed');
-        }
-        
-        const resultsOverlay = document.getElementById('resultsOverlay');
-        if (resultsOverlay && resultsOverlay.classList.contains('active')) {
-            resultsOverlay.style.display = 'none';
-            resultsOverlay.classList.remove('active');
-            console.log('✅ Results overlay closed');
-        }
-        
-        const heroSection = document.querySelector('.hero-section');
-        const searchSection = document.querySelector('.search-section');
-        if (heroSection) {
-            heroSection.style.display = 'block';
-            heroSection.style.visibility = 'visible';
-            console.log('✅ Hero section restored');
-        }
-        if (searchSection) {
-            searchSection.style.display = 'flex';
-            searchSection.style.visibility = 'visible';
-            console.log('✅ Search section restored');
-        }
-        
+        window.App.setState(STATE_KEYS.CURRENT_VIEW, 'home');
         document.body.style.overflow = '';
-        
-        const resultsMapContainer = document.getElementById('resultsMapContainer');
-        const resultsListContainer = document.getElementById('resultsListContainer');
-        const mapBtnText = document.getElementById('resultsMapBtnText');
-        
-        if (resultsMapContainer) resultsMapContainer.style.display = 'none';
-        if (resultsListContainer) resultsListContainer.style.display = 'block';
-        if (mapBtnText) mapBtnText.textContent = 'Map';
-        
-        if (window.App?.getModule('tracking')) {
-            window.App.getModule('tracking').trackEvent('close_overlays', 'Navigation', 'home');
-        }
-        
-        console.log('✅ Successfully returned to home view');
-        return true;
-    };
-    
-    const closeResults = () => {
-        console.log('🏠 closeResults called - delegating to centralized function');
-        return closeAllOverlaysAndGoHome();
     };
     
     // ================================
-    // VIEW MANAGEMENT (from ui.js)
+    // VIEW MANAGEMENT
     // ================================
-    
-    function showHomeView() {
+    const showHomeView = () => {
+        console.log('🏠 Showing home view');
+        
         hideAllOverlays();
         
-        const heroSection = document.querySelector('.hero-section');
-        const searchSection = document.querySelector('.search-section');
+        const elements = {
+            hero: document.querySelector('.hero-section'),
+            search: document.querySelector('.search-section')
+        };
         
-        if (heroSection) heroSection.style.display = 'block';
-        if (searchSection) searchSection.style.display = 'block';
+        if (elements.hero) elements.hero.style.display = 'block';
+        if (elements.search) elements.search.style.display = 'flex';
         
-        state.currentView = 'home';
+        window.App.setState(STATE_KEYS.CURRENT_VIEW, 'home');
         updateNavigationState();
         
         window.scrollTo(0, 0);
-    }
+    };
     
-    function showResultsView() {
-        const heroSection = document.querySelector('.hero-section');
-        const searchSection = document.querySelector('.search-section');
+    const closeAllOverlaysAndGoHome = () => {
+        console.log('🏠 Closing all overlays and returning home');
         
-        if (heroSection) heroSection.style.display = 'none';
-        if (searchSection) searchSection.style.display = 'none';
+        // Close specific overlays
+        ['pubDetailsOverlay', 'resultsOverlay', 'fullMapOverlay'].forEach(id => {
+            const overlay = document.getElementById(id);
+            if (overlay) {
+                overlay.style.display = 'none';
+                overlay.classList.remove('active');
+            }
+        });
         
-        state.currentView = 'results';
-        updateNavigationState();
-    }
+        // Clean up any map instances
+        const mapModule = window.App?.getModule('map');
+        if (mapModule) {
+            mapModule.cleanupResultsMap?.();
+        }
+        
+        showHomeView();
+        
+        // Track navigation
+        if (modules.tracking) {
+            modules.tracking.trackEvent('navigation_home', 'UI', 'overlay_close');
+        }
+        
+        return true;
+    };
     
-    function updateNavigationState() {
+    const updateNavigationState = () => {
+        const currentView = window.App.getState(STATE_KEYS.CURRENT_VIEW) || 'home';
+        
         document.querySelectorAll('.nav-item').forEach(item => {
             item.classList.remove('active');
         });
         
         const activeNavMap = {
-            'home': 'a[href="/"]',
-            'map': 'a[href="#"][onclick*="Map"]',
-            'breweries': 'a[href="/breweries"]',
-            'about': 'a[href="/about"]'
+            'home': '[href="/"]',
+            'map': '[data-action="show-full-map"]',
+            'breweries': '[href="/breweries"]',
+            'about': '[href="/about"]'
         };
         
-        const activeSelector = activeNavMap[state.currentView];
-        if (activeSelector) {
-            const activeNav = document.querySelector(`.nav-item${activeSelector}`);
+        const selector = activeNavMap[currentView];
+        if (selector) {
+            const activeNav = document.querySelector(`.nav-item${selector}`);
             if (activeNav) activeNav.classList.add('active');
         }
-    }
+    };
     
     // ================================
-    // LOADING STATES (from ui.js)
+    // ANIMATIONS
     // ================================
-    
-    function showLoading(container, message = 'Loading...') {
-        if (typeof container === 'string') {
-            container = document.getElementById(container);
-        }
-        
-        if (!container) return;
-        
-        const loadingHTML = `
-            <div class="loading-state">
-                <div class="spinner"></div>
-                <div class="loading-text">${message}</div>
-            </div>
-        `;
-        
-        container.innerHTML = loadingHTML;
-        state.isLoading = true;
-    }
-    
-    function hideLoading(container) {
-        if (typeof container === 'string') {
-            container = document.getElementById(container);
-        }
-        
-        if (!container) return;
-        
-        const loadingEl = container.querySelector('.loading-state');
-        if (loadingEl) loadingEl.remove();
-        
-        state.isLoading = false;
-    }
-    
-    // ================================
-    // NUMBER ANIMATION (from utils.js)
-    // ================================
-    
-    const animateNumber = (elementId, targetNumber, duration = 2000) => {
+    const animateNumber = (elementId, targetNumber, duration = config.animation.numberDuration) => {
         const element = document.getElementById(elementId);
         if (!element) {
-            console.warn(`Element ${elementId} not found for number animation`);
+            console.warn(`Element ${elementId} not found for animation`);
             return;
         }
         
@@ -279,6 +311,8 @@ export const HelpersModule = (function() {
         const updateNumber = (currentTime) => {
             const elapsed = currentTime - startTime;
             const progress = Math.min(elapsed / duration, 1);
+            
+            // Ease-out cubic
             const easeOut = 1 - Math.pow(1 - progress, 3);
             const currentNumber = Math.floor(startNumber + (targetNumber - startNumber) * easeOut);
             
@@ -295,18 +329,73 @@ export const HelpersModule = (function() {
     };
     
     // ================================
-    // UTILITY FUNCTIONS (from utils.js)
+    // STORAGE HELPERS
     // ================================
+    const Storage = {
+        get: (key, defaultValue = null) => {
+            try {
+                const item = localStorage.getItem(key);
+                return item ? JSON.parse(item) : defaultValue;
+            } catch (e) {
+                console.error('Storage read error:', e);
+                return defaultValue;
+            }
+        },
+        
+        set: (key, value) => {
+            try {
+                localStorage.setItem(key, JSON.stringify(value));
+                return true;
+            } catch (e) {
+                console.error('Storage write error:', e);
+                return false;
+            }
+        },
+        
+        remove: (key) => {
+            try {
+                localStorage.removeItem(key);
+                return true;
+            } catch (e) {
+                console.error('Storage remove error:', e);
+                return false;
+            }
+        },
+        
+        clear: () => {
+            try {
+                localStorage.clear();
+                return true;
+            } catch (e) {
+                console.error('Storage clear error:', e);
+                return false;
+            }
+        },
+        
+        has: (key) => {
+            return localStorage.getItem(key) !== null;
+        }
+    };
     
+    // ================================
+    // UTILITY FUNCTIONS
+    // ================================
     const debounce = (func, wait) => {
         let timeout;
-        return function executedFunction(...args) {
-            const later = () => {
-                clearTimeout(timeout);
-                func(...args);
-            };
+        return (...args) => {
             clearTimeout(timeout);
-            timeout = setTimeout(later, wait);
+            timeout = setTimeout(() => func(...args), wait);
+        };
+    };
+    
+    const throttle = (func, limit) => {
+        let inThrottle;
+        return (...args) => {
+            if (!inThrottle) {
+                func(...args);
+                inThrottle = true;
+                setTimeout(() => inThrottle = false, limit);
+            }
         };
     };
     
@@ -318,7 +407,7 @@ export const HelpersModule = (function() {
     };
     
     const calculateDistance = (lat1, lon1, lat2, lon2) => {
-        const R = 6371;
+        const R = 6371; // Earth's radius in km
         const dLat = (lat2 - lat1) * Math.PI / 180;
         const dLon = (lon2 - lon1) * Math.PI / 180;
         const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
@@ -329,82 +418,50 @@ export const HelpersModule = (function() {
     };
     
     // ================================
-    // STORAGE HELPERS (from utils.js)
-    // ================================
-    
-    const Storage = {
-        get: (key, defaultValue = null) => {
-            try {
-                const item = localStorage.getItem(key);
-                return item ? JSON.parse(item) : defaultValue;
-            } catch (e) {
-                console.error('Error reading from localStorage:', e);
-                return defaultValue;
-            }
-        },
-        
-        set: (key, value) => {
-            try {
-                localStorage.setItem(key, JSON.stringify(value));
-                return true;
-            } catch (e) {
-                console.error('Error writing to localStorage:', e);
-                return false;
-            }
-        },
-        
-        remove: (key) => {
-            try {
-                localStorage.removeItem(key);
-                return true;
-            } catch (e) {
-                console.error('Error removing from localStorage:', e);
-                return false;
-            }
-        },
-        
-        clear: () => {
-            try {
-                localStorage.clear();
-                return true;
-            } catch (e) {
-                console.error('Error clearing localStorage:', e);
-                return false;
-            }
-        }
-    };
-    
-    // ================================
     // RESPONSIVE HELPERS
     // ================================
-    
-    function isMobile() {
-        return window.innerWidth <= 768;
-    }
-    
-    function isTablet() {
-        return window.innerWidth > 768 && window.innerWidth <= 1024;
-    }
-    
-    function isDesktop() {
-        return window.innerWidth > 1024;
-    }
-    
-    function getViewportSize() {
+    const getViewportSize = () => {
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        
         return {
-            width: window.innerWidth,
-            height: window.innerHeight,
-            isMobile: isMobile(),
-            isTablet: isTablet(),
-            isDesktop: isDesktop()
+            width,
+            height,
+            isMobile: width <= 768,
+            isTablet: width > 768 && width <= 1024,
+            isDesktop: width > 1024,
+            orientation: width > height ? 'landscape' : 'portrait'
         };
-    }
+    };
+    
+    const isMobile = () => window.innerWidth <= 768;
+    const isTablet = () => window.innerWidth > 768 && window.innerWidth <= 1024;
+    const isDesktop = () => window.innerWidth > 1024;
     
     // ================================
-    // SCROLL MANAGEMENT
+    // ELEMENT UTILITIES
     // ================================
+    const updateElementText = (elementId, text) => {
+        const element = document.getElementById(elementId);
+        if (element) element.textContent = text;
+    };
     
-    function scrollToElement(elementId, options = {}) {
+    const updateElementHTML = (elementId, html) => {
+        const element = document.getElementById(elementId);
+        if (element) element.innerHTML = html;
+    };
+    
+    const toggleClass = (elementId, className) => {
+        const element = document.getElementById(elementId);
+        if (element) element.classList.toggle(className);
+    };
+    
+    const setElementVisibility = (elementId, visible) => {
+        const element = document.getElementById(elementId);
+        if (element) element.style.display = visible ? 'block' : 'none';
+    };
+    
+    const scrollToElement = (elementId, options = {}) => {
         const element = document.getElementById(elementId);
         if (!element) return;
         
@@ -415,187 +472,131 @@ export const HelpersModule = (function() {
         };
         
         element.scrollIntoView({ ...defaultOptions, ...options });
-    }
+    };
     
     // ================================
-    // ELEMENT UTILITIES (from ui.js)
+    // VALIDATION HELPERS
     // ================================
-    
-    function updateElementText(elementId, text) {
-        const element = document.getElementById(elementId);
-        if (element) element.textContent = text;
-    }
-    
-    function updateElementHTML(elementId, html) {
-        const element = document.getElementById(elementId);
-        if (element) element.innerHTML = html;
-    }
-    
-    function toggleClass(elementId, className) {
-        const element = document.getElementById(elementId);
-        if (element) element.classList.toggle(className);
-    }
-    
-    function setElementVisibility(elementId, visible) {
-        const element = document.getElementById(elementId);
-        if (element) element.style.display = visible ? 'block' : 'none';
-    }
-    
-    // ================================
-    // VALIDATION HELPERS (from utils.js)
-    // ================================
-    
     const isValidPostcode = (postcode) => {
-        const regex = /^[A-Z]{1,2}[0-9R][0-9A-Z]?\s?[0-9][A-Z]{2}$/i;
+        const regex = Constants.VALIDATION.POSTCODE_REGEX;
         return regex.test(postcode.replace(/\s/g, ''));
     };
     
     const isValidEmail = (email) => {
-        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const regex = Constants.VALIDATION.EMAIL_REGEX;
         return regex.test(email);
     };
     
     // ================================
-    // EVENT LISTENERS (from ui.js - simplified)
+    // EVENT LISTENERS
     // ================================
-    
-    function setupUIListeners() {
-        // Handle window resize
-        let resizeTimeout;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(() => {
-                handleResize();
-            }, 250);
-        });
+    const setupEventListeners = () => {
+        // Debounced resize handler
+        const handleResize = debounce(() => {
+            const viewport = getViewportSize();
+            document.body.setAttribute('data-viewport', 
+                viewport.isMobile ? 'mobile' : 
+                viewport.isTablet ? 'tablet' : 'desktop'
+            );
+            
+            // Dispatch custom event
+            window.dispatchEvent(new CustomEvent('viewportChange', { detail: viewport }));
+        }, config.debounce.resize);
+        
+        window.addEventListener('resize', handleResize);
         
         // Handle back button
         window.addEventListener('popstate', (e) => {
-            if (e.state && e.state.view) {
+            if (e.state?.view) {
                 handleViewChange(e.state.view);
             }
         });
-        
-        // Mobile touch feedback for search options
-        const searchOptions = document.querySelectorAll('.search-option');
-        searchOptions.forEach(option => {
-            option.addEventListener('touchstart', function(e) {
-                this.style.transform = 'scale(0.97)';
-                if ('vibrate' in navigator) navigator.vibrate(8);
-            }, { passive: true });
-            
-            option.addEventListener('touchend', function(e) {
-                this.style.transform = '';
-                this.classList.add('tapped');
-                setTimeout(() => this.classList.remove('tapped'), 200);
-            }, { passive: true });
-            
-            option.addEventListener('click', function(e) {
-                this.classList.add('loading');
-                setTimeout(() => this.classList.remove('loading'), 400);
-                if ('vibrate' in navigator) navigator.vibrate([10, 50, 10]);
-            });
-            
-            option.addEventListener('touchcancel', function(e) {
-                this.style.transform = '';
-            }, { passive: true });
-        });
-    }
+    };
     
-    function handleResize() {
-        const viewport = getViewportSize();
-        document.body.setAttribute('data-viewport', 
-            viewport.isMobile ? 'mobile' : 
-            viewport.isTablet ? 'tablet' : 'desktop'
-        );
-    }
-    
-    function handleViewChange(view) {
+    const handleViewChange = (view) => {
         switch(view) {
             case 'home':
                 showHomeView();
                 break;
             case 'results':
             case 'pub':
-                // These would be restored by search module
+                // Let search module handle these
                 break;
+            default:
+                console.warn(`Unknown view: ${view}`);
         }
-    }
+    };
+    
+    const initializeViewport = () => {
+        const viewport = getViewportSize();
+        document.body.setAttribute('data-viewport', 
+            viewport.isMobile ? 'mobile' : 
+            viewport.isTablet ? 'tablet' : 'desktop'
+        );
+    };
     
     // ================================
     // PUBLIC API
     // ================================
-    
     return {
         init,
         
-        // Toast notifications
+        // Toast system
+        showToast,
         showLoadingToast,
         hideLoadingToast,
         showSuccessToast,
+        showErrorToast,
         
         // Overlay management
         showOverlay,
         hideOverlay,
         hideAllOverlays,
-        closeAllOverlaysAndGoHome,
-        closeResults,
         
         // View management
         showHomeView,
-        showResultsView,
+        closeAllOverlaysAndGoHome,
         updateNavigationState,
         
-        // Loading states
-        showLoading,
-        hideLoading,
-        
-        // Utilities
+        // Animations
         animateNumber,
-        debounce,
-        escapeHtml,
-        calculateDistance,
         
         // Storage
         Storage,
         
-        // Responsive helpers
+        // Utilities
+        debounce,
+        throttle,
+        escapeHtml,
+        calculateDistance,
+        
+        // Responsive
+        getViewportSize,
         isMobile,
         isTablet,
         isDesktop,
-        getViewportSize,
-        
-        // Scroll management
-        scrollToElement,
         
         // Element utilities
         updateElementText,
         updateElementHTML,
         toggleClass,
         setElementVisibility,
+        scrollToElement,
         
         // Validation
         isValidPostcode,
         isValidEmail,
         
-        // State getters
-        getCurrentView: () => state.currentView,
-        isLoading: () => state.isLoading,
-        getActiveOverlays: () => [...state.activeOverlays]
+        // Legacy support
+        closeResults: closeAllOverlaysAndGoHome
     };
 })();
 
-// Auto-initialize when DOM is ready
+// Initialize when DOM ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', HelpersModule.init);
 } else {
     HelpersModule.init();
 }
 
-// Make it globally available
-window.HelpersModule = HelpersModule;
-
-// Legacy support
-window.UtilsModule = HelpersModule;
-window.UIModule = HelpersModule;
-window.closeResults = HelpersModule.closeResults;
+// DO NOT add window.HelpersModule here - let main.js handle registration
