@@ -1,17 +1,13 @@
 // ================================================================================
-// MAP.JS - Complete Refactor with STATE_KEYS
+// MAP.JS - Complete Refactor with STATE_KEYS and Arrow Functions
 // Handles: Map initialization, markers, user location, pub locations
 // ================================================================================
 
 import { Constants } from './constants.js';
 const STATE_KEYS = Constants.STATE_KEYS;
 
-export const MapModule = (function() {
+export const MapModule = (() => {
     'use strict';
-    
-    // This module is registered with App.registerModule('map', MapModule)
-    // Access other modules via: window.App.getModule('moduleName')
-    // Never use window.ModuleName directly
     
     // ================================
     // PRIVATE STATE
@@ -54,21 +50,19 @@ export const MapModule = (function() {
     // UTILITIES
     // ================================
     const utils = {
-        getUserLocation() {
-            return window.App.getState(STATE_KEYS.USER_LOCATION);
-        },
+        getUserLocation: () => window.App.getState(STATE_KEYS.USER_LOCATION),
         
-        setUserLocation(location) {
+        setUserLocation: (location) => {
             window.App.setState(STATE_KEYS.USER_LOCATION, location);
             window.App.setState(STATE_KEYS.LOCATION_TIMESTAMP, Date.now());
             
             // Update all active maps with user location
             Object.values(maps).forEach(map => {
-                if (map) this.addUserMarkerToMap(map, location);
+                if (map) utils.addUserMarkerToMap(map, location);
             });
         },
         
-        addUserMarkerToMap(map, location) {
+        addUserMarkerToMap: (map, location) => {
             if (!map || !location) return;
             
             const styles = getMapStyles();
@@ -83,7 +77,7 @@ export const MapModule = (function() {
             }).addTo(map).bindPopup('📍 You are here!');
         },
         
-        calculateDistance(lat1, lon1, lat2, lon2) {
+        calculateDistance: (lat1, lon1, lat2, lon2) => {
             const R = 6371;
             const dLat = (lat2 - lat1) * Math.PI / 180;
             const dLon = (lon2 - lon1) * Math.PI / 180;
@@ -94,14 +88,14 @@ export const MapModule = (function() {
             return R * c;
         },
         
-        escapeHtml(text) {
+        escapeHtml: (text) => {
             if (!text) return '';
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         },
         
-        cleanupMap(mapInstance) {
+        cleanupMap: (mapInstance) => {
             if (mapInstance) {
                 try {
                     mapInstance.remove();
@@ -115,7 +109,7 @@ export const MapModule = (function() {
     // ================================
     // STYLE MANAGEMENT
     // ================================
-    function getMapStyles() {
+    const getMapStyles = () => {
         if (!cachedStyles) {
             const rootStyles = getComputedStyle(document.documentElement);
             cachedStyles = {
@@ -134,9 +128,9 @@ export const MapModule = (function() {
             };
         }
         return cachedStyles;
-    }
+    };
     
-    function getMarkerStyleForGFStatus(gfStatus) {
+    const getMarkerStyleForGFStatus = (gfStatus) => {
         const styles = getMapStyles();
         const baseStyle = {
             weight: 2,
@@ -170,12 +164,12 @@ export const MapModule = (function() {
         };
         
         return { ...baseStyle, ...(statusStyles[gfStatus] || statusStyles.unknown) };
-    }
+    };
     
     // ================================
     // MAP INITIALIZATION
     // ================================
-    function createMap(containerId, options = {}) {
+    const createMap = (containerId, options = {}) => {
         const mapElement = document.getElementById(containerId);
         if (!mapElement) {
             console.error(`Map container '${containerId}' not found`);
@@ -205,7 +199,7 @@ export const MapModule = (function() {
         }
         
         return map;
-    }
+    };
     
     // ================================
     // MAIN MAP
@@ -361,7 +355,7 @@ export const MapModule = (function() {
         }
     };
     
-    function showNoLocationMessage(container, pubName) {
+    const showNoLocationMessage = (container, pubName) => {
         container.innerHTML = `
             <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 20px; text-align: center; color: var(--text-secondary);">
                 <div style="font-size: 2rem; margin-bottom: 10px;">📍</div>
@@ -369,9 +363,9 @@ export const MapModule = (function() {
                 <div style="font-size: 0.9rem; opacity: 0.7;">Help us by reporting the exact location!</div>
             </div>
         `;
-    }
+    };
     
-    function showMapError(container, errorMessage) {
+    const showMapError = (container, errorMessage) => {
         container.innerHTML = `
             <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 20px; text-align: center; color: var(--text-secondary);">
                 <div style="font-size: 2rem; margin-bottom: 10px;">⚠️</div>
@@ -379,12 +373,12 @@ export const MapModule = (function() {
                 <div style="font-size: 0.9rem; opacity: 0.7;">${errorMessage}</div>
             </div>
         `;
-    }
+    };
     
     // ================================
     // MARKER MANAGEMENT
     // ================================
-    function addPubMarkers(pubs, mapInstance) {
+    const addPubMarkers = (pubs, mapInstance) => {
         if (!mapInstance || !pubs || pubs.length === 0) return 0;
         
         console.log(`📍 Adding ${pubs.length} pub markers...`);
@@ -422,15 +416,15 @@ export const MapModule = (function() {
         }
         
         return markersAdded;
-    }
+    };
     
-    function determineGFStatus(pub) {
+    const determineGFStatus = (pub) => {
         if (pub.gf_status) return pub.gf_status;
         if (pub.bottle || pub.tap || pub.cask || pub.can) return 'currently';
         return 'unknown';
-    }
+    };
     
-    function createPubPopupContent(pub, gfStatus = null) {
+    const createPubPopupContent = (pub, gfStatus = null) => {
         if (!gfStatus) gfStatus = determineGFStatus(pub);
         
         let content = `<div class="popup-content">`;
@@ -475,7 +469,7 @@ export const MapModule = (function() {
         content += `</div>`;
         
         return content;
-    }
+    };
     
     // ================================
     // FULL UK MAP
@@ -621,10 +615,10 @@ export const MapModule = (function() {
     // ================================
     // MAP CONTROLS
     // ================================
-    function addMapLegend(mapInstance) {
+    const addMapLegend = (mapInstance) => {
         const legend = L.control({ position: 'bottomright' });
         
-        legend.onAdd = function(map) {
+        legend.onAdd = (map) => {
             const div = L.DomUtil.create('div', 'legend-container');
             
             div.innerHTML = `
@@ -657,13 +651,13 @@ export const MapModule = (function() {
         };
         
         legend.addTo(mapInstance);
-    }
+    };
     
-    function addZoomHint(mapInstance) {
+    const addZoomHint = (mapInstance) => {
         const hintControl = L.Control.extend({
             options: { position: 'topright' },
             
-            onAdd: function(map) {
+            onAdd: (map) => {
                 const container = L.DomUtil.create('div', 'zoom-hint-container');
                 container.innerHTML = `
                     <div class="zoom-hint">
@@ -684,12 +678,12 @@ export const MapModule = (function() {
         });
         
         mapInstance.addControl(new hintControl());
-    }
+    };
     
     // ================================
     // MAP TOGGLE FUNCTIONALITY
     // ================================
-    function initMapToggle() {
+    const initMapToggle = () => {
         const container = document.getElementById('mapToggleContainer');
         if (!container) return;
         
@@ -728,9 +722,9 @@ export const MapModule = (function() {
         
         updateMapDisplay(true);
         setupZoomHandler();
-    }
+    };
     
-    function updateMapDisplay(showGFOnly) {
+    const updateMapDisplay = (showGFOnly) => {
         const fullUKMap = window.App.getState(STATE_KEYS.MAP_DATA.FULL_UK_MAP);
         const allPubs = window.App.getState(STATE_KEYS.MAP_DATA.ALL_PUBS);
         if (!fullUKMap || !allPubs) return;
@@ -745,9 +739,9 @@ export const MapModule = (function() {
         } else {
             displayAllPubsClustered(fullUKMap, allPubs);
         }
-    }
+    };
     
-    function clearMapLayers(map) {
+    const clearMapLayers = (map) => {
         const layers = {
             gf: window.App.getState(STATE_KEYS.MAP_DATA.GF_PUBS_LAYER),
             clustered: window.App.getState(STATE_KEYS.MAP_DATA.CLUSTERED_PUBS_LAYER)
@@ -756,9 +750,9 @@ export const MapModule = (function() {
         Object.values(layers).forEach(layer => {
             if (layer && map) map.removeLayer(layer);
         });
-    }
+    };
     
-    function displayGFPubsOnly(map, allPubs) {
+    const displayGFPubsOnly = (map, allPubs) => {
         const gfPubsLayer = L.layerGroup().addTo(map);
         window.App.setState(STATE_KEYS.MAP_DATA.GF_PUBS_LAYER, gfPubsLayer);
         
@@ -782,15 +776,15 @@ export const MapModule = (function() {
             
             gfPubsLayer.addLayer(marker);
         });
-    }
+    };
     
-    function displayAllPubsClustered(map, allPubs) {
+    const displayAllPubsClustered = (map, allPubs) => {
         const gfPubsLayer = L.layerGroup().addTo(map);
         window.App.setState(STATE_KEYS.MAP_DATA.GF_PUBS_LAYER, gfPubsLayer);
         
         const clusteredPubsLayer = L.markerClusterGroup({
             ...config.clusterConfig,
-            iconCreateFunction: function(cluster) {
+            iconCreateFunction: (cluster) => {
                 const count = cluster.getChildCount();
                 let size = 'small';
                 
@@ -865,16 +859,16 @@ export const MapModule = (function() {
             
             clusteredPubsLayer.addLayer(marker);
         });
-    }
+    };
     
-    function setupZoomHandler() {
+    const setupZoomHandler = () => {
         const fullUKMap = window.App.getState(STATE_KEYS.MAP_DATA.FULL_UK_MAP);
         if (!fullUKMap) return;
         
         fullUKMap.off('zoomend');
         
         let zoomTimeout;
-        fullUKMap.on('zoomend', function() {
+        fullUKMap.on('zoomend', () => {
             clearTimeout(zoomTimeout);
             zoomTimeout = setTimeout(() => {
                 const zoom = fullUKMap.getZoom();
@@ -886,7 +880,7 @@ export const MapModule = (function() {
                 updateMapDisplay(currentMode === 'gf');
             }, 300);
         });
-    }
+    };
     
     // ================================
     // TOGGLE RESULTS MAP
