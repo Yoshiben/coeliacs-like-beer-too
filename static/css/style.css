@@ -476,7 +476,7 @@ html {
 }
 
 
-/* VALIDATED TO HERE */
+
 
 
 
@@ -1708,6 +1708,64 @@ html {
    height: 25px;
 }
 
+
+
+
+/* VALIDATED TO HERE */
+
+
+
+/* ================================
+   LOCATION BLOCKED MODAL STYLES
+   ================================ */
+
+/* Blocked state styling */
+.permission-icon.blocked {
+    color: var(--red);
+    animation: shake 0.5s ease-in-out;
+}
+
+.blocked-instructions {
+    background: rgba(239, 68, 68, 0.1);
+    border: 2px solid rgba(239, 68, 68, 0.2);
+}
+
+.blocked-instructions h4 {
+    margin-bottom: var(--space-lg);
+    color: var(--text-primary);
+}
+
+/* Browser instructions */
+.browser-instructions {
+    text-align: left;
+}
+
+.instruction-set {
+    display: none;
+}
+
+.instruction-set strong {
+    display: block;
+    margin-bottom: var(--space-sm);
+    color: var(--text-primary);
+}
+
+.instruction-set ol {
+    margin: var(--space-md) 0;
+    padding-left: var(--space-xl);
+}
+
+.instruction-set li {
+    margin-bottom: var(--space-xs);
+    color: var(--text-secondary);
+}
+
+/* Shake animation for blocked icon */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
 
 
 
