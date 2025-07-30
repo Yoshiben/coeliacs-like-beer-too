@@ -1788,28 +1788,6 @@ html {
    pointer-events: auto; /* But buttons are clickable */
 }
 
-.map-overlay-nav .btn-home {
-   background: var(--bg-white);
-   color: var(--text-primary);
-   border: none;
-   padding: var(--space-sm) var(--space-lg);
-   border-radius: var(--radius-pill);
-   font-weight: 600;
-   box-shadow: var(--shadow-sm);
-}
-
-.map-overlay-nav .btn-location {
-   background: var(--bg-white);
-   color: var(--text-primary);
-   border: none;
-   padding: var(--space-sm) var(--space-lg);
-   border-radius: var(--radius-pill);
-   font-weight: 600;
-   box-shadow: var(--shadow-sm);
-}
-
-
-
 
 
 
@@ -1826,14 +1804,8 @@ html {
    MAP TOGGLE SWITCH - PROPER TOGGLE
    ================================ */
 
-/* .map-toggle-switch {
-   flex: 0 0 auto;
-} */
-
 .toggle-container {
-   background: rgba(255, 255, 255, 0.2);
-   border-radius: 25px;
-   padding: 4px;
+   border-radius: var(--radius-pill);
    display: flex;
    position: relative;
    border: 2px solid rgba(255, 255, 255, 0.3);
