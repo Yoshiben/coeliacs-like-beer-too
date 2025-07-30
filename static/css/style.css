@@ -152,6 +152,33 @@
    --purple-shadow-strong: rgba(139, 92, 246, 0.4);
 }
 
+#distanceModal,
+#nameModal,
+#areaModal,
+#beerModal,
+#resultsOverlay,
+#pubDetailsOverlay,
+#fullMapOverlay {
+    display: none; /* Hidden by default */
+}
+
+/* Generic Buttons */
+
+.btn-primary {
+    background: var(--primary-gradient);
+    color: var(--text-white);
+    box-shadow: var(--shadow);
+}
+
+.btn-secondary {
+    background: var(--bg-white);
+    color: var(--text-secondary);
+    box-shadow: var(--shadow-sm);
+    backdrop-filter: blur(10px);
+}
+
+/* Holistic CSS */
+
 body {
    background: var(--primary-gradient);
    margin: 0;
@@ -409,6 +436,64 @@ html {
    padding: 0 var(--space-xs);
 }
 
+/* ================================
+   BOTTOM NAVIGATION - VALIDATED
+   ================================ */
+
+.bottom-nav {
+   position: relative;
+   bottom: 0;
+   left: 0;
+   right: 0;
+   background: var(--primary-gradient);
+   border-top: 1px solid var(--border-light);
+   display: flex;
+   justify-content: space-around;
+   align-items: center;
+   z-index: var(--z-navigation);
+   box-shadow: var(--shadow);
+   backdrop-filter: blur(10px);
+   height: 8vh;
+   height: 8dvh;
+   width: 100%;
+   flex-shrink:0;
+}
+
+.nav-item {
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: center;
+   text-decoration: none;
+   color: var(--text-white);
+   transition: all var(--transition);
+   padding: var(--space-xs);
+   border-radius: var(--radius);
+   min-width: 60px;
+   cursor: pointer;
+   flex: 1;
+   max-width: 80px;
+}
+
+.nav-item:hover,
+.nav-item.active {
+   color: #667eea;
+   background: var(--hover-subtle);
+}
+
+.nav-icon {
+   font-size: 1.25rem;
+   margin-bottom: 2px;
+   line-height: 1;
+}
+
+.nav-label {
+   font-size: 0.7rem;
+   font-weight: 600;
+   line-height: 1;
+   text-align: center;
+}
+
 
 
 
@@ -605,81 +690,8 @@ html {
 
 
 
-/* ================================
-   BOTTOM NAVIGATION
-   ================================ */
-
-.bottom-nav {
-   position: relative;
-   bottom: 0;
-   left: 0;
-   right: 0;
-   background: var(--primary-gradient);
-   border-top: 1px solid var(--border-light);
-   display: flex;
-   justify-content: space-around;
-   align-items: center;
-   z-index: var(--z-navigation);
-   box-shadow: var(--shadow);
-   backdrop-filter: blur(10px);
-   height: 8vh;
-   height: 8dvh;
-   width: 100%;
-   flex-shrink:0;
-}
-
-.nav-item {
-   display: flex;
-   flex-direction: column;
-   align-items: center;
-   justify-content: center;
-   text-decoration: none;
-   color: var(--text-white);
-   transition: all var(--transition);
-   padding: var(--space-xs);
-   border-radius: var(--radius);
-   min-width: 60px;
-   cursor: pointer;
-   flex: 1;
-   max-width: 80px;
-}
-
-.nav-item:hover,
-.nav-item.active {
-   color: #667eea;
-   background: var(--hover-subtle);
-}
-
-.nav-icon {
-   font-size: 1.25rem;
-   margin-bottom: 2px;
-   line-height: 1;
-}
-
-.nav-label {
-   font-size: 0.7rem;
-   font-weight: 600;
-   line-height: 1;
-   text-align: center;
-}
 
 
-
-
-
-
-
-
-
-#distanceModal,
-#nameModal,
-#areaModal,
-#beerModal,
-#resultsOverlay,
-#pubDetailsOverlay,
-#fullMapOverlay {
-    display: none; /* Hidden by default */
-}
 
 
 
@@ -843,6 +855,7 @@ html {
    transition: border-color 0.25s ease;
    overflow: hidden;
    padding: var(--space-md);
+   box-sizing: border-box;
 }
 
 .search-modal .form-input:focus {
@@ -2004,10 +2017,10 @@ html {
     transition: all 0.25s ease;
 }
 
-.modal-actions .btn-secondary {
+/* .modal-actions .btn-secondary {
     background: rgba(0, 0, 0, 0.1);
     color: var(--text-secondary);
-}
+} */
 
 .modal-actions .btn-secondary:hover {
     background: rgba(0, 0, 0, 0.15);
@@ -2720,12 +2733,6 @@ p {
     font-size: var(--text-lg);
 }
 
-.btn-primary {
-    background: var(--primary-gradient);
-    color: var(--text-white);
-    box-shadow: var(--shadow);
-}
-
 .btn-primary:hover {
     background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
     transform: translateY(-2px);
@@ -2744,12 +2751,7 @@ p {
     box-shadow: var(--shadow-lg);
 }
 
-.btn-secondary {
-    background: var(--bg-white);
-    color: var(--text-secondary);
-    box-shadow: var(--shadow-sm);
-    backdrop-filter: blur(10px);
-}
+
 
 .btn-secondary:hover {
     background: var(--text-white);
