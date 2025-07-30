@@ -600,17 +600,40 @@ export const SearchModule = (function() {
     // ================================
     // NAVIGATION
     // ================================
+    // UPDATE: In search.js, replace the goBackToResults function (around line 608)
+
     const goBackToResults = () => {
         console.log('🔙 Going back to results...');
         
         // Close pub details
         hideOverlays(['pubDetailsOverlay']);
         
-        // Show results
+        // Show results overlay
         const resultsOverlay = document.getElementById('resultsOverlay');
         if (resultsOverlay) {
             resultsOverlay.style.display = 'flex';
             resultsOverlay.classList.add('active');
+        }
+        
+        // IMPORTANT: Reset map/list view to show list
+        const elements = {
+            list: document.getElementById('resultsListContainer'),
+            map: document.getElementById('resultsMapContainer'),
+            btnText: document.getElementById('resultsMapBtnText')
+        };
+        
+        if (elements.list && elements.map) {
+            // Always show list when going back
+            elements.list.style.display = 'block';
+            elements.list.style.flex = '1';
+            elements.map.style.display = 'none';
+            elements.btnText.textContent = 'Map';
+            
+            // Clean up any existing map instance
+            const mapModule = modules.map;
+            if (mapModule) {
+                mapModule.cleanupResultsMap?.();
+            }
         }
         
         // Restore cached results if available
@@ -1073,14 +1096,18 @@ export const SearchModule = (function() {
         return clone;
     };
     
+    // UPDATE: In search.js, update the resetResultsMapState function (around line 1094)
+
     const resetResultsMapState = () => {
         const elements = {
             list: document.getElementById('resultsListContainer'),
             map: document.getElementById('resultsMapContainer'),
             btnText: document.getElementById('resultsMapBtnText'),
-            overlay: document.getElementById('resultsOverlay')
+            overlay: document.getElementById('resultsOverlay'),
+            content: document.querySelector('.results-content')
         };
         
+        // Always reset to list view
         if (elements.list) {
             elements.list.style.display = 'block';
             elements.list.style.flex = '1';
@@ -1088,12 +1115,28 @@ export const SearchModule = (function() {
         if (elements.map) {
             elements.map.style.display = 'none';
             elements.map.classList.remove('split-view');
+            // Clean up any inline styles that might interfere
+            elements.map.style.removeProperty('flex');
+            elements.map.style.removeProperty('height');
+            elements.map.style.removeProperty('minHeight');
         }
         if (elements.btnText) {
             elements.btnText.textContent = 'Map';
         }
         if (elements.overlay) {
             elements.overlay.classList.remove('split-view');
+        }
+        if (elements.content) {
+            // Reset content container styles
+            elements.content.style.removeProperty('display');
+            elements.content.style.removeProperty('flexDirection');
+            elements.content.style.removeProperty('height');
+        }
+        
+        // Clean up any existing map instance
+        const mapModule = modules.map;
+        if (mapModule) {
+            mapModule.cleanupResultsMap?.();
         }
     };
     
