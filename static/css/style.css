@@ -1722,7 +1722,7 @@ html {
 }
 
 /* Style the navigation bar container */
-.map-overlay-nav {
+/* .map-overlay-nav {
    top: 0;
    left: 0;
    right: 0;
@@ -1731,7 +1731,19 @@ html {
    align-items: stretch;
    padding: var(--space-md) var(--space-xs);
    background: transparent;
-/*    height: 60px; */
+   z-index: 10;
+   flex-shrink: 0;
+} */
+
+.map-overlay-nav {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   padding: var(--space-md);
+   background: rgba(255, 255, 255, 0.1);
+   border-radius: var(--radius-lg);
+   margin-bottom: var(--space-sm);
+   backdrop-filter: blur(10px);
    z-index: 10;
    flex-shrink: 0;
 }
