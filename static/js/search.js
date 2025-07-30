@@ -976,11 +976,31 @@ export const SearchModule = (function() {
     // ================================
     // UI HELPERS
     // ================================
+    // UPDATE: In search.js, replace the showResultsOverlay function (around line 977)
+
     const showResultsOverlay = (title) => {
         console.log('📋 Showing results overlay:', title);
         
         // Hide home content
         hideOverlays(['hero-section', 'search-section'], false);
+        
+        // Reset to list view (not map view)
+        const elements = {
+            list: document.getElementById('resultsListContainer'),
+            map: document.getElementById('resultsMapContainer'),
+            btnText: document.getElementById('resultsMapBtnText')
+        };
+        
+        if (elements.list) {
+            elements.list.style.display = 'block';
+            elements.list.style.flex = '1';
+        }
+        if (elements.map) {
+            elements.map.style.display = 'none';
+        }
+        if (elements.btnText) {
+            elements.btnText.textContent = 'Map';
+        }
         
         setTimeout(() => {
             const resultsOverlay = document.getElementById('resultsOverlay');
@@ -1028,23 +1048,43 @@ export const SearchModule = (function() {
         if (noResultsText) noResultsText.textContent = message;
     };
     
+    // UPDATE: In search.js, replace the displayResultsInOverlay function (around line 1031)
+
     const displayResultsInOverlay = (pubs, title) => {
         state.currentSearchPubs = pubs;
         
         console.log('💾 Stored search results:', pubs.length, 'pubs');
         
-        // Reset map toggle state
-        resetResultsMapState();
-        
-        // Hide loading and show results
+        // IMPORTANT: Don't call resetResultsMapState here as it cleans up the map
+        // Just ensure we're showing the list view
         const elements = {
             loading: document.getElementById('resultsLoading'),
             noResults: document.getElementById('noResultsFound'),
-            list: document.getElementById('resultsList')
+            list: document.getElementById('resultsList'),
+            listContainer: document.getElementById('resultsListContainer'),
+            mapContainer: document.getElementById('resultsMapContainer'),
+            btnText: document.getElementById('resultsMapBtnText')
         };
         
+        // Hide loading and no results
         if (elements.loading) elements.loading.style.display = 'none';
         if (elements.noResults) elements.noResults.style.display = 'none';
+        
+        // Ensure list container is visible
+        if (elements.listContainer) {
+            elements.listContainer.style.display = 'block';
+            elements.listContainer.style.flex = '1';
+        }
+        
+        // Hide map container if it's visible
+        if (elements.mapContainer) {
+            elements.mapContainer.style.display = 'none';
+        }
+        
+        // Update button text
+        if (elements.btnText) {
+            elements.btnText.textContent = 'Map';
+        }
         
         // Populate results
         if (elements.list) {
