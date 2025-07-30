@@ -473,7 +473,7 @@ const App = {
 
             'find-pub-online': () => {
                 console.log('🔍 Finding pub online...');
-                const pub = window.App.state.currentPub || window.currentPubData;
+                const pub = window.App.getState('currentPub');
                 if (pub) {
                     const searchQuery = encodeURIComponent(`${pub.name} ${pub.postcode} pub`);
                     window.open(`https://www.google.com/search?q=${searchQuery}`, '_blank');
@@ -487,7 +487,7 @@ const App = {
             
             'get-pub-directions': () => {
                 console.log('🧭 Getting directions to pub...');
-                const pub = window.App.state.currentPub || window.currentPubData;
+                const pub = window.App.getState('currentPub');
                 if (pub) {
                     const destination = encodeURIComponent(`${pub.name}, ${pub.address}, ${pub.postcode}`);
                     window.open(`https://www.google.com/maps/dir/?api=1&destination=${destination}`, '_blank');
@@ -657,7 +657,7 @@ const App = {
     },
     
     handleReportBeer(modules) {
-        const pubData = window.currentPubData || this.state?.selectedPub;
+        const pubData = window.App.getState('currentPub');
         
         // Close overlays
         ['pubDetailsOverlay', 'resultsOverlay'].forEach(id => {
@@ -684,14 +684,14 @@ const App = {
         console.log('🗺️ Showing full UK map...');
         
         // Check if we need location first
-        if (!window.App.state.userLocation) {
+        if (!window.App.getState('userLocation')) {
             try {
                 if (modules.search?.requestLocationWithUI) {
                     console.log('📍 Requesting location for map...');
-                    window.App.state.userLocation = await modules.search.requestLocationWithUI();
+                    window.App.getState('userLocation') = await modules.search.requestLocationWithUI();
                     
                     if (modules.map?.setUserLocation) {
-                        modules.map.setUserLocation(window.App.state.userLocation);
+                        modules.map.setUserLocation(window.App.getState('userLocation'));
                     }
                 }
             } catch (error) {
@@ -795,15 +795,15 @@ const App = {
         if (mapContainer && listContainer && mapBtnText) {
             if (mapContainer.style.display === 'none' || !mapContainer.style.display) {
                 // Check for location before showing map
-                if (!window.App.state.userLocation) {
+                if (!window.App.getState('userLocation')) {
                     try {
                         const modules = this.modules;
                         if (modules.search?.requestLocationWithUI) {
                             console.log('📍 Requesting location for results map...');
-                            window.App.state.userLocation = await modules.search.requestLocationWithUI();
+                            window.App.getState('userLocation') = await modules.search.requestLocationWithUI();
                             
                             if (modules.map?.setUserLocation) {
-                                modules.map.setUserLocation(window.App.state.userLocation);
+                                modules.map.setUserLocation(window.App.getState('userLocation'));
                             }
                         }
                     } catch (error) {
