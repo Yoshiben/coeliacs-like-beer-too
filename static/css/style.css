@@ -872,7 +872,19 @@ html {
 /*    margin-bottom: var(--space-lg); */
 }
 
-.search-modal .form-input {
+.search-modal .form-select,{
+   width: 100%;
+   border: 2px solid rgba(0, 0, 0, 0.1);
+   border-radius: var(--radius-lg);
+   font-size: var(--text-md);
+   margin: var(--space-xl) 0;
+   transition: border-color 0.25s ease;
+   overflow: hidden;
+   padding: var(--space-md);
+   box-sizing: border-box;
+}
+
+.search-modal .form-input,{
    width: 100%;
    border: 2px solid rgba(0, 0, 0, 0.1);
    border-radius: var(--radius-lg);
