@@ -152,6 +152,13 @@
    --purple-shadow-strong: rgba(139, 92, 246, 0.4);
 }
 
+/* Apply border-box to everything */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
 #distanceModal,
 #nameModal,
 #areaModal,
@@ -827,9 +834,8 @@ html {
 .search-modal .modal-content {
    background: var(--bg-white);
    border-radius: var(--radius-xl);
-   padding: var(--space-xl);
+   padding: var(--space-xs) var(--space-xl) var(--space-xl);
    max-width: 400px;
-/*    max-height: 400px; */
    width: 100%;
    box-shadow: var(--shadow-lg);
    margin: 0;
