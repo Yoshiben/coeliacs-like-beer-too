@@ -956,7 +956,7 @@ export const FormModule = (function() {
         openStatusModal() {
             console.log('🔍 openStatusModal called');
             // CHANGE: Use window.currentPubData directly and store it
-            this.currentPub = window.currentPubData;
+            this.currentPub = window.App.getState('currentPub');
             console.log('🏠 Current pub:', this.currentPub);
             
             if (!this.currentPub) {
@@ -1011,7 +1011,7 @@ export const FormModule = (function() {
             console.log('Window currentPubData:', window.currentPubData);
             
             // Safety check
-            const pubToUpdate = this.currentPub || window.currentPubData;
+            const pubToUpdate = this.currentPub || window.App.getState('currentPub');
             if (!pubToUpdate || !pubToUpdate.pub_id) {
                 console.error('❌ No pub data available for update');
                 if (window.showSuccessToast) {
