@@ -70,17 +70,6 @@ export const FormModule = (function() {
                 postcode: reportData.postcode
             });
         }
-            // Use searched/entered pub data
-            reportData.pub_name = formData.get('reportPubName') || document.getElementById('reportPubName').value || 'Unknown Pub';
-            reportData.address = formData.get('reportAddress') || document.getElementById('reportAddress').value || '';
-            reportData.postcode = formData.get('reportPostcode') || document.getElementById('reportPostcode').value || '';
-            console.log('🏠 Using manual pub data');
-            console.log('🔍 DEBUG - Manual pub data:', {
-                pub_name: reportData.pub_name,
-                address: reportData.address,
-                postcode: reportData.postcode
-            });
-        }
         
         console.log('🔍 DEBUG - Full reportData before API call:', reportData);
         
