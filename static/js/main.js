@@ -489,10 +489,19 @@ const App = {
             modules.modal?.open('cookieSettings');
         },
         
-        // Misc actions
+        'close-location-blocked': (el, modules) => {
+            const modal = document.getElementById('locationBlockedModal');
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+            // Open area search as alternative
+            modules.modal?.open('areaModal');
+        },
+        
         'reload-page': () => {
             location.reload();
-        }
+        },
     },
     
     // ================================
