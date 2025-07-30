@@ -6,15 +6,6 @@
 export const MapModule = (function() {
     'use strict';
     
-    // Private variables
-    let map = null;
-    let userMarker = null;
-    let pubMarkers = [];
-    // let userLocation = null;
-    let mapVisible = false;
-    let resultsMap = null;
-    let pubDetailMap = null;
-    
     // Configuration
     const config = {
         defaultCenter: [54.5, -3], // UK center
@@ -300,19 +291,22 @@ export const MapModule = (function() {
     
     // Add user location marker
     const addUserMarker = (location) => {
+        const map = window.App.getState('mapData.fullUKMapInstance');
         if (!map) return;
         
         window.App.setState('userLocation', location);
         window.App.setState('locationTimestamp', Date.now());
+        
         const styles = getMapStyles();
         
         // Remove existing user marker
-        if (userMarker) {
-            map.removeLayer(userMarker);
+        const existingMarker = window.App.getState('mapData.userMarker');
+        if (existingMarker && map) {
+            map.removeLayer(existingMarker);
         }
         
         // Add new user marker
-        userMarker = L.circleMarker([location.lat, location.lng], {
+        const userMarker = L.circleMarker([location.lat, location.lng], {
             radius: config.userMarkerRadius,
             fillColor: styles.userFillColor,
             color: styles.userStrokeColor,
@@ -322,6 +316,7 @@ export const MapModule = (function() {
         }).addTo(map);
         
         userMarker.bindPopup('📍 You are here!');
+        window.App.setState('mapData.userMarker', userMarker);
         
         console.log('📍 User marker added to map');
     };
@@ -391,8 +386,8 @@ export const MapModule = (function() {
         console.log(`🎯 Adding hybrid markers: GF individual, others clustered...`);
         
         // Clear existing layers
-        if (window.gfPubsLayer) {
-            targetMap.removeLayer(window.gfPubsLayer);
+        if (window.App.getState('mapData.gfPubsLayer')) {
+            targetMap.removeLayer(window.App.getState('mapData.gfPubsLayer'));
         }
         if (window.clusteredPubsLayer) {
             targetMap.removeLayer(window.clusteredPubsLayer);
@@ -400,10 +395,10 @@ export const MapModule = (function() {
         
         // Create layer groups
         const fullUKMap = window.App.getState('mapData.fullUKMapInstance');
-        window.gfPubsLayer = L.layerGroup().addTo(fullUKMap);
+        window.App.getState('mapData.gfPubsLayer') = L.layerGroup().addTo(fullUKMap);
         window.clusteredPubsLayer = L.markerClusterGroup({
-            maxClusterRadius: 40,  // Smaller radius for tighter clustering
-            disableClusteringAtZoom: 12,  // Show individual markers when very close
+            maxClusterRadius: 40,
+            disableClusteringAtZoom: 12,
             spiderfyOnMaxZoom: true,
             showCoverageOnHover: false,
             iconCreateFunction: function(cluster) {
@@ -420,6 +415,36 @@ export const MapModule = (function() {
                 });
             }
         }).addTo(targetMap);
+        
+        // REPLACE WITH THIS:
+        const fullUKMap = window.App.getState('mapData.fullUKMapInstance');
+        
+        // Create and store GF pubs layer
+        const gfPubsLayer = L.layerGroup().addTo(fullUKMap);
+        window.App.setState('mapData.gfPubsLayer', gfPubsLayer);
+        
+        // Create and store clustered pubs layer
+        const clusteredPubsLayer = L.markerClusterGroup({
+            maxClusterRadius: 40,
+            disableClusteringAtZoom: 12,
+            spiderfyOnMaxZoom: true,
+            showCoverageOnHover: false,
+            iconCreateFunction: function(cluster) {
+                const count = cluster.getChildCount();
+                let size = 'small';
+                
+                if (count > 1000) size = 'large';
+                else if (count > 100) size = 'medium';
+                
+                return L.divIcon({
+                    html: `<div><span>${count}</span></div>`,
+                    className: `marker-cluster marker-cluster-${size}`,
+                    iconSize: L.point(30, 30)
+                });
+            }
+        }).addTo(targetMap);
+        window.App.setState('mapData.clusteredPubsLayer', clusteredPubsLayer);
+
         
         // Separate pubs by GF status
         let gfPubs = [];
@@ -453,7 +478,7 @@ export const MapModule = (function() {
             const popupContent = createPubPopupContent(pub, gfStatus);
             marker.bindPopup(popupContent);
             
-            window.gfPubsLayer.addLayer(marker);
+            window.App.getState('mapData.gfPubsLayer').addLayer(marker);
         });
         
         // Add other pubs to cluster layer
@@ -485,9 +510,6 @@ export const MapModule = (function() {
             
             window.clusteredPubsLayer.addLayer(marker);
         });
-        
-        // Ensure GF pubs are on top
-        // window.gfPubsLayer.bringToFront();
         
         return pubs.length;
     };
@@ -1218,13 +1240,16 @@ export const MapModule = (function() {
         if (fullUKMap && gfPubsLayer) {
             fullUKMap.removeLayer(gfPubsLayer);
         }
-        if (window.clusteredPubsLayer) {
-            window.fullUKMap.removeLayer(window.clusteredPubsLayer);
+        const clusteredPubsLayer = window.App.getState('mapData.clusteredPubsLayer');
+        if (clusteredPubsLayer && fullUKMap) {
+            fullUKMap.removeLayer(clusteredPubsLayer);
+        }
         }
         
         if (showGFOnly) {
             // Show only GF pubs
-            window.gfPubsLayer = L.layerGroup().addTo(window.fullUKMap);
+            const gfPubsLayer = L.layerGroup().addTo(targetMap);
+            window.App.setState('mapData.gfPubsLayer', gfPubsLayer);
             
             const gfPubs = allPubs.filter(pub => 
                 pub.gf_status === 'always' || pub.gf_status === 'currently'
@@ -1244,12 +1269,16 @@ export const MapModule = (function() {
                 const popupContent = createPubPopupContent(pub, gfStatus);
                 marker.bindPopup(popupContent);
                 
-                window.gfPubsLayer.addLayer(marker);
+                gfPubsLayer.addLayer(marker);
             });
             
         } else {
             // Show all pubs with clustering
-            addFilteredPubMarkers(window.allPubsData, window.fullUKMap);
+            const allPubs = window.App.getState('mapData.allPubs');
+            const fullUKMap = window.App.getState('mapData.fullUKMapInstance');
+            if (allPubs && fullUKMap) {
+                addFilteredPubMarkers(allPubs, fullUKMap);
+            }
         }
     };
     
