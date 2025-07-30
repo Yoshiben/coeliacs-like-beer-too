@@ -28,13 +28,74 @@ const App = {
     initialized: false,
     modules: {},
     events: new EventBus(),
-    
-    // State management
+
+    // NEW: Complete state definition
     state: {
+        // Navigation state
         currentView: 'home',
+        activeOverlays: new Set(),
+        
+        // Location state
         userLocation: null,
+        locationTimestamp: null,
+        locationAccuracy: null,
+        
+        // Search state
+        lastSearch: {
+            type: null,      // 'nearby', 'name', 'area', 'beer'
+            query: null,
+            radius: null,
+            timestamp: null
+        },
         searchResults: [],
-        selectedPub: null
+        
+        // Current selections
+        currentPub: null,        // Replaces window.currentPubData
+        selectedPubForReport: null,  // Replaces window.selectedPubData
+        
+        // Map state
+        mapData: {
+            allPubs: [],         // Replaces window.allPubsData
+            fullUKMapInstance: null,  // Replaces window.fullUKMap
+            resultsMapInstance: null,
+            pubDetailMapInstance: null,
+            userMarker: null     // Replaces window.fullUKMapUserMarker
+        },
+        
+        // Form state
+        currentBrewery: null,
+        reportFormData: {},
+        
+        // UI state
+        activeModals: [],
+        toastQueue: [],
+        mapViewMode: 'gf'  // 'gf' or 'all'
+    },
+    
+    // Add state management methods
+    setState(path, value) {
+        const keys = path.split('.');
+        let current = this.state;
+        
+        for (let i = 0; i < keys.length - 1; i++) {
+            if (!current[keys[i]]) current[keys[i]] = {};
+            current = current[keys[i]];
+        }
+        
+        current[keys[keys.length - 1]] = value;
+        console.log(`📊 State updated: ${path} =`, value);
+    },
+    
+    getState(path) {
+        const keys = path.split('.');
+        let current = this.state;
+        
+        for (const key of keys) {
+            current = current[key];
+            if (current === undefined) return null;
+        }
+        
+        return current;
     },
     
     // Register module
@@ -524,7 +585,7 @@ const App = {
             'go-to-my-location': () => {
                 console.log('📍 Go to my location clicked');
                 const mapModule = modules.map;
-                const currentLocation = window.App.state.userLocation;
+                const currentLocation = window.App.getState('userLocation');
                 
                 if (!currentLocation) {
                     if (window.showSuccessToast) {
