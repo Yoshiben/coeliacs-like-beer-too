@@ -331,6 +331,22 @@ html {
     padding: 0 var(--space-lg);
 }
 
+/* Left Section */
+.nav-left {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+}
+
+/* Right Section */
+.nav-right {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+}
+
 /* Logo Container */
 .logo-container {
     flex: 1;
@@ -371,26 +387,80 @@ html {
     align-items: center;
 }
 
+/* Back Button */
+.nav-back-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: var(--white);
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius-pill);
+    font-weight: 600;
+    font-size: var(--text-sm);
+    cursor: pointer;
+    transition: all var(--transition);
+    display: none; /* Hidden by default */
+}
+
+.nav-back-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateX(-2px);
+}
+
+/* Tagline */
+.nav-tagline {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: var(--text-sm);
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    display: none; /* Hidden by default */
+}
+
+/* Toggle */
+.nav-toggle {
+    display: none; /* Hidden by default */
+}
+
+.nav-toggle .toggle-container {
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.nav-toggle .toggle-option {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.nav-toggle .toggle-option.active {
+    color: var(--text-primary);
+}
+
 /* ================================
-   MOBILE ADJUSTMENTS
+   PAGE-SPECIFIC VISIBILITY
    ================================ */
-/* @media (max-width: 768px) {
-    .nav-logo {
-        height: 5vh;
-        height: 5dvh;
-    }
-    
-    .nav-content {
-        padding: 0 var(--space-md);
-    } */
-    
-    /* Hide "Like Beer Too!" on very small screens */
-/*     @media (max-width: 360px) {
-        .nav-logo { */
-            /* You could create a mobile version that just says "CLBT" */
-/*         }
-    }
-} */
+
+/* Home Page */
+body.page-home .nav-tagline {
+    display: block;
+}
+
+/* Results Page */
+body.page-results .nav-back-btn {
+    display: flex;
+}
+body.page-results .nav-toggle {
+    display: block;
+}
+
+/* Map Page */
+body.page-map .nav-back-btn {
+    display: flex;
+}
+body.page-map .nav-toggle {
+    display: block;
+}
+
+/* Pub Details Page */
+body.page-pub .nav-back-btn {
+    display: flex;
+}
    
 
 
