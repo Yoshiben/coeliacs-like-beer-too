@@ -4726,37 +4726,71 @@ p {
     }
 }
 
-/* Alternative: Use a tabbed/stepped approach */
-.report-modal-tabs {
-    display: flex;
-    border-bottom: 1px solid var(--divider-color);
-    margin-bottom: var(--space-lg);
+
+/* ================================
+   FIX DROPDOWN OVERLAP - UPDATE
+   Add/update these styles in your CSS
+   ================================ */
+
+/* Make dropdown containers relative for absolute positioning */
+.brewery-dropdown-container,
+.beer-name-container,
+.beer-style-container {
+    position: relative;
 }
 
-.report-modal-tab {
-    flex: 1;
-    padding: var(--space-md);
-    text-align: center;
-    border: none;
-    background: none;
-    font-size: var(--text-sm);
-    color: var(--text-muted);
-    cursor: pointer;
-}
-
-.report-modal-tab.active {
-    color: var(--primary-gradient);
-    border-bottom: 2px solid var(--primary-gradient);
-}
-
-/* Hide inactive tab content */
-.tab-content {
+/* Fix dropdown positioning and scrolling */
+.report-modal .suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    background: var(--white);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-lg);
+    margin-top: var(--space-xs);
+    z-index: calc(var(--z-dropdown) + 10); /* Higher z-index */
     display: none;
-    flex: 1;
-    min-height: 0;
 }
 
-.tab-content.active {
-    display: flex;
-    flex-direction: column;
+/* Ensure modal body doesn't clip dropdowns */
+.report-modal .modal-body {
+    overflow-y: visible; /* Changed from auto */
+    position: relative;
 }
+
+/* Add scroll container inside modal body */
+.report-modal .modal-form {
+    overflow-y: auto;
+    max-height: calc(100vh - 200px); /* Account for header and actions */
+    padding-right: var(--space-sm); /* Space for scrollbar */
+}
+
+/* When dropdown is open, prevent body scroll */
+.report-modal.dropdown-open .modal-body {
+    overflow: hidden;
+}
+
+/* Dropdown header should stick to top when scrolling */
+.suggestions .dropdown-header {
+    position: sticky;
+    top: 0;
+    background: var(--white);
+    z-index: 2;
+    border-bottom: 1px solid var(--divider-color);
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .report-modal .suggestions {
+        max-height: 150px; /* Smaller on mobile */
+    }
+    
+    .report-modal .modal-form {
+        max-height: calc(100vh - 180px);
+    }
+}
+
