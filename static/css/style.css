@@ -4332,7 +4332,7 @@ p {
 /* ================================
    PRINT STYLES
    ================================ */
-@media print {
+/* @media print {
     .btn,
     .modal,
     .toast,
@@ -4350,7 +4350,7 @@ p {
         box-shadow: none;
         border: 1px solid #ccc;
     }
-}
+} */
 
 
 
@@ -5212,7 +5212,7 @@ p {
 
 .cookie-settings-float {
     position: fixed;
-    bottom: var(--space-xl);
+    bottom: 10vh;
     left: var(--space-xl);
     z-index: var(--z-dropdown);
 }
