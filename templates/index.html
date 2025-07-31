@@ -419,7 +419,10 @@
                                     <span class="status-text">Not Sure</span>
                                     <span class="status-meta">Help us find out!</span>
                                 </div>
-                                <button class="btn btn-sm" data-action="change-gf-status">✏️ Change this</button>
+                                <div class="status-actions">
+                                    <button class="btn btn-sm btn-outline" data-action="change-gf-status">📊 Update Status</button>
+                                    <button class="btn btn-sm btn-primary" data-action="report-beer">➕ Add New Beer</button>
+                                </div>
                             </div>
                         </div>
 
@@ -430,20 +433,18 @@
                     </div>
                     
                     <!-- Action buttons stick to bottom -->
-                    <div class="pub-action-grid">
+                    <div class="pub-action-grid pub-action-grid-simple">
                         <button class="btn btn-external" data-action="find-pub-online">🔍 Find Online</button>
                         <button class="btn btn-external" data-action="get-pub-directions">🧭 Get Directions</button>
-                        <button class="btn btn-toggle" data-action="toggle-pub-map">🗺️ <span id="pubMapBtnText">Show on Map</span></button>
-                        <button class="btn btn-positive" data-action="report-beer">📝 Report GF Beer</button>
                     </div>
                 </div>
                 
                 <!-- Map container for split view -->
-                <div class="pub-map-container" id="pubMapContainer">
+<!--                 <div class="pub-map-container" id="pubMapContainer">
                     <div class="pub-map-placeholder">🗺️ Interactive Map Loading...</div>
                 </div>
             </div>
-        </div>
+        </div> -->
 
         <!-- Report Modal -->
         <div id="reportModal" class="report-modal">
