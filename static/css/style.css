@@ -1893,31 +1893,9 @@ body.page-pub .nav-notification-btn {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 /* ================================
    PUB DETAILS OVERLAY
    ================================ */
-
-.pub-details-overlay {
-   display: none;
-   position: fixed;
-   top: 0;
-   left: 0;
-   width: 100%;
-   background: var(--primary-gradient);
-   z-index: var(--z-pub-details);
-   overflow: hidden;
-}
 
 .pub-details-overlay.active {
    display: flex !important;
@@ -1930,7 +1908,6 @@ body.page-pub .nav-notification-btn {
    flex-direction: column;
    height: 100%;
    width: 100%;
-   padding: var(--space-sm);
    box-sizing: border-box;
 }
 
@@ -1955,24 +1932,6 @@ body.page-pub .nav-notification-btn {
     -webkit-overflow-scrolling: touch;
 }
 
-/* REMOVE: Old nav-top as it's now in the purple bar */
-.pub-nav-top {
-    display: none;
-}
-
-/* ADD: Purple navigation bar like results */
-/* .pub-details-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--space-md);
-    background: var(--bg-glass);
-    border-radius: var(--radius-lg);
-    margin-bottom: var(--space-sm);
-    backdrop-filter: blur(10px);
-} */
-
-/* UPDATE: Header styling - remove nav buttons from here */
 .pub-header {
     text-align: center;
     margin-bottom: var(--space-xl);
