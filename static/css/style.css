@@ -3516,14 +3516,6 @@ p {
    .search-option {
        padding: var(--space-lg);
    }
-   
-   .search-card {
-       border-radius: var(--radius-xl); /* Full radius on mobile */
-   }
-   
-   .search-body {
-       padding: var(--space-lg); /* Smaller padding on mobile */
-   }
     
     .search-icon {
         font-size: var(--text-3xl); /* Slightly smaller on mobile */
