@@ -168,7 +168,9 @@
 #resultsOverlay,
 #pubDetailsOverlay,
 #fullMapOverlay,
-#cookieConsent {
+#cookieConsent,
+#cookieSettings,
+#cookieSettingsFloat {
     display: none; /* Hidden by default */
 }
 
