@@ -371,21 +371,10 @@ html {
     align-items: center;
 }
 
-/* Adjust body padding to account for top nav */
-/* body {
-    padding-top: 8vh;
-    padding-top: 8dvh;
-} */
-
-/* Adjust community-home to account for top nav */
-.community-home {
-    padding-top: 0; /* Remove any top padding since body handles it */
-}
-
 /* ================================
    MOBILE ADJUSTMENTS
    ================================ */
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
     .nav-logo {
         height: 5vh;
         height: 5dvh;
@@ -393,15 +382,15 @@ html {
     
     .nav-content {
         padding: 0 var(--space-md);
-    }
+    } */
     
     /* Hide "Like Beer Too!" on very small screens */
-    @media (max-width: 360px) {
-        .nav-logo {
+/*     @media (max-width: 360px) {
+        .nav-logo { */
             /* You could create a mobile version that just says "CLBT" */
-        }
+/*         }
     }
-}
+} */
    
 
 
