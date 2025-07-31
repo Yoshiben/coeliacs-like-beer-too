@@ -678,6 +678,10 @@ const App = {
             setTimeout(() => modules.map?.initFullUKMap?.(), 100);
             
             modules.tracking?.trackEvent('full_map_view', 'Navigation', 'nav_bar');
+
+            // ADD THIS: Update navigation context after overlay is shown
+            const navModule = modules.nav;
+            navModule?.showMapWithContext();
         }
     },
     
