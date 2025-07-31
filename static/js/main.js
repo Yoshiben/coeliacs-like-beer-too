@@ -618,7 +618,7 @@ const App = {
                 document.body.style.overflow = 'hidden';
                 
                 // Update nav context
-                modules.nav?.setPageContext('search');
+                modules.nav?.showSearchWithContext();
             }
             modules.tracking?.trackEvent('search_overlay_opened', 'Navigation', 'bottom_nav');
         },
