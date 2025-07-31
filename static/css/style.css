@@ -290,6 +290,15 @@ html {
    position: fixed;
 }
 
+.top-nav {
+   height: 8vh;
+   height: 8dvh;
+   display: flex;
+   justify-content: space-between;
+   z-index: navigation;
+}
+   
+
 
 
 
@@ -1481,17 +1490,17 @@ html {
    margin: 0;
 }
 
-.results-nav {
+/* .results-nav {
    display: flex;
    justify-content: space-between;
    align-items: center;
    height: 8vh;
-   height: 8dvh;
+   height: 8dvh; */
 /*    padding: var(--space-sm);
    background: var(--bg-glass);
    border-radius: var(--radius-lg);
    margin-bottom: var(--space-sm); */
-}
+/* } */
 
 /* .results-title {
    color: white;
@@ -1790,7 +1799,7 @@ html {
 }
 
 /* ADD: Purple navigation bar like results */
-.pub-details-nav {
+/* .pub-details-nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -1799,7 +1808,7 @@ html {
     border-radius: var(--radius-lg);
     margin-bottom: var(--space-sm);
     backdrop-filter: blur(10px);
-}
+} */
 
 /* UPDATE: Header styling - remove nav buttons from here */
 .pub-header {
@@ -2377,7 +2386,7 @@ html {
    min-height: 0; /* Allow shrinking */
 }
 
-.map-nav {
+/* .map-nav {
    display: flex;
    justify-content: space-between;
    align-items: center;
@@ -2385,7 +2394,7 @@ html {
    background: var(--bg-glass);
    border-radius: var(--radius-lg);
    margin-bottom: var(--space-sm);
-}
+} */
 
 .map-nav button {
    pointer-events: auto; /* But buttons are clickable */
