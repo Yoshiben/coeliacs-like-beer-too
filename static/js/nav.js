@@ -147,23 +147,48 @@ export const NavStateManager = (() => {
     // ================================
     // INITIALIZATION
     // ================================
+    // REPLACE the entire init function with this:
+
     const init = () => {
         console.log('🔧 Initializing NavStateManager');
         
         // Set initial context
         setPageContext('home');
         
-        // Listen for overlay changes
-        document.addEventListener('overlayShown', (e) => {
-            const overlayId = e.detail?.overlayId;
-            if (overlayId === 'resultsOverlay') {
-                setPageContext('results');
-            } else if (overlayId === 'pubDetailsOverlay') {
-                setPageContext('pub');
-            } else if (overlayId === 'fullMapOverlay') {
-                setPageContext('map');
-            }
-        });
+        // Watch for overlay visibility changes
+        const observeOverlay = (overlayId, context) => {
+            const overlay = document.getElementById(overlayId);
+            if (!overlay) return;
+            
+            // Create observer
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    if (mutation.type === 'attributes' && 
+                        (mutation.attributeName === 'style' || mutation.attributeName === 'class')) {
+                        
+                        const isVisible = overlay.style.display !== 'none' && 
+                                        (overlay.classList.contains('active') || 
+                                         overlay.style.display === 'flex');
+                        
+                        if (isVisible) {
+                            console.log(`📍 ${overlayId} became visible, setting context: ${context}`);
+                            setPageContext(context);
+                        }
+                    }
+                });
+            });
+            
+            // Start observing
+            observer.observe(overlay, {
+                attributes: true,
+                attributeFilter: ['style', 'class']
+            });
+        };
+        
+        // Observe all overlays
+        observeOverlay('resultsOverlay', 'results');
+        observeOverlay('pubDetailsOverlay', 'pub');
+        observeOverlay('fullMapOverlay', 'map');
         
         console.log('✅ NavStateManager initialized');
     };
