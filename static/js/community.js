@@ -90,7 +90,7 @@ export const CommunityModule = (() => {
             description: '6 dedicated GF taps including Bellfield, Jump Ship & Brass Castle!',
             address: 'Sheffield City Centre',
             gf_status: 'always',
-            photo_url: '/static/images/botanist-taps.jpg'
+            photo_url: ''
         };
     };
     
@@ -115,7 +115,7 @@ export const CommunityModule = (() => {
                 type: 'shop_find',
                 content: 'New GF section at <strong>Tesco Express</strong> - spotted Heart & Soul lager!',
                 location: 'Manchester',
-                photo_url: '/static/images/tesco-gf-beer.jpg',
+                // photo_url: '/static/images/tesco-gf-beer.jpg',
                 thanks_count: 24
             },
             {
