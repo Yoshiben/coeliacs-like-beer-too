@@ -348,8 +348,11 @@ const App = {
             helpers: App.getModule('helpers'),
             map: App.getModule('map'),
             form: App.getModule('form'),
-            tracking: App.getModule('tracking')
+            tracking: App.getModule('tracking'),
+            nav: App.getModule('nav') 
         };
+
+        console.log('📦 Available modules:', Object.keys(modules).filter(key => modules[key] !== null));
         
         // Route to appropriate handler
         const handler = App.actionHandlers[action];
