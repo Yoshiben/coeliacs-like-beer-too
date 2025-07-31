@@ -1850,7 +1850,6 @@ body.page-pub .nav-notification-btn {
 /* UPDATE: Card styling */
 .pub-details-card {
     background: var(--bg-white);
-    border-radius: var(--radius-xl);
     backdrop-filter: blur(10px);
     box-shadow: var(--shadow-lg);
     flex: 1;
@@ -1863,32 +1862,27 @@ body.page-pub .nav-notification-btn {
 /* UPDATE: Content area with scroll */
 .pub-details-content {
     flex: 1;
-    padding: var(--space-xl);
-    overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+   padding: 0 var(--space-xl)
 }
 
 .pub-header {
     text-align: center;
-    margin-bottom: var(--space-xl);
-    padding-bottom: var(--space-xl);
-    border-bottom: 2px solid var(--divider-color);
+    padding-bottom: var(--space-md);
 }
 
 .pub-title {
-    font-size: 1.8rem;
-    font-weight: 800;
-    color: var(--text-primary);
-    margin-bottom: var(--space-md);
-    line-height: 1.2;
-    background: var(--primary-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+   font-size: var(--text-2xl);
+   font-weight: 800;
+   color: var(--text-primary);
+   margin-top: var(--space-sm);
+   margin-bottom: 0;
+   background: var(--primary-gradient);
+   -webkit-background-clip: text;
+   -webkit-text-fill-color: transparent;
+   background-clip: text;
 }
 
-
-/* UPDATE: Address styling */
 .pub-address {
     color: var(--text-secondary);
     font-size: var(--text-lg);
@@ -1905,6 +1899,85 @@ body.page-pub .nav-notification-btn {
 }
 
 
+
+
+
+
+
+
+
+
+/* UPDATE: GF Status section with better design */
+
+.status-card {
+   background: linear-gradient(135deg, var(--purple-bg) 0%, rgba(139, 92, 246, 0.05) 100%);
+   border: 2px solid var(--purple-border);
+   border-radius: var(--radius-xl);
+   padding-bottom: var(--space-xl);
+   text-align: center;
+   position: relative;
+   overflow: hidden;
+}
+
+.status-card::before {
+    content: '🍺';
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    font-size: 5rem;
+    opacity: 0.1;
+    transform: rotate(-15deg);
+}
+
+.status-question {
+   font-weight: 700;
+   color: var(--text-primary);
+   margin: var(--space-md);
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   gap: var(--space-sm);
+}
+
+.current-status {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-md);
+}
+
+.current-status .status-icon {
+    font-size: 2rem;
+    line-height: 1;
+}
+
+.current-status .status-text {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.current-status .status-meta {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+/* UPDATE: Change status button */
+.status-card .btn-sm {
+   background: var(--purple-gradient);
+   color: white;
+   border: none;
+   padding: var(--space-sm) var(--space-3xl);
+   font-weight: 600;
+   box-shadow: var(--shadow-sm);
+   border-radius: var(--radius-xl);
+}
+
+.status-card .btn-sm:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
 
 .beer-section {
    background: linear-gradient(135deg, var(--success-bg) 0%, var(--success-bg) 100%);
@@ -4363,137 +4436,8 @@ p {
 
 
 
-/* UPDATE: GF Status section with better design */
-.gf-status-section {
-    margin: var(--space-xl) 0;
-}
-
-.status-card {
-    background: linear-gradient(135deg, var(--purple-bg) 0%, rgba(139, 92, 246, 0.05) 100%);
-    border: 2px solid var(--purple-border);
-    border-radius: var(--radius-xl);
-    padding: var(--space-xl);
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-}
-
-.status-card::before {
-    content: '🍺';
-    position: absolute;
-    top: -20px;
-    right: -20px;
-    font-size: 5rem;
-    opacity: 0.1;
-    transform: rotate(-15deg);
-}
-
-.status-question {
-    font-size: 1.3rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: var(--space-lg);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--space-sm);
-}
-
-.current-status {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-xs);
-    margin-bottom: var(--space-lg);
-}
-
-.current-status .status-icon {
-    font-size: 3rem;
-    line-height: 1;
-}
-
-.current-status .status-text {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.current-status .status-meta {
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-}
-
-/* UPDATE: Change status button */
-.status-card .btn-sm {
-    background: var(--purple-gradient);
-    color: white;
-    border: none;
-    padding: var(--space-sm) var(--space-xl);
-    font-weight: 600;
-    box-shadow: var(--shadow-sm);
-}
-
-.status-card .btn-sm:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow);
-}
-
-/* UPDATE: Action buttons - keep sticky at bottom */
 
 
-/* ================================
-   MOBILE OPTIMIZATIONS
-   ================================ */
-@media (max-width: 768px) {
-    .pub-details-container {
-        padding: 4px;
-    }
-    
-    .pub-details-nav {
-        padding: var(--space-sm);
-        margin-bottom: 4px;
-    }
-    
-    .pub-nav-title {
-        font-size: 1rem;
-    }
-    
-/*     .pub-details-nav .btn-nav-small {
-        padding: var(--space-sm) var(--space-md);
-        font-size: var(--text-sm);
-    } */
-    
-    .pub-details-content {
-        padding: var(--space-lg);
-    }
-    
-    .pub-title {
-        font-size: 1.5rem;
-    }
-    
-    .pub-action-grid {
-        padding: var(--space-lg);
-    }
-}
-
-@media (max-width: 480px) {
-    .pub-nav-title {
-        font-size: 0.9rem;
-        padding: 0 var(--space-xs);
-    }
-    
-    .pub-details-content {
-        padding: var(--space-md);
-    }
-    
-    .pub-title {
-        font-size: 1.3rem;
-    }
-    
-    .status-question {
-        font-size: 1.1rem;
-    }
-}
 
 
 
