@@ -271,7 +271,49 @@
                 <div class="nav-icon">⋯</div>
                 <div class="nav-label">More</div>
             </a>
-        </nav>        
+        </nav>   
+
+        <!-- Search Options Overlay -->
+        <div id="searchOverlay" class="overlay search-overlay">
+            <div class="search-container">
+                <div class="search-card">
+                    <div class="search-header">
+                        <h2 class="search-title">🔍 What are you searching for? 🍺</h2>
+                    </div>
+                    <div class="search-body">
+                        <div class="search-options">
+                            <!-- Location Search -->
+                            <div class="search-option location" data-action="location-search">
+                                <span class="search-icon">📍</span>
+                                <h3 class="search-title">Pubs Near Me</h3>
+                                <p class="search-description">Find pubs close to you, control the search distance.</p>
+                            </div>
+                            
+                            <!-- Name Search -->
+                            <div class="search-option name" data-action="search-name">
+                                <span class="search-icon">🏠</span>
+                                <h3 class="search-title">Pubs by Name</h3>
+                                <p class="search-description">Search for a specific pub name - "Milestone" etc</p>
+                            </div>
+                            
+                            <!-- Area Search -->
+                            <div class="search-option area" data-action="search-area">
+                                <span class="search-icon">🗺️</span>
+                                <h3 class="search-title">Pubs by Area</h3>
+                                <p class="search-description">Explore pubs in regions, cities, or postcodes</p>
+                            </div>
+                            
+                            <!-- Beer Search -->
+                            <div class="search-option beer" data-action="search-beer">
+                                <span class="search-icon">🍺</span>
+                                <h3 class="search-title">Pubs by Beer</h3>
+                                <p class="search-description">Find pubs serving specific GF beers - "Zapato", "IPA" etc.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     
         <!-- Search Modals -->
         <div id="nameModal" class="search-modal">
