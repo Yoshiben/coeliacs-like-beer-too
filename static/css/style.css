@@ -7,14 +7,14 @@
    --z-dropdown: 100;
    --z-search-suggestions: 150;
    --z-sticky: 200;
-   --z-navigation: 800;
    --z-toast: 900;
    --z-results-overlay: 1000;
    --z-pub-details: 1100;           
    --z-modal-backdrop: 1200;        
    --z-modal-content: 1210;        
    --z-status-modals: 1300;         
-   --z-cookie: 1400;               
+   --z-cookie: 1400;   
+   --z-navigation: 1800;
    
    /* Classic colours */
    --white: rgba(255, 255, 255, 1);
@@ -4329,31 +4329,6 @@ p {
     }
 }
 
-/* ================================
-   PRINT STYLES
-   ================================ */
-/* @media print {
-    .btn,
-    .modal,
-    .toast,
-    .cookie-consent,
-    .cookie-settings-float {
-        display: none;
-    }
-    
-    body {
-        background: white;
-        color: black;
-    }
-    
-    .card {
-        box-shadow: none;
-        border: 1px solid #ccc;
-    }
-} */
-
-
-
 
 
 
@@ -5218,12 +5193,12 @@ p {
 }
 
 .cookie-float-btn {
-    width: 3vh;
-    height: 3vh;
+    width: 4vh;
+    height: 4vh;
     border-radius: 50%;
     background: rgba(102, 126, 234, 0.9);
     border: none;
-    font-size: var(--text-xl);
+    font-size: var(--text-md);
     cursor: pointer;
     box-shadow: var(--shadow);
     transition: all var(--transition);
