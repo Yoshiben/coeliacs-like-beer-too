@@ -5212,14 +5212,14 @@ p {
 
 .cookie-settings-float {
     position: fixed;
-    bottom: 10vh;
-    left: var(--space-xl);
+    bottom: 9vh;
+    left: var(--space-md);
     z-index: var(--z-dropdown);
 }
 
 .cookie-float-btn {
-    width: 50px;
-    height: 50px;
+    width: 3vh;
+    height: 3vh;
     border-radius: 50%;
     background: rgba(102, 126, 234, 0.9);
     border: none;
