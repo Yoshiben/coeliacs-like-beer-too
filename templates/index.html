@@ -33,62 +33,182 @@
     </head>
     <body>
         
-        <div class="home-page">
-            <!-- Hero Section -->
-            <div class="hero-section">
-                <div class="hero-content">
-                    <h1 class="hero-title">Coeliacs Like Beer Too!</h1>
-                    <p class="hero-subtitle">The UK's largest community-driven guide to gluten free beer</p>
-                    
-                    <div class="hero-stats">
-                        <div class="stat-item">
-                            <span class="stat-number" id="totalPubs">Loading...</span>
-                            <span class="stat-label">Pubs in the UK</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-number" id="gfPubs">Loading...</span>
-                            <span class="stat-label">Serving GF Beer</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+       <!-- REPLACE the current hero-section and search-section with this -->
 
+        <!-- Community Homepage -->
+        <div class="community-home">
+            <!-- Simplified Hero -->
+            <div class="hero-compact">
+                <h1 class="hero-title-compact">Coeliacs Like Beer Too!</h1>
+                <p class="hero-tagline">Your community for finding great gluten free beer 🍺</p>
+            </div>
             
-        
-            <!-- Search Section -->
-            <div class="search-section" id="search">
-                <div class="search-container">
-                    <div class="search-card">
-                        <div class="search-header">
-<!--                             <h2 class="section-title">🔍 What are you searching for? 🍺</h2> -->
+            <!-- Quick Stats Bar -->
+            <div class="stats-bar">
+                <div class="stat-pill">
+                    <span class="stat-number-small" id="totalPubs">49k+</span>
+                    <span class="stat-label-small">UK Pubs</span>
+                </div>
+                <div class="stat-pill highlighted">
+                    <span class="stat-number-small" id="gfPubs">1.2k+</span>
+                    <span class="stat-label-small">Serve GF Beer</span>
+                </div>
+                <div class="stat-pill">
+                    <span class="stat-number-small">237</span>
+                    <span class="stat-label-small">Added This Month</span>
+                </div>
+            </div>
+            
+            <!-- Near Me Quick Access -->
+            <div class="near-me-section">
+                <button class="near-me-button" data-action="quick-nearby">
+                    <div class="near-me-icon">📍</div>
+                    <div class="near-me-content">
+                        <h3>Find GF Beer Near Me</h3>
+                        <p>Quick 5km search around you</p>
+                    </div>
+                    <div class="near-me-arrow">→</div>
+                </button>
+            </div>
+            
+            <!-- Community Feed -->
+            <div class="community-feed">
+                <!-- Pub of the Month -->
+                <div class="featured-card">
+                    <div class="featured-badge">🏆 Pub of the Month</div>
+                    <div class="featured-content">
+                        <h2>The Botanist Sheffield</h2>
+                        <p>6 dedicated GF taps including Bellfield, Jump Ship & Brass Castle!</p>
+                        <div class="featured-stats">
+                            <span>📍 Sheffield City Centre</span>
+                            <span>🍺 Always GF Available</span>
                         </div>
-                        <div class="search-body">
-                            <div class="search-options">
-                                <div class="search-option location" data-action="location-search">
-                                    <span class="search-icon">📍</span>
-                                    <h3 class="search-title">Pubs Near Me</h3>
-                                    <p class="search-description">Find pubs close to you, control the search distance.</p>
-                                </div>
-                                <div class="search-option name" data-modal="nameModal">
-                                    <span class="search-icon">🏠</span>
-                                    <h3 class="search-title">Pubs by Name</h3>
-                                    <p class="search-description">Search for a specific pub name - "Milestone" etc</p>
-                                </div>
-                                <div class="search-option area" data-modal="areaModal">
-                                    <span class="search-icon">🗺️</span>
-                                    <h3 class="search-title">Pubs by Area</h3>
-                                    <p class="search-description">Explore pubs in regions, cities, or postcodes</p>
-                                </div>
-                                <div class="search-option beer" data-modal="beerModal">
-                                    <span class="search-icon">🍺</span>
-                                    <h3 class="search-title">Pubs by Beer</h3>
-                                    <p class="search-description">Find pubs serving specific GF beers - "Zapato", "IPA" etc.</p>
-                                </div>            
-                            </div>
+                        <button class="btn-featured" data-action="view-pub" data-pub-id="12345">
+                            View Details
+                        </button>
+                    </div>
+                    <div class="featured-image">
+                        <img src="/static/images/botanist-taps.jpg" alt="GF taps at The Botanist">
+                    </div>
+                </div>
+                
+                <!-- What's New Section -->
+                <div class="section-header">
+                    <h2>🆕 Latest Finds</h2>
+                    <a href="#" class="see-all-link">See all →</a>
+                </div>
+                
+                <div class="finds-grid">
+                    <!-- Recent Find 1 -->
+                    <div class="find-card">
+                        <div class="find-header">
+                            <span class="find-user">Sarah M.</span>
+                            <span class="find-time">2 hours ago</span>
+                        </div>
+                        <div class="find-content">
+                            <p>Just found <strong>Vagabond Pale Ale</strong> on tap at <strong>The Old Bell</strong>!</p>
+                            <div class="find-location">📍 Leeds</div>
+                        </div>
+                        <div class="find-actions">
+                            <button class="btn-small-outline" data-action="view-pub" data-pub-id="23456">
+                                View Pub
+                            </button>
+                            <button class="btn-small-text">
+                                🙌 Thanks! (12)
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Find 2 -->
+                    <div class="find-card">
+                        <div class="find-header">
+                            <span class="find-user">Mike R.</span>
+                            <span class="find-time">5 hours ago</span>
+                        </div>
+                        <div class="find-content">
+                            <p>New GF section at <strong>Tesco Express</strong> - spotted Heart & Soul lager!</p>
+                            <div class="find-location">📍 Manchester</div>
+                        </div>
+                        <div class="find-photo">
+                            <img src="/static/images/tesco-gf-beer.jpg" alt="GF beer at Tesco">
+                        </div>
+                        <div class="find-actions">
+                            <button class="btn-small-text">
+                                🙌 Thanks! (24)
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Recent Find 3 -->
+                    <div class="find-card highlight">
+                        <div class="find-header">
+                            <span class="find-brewery">🎉 New Brewery Alert!</span>
+                        </div>
+                        <div class="find-content">
+                            <p><strong>Jump Ship Brewing</strong> just launched 3 new GF beers! Now available in selected Wetherspoons.</p>
+                        </div>
+                        <div class="find-actions">
+                            <button class="btn-small-primary">
+                                Find Stockists
+                            </button>
                         </div>
                     </div>
                 </div>
+                
+                <!-- Trending This Week -->
+                <div class="section-header">
+                    <h2>📈 Trending This Week</h2>
+                </div>
+                
+                <div class="trending-list">
+                    <div class="trending-item">
+                        <span class="trending-rank">1</span>
+                        <div class="trending-content">
+                            <strong>Brass Castle - Haze</strong>
+                            <small>Reported 18 times</small>
+                        </div>
+                        <span class="trending-badge">🔥</span>
+                    </div>
+                    <div class="trending-item">
+                        <span class="trending-rank">2</span>
+                        <div class="trending-content">
+                            <strong>Bellfield - Lawless</strong>
+                            <small>Reported 15 times</small>
+                        </div>
+                    </div>
+                    <div class="trending-item">
+                        <span class="trending-rank">3</span>
+                        <div class="trending-content">
+                            <strong>Vagabond - American Pale Ale</strong>
+                            <small>Reported 12 times</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <button class="action-card" data-action="browse-breweries">
+                        <span class="action-icon">🏭</span>
+                        <span class="action-label">Browse Breweries</span>
+                    </button>
+                    <button class="action-card" data-action="new-to-gf">
+                        <span class="action-icon">🎓</span>
+                        <span class="action-label">New to GF?</span>
+                    </button>
+                    <button class="action-card" data-action="add-find">
+                        <span class="action-icon">➕</span>
+                        <span class="action-label">Add a Find</span>
+                    </button>
+                    <button class="action-card" data-action="saved-pubs">
+                        <span class="action-icon">❤️</span>
+                        <span class="action-label">Saved Pubs</span>
+                    </button>
+                </div>
             </div>
+        </div>
+        
+        <!-- Keep the search modals but triggered from nav -->
+        <!-- Move bottom nav to top for desktop in CSS -->
 
             <!-- Bottom navigation bar -->
             <nav class="bottom-nav">
