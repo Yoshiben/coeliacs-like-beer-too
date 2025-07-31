@@ -433,7 +433,7 @@ html {
 }
 
 /* Nav notification button */
-.nav-notification-button {
+.nav-notification-btn {
    display: flex;
    background: none;
    border: none;
