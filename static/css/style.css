@@ -3260,22 +3260,6 @@ body.page-pub .nav-notification-btn {
 }
 
 /* ================================
-   MOBILE COMPACT - MAX 767PX
-   ================================ */
-@media (max-width: 767px) {
-    .map-location-btn {
-        padding: 10px;
-        min-width: 44px;
-        justify-content: center;
-    }
-    
-    .leaflet-control-custom {
-        margin-left: 10px;
-        margin-top: 60px;
-    }
-}
-
-/* ================================
    MOBILE - MAX 640PX
    ================================ */
 @media (max-width: 640px) {
