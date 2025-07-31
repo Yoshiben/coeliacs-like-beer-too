@@ -38,6 +38,7 @@
    --text-secondary: rgba(74,85,104,1);
    --text-muted: rgba(113,128,150,1);
    --text-white: var(--white);
+   --text-purple: rgba(118, 75, 162,1);
    
    /* Text Sizing */
    --text-xs: 0.75rem;
@@ -281,8 +282,8 @@ html {
    ================================ */
 
 .hero-section {
-   background: var(--primary-gradient);
-   color: var(--text-white);
+   background: var(--bg-white);
+   color: var(--text-purple);
    text-align: center;
    position: relative;
    overflow: hidden;
