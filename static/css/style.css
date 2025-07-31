@@ -393,13 +393,13 @@ html {
    border-bottom: 1px solid var(--border-light);
 }
 
-.section-title {
+/* .section-title {
    font-size: var(--text-md);
    font-weight: 500;
    color: var(--text-secondary);
    margin-top: var(--space-md);
    line-height: 1.1;
-}
+} */
 
 .search-body {
    flex: 1;
