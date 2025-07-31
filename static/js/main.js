@@ -438,8 +438,43 @@ const App = {
         'toggle-pub-map': (el, modules) => {
             App.togglePubDetailMap(modules);
         },
-        'show-full-map': (el, modules) => {
+        'show-pub-on-map': (el, modules) => {
+            const currentPub = App.getState(STATE_KEYS.CURRENT_PUB);
+            if (!currentPub || !currentPub.latitude || !currentPub.longitude) {
+                modules.helpers?.showToast('📍 Location not available for this pub', 'error');
+                return;
+            }
+            
+            // Show full map
             App.showFullMap(modules);
+            
+            // After map loads, center on this pub
+            setTimeout(() => {
+                const map = App.getState(STATE_KEYS.MAP_DATA.FULL_UK_MAP);
+                if (map) {
+                    map.setView([parseFloat(currentPub.latitude), parseFloat(currentPub.longitude)], 16);
+                    
+                    // Find and open the pub's popup
+                    map.eachLayer(layer => {
+                        if (layer.options && layer.options.pubId === currentPub.pub_id) {
+                            layer.openPopup();
+                        }
+                    });
+                }
+            }, 500);
+        },
+        
+        // Also UPDATE the bottom nav map click handler when on pub details:
+        'show-full-map': (el, modules) => {
+            // Check if we're on pub details
+            const currentContext = modules.nav?.getCurrentContext();
+            if (currentContext === 'pub') {
+                // Show this pub on map instead
+                App.actionHandlers['show-pub-on-map'](el, modules);
+            } else {
+                // Normal map view
+                App.showFullMap(modules);
+            }
         },
         'close-full-map': (el, modules) => {
             App.closeFullMap(modules);
