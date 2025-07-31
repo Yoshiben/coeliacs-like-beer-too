@@ -216,7 +216,12 @@ const App = {
         if (tracking) {
             tracking.trackSessionStart();
         }
+
+        const { NavStateManager } = await import('./nav.js');
+        App.registerModule('nav', NavStateManager);
     },
+
+    
     
     // ================================
     // DATA LOADING
@@ -371,14 +376,24 @@ const App = {
         
         // Navigation actions
         'close-results': (el, modules) => {
-            modules.helpers?.closeAllOverlaysAndGoHome?.();
+            modules.nav?.goToHome();
             modules.tracking?.trackEvent('close_results', 'Navigation', 'button');
         },
         'close-pub-details': (el, modules) => {
-            modules.helpers?.closeAllOverlaysAndGoHome?.();
+            modules.nav?.goToHome();
         },
         'back-to-results': (el, modules) => {
-            modules.search?.goBackToResults?.();
+            modules.nav?.goBackFromPub();
+        },
+        
+        // ADD this new one
+        'nav-back': (el, modules) => {
+            const currentContext = modules.nav?.getCurrentContext();
+            if (currentContext === 'pub') {
+                modules.nav?.goBackFromPub();
+            } else {
+                modules.nav?.goToHome();
+            }
         },
         'close-modal': (el, modules) => {
             const modal = el.closest('.modal, .search-modal');
@@ -543,6 +558,8 @@ const App = {
             const community = modules.community || window.App?.getModule('community');
             community?.handleQuickAction('find-stockists');
         },
+
+        
 
     },
     
