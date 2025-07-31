@@ -2542,12 +2542,12 @@ body.page-pub .nav-back-btn {
 
 .map-overlay-content {
     position: absolute;
-    top: 8vh; /* Account for top nav */
-    top: 8dvh;
+/*     top: 8vh; 
+    top: 8dvh; */
     left: 0;
     right: 0;
-    bottom: 8vh; /* Account for bottom nav */
-    bottom: 8dvh;
+/*     bottom: 8vh;  */
+/*     bottom: 8dvh; */
     width: 100%;
     flex: 1;
     display: flex;
@@ -2559,7 +2559,71 @@ body.page-pub .nav-back-btn {
     flex-shrink: 0;
 }
 
+/* ================================
+   MAP LOCATION BUTTON
+   ================================ */
 
+.leaflet-control-custom {
+    margin-top: 10px !important;
+}
+
+.map-location-btn {
+    width: 44px;
+    height: 44px;
+    line-height: 44px;
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    background: var(--purple-gradient);
+    color: white;
+    border-radius: 4px;
+    box-shadow: var(--shadow);
+    font-size: 1.5rem;
+    transition: all var(--transition);
+    cursor: pointer;
+    position: relative;
+}
+
+.map-location-btn:hover {
+    background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
+    transform: scale(1.05);
+    box-shadow: var(--shadow-lg);
+}
+
+.map-location-btn:active {
+    transform: scale(0.95);
+}
+
+/* Add pulsing animation when getting location */
+.map-location-btn.locating {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.map-location-btn.locating::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: ripple 1.5s ease-out infinite;
+}
+
+@keyframes ripple {
+    0% {
+        width: 30px;
+        height: 30px;
+        opacity: 1;
+    }
+    100% {
+        width: 60px;
+        height: 60px;
+        opacity: 0;
+    }
+}
 
 
 
