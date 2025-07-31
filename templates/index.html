@@ -32,30 +32,47 @@
         </script>
     </head>
     <body>
-        
-       <!-- REPLACE the current hero-section and search-section with this -->
-
         <!-- Community Homepage -->
         <div class="community-home">
-            <!-- Simplified Hero -->
             <!-- Top Navigation Bar -->
             <nav class="top-nav home-nav">
                 <div class="nav-content">
-                    <!-- Logo -->
-                    <div class="logo-container">
-                        <img src="/static/images/logo-white.svg" alt="Coeliacs Like Beer Too" class="nav-logo">
+                    <!-- Left Section -->
+                    <div class="nav-left">
+                        <!-- Back Button (hidden on home) -->
+                        <button class="nav-back-btn" data-action="nav-back">
+                            ← Back
+                        </button>
+                        
+                        <!-- Logo (always visible) -->
+                        <div class="logo-container">
+                            <img src="/static/images/logo-white.svg" alt="Coeliacs Like Beer Too" class="nav-logo">
+                        </div>
+                        
+                        <!-- Tagline (only on home) -->
+                        <div class="nav-tagline">
+                            Welcome to your GF beer community!
+                        </div>
                     </div>
                     
-                    <!-- GF/All Toggle -->
-<!--                     <div class="nav-toggle">
-                        <div class="toggle-container" id="mainToggleContainer">
-                            <div class="toggle-track">
-                                <div class="toggle-thumb" id="mainToggleThumb"></div>
-                                <div class="toggle-option active" data-value="gf">GF Only</div>
-                                <div class="toggle-option" data-value="all">All Pubs</div>
+                    <!-- Right Section -->
+                    <div class="nav-right">
+                        <!-- GF/All Toggle (results & map only) -->
+                        <div class="nav-toggle">
+                            <div class="toggle-container" id="mainToggleContainer">
+                                <div class="toggle-track">
+                                    <div class="toggle-thumb" id="mainToggleThumb"></div>
+                                    <div class="toggle-option active" data-value="gf">GF Only</div>
+                                    <div class="toggle-option" data-value="all">All Pubs</div>
+                                </div>
                             </div>
                         </div>
-                    </div> -->
+                        
+                        <!-- Future: Notifications, settings etc -->
+                        <div class="nav-actions">
+                            <button class="nav-notification-btn">🔔</button>
+                        </div>
+                    </div>
                 </div>
             </nav>
             
