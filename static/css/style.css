@@ -167,7 +167,8 @@
 #reportModal,
 #resultsOverlay,
 #pubDetailsOverlay,
-#fullMapOverlay {
+#fullMapOverlay,
+#cookieConsent {
     display: none; /* Hidden by default */
 }
 
@@ -282,8 +283,8 @@ html {
    ================================ */
 
 .hero-section {
-   background: var(--bg-white);
-   color: var(--text-purple);
+   background: var(--primary-gradient);
+   color: var(--text-white);
    text-align: center;
    position: relative;
    overflow: hidden;
