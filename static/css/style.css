@@ -812,18 +812,6 @@ html {
     position: relative;
 }
 
-.form-actions {
-    display: flex;
-    gap: var(--space-lg);
-    justify-content: flex-end;
-    padding-top: var(--space-xl);
-    border-top: 1px solid #e2e8f0;
-}
-
-
-
-
-
 
 
 
@@ -1667,6 +1655,21 @@ html {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /* ================================
    REPORT MODAL ATTRIBUTES
    ================================ */
@@ -1701,8 +1704,8 @@ html {
 .report-modal .modal-header {
    display: flex;
    align-items: center;
-   padding: var(--space-xl) var(--space-xl) var(--space-lg);
-   border-bottom: none;
+   padding: var(--space-lg) var(--space-xl) var(--space-md);
+   border-bottom: 1px solid var(--border-light);
    flex-shrink: 0;
 }
 
@@ -1746,33 +1749,42 @@ html {
    -webkit-overflow-scrolling: touch;
 }
 
+
+
+
+
+
 /* Form Groups */
 .report-modal .form-group {
    margin-bottom: var(--space-2xl);
 }
 
 .report-modal .form-label {
-   font-weight: 500;
-   color: var(--text-primary);
-   font-size: var(--text-md);
-   margin-bottom: var(--space-sm);
+   font-weight: 600;
+   color: var(--text-secondary);
+/*    margin-bottom: var(--space-sm); -- add to make brewery, beer etc have more room on form */
    display: block;
 }
 
-/* Inputs - iOS Style */
 .report-modal .form-input,
 .report-modal .form-select {
    width: 100%;
-   font-size: 18px;
-   min-height: 56px;
-   padding: var(--space-lg) var(--space-xl);
-   border: none;
+   font-size: 14px;
+   padding: var(--space-sm) var(--space-sm);
+   border: var(--border-light);
    border-radius: var(--radius);
-   background: var(--bg-section);
    transition: all var(--transition);
    -webkit-appearance: none;
    appearance: none;
    font-family: -apple-system, system-ui, sans-serif;
+}
+
+.report-modamodal .form-input:focus,
+.report-modal .form-select:focus {
+   outline: none;
+   border-color: var(--purple-border);
+   box-shadow: 0 0 0 3px var(--purple-shadow);
+   background: var(--bg-white);
 }
 
 .report-modal .form-select {
@@ -1782,69 +1794,89 @@ html {
    padding-right: 48px;
 }
 
-.report-modamodal .form-input:focus,
-.report-modal .form-select:focus {
-   outline: none;
-   background: var(--white);
-   box-shadow: 0 0 0 2px vag-white);
-}
+
 
 .report-modal .form-actions {
-    margin-top: var(--space-2xl);
-    padding-top: var(--space-xl);
-    border-top: 2px solid var(--divider-color);
-    background: var(--bg-white);
-    position: sticky;
-    bottom: 0;
-    margin-bottom: 0;
+   display: flex;
+   flex-direction: column;
+   position: sticky;
+   gap: var(--space-md);
+   flex-shrink: 0;
 }
 
+
+    
+    
+
+
+
+
+
+
+/* ================================
+   PHOTO UPLOAD ATTRIBUTES
+   ================================ */
+
+
 .photo-upload-compact {
-    display: flex;
-    align-items: center;
-    gap: var(--space-lg);
-    padding: var(--space-lg);
-    border: 2px dashed var(--border-light);
-    border-radius: var(--radius-lg);
-    background: var(--bg-section);
-    cursor: pointer;
-    transition: all var(--transition);
-    min-height: 60px;
+   display: flex;
+   align-items: center;
+   gap: var(--space-md);
+   border: 2px dashed var(--purple-border);
+   border-radius: var(--radius-lg);
+   background: var(--bg-section);
+   cursor: pointer;
+   transition: all var(--transition);
 }
 
 .photo-upload-compact:hover {
-    border-color: #667eea;
-    background: var(--hover-subtle);
+    border-color: var(--purple-border);
+    background: linear-gradient(135deg, var(--purple-bg) 0%, rgba(139, 92, 246, 0.1) 100%);
     transform: translateY(-1px);
+    box-shadow: 0 4px 12px var(--purple-shadow);
+}
+
+.photo-upload-compact:active {
+    background: var(--hover-subtle);
+    transform: scale(0.98);
 }
 
 .photo-upload-compact.active {
-    border-color: var(--success-border);
-    background: var(--success-bg);
+    border-style: solid;
+    background: var(--purple-gradient);
+    color: var(--text-white);
+}
+
+.photo-upload-compact.active .photo-upload-text strong,
+.photo-upload-compact.active .photo-upload-text small {
+    color: var(--text-white);
 }
 
 .photo-upload-icon {
-    font-size: 1.5rem;
-    color: var(--text-muted);
-    flex-shrink: 0;
+   font-size: var(--text-2xl);
+   color: var(--text-muted);
+   flex-shrink: 0;
+   padding: 0 var(--space-md) var(--space-sm);
 }
+
 
 .photo-upload-text {
     flex: 1;
-    color: var(--text-secondary);
 }
 
 .photo-upload-text strong {
     color: var(--text-primary);
     font-weight: 600;
-    display: block;
-    margin-bottom: var(--space-xs);
+/*     display: block;
+    margin-bottom: var(--space-xs); */
 }
 
 .photo-upload-text small {
     color: var(--text-muted);
     font-size: var(--text-xs);
 }
+
+
 
 
 
@@ -2779,24 +2811,6 @@ p {
     padding: var(--space-xl);
 }
 
-.form-select,
-.form-input {
-    width: 100%;
-    min-height: var(--btn-height);
-    padding: var(--btn-padding);
-    border: 2px solid #e2e8f0;
-    border-radius: var(--radius-pill);
-    font-size: var(--text-md);
-    background: var(--text-white);
-    transition: all var(--transition);
-    outline: none;
-}
-
-.form-select:focus,
-.form-input:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
 
 .form-checkbox {
     display: flex;
@@ -4246,21 +4260,8 @@ p {
     margin-bottom: var(--space-xl);
 }
 
-.report-modal .form-label {
-    font-weight: 600;
-    color: var(--text-secondary);
-    font-size: var(--text-sm);
-    margin-bottom: var(--space-sm);
-    display: block;
-}
 
-.report-modal .form-input:focus,
-.report-modal .form-select:focus {
-    outline: none;
-    border-color: var(--purple-border);
-    box-shadow: 0 0 0 3px var(--purple-shadow);
-    background: var(--bg-white);
-}
+
 
 /* Dropdown Containers with Purple Theme */
 .brewery-dropdown-container,
@@ -4408,50 +4409,13 @@ p {
 }
 
 /* Photo Upload with Purple Theme */
-.photo-upload-compact {
-    display: flex;
-    align-items: center;
-    gap: var(--space-lg);
-    padding: var(--space-lg);
-    border: 2px dashed var(--purple-border);
-    border-radius: var(--radius-lg);
-    background: var(--purple-bg);
-    cursor: pointer;
-    transition: all var(--transition);
-    min-height: 60px;
-}
 
-.photo-upload-compact:hover {
-    border-color: var(--purple-border);
-    background: linear-gradient(135deg, var(--purple-bg) 0%, rgba(139, 92, 246, 0.1) 100%);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px var(--purple-shadow);
-}
 
-.photo-upload-compact.active {
-    border-style: solid;
-    background: var(--purple-gradient);
-    color: var(--text-white);
-}
 
-.photo-upload-compact.active .photo-upload-icon,
-.photo-upload-compact.active .photo-upload-text strong,
-.photo-upload-compact.active .photo-upload-text small {
-    color: var(--text-white);
-}
 
-/* Form Actions */
-.report-modal .form-actions {
-    margin-top: var(--space-2xl);
-    padding-top: var(--space-xl);
-    border-top: 2px solid var(--divider-color);
-    background: var(--bg-white);
-    position: sticky;
-    bottom: 0;
-    display: flex;
-    gap: var(--space-lg);
-    justify-content: flex-end;
-}
+
+
+
 
 /* Auto-filled Animation */
 .report-modal .auto-filled {
@@ -4648,39 +4612,10 @@ p {
 }
 
 /* Photo Upload - Compact iOS Style */
-.photo-upload-compact {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 56px;
-    padding: var(--space-lg);
-    border: 2px dashed var(--border-light);
-    border-radius: var(--radius);
-    background: var(--bg-section);
-    cursor: pointer;
-    transition: all var(--transition);
-}
 
-.photo-upload-compact:active {
-    background: var(--hover-subtle);
-    transform: scale(0.98);
-}
 
-.photo-upload-icon {
-    font-size: var(--text-2xl);
-    color: var(--light-blue);
-}
 
-/* Form Actions - Bottom Fixed */
-.report-modal .form-actions {
-    padding: var(--space-lg) var(--space-xl) var(--space-2xl);
-    background: var(--white);
-    border-top: 1px solid var(--divider-color);
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-md);
-    flex-shrink: 0;
-}
+
 
 /* Buttons - iOS Style */
 .report-modal .btn {
@@ -4786,38 +4721,12 @@ p {
     margin-bottom: var(--space-lg); /* Reduced from 2xl */
 }
 
-/* Smaller inputs */
-.report-modal .form-input,
-.report-modal .form-select {
-    min-height: 48px; /* Reduced from 56px */
-    padding: var(--space-md) var(--space-lg);
-    font-size: 16px; /* Reduced from 18px */
-}
 
-/* Compact labels */
-.report-modal .form-label {
-    font-size: var(--text-sm);
-    margin-bottom: var(--space-xs);
-}
+
 
 /* Hide optional fields or make them smaller */
 .report-modal .form-group:last-of-type { /* Photo field */
     margin-bottom: 0;
-}
-
-.photo-upload-compact {
-    min-height: 44px; /* Smaller */
-    padding: var(--space-md);
-}
-
-/* Smaller header */
-.report-modal .modal-header {
-    padding: var(--space-lg) var(--space-xl) var(--space-md);
-}
-
-/* Smaller buttons */
-.report-modal .form-actions {
-    padding: var(--space-md) var(--space-xl) var(--space-lg);
 }
 
 .report-modal .btn {
