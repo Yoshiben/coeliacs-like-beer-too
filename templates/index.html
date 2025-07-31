@@ -38,10 +38,26 @@
         <!-- Community Homepage -->
         <div class="community-home">
             <!-- Simplified Hero -->
-            <div class="top-nav hero-nav">
-                <h1 class="hero-title-compact">Coeliacs Like Beer Too!</h1>
-<!--                 <p class="hero-tagline">Your community for finding great gluten free beer 🍺</p> -->
-            </div>
+            <!-- Top Navigation Bar -->
+            <nav class="top-nav home-nav">
+                <div class="nav-content">
+                    <!-- Logo -->
+                    <div class="logo-container">
+                        <img src="/static/images/logo-white.svg" alt="Coeliacs Like Beer Too" class="nav-logo">
+                    </div>
+                    
+                    <!-- GF/All Toggle -->
+                    <div class="nav-toggle">
+                        <div class="toggle-container" id="mainToggleContainer">
+                            <div class="toggle-track">
+                                <div class="toggle-thumb" id="mainToggleThumb"></div>
+                                <div class="toggle-option active" data-value="gf">GF Only</div>
+                                <div class="toggle-option" data-value="all">All Pubs</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </nav>
             
             <!-- Quick Stats Bar -->
             <div class="stats-bar">
