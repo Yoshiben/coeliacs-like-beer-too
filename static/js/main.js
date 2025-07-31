@@ -186,12 +186,14 @@ const App = {
         const [{ MapModule }, { SearchModule }, { FormModule }] = await Promise.all([
             import('./map.js'),
             import('./search.js'),
-            import('./forms.js')
+            import('./forms.js'),
+            import('./community.js')
         ]);
         
         App.registerModule('map', MapModule);
         App.registerModule('search', SearchModule);
         App.registerModule('form', FormModule);
+        App.registerModule('community', CommunityModule); 
         
         // Initialize forms
         FormModule.init();
@@ -502,6 +504,46 @@ const App = {
         'reload-page': () => {
             location.reload();
         },
+
+        // Community actions
+        'quick-nearby': (el, modules) => {
+            const community = modules.community || window.App?.getModule('community');
+            community?.handleQuickNearby();
+        },
+        
+        'thanks': (el, modules) => {
+            const findId = el.dataset.findId;
+            if (findId) {
+                const community = modules.community || window.App?.getModule('community');
+                community?.handleThanks(parseInt(findId));
+            }
+        },
+        
+        'browse-breweries': (el, modules) => {
+            const community = modules.community || window.App?.getModule('community');
+            community?.handleQuickAction('browse-breweries');
+        },
+        
+        'new-to-gf': (el, modules) => {
+            const community = modules.community || window.App?.getModule('community');
+            community?.handleQuickAction('new-to-gf');
+        },
+        
+        'add-find': (el, modules) => {
+            const community = modules.community || window.App?.getModule('community');
+            community?.handleQuickAction('add-find');
+        },
+        
+        'saved-pubs': (el, modules) => {
+            const community = modules.community || window.App?.getModule('community');
+            community?.handleQuickAction('saved-pubs');
+        },
+        
+        'find-stockists': (el, modules) => {
+            const community = modules.community || window.App?.getModule('community');
+            community?.handleQuickAction('find-stockists');
+        },
+
     },
     
     // ================================
