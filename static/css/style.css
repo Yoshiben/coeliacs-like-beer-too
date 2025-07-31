@@ -325,7 +325,7 @@ html {
 }
 
 /* Compact Hero */
-.hero-compact {
+.hero-nav {
     background: var(--primary-gradient);
     color: var(--white);
     padding: var(--space-md);
