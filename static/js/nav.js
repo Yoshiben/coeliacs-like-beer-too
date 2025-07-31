@@ -124,6 +124,73 @@ export const NavStateManager = (() => {
             goToHome();
         }
     };
+
+    // ================================
+    // TOGGLE MANAGEMENT
+    // ================================
+    const initToggle = () => {
+        const container = document.querySelector('.top-nav .toggle-container');
+        if (!container) return;
+        
+        const options = container.querySelectorAll('.toggle-option');
+        const thumb = container.querySelector('.toggle-thumb');
+        
+        const updateThumb = () => {
+            const activeOption = container.querySelector('.toggle-option.active');
+            if (activeOption && thumb) {
+                thumb.style.width = `${activeOption.offsetWidth}px`;
+                thumb.style.transform = `translateX(${activeOption.offsetLeft}px)`;
+            }
+        };
+        
+        // Initial position
+        setTimeout(updateThumb, 100);
+        
+        // Window resize
+        window.addEventListener('resize', updateThumb);
+        
+        // Click handlers
+        options.forEach(option => {
+            option.addEventListener('click', (e) => {
+                e.preventDefault();
+                const value = option.dataset.value;
+                const currentActive = container.querySelector('.toggle-option.active');
+                
+                if (currentActive === option) return;
+                
+                // Update UI
+                options.forEach(opt => opt.classList.remove('active'));
+                option.classList.add('active');
+                
+                updateThumb();
+                handleToggleChange(value);
+                
+                modules.tracking?.trackEvent('toggle_changed', 'Navigation', `${state.currentContext}_${value}`);
+            });
+        });
+    };
+    
+    const handleToggleChange = (mode) => {
+        console.log(`🔀 Toggle changed to: ${mode} on ${state.currentContext} page`);
+        
+        const mapModule = modules.map || window.App?.getModule('map');
+        const searchModule = modules.search || window.App?.getModule('search');
+        
+        switch (state.currentContext) {
+            case 'map':
+                if (mapModule?.updateMapDisplay) {
+                    mapModule.updateMapDisplay(mode === 'gf');
+                }
+                break;
+                
+            case 'results':
+                // TODO: Add results filtering when implemented
+                if (searchModule?.filterResults) {
+                    searchModule.filterResults(mode === 'gf');
+                }
+                break;
+        }
+    };
     
     // ================================
     // INTEGRATION HELPERS
@@ -147,13 +214,15 @@ export const NavStateManager = (() => {
     // ================================
     // INITIALIZATION
     // ================================
-    // REPLACE the entire init function with this:
 
     const init = () => {
         console.log('🔧 Initializing NavStateManager');
         
         // Set initial context
         setPageContext('home');
+        
+        // Initialize toggle
+        initToggle();
         
         // Watch for overlay visibility changes
         const observeOverlay = (overlayId, context) => {
