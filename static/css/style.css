@@ -286,6 +286,7 @@ html {
 
 .overlay {
    padding-bottom: 8vh;
+   padding-top: 8vh;
    width: 100%;
    height: 100%;
    position: fixed;
