@@ -245,6 +245,10 @@ export const NavStateManager = (() => {
     const showHomeWithContext = () => {
         setPageContext('home');
     };
+
+    const showSearchWithContext = () => {
+        setPageContext('search');
+    };
     
     // ================================
     // INITIALIZATION
@@ -307,6 +311,7 @@ export const NavStateManager = (() => {
         showMapWithContext,
         showPubDetailsWithContext,
         showHomeWithContext,
+        showSearchWithContext,
         goToHome,
         goBackFromPub,
         getCurrentContext: () => state.currentContext,
