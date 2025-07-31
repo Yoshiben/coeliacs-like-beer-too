@@ -488,6 +488,9 @@ export const SearchModule = (function() {
         setupMapButtonHandler(pub);
         
         modules.tracking?.trackPubView(pub.name);
+
+        const navModule = window.App?.getModule('nav');
+        navModule?.showPubDetailsWithContext();
     };
     
     const populatePubDetails = (pub) => {
@@ -635,6 +638,10 @@ export const SearchModule = (function() {
                 mapModule.cleanupResultsMap?.();
             }
         }
+
+        // ADD THIS: Update navigation context after showing results
+        const navModule = window.App?.getModule('nav');
+        navModule?.showResultsWithContext();
         
         // Restore cached results if available
         if (state.currentSearchPubs && state.currentSearchPubs.length > 0) {
@@ -1015,6 +1022,10 @@ export const SearchModule = (function() {
             }
             
             document.body.style.overflow = 'hidden';
+
+            // ADD THIS: Update navigation context after overlay is shown
+            const navModule = window.App?.getModule('nav');
+            navModule?.showResultsWithContext();
         }, 50);
     };
     
@@ -1193,6 +1204,9 @@ export const SearchModule = (function() {
         if (searchSection) searchSection.style.display = 'flex';
         
         document.body.style.overflow = '';
+
+        const navModule = window.App?.getModule('nav');
+        navModule?.showHomeWithContext();
     };
     
     const hideOverlays = (overlayIds, useQuerySelector = true) => {
