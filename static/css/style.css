@@ -165,9 +165,6 @@
 #areaModal,
 #beerModal,
 #reportModal,
-#resultsOverlay,
-#pubDetailsOverlay,
-#fullMapOverlay,
 #cookieConsent,
 #cookieSettings,
 #cookieSettingsFloat,
@@ -247,7 +244,9 @@
    box-shadow: var(--shadow-primary);
 }
 
-/* Holistic CSS */
+/* ================================
+   HOLISTIC
+   ================================ */
 
 body {
    background: var(--primary-gradient);
@@ -317,13 +316,6 @@ html {
 /* ================================
    HERO SECTION
    ================================ */
-
-
-
-
-
-
-
 
 .nav-content {
     height: 100%;
@@ -450,36 +442,58 @@ html {
 
 
 /* ================================
-   PAGE-SPECIFIC VISIBILITY
+   NAV VISIBILITY RULES - UPDATED
    ================================ */
+
+/* Default state - hide everything except logo */
+.nav-back-btn,
+.nav-tagline,
+.nav-toggle,
+.nav-notification-btn {
+    display: none !important;
+}
 
 /* Home Page */
 body.page-home .nav-tagline {
-    display: block;
+    display: block !important;
 }
 body.page-home .nav-notification-btn {
-    display: flex;
+    display: flex !important;
 }
 
 /* Results Page */
 body.page-results .nav-back-btn {
-    display: flex;
+    display: flex !important;
 }
 body.page-results .nav-toggle {
-    display: block;
+    display: block !important;
 }
 
 /* Map Page */
 body.page-map .nav-back-btn {
-    display: flex;
+    display: flex !important;
 }
 body.page-map .nav-toggle {
-    display: block;
+    display: block !important;
+}
+/* Hide the tagline and notification on map */
+body.page-map .nav-tagline {
+    display: none !important;
+}
+body.page-map .nav-notification-btn {
+    display: none !important;
 }
 
 /* Pub Details Page */
 body.page-pub .nav-back-btn {
-    display: flex;
+    display: flex !important;
+}
+/* Hide tagline and notification on pub details */
+body.page-pub .nav-tagline {
+    display: none !important;
+}
+body.page-pub .nav-notification-btn {
+    display: none !important;
 }
    
 
@@ -1233,7 +1247,7 @@ body.page-pub .nav-back-btn {
    SEARCH RESULTS MAP - VALIDATED
    ================================ */
 
-.results-map-container {
+/* .results-map-container {
    display:none;
    flex: 1;
    position: relative;
@@ -1267,7 +1281,7 @@ body.page-pub .nav-back-btn {
 
 .results-list-container[style*="display: none"] {
    display: none !important;
-}
+} */
 
 
 
@@ -1626,19 +1640,10 @@ body.page-pub .nav-back-btn {
 
 
 
-
-
-
 /* ================================
    RESULTS OVERLAY - FIXED
    ================================ */
 .results-overlay {
-   position: fixed;
-   top: 0;
-   left: 0;
-   width: 100%;
-   background: var(--primary-gradient);
-   z-index: var(--z-results-overlay);
    flex-direction: column;
    overflow: hidden;
 }
@@ -1654,10 +1659,12 @@ body.page-pub .nav-back-btn {
    flex-direction: column;
    height: 100%;
    width: 100%;
-   padding: var(--space-sm);
-   box-sizing: border-box;
    background: var(--primary-gradient);
-   min-height: 0; /* Allow shrinking */
+   min-height: 0;
+   padding-top: 8vh; /* Account for top nav */
+   padding-top: 8dvh;
+   padding-bottom: 8vh; /* Account for bottom nav */
+   padding-bottom: 8dvh;
 }
 
 /* Make loading state fill available space */
@@ -1674,26 +1681,6 @@ body.page-pub .nav-back-btn {
    margin: 0;
 }
 
-/* .results-nav {
-   display: flex;
-   justify-content: space-between;
-   align-items: center;
-   height: 8vh;
-   height: 8dvh; */
-/*    padding: var(--space-sm);
-   background: var(--bg-glass);
-   border-radius: var(--radius-lg);
-   margin-bottom: var(--space-sm); */
-/* } */
-
-/* .results-title {
-   color: white;
-   font-size: 1.1rem;
-   font-weight: 600;
-   margin: 0;
-   text-align: center;
-   flex: 1;
-} */
 
 .results-content {
    flex: 1;
@@ -1715,15 +1702,6 @@ body.page-pub .nav-back-btn {
 .results-list-container[style*="display: block"] {
    display: block;
    padding: var(--space-lg);
-}
-
-.results-loading {
-   display: flex;
-   flex-direction: column;
-   align-items: center;
-   justify-content: center;
-   padding: var(--space-4xl);
-   text-align: center;
 }
 
 .loading-spinner {
@@ -3964,75 +3942,6 @@ p {
         padding-top: var(--space-xl);
     }
 }
-
-/* ================================
-   DESKTOP - MIN 768PX
-   ================================ */
-/* @media (min-width: 768px) {
-    :root {
-        --btn-height: 48px;
-        --btn-padding: 14px 24px;
-        --space-lg: 20px;
-        --space-xl: 24px;
-        --space-2xl: 32px;
-        --space-3xl: 40px;
-        --space-4xl: 60px;
-        --legend-font-size: 0.7rem;
-        --legend-padding: var(--space-sm);
-        --legend-marker-size: 10px;
-        --legend-user-marker-size: 8px;
-        --popup-min-width: 160px;
-        --popup-title-size: var(--text-xs);
-        --popup-text-size: 0.7rem;
-    }
-    
-    .footer-content,
-    .footer-bottom-content {
-        padding: 0 var(--space-xl);
-    }
-    
-    .cookie-content {
-        flex-direction: row;
-    }
-    
-    .search-section {
-        height: calc(100vh - 280px);
-        height: calc(100dvh - 280px);
-    }
-    
-    .search-body {
-        padding: var(--space-lg);
-    }
-    
-    .search-options {
-        gap: var(--space-md);
-    }
-    
-    .results-map-container #resultsMap {
-        min-height: 300px;
-        border-radius: 0 0 var(--radius-lg) var(--radius-lg);
-    }
-    
-    .results-map-container .leaflet-container {
-        touch-action: pan-x pan-y;
-    }
-    
-    .container {
-        padding: 0 var(--space-xl);
-    }
-    
-    .split-view .pub-nav-top {
-        margin-bottom: var(--space-md);
-    }
-    
-    .map-location-btn {
-        padding: 10px 16px;
-    }
-    
-    .location-text {
-        display: inline;
-    }
-} */
 
 /* ================================
    MOBILE - MAX 768PX
