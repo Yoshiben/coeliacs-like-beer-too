@@ -434,7 +434,7 @@ html {
 
 /* Nav notification button */
 .nav-notification-btn {
-   display: flex;
+   display: none;
    background: none;
    border: none;
 }
@@ -452,6 +452,9 @@ html {
 /* Home Page */
 body.page-home .nav-tagline {
     display: block;
+}
+body.page-home .nav-notification-btn {
+    display: flex;
 }
 
 /* Results Page */
