@@ -1689,16 +1689,16 @@ html {
 }
 
 .report-modal .modal-content {
-   background: var(--white);
-   border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-   width: 100%;
-   max-width: 500px;
-   max-height: 95vh;
-   max-height: 95dvh;
-   overflow: hidden;
-   display: flex;
-   flex-direction: column;
-   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+    background: var(--bg-white);
+    border-radius: var(--radius-xl);
+    max-width: 500px;
+    width: 100%;
+    max-height: 90vh;
+    max-height: 90dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-xl);
 }
 
 .report-modal .modal-header {
@@ -4235,18 +4235,6 @@ p {
     overflow-y: auto;
 }
 
-.report-modal .modal-content {
-    background: var(--bg-white);
-    border-radius: var(--radius-xl);
-    max-width: 500px;
-    width: 100%;
-    max-height: 92vh;
-    max-height: 92dvh;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    box-shadow: var(--shadow-xl);
-}
 
 .report-modal .modal-title {
     font-weight: 700;
@@ -4470,7 +4458,7 @@ p {
         max-height: 98dvh;
         margin: 1vh auto;
         margin: 1dvh auto;
-        border-radius: var(--radius-lg);
+        border-radius: var(--radius-xl);
     }
     
     .report-modal .modal-header {
@@ -4670,12 +4658,6 @@ p {
 @media (min-width: 769px) {
     .report-modal {
         align-items: center;
-    }
-    
-    .report-modal .modal-content {
-        border-radius: var(--radius-xl);
-        max-height: 90vh;
-        max-height: 90dvh;
     }
     
     .report-modal .form-actions {
