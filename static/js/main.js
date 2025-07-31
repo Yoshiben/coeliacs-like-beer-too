@@ -412,7 +412,17 @@ const App = {
         },
         'view-pub-from-map': (el, modules) => {
             const pubId = el.dataset.pubId;
-            if (pubId) modules.search?.showPubDetails?.(pubId);
+            if (pubId) {
+                // First close the map overlay
+                const mapOverlay = document.getElementById('fullMapOverlay');
+                if (mapOverlay) {
+                    mapOverlay.style.display = 'none';
+                    mapOverlay.classList.remove('active');
+                }
+                
+                // Then show pub details
+                modules.search?.showPubDetails?.(pubId);
+            }
         },
         'find-pub-online': (el, modules) => {
             App.openPubExternalSearch(modules);
