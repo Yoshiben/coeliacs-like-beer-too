@@ -2543,12 +2543,12 @@ body.page-pub .nav-back-btn {
 
 .map-overlay-content {
     position: absolute;
-/*     top: 8vh; 
-    top: 8dvh; */
+    top: 8vh; 
+    top: 8dvh;
     left: 0;
     right: 0;
-/*     bottom: 8vh;  */
-/*     bottom: 8dvh; */
+    bottom: 8vh; 
+    bottom: 8dvh;
     width: 100%;
     flex: 1;
     display: flex;
