@@ -265,6 +265,7 @@ export const MapModule = (() => {
                 }
                 
                 // Add legend
+                addLocationButton(maps.results);
                 addMapLegend(maps.results);
                 
                 // Force render
@@ -536,6 +537,7 @@ export const MapModule = (() => {
         }
         
         // Add controls
+        addLocationButton(fullUKMap);
         addMapLegend(fullUKMap);
         addZoomHint(fullUKMap);
         
@@ -615,39 +617,113 @@ export const MapModule = (() => {
     // ================================
     // MAP CONTROLS
     // ================================
+
+    
+    // ADD this function to your map.js file in the MAP CONTROLS section:
+    
+    const addLocationButton = (mapInstance) => {
+        const LocationControl = L.Control.extend({
+            options: {
+                position: 'topleft'
+            },
+            
+            onAdd: function(map) {
+                const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
+                
+                const button = L.DomUtil.create('a', 'map-location-btn', container);
+                button.href = '#';
+                button.title = 'Go to my location';
+                button.innerHTML = '📍';
+                button.setAttribute('role', 'button');
+                button.setAttribute('aria-label', 'Go to my location');
+                
+                L.DomEvent.disableClickPropagation(button);
+                L.DomEvent.on(button, 'click', function(e) {
+                    L.DomEvent.preventDefault(e);
+                    goToUserLocation(map);
+                });
+                
+                return container;
+            }
+        });
+        
+        mapInstance.addControl(new LocationControl());
+    };
+    
+    const goToUserLocation = (map) => {
+        const location = utils.getUserLocation();
+        
+        if (!location) {
+            // Try to get location
+            const searchModule = modules.search;
+            if (searchModule?.requestLocationWithUI) {
+                searchModule.requestLocationWithUI().then(newLocation => {
+                    if (newLocation) {
+                        utils.setUserLocation(newLocation);
+                        map.setView([newLocation.lat, newLocation.lng], 14);
+                        
+                        // Flash the user marker
+                        const userMarker = window.App.getState(STATE_KEYS.MAP_DATA.USER_MARKER);
+                        if (userMarker) {
+                            userMarker.openPopup();
+                        }
+                    }
+                }).catch(error => {
+                    if (window.showSuccessToast) {
+                        window.showSuccessToast('📍 Location not available');
+                    }
+                });
+            }
+            return;
+        }
+        
+        // Animate to user location
+        map.setView([location.lat, location.lng], 14, {
+            animate: true,
+            duration: 0.5
+        });
+        
+        // Flash the user marker if it exists
+        const userMarker = window.App.getState(STATE_KEYS.MAP_DATA.USER_MARKER);
+        if (userMarker) {
+            userMarker.openPopup();
+        }
+        
+        modules.tracking?.trackEvent('go_to_location', 'Map', 'button_click');
+    };
+    
     const addMapLegend = (mapInstance) => {
         const legend = L.control({ position: 'bottomright' });
         
         legend.onAdd = (map) => {
-            const div = L.DomUtil.create('div', 'legend-container');
+            // Create container
+            const container = L.DomUtil.create('div', 'legend-container');
+            const legendDiv = L.DomUtil.create('div', 'map-legend', container);
             
-            div.innerHTML = `
-                <div class="map-legend">
-                    <div class="legend-title">🍺 GF Beer Status</div>
-                    <div class="legend-item">
-                        <div class="legend-marker always-gf"></div>
-                        <span class="legend-text">Always Has GF Beer</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-marker current-gf"></div>
-                        <span class="legend-text">Currently Has GF Beer</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-marker no-gf"></div>
-                        <span class="legend-text">No GF Currently</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-marker unknown"></div>
-                        <span class="legend-text">Unknown Status</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-marker user-location"></div>
-                        <span class="legend-text">Your Location</span>
-                    </div>
-                </div>
-            `;
+            // Title
+            const title = L.DomUtil.create('div', 'legend-title', legendDiv);
+            title.textContent = '🍺 GF Beer Status';
             
-            return div;
+            // Legend items data
+            const items = [
+                { class: 'always-gf', text: 'Always Has GF Beer' },
+                { class: 'current-gf', text: 'Currently Has GF Beer' },
+                { class: 'no-gf', text: 'No GF Currently' },
+                { class: 'unknown', text: 'Unknown Status' },
+                { class: 'user-location', text: 'Your Location' }
+            ];
+            
+            // Create legend items
+            items.forEach(item => {
+                const itemDiv = L.DomUtil.create('div', 'legend-item', legendDiv);
+                
+                const marker = L.DomUtil.create('div', `legend-marker ${item.class}`, itemDiv);
+                
+                const text = L.DomUtil.create('span', 'legend-text', itemDiv);
+                text.textContent = item.text;
+            });
+            
+            return container;
         };
         
         legend.addTo(mapInstance);
