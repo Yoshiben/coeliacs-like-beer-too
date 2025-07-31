@@ -46,6 +46,11 @@
     <path d="M 8 20 L 10 48 Q 10 50 12 50 L 28 50 Q 30 50 30 48 L 32 20 Q 32 18 30 18 L 10 18 Q 8 18 8 20 Z" 
           fill="url(#beerLiquid)" opacity="0.9"/>
     
+    <!-- Glass base -->
+    <ellipse cx="20" cy="50" rx="10" ry="2" fill="#ffffff" opacity="0.3"/>
+    <rect x="18" y="48" width="4" height="6" fill="#ffffff" opacity="0.3"/>
+    <ellipse cx="20" cy="54" rx="8" ry="2" fill="#ffffff" opacity="0.3"/>
+    
     <!-- Bubbles -->
     <circle cx="15" cy="40" r="0.8" fill="#ffffff" opacity="0.5">
       <animate attributeName="cy" from="48" to="22" dur="3s" repeatCount="indefinite"/>
@@ -57,6 +62,9 @@
     <!-- Glass outline -->
     <path d="M 8 20 L 10 48 Q 10 50 12 50 L 28 50 Q 30 50 30 48 L 32 20 Q 32 18 30 18 L 10 18 Q 8 18 8 20 Z" 
           fill="none" stroke="#ffffff" stroke-width="0.8" opacity="0.2"/>
+    <!-- Glass stem and base outline -->
+    <line x1="20" y1="50" x2="20" y2="54" stroke="#ffffff" stroke-width="0.8" opacity="0.2"/>
+    <ellipse cx="20" cy="54" rx="8" ry="2" fill="none" stroke="#ffffff" stroke-width="0.8" opacity="0.2"/>
     
     <!-- Reflection -->
     <path d="M 11 22 L 12 45 L 18 45 L 16 22 Z" fill="url(#glassGradient)" opacity="0.5"/>
