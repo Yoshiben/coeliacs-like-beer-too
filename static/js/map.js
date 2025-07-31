@@ -544,11 +544,6 @@ export const MapModule = (() => {
         // Load pubs
         await loadAllPubsOnMap();
         
-        // Initialize toggle
-        setTimeout(() => {
-            initMapToggle();
-        }, 500);
-        
         // Force render
         setTimeout(() => {
             const map = window.App.getState(STATE_KEYS.MAP_DATA.FULL_UK_MAP);
