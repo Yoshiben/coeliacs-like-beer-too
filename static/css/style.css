@@ -2364,20 +2364,22 @@ body.page-pub .nav-notification-btn {
 }
 
 .map-location-btn {
-    width: 44px;
-    height: 44px;
-    line-height: 44px;
-    display: block;
-    text-align: center;
-    text-decoration: none;
-    background: var(--purple-gradient);
-    color: white;
-    border-radius: 4px;
-    box-shadow: var(--shadow);
-    font-size: 1.5rem;
-    transition: all var(--transition);
-    cursor: pointer;
-    position: relative;
+   width: 5vh;
+   width: 5dvh;
+   height: 5vh;
+   width: 5dvh;
+   line-height: 44px;
+   display: block;
+   text-align: center;
+   text-decoration: none;
+   background: var(--purple-gradient);
+   color: white;
+   border-radius: 4px;
+   box-shadow: var(--shadow);
+/*    font-size: 1.5rem; */
+   transition: all var(--transition);
+   cursor: pointer;
+   position: relative;
 }
 
 .map-location-btn:hover {
