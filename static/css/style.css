@@ -291,12 +291,96 @@ html {
 }
 
 .top-nav {
+   position: fixed;
+   top: 0;
+   left: 0;
+   right: 0;
    height: 8vh;
    height: 8dvh;
-   display: flex;
-   justify-content: space-between;
-   z-index: navigation;
+   background: var(--primary-gradient);
+   z-index: var(--z-navigation);
+   box-shadow: var(--shadow-sm);
+   backdrop-filter: blur(10px);
 }
+
+
+
+
+
+
+/* ================================
+   HERO SECTION
+   ================================ */
+
+
+
+
+
+
+
+
+.nav-content {
+    height: 100%;
+    max-width: var(--container-xl);
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--space-lg);
+}
+
+/* Logo Container */
+.logo-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.nav-logo {
+    height: 6vh;
+    height: 6dvh;
+    width: auto;
+    max-width: 280px;
+}
+
+/* Toggle in Nav */
+.nav-toggle {
+    flex: 0 0 auto;
+}
+
+/* Reuse your existing toggle styles but make text white */
+.nav-toggle .toggle-container {
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.nav-toggle .toggle-option {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.nav-toggle .toggle-option.active {
+    color: var(--text-primary);
+}
+
+/* Future nav actions */
+.nav-actions {
+    flex: 1;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+/* Adjust body padding to account for top nav */
+body {
+    padding-top: 8vh;
+    padding-top: 8dvh;
+}
+
+/* Adjust community-home to account for top nav */
+.community-home {
+    padding-top: 0; /* Remove any top padding since body handles it */
+}
+
+
    
 
 
