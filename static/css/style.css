@@ -432,6 +432,19 @@ html {
     color: var(--text-primary);
 }
 
+/* Nav notification button */
+.nav-notification-button {
+   display: flex;
+   background: none;
+   border: none;
+}
+
+
+
+
+
+
+
 /* ================================
    PAGE-SPECIFIC VISIBILITY
    ================================ */
