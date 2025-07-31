@@ -77,8 +77,15 @@ export const NavStateManager = (() => {
     const goToHome = () => {
         console.log('🏠 Navigating to home');
         
-        // Use helpers module to close all overlays
-        modules.helpers?.hideAllOverlays();
+        // Hide all overlays
+        const overlays = ['resultsOverlay', 'pubDetailsOverlay', 'fullMapOverlay'];
+        overlays.forEach(id => {
+            const overlay = document.getElementById(id);
+            if (overlay) {
+                overlay.style.display = 'none';
+                overlay.classList.remove('active');
+            }
+        });
         
         // Show community home
         const communityHome = document.querySelector('.community-home');
@@ -128,46 +135,74 @@ export const NavStateManager = (() => {
     // ================================
     // TOGGLE MANAGEMENT
     // ================================
+    // UPDATE the initToggle function in nav.js:
+
     const initToggle = () => {
         const container = document.querySelector('.top-nav .toggle-container');
-        if (!container) return;
+        if (!container) {
+            console.log('⚠️ Toggle container not found');
+            return;
+        }
         
         const options = container.querySelectorAll('.toggle-option');
         const thumb = container.querySelector('.toggle-thumb');
         
+        if (!thumb) {
+            console.error('❌ Toggle thumb not found');
+            return;
+        }
+        
         const updateThumb = () => {
             const activeOption = container.querySelector('.toggle-option.active');
-            if (activeOption && thumb) {
+            if (activeOption) {
+                const containerRect = container.getBoundingClientRect();
+                const optionRect = activeOption.getBoundingClientRect();
+                const offset = optionRect.left - containerRect.left;
+                
                 thumb.style.width = `${activeOption.offsetWidth}px`;
-                thumb.style.transform = `translateX(${activeOption.offsetLeft}px)`;
+                thumb.style.transform = `translateX(${offset}px)`;
             }
         };
         
-        // Initial position
-        setTimeout(updateThumb, 100);
-        
-        // Window resize
-        window.addEventListener('resize', updateThumb);
-        
-        // Click handlers
+        // Remove old event listeners by cloning
         options.forEach(option => {
+            const newOption = option.cloneNode(true);
+            option.parentNode.replaceChild(newOption, option);
+        });
+        
+        // Re-query after cloning
+        const newOptions = container.querySelectorAll('.toggle-option');
+        
+        // Add new event listeners
+        newOptions.forEach(option => {
             option.addEventListener('click', (e) => {
                 e.preventDefault();
-                const value = option.dataset.value;
-                const currentActive = container.querySelector('.toggle-option.active');
+                e.stopPropagation();
                 
-                if (currentActive === option) return;
+                const value = option.dataset.value;
+                
+                // Don't do anything if already active
+                if (option.classList.contains('active')) return;
+                
+                console.log(`🔀 Toggle clicked: ${value}`);
                 
                 // Update UI
-                options.forEach(opt => opt.classList.remove('active'));
+                newOptions.forEach(opt => opt.classList.remove('active'));
                 option.classList.add('active');
                 
+                // Update thumb position
                 updateThumb();
-                handleToggleChange(value);
                 
-                modules.tracking?.trackEvent('toggle_changed', 'Navigation', `${state.currentContext}_${value}`);
+                // Handle the change
+                handleToggleChange(value);
             });
         });
+        
+        // Initial thumb position
+        requestAnimationFrame(updateThumb);
+        
+        // Update on resize
+        window.addEventListener('resize', updateThumb);
     };
     
     const handleToggleChange = (mode) => {
