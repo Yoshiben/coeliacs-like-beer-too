@@ -208,32 +208,35 @@
         </div>
         
         <!-- Keep the search modals but triggered from nav -->
+
+        <div id="cookieSettingsFloat" class="cookie-settings-float">
+            <button data-action="show-cookie-settings" class="cookie-float-btn" title="Cookie Settings">🍪</button>
+        </div>
         <!-- Move bottom nav to top for desktop in CSS -->
 
             <!-- Bottom navigation bar -->
-            <nav class="bottom-nav">
-                <a href="/" class="nav-item">
-                    <div class="nav-icon">🏠</div>
-                    <div class="nav-label">Home</div>
-                </a>
-                <a href="#" data-action="open-search" class="nav-item">
-                    <div class="nav-icon">🔍</div>
-                    <div class="nav-label">Search</div>
-                </a>
-                <a href="#" data-action="show-full-map" class="nav-item">
-                    <div class="nav-icon">🗺️</div>
-                    <div class="nav-label">Map</div>
-                </a>
-                <a href="/breweries" class="nav-item">
-                    <div class="nav-icon">🍺</div>
-                    <div class="nav-label">Breweries</div>
-                </a>
-                <a href="/more" class="nav-item">
-                    <div class="nav-icon">⋯</div>
-                    <div class="nav-label">More</div>
-                </a>
-            </nav>        
-        </div>
+        <nav class="bottom-nav">
+            <a href="/" class="nav-item">
+                <div class="nav-icon">🏠</div>
+                <div class="nav-label">Home</div>
+            </a>
+            <a href="#" data-action="open-search" class="nav-item">
+                <div class="nav-icon">🔍</div>
+                <div class="nav-label">Search</div>
+            </a>
+            <a href="#" data-action="show-full-map" class="nav-item">
+                <div class="nav-icon">🗺️</div>
+                <div class="nav-label">Map</div>
+            </a>
+            <a href="/breweries" class="nav-item">
+                <div class="nav-icon">🍺</div>
+                <div class="nav-label">Breweries</div>
+            </a>
+            <a href="/more" class="nav-item">
+                <div class="nav-icon">⋯</div>
+                <div class="nav-label">More</div>
+            </a>
+        </nav>        
     
         <!-- Search Modals -->
         <div id="nameModal" class="search-modal">
@@ -972,9 +975,6 @@
             </div>
         </div>
         
-        <div id="cookieSettingsFloat" class="cookie-settings-float">
-            <button data-action="show-cookie-settings" class="cookie-float-btn" title="Cookie Settings">🍪</button>
-        </div>
 
         <!-- Templates -->
         <template id="pub-result-template">
