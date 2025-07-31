@@ -609,7 +609,32 @@ const App = {
             community?.handleQuickAction('find-stockists');
         },
 
-        
+        'open-search': (el, modules) => {
+            console.log('🔍 Opening search overlay');
+            const searchOverlay = document.getElementById('searchOverlay');
+            if (searchOverlay) {
+                searchOverlay.style.display = 'flex';
+                searchOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                
+                // Update nav context
+                modules.nav?.setPageContext('search');
+            }
+            modules.tracking?.trackEvent('search_overlay_opened', 'Navigation', 'bottom_nav');
+        },
+
+        'close-search': (el, modules) => {
+            console.log('🔍 Closing search overlay');
+            const searchOverlay = document.getElementById('searchOverlay');
+            if (searchOverlay) {
+                searchOverlay.style.display = 'none';
+                searchOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+                
+                // Return to home context
+                modules.nav?.goToHome();
+            }
+        },
 
     },
     
