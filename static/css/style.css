@@ -2096,6 +2096,20 @@ body.page-pub .nav-notification-btn {
    display: flex !important;
 }
 
+.results-header {
+   padding: var(--space-lg);
+   background: var(--primary-gradient);
+   color: var(--white);
+   text-align: center;
+   flex-shrink: 0;
+}
+
+.results-title {
+   margin: 0;
+   font-size: var(--text-xl);
+   font-weight: 700;
+}
+
 /* Ensure results container fills the screen */
 .results-container {
    flex: 1;
