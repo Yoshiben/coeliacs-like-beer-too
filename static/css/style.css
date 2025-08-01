@@ -953,6 +953,48 @@ body.page-pub .nav-notification-btn {
 }
 
 
+/* More Menu Dropdown */
+.nav-more {
+   position: relative;
+}
+
+.more-menu {
+   position: absolute;
+   bottom: 100%;
+   right: 0;
+   background: var(--bg-white);
+   border-radius: var(--radius-lg);
+   box-shadow: var(--shadow-lg);
+   min-width: 200px;
+   display: none;
+   margin-bottom: var(--space-sm);
+}
+
+.more-menu.active {
+   display: block;
+}
+
+.more-menu-item {
+   display: flex;
+   align-items: center;
+   gap: var(--space-md);
+   padding: var(--space-lg);
+   color: var(--text-primary);
+   text-decoration: none;
+   border-bottom: 1px solid var(--border-light);
+   transition: all var(--transition);
+}
+
+.more-menu-item:last-child {
+   border-bottom: none;
+}
+
+.more-menu-item:hover {
+   background: var(--hover-subtle);
+}
+
+
+
 
 /* ================================
    SEARCH SECTION - VALIDATED
