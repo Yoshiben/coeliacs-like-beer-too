@@ -166,6 +166,14 @@ export const ModalManager = (() => {
         state.overlayStack = state.overlayStack.filter(id => id !== overlayId);
         state.activeOverlays = state.activeOverlays.filter(id => id !== overlayId);
         
+        // Show community home if no overlays are active
+        if (state.activeOverlays.length === 0) {
+            const communityHome = document.querySelector('.community-home');
+            if (communityHome) {
+                communityHome.style.display = 'block';
+            }
+        }
+        
         // Restore body scroll if needed
         if (state.activeOverlays.length === 0 && state.activeModals.length === 0) {
             document.body.style.overflow = '';
