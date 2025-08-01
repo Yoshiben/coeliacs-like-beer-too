@@ -25,6 +25,7 @@ export const SearchModule = (function() {
         get api() { return window.App?.getModule('api'); },
         get map() { return window.App?.getModule('map'); },
         get modal() { return window.App?.getModule('modal'); },
+        get modalManager() { return window.App?.getModule('modalManager'); },
         get tracking() { return window.App?.getModule('tracking'); },
         get ui() { return window.App?.getModule('ui'); }
     };
@@ -78,10 +79,14 @@ export const SearchModule = (function() {
         
         modules.tracking?.trackEvent('location_search_start', 'Search', 'distance_modal');
         
-        if (modules.modal) {
+        // Use modalManager instead of modal
+        if (modules.modalManager) {
+            modules.modalManager.open('distanceModal');
+        } else if (modules.modal) {
+            // Fallback to old method
             modules.modal.open('distanceModal');
         } else {
-            // Fallback
+            // Ultimate fallback
             const distanceModal = document.getElementById('distanceModal');
             if (distanceModal) {
                 distanceModal.style.display = 'flex';
@@ -94,7 +99,8 @@ export const SearchModule = (function() {
         console.log(`🎯 Searching within ${radiusKm}km...`);
         
         try {
-            modules.modal?.close('distanceModal');
+            // Close distance modal using modalManager
+            modules.modalManager?.close('distanceModal') || modules.modal?.close('distanceModal');
             
             showResultsOverlay(`Pubs within ${radiusKm}km`);
             showResultsLoading('📍 Getting precise location...');
@@ -225,7 +231,9 @@ export const SearchModule = (function() {
         }
         
         console.log('🏠 Searching for pub name:', query);
-        modules.modal?.close('nameModal');
+        
+        // Close modal using modalManager
+        modules.modalManager?.close('nameModal') || modules.modal?.close('nameModal');
         
         showResultsOverlay(`Pub name: "${query}"`);
         showResultsLoading('Searching for pubs...');
@@ -253,7 +261,9 @@ export const SearchModule = (function() {
         }
         
         console.log(`🗺️ Searching by ${searchType}:`, query);
-        modules.modal?.close('areaModal');
+        
+        // Close modal using modalManager
+        modules.modalManager?.close('areaModal') || modules.modal?.close('areaModal');
         
         const searchTypeText = searchType === 'postcode' ? 'postcode' : 'area';
         showResultsOverlay(`${searchTypeText}: "${query}"`);
@@ -321,7 +331,9 @@ export const SearchModule = (function() {
         }
         
         console.log(`🍺 Searching by ${searchType}:`, query);
-        modules.modal?.close('beerModal');
+        
+        // Close modal using modalManager
+        modules.modalManager?.close('beerModal') || modules.modal?.close('beerModal');
         
         const searchTypeText = searchType === 'brewery' ? 'brewery' : 
                              searchType === 'beer' ? 'beer' : 'style';
@@ -724,18 +736,19 @@ export const SearchModule = (function() {
             }
         });
     };
-    
-    // ADD this new function after the showLocationPermissionUI function:
-    
-    // UPDATE the showLocationBlockedModal function in search.js:
 
     const showLocationBlockedModal = () => {
-        const modal = document.getElementById('locationBlockedModal');
-        if (!modal) {
-            console.error('Location blocked modal not found');
-            utils.showToast('📍 Location blocked. Enable in browser settings and refresh.', 'error');
-            return;
-        }
+        // Use modalManager to ensure proper modal management
+        if (modules.modalManager) {
+            modules.modalManager.closeAll(); // Close any open modals
+            modules.modalManager.open('locationBlockedModal');
+        } else {
+            const modal = document.getElementById('locationBlockedModal');
+            if (!modal) {
+                console.error('Location blocked modal not found');
+                utils.showToast('📍 Location blocked. Enable in browser settings and refresh.', 'error');
+                return;
+            }
         
         // Detect browser and show relevant instructions
         const userAgent = navigator.userAgent.toLowerCase();
@@ -873,19 +886,32 @@ export const SearchModule = (function() {
     // REPLACE the showLocationPermissionUI function in search.js (around line 779)
 
     const showLocationPermissionUI = (resolve, reject) => {
-        const modal = document.getElementById('locationPermissionModal');
-        if (!modal) {
-            console.error('Location permission modal not found');
-            reject(new Error('Permission UI not available'));
-            return;
+        // Use modalManager to ensure no conflicts
+        if (modules.modalManager) {
+            modules.modalManager.closeAll(); // Close any open modals first
+            modules.modalManager.open('locationPermissionModal');
+        } else {
+            const modal = document.getElementById('locationPermissionModal');
+            if (!modal) {
+                console.error('Location permission modal not found');
+                reject(new Error('Permission UI not available'));
+                return;
+            }
+            
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
         }
         
-        modal.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-        
         const cleanup = () => {
-            modal.style.display = 'none';
-            document.body.style.overflow = '';
+            if (modules.modalManager) {
+                modules.modalManager.close('locationPermissionModal');
+            } else {
+                const modal = document.getElementById('locationPermissionModal');
+                if (modal) {
+                    modal.style.display = 'none';
+                    document.body.style.overflow = '';
+                }
+            }
             document.removeEventListener('locationPermissionGranted', grantedHandler);
             document.removeEventListener('locationPermissionDenied', deniedHandler);
         };
