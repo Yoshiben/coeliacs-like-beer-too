@@ -173,11 +173,17 @@ const App = {
     initPhase3: async () => {
         console.log('🔧 Phase 3: UI Layer...');
         
-        const { ModalModule } = await import('./modals.js');
-        App.registerModule('modal', ModalModule);
+        const [{ ModalModule }, { ModalManager }] = await Promise.all([
+            import('./modals.js'),
+            import('./modal-manager.js') // ADD THIS
+        ]);
         
-        // Initialize modals
+        App.registerModule('modal', ModalModule);
+        App.registerModule('modalManager', ModalManager); // ADD THIS
+        
+        // Initialize both
         ModalModule.init();
+        ModalManager.init(); // ADD THIS
     },
     
     initPhase4: async () => {
@@ -347,11 +353,12 @@ const App = {
         const modules = {
             search: App.getModule('search'),
             modal: App.getModule('modal'),
+            modalManager: App.getModule('modalManager'), // ADD THIS
             helpers: App.getModule('helpers'),
             map: App.getModule('map'),
             form: App.getModule('form'),
             tracking: App.getModule('tracking'),
-            nav: App.getModule('nav') 
+            nav: App.getModule('nav')
         };
 
         console.log('📦 Available modules:', Object.keys(modules).filter(key => modules[key] !== null));
@@ -369,16 +376,16 @@ const App = {
     actionHandlers: {
         // Search actions
         'location-search': (el, modules) => {
-            modules.search?.startLocationSearch?.();
+            modules.modalManager?.open('distanceModal');
         },
         'search-name': (el, modules) => {
-            modules.search?.openSearchModal?.('name');
+            modules.modalManager?.open('nameModal'); // CHANGED from modules.search
         },
         'search-area': (el, modules) => {
-            modules.search?.openSearchModal?.('area');
+            modules.modalManager?.open('areaModal'); // CHANGED from modules.search
         },
         'search-beer': (el, modules) => {
-            modules.search?.openSearchModal?.('beer');
+            modules.modalManager?.open('beerModal'); // CHANGED from modules.search
         },
         
         // Navigation actions
@@ -404,8 +411,9 @@ const App = {
         },
         'close-modal': (el, modules) => {
             const modal = el.closest('.modal, .search-modal');
-            if (modal?.id) modules.modal?.close(modal.id);
+            if (modal?.id) modules.modalManager?.close(modal.id); // CHANGED from modules.modal
         },
+
         
         // Pub actions
         'view-pub': (el, modules) => {
@@ -496,26 +504,30 @@ const App = {
         'clear-selected-pub': (el, modules) => {
             modules.form?.clearSelectedPub?.();
         },
+
+        
         
         // Status actions
         'change-gf-status': (el, modules) => {
-            modules.form?.GFStatusFlow?.openStatusModal?.();
+            modules.modalManager?.open('gfStatusModal'); // CHANGED
         },
         'confirm-status': (el, modules) => {
             modules.form?.GFStatusFlow?.confirmStatusUpdate?.();
         },
         'cancel-status': (el, modules) => {
-            modules.modal?.close('gfStatusConfirmModal');
+            modules.modalManager?.close('gfStatusConfirmModal'); // CHANGED
         },
         'skip-details': (el, modules) => {
-            modules.modal?.close('beerDetailsPromptModal');
+            modules.modalManager?.close('beerDetailsPromptModal'); // CHANGED
             modules.helpers?.showSuccessToast?.('✅ Status updated successfully!');
         },
         'add-beer-details': (el, modules) => {
-            modules.modal?.close('beerDetailsPromptModal');
+            modules.modalManager?.close('beerDetailsPromptModal'); // CHANGED
             const currentPub = App.getState(STATE_KEYS.CURRENT_PUB);
-            modules.modal?.openReportModal?.(currentPub);
+            modules.modalManager?.open('reportModal', { data: currentPub }); // CHANGED
         },
+
+        
         
         // Places search actions
         'add-new-pub-from-results': (el, modules) => {
@@ -543,6 +555,7 @@ const App = {
         },
         
         // Cookie actions
+        // Update cookie consent:
         'accept-all-cookies': (el, modules) => {
             App.handleCookieConsent(true);
         },
@@ -552,20 +565,17 @@ const App = {
         'save-cookie-preferences': (el, modules) => {
             const analyticsConsent = document.getElementById('analyticsConsent')?.checked;
             App.handleCookieConsent(analyticsConsent);
-            modules.modal?.close('cookieSettings');
+            modules.modalManager?.close('cookieSettings'); // CHANGED
         },
         'show-cookie-settings': (el, modules) => {
-            modules.modal?.open('cookieSettings');
+            modules.modalManager?.open('cookieSettings'); // CHANGED
         },
         
+        // Update location blocked:
         'close-location-blocked': (el, modules) => {
-            const modal = document.getElementById('locationBlockedModal');
-            if (modal) {
-                modal.style.display = 'none';
-                document.body.style.overflow = '';
-            }
+            modules.modalManager?.close('locationBlockedModal'); // CHANGED
             // Open area search as alternative
-            modules.modal?.open('areaModal');
+            modules.modalManager?.open('areaModal'); // CHANGED
         },
         
         'reload-page': () => {
@@ -659,11 +669,11 @@ const App = {
         },
         'about-us': (el, modules) => {
             e.preventDefault();
-            modules.modal?.open('aboutModal');
+            modules.modalManager?.open('aboutModal'); // CHANGED
         },
         'about-gf': (el, modules) => {
             e.preventDefault();
-            modules.modal?.open('gfInfoModal');
+            modules.modalManager?.open('gfInfoModal'); // CHANGED
         },
 
     },
@@ -828,19 +838,13 @@ const App = {
     handleReportBeer: (modules) => {
         const pubData = App.getState(STATE_KEYS.CURRENT_PUB);
         
-        // Close overlays
-        ['pubDetailsOverlay', 'resultsOverlay'].forEach(id => {
-            const overlay = document.getElementById(id);
-            if (overlay) {
-                overlay.style.display = 'none';
-                overlay.classList.remove('active');
-            }
-        });
+        // Close overlays using modalManager
+        modules.modalManager?.closeAllOverlays(); // CHANGED
         
         document.body.style.overflow = '';
         
         // Open report modal
-        modules.modal?.openReportModal?.(pubData);
+        modules.modalManager?.open('reportModal', { data: pubData }); // CHANGED
         
         modules.tracking?.trackEvent('report_beer_click', 'User Action', pubData?.name || 'unknown');
     },
