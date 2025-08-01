@@ -69,6 +69,28 @@ export const SearchModule = (function() {
             }
         }
     };
+
+    // Add these methods after the utils object
+    const openSearchModal = (type) => {
+        const modalMap = {
+            'name': 'nameModal',
+            'area': 'areaModal',     
+            'beer': 'beerModal'
+        };
+        
+        const modalId = modalMap[type];
+        if (modalId) {
+            // Close search overlay first
+            const searchOverlay = document.getElementById('searchOverlay');
+            if (searchOverlay) {
+                searchOverlay.style.display = 'none';
+                searchOverlay.classList.remove('active');
+            }
+            
+            // Open the specific modal
+            modules.modal?.open(modalId);
+        }
+    };
     
     // ================================
     // LOCATION SEARCH
