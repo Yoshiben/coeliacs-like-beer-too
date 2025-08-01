@@ -25,7 +25,7 @@
    --light-grey: rgba(156,163,175,1);
    --light-blue: rgba(102,126,234,1);
    --light-purple: #BCAFCA;
-   --grey-white: #F5F5F5
+   --grey-white: #F5F5F5;
    
    /* Brand Colors & Gradients */
    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -176,7 +176,7 @@
 }
 
 /* ================================
-   BUTTONS
+   GROUP - BUTTONS
    ================================ */
 
 .btn-primary {
@@ -255,7 +255,7 @@
 }
 
 /* ================================
-   HOLISTIC
+   GROUP - HOLISTIC
    ================================ */
 
 body {
@@ -318,7 +318,9 @@ html {
 }
 
 
-
+/* ================================
+   GROUP - HOME PAGE
+   ================================ */
 
 
 
@@ -902,7 +904,6 @@ body.page-pub .nav-notification-btn {
 }
 
 
-
 /* ================================
    BOTTOM NAVIGATION - VALIDATED
    ================================ */
@@ -1003,10 +1004,13 @@ body.page-pub .nav-notification-btn {
 }
 
 
+/* ================================
+   GROUP - OVERLAYS
+   ================================ */
 
 
 /* ================================
-   SEARCH SECTION - VALIDATED
+   SEARCH OVERLAY - VALIDATED
    ================================ */
 
 .search-overlay {
@@ -1154,6 +1158,591 @@ body.page-pub .nav-notification-btn {
    text-align: center;
    padding: 0 var(--space-xs);
 }
+
+/* ================================
+   MAP OVERLAY - VALIDATED
+   ================================ */
+
+.map-overlay {
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    z-index: var(--z-modal-backdrop);
+    background: var(--primary-gradient);
+}
+
+.map-overlay.active {
+    display: flex !important;
+}
+
+.map-overlay-content {
+    position: absolute;
+    top: 8vh; 
+    top: 8dvh;
+    left: 0;
+    right: 0;
+    bottom: 8vh; 
+    bottom: 8dvh;
+    width: 100%;
+    flex: 1;
+    display: flex;
+}
+
+.full-map {
+    width: 100%;
+    height: 100%;
+    flex-shrink: 0;
+}
+
+/* MAP LOCATION BUTTON */
+
+.leaflet-control-custom {
+    margin-top: 10px !important;
+}
+
+.map-location-btn {
+   width: 5vh;
+   width: 5dvh;
+   height: 5vh;
+   width: 5dvh;
+   line-height: 44px;
+   display: block;
+   text-align: center;
+   text-decoration: none;
+   background: var(--purple-gradient);
+   color: white;
+   border-radius: 4px;
+   box-shadow: var(--shadow);
+/*    font-size: 1.5rem; */
+   transition: all var(--transition);
+   cursor: pointer;
+   position: relative;
+}
+
+.map-location-btn:hover {
+    background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
+    transform: scale(1.05);
+    box-shadow: var(--shadow-lg);
+}
+
+.map-location-btn:active {
+    transform: scale(0.95);
+}
+
+/* Add pulsing animation when getting location */
+.map-location-btn.locating {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.map-location-btn.locating::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: ripple 1.5s ease-out infinite;
+}
+
+@keyframes ripple {
+    0% {
+        width: 30px;
+        height: 30px;
+        opacity: 1;
+    }
+    100% {
+        width: 60px;
+        height: 60px;
+        opacity: 0;
+    }
+}
+
+/* ================================
+   PUB DETAILS OVERLAY - VALIDATED
+   ================================ */
+
+.pub-details-overlay.active {
+   display: flex !important;
+   flex-direction: column;
+}
+
+.pub-details-container {
+   flex: 1;
+   display: flex;
+   flex-direction: column;
+   height: 100%;
+   width: 100%;
+   box-sizing: border-box;
+}
+
+.pub-details-card {
+    background: var(--bg-white);
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-lg);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+}
+
+.pub-details-content {
+    flex: 1;
+    -webkit-overflow-scrolling: touch;
+   padding: 0 var(--space-xl)
+}
+
+.pub-header {
+    text-align: center;
+    padding-bottom: var(--space-md);
+}
+
+.pub-title {
+   font-size: var(--text-2xl);
+   font-weight: 800;
+   color: var(--text-primary);
+   margin-top: var(--space-sm);
+   margin-bottom: 0;
+   background: var(--primary-gradient);
+   -webkit-background-clip: text;
+   -webkit-text-fill-color: transparent;
+   background-clip: text;
+}
+
+.pub-address {
+    color: var(--text-secondary);
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-xs);
+    font-weight: 500;
+}
+
+.pub-location {
+    color: var(--text-muted);
+    font-size: var(--text-md);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-card {
+   background: linear-gradient(135deg, var(--purple-bg) 0%, rgba(139, 92, 246, 0.05) 100%);
+   border: 2px solid var(--purple-border);
+   border-radius: var(--radius-xl);
+   padding-bottom: var(--space-xl);
+   text-align: center;
+   position: relative;
+   overflow: hidden;
+}
+
+.status-card::before {
+    content: '🍺';
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    font-size: 5rem;
+    opacity: 0.1;
+    transform: rotate(-15deg);
+}
+
+.status-question {
+   font-weight: 700;
+   color: var(--text-primary);
+   margin: var(--space-md);
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   gap: var(--space-sm);
+}
+
+.current-status {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-md);
+}
+
+.current-status .status-icon {
+    font-size: 2rem;
+    line-height: 1;
+}
+
+.current-status .status-text {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.current-status .status-meta {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+/* UPDATE: Change status button */
+.status-card .btn-sm {
+   background: var(--purple-gradient);
+   color: white;
+   border: none;
+   padding: var(--space-sm) var(--space-3xl);
+   font-weight: 600;
+   box-shadow: var(--shadow-sm);
+   border-radius: var(--radius-xl);
+}
+
+.status-card .btn-sm:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.beer-section {
+   background: linear-gradient(135deg, var(--success-bg) 0%, var(--success-bg) 100%);
+   border: 2px solid var(--success-border);
+   border-radius: var(--radius-xl);
+   padding: var(--space-xl);
+   margin: var(--space-xl) 0;
+   border-left: 6px solid var(--success-gradient);
+   position: relative;
+   overflow: hidden;
+}
+
+.beer-section::before {
+   content: '🍺';
+   position: absolute;
+   top: -10px;
+   right: -10px;
+   font-size: 4rem;
+   opacity: 0.1;
+   pointer-events: none;
+}
+
+.beer-section-title {
+   display: flex;
+   align-items: center;
+   font-size: 1.1rem;
+   font-weight: 700;
+   color: var(--text-primary);
+   margin-bottom: var(--space-lg);
+   gap: var(--space-sm);
+   line-height: 1.2;
+}
+
+.beer-status {
+   color: var(--text-secondary);
+   font-size: 0.95rem;
+   line-height: 1.6;
+   position: relative;
+   z-index: 1;
+}
+
+.beer-status strong {
+   color: var(--success-text);
+   font-weight: 700;
+}
+
+.beer-status em {
+   color: var(--text-muted);
+   font-size: 0.85rem;
+}
+
+
+
+
+
+
+/* UPDATE: Status Actions Buttons */
+.status-actions {
+    display: flex;
+    gap: var(--space-md);
+    margin-top: var(--space-lg);
+    justify-content: center;
+}
+
+.status-actions .btn-sm {
+    padding: var(--space-sm) var(--space-lg);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    border-radius: var(--radius-pill);
+}
+
+.status-actions .btn-outline {
+    background: var(--bg-white);
+    color: var(--purple-text);
+    border: 2px solid var(--purple-border);
+}
+
+.status-actions .btn-outline:hover {
+    background: var(--purple-bg);
+    transform: translateY(-1px);
+}
+
+.status-actions .btn-primary {
+    background: var(--purple-gradient);
+    color: var(--white);
+    border: none;
+}
+
+
+.pub-action-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 12px;
+    padding: var(--space-xl);
+    background: var(--bg-white);
+    border-top: 1px solid var(--divider-color);
+    margin-top: auto;
+}
+
+.pub-action-grid .btn {
+   margin: 0;
+   padding: 0;
+   border: none;
+   width: 100%;
+   height: 48px;
+   min-height: 48px;
+   max-height: 48px;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   gap: 8px;
+   font-size: 0.9rem;
+   font-weight: 700;
+   border-radius: 24px;
+   cursor: pointer;
+   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+   position: relative;
+   overflow: hidden;
+   box-sizing: border-box;
+   text-decoration: none;
+   white-space: nowrap;
+   line-height: 1;
+}
+
+.pub-action-grid .btn::before {
+   content: '';
+   position: absolute;
+   top: 0;
+   left: -100%;
+   width: 100%;
+   height: 100%;
+   background: linear-gradient(90deg, transparent, var(--glass-overlay), transparent);
+   transition: left 0.5s;
+}
+
+.pub-action-grid .btn:hover::before {
+   left: 100%;
+}
+
+.pub-action-grid .btn:hover {
+   transform: translateY(-3px) scale(1.02);
+   box-shadow: var(--shadow-lg);
+}
+
+.pub-action-grid .btn-external {
+   background: var(--info-gradient);
+   color: var(--text-white);
+   box-shadow: var(--shadow-blue);
+}
+
+.pub-action-grid .btn-positive {
+   background: var(--success-gradient);
+   color: var(--text-white);
+   box-shadow: var(--shadow-success);
+}
+
+.pub-action-grid .btn-toggle {
+   background: var(--purple-bg);
+   color: var(--purple-text);
+   border: 2px solid var(--purple-border);
+   box-shadow: var(--shadow-purple);
+}
+
+.pub-action-grid .btn-toggle.active {
+   background: var(--purple-gradient);
+   color: var(--text-white);
+   border-color: transparent;
+   box-shadow: 0 4px 15px var(--purple-shadow);
+}
+
+.pub-map-container {
+   background: var(--bg-white);
+   border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+   overflow: hidden;
+   flex: 1;
+   display: none;
+   position: relative;
+   min-height: 0;
+}
+
+.split-view .pub-map-container {
+   display: block;
+   flex: 1;
+}
+
+
+/* UPDATE: Simplified Action Grid */
+.pub-action-grid-simple {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+}
+
+
+
+
+
+/* ================================
+   BREWERIES OVERLAY
+   ================================ */
+.breweries-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    background: var(--primary-gradient);
+    z-index: var(--z-results-overlay);
+    padding: 8vh 0;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.breweries-overlay.active {
+    display: flex !important;
+}
+
+.breweries-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.breweries-header {
+    text-align: center;
+    padding: var(--space-xl) var(--space-lg);
+    color: white;
+}
+
+.breweries-header h1 {
+    font-size: var(--text-2xl);
+    margin-bottom: var(--space-sm);
+}
+
+.breweries-header p {
+    opacity: 0.9;
+}
+
+.breweries-content {
+    flex: 1;
+    background: var(--bg-white);
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+    padding: var(--space-xl);
+    overflow-y: auto;
+}
+
+.breweries-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--space-lg);
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.brewery-card {
+    background: var(--bg-white);
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: var(--space-xl);
+    text-align: center;
+    transition: all var(--transition);
+    cursor: pointer;
+}
+
+.brewery-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--primary);
+}
+
+.brewery-icon {
+    font-size: 3rem;
+    margin-bottom: var(--space-md);
+}
+
+.brewery-name {
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-lg);
+    color: var(--text-primary);
+}
+
+.brewery-button {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: var(--space-md) var(--space-xl);
+    border-radius: var(--radius-full);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.brewery-button:hover {
+    background: var(--primary-dark);
+    transform: scale(1.05);
+}
+
+/* Mobile optimizations */
+/* @media (max-width: 768px) {
+    .breweries-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: var(--space-md);
+    }
+    
+    .brewery-card {
+        padding: var(--space-lg);
+    }
+    
+    .brewery-icon {
+        font-size: 2rem;
+    }
+    
+    .brewery-name {
+        font-size: var(--text-base);
+    }
+} */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1722,365 +2311,6 @@ body.page-pub .nav-notification-btn {
 
 
 
-/* ================================
-   PUB DETAILS OVERLAY
-   ================================ */
-
-.pub-details-overlay.active {
-   display: flex !important;
-   flex-direction: column;
-}
-
-.pub-details-container {
-   flex: 1;
-   display: flex;
-   flex-direction: column;
-   height: 100%;
-   width: 100%;
-   box-sizing: border-box;
-}
-
-/* UPDATE: Card styling */
-.pub-details-card {
-    background: var(--bg-white);
-    backdrop-filter: blur(10px);
-    box-shadow: var(--shadow-lg);
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    min-height: 0;
-}
-
-/* UPDATE: Content area with scroll */
-.pub-details-content {
-    flex: 1;
-    -webkit-overflow-scrolling: touch;
-   padding: 0 var(--space-xl)
-}
-
-.pub-header {
-    text-align: center;
-    padding-bottom: var(--space-md);
-}
-
-.pub-title {
-   font-size: var(--text-2xl);
-   font-weight: 800;
-   color: var(--text-primary);
-   margin-top: var(--space-sm);
-   margin-bottom: 0;
-   background: var(--primary-gradient);
-   -webkit-background-clip: text;
-   -webkit-text-fill-color: transparent;
-   background-clip: text;
-}
-
-.pub-address {
-    color: var(--text-secondary);
-    font-size: var(--text-lg);
-    margin-bottom: var(--space-xs);
-    font-weight: 500;
-}
-
-.pub-location {
-    color: var(--text-muted);
-    font-size: var(--text-md);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-
-
-
-
-
-/* UPDATE: GF Status section with better design */
-
-.status-card {
-   background: linear-gradient(135deg, var(--purple-bg) 0%, rgba(139, 92, 246, 0.05) 100%);
-   border: 2px solid var(--purple-border);
-   border-radius: var(--radius-xl);
-   padding-bottom: var(--space-xl);
-   text-align: center;
-   position: relative;
-   overflow: hidden;
-}
-
-.status-card::before {
-    content: '🍺';
-    position: absolute;
-    top: -20px;
-    right: -20px;
-    font-size: 5rem;
-    opacity: 0.1;
-    transform: rotate(-15deg);
-}
-
-.status-question {
-   font-weight: 700;
-   color: var(--text-primary);
-   margin: var(--space-md);
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   gap: var(--space-sm);
-}
-
-.current-status {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-xs);
-    margin-bottom: var(--space-md);
-}
-
-.current-status .status-icon {
-    font-size: 2rem;
-    line-height: 1;
-}
-
-.current-status .status-text {
-    font-size: var(--text-lg);
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.current-status .status-meta {
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-}
-
-/* UPDATE: Change status button */
-.status-card .btn-sm {
-   background: var(--purple-gradient);
-   color: white;
-   border: none;
-   padding: var(--space-sm) var(--space-3xl);
-   font-weight: 600;
-   box-shadow: var(--shadow-sm);
-   border-radius: var(--radius-xl);
-}
-
-.status-card .btn-sm:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow);
-}
-
-.beer-section {
-   background: linear-gradient(135deg, var(--success-bg) 0%, var(--success-bg) 100%);
-   border: 2px solid var(--success-border);
-   border-radius: var(--radius-xl);
-   padding: var(--space-xl);
-   margin: var(--space-xl) 0;
-   border-left: 6px solid var(--success-gradient);
-   position: relative;
-   overflow: hidden;
-}
-
-.beer-section::before {
-   content: '🍺';
-   position: absolute;
-   top: -10px;
-   right: -10px;
-   font-size: 4rem;
-   opacity: 0.1;
-   pointer-events: none;
-}
-
-.beer-section-title {
-   display: flex;
-   align-items: center;
-   font-size: 1.1rem;
-   font-weight: 700;
-   color: var(--text-primary);
-   margin-bottom: var(--space-lg);
-   gap: var(--space-sm);
-   line-height: 1.2;
-}
-
-.beer-status {
-   color: var(--text-secondary);
-   font-size: 0.95rem;
-   line-height: 1.6;
-   position: relative;
-   z-index: 1;
-}
-
-.beer-status strong {
-   color: var(--success-text);
-   font-weight: 700;
-}
-
-.beer-status em {
-   color: var(--text-muted);
-   font-size: 0.85rem;
-}
-
-
-
-
-
-
-/* ================================
-   UPDATE: Status Actions Buttons
-   ================================ */
-.status-actions {
-    display: flex;
-    gap: var(--space-md);
-    margin-top: var(--space-lg);
-    justify-content: center;
-}
-
-.status-actions .btn-sm {
-    padding: var(--space-sm) var(--space-lg);
-    font-size: var(--text-sm);
-    font-weight: 600;
-    border-radius: var(--radius-pill);
-}
-
-.status-actions .btn-outline {
-    background: var(--bg-white);
-    color: var(--purple-text);
-    border: 2px solid var(--purple-border);
-}
-
-.status-actions .btn-outline:hover {
-    background: var(--purple-bg);
-    transform: translateY(-1px);
-}
-
-.status-actions .btn-primary {
-    background: var(--purple-gradient);
-    color: var(--white);
-    border: none;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-.pub-action-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    gap: 12px;
-    padding: var(--space-xl);
-    background: var(--bg-white);
-    border-top: 1px solid var(--divider-color);
-    margin-top: auto;
-}
-
-.pub-action-grid .btn {
-   margin: 0;
-   padding: 0;
-   border: none;
-   width: 100%;
-   height: 48px;
-   min-height: 48px;
-   max-height: 48px;
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   gap: 8px;
-   font-size: 0.9rem;
-   font-weight: 700;
-   border-radius: 24px;
-   cursor: pointer;
-   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-   position: relative;
-   overflow: hidden;
-   box-sizing: border-box;
-   text-decoration: none;
-   white-space: nowrap;
-   line-height: 1;
-}
-
-.pub-action-grid .btn::before {
-   content: '';
-   position: absolute;
-   top: 0;
-   left: -100%;
-   width: 100%;
-   height: 100%;
-   background: linear-gradient(90deg, transparent, var(--glass-overlay), transparent);
-   transition: left 0.5s;
-}
-
-.pub-action-grid .btn:hover::before {
-   left: 100%;
-}
-
-.pub-action-grid .btn:hover {
-   transform: translateY(-3px) scale(1.02);
-   box-shadow: var(--shadow-lg);
-}
-
-.pub-action-grid .btn-external {
-   background: var(--info-gradient);
-   color: var(--text-white);
-   box-shadow: var(--shadow-blue);
-}
-
-.pub-action-grid .btn-positive {
-   background: var(--success-gradient);
-   color: var(--text-white);
-   box-shadow: var(--shadow-success);
-}
-
-.pub-action-grid .btn-toggle {
-   background: var(--purple-bg);
-   color: var(--purple-text);
-   border: 2px solid var(--purple-border);
-   box-shadow: var(--shadow-purple);
-}
-
-.pub-action-grid .btn-toggle.active {
-   background: var(--purple-gradient);
-   color: var(--text-white);
-   border-color: transparent;
-   box-shadow: 0 4px 15px var(--purple-shadow);
-}
-
-.pub-map-container {
-   background: var(--bg-white);
-   border-radius: 0 0 var(--radius-xl) var(--radius-xl);
-   overflow: hidden;
-   flex: 1;
-   display: none;
-   position: relative;
-   min-height: 0;
-}
-
-.split-view .pub-map-container {
-   display: block;
-   flex: 1;
-}
-
-
-
-
-
-
-
-/* ================================
-   UPDATE: Simplified Action Grid
-   ================================ */
-.pub-action-grid-simple {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr;
-}
-
 
 /* ================================
    STATUS MODAL SYSTEM - CONSOLIDATED
@@ -2375,114 +2605,6 @@ body.page-pub .nav-notification-btn {
     color: var(--text-muted);
     font-size: var(--text-xs);
 }
-
-
-
-
-/* ================================
-   FULL SCREEN MAP
-   ================================ */
-
-.map-overlay {
-    width: 100%;
-    height: 100vh;
-    height: 100dvh;
-    z-index: var(--z-modal-backdrop);
-    background: var(--primary-gradient);
-}
-
-.map-overlay.active {
-    display: flex !important;
-}
-
-.map-overlay-content {
-    position: absolute;
-    top: 8vh; 
-    top: 8dvh;
-    left: 0;
-    right: 0;
-    bottom: 8vh; 
-    bottom: 8dvh;
-    width: 100%;
-    flex: 1;
-    display: flex;
-}
-
-.full-map {
-    width: 100%;
-    height: 100%;
-    flex-shrink: 0;
-}
-
-/* ================================
-   MAP LOCATION BUTTON
-   ================================ */
-
-.leaflet-control-custom {
-    margin-top: 10px !important;
-}
-
-.map-location-btn {
-   width: 5vh;
-   width: 5dvh;
-   height: 5vh;
-   width: 5dvh;
-   line-height: 44px;
-   display: block;
-   text-align: center;
-   text-decoration: none;
-   background: var(--purple-gradient);
-   color: white;
-   border-radius: 4px;
-   box-shadow: var(--shadow);
-/*    font-size: 1.5rem; */
-   transition: all var(--transition);
-   cursor: pointer;
-   position: relative;
-}
-
-.map-location-btn:hover {
-    background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
-    transform: scale(1.05);
-    box-shadow: var(--shadow-lg);
-}
-
-.map-location-btn:active {
-    transform: scale(0.95);
-}
-
-/* Add pulsing animation when getting location */
-.map-location-btn.locating {
-    animation: pulse 2s ease-in-out infinite;
-}
-
-.map-location-btn.locating::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 30px;
-    height: 30px;
-    border: 3px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    animation: ripple 1.5s ease-out infinite;
-}
-
-@keyframes ripple {
-    0% {
-        width: 30px;
-        height: 30px;
-        opacity: 1;
-    }
-    100% {
-        width: 60px;
-        height: 60px;
-        opacity: 0;
-    }
-}
-
-
 
 
 
