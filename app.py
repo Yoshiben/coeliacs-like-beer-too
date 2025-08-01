@@ -678,6 +678,24 @@ def get_all_pubs_for_map():
             cursor.close()
             conn.close()
 
+@app.route('/api/breweries')
+def api_breweries():
+    """Get unique brewery names from beers data"""
+    try:
+        # Query unique breweries from your beers data
+        result = supabase.table('beers')\
+            .select('brewery')\
+            .execute()
+        
+        # Extract unique brewery names
+        breweries = list(set(beer['brewery'] for beer in result.data if beer.get('brewery')))
+        breweries.sort()
+        
+        return jsonify(breweries)
+    except Exception as e:
+        logger.error(f"Error fetching breweries: {e}")
+        return jsonify([]), 500
+
 # ================================================================================
 # ADMIN ROUTES
 # ================================================================================
