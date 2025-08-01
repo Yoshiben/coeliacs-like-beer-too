@@ -121,19 +121,18 @@ export const ModalManager = (() => {
             closeAllOverlays();
         }
         
-        // Special handling for certain overlays
-        if (overlayId === 'resultsOverlay' || overlayId === 'pubDetailsOverlay' || overlayId === 'fullMapOverlay') {
-            // Hide community home when showing these overlays
-            const communityHome = document.querySelector('.community-home');
-            if (communityHome) {
-                communityHome.style.display = 'none';
-            }
-        }
-        
         const overlay = document.getElementById(overlayId);
         if (!overlay) {
             console.error(`❌ Overlay not found: ${overlayId}`);
             return false;
+        }
+        
+        // Hide community home for main overlays
+        if (['resultsOverlay', 'pubDetailsOverlay', 'fullMapOverlay'].includes(overlayId)) {
+            const communityHome = document.querySelector('.community-home');
+            if (communityHome) {
+                communityHome.style.display = 'none';
+            }
         }
         
         // Show overlay
