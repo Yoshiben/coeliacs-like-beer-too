@@ -530,6 +530,7 @@ export const ModalModule = (function() {
         openAdminModal,
         updateAreaPlaceholder,
         updateBeerPlaceholder,
+        initializeReportModal,
         
         // For external access if needed
         getActiveModals: () => [...activeModals],
