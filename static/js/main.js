@@ -403,8 +403,22 @@ const App = {
             }
         },
         'close-modal': (el, modules) => {
-            const modal = el.closest('.modal, .search-modal');
-            if (modal?.id) modules.modal?.close(modal.id);
+            const modal = el.closest('.modal, .modal-wrapper');
+            if (modal) {
+                const isSearchModal = ['nameModal', 'areaModal', 'beerModal'].includes(modal.id);
+                modules.modal?.close(modal.id);
+                
+                // If it was a search modal, reopen search overlay
+                if (isSearchModal) {
+                    const searchOverlay = document.getElementById('searchOverlay');
+                    if (searchOverlay) {
+                        searchOverlay.style.display = 'flex';
+                        searchOverlay.classList.add('active');
+                        document.body.style.overflow = 'hidden';
+                        modules.nav?.setPageContext('search');
+                    }
+                }
+            }
         },
         
         // Pub actions
