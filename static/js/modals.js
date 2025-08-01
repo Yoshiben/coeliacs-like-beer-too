@@ -8,6 +8,9 @@ export const ModalModule = (function() {
     
     // Private state
     let activeModals = [];
+
+    let parentModules = {};
+    
     let modalConfig = {
         animation: {
             duration: 300,
