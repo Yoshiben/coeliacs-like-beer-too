@@ -184,10 +184,10 @@
    background: var(--primary-gradient);
    color: var(--text-white);
    box-shadow: var(--shadow);
-   flex: 1;
+/*    flex: 1; */
    padding: var(--space-lg);
    border: none;
-   border-radius: var(--radius-lg);
+   border-radius: var(--radius-xl);
    font-weight: 600;
    cursor: pointer;
    transition: all 0.25s ease;
@@ -260,6 +260,12 @@
    border-color: transparent;
    transform: translateY(-2px);
    box-shadow: var(--shadow-primary);
+}
+
+.btn-sm {
+   cursor: pointer;
+   border-radius: var(--radius-xl);
+   padding: var(--space-sm) var(--space-3xl);
 }
 
 /* ================================
@@ -1404,13 +1410,13 @@ body.page-pub .nav-notification-btn {
 
 /* UPDATE: Change status button */
 .status-card .btn-sm {
-   background: var(--purple-gradient);
+/*    background: var(--purple-gradient);
    color: white;
-   border: none;
+   border: none; */
    padding: var(--space-sm) var(--space-3xl);
    font-weight: 600;
-   box-shadow: var(--shadow-sm);
-   border-radius: var(--radius-xl);
+/*    box-shadow: var(--shadow-sm); */
+/*    border-radius: var(--radius-xl); */
 }
 
 .status-card .btn-sm:hover {
@@ -1481,12 +1487,6 @@ body.page-pub .nav-notification-btn {
     justify-content: center;
 }
 
-.status-actions .btn-sm {
-    padding: var(--space-sm) var(--space-lg);
-    font-size: var(--text-sm);
-    font-weight: 600;
-    border-radius: var(--radius-pill);
-}
 
 .status-actions .btn-outline {
     background: var(--bg-white);
@@ -1498,13 +1498,6 @@ body.page-pub .nav-notification-btn {
     background: var(--purple-bg);
     transform: translateY(-1px);
 }
-
-.status-actions .btn-primary {
-    background: var(--purple-gradient);
-    color: var(--white);
-    border: none;
-}
-
 
 .pub-action-grid {
     display: grid;
