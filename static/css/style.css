@@ -26,6 +26,7 @@
    --light-blue: rgba(102,126,234,1);
    --light-purple: #BCAFCA;
    --grey-white: #F5F5F5;
+   --grey-purple: #D5D0DA;
    
    /* Brand Colors & Gradients */
    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -191,7 +192,7 @@
 }
 
 .btn-secondary {
-   background: var(--grey-white);
+   background: var(--grey-purple);
    color: var(--text-secondary);
    box-shadow: var(--shadow-sm);
    backdrop-filter: blur(10px);
