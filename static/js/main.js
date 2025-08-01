@@ -410,8 +410,10 @@ const App = {
             }
         },
         'close-modal': (el, modules) => {
-            const modal = el.closest('.modal, .search-modal');
-            if (modal?.id) modules.modalManager?.close(modal.id); // CHANGED from modules.modal
+            const modal = el.closest('.modal, .search-modal, .report-modal');
+            if (modal?.id) {
+                modules.modalManager?.close(modal.id) || modules.modal?.close(modal.id);
+            }
         },
 
         
@@ -649,7 +651,8 @@ const App = {
         },
 
         'open-breweries': (el, modules) => {
-            modules.breweries?.openBreweries();
+            const breweries = modules.breweries || window.App?.getModule('breweries');
+            breweries?.openBreweries();
         },
         'search-brewery': (el, modules) => {
             const brewery = el.dataset.brewery;
@@ -667,13 +670,22 @@ const App = {
                 menu.classList.toggle('active');
             }
         },
+        // In actionHandlers:
         'about-us': (el, modules) => {
             e.preventDefault();
-            modules.modalManager?.open('aboutModal'); // CHANGED
+            // Use overlay approach
+            modules.modalManager?.open('aboutModal') || modules.modal?.open('aboutModal');
         },
         'about-gf': (el, modules) => {
             e.preventDefault();
-            modules.modalManager?.open('gfInfoModal'); // CHANGED
+            modules.modalManager?.open('gfInfoModal') || modules.modal?.open('gfInfoModal');
+        },
+        // For privacy, terms etc that have separate pages:
+        'privacy-policy': (el, modules) => {
+            window.location.href = '/privacy';
+        },
+        'terms-of-service': (el, modules) => {
+            window.location.href = '/terms';
         },
 
     },
