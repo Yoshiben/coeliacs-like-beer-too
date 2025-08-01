@@ -181,9 +181,16 @@
    ================================ */
 
 .btn-primary {
-    background: var(--primary-gradient);
-    color: var(--text-white);
-    box-shadow: var(--shadow);
+   background: var(--primary-gradient);
+   color: var(--text-white);
+   box-shadow: var(--shadow);
+   flex: 1;
+   padding: var(--space-lg);
+   border: none;
+   border-radius: var(--radius-lg);
+   font-weight: 600;
+   cursor: pointer;
+   transition: all 0.25s ease;
 }
 
 .btn-primary:hover {
@@ -204,7 +211,7 @@
    font-weight: 600;
    cursor: pointer;
    transition: all 0.25s ease;
-   width: 100%;
+/*    width: 100%; */
 }
 
 .btn-secondary:hover {
@@ -2054,7 +2061,9 @@ body.page-pub .nav-notification-btn {
     color: var(--text-secondary);
 }
 
-
+.distance-actions. btn-secondary {
+   width:100%;
+)
 
 
 
