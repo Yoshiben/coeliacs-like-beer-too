@@ -4459,3 +4459,90 @@ body.page-pub .nav-notification-btn {
 
 
 
+/* Status Modal Centering and Styling */
+.status-modal .modal-content,
+.status-modal .status-modal-content {
+    max-width: 500px;
+    width: 90%;
+    margin: auto;
+    background: var(--bg-white);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+    padding: 0;
+    overflow: hidden;
+}
+
+.status-modal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-lg);
+}
+
+/* Modal Header */
+.status-modal .modal-header {
+    background: var(--primary-gradient);
+    color: var(--white);
+    padding: var(--space-xl);
+    text-align: center;
+    position: relative;
+}
+
+.status-modal .modal-header h2 {
+    margin: 0;
+    font-size: var(--text-2xl);
+}
+
+.status-modal .modal-close {
+    position: absolute;
+    right: var(--space-lg);
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+}
+
+/* Modal Body */
+.status-modal .modal-body {
+    padding: var(--space-2xl);
+}
+
+/* Status Options */
+.status-options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+.status-option {
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    padding: var(--space-xl);
+    background: var(--bg-section);
+    border: 3px solid var(--border-light);
+    border-radius: var(--radius-xl);
+    cursor: pointer;
+    transition: all var(--transition);
+    text-align: left;
+    box-shadow: var(--shadow-sm);
+}
+
+.status-option:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+    background: var(--bg-white);
+}
+
+/* Fix the weird display on pub details page */
+.pub-details-overlay .status-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background: var(--modal-backdrop);
+    z-index: var(--z-status-modals);
+}
