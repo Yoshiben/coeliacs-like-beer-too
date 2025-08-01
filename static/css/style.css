@@ -312,6 +312,30 @@ html {
    z-index: var(--z-modal-backdrop);
 }
 
+.modal {
+   display:none;
+}
+
+.modal-wrapper {
+   display:none;
+}
+
+/* Active state just controls visibility */
+.overlay.active,
+.modal.active,
+.modal-wrapper.active {
+    display: flex !important;
+}
+
+
+/* ================================
+   GROUP - HOME PAGE
+   ================================ */
+
+/* ================================
+   TOP NAV SECTION
+   ================================ */
+
 .top-nav {
    position: fixed;
    top: 0;
@@ -324,19 +348,7 @@ html {
    box-shadow: var(--shadow-sm);
    backdrop-filter: blur(10px);
 }
-
-
-/* ================================
-   GROUP - HOME PAGE
-   ================================ */
-
-
-
-/* ================================
-   HERO & NAV SECTION
-   ================================ */
-
-.nav-content {
+   .nav-content {
     height: 100%;
     max-width: var(--container-xl);
     margin: 0 auto;
