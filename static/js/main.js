@@ -497,8 +497,28 @@ const App = {
         
         // Form actions
         'report-beer': (el, modules) => {
-            App.handleReportBeer(modules);
+            const pubData = window.App.getState('currentPub');
+            
+            // Close overlays if needed
+            modules.modalManager?.closeAllOverlays();
+            document.body.style.overflow = '';
+            
+            // Open report modal with pub data
+            if (modules.modalManager) {
+                modules.modalManager.open('reportModal', {
+                    onOpen: () => {
+                        if (modules.modal?.initializeReportModal) {
+                            modules.modal.initializeReportModal(pubData);
+                        } else if (window.initializeReportModal) {
+                            window.initializeReportModal(pubData);
+                        }
+                    }
+                });
+            }
+            
+            modules.tracking?.trackEvent('report_beer_click', 'User Action', pubData?.name || 'unknown');
         },
+
         'submit-report': (el, modules) => {
             const form = document.getElementById('reportForm');
             if (form) form.dispatchEvent(new Event('submit', { bubbles: true }));
@@ -524,9 +544,24 @@ const App = {
             modules.helpers?.showSuccessToast?.('✅ Status updated successfully!');
         },
         'add-beer-details': (el, modules) => {
-            modules.modalManager?.close('beerDetailsPromptModal'); // CHANGED
-            const currentPub = App.getState(STATE_KEYS.CURRENT_PUB);
-            modules.modalManager?.open('reportModal', { data: currentPub }); // CHANGED
+            modules.modalManager?.close('beerDetailsPromptModal');
+            
+            // Get the current pub from state
+            const currentPub = window.App.getState('currentPub');
+            
+            // Open report modal with current pub data
+            if (modules.modalManager) {
+                modules.modalManager.open('reportModal', {
+                    onOpen: () => {
+                        // Initialize with current pub
+                        if (modules.modal?.initializeReportModal) {
+                            modules.modal.initializeReportModal(currentPub);
+                        } else if (window.initializeReportModal) {
+                            window.initializeReportModal(currentPub);
+                        }
+                    }
+                });
+            }
         },
 
         
