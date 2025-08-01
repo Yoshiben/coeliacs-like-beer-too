@@ -195,6 +195,14 @@
    box-shadow: var(--shadow-sm);
    backdrop-filter: blur(10px);
    border: 2px solid var(--border-light);
+   flex: 1;
+   padding: var(--space-lg);
+   border: none;
+   border-radius: var(--radius-lg);
+   font-weight: 600;
+   cursor: pointer;
+   transition: all 0.25s ease;
+   width: 100%;
 }
 
 .btn-secondary:hover {
@@ -1145,6 +1153,8 @@ body.page-pub .nav-notification-btn {
    text-align: center;
    padding: 0 var(--space-xs);
 }
+
+
 
 
 
@@ -4030,15 +4040,6 @@ body.page-pub .nav-notification-btn {
     .report-modal .form-actions {
         flex-direction: row;
         justify-content: flex-end;
-    }
-    
-    .report-modal .btn {
-        width: auto;
-        min-width: 120px;
-    }
-    
-    .report-modal .btn-secondary {
-        order: -1;
     }
 }
 
