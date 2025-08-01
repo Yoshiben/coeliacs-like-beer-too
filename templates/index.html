@@ -255,18 +255,18 @@
                 <div class="nav-icon">🏠</div>
                 <div class="nav-label">Home</div>
             </a>
-            <a href="#" data-action="open-search" class="nav-item">
+            <div class="nav-item" data-action="open-search">
                 <div class="nav-icon">🔍</div>
                 <div class="nav-label">Search</div>
-            </a>
+            </div>
             <a href="#" data-action="show-full-map" class="nav-item">
                 <div class="nav-icon">🗺️</div>
                 <div class="nav-label">Map</div>
             </a>
-            <a href="/breweries" class="nav-item">
+            <div class="nav-item" data-action="open-breweries">
                 <div class="nav-icon">🍺</div>
                 <div class="nav-label">Breweries</div>
-            </a>
+            </div>
             <div class="nav-item nav-more" data-action="toggle-more-menu">
                 <div class="nav-icon">⋯</div>
                 <div class="nav-label">More</div>
@@ -436,6 +436,22 @@
         <div id="fullMapOverlay" class="overlay map-overlay">
             <div class="map-overlay-content">
                 <div id="fullMap" class="full-map"></div>
+            </div>
+        </div>
+
+        <!-- Breweries Overlay -->
+        <div id="breweriesOverlay" class="overlay breweries-overlay">
+            <div class="breweries-container">
+                <div class="breweries-header">
+                    <h1>🏭 Gluten Free Breweries</h1>
+                    <p>Discover amazing UK breweries making gluten free beer</p>
+                </div>
+                
+                <div class="breweries-content">
+                    <div class="breweries-grid" id="breweriesGrid">
+                        <!-- Will be populated by JS -->
+                    </div>
+                </div>
             </div>
         </div>
     
