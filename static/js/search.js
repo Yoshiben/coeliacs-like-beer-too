@@ -1013,13 +1013,16 @@ export const SearchModule = (function() {
     // ================================
     // UI HELPERS
     // ================================
-    // UPDATE: In search.js, replace the showResultsOverlay function (around line 977)
 
+    // Replace the showResultsOverlay function to use ModalManager:
     const showResultsOverlay = (title) => {
         console.log('📋 Showing results overlay:', title);
         
-        // Hide home content
-        hideOverlays(['hero-section', 'search-section'], false);
+        // Hide community home content
+        const communityHome = document.querySelector('.community-home');
+        if (communityHome) {
+            communityHome.style.display = 'none';
+        }
         
         // Reset to list view (not map view)
         const elements = {
@@ -1039,24 +1042,32 @@ export const SearchModule = (function() {
             elements.btnText.textContent = 'Map';
         }
         
-        setTimeout(() => {
+        // Update title
+        const resultsTitle = document.getElementById('resultsTitle');
+        if (resultsTitle) {
+            resultsTitle.textContent = title;
+        }
+        
+        // Use ModalManager to open the results overlay
+        if (modules.modalManager) {
+            modules.modalManager.open('resultsOverlay', {
+                onOpen: () => {
+                    document.body.style.overflow = 'hidden';
+                    
+                    // Update navigation context
+                    const navModule = window.App?.getModule('nav');
+                    navModule?.showResultsWithContext();
+                }
+            });
+        } else {
+            // Fallback if modalManager not available
             const resultsOverlay = document.getElementById('resultsOverlay');
             if (resultsOverlay) {
                 resultsOverlay.classList.add('active');
                 resultsOverlay.style.display = 'flex';
             }
-            
-            const resultsTitle = document.getElementById('resultsTitle');
-            if (resultsTitle) {
-                resultsTitle.textContent = title;
-            }
-            
             document.body.style.overflow = 'hidden';
-
-            // ADD THIS: Update navigation context after overlay is shown
-            const navModule = window.App?.getModule('nav');
-            navModule?.showResultsWithContext();
-        }, 50);
+        }
     };
     
     const showResultsLoading = (message) => {
@@ -1221,20 +1232,27 @@ export const SearchModule = (function() {
         }
     };
     
+    // Replace hideResultsAndShowHome function:
     const hideResultsAndShowHome = () => {
-        const resultsOverlay = document.getElementById('resultsOverlay');
-        if (resultsOverlay) {
-            resultsOverlay.style.display = 'none';
-            resultsOverlay.classList.remove('active');
+        // Use ModalManager to close results overlay
+        if (modules.modalManager) {
+            modules.modalManager.close('resultsOverlay');
+        } else {
+            const resultsOverlay = document.getElementById('resultsOverlay');
+            if (resultsOverlay) {
+                resultsOverlay.style.display = 'none';
+                resultsOverlay.classList.remove('active');
+            }
         }
         
-        const heroSection = document.querySelector('.hero-section');
-        const searchSection = document.querySelector('.search-section');
-        if (heroSection) heroSection.style.display = 'block';
-        if (searchSection) searchSection.style.display = 'flex';
+        // Show community home
+        const communityHome = document.querySelector('.community-home');
+        if (communityHome) {
+            communityHome.style.display = 'block';
+        }
         
         document.body.style.overflow = '';
-
+    
         const navModule = window.App?.getModule('nav');
         navModule?.showHomeWithContext();
     };
