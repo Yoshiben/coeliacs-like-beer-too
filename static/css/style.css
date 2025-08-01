@@ -316,16 +316,16 @@ html {
    display:none;
 }
 
-.modal-wrapper {
+/* .modal-wrapper {
    display:none;
-}
+} */
 
 /* Active state just controls visibility */
-.overlay.active,
+/* .overlay.active,
 .modal.active,
 .modal-wrapper.active {
     display: flex !important;
-}
+} */
 
 
 /* ================================
