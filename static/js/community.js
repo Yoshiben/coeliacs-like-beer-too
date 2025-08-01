@@ -32,6 +32,7 @@ export const CommunityModule = (() => {
         get api() { return window.App?.getModule('api'); },
         get search() { return window.App?.getModule('search'); },
         get modal() { return window.App?.getModule('modal'); },
+        get modalManager() { return window.App?.getModule('modalManager'); },
         get tracking() { return window.App?.getModule('tracking'); },
         get helpers() { return window.App?.getModule('helpers'); }
     };
@@ -287,6 +288,11 @@ export const CommunityModule = (() => {
     const handleQuickNearby = async () => {
         console.log('📍 Quick nearby search triggered');
         
+        // IMPORTANT: Close any open modals first to prevent conflicts
+        if (modules.modalManager) {
+            modules.modalManager.closeAll();
+        }
+        
         modules.helpers?.showLoadingToast('Finding GF beer near you...');
         
         try {
@@ -306,8 +312,12 @@ export const CommunityModule = (() => {
             modules.helpers?.hideLoadingToast();
             modules.helpers?.showToast('Could not get location. Try searching by area instead.', 'error');
             
-            // Open area search as fallback
-            modules.modal?.open('areaModal');
+            // Open area search as fallback using modalManager
+            if (modules.modalManager) {
+                modules.modalManager.open('areaModal');
+            } else if (modules.modal) {
+                modules.modal.open('areaModal');
+            }
         }
     };
     
