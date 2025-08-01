@@ -511,12 +511,6 @@ export const ModalModule = (function() {
     const init = (modules = {}) => {
         console.log('🔧 Initializing Modal Module');
         parentModules = modules;
-        
-        // Ensure all modals start hidden - CORRECT VERSION
-        document.querySelectorAll('.modal, .modal-wrapper').forEach(modal => {
-            modal.style.display = 'none';
-        });
-        
         setupEventListeners();
         console.log('✅ Modal Module initialized');
     };
