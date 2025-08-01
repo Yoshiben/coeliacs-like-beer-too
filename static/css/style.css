@@ -25,6 +25,7 @@
    --light-grey: rgba(156,163,175,1);
    --light-blue: rgba(102,126,234,1);
    --light-purple: #BCAFCA;
+   --grey-white: #F5F5F5
    
    /* Brand Colors & Gradients */
    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -190,7 +191,7 @@
 }
 
 .btn-secondary {
-   background: var(--light-purple);
+   background: var(--grey-white);
    color: var(--text-secondary);
    box-shadow: var(--shadow-sm);
    backdrop-filter: blur(10px);
@@ -206,7 +207,7 @@
 }
 
 .btn-secondary:hover {
-    background: var(--text-white);
+/*     background: var(--text-white); */
     transform: translateY(-1px);
     box-shadow: var(--shadow);
 }
