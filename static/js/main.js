@@ -183,18 +183,20 @@ const App = {
     initPhase4: async () => {
         console.log('🔧 Phase 4: Features...');
         
-        const [{ MapModule }, { SearchModule }, { FormModule }, { CommunityModule }, { NavStateManager }] = await Promise.all([
+        const [{ MapModule }, { SearchModule }, { FormModule }, { CommunityModule }, { NavStateManager }, { BreweriesModule }] = await Promise.all([
             import('./map.js'),
             import('./search.js'),
             import('./forms.js'),
             import('./community.js'),
-            import('./nav.js')
+            import('./nav.js'),
+            import('./breweries.js')
         ]);
         
         App.registerModule('map', MapModule);
         App.registerModule('search', SearchModule);
         App.registerModule('form', FormModule);
         App.registerModule('community', CommunityModule); 
+        App.registerModule('breweries', BreweriesModule);
         
         // Initialize forms
         FormModule.init();
