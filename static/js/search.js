@@ -749,44 +749,48 @@ export const SearchModule = (function() {
                 utils.showToast('📍 Location blocked. Enable in browser settings and refresh.', 'error');
                 return;
             }
-        
-        // Detect browser and show relevant instructions
-        const userAgent = navigator.userAgent.toLowerCase();
-        let browser = 'generic';
-        
-        if (userAgent.includes('chrome') && !userAgent.includes('edge')) {
-            browser = 'chrome';
-        } else if (userAgent.includes('firefox')) {
-            browser = 'firefox';
-        } else if (userAgent.includes('safari') && !userAgent.includes('chrome')) {
-            browser = 'safari';
-        } else if (userAgent.includes('edge')) {
-            browser = 'edge';
-        }
-        
-        // Hide all instructions first
-        const allInstructions = modal.querySelectorAll('.instruction-set');
-        allInstructions.forEach(inst => inst.classList.remove('active'));
-        
-        // Show the relevant one
-        const relevantInstruction = modal.querySelector(`[data-browser="${browser}"]`);
-        if (relevantInstruction) {
-            relevantInstruction.style.display = 'block';
-        } else {
-            // Fallback to generic
-            modal.querySelector('[data-browser="generic"]').style.display = 'block';
-        }
-        
-        modal.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-        
-        // Close on background click
-        modal.onclick = (e) => {
-            if (e.target === modal) {
-                modal.style.display = 'none';
-                document.body.style.overflow = '';
+            
+            // Detect browser and show relevant instructions
+            const userAgent = navigator.userAgent.toLowerCase();
+            let browser = 'generic';
+            
+            if (userAgent.includes('chrome') && !userAgent.includes('edge')) {
+                browser = 'chrome';
+            } else if (userAgent.includes('firefox')) {
+                browser = 'firefox';
+            } else if (userAgent.includes('safari') && !userAgent.includes('chrome')) {
+                browser = 'safari';
+            } else if (userAgent.includes('edge')) {
+                browser = 'edge';
             }
-        };
+            
+            // Hide all instructions first
+            const allInstructions = modal.querySelectorAll('.instruction-set');
+            allInstructions.forEach(inst => inst.classList.remove('active'));
+            
+            // Show the relevant one
+            const relevantInstruction = modal.querySelector(`[data-browser="${browser}"]`);
+            if (relevantInstruction) {
+                relevantInstruction.style.display = 'block';
+            } else {
+                // Fallback to generic
+                const genericInstruction = modal.querySelector('[data-browser="generic"]');
+                if (genericInstruction) {
+                    genericInstruction.style.display = 'block';
+                }
+            }
+            
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            
+            // Close on background click
+            modal.onclick = (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                    document.body.style.overflow = '';
+                }
+            };
+        }
     };
     
     const getUserLocation = () => {
