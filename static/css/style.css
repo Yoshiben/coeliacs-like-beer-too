@@ -344,7 +344,7 @@ html {
    height: 8vh;
    height: 8dvh;
    background: var(--primary-gradient);
-   z-index: var(--z-navigation);
+   z-index: var(--z-navigation) !important;
    box-shadow: var(--shadow-sm);
    backdrop-filter: blur(10px);
 }
@@ -2090,10 +2090,6 @@ body.page-pub .nav-notification-btn {
 .results-overlay {
    flex-direction: column;
    overflow: hidden;
-}
-
-.results-overlay.active {
-   display: flex !important;
 }
 
 .results-header {
