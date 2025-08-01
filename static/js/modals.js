@@ -8,9 +8,6 @@ export const ModalModule = (function() {
     
     // Private state
     let activeModals = [];
-
-    let parentModules = {};
-    
     let modalConfig = {
         animation: {
             duration: 300,
@@ -511,9 +508,8 @@ export const ModalModule = (function() {
     // INITIALIZATION
     // ================================
     
-    const init = (modules = {}) => {
+    const init = () => {
         console.log('🔧 Initializing Modal Module');
-        parentModules = modules;
         setupEventListeners();
         console.log('✅ Modal Module initialized');
     };
