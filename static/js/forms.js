@@ -39,6 +39,7 @@ export const FormModule = (() => {
     const modules = {
         get api() { return window.App?.getModule('api') || APIModule; },
         get modal() { return window.App?.getModule('modal') || ModalModule; },
+        get modalManager() { return window.App?.getModule('modalManager'); },
         get tracking() { return window.App?.getModule('tracking'); }
     };
     
@@ -182,8 +183,12 @@ export const FormModule = (() => {
     const handleSubmissionSuccess = (result) => {
         utils.showToast('🎉 Beer report submitted successfully! Thanks for contributing!');
         
-        // Close modal properly using ModalModule
-        modules.modal.close('reportModal');
+        // Close modal properly using modalManager
+        if (modules.modalManager) {
+            modules.modalManager.close('reportModal');
+        } else {
+            modules.modal.close('reportModal');
+        }
         
         // Reset form
         resetReportForm();
@@ -192,7 +197,11 @@ export const FormModule = (() => {
         returnToHomeView();
         
         // Track success
-        modules.tracking?.trackEvent('beer_report_submitted', 'Form', 'success');
+        modules.tracking?.trackFormSubmission('beer_report', {
+            tier: result.tier,
+            status: result.status,
+            brewery: reportData.brewery
+        });
     };
     
     const returnToHomeView = () => {
@@ -639,14 +648,23 @@ export const FormModule = (() => {
                 pubNameEl.textContent = this.currentPub.name;
             }
             
-            modules.modal.open('gfStatusModal');
+            // Use modalManager if available
+            if (modules.modalManager) {
+                modules.modalManager.open('gfStatusModal');
+            } else {
+                modules.modal.open('gfStatusModal');
+            }
         },
         
         selectStatus(status) {
             this.selectedStatus = status;
             
-            // Close status selection modal
-            modules.modal.close('gfStatusModal');
+            // Close status selection modal using modalManager
+            if (modules.modalManager) {
+                modules.modalManager.close('gfStatusModal');
+            } else {
+                modules.modal.close('gfStatusModal');
+            }
             
             // Update confirmation display
             const confirmStatusEl = document.getElementById('confirmStatus');
@@ -663,7 +681,11 @@ export const FormModule = (() => {
             
             // Show confirmation modal
             setTimeout(() => {
-                modules.modal.open('gfStatusConfirmModal');
+                if (modules.modalManager) {
+                    modules.modalManager.open('gfStatusConfirmModal');
+                } else {
+                    modules.modal.open('gfStatusConfirmModal');
+                }
             }, 100);
         },
         
@@ -682,9 +704,13 @@ export const FormModule = (() => {
                 return;
             }
             
-            // Close modals
-            modules.modal.close('gfStatusConfirmModal');
-            modules.modal.close('gfStatusModal');
+            // Close modals using modalManager
+            if (modules.modalManager) {
+                modules.modalManager.closeGroup('status'); // Close all status modals
+            } else {
+                modules.modal.close('gfStatusConfirmModal');
+                modules.modal.close('gfStatusModal');
+            }
             
             // Show loading
             utils.showLoadingToast('Updating status...');
@@ -706,7 +732,11 @@ export const FormModule = (() => {
                     
                     // Show appropriate follow-up
                     if (this.selectedStatus === 'always' || this.selectedStatus === 'currently') {
-                        modules.modal.open('beerDetailsPromptModal');
+                        if (modules.modalManager) {
+                            modules.modalManager.open('beerDetailsPromptModal');
+                        } else {
+                            modules.modal.open('beerDetailsPromptModal');
+                        }
                     } else {
                         utils.showToast('✅ Status updated successfully!');
                     }
