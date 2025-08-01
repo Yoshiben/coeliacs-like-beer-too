@@ -370,13 +370,13 @@ const App = {
             modules.search?.startLocationSearch?.();
         },
         'search-name': (el, modules) => {
-            modules.search?.searchByName?.();
+            modules.search?.openSearchModal?.('name');
         },
         'search-area': (el, modules) => {
-            modules.search?.searchByArea?.();
+            modules.search?.openSearchModal?.('area');
         },
         'search-beer': (el, modules) => {
-            modules.search?.searchByBeer?.();
+            modules.search?.openSearchModal?.('beer');
         },
         
         // Navigation actions
@@ -634,6 +634,21 @@ const App = {
                 // Return to home context
                 modules.nav?.goToHome();
             }
+        },
+
+        'toggle-more-menu': (el, modules) => {
+            const menu = document.getElementById('moreMenu');
+            if (menu) {
+                menu.classList.toggle('active');
+            }
+        },
+        'about-us': (el, modules) => {
+            e.preventDefault();
+            modules.modal?.open('aboutModal');
+        },
+        'about-gf': (el, modules) => {
+            e.preventDefault();
+            modules.modal?.open('gfInfoModal');
         },
 
     },
