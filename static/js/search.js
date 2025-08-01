@@ -74,7 +74,7 @@ export const SearchModule = (function() {
     const openSearchModal = (type) => {
         const modalMap = {
             'name': 'nameModal',
-            'area': 'areaModal',     
+            'area': 'areaModal', 
             'beer': 'beerModal'
         };
         
@@ -85,6 +85,7 @@ export const SearchModule = (function() {
             if (searchOverlay) {
                 searchOverlay.style.display = 'none';
                 searchOverlay.classList.remove('active');
+                document.body.style.overflow = '';
             }
             
             // Open the specific modal
@@ -1623,6 +1624,7 @@ export const SearchModule = (function() {
         
         // Sub-modules
         PlacesSearchModule,
+        openSearchModal,
         
         // State getters
         getCurrentResults: () => state.currentSearchPubs,
