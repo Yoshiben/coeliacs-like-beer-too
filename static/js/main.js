@@ -636,6 +636,19 @@ const App = {
             }
         },
 
+        'open-breweries': (el, modules) => {
+            modules.breweries?.openBreweries();
+        },
+        'search-brewery': (el, modules) => {
+            const brewery = el.dataset.brewery;
+            if (brewery) {
+                modules.breweries?.searchBreweryBeers(brewery);
+            }
+        },
+        'retry-breweries': (el, modules) => {
+            modules.breweries?.loadBreweries();
+        },
+
         'toggle-more-menu': (el, modules) => {
             const menu = document.getElementById('moreMenu');
             if (menu) {
