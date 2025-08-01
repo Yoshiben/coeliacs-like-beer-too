@@ -2342,7 +2342,18 @@ body.page-pub .nav-notification-btn {
    STATUS MODAL SYSTEM - CONSOLIDATED
    ================================ */
 .status-modal .modal-content {
-   max-width: 500px;
+   background: var(--bg-white);
+   border-radius: var(--radius-xl);
+   padding: var(--space-xs) var(--space-xl) var(--space-xl);
+   max-width: 400px;
+   width: 100%;
+   box-shadow: var(--shadow-lg);
+   margin: 0;
+   z-index: var(--z-modal-content);
+   max-height: 92vh;
+   display: flex;
+   flex-direction: column;
+   overflow: hidden;   
 }
 
 .status-prompt {
