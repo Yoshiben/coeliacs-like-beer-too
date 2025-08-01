@@ -17,7 +17,7 @@ export const ModalManager = (() => {
         blockedModals: new Set(),
         config: {
             allowMultipleModals: false,
-            allowModalOverOverlay: false,
+            allowModalOverOverlay: true,
             debugMode: true
         }
     };
@@ -38,7 +38,7 @@ export const ModalManager = (() => {
         distanceModal: { type: 'modal', group: 'search-input', exclusive: true },
         
         // Status modals (can stack in specific order)
-        gfStatusModal: { type: 'modal', group: 'status', stackable: true, order: 1 },
+        gfStatusModal: { type: 'modal', group: 'status', stackable: true, order: 1, priority: true },
         gfStatusConfirmModal: { type: 'modal', group: 'status', stackable: true, order: 2 },
         beerDetailsPromptModal: { type: 'modal', group: 'status', stackable: true, order: 3 },
         
