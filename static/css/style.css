@@ -4286,3 +4286,312 @@ body.page-pub .nav-notification-btn {
     background: var(--modal-backdrop);
     z-index: var(--z-status-modals);
 }
+
+
+/* ================================
+   BOLD COMMUNITY PAGE ENHANCEMENTS - ADD THESE
+   ================================ */
+
+/* Vibrant gradient background */
+.community-home {
+    background: 
+        linear-gradient(180deg, 
+            rgba(139, 92, 246, 0.08) 0%, 
+            rgba(102, 126, 234, 0.04) 20%,
+            rgba(255, 255, 255, 1) 40%,
+            rgba(248, 249, 250, 1) 100%
+        ),
+        radial-gradient(ellipse at top right, rgba(139, 92, 246, 0.05) 0%, transparent 50%),
+        radial-gradient(ellipse at bottom left, rgba(102, 126, 234, 0.05) 0%, transparent 50%);
+}
+
+/* Stats bar with gradient border */
+.stats-bar {
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.95) 0%, 
+        rgba(248, 249, 250, 0.95) 100%
+    );
+    backdrop-filter: blur(10px);
+    box-shadow: 
+        0 4px 12px rgba(139, 92, 246, 0.15),
+        inset 0 -2px 0 rgba(139, 92, 246, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.stats-bar::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--purple-gradient);
+}
+
+/* Highlighted stat pill with glow */
+.stat-pill.highlighted {
+    background: var(--purple-gradient);
+    color: var(--white);
+    box-shadow: 
+        0 4px 16px rgba(139, 92, 246, 0.3),
+        0 0 0 3px rgba(139, 92, 246, 0.1);
+    animation: pulse-glow 3s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+    0%, 100% { 
+        box-shadow: 
+            0 4px 16px rgba(139, 92, 246, 0.3),
+            0 0 0 3px rgba(139, 92, 246, 0.1);
+    }
+    50% { 
+        box-shadow: 
+            0 4px 20px rgba(139, 92, 246, 0.4),
+            0 0 0 5px rgba(139, 92, 246, 0.15);
+    }
+}
+
+/* Near me button - BOLD gradient */
+.near-me-button {
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 1) 0%, 
+        rgba(139, 92, 246, 0.05) 100%
+    );
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    position: relative;
+    overflow: hidden;
+}
+
+.near-me-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--purple-gradient);
+    opacity: 0;
+    transition: opacity var(--transition);
+    z-index: 0;
+}
+
+.near-me-button:hover::before {
+    opacity: 0.08;
+}
+
+.near-me-button > * {
+    position: relative;
+    z-index: 1;
+}
+
+.near-me-icon {
+    background: var(--purple-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 2px 4px rgba(139, 92, 246, 0.2));
+}
+
+/* Featured card with gradient overlay */
+.featured-card {
+    box-shadow: 
+        0 8px 16px rgba(139, 92, 246, 0.15),
+        0 16px 48px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(139, 92, 246, 0.12);
+    position: relative;
+    overflow: hidden;
+}
+
+.featured-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.08) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+/* Find cards with colorful hover */
+.find-card {
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 1) 0%, 
+        rgba(248, 249, 250, 0.8) 100%
+    );
+    box-shadow: 
+        0 4px 8px rgba(139, 92, 246, 0.1),
+        0 8px 24px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(139, 92, 246, 0.08);
+}
+
+.find-card:hover {
+    background: linear-gradient(135deg, 
+        rgba(139, 92, 246, 0.05) 0%, 
+        rgba(255, 255, 255, 1) 100%
+    );
+    box-shadow: 
+        0 8px 16px rgba(139, 92, 246, 0.2),
+        0 16px 48px rgba(0, 0, 0, 0.1);
+    transform: translateY(-4px);
+    border-color: rgba(139, 92, 246, 0.2);
+}
+
+/* Highlight card with animated border */
+.find-card.highlight {
+    background: linear-gradient(135deg, 
+        rgba(139, 92, 246, 0.1) 0%, 
+        rgba(102, 126, 234, 0.05) 100%
+    );
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    position: relative;
+}
+
+.find-card.highlight::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    margin: -2px;
+    border-radius: inherit;
+    background: var(--purple-gradient);
+    animation: gradient-rotate 3s linear infinite;
+}
+
+@keyframes gradient-rotate {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+}
+
+/* Section headers with animated underline */
+.section-header {
+    position: relative;
+    padding-bottom: var(--space-lg);
+}
+
+.section-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 80px;
+    height: 4px;
+    background: var(--purple-gradient);
+    border-radius: 2px;
+    animation: width-pulse 3s ease-in-out infinite;
+}
+
+@keyframes width-pulse {
+    0%, 100% { width: 80px; }
+    50% { width: 120px; }
+}
+
+/* Trending list with gradient background */
+.trending-list {
+    background: linear-gradient(180deg, 
+        rgba(139, 92, 246, 0.03) 0%, 
+        rgba(255, 255, 255, 1) 50%,
+        rgba(248, 249, 250, 1) 100%
+    );
+    border: 2px solid rgba(139, 92, 246, 0.1);
+    box-shadow: 
+        0 4px 12px rgba(139, 92, 246, 0.08),
+        inset 0 1px 0 rgba(139, 92, 246, 0.05);
+}
+
+.trending-item:hover {
+    background: linear-gradient(90deg, 
+        rgba(139, 92, 246, 0.08) 0%, 
+        rgba(139, 92, 246, 0.02) 100%
+    );
+    border-left: 4px solid var(--purple-border);
+    padding-left: calc(var(--space-lg) - 4px);
+}
+
+/* Quick actions with bold hover */
+.action-card {
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 1) 0%, 
+        rgba(139, 92, 246, 0.02) 100%
+    );
+    border: 2px solid rgba(139, 92, 246, 0.1);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.08);
+    position: relative;
+    overflow: hidden;
+}
+
+.action-card::before {
+    content: '';
+    position: absolute;
+    top: -100%;
+    left: -100%;
+    width: 300%;
+    height: 300%;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+    transition: all 0.5s ease;
+    opacity: 0;
+}
+
+.action-card:hover::before {
+    top: -150%;
+    left: -150%;
+    opacity: 1;
+}
+
+.action-card:hover {
+    transform: translateY(-4px) scale(1.02);
+    border-color: var(--purple-border);
+    box-shadow: 
+        0 8px 24px rgba(139, 92, 246, 0.2),
+        0 16px 48px rgba(0, 0, 0, 0.1);
+}
+
+.action-icon {
+    font-size: var(--text-3xl);
+    filter: drop-shadow(0 2px 4px rgba(139, 92, 246, 0.2));
+}
+
+/* Alternating sections with gradients */
+.community-feed > *:nth-child(even) {
+    background: linear-gradient(180deg, 
+        rgba(139, 92, 246, 0.02) 0%, 
+        rgba(248, 249, 250, 0.6) 50%,
+        rgba(139, 92, 246, 0.02) 100%
+    );
+    padding: var(--space-2xl);
+    margin: 0 calc(var(--space-lg) * -1);
+    padding-left: var(--space-lg);
+    padding-right: var(--space-lg);
+    border-radius: var(--radius-xl);
+    position: relative;
+}
+
+/* Decorative purple orbs */
+.community-home::after {
+    content: '';
+    position: fixed;
+    top: 20%;
+    right: -10%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+    animation: float 20s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0) translateX(0); }
+    33% { transform: translateY(-30px) translateX(-20px); }
+    66% { transform: translateY(20px) translateX(10px); }
+}
+
+}
