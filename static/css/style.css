@@ -4286,3 +4286,56 @@ body.page-pub .nav-notification-btn {
     background: var(--modal-backdrop);
     z-index: var(--z-status-modals);
 }
+
+/* ================================
+   PURPLE SHADOW ENHANCEMENTS - ADD THESE
+   ================================ */
+
+/* Enhanced shadows with purple tint */
+.featured-card {
+    box-shadow: 
+        0 4px 6px rgba(139, 92, 246, 0.08),
+        0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.find-card {
+    box-shadow: 
+        0 2px 4px rgba(139, 92, 246, 0.06),
+        0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.find-card:hover {
+    box-shadow: 
+        0 4px 8px rgba(139, 92, 246, 0.12),
+        0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.near-me-button {
+    box-shadow: 
+        0 2px 4px rgba(139, 92, 246, 0.08),
+        0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.near-me-button:hover {
+    box-shadow: 
+        0 4px 8px rgba(139, 92, 246, 0.15),
+        0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+.action-card {
+    box-shadow: 0 2px 6px rgba(139, 92, 246, 0.06);
+}
+
+.action-card:hover {
+    box-shadow: 
+        0 4px 12px rgba(139, 92, 246, 0.12),
+        0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.trending-list {
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.06);
+}
+
+.stats-bar {
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.06);
+}
