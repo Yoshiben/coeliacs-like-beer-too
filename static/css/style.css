@@ -3870,3 +3870,100 @@ body.page-pub .nav-notification-btn {
 .stats-bar {
     box-shadow: 0 2px 8px rgba(139, 92, 246, 0.06);
 }
+
+
+.legend-marker {
+   width: var(--space-md);
+   height: var(--space-md);
+   border-radius: 50%;
+   border: 1px solid var(--text-white);
+   flex-shrink: 0;
+}
+
+/* UPDATED 5-TIER LEGEND COLORS */
+.legend-marker.always-tap-cask {
+   background: var(--always-tap-cask-fill);
+   border-color: var(--always-tap-cask-border);
+   box-shadow: 0 0 4px rgba(255, 215, 0, 0.6);
+   width: calc(var(--space-md) * 1.5);
+   height: calc(var(--space-md) * 1.5);
+}
+
+.legend-marker.always-bottle-can {
+   background: var(--always-bottle-can-fill);
+   border-color: var(--always-bottle-can-border);
+   box-shadow: 0 0 3px rgba(0, 245, 0, 0.4);
+   width: calc(var(--space-md) * 1.25);
+   height: calc(var(--space-md) * 1.25);
+}
+
+.legend-marker.currently {
+   background: var(--currently-fill);
+   border-color: var(--currently-border);
+}
+
+.legend-marker.not-currently {
+   background: var(--not-currently-fill);
+   border-color: var(--not-currently-border);
+}
+
+.legend-marker.unknown {
+   background: var(--unknown-fill);
+   border-color: var(--unknown-border);
+}
+
+.legend-marker.user-location {
+   background: var(--my-location-fill);
+   border-color: var(--white);
+}
+
+
+
+
+/* ================================
+   ENHANCED MAP MARKER STYLES
+   5-TIER GF STATUS VISUAL HIERARCHY
+   ================================ */
+
+/* Gold star markers - make them SHINE! */
+.leaflet-marker-pane .always-tap-cask-marker {
+    filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.8));
+    animation: pulse-gold 2s ease-in-out infinite;
+}
+
+@keyframes pulse-gold {
+    0%, 100% {
+        filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.8));
+    }
+    50% {
+        filter: drop-shadow(0 0 12px rgba(255, 215, 0, 1));
+    }
+}
+
+/* Green markers - subtle glow */
+.leaflet-marker-pane .always-bottle-can-marker {
+    filter: drop-shadow(0 0 4px rgba(0, 245, 0, 0.5));
+}
+
+/* Zoom-based marker sizing */
+.leaflet-zoom-13 .always-tap-cask-marker,
+.leaflet-zoom-14 .always-tap-cask-marker,
+.leaflet-zoom-15 .always-tap-cask-marker,
+.leaflet-zoom-16 .always-tap-cask-marker,
+.leaflet-zoom-17 .always-tap-cask-marker,
+.leaflet-zoom-18 .always-tap-cask-marker,
+.leaflet-zoom-19 .always-tap-cask-marker {
+    stroke-width: 5;
+}
+
+/* Custom legend for 5-tier system */
+.map-legend .legend-item {
+    transition: all var(--transition-fast);
+}
+
+.map-legend .legend-item:hover {
+    background: var(--hover-subtle);
+    border-radius: var(--radius-sm);
+    padding: 0 var(--space-xs);
+    margin: 0 calc(var(--space-xs) * -1);
+}
