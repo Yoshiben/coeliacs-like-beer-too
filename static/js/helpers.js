@@ -298,14 +298,29 @@ export const HelpersModule = (function() {
     // ================================
     // ANIMATIONS
     // ================================
-    const animateNumber = (elementId, targetNumber, duration = config.animation.numberDuration) => {
+    // In helpers.js, update the animateNumber function around line 176
+    // REPLACE the existing animateNumber function with this:
+    
+    const animateNumber = (elementId, targetValue, duration = config.animation.numberDuration) => {
         const element = document.getElementById(elementId);
         if (!element) {
             console.warn(`Element ${elementId} not found for animation`);
             return;
         }
         
-        const startNumber = parseInt(element.textContent.replace(/,/g, '')) || 0;
+        // Check if targetValue is a string with 'k+' suffix
+        let targetNumber;
+        let suffix = '';
+        
+        if (typeof targetValue === 'string') {
+            // Just set it directly without animation for string values
+            element.textContent = targetValue;
+            return;
+        } else {
+            targetNumber = targetValue;
+        }
+        
+        const startNumber = parseInt(element.textContent.replace(/[^0-9]/g, '')) || 0;
         const startTime = performance.now();
         
         const updateNumber = (currentTime) => {
@@ -316,12 +331,12 @@ export const HelpersModule = (function() {
             const easeOut = 1 - Math.pow(1 - progress, 3);
             const currentNumber = Math.floor(startNumber + (targetNumber - startNumber) * easeOut);
             
-            element.textContent = currentNumber.toLocaleString();
+            element.textContent = currentNumber.toLocaleString() + suffix;
             
             if (progress < 1) {
                 requestAnimationFrame(updateNumber);
             } else {
-                element.textContent = targetNumber.toLocaleString();
+                element.textContent = targetNumber.toLocaleString() + suffix;
             }
         };
         
