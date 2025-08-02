@@ -124,6 +124,24 @@
    --unknown-gf-border: var(--white);
    --my-location-fill: var(--light-blue);
    --my-location-border: var(--white);
+
+   --always-tap-cask-fill: #FFD700;
+   --always-tap-cask-border: #FDB904;
+   --always-bottle-can-fill: #00F500;
+   --always-bottle-can-border: #00C400;
+   --currently-fill: #3B82F6;
+   --currently-border: #2563EB;
+   --not-currently-fill: #EF4444;
+   --not-currently-border: #DC2626;
+   --unknown-fill: #9CA3AF;
+   --unknown-border: #6B7280;
+
+   /* Status backgrounds for cards */
+   --status-always-tap-cask-bg: rgba(255, 215, 0, 0.1);
+   --status-always-bottle-can-bg: rgba(0, 245, 0, 0.1);
+   --status-currently-bg: rgba(59, 130, 246, 0.1);
+   --status-not-currently-bg: rgba(239, 68, 68, 0.1);
+   --status-unknown-bg: rgba(156, 163, 175, 0.1);
    
    /* Transitions */
    --transition-fast: 0.15s ease-out;
