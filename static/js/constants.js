@@ -164,9 +164,69 @@ export const Constants = {
         'Belgian Ale', 'Blonde Ale', 'Red Ale', 'Mild', 'Best Bitter'
     ],
     
+    // REPLACE the existing VALIDATION section with this updated version:
+
     // ================================
-    // VALIDATION
+    // GF STATUS SYSTEM
     // ================================
+    GF_STATUS: {
+        ALWAYS_TAP_CASK: 'always_tap_cask',    // Gold - The holy grail!
+        ALWAYS_BOTTLE_CAN: 'always_bottle_can', // Green - Reliable backup
+        CURRENTLY: 'currently',                  // Blue - Available now
+        NOT_CURRENTLY: 'not_currently',         // Red - None right now
+        UNKNOWN: 'unknown'                       // Grey - Needs checking
+    },
+    
+    // Status display configuration
+    GF_STATUS_CONFIG: {
+        always_tap_cask: {
+            label: 'Always Has GF on Tap/Cask',
+            shortLabel: 'Always (Tap/Cask)',
+            icon: '⭐',
+            color: 'gold',
+            priority: 1,
+            fillColor: '#FFD700',
+            borderColor: '#FDB904'
+        },
+        always_bottle_can: {
+            label: 'Always Has GF Bottles/Cans',
+            shortLabel: 'Always (Bottles/Cans)',
+            icon: '✅',
+            color: 'green',
+            priority: 2,
+            fillColor: '#00F500',
+            borderColor: '#00C400'
+        },
+        currently: {
+            label: 'Currently Has GF Beer',
+            shortLabel: 'Currently Available',
+            icon: '🔵',
+            color: 'blue',
+            priority: 3,
+            fillColor: '#3B82F6',
+            borderColor: '#2563EB'
+        },
+        unknown: {
+            label: 'GF Status Unknown',
+            shortLabel: 'Unknown',
+            icon: '❓',
+            color: 'grey',
+            priority: 4,
+            fillColor: '#9CA3AF',
+            borderColor: '#6B7280'
+        },
+        not_currently: {
+            label: 'No GF Beer Currently',
+            shortLabel: 'Not Available',
+            icon: '❌',
+            color: 'red',
+            priority: 5,
+            fillColor: '#EF4444',
+            borderColor: '#DC2626'
+        }
+    },
+    
+    // REPLACE the VALIDATION section's validation tiers with:
     VALIDATION: {
         POSTCODE_REGEX: /^[A-Z]{1,2}[0-9R][0-9A-Z]?\s?[0-9][A-Z]{2}$/i,
         EMAIL_REGEX: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
@@ -184,7 +244,10 @@ export const Constants = {
             MANUAL_REVIEW: 3
         },
         
-        SOFT_VALIDATION_DELAY: 24 // hours
+        SOFT_VALIDATION_DELAY: 24, // hours
+        
+        // Valid status values for API
+        VALID_STATUSES: ['always_tap_cask', 'always_bottle_can', 'currently', 'not_currently', 'unknown']
     },
     
     // ================================
