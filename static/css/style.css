@@ -1202,7 +1202,7 @@ body.page-pub .nav-notification-btn {
 .search-overlay {
     height: 100vh;
     height: 100dvh;
-    background: var(--search-overlay-bg);
+/*     background: var(--search-overlay-bg); */
     z-index: var(--z-results-overlay);
     display: none;
     flex-direction: column;
@@ -1354,7 +1354,7 @@ body.page-pub .nav-notification-btn {
     height: 100vh;
     height: 100dvh;
     z-index: var(--z-modal-backdrop);
-    background: var(--primary-gradient);
+/*     background: var(--primary-gradient); */
 }
 
 .map-overlay.active {
@@ -1776,7 +1776,7 @@ body.page-pub .nav-notification-btn {
     width: 100%;
     height: 100vh;
     height: 100dvh;
-    background: var(--primary-gradient);
+/*     background: var(--primary-gradient); */
     z-index: var(--z-results-overlay);
     padding: 8vh 0;
     display: none;
