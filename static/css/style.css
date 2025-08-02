@@ -322,17 +322,6 @@ html {
    display:none;
 }
 
-/* .modal-wrapper {
-   display:none;
-} */
-
-/* Active state just controls visibility */
-/* .overlay.active,
-.modal.active,
-.modal-wrapper.active {
-    display: flex !important;
-} */
-
 
 /* ================================
    GROUP - HOME PAGE
@@ -928,6 +917,158 @@ body.page-pub .nav-notification-btn {
     font-size: var(--text-sm);
     font-weight: 600;
     color: var(--text-primary);
+}
+
+/* ================================
+   COMMUNITY PAGE ENHANCEMENTS - ADD THESE
+   ================================ */
+
+/* Background depth and subtle gradient */
+.community-home {
+    background: linear-gradient(180deg, 
+        rgba(139, 92, 246, 0.03) 0%, 
+        rgba(255, 255, 255, 1) 15%,
+        rgba(248, 249, 250, 1) 100%
+    );
+}
+
+/* Alternating section backgrounds */
+.community-feed > *:nth-child(even) {
+    background: rgba(248, 249, 250, 0.5);
+    padding: var(--space-xl);
+    margin: 0 calc(var(--space-lg) * -1);
+    padding-left: var(--space-lg);
+    padding-right: var(--space-lg);
+    border-radius: var(--radius-xl);
+}
+
+/* Enhanced card shadows with purple tint */
+.featured-card {
+    box-shadow: 
+        0 4px 6px rgba(139, 92, 246, 0.08),
+        0 8px 24px rgba(0, 0, 0, 0.06);
+    border: 1px solid rgba(139, 92, 246, 0.06);
+}
+
+.find-card {
+    box-shadow: 
+        0 2px 4px rgba(139, 92, 246, 0.06),
+        0 4px 12px rgba(0, 0, 0, 0.04);
+    transition: all var(--transition);
+}
+
+.find-card:hover {
+    box-shadow: 
+        0 4px 8px rgba(139, 92, 246, 0.12),
+        0 8px 24px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+}
+
+/* Stats bar enhancement */
+.stats-bar {
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.95) 0%, 
+        rgba(248, 249, 250, 0.95) 100%
+    );
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.06);
+}
+
+/* Near me button enhancement */
+.near-me-button {
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 1) 0%, 
+        rgba(248, 249, 250, 1) 100%
+    );
+    box-shadow: 
+        0 2px 4px rgba(139, 92, 246, 0.08),
+        0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.near-me-button:hover {
+    background: linear-gradient(135deg, 
+        rgba(139, 92, 246, 0.05) 0%, 
+        rgba(255, 255, 255, 1) 100%
+    );
+    box-shadow: 
+        0 4px 8px rgba(139, 92, 246, 0.15),
+        0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+/* Trending list with subtle background */
+.trending-list {
+    background: linear-gradient(180deg, 
+        rgba(255, 255, 255, 1) 0%, 
+        rgba(248, 249, 250, 0.8) 100%
+    );
+    border: 1px solid rgba(139, 92, 246, 0.08);
+}
+
+.trending-item {
+    background: rgba(255, 255, 255, 0.7);
+}
+
+.trending-item:hover {
+    background: rgba(139, 92, 246, 0.03);
+}
+
+/* Quick actions cards */
+.action-card {
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 1) 0%, 
+        rgba(248, 249, 250, 0.6) 100%
+    );
+    box-shadow: 0 2px 6px rgba(139, 92, 246, 0.06);
+}
+
+.action-card:hover {
+    background: linear-gradient(135deg, 
+        rgba(139, 92, 246, 0.08) 0%, 
+        rgba(255, 255, 255, 1) 100%
+    );
+}
+
+/* Section headers with purple accent */
+.section-header {
+    position: relative;
+    padding-bottom: var(--space-md);
+}
+
+.section-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 60px;
+    height: 3px;
+    background: var(--purple-gradient);
+    border-radius: 2px;
+}
+
+/* Featured badge glow */
+.featured-badge {
+    background: linear-gradient(135deg, var(--gold) 0%, var(--dark-gold) 100%);
+    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+}
+
+/* Subtle pattern overlay (optional) */
+.community-home::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.02) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(102, 126, 234, 0.02) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.community-home > * {
+    position: relative;
+    z-index: 1;
 }
 
 
