@@ -552,13 +552,18 @@ export const SearchModule = (function() {
         if (!statusEl) return;
         
         const displays = {
-            'always': {
+            'always_tap_cask': {
                 icon: '⭐',
-                text: 'Always Available',
-                meta: 'Permanent GF options!'
+                text: 'Always Has Tap/Cask',
+                meta: 'The holy grail of GF beer!'
+            },
+            'always_bottle_can': {
+                icon: '✅',
+                text: 'Always Has Bottles/Cans',
+                meta: 'Reliable GF options'
             },
             'currently': {
-                icon: '✅',
+                icon: '🔵',
                 text: 'Available Now',
                 meta: 'GF beer in stock'
             },
