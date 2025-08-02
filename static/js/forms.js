@@ -669,8 +669,9 @@ export const FormModule = (() => {
             // Update confirmation display
             const confirmStatusEl = document.getElementById('confirmStatus');
             const statusLabels = {
-                'always': '⭐ Always Available',
-                'currently': '✅ Available Now',
+                'always_tap_cask': '⭐ Always Has Tap/Cask',
+                'always_bottle_can': '✅ Always Has Bottles/Cans',
+                'currently': '🔵 Available Now',
                 'not_currently': '❌ Not Available',
                 'unknown': '❓ Not Sure'
             };
