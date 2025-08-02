@@ -3967,3 +3967,48 @@ body.page-pub .nav-notification-btn {
     padding: 0 var(--space-xs);
     margin: 0 calc(var(--space-xs) * -1);
 }
+
+.legend-marker {
+   width: var(--space-md);
+   height: var(--space-md);
+   border-radius: 50%;
+   border: 1px solid var(--text-white);
+   flex-shrink: 0;
+}
+
+/* UPDATED 5-TIER LEGEND COLORS */
+.legend-marker.always-tap-cask {
+   background: var(--always-tap-cask-fill);
+   border-color: var(--always-tap-cask-border);
+   box-shadow: 0 0 4px rgba(255, 215, 0, 0.6);
+   width: calc(var(--space-md) * 1.5);
+   height: calc(var(--space-md) * 1.5);
+}
+
+.legend-marker.always-bottle-can {
+   background: var(--always-bottle-can-fill);
+   border-color: var(--always-bottle-can-border);
+   box-shadow: 0 0 3px rgba(0, 245, 0, 0.4);
+   width: calc(var(--space-md) * 1.25);
+   height: calc(var(--space-md) * 1.25);
+}
+
+.legend-marker.currently {
+   background: var(--currently-fill);
+   border-color: var(--currently-border);
+}
+
+.legend-marker.not-currently {
+   background: var(--not-currently-fill);
+   border-color: var(--not-currently-border);
+}
+
+.legend-marker.unknown {
+   background: var(--unknown-fill);
+   border-color: var(--unknown-border);
+}
+
+.legend-marker.user-location {
+   background: var(--my-location-fill);
+   border-color: var(--white);
+}
