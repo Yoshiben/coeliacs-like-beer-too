@@ -30,6 +30,10 @@ export const ModalManager = (() => {
         fullMapOverlay: { type: 'overlay', group: 'map', exclusive: true },
         pubDetailsOverlay: { type: 'overlay', group: 'details', exclusive: true },
         breweriesOverlay: { type: 'overlay', group: 'breweries', exclusive: true },
+
+        // Info overlays
+        aboutOverlay: { type: 'overlay', group: 'info', exclusive: true },
+        gfInfoOverlay: { type: 'overlay', group: 'info', exclusive: true },
         
         // Search modals (mutually exclusive within group)
         nameModal: { type: 'modal', group: 'search-input', exclusive: true },
