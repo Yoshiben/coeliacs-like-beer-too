@@ -447,15 +447,6 @@ html {
     transform: translateX(-2px);
 }
 
-/* Tagline */
-.nav-tagline {
-   background: var(--primary-gradient);
-   color: rgba(255, 255, 255, 0.9);
-   font-size: var(--text-sm);
-   font-weight: 400;
-   letter-spacing: 0.5px;
-}
-
 /* Toggle */
 .nav-toggle {
     display: none; /* Hidden by default */
@@ -492,16 +483,11 @@ html {
 
 /* Default state - hide everything except logo */
 .nav-back-btn,
-.nav-tagline,
 .nav-toggle,
 .nav-notification-btn {
     display: none !important;
 }
 
-/* Home Page */
-body.page-home .nav-tagline {
-    display: block !important;
-}
 body.page-home .nav-notification-btn {
     display: flex !important;
 }
@@ -521,10 +507,7 @@ body.page-map .nav-back-btn {
 body.page-map .nav-toggle {
     display: block !important;
 }
-/* Hide the tagline and notification on map */
-body.page-map .nav-tagline {
-    display: none !important;
-}
+
 body.page-map .nav-notification-btn {
     display: none !important;
 }
@@ -532,10 +515,6 @@ body.page-map .nav-notification-btn {
 /* Pub Details Page */
 body.page-pub .nav-back-btn {
     display: flex !important;
-}
-/* Hide tagline and notification on pub details */
-body.page-pub .nav-tagline {
-    display: none !important;
 }
 body.page-pub .nav-notification-btn {
     display: none !important;
@@ -556,6 +535,16 @@ body.page-pub .nav-notification-btn {
     -webkit-overflow-scrolling: touch;
     background: #F8F9FA;
 }
+
+/* .nav-tagline {
+   background: var(--primary-gradient);
+   color: rgba(255, 255, 255, 0.9);
+   font-size: var(--text-sm);
+   font-weight: 400;
+   letter-spacing: 0.5px;
+   display: flex;
+   flex: 1;
+} */
 
 /* Compact Hero */
 .hero-nav {
