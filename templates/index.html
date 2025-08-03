@@ -37,11 +37,11 @@
             <div class="nav-content">
                 <!-- Left Section -->
                 <div class="nav-left">
-                    
                     <!-- Logo (always visible) -->
                     <div class="logo-container">
                         <img src="/static/images/logo-white.svg" alt="Coeliacs Like Beer Too" class="nav-logo">
                     </div>
+                </div> <!-- ← THIS WAS MISSING! -->
                 
                 <!-- Right Section -->
                 <div class="nav-right">
@@ -56,17 +56,13 @@
                         </div>
                     </div>
                     
-                    
                     <!-- Future: Notifications, settings etc -->
                     <div class="nav-actions">
                         <button class="nav-notification-btn">🔔</button>
                     </div>
-
-                     <!-- Back Button (hidden on home) -->
-                    <button class="nav-back-btn" data-action="nav-back">
-                        ← Back
-                    </button>
                     
+                    <!-- Back Button (hidden on home) -->
+                    <button class="nav-back-btn" data-action="nav-back">← Back</button>
                 </div>
             </div>
         </nav>
@@ -1170,6 +1166,7 @@
         </script>
     </body>
 </html>
+
 
 
 
