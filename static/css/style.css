@@ -192,7 +192,7 @@
 #cookieSettingsFloat,
 #loadingToast,
 #successToast {
-    display: none; /* Hidden by default */
+    display: none; 
 }
 
 /* ================================
@@ -347,7 +347,7 @@ html {
 }
 
 .modal-header {
-   display: flex;
+   display: none;
    align-items: center;
    background: (--primary-gradient);
    text-align: center;
