@@ -2421,15 +2421,15 @@ body.page-pub .nav-notification-btn {
    background: var(--bg-white);
    border-radius: var(--radius-xl);
    padding: var(--space-xs) var(--space-xl) var(--space-xl);
-   max-width: 400px;
+   max-width: 500px;
    width: 100%;
-   box-shadow: var(--shadow-lg);
-   margin: 0;
+   box-shadow: var(--shadow-xl);
    z-index: var(--z-modal-content);
    max-height: 92vh;
    display: flex;
    flex-direction: column;
    overflow: hidden;   
+   padding: 0;
 }
 
 .status-prompt {
@@ -2513,6 +2513,21 @@ body.page-pub .nav-notification-btn {
    border-radius: var(--radius-lg);
    font-size: var(--text-xl);
    font-weight: 700;
+}
+
+.confirm-modal .modal-content {
+   background: var(--bg-white);
+   border-radius: var(--radius-xl);
+   padding: var(--space-xs) var(--space-xl) var(--space-xl);
+   max-width: 500px;
+   width: 100%;
+   box-shadow: var(--shadow-xl);
+   z-index: var(--z-modal-content);
+   max-height: 92vh;
+   display: flex;
+   flex-direction: column;
+   overflow: hidden;   
+   padding: 0;
 }
 
 
@@ -3698,20 +3713,6 @@ body.page-pub .nav-notification-btn {
     box-shadow: var(--shadow-lg);
 }
 
-
-
-/* Status Modal Centering and Styling */
-.status-modal .modal-content,
-.status-modal .status-modal-content {
-    max-width: 500px;
-    width: 90%;
-    margin: auto;
-    background: var(--bg-white);
-    border-radius: var(--radius-xl);
-    box-shadow: var(--shadow-xl);
-    padding: 0;
-    overflow: hidden;
-}
 
 .status-modal {
     display: flex;
