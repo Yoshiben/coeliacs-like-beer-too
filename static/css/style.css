@@ -449,11 +449,11 @@ html {
 
 /* Tagline */
 .nav-tagline {
-    color: rgba(255, 255, 255, 0.9);
-    font-size: var(--text-sm);
-    font-weight: 400;
-    letter-spacing: 0.5px;
-    display: none; /* Hidden by default */
+   background: var(--primary-gradient);
+   color: rgba(255, 255, 255, 0.9);
+   font-size: var(--text-sm);
+   font-weight: 400;
+   letter-spacing: 0.5px;
 }
 
 /* Toggle */
