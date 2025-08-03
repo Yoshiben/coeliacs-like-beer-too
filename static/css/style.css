@@ -559,7 +559,7 @@ body.page-pub .nav-notification-btn {
    display: flex;
    justify-content: center;
    gap: var(--space-xl);
-   padding: var(--space-md);
+   padding: var(--space-xs);
    background: var(--white);
    border-bottom: 1px solid var(--border-light);
    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.06);
@@ -569,13 +569,13 @@ body.page-pub .nav-notification-btn {
 
 .stat-pill {
     text-align: center;
-    padding: var(--space-sm) var(--space-lg);
+    padding: var(--space-xs) var(--space-xs);
     border-radius: var(--radius-pill);
-    background: var(--bg-section);
+    background: var(--bg-home);
 }
 
 .stat-pill.highlighted {
-    background: var(--purple-gradient);
+    background: var(--primary-gradient);
     color: var(--white);
 }
 
