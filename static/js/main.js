@@ -705,15 +705,25 @@ const App = {
                 menu.classList.toggle('active');
             }
         },
-        // In actionHandlers:
         'about-us': (el, modules) => {
-            e.preventDefault();
-            // Use overlay approach
-            modules.modalManager?.open('aboutModal') || modules.modal?.open('aboutModal');
+            if (modules.modalManager) {
+                modules.modalManager.open('aboutOverlay');
+            }
         },
         'about-gf': (el, modules) => {
-            e.preventDefault();
-            modules.modalManager?.open('gfInfoModal') || modules.modal?.open('gfInfoModal');
+            if (modules.modalManager) {
+                modules.modalManager.open('gfInfoOverlay');
+            }
+        },
+        'close-about': (el, modules) => {
+            if (modules.modalManager) {
+                modules.modalManager.close('aboutOverlay');
+            }
+        },
+        'close-gf-info': (el, modules) => {
+            if (modules.modalManager) {
+                modules.modalManager.close('gfInfoOverlay');
+            }
         },
         // For privacy, terms etc that have separate pages:
         'privacy-policy': (el, modules) => {
