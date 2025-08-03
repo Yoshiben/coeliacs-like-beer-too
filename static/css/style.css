@@ -4198,11 +4198,3 @@ body.page-pub .nav-notification-btn {
     color: var(--purple-border);
     font-weight: bold;
 }
-
-/* Debug helper - temporarily add this to see what's causing the gap */
-.top-nav::after {
-    content: '';
-    display: block; /* Change to 'block' to see if there's a pseudo-element */
-    background: red;
-    height: 1px;
-}
