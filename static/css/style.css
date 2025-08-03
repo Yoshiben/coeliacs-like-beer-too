@@ -346,6 +346,10 @@ html {
    justify-content: center;    /* Horizontal center */
 }
 
+.modal-body {
+   display:none;
+}
+
 .modal-header {
    display: none;
    align-items: center;
