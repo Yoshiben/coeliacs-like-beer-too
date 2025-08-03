@@ -288,10 +288,6 @@
                     </a>
                 </div>
             </div>
-<!--             <a href="/more" class="nav-item">
-                <div class="nav-icon">⋯</div>
-                <div class="nav-label">More</div>
-            </a> -->
         </nav>   
 
         <!-- Search Options Overlay -->
@@ -304,6 +300,7 @@
                     </div>
                     <div class="search-body">
                         <div class="search-options">
+                            
                             <!-- Location Search -->
                             <div class="search-option location" data-action="location-search">
                                 <span class="search-icon">📍</span>
@@ -432,7 +429,7 @@
             </div>
         </div>
 
-        <!-- Map Overlay - Simplified -->
+        <!-- Map Overlay -->
         <div id="fullMapOverlay" class="overlay map-overlay">
             <div class="map-overlay-content">
                 <div id="fullMap" class="full-map"></div>
@@ -449,13 +446,12 @@
                 
                 <div class="breweries-content">
                     <div class="breweries-grid" id="breweriesGrid">
-                        <!-- Will be populated by JS -->
                     </div>
                 </div>
             </div>
         </div>
     
-        <!-- Results Overlay - Simplified -->
+        <!-- Results Overlay -->
         <div id="resultsOverlay" class="overlay results-overlay">
             <div class="results-container">
                 <div class="results-content">
@@ -761,50 +757,46 @@
             </div>
         </div>
 
-        <!-- Info Modals -->
-        <div id="aboutModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 class="modal-title">ℹ️ About Coeliacs Like Beer Too</h2>
-                    <button class="modal-close" aria-label="Close about modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="about-content">
-                        <div class="about-section">
+        <!-- About Overlay -->
+        <div id="aboutOverlay" class="overlay info-overlay">
+            <div class="info-container">
+                <div class="info-card">
+                    <div class="info-header">
+                        <h1 class="info-title">ℹ️ About Coeliacs Like Beer Too</h1>
+                        <button class="info-close" data-action="close-about" aria-label="Close">×</button>
+                    </div>
+                    <div class="info-content">
+                        <div class="info-section">
                             <h3>🍺 Our Mission</h3>
                             <p>We believe that being coeliac shouldn't mean missing out on great beer experiences. Our mission is to create the UK's most comprehensive, community-driven guide to gluten free beer options across the country.</p>
                         </div>
-                        <div class="about-section">
+                        <div class="info-section">
                             <h3>👥 Our Story</h3>
                             <p>Started by coeliacs, for coeliacs. We understand the frustration of walking into a pub and not knowing if they have any safe options. That's why we built this platform - to help our community find amazing gluten free beer wherever they are in the UK.</p>
                         </div>
-                        <div class="about-section">
+                        <div class="info-section">
                             <h3>🤝 Community Driven</h3>
                             <p>Every beer report, every pub update, every photo comes from real people in the coeliac community. Together, we're building something that helps everyone discover new places and feel confident about their choices.</p>
                         </div>
-                        <div class="about-section">
+                        <div class="info-section">
                             <h3>📈 Growing Together</h3>
                             <p>With thousands of pubs in our database and growing reports every day, we're becoming the go-to resource for gluten free beer discovery. Join us in making the UK more accessible for coeliacs!</p>
-                        </div>
-                        <div class="contact-info">
-                            <h3>💬 Get in Touch</h3>
-                            <p>Questions, suggestions, or partnership opportunities? We'd love to hear from you!</p>
-                            <button data-action="coming-soon" data-feature="Contact Form" class="btn btn-primary">Contact Us</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
         
-        <div id="gfInfoModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2 class="modal-title">🔬 What is Gluten Free Beer?</h2>
-                    <button data-action="close-modal" aria-label="Close GF info modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="gf-content">
-                        <div class="gf-section">
+        <!-- GF Info Overlay -->
+        <div id="gfInfoOverlay" class="overlay info-overlay">
+            <div class="info-container">
+                <div class="info-card">
+                    <div class="info-header">
+                        <h1 class="info-title">🔬 What is Gluten Free Beer?</h1>
+                        <button class="info-close" data-action="close-gf-info" aria-label="Close">×</button>
+                    </div>
+                    <div class="info-content">
+                        <div class="info-section">
                             <h3>🧪 Official Standards</h3>
                             <div class="standards-grid">
                                 <div class="standard-item">
@@ -821,34 +813,29 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="gf-section">
+                        <div class="info-section">
                             <h3>🏷️ Types of GF Beer</h3>
-                            <div class="beer-types">
-                                <div class="beer-type-item">
-                                    <strong>✅ Certified Gluten Free</strong>
-                                    <p>Made from naturally gluten free grains (rice, sorghum, millet). Safest option.</p>
-                                </div>
-                                <div class="beer-type-item">
-                                    <strong>⚗️ Gluten Removed/Reduced</strong>
-                                    <p>Made from barley/wheat but treated with enzymes to break down gluten. Some coeliacs react.</p>
-                                </div>
-                                <div class="beer-type-item">
-                                    <strong>🌾 "Made Without Gluten"</strong>
-                                    <p>No gluten ingredients added, but may have cross-contamination. Check carefully!</p>
-                                </div>
+                            <div class="beer-type-item">
+                                <strong>✅ Certified Gluten Free</strong>
+                                <p>Made from naturally gluten free grains (rice, sorghum, millet). Safest option.</p>
+                            </div>
+                            <div class="beer-type-item">
+                                <strong>⚗️ Gluten Removed/Reduced</strong>
+                                <p>Made from barley/wheat but treated with enzymes to break down gluten. Some coeliacs react.</p>
+                            </div>
+                            <div class="beer-type-item">
+                                <strong>🌾 "Made Without Gluten"</strong>
+                                <p>No gluten ingredients added, but may have cross-contamination. Check carefully!</p>
                             </div>
                         </div>
-                        <div class="gf-section">
+                        <div class="info-section">
                             <h3>⚠️ Important Notes</h3>
                             <ul class="safety-notes">
                                 <li><strong>Cross-contamination</strong> can happen in breweries that also make regular beer</li>
                                 <li><strong>Always check labels</strong> and ask staff about preparation methods</li>
-                                <li><strong>Coeliacs vs Gluten Intolerant</strong> - Coeliac disease is an autoimmune condition requiring strict gluten avoidance, while gluten intolerance is a separate digestive sensitivity</li>
+                                <li><strong>Coeliacs vs Gluten Intolerant</strong> - Coeliac disease is an autoimmune condition requiring strict gluten avoidance</li>
                                 <li><strong>When in doubt</strong>, choose certified gluten free options</li>
                             </ul>
-                        </div>
-                        <div class="disclaimer">
-                            <p><strong>Disclaimer:</strong> This information is for guidance only. Always consult with healthcare professionals and verify product safety for your individual needs.</p>
                         </div>
                     </div>
                 </div>
@@ -1187,5 +1174,6 @@
         </script>
     </body>
 </html>
+
 
 
