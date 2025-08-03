@@ -559,7 +559,7 @@ body.page-pub .nav-notification-btn {
    display: flex;
    justify-content: center;
    gap: var(--space-md);
-   /*     padding: var(--space-lg); */
+       padding: var(--space-lg);
    background: var(--white);
    border-bottom: 1px solid var(--border-light);
    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.06);
