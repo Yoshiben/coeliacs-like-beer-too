@@ -262,6 +262,10 @@ html {
    padding: var(--space-xl);
 }
 
+.modal-title {
+   margin: 0;
+}
+
 .modal-close {
    position: absolute;
    right: var(--space-lg);
@@ -2568,19 +2572,6 @@ body.page-pub .nav-notification-btn {
    z-index: var(--z-modal-backdrop);
 }
 
-.report-modal .modal-content {
-    background: var(--bg-white);
-    border-radius: var(--radius-xl);
-    max-width: 500px;
-    width: 100%;
-    max-height: 90vh;
-    max-height: 90dvh;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    box-shadow: var(--shadow-xl);
-}
-
 .report-modal .modal-title {
    font-weight: 600;
    color: var(--text-primary);
@@ -3727,23 +3718,6 @@ body.page-pub .nav-notification-btn {
     justify-content: center;
     padding: var(--space-lg);
 }
-
-
-.status-modal .modal-header h2 {
-    margin: 0;
-    font-size: var(--text-2xl);
-}
-
-/* .status-modal .modal-close {
-    position: absolute;
-    right: var(--space-lg);
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-} */
 
 /* Modal Body */
 .status-modal .modal-body {
