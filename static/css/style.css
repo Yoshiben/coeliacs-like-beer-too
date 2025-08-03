@@ -472,11 +472,6 @@ html {
 }
 
 
-
-
-
-
-
 /* ================================
    NAV VISIBILITY RULES - UPDATED
    ================================ */
@@ -535,16 +530,6 @@ body.page-pub .nav-notification-btn {
     -webkit-overflow-scrolling: touch;
     background: #F8F9FA;
 }
-
-/* .nav-tagline {
-   background: var(--primary-gradient);
-   color: rgba(255, 255, 255, 0.9);
-   font-size: var(--text-sm);
-   font-weight: 400;
-   letter-spacing: 0.5px;
-   display: flex;
-   flex: 1;
-} */
 
 /* Compact Hero */
 .hero-nav {
@@ -4209,4 +4194,12 @@ body.page-pub .nav-notification-btn {
     left: var(--space-sm);
     color: var(--purple-border);
     font-weight: bold;
+}
+
+/* Debug helper - temporarily add this to see what's causing the gap */
+.top-nav::after {
+    content: '';
+    display: block; /* Change to 'block' to see if there's a pseudo-element */
+    background: red;
+    height: 1px;
 }
