@@ -257,6 +257,7 @@ html {
    align-items: center;
    background: var(--primary-gradient);
    text-align: center;
+   position: relative;
 }
 
 .modal-close {
