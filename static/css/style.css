@@ -338,7 +338,9 @@ html {
 }
 
 .modal {
-   display:none;
+   display: none;
+   height: 100%;
+   margin: auto;
 }
 
 
