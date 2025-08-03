@@ -58,6 +58,7 @@
    --bg-glass: rgba(255, 255, 255, 0.1);
    --bg-section: rgba(248, 250, 252, 0.8);
    --bg-overlay: rgba(0, 0, 0, 0.8);
+   --bg-home: rgba(248, 249, 250, 1);
    
    /* Button System */
    --btn-height: 44px;
@@ -305,8 +306,8 @@ body {
    width: 100%;
    display: flex;
    flex-direction: column;
-   padding-bottom: 8vh;
-   padding-top: 8vh;
+/*    padding-bottom: 8vh;
+   padding-top: 8vh; */
 }
 
 .home-page {
@@ -523,12 +524,14 @@ body.page-pub .nav-notification-btn {
 
 /* Community Home Container */
 .community-home {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    background: #F8F9FA;
+   flex: 1;
+   display: flex;
+   flex-direction: column;
+   overflow-y: auto;
+   -webkit-overflow-scrolling: touch;
+   background: var(--bg-home);
+   padding-bottom: 8vh;
+   padding-top: 8vh;
 }
 
 /* Compact Hero */
