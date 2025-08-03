@@ -128,7 +128,7 @@ export const ModalManager = (() => {
         }
         
         // Hide community home for main overlays
-        if (['resultsOverlay', 'pubDetailsOverlay', 'fullMapOverlay'].includes(overlayId)) {
+        if (['resultsOverlay', 'pubDetailsOverlay', 'fullMapOverlay', 'searchOverlay'].includes(overlayId)) {
             const communityHome = document.querySelector('.community-home');
             if (communityHome) {
                 communityHome.style.display = 'none';
@@ -138,6 +138,11 @@ export const ModalManager = (() => {
         // Show overlay
         overlay.style.display = 'flex';
         overlay.classList.add('active');
+        
+        // Ensure proper z-index based on overlay type
+        if (overlayId === 'pubDetailsOverlay') {
+            overlay.style.zIndex = getComputedStyle(document.documentElement).getPropertyValue('--z-pub-details');
+        }
         
         // Add to stack
         state.overlayStack.push(overlayId);
@@ -152,6 +157,7 @@ export const ModalManager = (() => {
         if (options.onOpen) options.onOpen();
         
         return true;
+    };
     };
     
     const closeOverlay = (overlayId) => {
