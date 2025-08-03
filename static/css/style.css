@@ -586,9 +586,10 @@ body.page-pub .nav-notification-btn {
 }
 
 .stat-label-small {
-    display: block;
-    font-size: var(--text-xs);
-    opacity: 0.8;
+   display: block;
+   font-size: var(--text-xs);
+   opacity: 0.8;
+   padding: var(--space-xs);
 }
 
 /* Near Me Button */
