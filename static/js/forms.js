@@ -631,16 +631,29 @@ export const FormModule = (() => {
     const GFStatusFlow = {
         currentPub: null,
         selectedStatus: null,
+        initialized: false, 
+
+        init() {
+            // Only initialize once
+            if (this.initialized) return;
+            this.initialized = true;
+            console.log('✅ GFStatusFlow initialized');
+        },
         
         openStatusModal() {
             console.log('🔍 Opening GF status modal');
+            
+            // IMPORTANT: Get fresh pub data when button is clicked
             this.currentPub = utils.getCurrentPub();
             
-            if (!this.currentPub) {
+            if (!this.currentPub || !this.currentPub.pub_id) {
                 console.error('❌ No current pub data');
                 utils.showToast('❌ No pub selected', 'error');
                 return;
             }
+            
+            // Reset selected status
+            this.selectedStatus = null;
             
             // Set pub name in modal
             const pubNameEl = document.getElementById('statusPubName');
@@ -652,7 +665,12 @@ export const FormModule = (() => {
             if (modules.modalManager) {
                 modules.modalManager.open('gfStatusModal');
             } else {
-                modules.modal.open('gfStatusModal');
+                const modal = document.getElementById('gfStatusModal');
+                if (modal) {
+                    modal.style.display = 'flex';
+                    modal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
             }
         },
         
@@ -690,27 +708,40 @@ export const FormModule = (() => {
             }, 100);
         },
         
+        // ================================
+        // FIX FOR GF STATUS UPDATE - REPLACE the confirmStatusUpdate function in forms.js (around line 685)
+        // ================================
+        
         async confirmStatusUpdate() {
             console.log('🔍 Confirming status update');
             
+            // Get the current pub data properly
             const pubToUpdate = this.currentPub || utils.getCurrentPub();
+            
             if (!pubToUpdate || !pubToUpdate.pub_id) {
-                console.error('❌ No pub data available');
+                console.error('❌ No pub data available:', pubToUpdate);
                 utils.showToast('❌ Error: No pub selected', 'error');
                 return;
             }
             
             if (!this.selectedStatus) {
                 console.error('❌ No status selected');
+                utils.showToast('❌ Please select a status', 'error');
                 return;
             }
             
-            // Close modals using modalManager
+            // Log what we're sending
+            console.log('📤 Sending update:', {
+                pub_id: pubToUpdate.pub_id,
+                status: this.selectedStatus
+            });
+            
+            // Close modals first
             if (modules.modalManager) {
-                modules.modalManager.closeGroup('status'); // Close all status modals
+                modules.modalManager.closeGroup('status');
             } else {
-                modules.modal.close('gfStatusConfirmModal');
-                modules.modal.close('gfStatusModal');
+                modules.modal?.close('gfStatusConfirmModal');
+                modules.modal?.close('gfStatusModal');
             }
             
             // Show loading
@@ -719,37 +750,41 @@ export const FormModule = (() => {
             try {
                 const response = await fetch('/api/update-gf-status', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
                     body: JSON.stringify({
-                        pub_id: pubToUpdate.pub_id,
+                        pub_id: parseInt(pubToUpdate.pub_id), // Ensure it's a number
                         status: this.selectedStatus
                     })
                 });
                 
+                // Log response for debugging
+                console.log('📥 Response status:', response.status);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('❌ Server error:', errorText);
+                    throw new Error(`Server error: ${response.status}`);
+                }
+                
+                const result = await response.json();
                 utils.hideLoadingToast();
                 
-                if (response.ok) {
-                    this.updateStatusDisplay(this.selectedStatus);
-                    
-                    // Show appropriate follow-up
-                    if (this.selectedStatus === 'always' || this.selectedStatus === 'currently') {
-                        if (modules.modalManager) {
-                            modules.modalManager.open('beerDetailsPromptModal');
-                        } else {
-                            modules.modal.open('beerDetailsPromptModal');
-                        }
-                    } else {
-                        utils.showToast('✅ Status updated successfully!');
-                    }
-                    
-                    modules.tracking?.trackEvent('gf_status_updated', 'Form', this.selectedStatus);
-                } else {
-                    throw new Error('Failed to update status');
-                }
+                // Update the display
+                this.updateStatusDisplay(this.selectedStatus);
+                
+                // Show success
+                utils.showToast('✅ Status updated successfully!');
+                
+                // Track event
+                modules.tracking?.trackEvent('gf_status_updated', 'Form', this.selectedStatus);
+                
             } catch (error) {
-                console.error('Error updating status:', error);
+                console.error('❌ Error updating status:', error);
                 utils.hideLoadingToast();
-                utils.showToast('❌ Failed to update status', 'error');
+                utils.showToast('❌ Failed to update status. Please try again.', 'error');
             }
         },
         
