@@ -248,12 +248,27 @@ html {
     justify-content: center;
 }
 
+.modal-content {
+   max-height: 82vh;
+   max-width: 500px;
+}
+
 .modal-header {
    align-items: center;
    background: var(--primary-gradient);
    text-align: center;
 }
 
+.modal-close {
+   position: absolute;
+   right: var(--space-lg);
+   top: 50%;
+   transform: translateY(-50%);
+   background: rgba(255, 255, 255, 0.2);
+   border-radius: 50%;
+   width: 40px;
+   height: 40px;
+}
 
 
 
@@ -377,13 +392,6 @@ html {
    border-radius: var(--radius-xl);
    padding: var(--space-sm) var(--space-3xl);
 }
-
-.report-modal .modal-header {
-   padding: var(--space-lg) var(--space-xl) var(--space-md);
-   border-bottom: 1px solid var(--border-light);
-   flex-shrink: 0;
-}
-
 
 /* ================================
    GROUP - HOME PAGE
@@ -1981,42 +1989,7 @@ body.page-pub .nav-notification-btn {
 
 
 
-
-
-
-
-/* ================================
-   GENERIC MODAL ATTRIBUTES
-   ================================ */
-
-/* .modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: var(--bg-overlay);
-    display: none;
-    z-index: var(--z-modal-backdrop);
-    backdrop-filter: blur(5px);
-    padding: 8px;
-    overflow-y: auto;
-}
-
-.modal-close {
-    width: 44px;
-    height: 44px;
-    border: none;
-    background: none;
-    font-size: var(--text-2xl);
-    color: var(--text-muted);
-    cursor: pointer;
-    border-radius: 50%;
-    transition: all var(--transition);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+/*
 
 .modal-close:hover {
     background: var(--white);
@@ -2621,7 +2594,7 @@ body.page-pub .nav-notification-btn {
    margin-top: 2px;
 }
 
-.report-modal .modal-close {
+/* .report-modal .modal-close {
    width: 32px;
    height: 32px;
    border: none;
@@ -2635,7 +2608,7 @@ body.page-pub .nav-notification-btn {
    justify-content: center;
    padding: 0;
    margin: 0;
-}
+} */
 
 /* Modal Body */
 .report-modal .modal-body {
@@ -3766,7 +3739,7 @@ body.page-pub .nav-notification-btn {
     font-size: var(--text-2xl);
 }
 
-.status-modal .modal-close {
+/* .status-modal .modal-close {
     position: absolute;
     right: var(--space-lg);
     top: 50%;
@@ -3775,7 +3748,7 @@ body.page-pub .nav-notification-btn {
     border-radius: 50%;
     width: 40px;
     height: 40px;
-}
+} */
 
 /* Modal Body */
 .status-modal .modal-body {
