@@ -162,7 +162,6 @@ export const ModalManager = (() => {
         
         return true;
     };
-    };
     
     const closeOverlay = (overlayId) => {
         const overlay = document.getElementById(overlayId);
