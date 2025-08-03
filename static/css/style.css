@@ -4012,3 +4012,76 @@ body.page-pub .nav-notification-btn {
    background: var(--my-location-fill);
    border-color: var(--white);
 }
+
+/* Improved back button styles */
+.nav-back-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: var(--white);
+    padding: calc(var(--space-sm) * 0.75) var(--space-md);
+    border-radius: var(--radius-pill);
+    font-weight: 500;
+    font-size: calc(var(--text-sm) * 0.9);
+    cursor: pointer;
+    transition: all var(--transition);
+    display: none;
+    backdrop-filter: blur(10px);
+    min-height: auto;
+    height: auto;
+}
+
+.nav-back-btn:hover {
+    background: rgba(255, 255, 255, 0.25);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateX(-2px);
+}
+
+/* Smaller, more aesthetic toggle */
+.nav-toggle .toggle-container {
+    border-radius: calc(var(--radius-pill) * 0.8);
+    border: 1.5px solid rgba(255, 255, 255, 0.3);
+    padding: 2px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.nav-toggle .toggle-option {
+    padding: 5px 12px;
+    font-size: calc(var(--text-xs) * 1.1);
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.nav-toggle .toggle-thumb {
+    border-radius: calc(var(--radius-pill) * 0.7);
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Add close button to search overlay */
+.search-overlay .search-card {
+    position: relative;
+}
+
+.search-overlay-close {
+    position: absolute;
+    top: var(--space-md);
+    right: var(--space-md);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.1);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition);
+    font-size: var(--text-xl);
+    color: var(--text-secondary);
+}
+
+.search-overlay-close:hover {
+    background: rgba(0, 0, 0, 0.2);
+    transform: scale(1.1);
+}
