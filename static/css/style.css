@@ -258,6 +258,8 @@ html {
    background: var(--primary-gradient);
    text-align: center;
    position: relative;
+   color: var(--white);
+   padding: var(--space-xl);
 }
 
 .modal-close {
@@ -3726,14 +3728,6 @@ body.page-pub .nav-notification-btn {
     padding: var(--space-lg);
 }
 
-/* Modal Header */
-.status-modal .modal-header {
-    background: var(--primary-gradient);
-    color: var(--white);
-    padding: var(--space-xl);
-    text-align: center;
-    position: relative;
-}
 
 .status-modal .modal-header h2 {
     margin: 0;
