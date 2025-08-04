@@ -301,6 +301,45 @@ html {
 }
 
 
+/* ============
+   FORMS
+   ============ */
+
+
+.form-input {
+   border: 2px solid var(--border-light);
+   border-radius: var(--radius-xl);
+   font-size: var(--text-md);
+   margin: var(--space-xl) 0;
+   transition: border-color 0.25s ease;
+   overflow: hidden;
+   padding: var(--space-xl);
+}
+
+form-input:focus {
+   outline: none;
+   border-color: var(--light-blue);
+   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-select {
+   padding: var(--space-xs);
+}
+
+.report-modal .form-input,
+.report-modal .form-select {
+   font-size: 14px;
+   padding: var(--space-sm) var(--space-sm);
+   border: var(--border-light);
+   border-radius: var(--radius);
+   transition: all var(--transition);
+}
+
+
+
+
+
+
 
 
 
@@ -2081,24 +2120,6 @@ body.page-pub .nav-notification-btn {
    box-sizing: border-box;
 }
 
-.search-modal .form-input {
-   width: 100%;
-   border: 2px solid rgba(0, 0, 0, 0.1);
-   border-radius: var(--radius-lg);
-   font-size: var(--text-md);
-   margin: var(--space-xl) 0;
-   transition: border-color 0.25s ease;
-   overflow: hidden;
-   padding: var(--space-md);
-   box-sizing: border-box;
-}
-
-.search-modal .form-input:focus {
-   outline: none;
-   border-color: var(--light-blue);
-   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
 .search-modal .form-label {
    font-weight: 600;
    color: var(--text-secondary);
@@ -2580,19 +2601,6 @@ body.page-pub .nav-notification-btn {
    font-weight: 600;
    color: var(--text-secondary);
    display: block;
-}
-
-.report-modal .form-input,
-.report-modal .form-select {
-   width: 100%;
-   font-size: 14px;
-   padding: var(--space-sm) var(--space-sm);
-   border: var(--border-light);
-   border-radius: var(--radius);
-   transition: all var(--transition);
-   -webkit-appearance: none;
-   appearance: none;
-   font-family: -apple-system, system-ui, sans-serif;
 }
 
 .report-modamodal .form-input:focus,
