@@ -249,7 +249,7 @@ html {
 }
 
 .modal-content {
-   max-height: 820vh;
+   max-height: 80vh;
    max-width: 400px;
    padding: 0;
    display: flex;
@@ -2054,10 +2054,7 @@ body.page-pub .nav-notification-btn {
    background: var(--bg-white);
    border-radius: var(--radius-xl);
    padding: var(--space-xs) var(--space-xl) var(--space-xl);
-   max-width: 400px;
-   width: 100%;
    box-shadow: var(--shadow-lg);
-   z-index: var(--z-modal-content);
 }
 
 .search-modal .form-select {
@@ -2529,16 +2526,9 @@ body.page-pub .nav-notification-btn {
 
 .confirm-modal .modal-content {
    background: var(--bg-white);
-   border-radius: var(--radius-xl);
    padding: var(--space-xs) var(--space-xl) var(--space-xl);
-   max-width: 500px;
-   width: 100%;
    box-shadow: var(--shadow-xl);
-   z-index: var(--z-modal-content);
-   max-height: 92vh;
-   display: flex;
-   flex-direction: column;
-   overflow: hidden;   
+   z-index: var(--z-modal-content);   
    padding: 0;
 }
 
