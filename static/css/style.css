@@ -3959,29 +3959,6 @@ body.page-pub .nav-notification-btn {
     position: relative;
 }
 
-.search-overlay-close {
-    position: absolute;
-    top: var(--space-md);
-    right: var(--space-md);
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: rgba(0, 0, 0, 0.1);
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all var(--transition);
-    font-size: var(--text-xl);
-    color: var(--text-secondary);
-}
-
-.search-overlay-close:hover {
-    background: rgba(0, 0, 0, 0.2);
-    transform: scale(1.1);
-}
-
 /* Info Overlay Styles */
 .info-overlay {
     position: fixed;
