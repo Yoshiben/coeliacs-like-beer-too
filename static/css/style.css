@@ -249,7 +249,8 @@ html {
 
 .modal-content {
    max-height: 80vh;
-   max-width: 400px;
+   max-width: 90vh;
+   width: 100%;
    padding: 0;
    display: flex;
    flex-direction: column;
@@ -261,26 +262,18 @@ html {
    box-shadow: var(--shadow-xl);
 }
 
-.search-modal .modal-content {
-   padding: var(--space-xs) var(--space-xl) var(--space-xl);
-}
-
-.confirm-modal .modal-content {
-   padding: var(--space-xs) var(--space-xl) var(--space-xl);
-}
-
-
-
 .modal-header {
    align-items: center;
    background: var(--primary-gradient);
+   border-radius: var(--radius-xl);
    text-align: center;
    position: relative;
    color: var(--white);
-   padding: var(--space-xl);
+   padding: var(--space-lg);
 }
 
 .modal-title {
+   color: var(--white);
    margin: 0;
 }
 
