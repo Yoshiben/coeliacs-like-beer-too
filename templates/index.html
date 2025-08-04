@@ -631,7 +631,7 @@
                         <div id="placesResults" class="places-results"></div>
                     </div>
                     <div class="search-powered-by"><small>Powered by OpenStreetMap</small></div>
-                    <div id="selectedPlacePreview" class="selected-place-preview" style="display: none;">
+                    <div id="selectedPlacePreview" class="selected-place-preview">
                         <h4>Selected Venue:</h4>
                         <div class="place-details">
                             <strong id="selectedPlaceName"></strong>
@@ -644,14 +644,14 @@
             </div>
         </div>
 
-        <div id="pubAddedPromptModal" class="modal prompt-modal" style="display: none;">
+        <div id="pubAddedPromptModal" class="modal prompt-modal">
             <div class="modal-content">
-                <div class="modal-body" style="text-align: center;">
-                    <div class="success-icon" style="font-size: 4rem; margin-bottom: 20px;">🎉</div>
+                <div class="modal-body">
+                    <div class="success-icon"</div>
                     <h3 style="margin-bottom: 10px;">Pub Added Successfully!</h3>
                     <p style="margin-bottom: 20px;"><strong id="addedPubName"></strong> has been added to our database.</p>
                     <p style="margin-bottom: 30px;">What would you like to do next?</p>
-                    <div class="modal-actions" style="display: flex; flex-direction: column; gap: 12px;">
+                    <div class="modal-actions status-modal-action">
                         <button class="btn btn-primary" data-action="update-gf-status-new-pub">📊 Update GF Beer Status</button>
                         <button class="btn btn-success" data-action="report-gf-beer-new-pub">🍺 Report GF Beer Available</button>
                         <button class="btn btn-secondary" data-action="close-pub-added-modal">✅ Done For Now</button>
@@ -668,7 +668,6 @@
                     <button class="modal-close" data-action="close-modal">&times;</button>
                 </div>
                 <div class="modal-body">
-                    <p class="status-prompt">Select the current GF beer situation at <strong id="statusPubName">this pub</strong>:</p>
                     <div class="status-options">
                         <button class="status-option always-tap-cask" data-status="always_tap_cask">
                             <div class="option-icon">⭐</div>
@@ -1160,3 +1159,4 @@
         </script>
     </body>
 </html>
+
