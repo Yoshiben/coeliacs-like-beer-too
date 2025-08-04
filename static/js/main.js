@@ -977,6 +977,39 @@ const initializeApp = () => {
 // Start initialization
 initializeApp();
 
+// ADD DEBUG CODE HERE - TEMPORARY
+window.addEventListener('load', () => {
+    console.log('🐛 Debug: Setting up modal tracking...');
+    
+    window.debugModalOpen = true;
+    
+    // Override the modal open functions
+    if (window.App?.modules?.modal?.open) {
+        const originalModalOpen = window.App.modules.modal.open;
+        window.App.modules.modal.open = function(modalId, ...args) {
+            console.trace('🔴 Modal.open called:', modalId);
+            return originalModalOpen.call(this, modalId, ...args);
+        };
+    }
+    
+    if (window.App?.modules?.modalManager?.open) {
+        const originalManagerOpen = window.App.modules.modalManager.open;
+        window.App.modules.modalManager.open = function(modalId, ...args) {
+            console.trace('🔵 ModalManager.open called:', modalId);
+            return originalManagerOpen.call(this, modalId, ...args);
+        };
+    }
+    
+    // Log all click events
+    document.addEventListener('click', (e) => {
+        if (window.debugModalOpen && e.target.closest('[data-action]')) {
+            console.log('🟡 Click action:', e.target.closest('[data-action]').dataset.action);
+        }
+    }, true);
+    
+    console.log('🐛 Debug: Modal tracking ready!');
+});
+
 // Export for global access
 window.CoeliacsApp = App;
 window.App = App;
