@@ -310,7 +310,7 @@ html {
    border: 2px solid var(--border-light);
    border-radius: var(--radius-xl);
    font-size: var(--text-md);
-   margin: var(--space-xl) 0;
+   margin: var(--space-xl);
    transition: border-color 0.25s ease;
    overflow: hidden;
    padding: var(--space-xl);
