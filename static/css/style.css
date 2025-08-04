@@ -4119,3 +4119,7 @@ body.page-pub .nav-notification-btn {
     color: var(--purple-border);
     font-weight: bold;
 }
+
+.active {
+    outline: 3px solid red !important;
+}
