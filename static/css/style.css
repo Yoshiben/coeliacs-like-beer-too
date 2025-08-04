@@ -230,6 +230,12 @@ html {
    flex-direction: column;
 }
 
+
+/* ============
+   MODALS
+   ============ */
+
+
 .modal {
    display:none;
    position: fixed;
@@ -267,7 +273,7 @@ html {
 .modal-header {
    align-items: center;
    background: var(--primary-gradient);
-   border-radius: var(--radius-xl);
+/*    border-radius: var(--radius-xl); */
    text-align: center;
    position: relative;
    color: var(--white);
@@ -2546,20 +2552,11 @@ body.page-pub .nav-notification-btn {
    z-index: var(--z-modal-backdrop);
 }
 
-.report-modal .modal-title {
-   font-weight: 600;
-   color: var(--text-primary);
-   font-size: var(--text-xl);
-   line-height: 1.2;
-   flex: 1;
-}
 
 .report-modal .modal-title small {
    display: block;
    font-weight: 400;
-   color: var(--text-secondary);
    font-size: var(--text-md);
-   margin-top: 2px;
 }
 
 /* Modal Body */
@@ -3124,13 +3121,6 @@ body.page-pub .nav-notification-btn {
     overflow-y: auto;
 }
 
-
-.report-modal .modal-title {
-    font-weight: 700;
-    color: var(--text-primary);
-    font-size: var(--text-xl);
-    line-height: 1.2;
-}
 
 /* Form Groups */
 .report-modal .form-group {
