@@ -241,9 +241,8 @@ html {
    background: var(--modal-backdrop);
 }
 
-.modal.active,
-.modal[style*="display: flex"] {
-    display: flex !important;
+.modal.active {
+    display: flex;
     align-items: center;
     justify-content: center;
 }
@@ -258,7 +257,19 @@ html {
    width: 100%;
    border-radius: var(--radius-xl);
    z-index: var(--z-modal-content);
+   background: var(--bg-white);
+   box-shadow: var(--shadow-xl);
 }
+
+.search-modal .modal-content {
+   padding: var(--space-xs) var(--space-xl) var(--space-xl);
+}
+
+.confirm-modal .modal-content {
+   padding: var(--space-xs) var(--space-xl) var(--space-xl);
+}
+
+
 
 .modal-header {
    align-items: center;
@@ -307,6 +318,7 @@ html {
 #areaModal,
 #beerModal,
 #reportModal,
+#gfStatusModal,
 #cookieConsent,
 #cookieSettings,
 #cookieSettingsFloat,
@@ -2050,12 +2062,7 @@ body.page-pub .nav-notification-btn {
    overflow: hidden;
 }
 
-.search-modal .modal-content {
-   background: var(--bg-white);
-   border-radius: var(--radius-xl);
-   padding: var(--space-xs) var(--space-xl) var(--space-xl);
-   box-shadow: var(--shadow-lg);
-}
+
 
 .search-modal .form-select {
    width: 100%;
@@ -2435,11 +2442,6 @@ body.page-pub .nav-notification-btn {
 /* ================================
    STATUS MODAL SYSTEM - CONSOLIDATED
    ================================ */
-.status-modal .modal-content {
-   background: var(--bg-white);
-   width: 100%;
-   box-shadow: var(--shadow-xl);
-}
 
 .status-prompt {
    text-align: center;
@@ -2524,13 +2526,7 @@ body.page-pub .nav-notification-btn {
    font-weight: 700;
 }
 
-.confirm-modal .modal-content {
-   background: var(--bg-white);
-   padding: var(--space-xs) var(--space-xl) var(--space-xl);
-   box-shadow: var(--shadow-xl);
-   z-index: var(--z-modal-content);   
-   padding: 0;
-}
+
 
 
 
@@ -2571,22 +2567,6 @@ body.page-pub .nav-notification-btn {
    margin-top: 2px;
 }
 
-/* .report-modal .modal-close {
-   width: 32px;
-   height: 32px;
-   border: none;
-   background: none;
-   font-size: var(--text-2xl);
-   color: var(--text-muted);
-   cursor: pointer;
-   border-radius: 50%;
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   padding: 0;
-   margin: 0;
-} */
-
 /* Modal Body */
 .report-modal .modal-body {
    flex: 1;
@@ -2594,11 +2574,6 @@ body.page-pub .nav-notification-btn {
    overflow-y: auto;
    -webkit-overflow-scrolling: touch;
 }
-
-
-
-
-
 
 /* Form Groups */
 .report-modal .form-group {
@@ -2608,7 +2583,6 @@ body.page-pub .nav-notification-btn {
 .report-modal .form-label {
    font-weight: 600;
    color: var(--text-secondary);
-/*    margin-bottom: var(--space-sm); -- add to make brewery, beer etc have more room on form */
    display: block;
 }
 
