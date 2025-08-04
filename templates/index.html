@@ -453,9 +453,9 @@
                             <div class="loading-text">Finding nearby GF beer...</div>
                         </div>
                         
-                        <div class="results-list" id="resultsList" style="display: none;"></div>
+                        <div class="results-list" id="resultsList"></div>
                         
-                        <div class="no-results-found" id="noResultsFound" style="display: none;">
+                        <div class="no-results-found" id="noResultsFound">
                             <div class="no-results-icon">🔍</div>
                             <div class="no-results-title">No pubs found</div>
                             <div class="no-results-text">Try expanding your search or check the spelling</div>
@@ -466,7 +466,7 @@
                         </div>
                     </div>
                     
-                    <div class="results-map-container" id="resultsMapContainer" style="display: none;">
+                    <div class="results-map-container" id="resultsMapContainer">
                         <div id="resultsMap" class="results-map"></div>
                     </div>
                 </div>
@@ -530,10 +530,9 @@
                             <label class="form-label">Find Your Pub *</label>
                             <input type="text" id="reportPubSearch" class="form-input" placeholder="Start typing pub name..." autocomplete="off">
                             <div id="pubSuggestions" class="suggestions"></div>
-                            <small style="color: var(--text-muted); font-size: 0.8rem;">Search for an existing pub first - we'll check our database!</small>
                         </div>
                         
-                        <div id="selectedPubInfo" class="selected-pub-info" style="display: none;">
+                        <div id="selectedPubInfo" class="selected-pub-info">
                             <div class="selected-pub-card">
                                 <strong id="selectedPubName"></strong>
                                 <div id="selectedPubAddress"></div>
@@ -541,7 +540,7 @@
                             </div>
                         </div>
                         
-                        <div id="newPubFields" class="new-pub-fields" style="display: none;">
+                        <div id="newPubFields" class="new-pub-fields">
                             <h4>📍 Add New Pub</h4>
                             <div class="form-group">
                                 <label class="form-label">Pub Name *</label>
@@ -605,7 +604,7 @@
                                     <strong>Add a photo</strong><br>
                                     <small>Beer menu, bottle, or tap</small>
                                 </div>
-                                <input type="file" id="reportPhoto" name="reportPhoto" accept="image/*" style="display: none;">
+                                <input type="file" id="reportPhoto" name="reportPhoto" accept="image/*">
                             </label>
                         </div>
                         
@@ -647,10 +646,10 @@
         <div id="pubAddedPromptModal" class="modal prompt-modal">
             <div class="modal-content">
                 <div class="modal-body">
-                    <div class="success-icon"</div>
-                    <h3 style="margin-bottom: 10px;">Pub Added Successfully!</h3>
-                    <p style="margin-bottom: 20px;"><strong id="addedPubName"></strong> has been added to our database.</p>
-                    <p style="margin-bottom: 30px;">What would you like to do next?</p>
+                    <div class="success-icon"> </div>
+                    <h3 Pub Added Successfully!> </h3>
+                    <p <strong id="addedPubName"> </strong> has been added to our database.</p>
+                    <p>What would you like to do next?</p>
                     <div class="modal-actions status-modal-action">
                         <button class="btn btn-primary" data-action="update-gf-status-new-pub">📊 Update GF Beer Status</button>
                         <button class="btn btn-success" data-action="report-gf-beer-new-pub">🍺 Report GF Beer Available</button>
@@ -830,7 +829,7 @@
         
 
         <!-- Location Permission Modal -->
-        <div id="locationPermissionModal" class="modal location-modal" style="display: none;">
+        <div id="locationPermissionModal" class="modal location-modal">
             <div class="modal-content location-permission-card">
                 <div class="permission-icon">📍</div>
                 <h2 class="permission-title">Enable Location Services</h2>
@@ -1091,7 +1090,7 @@
                 <div class="popup-title" data-field="name"></div>
                 <div class="popup-address" data-field="address"></div>
                 <div class="popup-postcode" data-field="postcode"></div>
-                <div class="popup-distance" data-field="distance" style="display: none;"></div>
+                <div class="popup-distance" data-field="distance"></div>
                 <div class="popup-gf-status" data-field="gf-status"></div>
                 <button class="popup-button" data-action="view-details">View Details</button>
             </div>
@@ -1159,5 +1158,6 @@
         </script>
     </body>
 </html>
+
 
 
