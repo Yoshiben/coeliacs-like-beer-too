@@ -381,11 +381,20 @@ const App = {
         'search-name': (el, modules) => {
             modules.modalManager?.open('nameModal'); // CHANGED from modules.search
         },
+        'perform-name-search': (el, modules) => {
+            modules.search?.searchByName();
+        },
         'search-area': (el, modules) => {
             modules.modalManager?.open('areaModal'); // CHANGED from modules.search
         },
+        'perform-area-search': (el, modules) => {
+            modules.search?.searchByArea();
+        },
         'search-beer': (el, modules) => {
             modules.modalManager?.open('beerModal'); // CHANGED from modules.search
+        },
+        'perform-beer-search': (el, modules) => {
+            modules.search?.searchByBeer();
         },
         
         // Navigation actions
