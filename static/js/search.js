@@ -473,36 +473,33 @@ export const SearchModule = (function() {
     };
     
     const displayPubDetails = (pub) => {
-        // Reset split-view state
-        resetPubDetailsView();
-        
-        // Hide other overlays
-        hideOverlays(['resultsOverlay', 'fullMapOverlay']);
-        
-        // Show pub details overlay
-        const overlay = document.getElementById('pubDetailsOverlay');
-        if (!overlay) {
-            console.error('❌ Pub details overlay not found!');
-            return;
+        // Use ModalManager to handle the overlay properly
+        if (modules.modalManager) {
+            modules.modalManager.open('pubDetailsOverlay', {
+                onOpen: () => {
+                    // Reset split-view state
+                    resetPubDetailsView();
+                    
+                    // Update navigation title
+                    const navTitle = document.getElementById('pubNavTitle');
+                    if (navTitle) navTitle.textContent = pub.name;
+                    
+                    // Populate content
+                    populatePubDetails(pub);
+                    setupPubButtons(pub);
+                    setupMapButtonHandler(pub);
+                    
+                    modules.tracking?.trackPubView(pub.name);
+                    
+                    const navModule = window.App?.getModule('nav');
+                    navModule?.showPubDetailsWithContext();
+                }
+            });
+        } else {
+            // Fallback to old method if modalManager not available
+            console.warn('⚠️ ModalManager not available, using direct DOM manipulation');
+            // ... existing code ...
         }
-        
-        overlay.style.display = 'flex';
-        overlay.classList.add('active');
-        document.body.style.overflow = 'hidden';
-        
-        // Update navigation title
-        const navTitle = document.getElementById('pubNavTitle');
-        if (navTitle) navTitle.textContent = pub.name;
-        
-        // Populate content
-        populatePubDetails(pub);
-        setupPubButtons(pub);
-        setupMapButtonHandler(pub);
-        
-        modules.tracking?.trackPubView(pub.name);
-
-        const navModule = window.App?.getModule('nav');
-        navModule?.showPubDetailsWithContext();
     };
     
     const populatePubDetails = (pub) => {
