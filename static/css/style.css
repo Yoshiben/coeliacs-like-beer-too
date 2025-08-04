@@ -251,6 +251,7 @@ html {
 .modal-content {
    max-height: 82vh;
    max-width: 500px;
+   padding: 0;
 }
 
 .modal-header {
@@ -2439,16 +2440,16 @@ body.page-pub .nav-notification-btn {
 .status-modal .modal-content {
    background: var(--bg-white);
    border-radius: var(--radius-xl);
-   padding: var(--space-xs) var(--space-xl) var(--space-xl);
+/*    padding: var(--space-xs) var(--space-xl) var(--space-xl); */
    max-width: 500px;
    width: 100%;
    box-shadow: var(--shadow-xl);
    z-index: var(--z-modal-content);
-   max-height: 92vh;
+/*    max-height: 92vh; */
    display: flex;
    flex-direction: column;
    overflow: hidden;   
-   padding: 0;
+/*    padding: 0; */
 }
 
 .status-prompt {
