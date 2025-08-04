@@ -268,6 +268,7 @@ html {
    z-index: var(--z-modal-content);
    background: var(--bg-white);
    box-shadow: var(--shadow-xl);
+   justify-content: space-between;
 }
 
 .modal-header {
@@ -299,6 +300,16 @@ html {
    width: 30px;
    height: 30px;
 }
+
+.modal-actions {
+   display: flex;
+   text-align: center;
+   gap: var(--space-4xl);
+   padding: var(--space-xl);
+}
+   
+   
+   
 
 
 /* ============
@@ -379,7 +390,7 @@ form-input:focus {
    background: var(--primary-gradient);
    color: var(--text-white);
    box-shadow: var(--shadow);
-/*    flex: 1; */
+   flex: 1;
    padding: var(--space-lg);
    border: none;
    border-radius: var(--radius-xl);
