@@ -273,7 +273,6 @@ html {
 .modal-header {
    align-items: center;
    background: var(--primary-gradient);
-/*    border-radius: var(--radius-xl); */
    text-align: center;
    position: relative;
    color: var(--white);
@@ -285,6 +284,11 @@ html {
    margin: 0;
 }
 
+.modal-subtitle {
+   color: var(--white);
+   margin: 0;
+}
+
 .modal-close {
    position: absolute;
    right: var(--space-lg);
@@ -292,8 +296,8 @@ html {
    transform: translateY(-50%);
    background: rgba(255, 255, 255, 0.2);
    border-radius: 50%;
-   width: 40px;
-   height: 40px;
+   width: 30px;
+   height: 30px;
 }
 
 
