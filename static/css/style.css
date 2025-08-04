@@ -249,7 +249,7 @@ html {
 
 .modal-content {
    max-height: 80vh;
-   max-width: 90vh;
+   max-width: 90vw;
    width: 100%;
    padding: 0;
    display: flex;
