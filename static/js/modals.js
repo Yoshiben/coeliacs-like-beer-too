@@ -261,8 +261,8 @@ export const ModalModule = (function() {
     const initializeReportModal = (pubData) => {
         console.log('🔧 Initializing report modal', pubData);
         
-        const modal = document.getElementById('reportModal');
         const modalTitle = modal.querySelector('.modal-title');
+        const modalSubtitle = document.getElementById('reportModalSubtitle');
         const pubSearchGroup = document.getElementById('pubSearchGroup');
         const reportForm = document.getElementById('reportForm');
         
@@ -272,7 +272,11 @@ export const ModalModule = (function() {
                 pubSearchGroup.style.display = 'none';
             }
             
-            modalTitle.innerHTML = `📸 Report GF Beer Find<br><small style="color: var(--text-secondary); font-weight: 400;">at ${pubData.name}</small>`;
+            // Show subtitle with pub name
+            if (modalSubtitle) {
+                modalSubtitle.textContent = `at ${pubData.name}`;
+                modalSubtitle.style.display = 'block';
+            }
             
             // Store pub data globally for form submission
             window.App.setState('selectedPubForReport', {
@@ -282,11 +286,13 @@ export const ModalModule = (function() {
                 postcode: pubData.postcode
             });
         } else {
-            // Normal flow
+            // Normal flow - hide subtitle
+            if (modalSubtitle) {
+                modalSubtitle.style.display = 'none';
+            }
             if (pubSearchGroup) {
                 pubSearchGroup.style.display = 'block';
             }
-            modalTitle.innerHTML = '📸 Report GF Beer Find';
             window.App.setState('selectedPubForReport', null);
         }
     
