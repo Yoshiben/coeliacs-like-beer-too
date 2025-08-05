@@ -117,6 +117,12 @@ export const ModalManager = (() => {
     };
     
     const openOverlay = (overlayId, config, options) => {
+
+        if (state.activeOverlays.includes(overlayId)) {
+            console.log(`⚠️ ${overlayId} is already open`);
+            return true; // Already open, nothing to do
+        }
+        
         // Close all overlays if exclusive
         if (config.exclusive) {
             closeAllOverlays();
@@ -168,7 +174,7 @@ export const ModalManager = (() => {
         overlay.style.display = 'none';
         overlay.classList.remove('active');
         
-        // Remove from stacks
+        // Remove from ALL stacks (both overlayStack and activeOverlays)
         state.overlayStack = state.overlayStack.filter(id => id !== overlayId);
         state.activeOverlays = state.activeOverlays.filter(id => id !== overlayId);
         
