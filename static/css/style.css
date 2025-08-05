@@ -3958,6 +3958,72 @@ body.page-pub .nav-notification-btn {
     color: var(--text-white);
 }
 
+/* Beer List Modal Styles */
+.beer-list-content {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.beer-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-lg);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-md);
+    background: var(--bg-white);
+    transition: all var(--transition);
+}
+
+.beer-list-item:hover {
+    border-color: var(--purple-border);
+    background: var(--purple-bg);
+}
+
+.beer-info {
+    flex: 1;
+}
+
+.beer-meta {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+    margin-top: var(--space-xs);
+}
+
+.btn-delete-beer {
+    background: none;
+    border: none;
+    font-size: var(--text-lg);
+    cursor: pointer;
+    padding: var(--space-sm);
+    opacity: 0.6;
+    transition: all var(--transition);
+}
+
+.btn-delete-beer:hover {
+    opacity: 1;
+    transform: scale(1.2);
+}
+
+.beer-list-empty {
+    text-align: center;
+    padding: var(--space-3xl);
+    color: var(--text-muted);
+}
+
+/* Make beer section look clickable */
+.beer-section[data-action] {
+    transition: all var(--transition);
+}
+
+.beer-section[data-action]:hover {
+    border-color: var(--purple-border);
+    background: linear-gradient(135deg, var(--purple-bg) 0%, rgba(139, 92, 246, 0.05) 100%);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
+}
+
 
 
 @media (min-width:1025px) {
@@ -3973,6 +4039,7 @@ body.page-pub .nav-notification-btn {
       display: block;
    }
 }
+
 
 
 
