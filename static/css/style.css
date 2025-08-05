@@ -527,9 +527,15 @@ form-input:focus {
    cursor: pointer;
    transition: all var(--transition);
    display: none; /* Hidden by default */
-   position: absolute;
-   right: 0;
-   margin: var(--space-xl);
+   
+}
+
+@media (min-width:1025px) {
+   .nav-back-btn {
+      position: absolute;
+      right: 0;
+      margin: var(--space-xl);
+   }
 }
 
 .nav-back-btn:hover {
