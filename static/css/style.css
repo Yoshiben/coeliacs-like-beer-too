@@ -721,7 +721,7 @@ body.page-pub .nav-notification-btn {
    display: block;
    font-size: var(--text-xs);
    opacity: 0.8;
-   padding: 0 var(--space-sm) var(--space-sm);
+   padding: 0 var(--space-lg) var(--space-lg);
 }
 
 /* Near Me Button */
