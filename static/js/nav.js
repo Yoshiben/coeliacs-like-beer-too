@@ -205,11 +205,16 @@ export const NavStateManager = (() => {
         window.addEventListener('resize', updateThumb);
     };
     
+    // UPDATE the handleToggleChange function (around line 217):
+
     const handleToggleChange = (mode) => {
         console.log(`🔀 Toggle changed to: ${mode} on ${state.currentContext} page`);
         
         const mapModule = modules.map || window.App?.getModule('map');
         const searchModule = modules.search || window.App?.getModule('search');
+        
+        // Store the current filter preference
+        window.App.setState('gfOnlyFilter', mode === 'gf');
         
         switch (state.currentContext) {
             case 'map':
@@ -219,12 +224,42 @@ export const NavStateManager = (() => {
                 break;
                 
             case 'results':
-                // TODO: Add results filtering when implemented
-                if (searchModule?.filterResults) {
-                    searchModule.filterResults(mode === 'gf');
+                // Re-run the last search with new filter
+                const lastSearch = window.App.getState('lastSearch');
+                if (lastSearch && searchModule) {
+                    console.log('🔄 Re-running search with filter:', mode);
+                    
+                    // Show loading
+                    const loadingEl = document.getElementById('resultsLoading');
+                    if (loadingEl) loadingEl.style.display = 'flex';
+                    
+                    // Re-run search based on type
+                    if (lastSearch.type === 'nearby' && lastSearch.userLocation) {
+                        searchModule.searchNearbyWithDistance(lastSearch.radius, mode === 'gf');
+                    } else if (lastSearch.query) {
+                        // For text searches, we need to filter results client-side
+                        const allResults = window.App.getState('searchResults') || [];
+                        const filteredResults = mode === 'gf' ? 
+                            allResults.filter(pub => pub.gf_status === 'always' || pub.gf_status === 'currently') :
+                            allResults;
+                        
+                        // Update display
+                        if (searchModule.displayResultsInOverlay) {
+                            searchModule.displayResultsInOverlay(filteredResults, 
+                                `${filteredResults.length} pubs ${mode === 'gf' ? 'with GF beer' : 'total'}`);
+                        }
+                    }
                 }
                 break;
+                
+            case 'home':
+                // On home, just store preference for next search
+                console.log('🏠 Filter preference saved for next search');
+                break;
         }
+        
+        // Track the change
+        modules.tracking?.trackEvent('filter_toggle', 'UI', `${state.currentContext}_${mode}`);
     };
     
     // ================================
