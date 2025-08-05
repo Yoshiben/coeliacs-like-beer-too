@@ -379,19 +379,19 @@ const App = {
             modules.modalManager?.open('distanceModal');
         },
         'search-name': (el, modules) => {
-            modules.modalManager?.open('nameModal'); // CHANGED from modules.search
+            modules.modalManager?.open('nameModal');
         },
         'perform-name-search': (el, modules) => {
             modules.search?.searchByName();
         },
         'search-area': (el, modules) => {
-            modules.modalManager?.open('areaModal'); // CHANGED from modules.search
+            modules.modalManager?.open('areaModal')
         },
         'perform-area-search': (el, modules) => {
             modules.search?.searchByArea();
         },
         'search-beer': (el, modules) => {
-            modules.modalManager?.open('beerModal'); // CHANGED from modules.search
+            modules.modalManager?.open('beerModal');
         },
         'perform-beer-search': (el, modules) => {
             modules.search?.searchByBeer();
@@ -540,16 +540,16 @@ const App = {
         
         // Status actions
         'change-gf-status': (el, modules) => {
-            modules.modalManager?.open('gfStatusModal'); // CHANGED
+            modules.modalManager?.open('gfStatusModal');
         },
         'confirm-status': (el, modules) => {
             modules.form?.GFStatusFlow?.confirmStatusUpdate?.();
         },
         'cancel-status': (el, modules) => {
-            modules.modalManager?.close('gfStatusConfirmModal'); // CHANGED
+            modules.modalManager?.close('gfStatusConfirmModal');
         },
         'skip-details': (el, modules) => {
-            modules.modalManager?.close('beerDetailsPromptModal'); // CHANGED
+            modules.modalManager?.close('beerDetailsPromptModal');
             modules.helpers?.showSuccessToast?.('✅ Status updated successfully!');
         },
         'add-beer-details': (el, modules) => {
@@ -750,10 +750,10 @@ const App = {
     handleDistanceSelection: (distance) => {
         console.log(`📍 Distance selected: ${distance}km`);
         
-        const modal = App.getModule('modal');
+        const modalManager = App.getModule('modalManager');
         const search = App.getModule('search');
         
-        modal?.close('distanceModal');
+        modalManager?.close('distanceModal');
         search?.searchNearbyWithDistance?.(distance);
     },
     
@@ -905,12 +905,12 @@ const App = {
         const pubData = App.getState(STATE_KEYS.CURRENT_PUB);
         
         // Close overlays using modalManager
-        modules.modalManager?.closeAllOverlays(); // CHANGED
+        modules.modalManager?.closeAllOverlays();
         
         document.body.style.overflow = '';
         
         // Open report modal
-        modules.modalManager?.open('reportModal', { data: pubData }); // CHANGED
+        modules.modalManager?.open('reportModal', { data: pubData });
         
         modules.tracking?.trackEvent('report_beer_click', 'User Action', pubData?.name || 'unknown');
     },
@@ -985,39 +985,6 @@ const initializeApp = () => {
 
 // Start initialization
 initializeApp();
-
-// ADD DEBUG CODE HERE - TEMPORARY
-window.addEventListener('load', () => {
-    console.log('🐛 Debug: Setting up modal tracking...');
-    
-    window.debugModalOpen = true;
-    
-    // Override the modal open functions
-    if (window.App?.modules?.modal?.open) {
-        const originalModalOpen = window.App.modules.modal.open;
-        window.App.modules.modal.open = function(modalId, ...args) {
-            console.trace('🔴 Modal.open called:', modalId);
-            return originalModalOpen.call(this, modalId, ...args);
-        };
-    }
-    
-    if (window.App?.modules?.modalManager?.open) {
-        const originalManagerOpen = window.App.modules.modalManager.open;
-        window.App.modules.modalManager.open = function(modalId, ...args) {
-            console.trace('🔵 ModalManager.open called:', modalId);
-            return originalManagerOpen.call(this, modalId, ...args);
-        };
-    }
-    
-    // Log all click events
-    document.addEventListener('click', (e) => {
-        if (window.debugModalOpen && e.target.closest('[data-action]')) {
-            console.log('🟡 Click action:', e.target.closest('[data-action]').dataset.action);
-        }
-    }, true);
-    
-    console.log('🐛 Debug: Modal tracking ready!');
-});
 
 // Export for global access
 window.CoeliacsApp = App;
