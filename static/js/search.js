@@ -98,9 +98,10 @@ export const SearchModule = (function() {
     const searchNearbyWithDistance = async (radiusKm) => {
         console.log(`🎯 Searching within ${radiusKm}km...`);
 
-        // Get filter preference from centralized manager
-        const filterGF = window.App?.getModule('filterGF');
-        const gfOnly = filterGF ? filterGF.isGFOnly() : window.App.getState('gfOnlyFilter') !== false;
+        // Get CURRENT filter preference - NOT defaulting to true!
+        const gfOnly = window.App.getState('gfOnlyFilter') !== false;
+        console.log(`🍺 Current filter: ${gfOnly ? 'GF Only' : 'All Pubs'}`);
+
         
         try {
             // Close distance modal using modalManager
