@@ -323,6 +323,19 @@ html {
    height: 30px;
 }
 
+.modal-body {
+   flex: 1;
+   padding: var(--space-sm) var(--space-xl) var(--space-xl);
+   overflow-y: auto;
+   -webkit-overflow-scrolling: touch;
+   flex: 1;
+   padding: var(--space-sm) var(--space-xl) var(--space-xl);
+   -webkit-overflow-scrolling: touch;
+   overflow: hidden;
+   display: flex;
+   flex-direction: column;
+}
+
 .modal-actions {
    display: flex;
    text-align: center;
@@ -2553,14 +2566,6 @@ body.page-pub .nav-notification-btn {
    font-size: var(--text-md);
 }
 
-/* Modal Body */
-.report-modal .modal-body {
-   flex: 1;
-   padding: var(--space-sm) var(--space-xl) var(--space-xl);
-   overflow-y: auto;
-   -webkit-overflow-scrolling: touch;
-}
-
 /* Form Groups */
 .report-modal .form-group {
    margin-bottom: var(--space-2xl);
@@ -3346,15 +3351,6 @@ body.page-pub .nav-notification-btn {
    REPLACE the modal body and form sections
    ================================ */
 
-/* Force no scroll on modal body */
-.report-modal .modal-body {
-    flex: 1;
-    padding: var(--space-sm) var(--space-xl) var(--space-lg);
-    overflow: hidden; /* NO SCROLL */
-    display: flex;
-    flex-direction: column;
-}
-
 /* Make form flex to fit available space */
 .report-modal .modal-form {
     display: flex;
@@ -3412,11 +3408,6 @@ body.page-pub .nav-notification-btn {
     display: none;
 }
 
-/* Ensure modal body doesn't clip dropdowns */
-.report-modal .modal-body {
-    overflow-y: visible; /* Changed from auto */
-    position: relative;
-}
 
 /* Add scroll container inside modal body */
 .report-modal .modal-form {
@@ -3425,10 +3416,6 @@ body.page-pub .nav-notification-btn {
     padding-right: var(--space-sm); /* Space for scrollbar */
 }
 
-/* When dropdown is open, prevent body scroll */
-.report-modal.dropdown-open .modal-body {
-    overflow: hidden;
-}
 
 /* Dropdown header should stick to top when scrolling */
 .suggestions .dropdown-header {
@@ -3565,12 +3552,6 @@ body.page-pub .nav-notification-btn {
     justify-content: center;
     padding: var(--space-lg);
 }
-
-/* Modal Body */
-.status-modal .modal-body {
-    padding: var(--space-2xl);
-}
-
 
 /* Fix the weird display on pub details page */
 .pub-details-overlay .status-modal {
