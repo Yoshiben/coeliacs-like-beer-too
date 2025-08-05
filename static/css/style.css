@@ -330,6 +330,11 @@ html {
    padding: var(--space-xl);
 }
 
+.modal-options {
+   display: grid;
+   gap: var(--space-md);
+   padding: var(--space-lg);
+}
 
 /* ============
    FORMS
@@ -2453,13 +2458,6 @@ body.page-pub .nav-notification-btn {
    margin-bottom: var(--space-2xl);
    font-size: var(--text-md);
 }
-
-.status-options {
-   display: flex;
-   flex-direction: column;
-   gap: var(--space-md);
-}
-
 .status-option {
    display: flex;
    align-items: center;
@@ -3573,32 +3571,6 @@ body.page-pub .nav-notification-btn {
     padding: var(--space-2xl);
 }
 
-/* Status Options */
-.status-options {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-lg);
-}
-
-.status-option {
-    display: flex;
-    align-items: center;
-    gap: var(--space-lg);
-    padding: var(--space-xl);
-    background: var(--bg-section);
-    border: 3px solid var(--border-light);
-    border-radius: var(--radius-xl);
-    cursor: pointer;
-    transition: all var(--transition);
-    text-align: left;
-    box-shadow: var(--shadow-sm);
-}
-
-.status-option:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
-    background: var(--bg-white);
-}
 
 /* Fix the weird display on pub details page */
 .pub-details-overlay .status-modal {
