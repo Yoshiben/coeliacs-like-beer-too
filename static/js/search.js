@@ -501,33 +501,27 @@ export const SearchModule = (function() {
     };
     
     const displayPubDetails = (pub) => {
-        // Use ModalManager to handle the overlay properly
-        if (modules.modalManager) {
-            modules.modalManager.open('pubDetailsOverlay', {
-                onOpen: () => {
-                    // Reset split-view state
-                    resetPubDetailsView();
-                    
-                    // Update navigation title
-                    const navTitle = document.getElementById('pubNavTitle');
-                    if (navTitle) navTitle.textContent = pub.name;
-                    
-                    // Populate content
-                    populatePubDetails(pub);
-                    setupPubButtons(pub);
-                    setupMapButtonHandler(pub);
-                    
-                    modules.tracking?.trackPubView(pub.name);
-                    
-                    const navModule = window.App?.getModule('nav');
-                    navModule?.showPubDetailsWithContext();
-                }
-            });
-        } else {
-            // Fallback to old method if modalManager not available
-            console.warn('⚠️ ModalManager not available, using direct DOM manipulation');
-            // ... existing code ...
-        }
+        // Use ModalManager to handle the overlay
+        modules.modalManager.open('pubDetailsOverlay', {
+            onOpen: () => {
+                // Reset split-view state
+                resetPubDetailsView();
+                
+                // Update navigation title
+                const navTitle = document.getElementById('pubNavTitle');
+                if (navTitle) navTitle.textContent = pub.name;
+                
+                // Populate content
+                populatePubDetails(pub);
+                setupPubButtons(pub);
+                setupMapButtonHandler(pub);
+                
+                modules.tracking?.trackPubView(pub.name);
+                
+                const navModule = window.App?.getModule('nav');
+                navModule?.showPubDetailsWithContext();
+            }
+        });
     };
     
     const populatePubDetails = (pub) => {
@@ -1044,7 +1038,6 @@ export const SearchModule = (function() {
     // UI HELPERS
     // ================================
 
-    // Replace the showResultsOverlay function to use ModalManager:
     const showResultsOverlay = (title) => {
         console.log('📋 Showing results overlay:', title);
         
@@ -1078,26 +1071,16 @@ export const SearchModule = (function() {
             resultsTitle.textContent = title;
         }
         
-        // Use ModalManager to open the results overlay
-        if (modules.modalManager) {
-            modules.modalManager.open('resultsOverlay', {
-                onOpen: () => {
-                    document.body.style.overflow = 'hidden';
-                    
-                    // Update navigation context
-                    const navModule = window.App?.getModule('nav');
-                    navModule?.showResultsWithContext();
-                }
-            });
-        } else {
-            // Fallback if modalManager not available
-            const resultsOverlay = document.getElementById('resultsOverlay');
-            if (resultsOverlay) {
-                resultsOverlay.classList.add('active');
-                resultsOverlay.style.display = 'flex';
+        // Use ModalManager to open the overlay
+        modules.modalManager.open('resultsOverlay', {
+            onOpen: () => {
+                document.body.style.overflow = 'hidden';
+                
+                // Update navigation context
+                const navModule = window.App?.getModule('nav');
+                navModule?.showResultsWithContext();
             }
-            document.body.style.overflow = 'hidden';
-        }
+        });
     };
     
     const showResultsLoading = (message) => {
@@ -1287,18 +1270,8 @@ export const SearchModule = (function() {
         }
     };
     
-    // Replace hideResultsAndShowHome function:
     const hideResultsAndShowHome = () => {
-        // Use ModalManager to close results overlay
-        if (modules.modalManager) {
-            modules.modalManager.close('resultsOverlay');
-        } else {
-            const resultsOverlay = document.getElementById('resultsOverlay');
-            if (resultsOverlay) {
-                resultsOverlay.style.display = 'none';
-                resultsOverlay.classList.remove('active');
-            }
-        }
+        modules.modalManager.close('resultsOverlay');
         
         // Show community home
         const communityHome = document.querySelector('.community-home');
@@ -1307,21 +1280,9 @@ export const SearchModule = (function() {
         }
         
         document.body.style.overflow = '';
-    
+        
         const navModule = window.App?.getModule('nav');
         navModule?.showHomeWithContext();
-    };
-    
-    const hideOverlays = (overlayIds, useQuerySelector = true) => {
-        overlayIds.forEach(id => {
-            const element = useQuerySelector ? 
-                document.querySelector(`.${id}`) : 
-                document.getElementById(id);
-            if (element) {
-                element.style.display = 'none';
-                element.classList.remove('active');
-            }
-        });
     };
     
     const showLocationAccuracyFeedback = (accuracy) => {
