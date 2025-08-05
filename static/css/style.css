@@ -326,10 +326,6 @@ html {
 .modal-body {
    flex: 1;
    padding: var(--space-sm) var(--space-xl) var(--space-xl);
-   overflow-y: auto;
-   -webkit-overflow-scrolling: touch;
-   flex: 1;
-   padding: var(--space-sm) var(--space-xl) var(--space-xl);
    -webkit-overflow-scrolling: touch;
    overflow: hidden;
    display: flex;
@@ -435,21 +431,24 @@ form-input:focus {
    visibility: visible !important;
 }
    
-
 /* ================================
    GROUP - BUTTONS
    ================================ */
 
+.btn {
+   border: none;
+   border-radius: var(--radius-xl);
+   padding: var(--space-lg);
+   font-weight: 600;
+   cursor: pointer;
+   box-shadow: var(--shadow);
+   transition: all 0.25s ease;
+}
+
 .btn-primary {
    background: var(--primary-gradient);
    color: var(--text-white);
-   box-shadow: var(--shadow);
    flex: 1;
-   padding: var(--space-lg);
-   border: none;
-   border-radius: var(--radius-xl);
-   font-weight: 600;
-   cursor: pointer;
    transition: all 0.25s ease;
 }
 
@@ -461,21 +460,13 @@ form-input:focus {
 .btn-secondary {
    background: var(--grey-purple);
    color: var(--text-secondary);
-   box-shadow: var(--shadow-sm);
    backdrop-filter: blur(10px);
    border: 2px solid var(--border-light);
    flex: 1;
-   padding: var(--space-lg);
-   border: none;
-   border-radius: var(--radius-lg);
-   font-weight: 600;
-   cursor: pointer;
    transition: all 0.25s ease;
-/*    width: 100%; */
 }
 
 .btn-secondary:hover {
-/*     background: var(--text-white); */
     transform: translateY(-1px);
     box-shadow: var(--shadow);
 }
@@ -507,9 +498,7 @@ form-input:focus {
 .btn-nav-small {
    background: var(--bg-white);
    color: var(--text-primary);
-   border: none;
    padding: var(--space-sm) var(--space-lg);
-   border-radius: var(--radius-pill);
    font-weight: 600;
    box-shadow: var(--shadow-sm);
 }
@@ -532,7 +521,6 @@ form-input:focus {
 .nav-notification-btn {
    display: none;
    background: none;
-   border: none;
    position: absolute;
    right: 0;
    padding: var(--space-xl);
@@ -541,22 +529,19 @@ form-input:focus {
 /* Back Button */
 .nav-back-btn {
    background: rgba(255, 255, 255, 0.2);
-   border: none;
    color: var(--white);
    padding: var(--space-sm) var(--space-lg);
    border-radius: var(--radius-pill);
-   font-weight: 600;
    font-size: var(--text-sm);
-   cursor: pointer;
    transition: all var(--transition);
    display: none; /* Hidden by default */
-   
 }
 
 .nav-back-btn:hover {
     background: rgba(255, 255, 255, 0.3);
     transform: translateX(-2px);
 }
+
 
 /* ================================
    GROUP - HOME PAGE
