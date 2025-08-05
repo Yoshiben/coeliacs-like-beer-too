@@ -60,6 +60,95 @@ export const NavStateManager = (() => {
         // Track navigation
         modules.tracking?.trackEvent('nav_context_change', 'Navigation', context);
     };
+
+    // ================================
+    // BROWSER HISTORY MANAGEMENT
+    // ================================
+    const pushState = (context, data = {}) => {
+        const url = getUrlForContext(context);
+        const stateData = {
+            context,
+            view: context,
+            ...data
+        };
+        
+        // Don't push duplicate states
+        if (window.location.pathname !== url) {
+            window.history.pushState(stateData, '', url);
+        }
+    };
+    
+    const getUrlForContext = (context) => {
+        const urlMap = {
+            'home': '/',
+            'results': '/search',
+            'search': '/search',
+            'pub': '/pub',
+            'map': '/map',
+            'breweries': '/breweries'
+        };
+        return urlMap[context] || '/';
+    };
+    
+    const handlePopState = (event) => {
+        console.log('🔙 Browser back button pressed', event.state);
+        
+        if (event.state && event.state.context) {
+            // Navigate based on the stored state
+            navigateToContext(event.state.context, false); // false = don't push state again
+        } else {
+            // No state, go home
+            goToHome(false);
+        }
+    };
+    
+    const navigateToContext = (context, shouldPushState = true) => {
+        switch(context) {
+            case 'home':
+                goToHome(shouldPushState);
+                break;
+            case 'results':
+                // Check if we have results to show
+                const searchResults = window.App?.getState('searchResults');
+                if (searchResults?.length > 0) {
+                    modules.modalManager?.open('resultsOverlay');
+                    setPageContext('results');
+                } else {
+                    goToHome(shouldPushState);
+                }
+                break;
+            case 'pub':
+                // Check if we have a current pub
+                const currentPub = window.App?.getState('currentPub');
+                if (currentPub) {
+                    modules.modalManager?.open('pubDetailsOverlay');
+                    setPageContext('pub');
+                } else {
+                    goToHome(shouldPushState);
+                }
+                break;
+            case 'map':
+                modules.modalManager?.open('fullMapOverlay');
+                setPageContext('map');
+                break;
+            case 'breweries':
+                modules.modalManager?.open('breweriesOverlay');
+                setPageContext('breweries');
+                break;
+            case 'search':
+                // Open search overlay
+                const searchOverlay = document.getElementById('searchOverlay');
+                if (searchOverlay) {
+                    searchOverlay.style.display = 'flex';
+                    searchOverlay.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                }
+                setPageContext('search');
+                break;
+            default:
+                goToHome(shouldPushState);
+        }
+    };
     
     const setupBackButton = (currentContext) => {
         const backBtn = document.querySelector('.nav-back-btn');
@@ -90,7 +179,7 @@ export const NavStateManager = (() => {
     // ================================
     // NAVIGATION METHODS
     // ================================
-    const goToHome = () => {
+    const goToHome = (shouldPushState = true) => {
         console.log('🏠 Navigating to home');
         
         // Hide all overlays
@@ -111,6 +200,11 @@ export const NavStateManager = (() => {
         
         // Update context
         setPageContext('home');
+        
+        // Update browser history
+        if (shouldPushState) {
+            pushState('home');
+        }
         
         // Reset body scroll
         document.body.style.overflow = '';
@@ -328,22 +422,27 @@ export const NavStateManager = (() => {
     // ================================
     const showResultsWithContext = () => {
         setPageContext('results');
+        pushState('results');
     };
     
     const showMapWithContext = () => {
         setPageContext('map');
+        pushState('map');
     };
     
     const showPubDetailsWithContext = () => {
         setPageContext('pub');
+        pushState('pub');
     };
     
     const showHomeWithContext = () => {
         setPageContext('home');
+        pushState('home');
     };
-
+    
     const showSearchWithContext = () => {
         setPageContext('search');
+        pushState('search');
     };
     
     // ================================
@@ -358,6 +457,12 @@ export const NavStateManager = (() => {
         
         // Initialize toggle
         initToggle();
+
+        // ADD THIS: Listen for browser back/forward
+        window.addEventListener('popstate', handlePopState);
+        
+        // ADD THIS: Set initial state
+        window.history.replaceState({ context: 'home', view: 'home' }, '', '/');
         
         const observeOverlay = (overlayId, context) => {
             const overlay = document.getElementById(overlayId);
