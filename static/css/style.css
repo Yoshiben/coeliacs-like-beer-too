@@ -407,7 +407,14 @@ form-input:focus {
    opacity: 1;
    visibility: visible;
    pointer-events: none;
-   z-index: 99999;
+   z-index: 1;
+   transform: translateX(0);
+}
+
+/* Ensure thumb is visible even during initialization */
+.toggle-container .toggle-thumb {
+   opacity: 1 !important;
+   visibility: visible !important;
 }
    
 
