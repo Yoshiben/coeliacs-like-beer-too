@@ -351,51 +351,33 @@ export const NavStateManager = (() => {
     // INITIALIZATION
     // ================================
 
-    const init = () => {
-        console.log('🔧 Initializing NavStateManager');
+    const observeOverlay = (overlayId, context) => {
+        const overlay = document.getElementById(overlayId);
+        if (!overlay) return;
         
-        // Set initial context
-        setPageContext('home');
+        let lastVisibleState = false;
         
-        // Initialize toggle
-        initToggle();
-        
-        // Watch for overlay visibility changes
-        const observeOverlay = (overlayId, context) => {
-            const overlay = document.getElementById(overlayId);
-            if (!overlay) return;
+        // Create observer
+        const observer = new MutationObserver((mutations) => {
+            const isVisible = overlay.style.display !== 'none' && 
+                            (overlay.classList.contains('active') || 
+                             overlay.style.display === 'flex');
             
-            // Create observer
-            const observer = new MutationObserver((mutations) => {
-                mutations.forEach((mutation) => {
-                    if (mutation.type === 'attributes' && 
-                        (mutation.attributeName === 'style' || mutation.attributeName === 'class')) {
-                        
-                        const isVisible = overlay.style.display !== 'none' && 
-                                        (overlay.classList.contains('active') || 
-                                         overlay.style.display === 'flex');
-                        
-                        if (isVisible) {
-                            console.log(`📍 ${overlayId} became visible, setting context: ${context}`);
-                            setPageContext(context);
-                        }
-                    }
-                });
-            });
-            
-            // Start observing
-            observer.observe(overlay, {
-                attributes: true,
-                attributeFilter: ['style', 'class']
-            });
-        };
+            // Only trigger if visibility actually changed
+            if (isVisible && !lastVisibleState) {
+                console.log(`📍 ${overlayId} became visible, setting context: ${context}`);
+                setPageContext(context);
+                lastVisibleState = true;
+            } else if (!isVisible && lastVisibleState) {
+                lastVisibleState = false;
+            }
+        });
         
-        // Observe all overlays
-        observeOverlay('resultsOverlay', 'results');
-        observeOverlay('pubDetailsOverlay', 'pub');
-        observeOverlay('fullMapOverlay', 'map');
-        
-        console.log('✅ NavStateManager initialized');
+        // Start observing
+        observer.observe(overlay, {
+            attributes: true,
+            attributeFilter: ['style', 'class']
+        });
     };
     
     // ================================
