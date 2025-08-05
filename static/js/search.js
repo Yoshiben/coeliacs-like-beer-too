@@ -144,7 +144,6 @@ export const SearchModule = (function() {
                 userLocation.lng, 
                 radiusKm, 
                 gfOnly  // Pass the filter preference
-);
             );
             
             console.log(`✅ Found ${pubs.length} pubs`);
