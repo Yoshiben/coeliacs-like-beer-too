@@ -49,10 +49,7 @@ export const ModalManager = (() => {
         // Form modals
         reportModal: { type: 'modal', group: 'form', exclusive: true },
         placesSearchModal: { type: 'modal', group: 'form', exclusive: true },
-        
-        // Info modals
-        aboutModal: { type: 'modal', group: 'info', exclusive: true },
-        gfInfoModal: { type: 'modal', group: 'info', exclusive: true },
+        pubAddedPromptModal: { type: 'modal', group: 'form', exclusive: true },
         
         // System modals
         locationPermissionModal: { type: 'modal', group: 'system', priority: true },
