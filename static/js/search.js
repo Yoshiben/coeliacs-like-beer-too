@@ -153,6 +153,13 @@ export const SearchModule = (function() {
                 gfOnly  // Pass the filter preference
             );
             
+            // Check if we got a valid response
+            if (!pubs || !Array.isArray(pubs)) {
+                console.error('❌ Invalid response from API:', pubs);
+                showNoResults('Error loading pubs. Please try again.');
+                return;
+            }
+            
             console.log(`✅ Found ${pubs.length} pubs`);
             
             if (pubs.length === 0) {
