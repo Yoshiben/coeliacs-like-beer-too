@@ -151,6 +151,10 @@ export const NavStateManager = (() => {
             return;
         }
         
+        // CRITICAL: Make thumb visible immediately
+        thumb.style.opacity = '1';
+        thumb.style.visibility = 'visible';
+        
         const updateThumb = () => {
             const activeOption = container.querySelector('.toggle-option.active');
             if (activeOption) {
@@ -183,14 +187,12 @@ export const NavStateManager = (() => {
             }
         }
         
-        // Force initial thumb update after DOM settles
+        // IMMEDIATE thumb update - no delay
+        updateThumb();
+        
+        // Also update after a frame to ensure DOM is ready
         requestAnimationFrame(() => {
             updateThumb();
-            // Ensure thumb is visible
-            if (thumb) {
-                thumb.style.opacity = '1';
-                thumb.style.visibility = 'visible';
-            }
         });
         
         // Remove old event listeners by cloning
