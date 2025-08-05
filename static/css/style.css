@@ -3931,7 +3931,32 @@ body.page-pub .nav-notification-btn {
 
 .status-action {
    padding: var(--space-xl);
-{
+}
+
+.gf-indicator.always-tap-cask {
+    background: linear-gradient(135deg, #FFD700 0%, #FDB904 100%);
+    color: var(--text-primary);
+}
+
+.gf-indicator.always-bottle-can {
+    background: linear-gradient(135deg, #00F500 0%, #00C400 100%);
+    color: var(--text-white);
+}
+
+.gf-indicator.currently {
+    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+    color: var(--text-white);
+}
+
+.gf-indicator.not-currently {
+    background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+    color: var(--text-white);
+}
+
+.gf-indicator.unknown {
+    background: linear-gradient(135deg, #9CA3AF 0%, #6B7280 100%);
+    color: var(--text-white);
+}
 
 
 
@@ -3948,4 +3973,6 @@ body.page-pub .nav-notification-btn {
       display: block;
    }
 }
+
+
 
