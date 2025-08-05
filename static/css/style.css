@@ -729,16 +729,6 @@ body.page-pub .nav-notification-btn {
    DESKTOP SPECIFIC
    ================================ */
 
-@media (min-width:1025px) {
-   .nav-back-btn {
-      position: absolute;
-      right: 0;
-      margin: var(--space-xl);
-   }
-   .stats-bar {
-      padding: var(--space-sm);
-   }
-}
 
 .stat-pill.highlighted {
     background: var(--primary-gradient);
@@ -1771,10 +1761,11 @@ body.page-pub .nav-notification-btn {
 
 /* UPDATE: Status Actions Buttons */
 .status-actions {
-/*     display: flex; */
-    gap: var(--space-md);
-    margin-top: var(--space-lg);
-    justify-content: center;
+   display: flex;
+   gap: var(--space-md);
+   margin-top: var(--space-lg);
+   justify-content: center;
+   margin: var(--space-lg) var(--space-xl) 0;
 }
 
 
@@ -1782,6 +1773,7 @@ body.page-pub .nav-notification-btn {
     background: var(--bg-white);
     color: var(--purple-text);
     border: 2px solid var(--purple-border);
+   flex: 1;
 }
 
 .status-actions .btn-outline:hover {
@@ -3997,4 +3989,20 @@ body.page-pub .nav-notification-btn {
    border-top-color: var(--white);
    border-radius: 50%;
    animation: spin 0.8s linear infinite;
+}
+
+
+
+@media (min-width:1025px) {
+   .nav-back-btn {
+      position: absolute;
+      right: 0;
+      margin: var(--space-xl);
+   }
+   .stats-bar {
+      padding: var(--space-sm);
+   }
+   .status-actions {
+      display: block;
+   }
 }
