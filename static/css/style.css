@@ -345,6 +345,7 @@ html {
    transition: border-color 0.25s ease;
    overflow: hidden;
    padding: var(--space-xl);
+   width: -webkit-fill-available;
 }
 
 form-input:focus {
