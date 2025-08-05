@@ -593,9 +593,9 @@ form-input:focus {
 }
 
 /* Toggle in Nav */
-.nav-toggle {
+/* .nav-toggle {
     flex: 0 0 auto;
-}
+} */
 
 
 /* Future nav actions */
@@ -728,6 +728,7 @@ body.page-pub .nav-notification-btn {
    }
    .stats-bar {
       padding: var(--space-sm);
+   }
 }
 
 .stat-pill.highlighted {
