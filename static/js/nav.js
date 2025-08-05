@@ -278,21 +278,52 @@ export const NavStateManager = (() => {
         }
     };
 
+    // REPLACE: The entire handleToggleChange function in nav.js around line 280
+
     const handleToggleChange = (mode) => {
         console.log(`🔀 Toggle changed to: ${mode}`);
         
-        // Use centralized filter manager
-        const filterGF = window.App?.getModule('filterGF');
-        if (filterGF) {
-            filterGF.setFilter(mode);
-        } else {
-            // Fallback to old method
-            console.warn('⚠️ FilterGF module not available, using fallback');
-            window.App.setState('gfOnlyFilter', mode === 'gf');
+        // Update the filter state
+        window.App.setState('gfOnlyFilter', mode === 'gf');
+        
+        // Get current context
+        const currentContext = state.currentContext;
+        
+        // If we're on results page, re-run the search
+        if (currentContext === 'results') {
+            const searchModule = window.App?.getModule('search');
+            const lastSearch = window.App?.getState('lastSearch');
+            
+            console.log('📱 Current context:', currentContext);
+            console.log('🔍 Last search:', lastSearch);
+            
+            if (lastSearch && searchModule) {
+                // Re-run based on search type
+                if (lastSearch.type === 'nearby' && lastSearch.radius) {
+                    console.log('🔄 Re-running nearby search with radius:', lastSearch.radius);
+                    searchModule.searchNearbyWithDistance(lastSearch.radius);
+                } else if (lastSearch.type === 'name' && lastSearch.query) {
+                    console.log('🔄 Re-running name search');
+                    // Need to set the input value first
+                    const nameInput = document.getElementById('nameInput');
+                    if (nameInput) nameInput.value = lastSearch.query;
+                    searchModule.searchByName();
+                } else if (lastSearch.type === 'area' && lastSearch.query) {
+                    console.log('🔄 Re-running area search');
+                    // Need to set the input value first
+                    const areaInput = document.getElementById('areaInput');
+                    if (areaInput) areaInput.value = lastSearch.query;
+                    searchModule.searchByArea();
+                }
+            }
+        } else if (currentContext === 'map') {
+            // Update map display
+            const mapModule = window.App?.getModule('map');
+            mapModule?.updateMapDisplay?.(mode === 'gf');
         }
         
         // Track the change
-        modules.tracking?.trackEvent('filter_toggle', 'UI', `${state.currentContext}_${mode}`);
+        modules.tracking?.trackEvent('filter_toggle', 'UI', `${currentContext}_${mode}`);
     };
     
     // ================================
