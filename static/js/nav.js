@@ -41,6 +41,22 @@ export const NavStateManager = (() => {
         // Update back button functionality
         setupBackButton(context);
         
+        // IMPORTANT: Re-initialize toggle when it becomes visible
+        if (context === 'results' || context === 'map') {
+            // Give the DOM a moment to update visibility
+            setTimeout(() => {
+                refreshToggleState();
+                // Force thumb visibility
+                const thumb = document.querySelector('.nav-toggle .toggle-thumb');
+                if (thumb) {
+                    thumb.style.opacity = '1';
+                    thumb.style.visibility = 'visible';
+                    thumb.style.display = 'block';
+                    thumb.style.background = 'white';
+                }
+            }, 10);
+        }
+        
         // Track navigation
         modules.tracking?.trackEvent('nav_context_change', 'Navigation', context);
     };
