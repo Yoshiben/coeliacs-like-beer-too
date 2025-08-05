@@ -1168,19 +1168,12 @@ export const FormModule = (() => {
         setupInputListeners();
         initializePhotoUpload();
 
-        // ADD HERE:
         // Close dropdowns when scrolling the form
         const modalForm = document.querySelector('.report-modal .modal-form');
         if (modalForm) {
             modalForm.addEventListener('scroll', () => {
                 hideAllDropdowns();
             });
-        }
-        
-        // Expose report form handler globally for the form submit
-        const reportForm = document.getElementById('reportForm');
-        if (reportForm) {
-            reportForm.addEventListener('submit', handleReportSubmission);
         }
         
         console.log('✅ Form Module initialized');
