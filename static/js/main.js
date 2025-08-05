@@ -715,6 +715,12 @@ const App = {
                 modules.form.selectBrewery(brewery);
             }
         },
+        'select-beer': (el, modules) => {
+            const beerData = el.dataset.beerData;
+            if (beerData && modules.form) {
+                modules.form.selectBeer(beerData);
+            }
+        },
         'retry-breweries': (el, modules) => {
             modules.breweries?.loadBreweries();
         },
