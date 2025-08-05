@@ -218,7 +218,6 @@ def search():
                     p.pub_id, p.name, p.address, p.postcode, p.local_authority, 
                     p.latitude, p.longitude,
                     COALESCE(s.status, 'unknown') as gf_status,
-                    s.bottle, s.tap, s.cask, s.can,
                     GROUP_CONCAT(
                         DISTINCT CONCAT(ba.format, ' - ', 
                         COALESCE(b.brewery, 'Unknown'), ' ', 
@@ -280,7 +279,6 @@ def search():
                 p.pub_id, p.name, p.address, p.postcode, p.local_authority, 
                 p.latitude, p.longitude,
                 COALESCE(s.status, 'unknown') as gf_status,
-                s.bottle, s.tap, s.cask, s.can,
                 GROUP_CONCAT(
                     DISTINCT CONCAT(ba.format, ' - ', 
                     COALESCE(b.brewery, 'Unknown'), ' ', 
@@ -642,7 +640,6 @@ def get_all_pubs_for_map():
                 p.pub_id, p.name, p.address, p.postcode, p.local_authority,
                 p.latitude, p.longitude,
                 COALESCE(s.status, 'unknown') as gf_status,
-                s.bottle, s.tap, s.cask, s.can
             FROM pubs p
             LEFT JOIN pub_gf_status s ON p.pub_id = s.pub_id
             WHERE p.latitude IS NOT NULL AND p.longitude IS NOT NULL 
