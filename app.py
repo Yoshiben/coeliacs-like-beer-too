@@ -219,16 +219,18 @@ def search():
                     p.latitude, p.longitude,
                     COALESCE(s.status, 'unknown') as gf_status,
                     GROUP_CONCAT(
-                        DISTINCT CONCAT(ba.format, ' - ', 
-                        COALESCE(b.brewery, 'Unknown'), ' ', 
-                        COALESCE(b.name, 'Unknown'), ' (', 
-                        COALESCE(b.style, 'Unknown'), ')')
+                        DISTINCT CONCAT(
+                            br.format, ' - ', 
+                            COALESCE(br.brewery, 'Unknown'), ' ', 
+                            COALESCE(br.beer_name, 'Unknown'), ' (', 
+                            COALESCE(br.beer_style, 'Unknown'), ')'
+                        )
                         SEPARATOR ', '
                     ) as beer_details
                 FROM pubs p
                 LEFT JOIN pub_gf_status s ON p.pub_id = s.pub_id
-                LEFT JOIN beer_availability ba ON p.pub_id = ba.pub_id
-                LEFT JOIN beers b ON ba.beer_id = b.beer_id
+                LEFT JOIN beer_reports br ON p.pub_id = br.pub_id 
+                    AND br.status = 'auto_approved'
                 WHERE p.pub_id = %s
                 GROUP BY p.pub_id
             """
@@ -977,6 +979,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
