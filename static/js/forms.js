@@ -861,16 +861,6 @@ export const FormModule = (() => {
                 }
             }
         }
-            
-            const display = displays[status] || displays.unknown;
-            
-            statusEl.className = `current-status ${status}`;
-            statusEl.innerHTML = `
-                <span class="status-icon">${display.icon}</span>
-                <span class="status-text">${display.text}</span>
-                <span class="status-meta">${display.meta}</span>
-            `;
-        }
     };
     
     // ================================
