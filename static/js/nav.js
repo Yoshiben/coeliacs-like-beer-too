@@ -122,21 +122,20 @@ export const NavStateManager = (() => {
     const goBackFromPub = () => {
         console.log('🔙 Going back from pub details');
         
+        // IMPORTANT: Use ModalManager to properly close pub details
+        const modalManager = window.App?.getModule('modalManager');
+        if (modalManager) {
+            modalManager.close('pubDetailsOverlay');
+        }
+        
         // Check if we have previous results
         const searchResults = window.App?.getState('searchResults');
-        const resultsOverlay = document.getElementById('resultsOverlay');
         
-        if (searchResults?.length > 0 && resultsOverlay) {
-            // Hide pub details
-            const pubOverlay = document.getElementById('pubDetailsOverlay');
-            if (pubOverlay) {
-                pubOverlay.style.display = 'none';
-                pubOverlay.classList.remove('active');
+        if (searchResults?.length > 0) {
+            // Show results using ModalManager
+            if (modalManager) {
+                modalManager.open('resultsOverlay');
             }
-            
-            // Show results
-            resultsOverlay.style.display = 'flex';
-            resultsOverlay.classList.add('active');
             
             // Update context
             setPageContext('results');
