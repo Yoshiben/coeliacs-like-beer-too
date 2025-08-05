@@ -709,6 +709,12 @@ const App = {
                 modules.breweries?.searchBreweryBeers(brewery);
             }
         },
+        'select-brewery': (el, modules) => {
+            const brewery = el.dataset.brewery;
+            if (brewery && modules.form) {
+                modules.form.selectBrewery(brewery);
+            }
+        },
         'retry-breweries': (el, modules) => {
             modules.breweries?.loadBreweries();
         },
