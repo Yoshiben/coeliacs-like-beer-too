@@ -758,6 +758,29 @@ const App = {
         'terms-of-service': (el, modules) => {
             window.location.href = '/terms';
         },
+        'show-beer-list': (el, modules) => {
+            const currentPub = window.App.getState('currentPub');
+            if (!currentPub) return;
+            
+            // Open beer list modal
+            modules.modalManager?.open('beerListModal');
+            
+            // Set pub name
+            const pubNameEl = document.getElementById('beerListPubName');
+            if (pubNameEl) pubNameEl.textContent = currentPub.name;
+            
+            // Load beer list
+            modules.search?.loadBeerList?.(currentPub);
+        },
+        
+        'delete-beer': (el, modules) => {
+            const beerId = el.dataset.beerId;
+            const beerName = el.dataset.beerName;
+            
+            if (confirm(`Remove "${beerName}" from this pub?`)) {
+                modules.api?.deleteBeerFromPub?.(beerId);
+            }
+        },
 
     },
     
