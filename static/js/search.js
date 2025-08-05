@@ -133,12 +133,16 @@ export const SearchModule = (function() {
             
             // Save search state
             state.lastSearchState = {
-                type: 'nearby',
-                radius: radiusKm,
-                userLocation: userLocation,
-                timestamp: Date.now()
-            };
-            
+            type: 'nearby',
+            radius: radiusKm,
+            userLocation: userLocation,
+            timestamp: Date.now()
+        };
+        
+        // Also store in global state for filter module
+        window.App.setState(STATE_KEYS.LAST_SEARCH.TYPE, 'nearby');
+        window.App.setState(STATE_KEYS.LAST_SEARCH.RADIUS, radiusKm);
+                    
             // Perform search
             showResultsLoading('🔍 Searching for GF beer options...');
             const pubs = await modules.api.findNearbyPubs(
@@ -202,11 +206,14 @@ export const SearchModule = (function() {
             
             // Save state
             state.lastSearchState = {
-                type: type,
-                query: searchConfig.stateQuery || query,
-                results: pubs,
+                type: 'name',
+                query: query,
                 timestamp: Date.now()
             };
+            
+            // Store globally
+            window.App.setState(STATE_KEYS.LAST_SEARCH.TYPE, 'name');
+            window.App.setState(STATE_KEYS.LAST_SEARCH.QUERY, query);
             
             state.currentSearchPubs = pubs;
             
@@ -306,12 +313,17 @@ export const SearchModule = (function() {
                 return;
             }
             
+            // UPDATE: In searchByArea around line 260
             state.lastSearchState = {
                 type: 'area',
-                query: `${postcode} (postcode)`,
-                results: pubs,
+                query: query,
+                searchType: searchType,
                 timestamp: Date.now()
             };
+
+            // Store globally
+            window.App.setState(STATE_KEYS.LAST_SEARCH.TYPE, 'area');
+            window.App.setState(STATE_KEYS.LAST_SEARCH.QUERY, query);
             
             state.currentSearchPubs = pubs;
             
@@ -393,10 +405,14 @@ export const SearchModule = (function() {
             // Save state and display
             state.lastSearchState = {
                 type: 'beer',
-                query: `${query} (${searchType})`,
-                results: filteredPubs,
+                query: query,
+                searchType: searchType,
                 timestamp: Date.now()
             };
+            
+            // Store globally
+            window.App.setState(STATE_KEYS.LAST_SEARCH.TYPE, 'beer');
+            window.App.setState(STATE_KEYS.LAST_SEARCH.QUERY, query);
             
             state.currentSearchPubs = filteredPubs;
             
