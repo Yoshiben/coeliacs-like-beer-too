@@ -97,6 +97,8 @@ export const SearchModule = (function() {
     
     const searchNearbyWithDistance = async (radiusKm) => {
         console.log(`🎯 Searching within ${radiusKm}km...`);
+
+        const gfOnly = window.App.getState('gfOnlyFilter') !== false; // Default to true
         
         try {
             // Close distance modal using modalManager
@@ -141,7 +143,8 @@ export const SearchModule = (function() {
                 userLocation.lat, 
                 userLocation.lng, 
                 radiusKm, 
-                false
+                gfOnly  // Pass the filter preference
+);
             );
             
             console.log(`✅ Found ${pubs.length} pubs`);
