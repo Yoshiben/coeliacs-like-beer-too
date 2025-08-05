@@ -135,7 +135,6 @@ export const NavStateManager = (() => {
     // ================================
     // TOGGLE MANAGEMENT
     // ================================
-    // UPDATE the initToggle function in nav.js:
 
     const initToggle = () => {
         const container = document.querySelector('.top-nav .toggle-container');
@@ -163,6 +162,22 @@ export const NavStateManager = (() => {
                 thumb.style.transform = `translateX(${offset}px)`;
             }
         };
+        
+        // Ensure GF Only is active by default
+        const gfOption = container.querySelector('.toggle-option[data-value="gf"]');
+        if (gfOption && !container.querySelector('.toggle-option.active')) {
+            gfOption.classList.add('active');
+        }
+        
+        // Force initial thumb update after DOM settles
+        requestAnimationFrame(() => {
+            updateThumb();
+            // Ensure thumb is visible
+            if (thumb) {
+                thumb.style.opacity = '1';
+                thumb.style.visibility = 'visible';
+            }
+        });
         
         // Remove old event listeners by cloning
         options.forEach(option => {
@@ -197,9 +212,6 @@ export const NavStateManager = (() => {
                 handleToggleChange(value);
             });
         });
-        
-        // Initial thumb position
-        requestAnimationFrame(updateThumb);
         
         // Update on resize
         window.addEventListener('resize', updateThumb);
