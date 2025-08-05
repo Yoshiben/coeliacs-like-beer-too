@@ -150,7 +150,6 @@ def nearby():
                 p.pub_id, p.name, p.address, p.postcode, p.local_authority, 
                 p.latitude, p.longitude,
                 COALESCE(s.status, 'unknown') as gf_status,
-                s.bottle, s.tap, s.cask, s.can,
                 (6371 * acos(cos(radians(%s)) * cos(radians(p.latitude)) * 
                 cos(radians(p.longitude) - radians(%s)) + sin(radians(%s)) * 
                 sin(radians(p.latitude)))) AS distance,
@@ -170,7 +169,7 @@ def nearby():
         params = [lat, lng, lat]
         
         if gf_only:
-            sql += " AND s.status IN ('always', 'currently')"
+            sql += " AND s.status IN ('always_tap_cask', 'always_bottle_can', 'currently')"
         
         sql += """
             GROUP BY p.pub_id
