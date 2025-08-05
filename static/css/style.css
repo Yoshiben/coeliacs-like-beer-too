@@ -403,9 +403,10 @@ form-input:focus {
    border-radius: var(--radius-xl);
    transition: all var(--transition-fast);
    box-shadow: var(--shadow-sm);
-   /* ADD: Set initial width and position */
-   width: 72px; /* Approximate width of "GF Only" option */
-   transform: translateX(0);
+   opacity: 1;
+   visibility: visible;
+   pointer-events: none;
+   z-index: 1;
 }
    
 
