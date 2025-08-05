@@ -213,7 +213,7 @@ export const ModalManager = (() => {
         
         // Handle exclusive modals
         if (config.exclusive) {
-            closeGroup(config.group, elementId);
+            closeGroup(config.group, modalId);
         }
         
         // Check stackable rules
