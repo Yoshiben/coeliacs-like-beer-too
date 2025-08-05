@@ -203,7 +203,7 @@ export const ModalManager = (() => {
         
         // Handle exclusive modals
         if (config.exclusive) {
-            closeGroup(config.group);
+            closeGroup(config.group, elementId);
         }
         
         // Check stackable rules
@@ -269,7 +269,7 @@ export const ModalManager = (() => {
         return true;
     };
     
-    const closeGroup = (group) => {
+    const closeGroup = (group, exceptId = null) => {
         const toClose = [...state.activeModals, ...state.activeOverlays].filter(id => {
             const config = registry[id];
             return config && config.group === group && id !== exceptId;
