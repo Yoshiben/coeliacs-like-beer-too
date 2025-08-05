@@ -544,27 +544,30 @@ export const SearchModule = (function() {
         const beerSection = document.getElementById('beerSection');
         if (!beerSection || !beerEl) return;
         
-        const hasGFOptions = pub.bottle || pub.tap || pub.cask || pub.can;
+        const hasGFOptions = pub.bottle || pub.tap || pub.cask || pub.can || pub.beer_details;
         
-        if (hasGFOptions) {
+        if (hasGFOptions || pub.gf_status === 'currently' || pub.gf_status === 'always_tap_cask' || pub.gf_status === 'always_bottle_can') {
             beerSection.style.display = 'block';
+            beerSection.style.cursor = 'pointer';
+            beerSection.setAttribute('data-action', 'show-beer-list');
             
-            const formats = [];
-            if (pub.bottle) formats.push('🍺 Bottles');
-            if (pub.tap) formats.push('🚰 Tap');
-            if (pub.cask) formats.push('🛢️ Cask');
-            if (pub.can) formats.push('🥫 Cans');
+            // Parse beer details if available
+            const beerCount = pub.beer_details ? pub.beer_details.split(',').length : 0;
             
-            beerEl.innerHTML = `<strong>Available in: ${formats.join(', ')}</strong>`;
-            
-            if (pub.beer_details) {
-                beerEl.innerHTML += `<br><small style="margin-top: var(--space-sm); display: block;">${pub.beer_details}</small>`;
-            }
+            beerEl.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        ${beerCount > 0 ? `<strong>${beerCount} GF beer${beerCount > 1 ? 's' : ''} reported</strong>` : '<strong>No beers listed yet</strong>'}
+                        <br><small style="opacity: 0.8;">Click to view/manage list</small>
+                    </div>
+                    <div style="font-size: 1.5rem; opacity: 0.6;">›</div>
+                </div>
+            `;
         } else {
             beerSection.style.display = 'none';
             beerEl.innerHTML = '';
         }
-    };
+};
     
     const setupGFStatusDisplay = (pub) => {
         const statusEl = document.getElementById('currentGFStatus');
