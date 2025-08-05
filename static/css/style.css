@@ -530,14 +530,6 @@ form-input:focus {
    
 }
 
-@media (min-width:1025px) {
-   .nav-back-btn {
-      position: absolute;
-      right: 0;
-      margin: var(--space-xl);
-   }
-}
-
 .nav-back-btn:hover {
     background: rgba(255, 255, 255, 0.3);
     transform: translateX(-2px);
@@ -735,7 +727,7 @@ body.page-pub .nav-notification-btn {
    display: flex;
    justify-content: space-evenly;
    gap: var(--space-md);
-   padding: var(--space-xs) 0;
+   padding: var(--space-xs);
    border-bottom: 1px solid var(--border-light);
    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.06);
    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%,  rgba(248, 249, 250, 0.95) 100%);
@@ -748,6 +740,20 @@ body.page-pub .nav-notification-btn {
    background: var(--grey-purple);
    gap: var(--space-md);
    padding: 0 var(--space-lg) var(--space-xs);
+}
+
+/* ================================
+   DESKTOP SPECIFIC
+   ================================ */
+
+@media (min-width:1025px) {
+   .nav-back-btn {
+      position: absolute;
+      right: 0;
+      margin: var(--space-xl);
+   }
+   .stats-bar {
+      padding: var(--space-sm);
 }
 
 .stat-pill.highlighted {
