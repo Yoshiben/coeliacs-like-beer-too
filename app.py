@@ -512,7 +512,6 @@ def submit_beer_update():
         
         # Handle auto-approval
         if status == 'auto_approved':
-            cursor.callproc('ApproveBeerReport', [report_id, 'auto_system'])
             conn.commit()
             
             return jsonify({
@@ -602,10 +601,21 @@ def update_gf_status():
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor()
         
-        # Call stored procedure to update status with history tracking
-        cursor.callproc('UpdatePubGFStatus', [
-            pub_id, status, 'user'
-        ])
+       # Update the GF status directly
+        cursor.execute("""
+            UPDATE pub_gf_status 
+            SET status = %s,
+                updated_at = NOW(),
+                updated_by = 'user'
+            WHERE pub_id = %s
+        """, (status, pub_id))
+        
+        # If no rows updated, insert new record
+        if cursor.rowcount == 0:
+            cursor.execute("""
+                INSERT INTO pub_gf_status (pub_id, status, updated_by)
+                VALUES (%s, %s, 'user')
+            """, (pub_id, status))
         
         conn.commit()
         
@@ -796,9 +806,6 @@ def approve_submission():
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor()
         
-        # Call stored procedure
-        cursor.callproc('ApproveBeerReport', [report_id, 'admin'])
-        
         # Add admin notes if provided
         if admin_notes:
             cursor.execute("""
@@ -961,3 +968,4 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
