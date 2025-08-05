@@ -278,8 +278,6 @@ export const NavStateManager = (() => {
         }
     };
 
-    // REPLACE: The entire handleToggleChange function in nav.js around line 280
-
     const handleToggleChange = (mode) => {
         console.log(`🔀 Toggle changed to: ${mode}`);
         
@@ -299,7 +297,7 @@ export const NavStateManager = (() => {
             
             if (lastSearch && searchModule) {
                 // Re-run based on search type
-                if (lastSearch.type === 'nearby' && lastSearch.radius) {
+                if (lastSearch.type === 'nearby' || lastSearch.type === 'location') && lastSearch.radius) {
                     console.log('🔄 Re-running nearby search with radius:', lastSearch.radius);
                     searchModule.searchNearbyWithDistance(lastSearch.radius);
                 } else if (lastSearch.type === 'name' && lastSearch.query) {
