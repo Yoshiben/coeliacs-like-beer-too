@@ -296,8 +296,12 @@ export const CommunityModule = (() => {
         try {
             const stats = await modules.api?.getStats();
             if (stats) {
-                modules.helpers?.animateNumber('totalPubs', Math.floor(stats.total_pubs / 1000) + 'k+');
-                modules.helpers?.animateNumber('gfPubs', (stats.gf_pubs / 1000).toFixed(1) + 'k+');
+                if (stats.total_pubs) {
+                    modules.helpers?.animateNumber('totalPubs', stats.total_pubs);
+                }
+                if (stats.gf_pubs) {
+                    modules.helpers?.animateNumber('gfPubs', stats.gf_pubs);
+                }
             }
         } catch (error) {
             console.error('Error updating stats:', error);
