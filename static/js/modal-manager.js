@@ -84,7 +84,17 @@ export const ModalManager = (() => {
             return false;
         }
         
-        // Handle exclusive groups
+        // Check if already open - if so, just refresh content
+        const isAlreadyOpen = state.activeModals.includes(elementId) || 
+                              state.activeOverlays.includes(elementId);
+        
+        if (isAlreadyOpen && options.onOpen) {
+            console.log(`🔄 ${elementId} already open, refreshing content`);
+            options.onOpen();
+            return true;
+        }
+        
+        // Handle exclusive groups (but don't close self)
         if (config.exclusive) {
             closeGroup(config.group, elementId);
         }
