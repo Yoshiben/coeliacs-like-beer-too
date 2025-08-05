@@ -351,35 +351,44 @@ export const NavStateManager = (() => {
     // INITIALIZATION
     // ================================
 
-    const observeOverlay = (overlayId, context) => {
-        const overlay = document.getElementById(overlayId);
-        if (!overlay) return;
+    const init = () => {
+        console.log('🔧 Initializing NavStateManager');
         
-        let lastVisibleState = false;
+        // Set initial context
+        setPageContext('home');
         
-        // Create observer
-        const observer = new MutationObserver((mutations) => {
-            const isVisible = overlay.style.display !== 'none' && 
-                            (overlay.classList.contains('active') || 
-                             overlay.style.display === 'flex');
+        // Initialize toggle
+        initToggle();
+        
+        const observeOverlay = (overlayId, context) => {
+            const overlay = document.getElementById(overlayId);
+            if (!overlay) return;
             
-            // Only trigger if visibility actually changed
-            if (isVisible && !lastVisibleState) {
-                console.log(`📍 ${overlayId} became visible, setting context: ${context}`);
-                setPageContext(context);
-                lastVisibleState = true;
-            } else if (!isVisible && lastVisibleState) {
-                lastVisibleState = false;
-            }
-        });
-        
-        // Start observing
-        observer.observe(overlay, {
-            attributes: true,
-            attributeFilter: ['style', 'class']
-        });
+            let lastVisibleState = false;
+            
+            // Create observer
+            const observer = new MutationObserver((mutations) => {
+                const isVisible = overlay.style.display !== 'none' && 
+                                (overlay.classList.contains('active') || 
+                                 overlay.style.display === 'flex');
+                
+                // Only trigger if visibility actually changed
+                if (isVisible && !lastVisibleState) {
+                    console.log(`📍 ${overlayId} became visible, setting context: ${context}`);
+                    setPageContext(context);
+                    lastVisibleState = true;
+                } else if (!isVisible && lastVisibleState) {
+                    lastVisibleState = false;
+                }
+            });
+            
+            // Start observing
+            observer.observe(overlay, {
+                attributes: true,
+                attributeFilter: ['style', 'class']
+            });
+        };
     };
-    
     // ================================
     // PUBLIC API
     // ================================
