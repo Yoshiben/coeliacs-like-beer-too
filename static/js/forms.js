@@ -772,14 +772,38 @@ export const FormModule = (() => {
                 const result = await response.json();
                 utils.hideLoadingToast();
                 
-                // Update the display
+                // UPDATE THE DISPLAY IMMEDIATELY
                 this.updateStatusDisplay(this.selectedStatus);
+                
+                // Update the current pub state
+                const currentPub = window.App.getState(STATE_KEYS.CURRENT_PUB);
+                if (currentPub) {
+                    window.App.setState(STATE_KEYS.CURRENT_PUB, {
+                        ...currentPub,
+                        gf_status: this.selectedStatus
+                    });
+                }
                 
                 // Show success
                 utils.showToast('✅ Status updated successfully!');
                 
                 // Track event
                 modules.tracking?.trackEvent('gf_status_updated', 'Form', this.selectedStatus);
+                
+                // CHECK IF WE SHOULD PROMPT FOR BEER DETAILS
+                if (this.selectedStatus === 'always_tap_cask' || 
+                    this.selectedStatus === 'always_bottle_can' || 
+                    this.selectedStatus === 'currently') {
+                    
+                    // Show the beer details prompt modal after a short delay
+                    setTimeout(() => {
+                        if (modules.modalManager) {
+                            modules.modalManager.open('beerDetailsPromptModal');
+                        } else {
+                            modules.modal?.open('beerDetailsPromptModal');
+                        }
+                    }, 500);
+                }
                 
             } catch (error) {
                 console.error('❌ Error updating status:', error);
@@ -793,13 +817,18 @@ export const FormModule = (() => {
             if (!statusEl) return;
             
             const displays = {
-                'always': {
+                'always_tap_cask': {
                     icon: '⭐',
-                    text: 'Always Available',
-                    meta: 'Permanent GF options!'
+                    text: 'Always Has Tap/Cask',
+                    meta: 'The holy grail of GF beer!'
+                },
+                'always_bottle_can': {
+                    icon: '✅',
+                    text: 'Always Has Bottles/Cans',
+                    meta: 'Reliable GF options'
                 },
                 'currently': {
-                    icon: '✅',
+                    icon: '🔵',
                     text: 'Available Now',
                     meta: 'GF beer in stock'
                 },
@@ -814,6 +843,24 @@ export const FormModule = (() => {
                     meta: 'Help us find out!'
                 }
             };
+            
+            const display = displays[status] || displays.unknown;
+            
+            statusEl.className = `current-status ${status}`;
+            statusEl.innerHTML = `
+                <span class="status-icon">${display.icon}</span>
+                <span class="status-text">${display.text}</span>
+                <span class="status-meta">${display.meta}</span>
+            `;
+            
+            // Also update the status card question if the status is now known
+            if (status !== 'unknown') {
+                const questionEl = document.querySelector('.status-question');
+                if (questionEl) {
+                    questionEl.innerHTML = '🍺 GF Beer Status';
+                }
+            }
+        }
             
             const display = displays[status] || displays.unknown;
             
