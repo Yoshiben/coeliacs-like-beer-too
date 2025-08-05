@@ -163,10 +163,24 @@ export const NavStateManager = (() => {
             }
         };
         
-        // Ensure GF Only is active by default
-        const gfOption = container.querySelector('.toggle-option[data-value="gf"]');
-        if (gfOption && !container.querySelector('.toggle-option.active')) {
-            gfOption.classList.add('active');
+        // Check stored preference or default to GF only
+        const storedFilter = window.App.getState('gfOnlyFilter');
+        const currentValue = storedFilter === false ? 'all' : 'gf'; // Default to 'gf' if not set
+        
+        // Set the correct option as active
+        options.forEach(opt => {
+            opt.classList.remove('active');
+            if (opt.dataset.value === currentValue) {
+                opt.classList.add('active');
+            }
+        });
+        
+        // If no active option, default to GF
+        if (!container.querySelector('.toggle-option.active')) {
+            const gfOption = container.querySelector('.toggle-option[data-value="gf"]');
+            if (gfOption) {
+                gfOption.classList.add('active');
+            }
         }
         
         // Force initial thumb update after DOM settles
@@ -213,8 +227,40 @@ export const NavStateManager = (() => {
             });
         });
         
-        // Update on resize
-        window.addEventListener('resize', updateThumb);
+        updateMapDisplay(true);
+        setupZoomHandler();
+    };
+    
+    // Add a refresh method to update toggle state when context changes
+    const refreshToggleState = () => {
+        const container = document.querySelector('.top-nav .toggle-container');
+        if (!container) return;
+        
+        const storedFilter = window.App.getState('gfOnlyFilter');
+        const currentValue = storedFilter === false ? 'all' : 'gf';
+        
+        const options = container.querySelectorAll('.toggle-option');
+        const thumb = container.querySelector('.toggle-thumb');
+        
+        options.forEach(opt => {
+            opt.classList.remove('active');
+            if (opt.dataset.value === currentValue) {
+                opt.classList.add('active');
+            }
+        });
+        
+        // Update thumb position
+        if (thumb) {
+            const activeOption = container.querySelector('.toggle-option.active');
+            if (activeOption) {
+                const containerRect = container.getBoundingClientRect();
+                const optionRect = activeOption.getBoundingClientRect();
+                const offset = optionRect.left - containerRect.left;
+                
+                thumb.style.width = `${activeOption.offsetWidth}px`;
+                thumb.style.transform = `translateX(${offset}px)`;
+            }
+        }
     };
     
     // UPDATE the handleToggleChange function (around line 217):
