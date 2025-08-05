@@ -708,26 +708,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- Beer List Modal -->
-        <div id="beerListModal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 class="modal-title">🍺 Current GF Beers</h3>
-                    <p class="modal-subtitle" id="beerListPubName"></p>
-                    <button class="modal-close" data-action="close-modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div id="beerListContent" class="beer-list-content">
-                        <!-- Beer items will be populated here -->
-                    </div>
-                    <div class="beer-list-empty" id="beerListEmpty" style="display: none;">
-                        <p>No GF beers reported yet</p>
-                        <button class="btn btn-primary" data-action="report-beer">Add First Beer</button>
-                    </div>
-                </div>
-            </div>
-        </div>
         
         <div id="gfStatusConfirmModal" class="modal confirm-modal">
             <div class="modal-content confirm-modal-content">
@@ -757,6 +737,26 @@
                     <div class="modal-actions">
                         <button class="btn btn-secondary" data-action="skip-details">Not Now</button>
                         <button class="btn btn-primary" data-action="add-beer-details">📝 Add Beer Details</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Beer List Modal -->
+        <div id="beerListModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">🍺 Current GF Beers</h3>
+                    <p class="modal-subtitle" id="beerListPubName"></p>
+                    <button class="modal-close" data-action="close-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="beerListContent" class="beer-list-content">
+                        <!-- Beer items will be populated here -->
+                    </div>
+                    <div class="beer-list-empty" id="beerListEmpty" style="display: none;">
+                        <p>No GF beers reported yet</p>
+                        <button class="btn btn-primary" data-action="report-beer">Add First Beer</button>
                     </div>
                 </div>
             </div>
@@ -1179,6 +1179,7 @@
         </script>
     </body>
 </html>
+
 
 
 
