@@ -114,7 +114,7 @@
    --search-area-border: rgba(139, 92, 246, 0.2);
    --search-area-border-hover: rgba(139, 92, 246, 0.4);
    
-   /* GF Status Colors */
+      /* GF Status Colors */
    --always-gf-fill: var(--gold);
    --always-gf-border: var(--dark-gold);
    --currently-gf-fill: var(--green);
@@ -126,6 +126,7 @@
    --my-location-fill: var(--light-blue);
    --my-location-border: var(--white);
 
+   /* 5-Tier Status System Colors */
    --always-tap-cask-fill: #FFD700;
    --always-tap-cask-border: #FDB904;
    --always-bottle-can-fill: #00F500;
@@ -256,10 +257,10 @@ html {
 .modal-content {
    max-height: 76vh;
    max-height: 76dvh;
-   height: 100%;
-   max-width: 90vw;
-   max-width: 90dvw;
-   width: 100%;
+/*    height: 100%; */
+   max-width: 96vw;
+   max-width: 96dvw;
+/*    width: 100%; */
    padding: 0;
    display: flex;
    flex-direction: column;
@@ -314,7 +315,8 @@ html {
    ============ */
 
 
-.form-input {
+.form-input,
+.form-select{
    border: 2px solid var(--border-light);
    border-radius: var(--radius-xl);
    font-size: var(--text-md);
@@ -330,20 +332,13 @@ form-input:focus {
    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-.form-select {
-   padding: var(--space-xs);
+.form-label {
+   font-weight: 600;
+   color: var(--text-secondary);
+   font-size: var(--text-sm);
+   padding: var(--space-md);
+   display: flex;
 }
-
-.report-modal .form-input,
-.report-modal .form-select {
-   font-size: 14px;
-   padding: var(--space-sm) var(--space-sm);
-   border: var(--border-light);
-   border-radius: var(--radius);
-   transition: all var(--transition);
-}
-
-
 
 /* ================================
    TOGGLE SWITCH - PROPER TOGGLE
@@ -2164,7 +2159,7 @@ body.page-pub .nav-notification-btn {
 
 
 
-.search-modal .form-select {
+/* .search-modal .form-select {
    width: 100%;
    border: 2px solid rgba(0, 0, 0, 0.1);
    border-radius: var(--radius-lg);
@@ -2174,15 +2169,15 @@ body.page-pub .nav-notification-btn {
    overflow: hidden;
    padding: var(--space-md);
    box-sizing: border-box;
-}
+} */
 
-.search-modal .form-label {
+/* .search-modal .form-label {
    font-weight: 600;
    color: var(--text-secondary);
    font-size: var(--text-sm);
    padding: var(--space-md) 0 0 var(--space-xs);  
 }
-
+ */
 
 
 
@@ -2668,26 +2663,26 @@ body.page-pub .nav-notification-btn {
    margin-bottom: var(--space-2xl);
 }
 
-.report-modal .form-label {
+/* .report-modal .form-label {
    font-weight: 600;
    color: var(--text-secondary);
    display: block;
 }
-
-.report-modamodal .form-input:focus,
+ */
+/* .report-modamodal .form-input:focus,
 .report-modal .form-select:focus {
    outline: none;
    border-color: var(--purple-border);
    box-shadow: 0 0 0 3px var(--purple-shadow);
    background: var(--bg-white);
-}
+} */
 
-.report-modal .form-select {
+/* .report-modal .form-select {
    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg width='14' height='8' viewBox='0 0 14 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M1 1L7 7L13 1' stroke='%23667eea' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3e%3c/svg%3e");
    background-repeat: no-repeat;
    background-position: right var(--space-xl) center;
    padding-right: 48px;
-}
+} */
 
 
 
