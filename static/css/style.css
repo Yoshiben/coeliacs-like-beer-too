@@ -1762,7 +1762,7 @@ body.page-pub .nav-notification-btn {
 
 /* UPDATE: Status Actions Buttons */
 .status-actions {
-    display: flex;
+/*     display: flex; */
     gap: var(--space-md);
     margin-top: var(--space-lg);
     justify-content: center;
