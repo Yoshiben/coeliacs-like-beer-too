@@ -89,15 +89,31 @@ export const FilterStateManager = (() => {
             }
         });
         
-        // Results module subscription
+        // Results module subscription - FIXED
         subscribe((newMode) => {
             const currentView = window.App.getState('currentView');
             if (currentView === 'results') {
                 const searchModule = window.App.getModule('search');
-                // Re-filter current results
-                const currentResults = searchModule?.getCurrentResults?.() || [];
-                const filtered = filterPubs(currentResults);
-                searchModule?.displayResultsInOverlay?.(filtered, getResultsTitle(filtered.length));
+                const lastSearch = window.App.getState('lastSearch');
+                
+                if (!lastSearch) return;
+                
+                console.log('🔄 Filter changed, re-running search with:', newMode);
+                
+                // Re-run the last search with new filter setting
+                if (lastSearch.type === 'nearby' && lastSearch.radius) {
+                    // Re-run nearby search with new filter
+                    searchModule?.searchNearbyWithDistance?.(lastSearch.radius);
+                } else if (lastSearch.type === 'name' && lastSearch.query) {
+                    // Re-run name search
+                    searchModule?.searchByName?.();
+                } else if (lastSearch.type === 'area' && lastSearch.query) {
+                    // Re-run area search
+                    searchModule?.searchByArea?.();
+                } else if (lastSearch.type === 'beer' && lastSearch.query) {
+                    // Re-run beer search
+                    searchModule?.searchByBeer?.();
+                }
             }
         });
     };
