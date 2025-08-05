@@ -746,7 +746,7 @@ body.page-pub .nav-notification-btn {
    border-radius: var(--radius-xl);
    background: var(--grey-purple);
    gap: var(--space-md);
-   padding: 0 var(--space-sm);
+   padding: 0 var(--space-lg) var(--space-xs);
 }
 
 .stat-pill.highlighted {
