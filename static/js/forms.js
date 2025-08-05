@@ -23,7 +23,8 @@ export const FormModule = (() => {
             pub: null
         },
         dropdownsOpen: new Set(),
-        currentSubmission: null
+        currentSubmission: null,
+        isSubmitting: false  // ADD THIS
     };
     
     const config = {
@@ -102,6 +103,13 @@ export const FormModule = (() => {
     // ================================
     const handleReportSubmission = async (event) => {
         event.preventDefault();
+
+        // Prevent duplicate submissions
+        if (state.isSubmitting) {
+            console.log('⚠️ Submission already in progress');
+            return;
+        }
+        
         console.log('📝 Handling report submission...');
         
         const form = event.target;
@@ -137,6 +145,7 @@ export const FormModule = (() => {
             utils.showToast('Error submitting report. Please try again.', 'error');
         } finally {
             state.currentSubmission = null;
+            state.isSubmitting = false;  // Reset flag
         }
     };
     
