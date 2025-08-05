@@ -1199,10 +1199,6 @@ export const SearchModule = (function() {
                 gfIndicator.textContent = '✅ Always (Bottles/Cans)';
                 gfIndicator.className = 'gf-indicator always-bottle-can';
                 break;
-            case 'always': // Legacy support
-                gfIndicator.textContent = '✅ Always Available';
-                gfIndicator.className = 'gf-indicator';
-                break;
             case 'currently':
                 gfIndicator.textContent = '🔵 Currently Available';
                 gfIndicator.className = 'gf-indicator currently';
@@ -1210,6 +1206,13 @@ export const SearchModule = (function() {
             case 'not_currently':
                 gfIndicator.textContent = '❌ Not Available';
                 gfIndicator.className = 'gf-indicator not-currently';
+                break;
+            case 'unknown':
+            case null:
+            case undefined:
+            case '':
+                gfIndicator.textContent = '❓ GF Unknown';
+                gfIndicator.className = 'gf-indicator unknown';
                 break;
             default:
                 gfIndicator.textContent = '❓ GF Unknown';
