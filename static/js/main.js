@@ -250,17 +250,17 @@ const App = {
             const helpers = App.getModule('helpers');
             
             if (helpers && stats) {
-                helpers.animateNumber('totalPubs', stats.total_pubs);
-                helpers.animateNumber('gfPubs', stats.gf_pubs);
+                // Just use the numbers as they are
+                if (stats.total_pubs) {
+                    helpers.animateNumber('totalPubs', stats.total_pubs);
+                }
+                if (stats.gf_pubs) {
+                    helpers.animateNumber('gfPubs', stats.gf_pubs);
+                }
             }
         } catch (error) {
             console.error('Failed to load stats:', error);
-            // Use fallback values
-            const helpers = App.getModule('helpers');
-            if (helpers) {
-                helpers.animateNumber('totalPubs', Constants.DEFAULTS.TOTAL_PUBS);
-                helpers.animateNumber('gfPubs', Constants.DEFAULTS.GF_PUBS);
-            }
+            // Leave blank on error - don't set fallback values
         }
     },
     
