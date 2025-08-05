@@ -138,11 +138,11 @@ export const SearchModule = (function() {
             radius: radiusKm,
             userLocation: userLocation,
             timestamp: Date.now()
-        };
-        
-        // Also store in global state for filter module
-        window.App.setState(STATE_KEYS.LAST_SEARCH.TYPE, 'nearby');
-        window.App.setState(STATE_KEYS.LAST_SEARCH.RADIUS, radiusKm);
+            };
+            
+            // Also store in global state for filter module
+            window.App.setState(STATE_KEYS.LAST_SEARCH.TYPE, 'nearby');
+            window.App.setState(STATE_KEYS.LAST_SEARCH.RADIUS, radiusKm);
                     
             // Perform search
             showResultsLoading('🔍 Searching for GF beer options...');
