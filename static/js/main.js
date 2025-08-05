@@ -158,13 +158,18 @@ const App = {
     initPhase2: async () => {
         console.log('🔧 Phase 2: Data Layer...');
         
-        const [{ APIModule }, { TrackingModule }] = await Promise.all([
+        const [{ APIModule }, { TrackingModule }, { FilterStateManager }] = await Promise.all([
             import('./api.js'),
-            import('./tracking.js')
+            import('./tracking.js'),
+            import('./filter-gf.js')
         ]);
         
         App.registerModule('api', APIModule);
         App.registerModule('tracking', TrackingModule);
+        App.registerModule('filterGF', FilterStateManager);
+        
+        // Initialize filter state manager
+        FilterStateManager.init();
         
         // Load initial stats
         await App.loadInitialStats();
