@@ -109,6 +109,7 @@ export const FormModule = (() => {
         
         // Collect and validate form data
         const reportData = collectReportData(formData);
+        console.log('🔍 DEBUG - Report data being sent:', JSON.stringify(reportData, null, 2));
         const validation = validateReportForm(reportData);
         
         if (!validation.isValid) {
@@ -148,6 +149,12 @@ export const FormModule = (() => {
             beer_abv: formData.get('reportBeerABV') || document.getElementById('reportBeerABV')?.value,
             notes: formData.get('reportNotes') || ''
         };
+
+        // ADD THIS: Check for beer_id
+        const beerNameInput = document.getElementById('reportBeerName');
+        if (beerNameInput?.dataset.beerId) {
+            reportData.beer_id = parseInt(beerNameInput.dataset.beerId);
+        }
         
         // Add pub data - check both selected pub state and current pub state
         const selectedPub = utils.getSelectedPub() || utils.getCurrentPub();
@@ -599,6 +606,12 @@ export const FormModule = (() => {
         document.getElementById('reportBeerName').value = beer.name;
         document.getElementById('reportBeerStyle').value = beer.style || '';
         document.getElementById('reportBeerABV').value = beer.abv || '';
+        
+        // IMPORTANT: Store the beer_id in a data attribute or hidden field
+        const beerNameInput = document.getElementById('reportBeerName');
+        if (beerNameInput && beer.beer_id) {
+            beerNameInput.dataset.beerId = beer.beer_id;
+        }
         
         hideDropdown('beerNameDropdown');
         
