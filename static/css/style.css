@@ -307,9 +307,6 @@ html {
    gap: var(--space-4xl);
    padding: var(--space-xl);
 }
-   
-   
-   
 
 
 /* ============
@@ -348,7 +345,53 @@ form-input:focus {
 
 
 
+/* ================================
+   TOGGLE SWITCH - PROPER TOGGLE
+   ================================ */
 
+.toggle-container {
+   border-radius: var(--radius-xl);
+   display: flex;
+   position: relative;
+   border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.toggle-track {
+   position: relative;
+   display: flex;
+   align-items: center;
+}
+
+.toggle-option {
+   padding: 8px 16px;
+   font-size: var(--text-sm);
+   font-weight: 600;
+   color: rgba(255, 255, 255, 0.7);
+   cursor: pointer;
+   transition: color var(--transition);
+   position: relative;
+   z-index: 2;
+   white-space: nowrap;
+}
+
+.toggle-option.active {
+   color: var(--text-primary);
+}
+
+.toggle-thumb {
+   position: absolute;
+   top: 0;
+   left: 0;
+   height: 100%;
+   background: white;
+   border-radius: var(--radius-xl);
+   transition: all var(--transition-fast);
+   box-shadow: var(--shadow-sm);
+   /* ADD: Set initial width and position */
+   width: 72px; /* Approximate width of "GF Only" option */
+   transform: translateX(0);
+}
+   
 
 
 
@@ -2705,59 +2748,6 @@ body.page-pub .nav-notification-btn {
 }
 
 
-
-
-/* ================================
-   TOGGLE SWITCH - PROPER TOGGLE
-   ================================ */
-
-.toggle-container {
-   border-radius: var(--radius-pill);
-   display: flex;
-   position: relative;
-   border: 2px solid rgba(255, 255, 255, 0.3);
-}
-
-.toggle-track {
-   position: relative;
-   display: flex;
-   align-items: center;
-}
-
-.toggle-option {
-   padding: 8px 16px;
-   font-size: var(--text-sm);
-   font-weight: 600;
-   color: rgba(255, 255, 255, 0.7);
-   cursor: pointer;
-   transition: color var(--transition);
-   position: relative;
-   z-index: 2;
-   white-space: nowrap;
-}
-
-.toggle-option.active {
-   color: var(--text-primary);
-}
-
-.toggle-thumb {
-   position: absolute;
-   top: 0;
-   left: 0;
-   height: 100%;
-   background: white;
-   border-radius: 20px;
-   transition: all var(--transition-fast);
-   box-shadow: var(--shadow-sm);
-}
-
-
-
-
-
-
-
-
 /* FULL MAP CLUSTERS */
 
 .marker-cluster {
@@ -3957,12 +3947,6 @@ body.page-pub .nav-notification-btn {
     font-size: calc(var(--text-xs) * 1.1);
     font-weight: 500;
     color: rgba(255, 255, 255, 0.8);
-}
-
-.nav-toggle .toggle-thumb {
-    border-radius: calc(var(--radius-pill) * 0.7);
-    background: rgba(255, 255, 255, 0.95);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 /* Add close button to search overlay */
