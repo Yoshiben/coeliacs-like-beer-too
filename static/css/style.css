@@ -2488,18 +2488,33 @@ body.page-pub .nav-notification-btn {
    cursor: pointer;
 }
 
+
+
+
+
+/* ================================
+   NO RESULTS FOUND
+   ================================ */
+
 .no-results-found {
    display: flex;
    flex-direction: column;
    align-items: center;
-   justify-content: center;
+   justify-content: space-evenly;
    padding: var(--space-4xl);
    text-align: center;
+   height: 100%;
+}
+
+.no-results-actions {
+   display: flex;
+   padding: var(--space-xl);
+   gap: var(--space-xl);
 }
 
 .no-results-icon {
    font-size: 4rem;
-   margin-bottom: var(--space-lg);
+/*    margin-bottom: var(--space-lg); */
    opacity: 0.5;
 }
 
@@ -2507,7 +2522,7 @@ body.page-pub .nav-notification-btn {
    font-size: 1.5rem;
    font-weight: 600;
    color: var(--text-primary);
-   margin-bottom: var(--space-sm);
+/*    margin-bottom: var(--space-sm); */
 }
 
 .no-results-text {
