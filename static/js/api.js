@@ -234,14 +234,25 @@ export const APIModule = (function() {
                 const data = await response.json();
                 if (data.error) throw new Error(data.error);
                 
-                const pubs = data.pubs || data;
+                // Ensure we always return an array
+                let pubs = [];
+                if (Array.isArray(data)) {
+                    pubs = data;
+                } else if (data.pubs && Array.isArray(data.pubs)) {
+                    pubs = data.pubs;
+                } else if (data.success === false) {
+                    // API error response
+                    throw new Error(data.error || 'Failed to load pubs');
+                }
                 
                 // Update state
                 window.App.setState(STATE_KEYS.SEARCH_RESULTS, pubs);
                 
                 return pubs;
             } catch (error) {
-                return handleAPIError(error, 'findNearbyPubs', { lat, lng, radius });
+                const errorResult = handleAPIError(error, 'findNearbyPubs', { lat, lng, radius });
+                // Ensure we return an empty array on error, not an error object
+                return [];
             }
         });
     };
