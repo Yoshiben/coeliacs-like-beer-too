@@ -408,7 +408,7 @@ export const FormModule = (() => {
         // Clear dependent fields
         clearBeerFields();
         
-        // Load beers for this brewery
+        // Load beers for this brewery (only once!)
         try {
             await loadBreweryBeers(brewery);
         } catch (error) {
