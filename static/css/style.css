@@ -702,7 +702,8 @@ body.page-pub .nav-notification-btn {
    text-align: center;
    border-radius: var(--radius-xl);
    background: var(--grey-purple);
-   gap: var(--space-md);
+   gap: var(--space-lg);
+   padding: 0 var(--space-xl);
 }
 
 .stat-pill.highlighted {
