@@ -613,8 +613,8 @@ def update_gf_status():
         # If no rows updated, insert new record
         if cursor.rowcount == 0:
             cursor.execute("""
-                INSERT INTO pub_gf_status (pub_id, status, updated_by)
-                VALUES (%s, %s, 'user')
+                INSERT INTO pub_gf_status (pub_id, status, updated_at, updated_by)
+                VALUES (%s, %s, NOW(), 'user')
             """, (pub_id, status))
         
         conn.commit()
@@ -977,5 +977,6 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
