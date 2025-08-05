@@ -712,6 +712,7 @@ export const FormModule = (() => {
         },
         
         selectStatus(status) {
+            console.log('🔍 Status selected:', status);
             this.selectedStatus = status;
             
             // Close status selection modal using modalManager
