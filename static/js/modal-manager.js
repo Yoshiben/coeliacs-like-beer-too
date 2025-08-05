@@ -86,7 +86,7 @@ export const ModalManager = (() => {
         
         // Handle exclusive groups
         if (config.exclusive) {
-            closeGroup(config.group);
+            closeGroup(config.group, elementId);
         }
         
         // Handle overlays vs modals
@@ -272,7 +272,7 @@ export const ModalManager = (() => {
     const closeGroup = (group) => {
         const toClose = [...state.activeModals, ...state.activeOverlays].filter(id => {
             const config = registry[id];
-            return config && config.group === group;
+            return config && config.group === group && id !== exceptId;
         });
         
         toClose.forEach(id => close(id));
