@@ -1160,6 +1160,8 @@ export const SearchModule = (function() {
         console.log(`✅ Displayed ${pubs.length} results`);
     };
     
+    // REPLACE the createResultItem function (around line 1076):
+
     const createResultItem = (pub) => {
         const template = document.getElementById('pub-result-template');
         const clone = template.content.cloneNode(true);
@@ -1174,12 +1176,35 @@ export const SearchModule = (function() {
         }
         
         const gfIndicator = clone.querySelector('.gf-indicator');
-        if (pub.bottle || pub.tap || pub.cask || pub.can) {
-            gfIndicator.textContent = '✅ GF Available';
-            gfIndicator.className = 'gf-indicator';
-        } else {
-            gfIndicator.textContent = '❓ GF Unknown';
-            gfIndicator.className = 'gf-indicator unknown';
+        
+        // Determine GF status properly
+        const gfStatus = pub.gf_status || 'unknown';
+        
+        // Set indicator based on status
+        switch(gfStatus) {
+            case 'always_tap_cask':
+                gfIndicator.textContent = '⭐ Always (Tap/Cask)';
+                gfIndicator.className = 'gf-indicator always-tap-cask';
+                break;
+            case 'always_bottle_can':
+                gfIndicator.textContent = '✅ Always (Bottles/Cans)';
+                gfIndicator.className = 'gf-indicator always-bottle-can';
+                break;
+            case 'always': // Legacy support
+                gfIndicator.textContent = '✅ Always Available';
+                gfIndicator.className = 'gf-indicator';
+                break;
+            case 'currently':
+                gfIndicator.textContent = '🔵 Currently Available';
+                gfIndicator.className = 'gf-indicator currently';
+                break;
+            case 'not_currently':
+                gfIndicator.textContent = '❌ Not Available';
+                gfIndicator.className = 'gf-indicator not-currently';
+                break;
+            default:
+                gfIndicator.textContent = '❓ GF Unknown';
+                gfIndicator.className = 'gf-indicator unknown';
         }
         
         clone.querySelector('.result-address').textContent = pub.address;
