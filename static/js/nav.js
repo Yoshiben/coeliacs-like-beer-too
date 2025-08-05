@@ -259,8 +259,6 @@ export const NavStateManager = (() => {
             }
         }
     };
-    
-    // UPDATE the handleToggleChange function (around line 217):
 
     const handleToggleChange = (mode) => {
         console.log(`🔀 Toggle changed to: ${mode} on ${state.currentContext} page`);
@@ -279,30 +277,63 @@ export const NavStateManager = (() => {
                 break;
                 
             case 'results':
-                // Re-run the last search with new filter
-                const lastSearch = window.App.getState('lastSearch');
-                if (lastSearch && searchModule) {
-                    console.log('🔄 Re-running search with filter:', mode);
+                // Get the last search state properly
+                const lastSearchState = searchModule?.getLastSearchState?.() || window.App.getState('lastSearch');
+                
+                if (!lastSearchState) {
+                    console.warn('⚠️ No search state found to re-run');
+                    return;
+                }
+                
+                console.log('🔄 Re-running search with filter:', mode, lastSearchState);
+                
+                // Re-run search based on type
+                if (lastSearchState.type === 'nearby') {
+                    // For nearby searches, we need to make a new API call
+                    const radius = lastSearchState.radius || 5;
+                    searchModule.searchNearbyWithDistance(radius);
+                } else {
+                    // For other searches, filter existing results
+                    const currentResults = searchModule?.getCurrentResults?.() || window.App.getState('searchResults') || [];
                     
-                    // Show loading
-                    const loadingEl = document.getElementById('resultsLoading');
-                    if (loadingEl) loadingEl.style.display = 'flex';
+                    if (currentResults.length === 0) {
+                        console.warn('⚠️ No results to filter');
+                        return;
+                    }
                     
-                    // Re-run search based on type
-                    if (lastSearch.type === 'nearby' && lastSearch.userLocation) {
-                        searchModule.searchNearbyWithDistance(lastSearch.radius, mode === 'gf');
-                    } else if (lastSearch.query) {
-                        // For text searches, we need to filter results client-side
-                        const allResults = window.App.getState('searchResults') || [];
-                        const filteredResults = mode === 'gf' ? 
-                            allResults.filter(pub => pub.gf_status === 'always' || pub.gf_status === 'currently') :
-                            allResults;
-                        
-                        // Update display
-                        if (searchModule.displayResultsInOverlay) {
-                            searchModule.displayResultsInOverlay(filteredResults, 
-                                `${filteredResults.length} pubs ${mode === 'gf' ? 'with GF beer' : 'total'}`);
-                        }
+                    // Filter results based on mode
+                    const filteredResults = mode === 'gf' ? 
+                        currentResults.filter(pub => {
+                            const status = pub.gf_status || 'unknown';
+                            return status === 'always' || 
+                                   status === 'currently' || 
+                                   status === 'always_tap_cask' || 
+                                   status === 'always_bottle_can';
+                        }) : currentResults;
+                    
+                    console.log(`📊 Filtered: ${filteredResults.length} of ${currentResults.length} pubs`);
+                    
+                    // Update display title based on search type
+                    let title = '';
+                    if (lastSearchState.type === 'name') {
+                        title = `${filteredResults.length} pubs matching "${lastSearchState.query}"`;
+                    } else if (lastSearchState.type === 'area') {
+                        title = `${filteredResults.length} pubs in ${lastSearchState.query}`;
+                    } else if (lastSearchState.type === 'beer') {
+                        title = `${filteredResults.length} pubs serving "${lastSearchState.query}"`;
+                    } else {
+                        title = `${filteredResults.length} pubs`;
+                    }
+                    
+                    if (mode === 'gf') {
+                        title += ' (GF only)';
+                    }
+                    
+                    // Update display using the search module's method
+                    if (searchModule.displayResultsInOverlay) {
+                        searchModule.displayResultsInOverlay(filteredResults, title);
+                    } else {
+                        console.error('❌ displayResultsInOverlay not available');
                     }
                 }
                 break;
