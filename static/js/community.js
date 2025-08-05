@@ -63,9 +63,18 @@ export const CommunityModule = (() => {
         try {
             // In parallel, load all community data
             const [pubOfMonth, latestFinds, trending] = await Promise.all([
-                loadPubOfMonth(),
-                loadLatestFinds(),
-                loadTrending()
+                loadPubOfMonth().catch(err => {
+                    console.error('Failed to load pub of month:', err);
+                    return null;
+                }),
+                loadLatestFinds().catch(err => {
+                    console.error('Failed to load latest finds:', err);
+                    return [];
+                }),
+                loadTrending().catch(err => {
+                    console.error('Failed to load trending:', err);
+                    return [];
+                })
             ]);
             
             // Update state
@@ -78,9 +87,27 @@ export const CommunityModule = (() => {
             updateCommunityUI();
             
         } catch (error) {
-            console.error('❌ Error loading community data:', error);
+            console.error('❌ Critical error loading community data:', error);
+            // Show fallback UI
+            showFallbackUI();
         }
     };
+
+    const showFallbackUI = () => {
+        // Ensure the page still works even if community data fails
+        const communityFeed = document.querySelector('.community-feed');
+        if (communityFeed && !communityFeed.querySelector('.fallback-message')) {
+            const fallback = document.createElement('div');
+            fallback.className = 'fallback-message';
+            fallback.innerHTML = `
+                <p style="text-align: center; color: var(--text-muted); padding: var(--space-xl);">
+                    Community updates temporarily unavailable. 
+                    <a href="#" onclick="location.reload()">Refresh page</a>
+                </p>
+            `;
+            communityFeed.insertBefore(fallback, communityFeed.firstChild);
+        }
+    };    
     
     const loadPubOfMonth = async () => {
         // TODO: Add API endpoint for pub of month
