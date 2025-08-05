@@ -211,6 +211,8 @@ export const FormModule = (() => {
         };
     };
     
+    // REPLACE the handleSubmissionSuccess function in forms.js (around line 177)
+
     const handleSubmissionSuccess = (result, reportData) => {
         utils.showToast('🎉 Beer report submitted successfully! Thanks for contributing!');
         
@@ -224,8 +226,20 @@ export const FormModule = (() => {
         // Reset form
         resetReportForm();
         
-        // Return to home view
-        returnToHomeView();
+        // IMPORTANT: Refresh the current pub to show the new beer
+        const currentPub = utils.getCurrentPub();
+        if (currentPub && currentPub.pub_id) {
+            // Refresh pub details to get updated beer list
+            const searchModule = window.App?.getModule('search');
+            if (searchModule) {
+                searchModule.showPubDetails(currentPub.pub_id);
+            }
+        }
+        
+        // Return to home view if not on pub details
+        if (!currentPub) {
+            returnToHomeView();
+        }
         
         // Track success
         modules.tracking?.trackFormSubmission('beer_report', {
