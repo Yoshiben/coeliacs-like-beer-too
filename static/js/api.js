@@ -356,6 +356,13 @@ export const APIModule = (function() {
     // ================================
     const submitBeerReport = async (reportData) => {
         try {
+            // ADD THIS DEBUG LOGGING:
+            console.log('🔍 DEBUG - Raw report data:', reportData);
+            console.log('🔍 DEBUG - Data types:', {
+                pub_id: typeof reportData.pub_id,
+                beer_abv: typeof reportData.beer_abv,
+                pub_id_value: reportData.pub_id
+            });
             // Validate required fields
             const requiredFields = ['pub_id', 'beer_format', 'brewery', 'beer_name'];
             const missingFields = requiredFields.filter(field => !reportData[field] && !reportData.pub_name);
