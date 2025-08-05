@@ -406,7 +406,7 @@ form-input:focus {
    opacity: 1;
    visibility: visible;
    pointer-events: none;
-   z-index: 1;
+   z-index: 99999;
 }
    
 
