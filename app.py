@@ -583,6 +583,8 @@ def submit_beer_update():
             cursor.close()
             conn.close()
 
+# REPLACE the update-gf-status route in app.py (around line 580)
+
 @app.route('/api/update-gf-status', methods=['POST'])
 def update_gf_status():
     """Update GF status using stored procedure"""
@@ -594,25 +596,40 @@ def update_gf_status():
         if not pub_id or not status:
             return jsonify({'error': 'Missing pub_id or status'}), 400
             
-        valid_statuses = ['always', 'currently', 'not_currently', 'unknown']
+        # Updated to include new 5-tier statuses
+        valid_statuses = ['always', 'currently', 'not_currently', 'unknown', 
+                         'always_tap_cask', 'always_bottle_can']
+        
         if status not in valid_statuses:
-            return jsonify({'error': 'Invalid status'}), 400
+            return jsonify({'error': f'Invalid status. Must be one of: {", ".join(valid_statuses)}'}), 400
         
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor()
         
-        # Get current format availability
-        cursor.execute("""
-            SELECT bottle, tap, cask, can 
-            FROM pub_gf_status 
-            WHERE pub_id = %s
-        """, (pub_id,))
-        
-        result = cursor.fetchone()
-        if result:
-            bottle, tap, cask, can = result
-        else:
+        # For new 5-tier statuses, we need to handle format availability differently
+        if status == 'always_tap_cask':
+            # Always has tap or cask
             bottle = tap = cask = can = 0
+            tap = 1
+            cask = 1
+        elif status == 'always_bottle_can':
+            # Always has bottles or cans
+            bottle = tap = cask = can = 0
+            bottle = 1
+            can = 1
+        else:
+            # Get current format availability for legacy statuses
+            cursor.execute("""
+                SELECT bottle, tap, cask, can 
+                FROM pub_gf_status 
+                WHERE pub_id = %s
+            """, (pub_id,))
+            
+            result = cursor.fetchone()
+            if result:
+                bottle, tap, cask, can = result
+            else:
+                bottle = tap = cask = can = 0
         
         # Call stored procedure to update status with history tracking
         cursor.callproc('UpdatePubGFStatus', [
@@ -625,7 +642,8 @@ def update_gf_status():
         
         return jsonify({
             'success': True,
-            'message': f'Status updated to {status}'
+            'message': f'Status updated to {status}',
+            'status': status
         })
         
     except Exception as e:
