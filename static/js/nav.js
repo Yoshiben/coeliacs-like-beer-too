@@ -279,87 +279,16 @@ export const NavStateManager = (() => {
     };
 
     const handleToggleChange = (mode) => {
-        console.log(`🔀 Toggle changed to: ${mode} on ${state.currentContext} page`);
+        console.log(`🔀 Toggle changed to: ${mode}`);
         
-        const mapModule = modules.map || window.App?.getModule('map');
-        const searchModule = modules.search || window.App?.getModule('search');
-        
-        // Store the current filter preference
-        window.App.setState('gfOnlyFilter', mode === 'gf');
-        
-        switch (state.currentContext) {
-            case 'map':
-                if (mapModule?.updateMapDisplay) {
-                    mapModule.updateMapDisplay(mode === 'gf');
-                }
-                break;
-                
-            case 'results':
-                // Get the last search state properly
-                const lastSearchState = searchModule?.getLastSearchState?.() || window.App.getState('lastSearch');
-                
-                if (!lastSearchState) {
-                    console.warn('⚠️ No search state found to re-run');
-                    return;
-                }
-                
-                console.log('🔄 Re-running search with filter:', mode, lastSearchState);
-                
-                // Re-run search based on type
-                if (lastSearchState.type === 'nearby') {
-                    // For nearby searches, we need to make a new API call
-                    const radius = lastSearchState.radius || 5;
-                    searchModule.searchNearbyWithDistance(radius);
-                } else {
-                    // For other searches, filter existing results
-                    const currentResults = searchModule?.getCurrentResults?.() || window.App.getState('searchResults') || [];
-                    
-                    if (currentResults.length === 0) {
-                        console.warn('⚠️ No results to filter');
-                        return;
-                    }
-                    
-                    // Filter results based on mode
-                    const filteredResults = mode === 'gf' ? 
-                        currentResults.filter(pub => {
-                            const status = pub.gf_status || 'unknown';
-                            return status === 'always' || 
-                                   status === 'currently' || 
-                                   status === 'always_tap_cask' || 
-                                   status === 'always_bottle_can';
-                        }) : currentResults;
-                    
-                    console.log(`📊 Filtered: ${filteredResults.length} of ${currentResults.length} pubs`);
-                    
-                    // Update display title based on search type
-                    let title = '';
-                    if (lastSearchState.type === 'name') {
-                        title = `${filteredResults.length} pubs matching "${lastSearchState.query}"`;
-                    } else if (lastSearchState.type === 'area') {
-                        title = `${filteredResults.length} pubs in ${lastSearchState.query}`;
-                    } else if (lastSearchState.type === 'beer') {
-                        title = `${filteredResults.length} pubs serving "${lastSearchState.query}"`;
-                    } else {
-                        title = `${filteredResults.length} pubs`;
-                    }
-                    
-                    if (mode === 'gf') {
-                        title += ' (GF only)';
-                    }
-                    
-                    // Update display using the search module's method
-                    if (searchModule.displayResultsInOverlay) {
-                        searchModule.displayResultsInOverlay(filteredResults, title);
-                    } else {
-                        console.error('❌ displayResultsInOverlay not available');
-                    }
-                }
-                break;
-                
-            case 'home':
-                // On home, just store preference for next search
-                console.log('🏠 Filter preference saved for next search');
-                break;
+        // Use centralized filter manager
+        const filterGF = window.App?.getModule('filterGF');
+        if (filterGF) {
+            filterGF.setFilter(mode);
+        } else {
+            // Fallback to old method
+            console.warn('⚠️ FilterGF module not available, using fallback');
+            window.App.setState('gfOnlyFilter', mode === 'gf');
         }
         
         // Track the change
