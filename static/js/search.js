@@ -99,6 +99,8 @@ export const SearchModule = (function() {
         console.log(`🎯 Searching within ${radiusKm}km...`);
 
         const gfOnly = window.App.getState('gfOnlyFilter') !== false; // Default to true
+
+        window.App.setState('gfOnlyFilter', gfOnly);
         
         try {
             // Close distance modal using modalManager
