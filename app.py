@@ -945,6 +945,15 @@ def gf_breweries():
     version = str(int(time.time()))
     return render_template('breweries.html', cache_buster=version)
 
+@app.route('/search')
+@app.route('/pub')
+@app.route('/map')
+@app.route('/breweries')
+def spa_routes():
+    """Handle client-side routing - always return index"""
+    version = str(int(time.time()))
+    return render_template('index.html', cache_buster=version)
+
 # ================================================================================
 # ERROR HANDLERS
 # ================================================================================
@@ -968,4 +977,5 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
