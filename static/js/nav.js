@@ -226,9 +226,6 @@ export const NavStateManager = (() => {
                 handleToggleChange(value);
             });
         });
-        
-        updateMapDisplay(true);
-        setupZoomHandler();
     };
     
     // Add a refresh method to update toggle state when context changes
