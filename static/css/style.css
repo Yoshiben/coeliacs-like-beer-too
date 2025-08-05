@@ -3929,6 +3929,10 @@ body.page-pub .nav-notification-btn {
    animation: spin 0.8s linear infinite;
 }
 
+.status-action {
+   padding: var(--space-xl);
+{
+
 
 
 @media (min-width:1025px) {
@@ -3944,3 +3948,4 @@ body.page-pub .nav-notification-btn {
       display: block;
    }
 }
+
