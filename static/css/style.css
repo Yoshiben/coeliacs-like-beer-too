@@ -409,10 +409,6 @@ form-input:focus {
 }
    
 
-
-
-
-
 /* ================================
    GROUP - BUTTONS
    ================================ */
@@ -601,18 +597,6 @@ form-input:focus {
     flex: 0 0 auto;
 }
 
-/* Reuse your existing toggle styles but make text white */
-.nav-toggle .toggle-container {
-    border-color: rgba(255, 255, 255, 0.3);
-}
-
-.nav-toggle .toggle-option {
-    color: rgba(255, 255, 255, 0.7);
-}
-
-.nav-toggle .toggle-option.active {
-    color: var(--text-primary);
-}
 
 /* Future nav actions */
 .nav-actions {
@@ -622,7 +606,6 @@ form-input:focus {
     align-items: center;
 }
 
-
 /* Toggle */
 .nav-toggle {
     display: none; /* Hidden by default */
@@ -631,15 +614,6 @@ form-input:focus {
 .nav-toggle .toggle-container {
     border-color: rgba(255, 255, 255, 0.3);
 }
-
-.nav-toggle .toggle-option {
-    color: rgba(255, 255, 255, 0.7);
-}
-
-.nav-toggle .toggle-option.active {
-    color: var(--text-primary);
-}
-
 
 /* ================================
    NAV VISIBILITY RULES - UPDATED
@@ -3933,20 +3907,13 @@ body.page-pub .nav-notification-btn {
 
 
 /* Smaller, more aesthetic toggle */
-.nav-toggle .toggle-container {
+/* .nav-toggle .toggle-container {
     border-radius: calc(var(--radius-pill) * 0.8);
     border: 1.5px solid rgba(255, 255, 255, 0.3);
     padding: 2px;
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
-}
-
-.nav-toggle .toggle-option {
-    padding: 5px 12px;
-    font-size: calc(var(--text-xs) * 1.1);
-    font-weight: 500;
-    color: rgba(255, 255, 255, 0.8);
-}
+} */
 
 /* Add close button to search overlay */
 .search-overlay .search-card {
@@ -4094,7 +4061,3 @@ body.page-pub .nav-notification-btn {
     color: var(--purple-border);
     font-weight: bold;
 }
-
-/* .active {
-    outline: 3px solid red !important;
-} */
