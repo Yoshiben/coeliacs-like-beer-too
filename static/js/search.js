@@ -607,10 +607,80 @@ export const SearchModule = (function() {
             <span class="status-meta">${display.meta}</span>
         `;
     };
+
+    const loadBeerList = (pub) => {
+        const contentEl = document.getElementById('beerListContent');
+        const emptyEl = document.getElementById('beerListEmpty');
+        
+        if (!contentEl || !emptyEl) return;
+        
+        // Parse beer details
+        if (pub.beer_details) {
+            const beers = parseBeerDetails(pub.beer_details);
+            
+            if (beers.length > 0) {
+                contentEl.style.display = 'block';
+                emptyEl.style.display = 'none';
+                
+                contentEl.innerHTML = beers.map(beer => `
+                    <div class="beer-list-item">
+                        <div class="beer-info">
+                            <strong>${beer.name}</strong>
+                            <div class="beer-meta">
+                                ${beer.brewery} • ${beer.style || 'Unknown style'} • ${beer.format}
+                            </div>
+                        </div>
+                        <button class="btn-delete-beer" data-action="delete-beer" data-beer-id="${beer.id}" data-beer-name="${beer.name}">
+                            ❌
+                        </button>
+                    </div>
+                `).join('');
+            } else {
+                contentEl.style.display = 'none';
+                emptyEl.style.display = 'block';
+            }
+        } else {
+            contentEl.style.display = 'none';
+            emptyEl.style.display = 'block';
+        }
+    };
+    
+    const parseBeerDetails = (beerDetailsString) => {
+        // Parse the beer_details string format
+        // Format: "format - brewery beer (style), format - brewery beer (style)"
+        const beers = [];
+        const beerStrings = beerDetailsString.split(', ');
+        
+        beerStrings.forEach((beerString, index) => {
+            const formatMatch = beerString.match(/^(.*?)\s*-\s*/);
+            const format = formatMatch ? formatMatch[1] : 'Unknown';
+            
+            const remainingString = formatMatch ? beerString.substring(formatMatch[0].length) : beerString;
+            const styleMatch = remainingString.match(/\((.*?)\)$/);
+            const style = styleMatch ? styleMatch[1] : null;
+            
+            const nameBreweryPart = styleMatch ? 
+                remainingString.substring(0, remainingString.lastIndexOf('(')).trim() : 
+                remainingString.trim();
+            
+            // Try to split brewery and beer name
+            const parts = nameBreweryPart.split(' ');
+            const brewery = parts[0];
+            const name = parts.slice(1).join(' ');
+            
+            beers.push({
+                id: `beer_${index}`, // We'll need real IDs from the database
+                format,
+                brewery,
+                name: name || nameBreweryPart,
+                style
+            });
+        });
+        
+        return beers;
+    };
     
     const setupPubButtons = (pub) => {
-        // Buttons are now handled by data-action in main.js
-        // Just ensure the pub data is available globally
         utils.setCurrentPub(pub);
     };
     
