@@ -524,7 +524,7 @@ form-input:focus {
    border: none;
    position: absolute;
    right: 0;
-   padding: var(--space-md);
+   padding: var(--space-xl);
 }
 
 /* ================================
