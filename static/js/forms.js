@@ -126,7 +126,7 @@ export const FormModule = (() => {
             utils.hideLoadingToast();
             
             if (result.success) {
-                handleSubmissionSuccess(result);
+                handleSubmissionSuccess(result, reportData);
             } else {
                 utils.showToast(result.message || 'Failed to submit report', 'error');
             }
@@ -149,18 +149,33 @@ export const FormModule = (() => {
             notes: formData.get('reportNotes') || ''
         };
         
-        // Add pub data
-        const selectedPub = utils.getSelectedPub();
-        if (selectedPub) {
-            reportData.pub_id = selectedPub.pub_id;
+        // Add pub data - check both selected pub state and current pub state
+        const selectedPub = utils.getSelectedPub() || utils.getCurrentPub();
+        
+        if (selectedPub && selectedPub.pub_id) {
+            // Using existing pub from database
+            reportData.pub_id = parseInt(selectedPub.pub_id) || parseInt(selectedPub.id);
             reportData.pub_name = selectedPub.name;
-            console.log('🏠 Using selected pub:', selectedPub.name);
+            console.log('🏠 Using selected pub:', selectedPub.name, 'ID:', reportData.pub_id);
         } else {
-            // Manual pub entry
-            reportData.pub_name = formData.get('reportPubName') || document.getElementById('reportPubName')?.value || 'Unknown Pub';
-            reportData.address = formData.get('reportAddress') || document.getElementById('reportAddress')?.value || '';
-            reportData.postcode = formData.get('reportPostcode') || document.getElementById('reportPostcode')?.value || '';
-            console.log('🏠 Using manual pub data');
+            // Manual pub entry or new pub
+            const pubNameField = document.getElementById('reportPubName');
+            const addressField = document.getElementById('reportAddress');
+            const postcodeField = document.getElementById('reportPostcode');
+            
+            reportData.pub_name = pubNameField?.value || formData.get('reportPubName') || 'Unknown Pub';
+            reportData.address = addressField?.value || formData.get('reportAddress') || '';
+            reportData.postcode = postcodeField?.value || formData.get('reportPostcode') || '';
+            
+            // Don't send pub_id if it's a new pub
+            reportData.pub_id = null;
+            
+            console.log('🏠 Using manual pub data:', reportData.pub_name);
+        }
+        
+        // Clean up ABV field - ensure it's a proper number or null
+        if (reportData.beer_abv) {
+            reportData.beer_abv = parseFloat(reportData.beer_abv) || null;
         }
         
         return reportData;
@@ -169,10 +184,19 @@ export const FormModule = (() => {
     const validateReportForm = (data) => {
         const errors = [];
         
+        // Required fields
         if (!data.beer_format) errors.push('Beer Format');
         if (!data.brewery) errors.push('Brewery');
         if (!data.beer_name) errors.push('Beer Name');
-        if (!data.pub_id && !data.pub_name) errors.push('Pub Name');
+        
+        // Either need pub_id OR pub details
+        if (!data.pub_id) {
+            if (!data.pub_name) errors.push('Pub Name');
+            // Only require address/postcode for new pubs
+            if (data.pub_name && (!data.address || !data.postcode)) {
+                console.warn('⚠️ New pub missing address/postcode - may fail validation');
+            }
+        }
         
         return {
             isValid: errors.length === 0,
@@ -180,7 +204,7 @@ export const FormModule = (() => {
         };
     };
     
-    const handleSubmissionSuccess = (result) => {
+    const handleSubmissionSuccess = (result, reportData) => {
         utils.showToast('🎉 Beer report submitted successfully! Thanks for contributing!');
         
         // Close modal properly using modalManager
