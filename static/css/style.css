@@ -180,6 +180,27 @@
    GROUP - HOLISTIC
    ================================ */
 
+#distanceModal,
+#nameModal,
+#areaModal,
+#beerModal,
+#reportModal,
+#gfStatusModal,
+#cookieConsent,
+#cookieSettings,
+#cookieSettingsFloat,
+#loadingToast,
+#successToast {
+    display: none; 
+}
+
+/* Apply border-box to everything */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
 body {
    background: var(--primary-gradient);
    margin: 0;
@@ -392,34 +413,6 @@ form-input:focus {
 
 
 
-
-
-
-
-
-
-
-/* Apply border-box to everything */
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
-}
-
-#distanceModal,
-#nameModal,
-#areaModal,
-#beerModal,
-#reportModal,
-#gfStatusModal,
-#cookieConsent,
-#cookieSettings,
-#cookieSettingsFloat,
-#loadingToast,
-#successToast {
-    display: none; 
-}
-
 /* ================================
    GROUP - BUTTONS
    ================================ */
@@ -522,6 +515,28 @@ form-input:focus {
    padding: var(--space-xl);
 }
 
+/* Back Button */
+.nav-back-btn {
+   background: rgba(255, 255, 255, 0.2);
+   border: none;
+   color: var(--white);
+   padding: var(--space-sm) var(--space-lg);
+   border-radius: var(--radius-pill);
+   font-weight: 600;
+   font-size: var(--text-sm);
+   cursor: pointer;
+   transition: all var(--transition);
+   display: none; /* Hidden by default */
+   position: absolute;
+   right: 0;
+   margin: var(--space-xl);
+}
+
+.nav-back-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateX(-2px);
+}
+
 /* ================================
    GROUP - HOME PAGE
    ================================ */
@@ -609,24 +624,6 @@ form-input:focus {
     align-items: center;
 }
 
-/* Back Button */
-.nav-back-btn {
-    background: rgba(255, 255, 255, 0.2);
-    border: none;
-    color: var(--white);
-    padding: var(--space-sm) var(--space-lg);
-    border-radius: var(--radius-pill);
-    font-weight: 600;
-    font-size: var(--text-sm);
-    cursor: pointer;
-    transition: all var(--transition);
-    display: none; /* Hidden by default */
-}
-
-.nav-back-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
-    transform: translateX(-2px);
-}
 
 /* Toggle */
 .nav-toggle {
@@ -3922,28 +3919,6 @@ body.page-pub .nav-notification-btn {
    border-color: var(--white);
 }
 
-/* Improved back button styles */
-.nav-back-btn {
-    background: rgba(255, 255, 255, 0.15);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: var(--white);
-    padding: calc(var(--space-sm) * 0.75) var(--space-md);
-    border-radius: var(--radius-pill);
-    font-weight: 500;
-    font-size: calc(var(--text-sm) * 0.9);
-    cursor: pointer;
-    transition: all var(--transition);
-    display: none;
-    backdrop-filter: blur(10px);
-    min-height: auto;
-    height: auto;
-}
-
-.nav-back-btn:hover {
-    background: rgba(255, 255, 255, 0.25);
-    border-color: rgba(255, 255, 255, 0.5);
-    transform: translateX(-2px);
-}
 
 /* Smaller, more aesthetic toggle */
 .nav-toggle .toggle-container {
