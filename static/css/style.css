@@ -517,6 +517,16 @@ form-input:focus {
    padding: var(--space-sm) var(--space-3xl);
 }
 
+/* Nav notification button */
+.nav-notification-btn {
+   display: none;
+   background: none;
+   border: none;
+   position: absolute;
+   right: 0;
+   padding: var(--space-md);
+}
+
 /* ================================
    GROUP - HOME PAGE
    ================================ */
@@ -638,13 +648,6 @@ form-input:focus {
 
 .nav-toggle .toggle-option.active {
     color: var(--text-primary);
-}
-
-/* Nav notification button */
-.nav-notification-btn {
-   display: none;
-   background: none;
-   border: none;
 }
 
 
