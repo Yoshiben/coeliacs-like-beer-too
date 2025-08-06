@@ -195,17 +195,12 @@
    box-sizing: border-box;
 }
 
-.modal {
-   display:none;
-}
-
-.overlay {
-   display: none;
-}
-
+.modal,
+.overlay,
 .toast {
    display:none;
 }
+
 /* =====================================================================================
    ANY CSS ABOVE THIS IS VALIDATED
    ===================================================================================== */
