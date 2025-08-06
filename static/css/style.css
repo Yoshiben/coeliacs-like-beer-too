@@ -3556,10 +3556,9 @@ body.page-pub .nav-notification-btn {
 
 
 .status-modal {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: var(--space-lg);
+   align-items: center;
+   justify-content: center;
+   padding: var(--space-lg);
 }
 
 /* Fix the weird display on pub details page */
