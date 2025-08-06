@@ -130,32 +130,69 @@ export default (function() {
         }
     };
     
-    const searchBreweryBeers = (brewery) => {
-        console.log(`🔍 Searching for beers from: ${brewery}`);
+    const searchBreweryBeers = async (brewery) => {
+        console.log(`🔍 Loading beers for: ${brewery}`);
         
-        // Close breweries overlay
-        closeBreweries();
-        
-        // Directly open beer modal with brewery pre-selected
+        // Open modal to show beers
         if (modules.modalManager) {
-            modules.modalManager.open('beerModal', {
-                onOpen: () => {
-                    // Set search type to brewery
-                    const searchType = document.getElementById('beerSearchType');
-                    if (searchType) searchType.value = 'brewery';
-                    
-                    // Set brewery name
-                    const beerInput = document.getElementById('beerInput');
-                    if (beerInput) {
-                        beerInput.value = brewery;
-                        // Focus to trigger any autocomplete
-                        beerInput.focus();
-                    }
-                }
-            });
+            modules.modalManager.open('breweryBeersModal');
         }
         
-        modules.tracking?.trackEvent('brewery_selected', 'Breweries', brewery);
+        // Update brewery name
+        const breweryNameEl = document.getElementById('breweryName');
+        if (breweryNameEl) breweryNameEl.textContent = brewery;
+        
+        // Show loading
+        document.getElementById('breweryBeersLoading').style.display = 'block';
+        document.getElementById('breweryBeersList').style.display = 'none';
+        document.getElementById('breweryBeersEmpty').style.display = 'none';
+        
+        try {
+            // Fetch beers for this brewery
+            const response = await fetch(`/api/brewery/${encodeURIComponent(brewery)}/beers`);
+            const beers = await response.json();
+            
+            displayBreweryBeers(beers, brewery);
+            
+        } catch (error) {
+            console.error('Error loading brewery beers:', error);
+            document.getElementById('breweryBeersLoading').style.display = 'none';
+            document.getElementById('breweryBeersEmpty').style.display = 'block';
+        }
+    };
+    
+    const displayBreweryBeers = (beers, brewery) => {
+        const loadingEl = document.getElementById('breweryBeersLoading');
+        const listEl = document.getElementById('breweryBeersList');
+        const emptyEl = document.getElementById('breweryBeersEmpty');
+        
+        loadingEl.style.display = 'none';
+        
+        if (beers.length === 0) {
+            emptyEl.style.display = 'block';
+            listEl.style.display = 'none';
+            return;
+        }
+        
+        listEl.style.display = 'block';
+        emptyEl.style.display = 'none';
+        
+        listEl.innerHTML = beers.map(beer => `
+            <div class="beer-item">
+                <div class="beer-info">
+                    <strong>${beer.name}</strong>
+                    <div class="beer-meta">
+                        ${beer.style ? `<span class="beer-style">${beer.style}</span>` : ''}
+                        ${beer.abv ? `<span class="beer-abv">${beer.abv}% ABV</span>` : ''}
+                        ${beer.gluten_status ? `<span class="beer-gf-status">${beer.gluten_status.replace('_', ' ')}</span>` : ''}
+                    </div>
+                </div>
+                <button class="btn btn-sm" data-action="find-pubs-with-beer" 
+                        data-beer="${beer.name}" data-brewery="${brewery}">
+                    Find Pubs
+                </button>
+            </div>
+        `).join('');
     };
     
     // Show error state
