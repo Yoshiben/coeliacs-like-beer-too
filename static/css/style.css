@@ -212,7 +212,7 @@ html {
    position: fixed;
    top: 0;
    left: 0;
-/*    padding: 8vh 0; */
+   padding: 8vh 0;
    width: 100%;
    height: 100vh;  
    height: 100dvh;
@@ -975,8 +975,16 @@ body.page-pub .nav-notification-btn {
    background: var(--white);
    position: relative;
    align-content: space-evenly;
-   padding: 8vh 0;
+/*    padding: 8vh 0; */
    overflow: hidden;
+}
+.map-overlay .map-container {
+    position: absolute;
+    top: 8vh;
+    bottom: 8vh;
+    left: 0;
+    right: 0;
+    height: auto;
 }
 .full-map {
     width: 100%;
@@ -3882,21 +3890,4 @@ body.page-pub .nav-notification-btn {
    }
 }
 
-
-/* For map overlay specifically */
-/* .map-overlay {
-    padding-top: 8vh;
-    padding-bottom: 8vh; 
-    box-sizing: border-box;
-} */
-
-/* Better approach - use actual nav heights */
-.map-overlay .map-container {
-    position: absolute;
-    top: 8vh;
-    bottom: 8vh;
-    left: 0;
-    right: 0;
-    height: auto;
-}
 
