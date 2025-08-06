@@ -2,6 +2,14 @@
    DESIGN SYSTEM - CSS VARIABLES
    ================================ */
 :root {
+
+/* ================================
+   ANY VARIABLES ABOVE THIS ARE USED
+   ================================ */
+
+   
+   
+   
    /* Z-Index Scale */
    --z-base: 1;
    --z-dropdown: 100;
@@ -177,10 +185,17 @@
 }
 
 /* ================================
+   ANY CSS ABOVE THIS ARE USED
+   ================================ */
+
+
+
+
+/* ================================
    GROUP - HOLISTIC
    ================================ */
 
-#distanceModal,
+/* #distanceModal,
 #nameModal,
 #areaModal,
 #beerModal,
@@ -192,7 +207,7 @@
 #loadingToast,
 #successToast {
     display: none; 
-}
+} */
 
 /* Apply border-box to everything */
 *,
