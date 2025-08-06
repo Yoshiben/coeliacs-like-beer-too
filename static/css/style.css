@@ -194,7 +194,7 @@
 
 .modal,
 .overlay,
-.toast
+.toast,
 .cookie-consent {
    display:none;
 }
