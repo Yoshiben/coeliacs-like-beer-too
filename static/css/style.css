@@ -212,7 +212,7 @@ html {
    position: fixed;
    top: 0;
    left: 0;
-   padding: 8vh 0;
+/*    padding: 8vh 0; */
    width: 100%;
    height: 100vh;  
    height: 100dvh;
@@ -3883,42 +3883,20 @@ body.page-pub .nav-notification-btn {
 }
 
 
-/* UPDATE - Remove borders from Leaflet elements */
-.leaflet-container {
-    border: none !important;
-    outline: none !important;
+/* For map overlay specifically */
+.map-overlay {
+    padding-top: 8vh; /* Height of top nav */
+    padding-bottom: 8vh; /* Height of bottom nav */
+    box-sizing: border-box;
 }
 
-/* Fix for results map container */
-#resultsMapContainer {
-    border: none;
-    outline: none;
-}
-
-#resultsMap {
-    border: none;
-    outline: none;
-}
-
-/* Fix for pub detail map */
-.pub-map-placeholder {
-    border: none;
-    outline: none;
-}
-
-#pubMapLeaflet {
-    border: none !important;
-    outline: none !important;
-}
-
-/* Also check overlay containers */
-.overlay {
-    border: none;
-    outline: none;
-}
-
-/* Remove any card borders on map containers */
-.map-container .card {
-    border: none;
+/* Better approach - use actual nav heights */
+.map-overlay .map-container {
+    position: absolute;
+    top: 8vh;
+    bottom: 8vh;
+    left: 0;
+    right: 0;
+    height: auto;
 }
 
