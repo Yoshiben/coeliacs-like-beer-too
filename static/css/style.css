@@ -184,10 +184,28 @@
    --purple-shadow-strong: rgba(139, 92, 246, 0.4);
 }
 
+/* =====================================================================================
+   ANY CSS BELOW THIS IS VALIDATED
+   ===================================================================================== */
 
-/* ================================
+/* Apply border-box to everything */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+.modal {
+   display:none;
+}
+
+.overlay {
+    display: none;
+}
+
+/* =====================================================================================
    ANY CSS ABOVE THIS IS VALIDATED
-   ================================ */
+   ===================================================================================== */
 
 
 
@@ -197,37 +215,30 @@
    ================================ */
 
 /* All modals should be hidden by default */
-.modal,
+/* .modal,
 .search-modal,
 .report-modal,
 .cookie-consent,
 .toast {
     display: none;
-}
+} */
 
 /* When active, modals use flex */
-.modal.active,
+/* .modal.active,
 .search-modal.active,
 .report-modal.active {
     display: flex !important;
 }
-
+ */
 /* Cookie consent uses block when visible */
-.cookie-consent.active {
+/* .cookie-consent.active {
     display: block !important;
-}
+} */
 
 /* Toasts handle their own visibility */
-.toast.show {
+/* .toast.show {
     display: flex !important;
-}
-
-/* Apply border-box to everything */
-*,
-*::before,
-*::after {
-    box-sizing: border-box;
-}
+} */
 
 body {
    background: var(--primary-gradient);
