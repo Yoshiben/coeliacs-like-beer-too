@@ -4212,6 +4212,29 @@ body.page-pub .nav-notification-btn {
     }
 }
 
+.map-retry-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--bg-white);
+    border-radius: var(--radius-xl);
+    padding: var(--space-2xl);
+    box-shadow: var(--shadow-xl);
+    text-align: center;
+    z-index: 500;
+}
+
+.map-retry-content p {
+    color: var(--text-secondary);
+    margin-bottom: var(--space-lg);
+    font-size: var(--text-lg);
+}
+
+.map-retry-content .btn {
+    min-width: 150px;
+}
+
 
 
 @media (min-width:1025px) {
