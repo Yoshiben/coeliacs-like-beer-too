@@ -152,3 +152,5 @@
         loadBreweries
     };
 })();
+
+export default BreweriesModule;
