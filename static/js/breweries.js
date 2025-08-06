@@ -231,27 +231,6 @@ export default (function() {
             modules.nav?.goToHome();
         }
     };
-    
-    // Search for brewery beers
-    const searchBreweryBeers = (brewery) => {
-        console.log(`🔍 Searching for beers from: ${brewery}`);
-        
-        // Close breweries overlay
-        closeBreweries();
-        
-        // Open beer search modal with brewery pre-filled
-        setTimeout(() => {
-            modules.modal?.open('beerModal');
-            const searchInput = document.getElementById('beerSearchInput');
-            if (searchInput) {
-                searchInput.value = brewery;
-                // Trigger search
-                const event = new Event('input', { bubbles: true });
-                searchInput.dispatchEvent(event);
-            }
-        }, 300);
-    };
-    
     // Public API
     return {
         init,
