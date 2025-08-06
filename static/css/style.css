@@ -3883,7 +3883,42 @@ body.page-pub .nav-notification-btn {
 }
 
 
-* {
-    border: 1px solid red !important;
+/* UPDATE - Remove borders from Leaflet elements */
+.leaflet-container {
+    border: none !important;
+    outline: none !important;
+}
+
+/* Fix for results map container */
+#resultsMapContainer {
+    border: none;
+    outline: none;
+}
+
+#resultsMap {
+    border: none;
+    outline: none;
+}
+
+/* Fix for pub detail map */
+.pub-map-placeholder {
+    border: none;
+    outline: none;
+}
+
+#pubMapLeaflet {
+    border: none !important;
+    outline: none !important;
+}
+
+/* Also check overlay containers */
+.overlay {
+    border: none;
+    outline: none;
+}
+
+/* Remove any card borders on map containers */
+.map-container .card {
+    border: none;
 }
 
