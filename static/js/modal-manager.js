@@ -409,30 +409,6 @@ export const ModalManager = (() => {
     
     const init = () => {
         console.log('🔧 Initializing ModalManager');
-
-        // Ensure all modals are hidden on init
-        const allModals = document.querySelectorAll('.modal, .search-modal, .report-modal, .overlay');
-        allModals.forEach(modal => {
-            if (!modal.classList.contains('active')) {
-                modal.style.display = 'none';
-            }
-        });
-        
-        // Hide cookie elements unless they should be visible
-        const cookieConsent = document.getElementById('cookieConsent');
-        const cookieFloat = document.getElementById('cookieSettingsFloat');
-        
-        if (cookieConsent && !modules.helpers?.Storage.get('cookieConsent')) {
-            cookieConsent.style.display = 'block';
-        } else if (cookieConsent) {
-            cookieConsent.style.display = 'none';
-        }
-        
-        if (cookieFloat && modules.helpers?.Storage.get('cookieConsent')) {
-            cookieFloat.style.display = 'block';
-        } else if (cookieFloat) {
-            cookieFloat.style.display = 'none';
-        }
         
         // Set up global close handlers
         document.addEventListener('click', (e) => {
