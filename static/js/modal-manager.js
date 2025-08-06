@@ -40,7 +40,7 @@ export const ModalManager = (() => {
         areaModal: { type: 'modal', group: 'search-input', exclusive: true },
         beerModal: { type: 'modal', group: 'search-input', exclusive: true },
         distanceModal: { type: 'modal', group: 'search-input', exclusive: true },
-        beerListModal: { type: 'modal', group: 'details', exclusive: true },
+        beerListModal: { type: 'modal', group: 'pub-sub', exclusive: true },
         
         // Status modals (can stack in specific order)
         gfStatusModal: { type: 'modal', group: 'status', stackable: true, order: 1, priority: true },
