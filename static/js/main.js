@@ -688,15 +688,22 @@ const App = {
 
         'close-search': (el, modules) => {
             console.log('🔍 Closing search overlay');
-            const searchOverlay = document.getElementById('searchOverlay');
-            if (searchOverlay) {
-                searchOverlay.style.display = 'none';
-                searchOverlay.classList.remove('active');
-                document.body.style.overflow = '';
-                
-                // Return to home context
-                modules.nav?.goToHome();
+            
+            // Use ModalManager to close
+            if (modules.modalManager) {
+                modules.modalManager.close('searchOverlay');
+            } else {
+                // Fallback
+                const searchOverlay = document.getElementById('searchOverlay');
+                if (searchOverlay) {
+                    searchOverlay.style.display = 'none';
+                    searchOverlay.classList.remove('active');
+                    document.body.style.overflow = '';
+                }
             }
+            
+            // Return to home context
+            modules.nav?.goToHome();
         },
 
         'open-breweries': (el, modules) => {
