@@ -6,10 +6,7 @@
 /* ================================
    ANY VARIABLES ABOVE THIS ARE USED
    ================================ */
-
-   
-   
-   
+ 
    /* Z-Index Scale */
    --z-base: 1;
    --z-dropdown: 100;
@@ -3446,7 +3443,7 @@ body.page-pub .nav-notification-btn {
 .cookie-content {
     max-width: var(--container-xl);
     margin: 0 auto;
-    display: flex;
+/*     display: flex; */
     align-items: center;
     justify-content: space-between;
     gap: var(--space-xl);
