@@ -3884,11 +3884,11 @@ body.page-pub .nav-notification-btn {
 
 
 /* For map overlay specifically */
-.map-overlay {
-    padding-top: 8vh; /* Height of top nav */
-    padding-bottom: 8vh; /* Height of bottom nav */
+/* .map-overlay {
+    padding-top: 8vh;
+    padding-bottom: 8vh; 
     box-sizing: border-box;
-}
+} */
 
 /* Better approach - use actual nav heights */
 .map-overlay .map-container {
