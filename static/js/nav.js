@@ -441,8 +441,15 @@ export const NavStateManager = (() => {
     };
     
     const showSearchWithContext = () => {
-        setPageContext('search');
-        pushState('search');
+        // Store previous context
+        state.previousContext = state.currentContext;
+        state.currentContext = 'search';
+        
+        // Update body class for CSS targeting
+        document.body.classList.add('page-search');
+        
+        // The nav elements will show based on CSS rules
+        console.log('🔍 Search context activated');
     };
     
     // ================================
