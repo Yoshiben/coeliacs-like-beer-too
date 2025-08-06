@@ -1756,6 +1756,8 @@ export const SearchModule = (function() {
         
         // State getters
         getCurrentResults: () => state.currentSearchPubs,
-        getLastSearchState: () => state.lastSearchState
+        getLastSearchState: () => state.lastSearchState,
+
+        loadBeerList
     };
 })();
