@@ -254,6 +254,7 @@ html {
    background: var(--bg-white);
    box-shadow: var(--shadow-xl);
    justify-content: space-between;
+   min-height: 0;
 }
 .modal-header {
    align-items: center;
@@ -1057,17 +1058,6 @@ body.page-search .nav-toggle {
    background: var(--hover-subtle);
 }
 
-
-
-/* =====================================================================================
-   ANY CSS ABOVE THIS IS VALIDATED
-   ===================================================================================== */
-
-
-
-
-
-
 /* ================================
    GROUP - OVERLAYS
    ================================ */
@@ -1197,14 +1187,6 @@ body.page-search .nav-toggle {
     margin-top: 10px !important;
 }
 .map-location-btn {
-/*    width: 5vh;
-   width: 5dvh;
-   height: 5vh;
-   width: 5dvh;
-   line-height: 44px;
-   display: block;
-   text-align: center;
-   text-decoration: none; */
    background: var(--purple-gradient);
    color: white;
    border-radius: 4px;
@@ -1266,9 +1248,7 @@ body.page-search .nav-toggle {
    flex-direction: column;
    height: 100%;
    width: 100%;
-   box-sizing: border-box;
 }
-
 .pub-details-card {
     background: var(--bg-white);
     backdrop-filter: blur(10px);
@@ -1279,18 +1259,15 @@ body.page-search .nav-toggle {
     overflow: hidden;
     min-height: 0;
 }
-
 .pub-details-content {
     flex: 1;
     -webkit-overflow-scrolling: touch;
    padding: 0 var(--space-xl)
 }
-
 .pub-header {
     text-align: center;
     padding-bottom: var(--space-md);
 }
-
 .pub-title {
    font-size: var(--text-2xl);
    font-weight: 800;
@@ -1302,14 +1279,12 @@ body.page-search .nav-toggle {
    -webkit-text-fill-color: transparent;
    background-clip: text;
 }
-
 .pub-address {
     color: var(--text-secondary);
     font-size: var(--text-lg);
     margin-bottom: var(--space-xs);
     font-weight: 500;
 }
-
 .pub-location {
     color: var(--text-muted);
     font-size: var(--text-md);
@@ -1317,7 +1292,6 @@ body.page-search .nav-toggle {
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
-
 .status-card {
    background: linear-gradient(135deg, var(--purple-bg) 0%, rgba(139, 92, 246, 0.05) 100%);
    border: 2px solid var(--purple-border);
@@ -1327,7 +1301,6 @@ body.page-search .nav-toggle {
    position: relative;
    overflow: hidden;
 }
-
 .status-card::before {
     content: '🍺';
     position: absolute;
@@ -1337,7 +1310,6 @@ body.page-search .nav-toggle {
     opacity: 0.1;
     transform: rotate(-15deg);
 }
-
 .status-question {
    font-weight: 700;
    color: var(--text-primary);
@@ -1347,7 +1319,6 @@ body.page-search .nav-toggle {
    justify-content: center;
    gap: var(--space-sm);
 }
-
 .current-status {
     display: flex;
     flex-direction: column;
@@ -1355,34 +1326,27 @@ body.page-search .nav-toggle {
     gap: var(--space-xs);
     margin-bottom: var(--space-md);
 }
-
 .current-status .status-icon {
     font-size: 2rem;
     line-height: 1;
 }
-
 .current-status .status-text {
     font-size: var(--text-lg);
     font-weight: 600;
     color: var(--text-primary);
 }
-
 .current-status .status-meta {
     font-size: 0.9rem;
     color: var(--text-secondary);
 }
-
-/* UPDATE: Change status button */
 .status-card .btn-sm {
    padding: var(--space-sm) var(--space-3xl);
    font-weight: 600;
 }
-
 .status-card .btn-sm:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow);
 }
-
 .beer-section {
    background: linear-gradient(135deg, var(--success-bg) 0%, var(--success-bg) 100%);
    border: 2px solid var(--success-border);
@@ -1393,7 +1357,6 @@ body.page-search .nav-toggle {
    position: relative;
    overflow: hidden;
 }
-
 .beer-section::before {
    content: '🍺';
    position: absolute;
@@ -1403,7 +1366,6 @@ body.page-search .nav-toggle {
    opacity: 0.1;
    pointer-events: none;
 }
-
 .beer-section-title {
    display: flex;
    align-items: center;
@@ -1414,7 +1376,6 @@ body.page-search .nav-toggle {
    gap: var(--space-sm);
    line-height: 1.2;
 }
-
 .beer-status {
    color: var(--text-secondary);
    font-size: 0.95rem;
@@ -1422,16 +1383,27 @@ body.page-search .nav-toggle {
    position: relative;
    z-index: 1;
 }
-
 .beer-status strong {
    color: var(--success-text);
    font-weight: 700;
 }
-
 .beer-status em {
    color: var(--text-muted);
    font-size: 0.85rem;
 }
+
+
+
+/* =====================================================================================
+   ANY CSS ABOVE THIS IS VALIDATED
+   ===================================================================================== */
+
+
+
+
+
+
+
 
 
 
@@ -1463,7 +1435,7 @@ body.page-search .nav-toggle {
 .pub-action-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
+    grid-template-rows: 1fr;
     gap: 12px;
     padding: var(--space-xl);
     background: var(--bg-white);
@@ -1472,28 +1444,7 @@ body.page-search .nav-toggle {
 }
 
 .pub-action-grid .btn {
-   margin: 0;
-   padding: 0;
-   border: none;
-   width: 100%;
-   height: 48px;
-   min-height: 48px;
-   max-height: 48px;
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   gap: 8px;
-   font-size: 0.9rem;
-   font-weight: 700;
-   border-radius: 24px;
-   cursor: pointer;
    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-   position: relative;
-   overflow: hidden;
-   box-sizing: border-box;
-   text-decoration: none;
-   white-space: nowrap;
-   line-height: 1;
 }
 
 .pub-action-grid .btn::before {
@@ -1522,7 +1473,7 @@ body.page-search .nav-toggle {
    box-shadow: var(--shadow-blue);
 }
 
-.pub-action-grid .btn-positive {
+/* .pub-action-grid .btn-positive {
    background: var(--success-gradient);
    color: var(--text-white);
    box-shadow: var(--shadow-success);
@@ -1540,116 +1491,7 @@ body.page-search .nav-toggle {
    color: var(--text-white);
    border-color: transparent;
    box-shadow: 0 4px 15px var(--purple-shadow);
-}
-
-/* UPDATE: Simplified Action Grid */
-.pub-action-grid-simple {
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr;
-}
-
-
-
-
-
-/* ================================
-   BREWERIES OVERLAY
-   ================================ */
-/* .breweries-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    height: 100dvh;
-    background: var(--primary-gradient);
-    z-index: var(--z-z-overlay);
-    padding: 8vh 0;
-    display: none;
-    flex-direction: column;
-    overflow: hidden;
-}
-.breweries-container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.breweries-header {
-    text-align: center;
-    padding: var(--space-xl) var(--space-lg);
-    color: white;
-}
-
-.breweries-header h1 {
-    font-size: var(--text-2xl);
-    margin-bottom: var(--space-sm);
-}
-
-.breweries-header p {
-    opacity: 0.9;
-}
-
-.breweries-content {
-    flex: 1;
-    background: var(--bg-white);
-    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
-    padding: var(--space-xl);
-    overflow-y: auto;
-}
-
-.breweries-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: var(--space-lg);
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.brewery-card {
-    background: var(--bg-white);
-    border: 2px solid var(--border-light);
-    border-radius: var(--radius-lg);
-    padding: var(--space-xl);
-    text-align: center;
-    transition: all var(--transition);
-    cursor: pointer;
-}
-
-.brewery-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-    border-color: var(--primary);
-}
-
-.brewery-icon {
-    font-size: 3rem;
-    margin-bottom: var(--space-md);
-}
-
-.brewery-name {
-    font-size: var(--text-lg);
-    margin-bottom: var(--space-lg);
-    color: var(--text-primary);
-}
-
-.brewery-button {
-    background: var(--primary);
-    color: white;
-    border: none;
-    padding: var(--space-md) var(--space-xl);
-    border-radius: var(--radius-full);
-    font-weight: 600;
-    cursor: pointer;
-    transition: all var(--transition);
-}
-
-.brewery-button:hover {
-    background: var(--primary-dark);
-    transform: scale(1.05);
 } */
-
 
 
 /* ================================
@@ -1704,29 +1546,35 @@ body.page-search .nav-toggle {
     border-radius: var(--radius-sm);
 }
 
-.popup-gf-status.always-gf {
-    color: var(--always-gf-fill);
-    background: var(--status-always-bg);
-    border: 1px solid var(--status-always-border);
+.popup-gf-status.always-tap-cask {
+    color: var(--text-primary);
+    background: var(--status-always-tap-cask-bg);
+    border: 1px solid var(--always-tap-cask-border);
     font-weight: 700;
 }
 
-.popup-gf-status.current-gf {
-    color: var(--status-current-text);
-    background: var(--status-current-bg);
-    border: 1px solid var(--status-current-border);
+.popup-gf-status.always-bottle-can {
+    color: var(--text-white);
+    background: var(--status-always-bottle-can-bg);
+    border: 1px solid var(--always-bottle-can-border);
 }
 
-.popup-gf-status.no-gf {
-    color: var(--no-gf-fill);
-    background: var(--status-no-bg);
-    border: 1px solid var(--status-no-border);
+.popup-gf-status.currently {
+    color: var(--text-white);
+    background: var(--status-currently-bg);
+    border: 1px solid var(--currently-border);
+}
+
+.popup-gf-status.not-currently {
+    color: var(--text-white);
+    background: var(--status-not-currently-bg);
+    border: 1px solid var(--not-currently-border);
 }
 
 .popup-gf-status.unknown {
-    color: var(--unknown-gf-fill);
+    color: var(--text-white);
     background: var(--status-unknown-bg);
-    border: 1px solid var(--status-unknown-border);
+    border: 1px solid var(--unknown-border);
 }
 
 .popup-button {
@@ -1857,7 +1705,6 @@ body.page-search .nav-toggle {
    font-weight: 700;
 }
 
-/* Ensure results container fills the screen */
 .results-container {
    flex: 1;
    display: flex;
@@ -1867,8 +1714,6 @@ body.page-search .nav-toggle {
    background: var(--primary-gradient);
    min-height: 0;
 }
-
-/* Make loading state fill available space */
 .results-loading {
    flex: 1;
    display: flex;
@@ -1886,11 +1731,10 @@ body.page-search .nav-toggle {
 .results-content {
    flex: 1;
    background: var(--bg-white);
-/*    border-radius: var(--radius-xl); */
    overflow: hidden;
    display: flex;
    flex-direction: column;
-/*    min-height: 0; */
+   min-height: 0;
    position: relative;
 }
 
@@ -2219,12 +2063,9 @@ body.page-search .nav-toggle {
    flex-shrink: 0;
 }
 
-
-
 /* ================================
    PHOTO UPLOAD ATTRIBUTES
    ================================ */
-
 
 .photo-upload-compact {
    display: flex;
@@ -2284,7 +2125,6 @@ body.page-search .nav-toggle {
     font-size: var(--text-xs);
 }
 
-
 /* FULL MAP CLUSTERS */
 
 .marker-cluster {
@@ -2341,12 +2181,6 @@ body.page-search .nav-toggle {
    width: 25px;
    height: 25px;
 }
-
-
-
-
-/* VALIDATED TO HERE */
-
 
 
 /* ================================
@@ -2474,8 +2308,6 @@ body.page-search .nav-toggle {
    color: var(--text-primary);
    font-size: var(--text-xs);
 }
-
-
 
 
 /* ================================
@@ -2681,11 +2513,11 @@ body.page-search .nav-toggle {
 
 
 /* Dropdown Containers with Purple Theme */
-.brewery-dropdown-container,
+/* .brewery-dropdown-container,
 .beer-name-container,
 .beer-style-container {
     position: relative;
-}
+} */
 
 /* Suggestion Dropdowns */
 .report-modal .suggestions {
@@ -4005,6 +3837,43 @@ body.page-search .nav-toggle {
     background: var(--purple-gradient);
     color: var(--white);
     border-color: transparent;
+}
+
+.brewery-beers-list {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding: var(--space-sm);
+}
+
+.beer-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-lg);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-md);
+    background: var(--bg-white);
+}
+
+.beer-item:hover {
+    border-color: var(--purple-border);
+    background: var(--purple-bg);
+}
+
+.beer-meta {
+    display: flex;
+    gap: var(--space-sm);
+    margin-top: var(--space-xs);
+    flex-wrap: wrap;
+}
+
+.beer-meta span {
+    font-size: var(--text-sm);
+    padding: var(--space-xs) var(--space-sm);
+    background: var(--bg-section);
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
 }
 
 @media (min-width:1025px) {
