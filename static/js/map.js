@@ -141,32 +141,32 @@ export const MapModule = (() => {
         
         const statusStyles = {
             'always_tap_cask': {
-                fillColor: styles.alwaysTapCaskFill,
-                color: styles.alwaysTapCaskBorder,
+                fillColor: styles.alwaysTapCaskFill || '#FFD700',  // Gold fallback
+                color: styles.alwaysTapCaskBorder || '#FDB904',    // Dark gold fallback
                 radius: 12,
                 weight: 4,
                 className: 'always-tap-cask-marker',
                 fillOpacity: 1
             },
             'always_bottle_can': {
-                fillColor: styles.alwaysBottleCanFill,
-                color: styles.alwaysBottleCanBorder,
+                fillColor: styles.alwaysBottleCanFill || '#00F500',  // Green fallback
+                color: styles.alwaysBottleCanBorder || '#00C400',    // Dark green fallback
                 radius: 10,
                 weight: 3,
                 className: 'always-bottle-can-marker'
             },
             'currently': {
-                fillColor: styles.currentlyFill,
-                color: styles.currentlyBorder
+                fillColor: styles.currentlyFill || '#3B82F6',        // Blue fallback
+                color: styles.currentlyBorder || '#2563EB'           // Dark blue fallback
             },
             'not_currently': {
-                fillColor: styles.notCurrentlyFill,
-                color: styles.notCurrentlyBorder,
+                fillColor: styles.notCurrentlyFill || '#EF4444',     // Red fallback
+                color: styles.notCurrentlyBorder || '#DC2626',       // Dark red fallback
                 fillOpacity: 0.7
             },
             'unknown': {
-                fillColor: styles.unknownFill,
-                color: styles.unknownBorder,
+                fillColor: styles.unknownFill || '#9CA3AF',          // Grey fallback
+                color: styles.unknownBorder || '#6B7280',            // Dark grey fallback
                 fillOpacity: 0.6
             }
         };
