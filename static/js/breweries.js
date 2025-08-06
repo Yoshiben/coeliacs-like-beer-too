@@ -44,37 +44,127 @@ export default (function() {
             showError();
         }
     };
-    
-    // Display breweries in grid
-    // UPDATE in breweries.js - displayBreweries function
 
+    // Update the displayBreweries function:
     const displayBreweries = () => {
         const grid = document.getElementById('breweriesGrid');
-        const header = document.querySelector('.breweries-header p');
+        const header = document.querySelector('.breweries-header');
         
         if (!grid) return;
         
-        // Update header with count
-        if (header) {
-            header.innerHTML = `Discover amazing UK breweries making gluten free beer<br>
-                               <span class="brewery-count">${breweries.length} breweries available</span>`;
+        // Add search bar if it doesn't exist
+        let searchContainer = document.querySelector('.breweries-search');
+        if (!searchContainer) {
+            searchContainer = document.createElement('div');
+            searchContainer.className = 'breweries-search';
+            searchContainer.innerHTML = `
+                <input type="text" 
+                       class="brewery-search-input" 
+                       id="brewerySearchInput"
+                       placeholder="Search breweries..."
+                       autocomplete="off">
+            `;
+            header.after(searchContainer);
+            
+            // Add search listener
+            const searchInput = document.getElementById('brewerySearchInput');
+            searchInput?.addEventListener('input', (e) => {
+                filterBreweries(e.target.value);
+            });
+        }
+        
+        // Add stats bar
+        let statsBar = document.querySelector('.brewery-stats');
+        if (!statsBar) {
+            statsBar = document.createElement('div');
+            statsBar.className = 'brewery-stats';
+            statsBar.innerHTML = `
+                <span class="brewery-count">${breweries.length} breweries</span>
+                <div class="view-toggle">
+                    <button class="active" data-view="grid">Grid</button>
+                    <button data-view="list">List</button>
+                </div>
+            `;
+            searchContainer.after(statsBar);
         }
         
         if (breweries.length === 0) {
             grid.innerHTML = `
                 <div class="breweries-empty">
-                    <p>No breweries found</p>
+                    <p>Loading breweries...</p>
                 </div>
             `;
             return;
         }
         
-        grid.innerHTML = breweries.map(brewery => `
+        // Sort breweries alphabetically
+        const sortedBreweries = [...breweries].sort((a, b) => a.localeCompare(b));
+        
+        grid.innerHTML = sortedBreweries.map(brewery => `
             <div class="brewery-card" data-action="search-brewery" data-brewery="${brewery}">
                 <div class="brewery-icon">🍺</div>
                 <h3 class="brewery-name">${brewery}</h3>
             </div>
         `).join('');
+    };
+    
+    // Add filter function
+    const filterBreweries = (query) => {
+        const cards = document.querySelectorAll('.brewery-card');
+        const normalizedQuery = query.toLowerCase().trim();
+        
+        cards.forEach(card => {
+            const breweryName = card.dataset.brewery.toLowerCase();
+            if (breweryName.includes(normalizedQuery)) {
+                card.style.display = 'flex';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        
+        // Update count
+        const visibleCount = document.querySelectorAll('.brewery-card:not([style*="display: none"])').length;
+        const countEl = document.querySelector('.brewery-count');
+        if (countEl) {
+            countEl.textContent = `${visibleCount} of ${breweries.length} breweries`;
+        }
+    };
+    
+    // Fix the searchBreweryBeers function to actually trigger beer search:
+    const searchBreweryBeers = (brewery) => {
+        console.log(`🔍 Searching for beers from: ${brewery}`);
+        
+        // Close breweries overlay
+        closeBreweries();
+        
+        // Open search overlay first
+        const searchOverlay = document.getElementById('searchOverlay');
+        if (searchOverlay) {
+            searchOverlay.style.display = 'flex';
+            searchOverlay.classList.add('active');
+        }
+        
+        // Then trigger beer search modal
+        setTimeout(() => {
+            // Trigger beer search option
+            const beerSearchOption = document.querySelector('.search-option.beer');
+            if (beerSearchOption) {
+                beerSearchOption.click();
+            }
+            
+            // After modal opens, set the brewery
+            setTimeout(() => {
+                const beerInput = document.getElementById('beerInput');
+                const searchType = document.getElementById('beerSearchType');
+                if (beerInput && searchType) {
+                    searchType.value = 'brewery';
+                    beerInput.value = brewery;
+                    // Trigger search
+                    const searchBtn = document.querySelector('[data-action="perform-beer-search"]');
+                    if (searchBtn) searchBtn.click();
+                }
+            }, 300);
+        }, 300);
     };
     
     // Show error state
