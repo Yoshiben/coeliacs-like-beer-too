@@ -455,6 +455,7 @@ form-input:focus {
    position: absolute;
    right: 0;
    padding: var(--space-xl);
+   box-shadow: none;
 }
 .nav-back-btn {
    background: rgba(255, 255, 255, 0.2);
@@ -965,37 +966,9 @@ body.page-pub .nav-notification-btn {
     font-weight: 600;
     color: var(--text-primary);
 }
-/* MAP */
-.map-overlay {
-   padding: 0;
-}
-.map-container {
-   height:100%;
-   flex: 1;
-   background: var(--white);
-   position: relative;
-   align-content: space-evenly;
-/*    padding: 8vh 0; */
-   overflow: hidden;
-}
-.map-overlay .map-container {
-    position: absolute;
-    top: 8vh;
-    bottom: 8vh;
-    left: 0;
-    right: 0;
-    height: auto;
-}
-.full-map {
-    width: 100%;
-    height: 100%;
-    flex-shrink: 0;
-    border: none; /* Add this */
-}
 /* ================================
-   BOTTOM NAVIGATION - VALIDATED
+   BOTTOM NAVIGATION
    ================================ */
-
 .bottom-nav {
    position: fixed;
    bottom: 0;
@@ -1079,6 +1052,7 @@ body.page-pub .nav-notification-btn {
 }
 
 
+
 /* =====================================================================================
    ANY CSS ABOVE THIS IS VALIDATED
    ===================================================================================== */
@@ -1104,25 +1078,18 @@ body.page-pub .nav-notification-btn {
    align-content: space-evenly;
 }
 .search-card {
-/*    width: 100%;
-   max-width: none; */
    display: flex;
    flex-direction: column;
    background: var(--bg-white);
-/*    box-shadow: var(--shadow-lg);
-   backdrop-filter: blur(10px);
-   overflow: hidden; */
    height: 100%;
 }
 .search-header {
-/*    flex-shrink: 0; */
    text-align: center;
 }
 .search-header-title {
    font-size: var(--text-md);
    color: var(--text-primary);
    margin-bottom: 0; 
-/*    line-height: 1.1; */
 }
 .search-body {
    flex: 1;
@@ -1130,14 +1097,10 @@ body.page-pub .nav-notification-btn {
    flex-direction: column;
    padding: var(--space-lg);
    min-height: 0;
-/*    justify-content: center;  */
-/*    align-items: center;  */
 }
 .search-options {
    flex: 1;
    display: grid;
-/*    grid-template-columns: 1fr 1fr;
-   grid-template-rows: 1fr 1fr; */
    gap: var(--space-md);
    width: 100%;
    height: 100%;
@@ -1149,16 +1112,12 @@ body.page-pub .nav-notification-btn {
    padding: var(--space-md);
    cursor: pointer;
    transition: all var(--transition);
-/*    text-align: center;
-   position: relative;
-   overflow: hidden; */
    display: flex;
    flex-direction: column;
    justify-content: center;
    align-items: center;
    min-height: 0;
    overflow: hidden;
-/*    max-height: 100%; */
 }
 .search-option:hover {
    transform: translateY(-3px);
@@ -1194,20 +1153,16 @@ body.page-pub .nav-notification-btn {
 }
 .search-icon {
    font-size: var(--text-2xl);
-/*    margin-bottom: var(--space-sm);
-   display: block; */
    line-height: 1;
 }
 .search-title {
    font-size: var(--text-md);
    color: var(--text-primary);
    margin-bottom: 0; 
-/*    line-height: 1.1; */
 }
 .search-description {
    font-size: var(--text-sm);
    color: var(--text-secondary);
-/*    line-height: 1.2; */
    text-align: center;
    padding: 0 var(--spac?e-xs);
 }
@@ -1218,33 +1173,37 @@ body.page-pub .nav-notification-btn {
 
 /* ================================
    MAP OVERLAY - VALIDATED
-   ================================ */
+   ================================ */   
+.map-container {
+   height:100%;
+   flex: 1;
+   background: var(--white);
+   position: relative;
+   align-content: space-evenly;
+   overflow: hidden;
+}
 .full-map {
     width: 100%;
     height: 100%;
     flex-shrink: 0;
 }
-
-/* MAP LOCATION BUTTON */
-
 .leaflet-control-custom {
     margin-top: 10px !important;
 }
-
 .map-location-btn {
-   width: 5vh;
+/*    width: 5vh;
    width: 5dvh;
    height: 5vh;
    width: 5dvh;
    line-height: 44px;
    display: block;
    text-align: center;
-   text-decoration: none;
+   text-decoration: none; */
    background: var(--purple-gradient);
    color: white;
    border-radius: 4px;
    box-shadow: var(--shadow);
-/*    font-size: 1.5rem; */
+   font-size: var(--text-xl);
    transition: all var(--transition);
    cursor: pointer;
    position: relative;
@@ -3874,6 +3833,225 @@ body.page-pub .nav-notification-btn {
     padding: var(--space-sm) var(--space-lg);
 }
 
+/* UPDATE in style.css - Replace the existing breweries styles (around line 1780) */
+
+/* ================================
+   BREWERIES OVERLAY - ENHANCED
+   ================================ */
+.breweries-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    z-index: var(--z-overlay);
+    padding: 0;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--bg-home);
+}
+
+.breweries-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding-top: 8vh;
+    padding-bottom: 8vh;
+}
+
+.breweries-header {
+    text-align: center;
+    padding: var(--space-xl) var(--space-lg) var(--space-sm);
+    background: var(--primary-gradient);
+    color: white;
+    margin: 0;
+}
+
+.breweries-header h1 {
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    margin-bottom: var(--space-xs);
+    font-weight: 700;
+}
+
+.breweries-header p {
+    opacity: 0.9;
+    font-size: clamp(0.9rem, 2vw, 1rem);
+    margin: 0;
+}
+
+.breweries-content {
+    flex: 1;
+    background: var(--bg-home);
+    padding: var(--space-xl);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.breweries-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 160px), 1fr));
+    gap: var(--space-lg);
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.brewery-card {
+    background: var(--bg-card-home);
+    border: 2px solid transparent;
+    border-radius: var(--radius-xl);
+    padding: var(--space-xl);
+    text-align: center;
+    transition: all var(--transition);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    min-height: 140px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.08);
+}
+
+.brewery-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity var(--transition);
+}
+
+.brewery-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(139, 92, 246, 0.15);
+    border-color: var(--purple-border);
+}
+
+.brewery-card:hover::before {
+    opacity: 1;
+}
+
+.brewery-icon {
+    font-size: clamp(2.5rem, 5vw, 3rem);
+    margin-bottom: var(--space-sm);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+    transition: transform var(--transition);
+}
+
+.brewery-card:hover .brewery-icon {
+    transform: scale(1.1) rotate(-5deg);
+}
+
+.brewery-name {
+    font-size: clamp(0.9rem, 2vw, 1.1rem);
+    margin: 0;
+    color: var(--text-primary);
+    font-weight: 600;
+    line-height: 1.2;
+    position: relative;
+    z-index: 1;
+}
+
+/* Loading state */
+.breweries-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-4xl);
+    color: var(--text-secondary);
+}
+
+.breweries-loading .loading-spinner {
+    margin-bottom: var(--space-lg);
+}
+
+/* Empty state */
+.breweries-empty {
+    text-align: center;
+    padding: var(--space-4xl);
+    color: var(--text-muted);
+}
+
+/* Search bar (future enhancement) */
+.breweries-search {
+    padding: 0 var(--space-xl) var(--space-lg);
+    max-width: 600px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.brewery-search-input {
+    width: 100%;
+    padding: var(--space-lg) var(--space-xl);
+    border: 2px solid var(--purple-border);
+    border-radius: var(--radius-pill);
+    font-size: var(--text-md);
+    background: var(--bg-white);
+    transition: all var(--transition);
+}
+
+.brewery-search-input:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+    border-color: var(--purple-gradient);
+}
+
+/* Brewery count badge */
+.brewery-count {
+    background: var(--purple-gradient);
+    color: white;
+    padding: var(--space-xs) var(--space-lg);
+    border-radius: var(--radius-pill);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    display: inline-block;
+    margin-top: var(--space-sm);
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    .breweries-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: var(--space-md);
+    }
+    
+    .brewery-card {
+        min-height: 120px;
+        padding: var(--space-lg);
+    }
+}
+
+/* Animations */
+@keyframes brewerySlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.brewery-card {
+    animation: brewerySlideIn 0.3s ease-out;
+    animation-fill-mode: both;
+}
+
+.brewery-card:nth-child(1) { animation-delay: 0.05s; }
+.brewery-card:nth-child(2) { animation-delay: 0.1s; }
+.brewery-card:nth-child(3) { animation-delay: 0.15s; }
+.brewery-card:nth-child(4) { animation-delay: 0.2s; }
+/* Continue pattern as needed */
+
 
 
 @media (min-width:1025px) {
@@ -3889,5 +4067,6 @@ body.page-pub .nav-notification-btn {
       display: block;
    }
 }
+
 
 
