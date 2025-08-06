@@ -545,6 +545,7 @@ const App = {
         
         // Status actions
         'change-gf-status': (el, modules) => {
+            console.trace('🔍 DEBUG: Opening GF status modal from main.js action handler');
             modules.modalManager?.open('gfStatusModal');
         },
         'confirm-status': (el, modules) => {
