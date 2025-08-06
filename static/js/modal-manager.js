@@ -25,11 +25,11 @@ export const ModalManager = (() => {
     // Modal/Overlay Registry with types and rules
     const registry = {
         // Search overlays (mutually exclusive)
-        searchOverlay: { type: 'overlay', group: 'search', exclusive: true },
-        resultsOverlay: { type: 'overlay', group: 'results', exclusive: true },
-        fullMapOverlay: { type: 'overlay', group: 'map', exclusive: true },
-        pubDetailsOverlay: { type: 'overlay', group: 'details', exclusive: true },
-        breweriesOverlay: { type: 'overlay', group: 'breweries', exclusive: true },
+        searchOverlay: { type: 'overlay', group: 'primary', exclusive: true },
+        resultsOverlay: { type: 'overlay', group: 'primary', exclusive: true },
+        fullMapOverlay: { type: 'overlay', group: 'primary', exclusive: true },
+        pubDetailsOverlay: { type: 'overlay', group: 'primary', exclusive: true },
+        breweriesOverlay: { type: 'overlay', group: 'primary', exclusive: true },
 
         // Info overlays
         aboutOverlay: { type: 'overlay', group: 'info', exclusive: true },
@@ -128,15 +128,30 @@ export const ModalManager = (() => {
     };
     
     const openOverlay = (overlayId, config, options) => {
-
+        // Check if already open
         if (state.activeOverlays.includes(overlayId)) {
             console.log(`⚠️ ${overlayId} is already open`);
-            return true; // Already open, nothing to do
+            
+            // If already open but has onOpen callback, call it to refresh content
+            if (options.onOpen) {
+                options.onOpen();
+            }
+            
+            return true;
         }
         
-        // Close all overlays if exclusive
-        if (config.exclusive) {
-            closeAllOverlays();
+        // Handle exclusive groups
+        if (config.exclusive && config.group) {
+            // Close all overlays in the same group
+            const overlaysToClose = state.activeOverlays.filter(id => {
+                const overlayConfig = registry[id];
+                return overlayConfig && overlayConfig.group === config.group && id !== overlayId;
+            });
+            
+            overlaysToClose.forEach(id => {
+                console.log(`🔒 Closing ${id} to open ${overlayId}`);
+                closeOverlay(id);
+            });
         }
         
         const overlay = document.getElementById(overlayId);
@@ -145,8 +160,8 @@ export const ModalManager = (() => {
             return false;
         }
         
-        // Hide community home for main overlays
-        if (['resultsOverlay', 'pubDetailsOverlay', 'fullMapOverlay', 'searchOverlay'].includes(overlayId)) {
+        // Hide community home for primary overlays
+        if (config.group === 'primary') {
             const communityHome = document.querySelector('.community-home');
             if (communityHome) {
                 communityHome.style.display = 'none';
@@ -156,11 +171,6 @@ export const ModalManager = (() => {
         // Show overlay
         overlay.style.display = 'flex';
         overlay.classList.add('active');
-        
-        // Ensure proper z-index based on overlay type
-        if (overlayId === 'pubDetailsOverlay') {
-            overlay.style.zIndex = getComputedStyle(document.documentElement).getPropertyValue('--z-pub-details');
-        }
         
         // Add to stack
         state.overlayStack.push(overlayId);
@@ -172,7 +182,12 @@ export const ModalManager = (() => {
         }
         
         // Call lifecycle hook
-        if (options.onOpen) options.onOpen();
+        if (options.onOpen) {
+            options.onOpen();
+        }
+        
+        console.log(`✅ Opened overlay: ${overlayId}`);
+        console.log(`📊 Active overlays: ${state.activeOverlays.join(', ')}`);
         
         return true;
     };
