@@ -1,5 +1,5 @@
 // Breweries Module
-(function() {
+export default (function() {
     'use strict';
     
     // Private state
@@ -152,5 +152,3 @@
         loadBreweries
     };
 })();
-
-export default BreweriesModule;
