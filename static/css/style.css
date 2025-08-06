@@ -1074,15 +1074,9 @@ body.page-pub .nav-notification-btn {
    SEARCH OVERLAY - VALIDATED
    ================================ */
 
-.search-section {
-   display: flex;
-   align-items: stretch;
-   flex:1;
-   min-height: 0;
-   height: 100%;
-}
 .search-container {
    height:100%;
+   flex: 1;
 }
 .search-card {
 /*    width: 100%;
