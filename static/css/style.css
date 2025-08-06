@@ -184,8 +184,9 @@
    --purple-shadow-strong: rgba(139, 92, 246, 0.4);
 }
 
+
 /* ================================
-   ANY CSS ABOVE THIS ARE USED
+   ANY CSS ABOVE THIS IS VALIDATED
    ================================ */
 
 
@@ -195,19 +196,31 @@
    GROUP - HOLISTIC
    ================================ */
 
-/* #distanceModal,
-#nameModal,
-#areaModal,
-#beerModal,
-#reportModal,
-#gfStatusModal,
-#cookieConsent,
-#cookieSettings,
-#cookieSettingsFloat,
-#loadingToast,
-#successToast {
-    display: none; 
-} */
+/* All modals should be hidden by default */
+.modal,
+.search-modal,
+.report-modal,
+.cookie-consent,
+.toast {
+    display: none;
+}
+
+/* When active, modals use flex */
+.modal.active,
+.search-modal.active,
+.report-modal.active {
+    display: flex !important;
+}
+
+/* Cookie consent uses block when visible */
+.cookie-consent.active {
+    display: block !important;
+}
+
+/* Toasts handle their own visibility */
+.toast.show {
+    display: flex !important;
+}
 
 /* Apply border-box to everything */
 *,
