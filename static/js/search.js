@@ -1141,12 +1141,6 @@ export const SearchModule = (function() {
     const showResultsOverlay = (title) => {
         console.log('📋 Showing results overlay:', title);
         
-        // Hide community home content
-        const communityHome = document.querySelector('.community-home');
-        if (communityHome) {
-            communityHome.style.display = 'none';
-        }
-        
         // Reset to list view (not map view)
         const elements = {
             list: document.getElementById('resultsListContainer'),
@@ -1174,7 +1168,7 @@ export const SearchModule = (function() {
         // Use ModalManager to open the overlay
         modules.modalManager.open('resultsOverlay', {
             onOpen: () => {
-                document.body.style.overflow = 'hidden';
+                console.log('✅ Results overlay opened via ModalManager');
                 
                 // Update navigation context
                 const navModule = window.App?.getModule('nav');
