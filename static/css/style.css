@@ -192,7 +192,7 @@
 *,
 *::before,
 *::after {
-    box-sizing: border-box;
+   box-sizing: border-box;
 }
 
 .modal {
@@ -200,9 +200,12 @@
 }
 
 .overlay {
-    display: none;
+   display: none;
 }
 
+.toast {
+   display:none;
+}
 /* =====================================================================================
    ANY CSS ABOVE THIS IS VALIDATED
    ===================================================================================== */
