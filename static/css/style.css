@@ -492,7 +492,7 @@ form-input:focus {
    gap: var(--space-lg);
 }
 .nav-right {
-   flex: 0 0 auto;
+   flex: 1;
    display: flex;
    align-items: center;
    gap: var(--space-lg);
@@ -514,9 +514,6 @@ form-input:focus {
     justify-content: flex-end;
     align-items: center;
 }
-.nav-toggle {
-    display: none;
-}
 .nav-toggle .toggle-container {
     border-color: rgba(255, 255, 255, 0.3);
 }
@@ -529,7 +526,7 @@ form-input:focus {
 .nav-back-btn,
 .nav-toggle,
 .nav-notification-btn {
-    display: none !important;
+    display: none;
 }
 
 body.page-home .nav-notification-btn {
