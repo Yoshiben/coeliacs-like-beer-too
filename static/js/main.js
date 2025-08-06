@@ -705,7 +705,11 @@ const App = {
         
         // Places search actions
         'add-new-pub-from-results': (el, modules) => {
-            modules.modal?.openReportModal?.({ isNewPub: true });
+            // Open places search instead of report modal
+            const searchModule = modules.search || window.App?.getModule('search');
+            if (searchModule?.PlacesSearchModule) {
+                searchModule.PlacesSearchModule.openPlacesSearch();
+            }
         },
         'search-google-places': (el, modules) => {
             modules.search?.PlacesSearchModule?.openPlacesSearch?.();
