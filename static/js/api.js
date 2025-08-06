@@ -170,7 +170,8 @@ export const APIModule = (function() {
                 // Return fallback data
                 return {
                     total_pubs: Constants.DEFAULTS.TOTAL_PUBS,
-                    gf_pubs: Constants.DEFAULTS.GF_PUBS
+                    gf_pubs: Constants.DEFAULTS.GF_PUBS,
+                    gf_pubs_this_month: Constants.DEFAULTS.GF_PUBS_THIS_MONTH
                 };
             }
         });
