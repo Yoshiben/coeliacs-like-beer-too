@@ -421,10 +421,10 @@ export const CommunityModule = (() => {
                 if (stats.gf_pubs && modules.helpers) {
                     modules.helpers.animateNumber('gfPubs', stats.gf_pubs);
                 }
-                // TODO: Add endpoint for monthly finds
-                // if (stats.monthly_finds) {
-                //     modules.helpers.animateNumber('monthlyFinds', stats.monthly_finds);
-                // }
+                // ADD THIS for monthly stats
+                if (stats.gf_pubs_this_month && modules.helpers) {
+                    modules.helpers.animateNumber('monthlyFinds', stats.gf_pubs_this_month);
+                }
             }
         } catch (error) {
             console.error('Error updating stats:', error);
