@@ -46,13 +46,23 @@ export default (function() {
     };
     
     // Display breweries in grid
+    // UPDATE in breweries.js - displayBreweries function
+
     const displayBreweries = () => {
         const grid = document.getElementById('breweriesGrid');
+        const header = document.querySelector('.breweries-header p');
+        
         if (!grid) return;
+        
+        // Update header with count
+        if (header) {
+            header.innerHTML = `Discover amazing UK breweries making gluten free beer<br>
+                               <span class="brewery-count">${breweries.length} breweries available</span>`;
+        }
         
         if (breweries.length === 0) {
             grid.innerHTML = `
-                <div class="no-results">
+                <div class="breweries-empty">
                     <p>No breweries found</p>
                 </div>
             `;
@@ -63,9 +73,6 @@ export default (function() {
             <div class="brewery-card" data-action="search-brewery" data-brewery="${brewery}">
                 <div class="brewery-icon">🍺</div>
                 <h3 class="brewery-name">${brewery}</h3>
-                <button class="brewery-button">
-                    View Beers →
-                </button>
             </div>
         `).join('');
     };
