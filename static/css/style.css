@@ -298,6 +298,16 @@ html {
    padding: var(--space-lg);
 }
 /* ============
+   CARDS
+   ============ */
+.card {
+   background: var(--white);
+   border-radius: var(--radius-xl);
+   overflow: hidden;
+   box-shadow: 0 4px 8px rgba(139, 92, 246, 0.12), 0 8px 24px rgba(0, 0, 0, 0.08);
+   border: 1px solid rgba(139, 92, 246, 0.06);
+}
+/* ============
    FORMS
    ============ */
 .form-input,
@@ -677,14 +687,19 @@ body.page-pub .nav-notification-btn {
 .community-feed {
     padding: 0 var(--space-lg) var(--space-xl);
 }
-.featured-card {
-    background: var(--white);
+/* .community-feed > *:nth-child(even) {
+    background: rgba(248, 249, 250, 0.5);
+    padding: var(--space-xl);
+    margin: 0 calc(var(--space-lg) * -1);
+    padding-left: var(--space-lg);
+    padding-right: var(--space-lg);
     border-radius: var(--radius-xl);
-    overflow: hidden;
+} */
+.featured-card {
     margin-bottom: var(--space-2xl);
-    box-shadow: var(--shadow);
-    position: relative;
+    position: relative;    
 }
+
 .featured-badge {
     position: absolute;
     top: var(--space-lg);
@@ -753,10 +768,15 @@ body.page-pub .nav-notification-btn {
     gap: var(--space-lg);
 }
 .find-card {
-    background: var(--white);
-    border-radius: var(--radius-lg);
     padding: var(--space-lg);
-    box-shadow: var(--shadow-sm);
+    transition: all var(--transition);
+}
+
+.find-card:hover {
+    box-shadow: 
+        0 4px 8px rgba(139, 92, 246, 0.12),
+        0 8px 24px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
 }
 .find-card.highlight {
     background: linear-gradient(135deg, var(--purple-bg) 0%, rgba(139, 92, 246, 0.05) 100%);
@@ -778,7 +798,6 @@ body.page-pub .nav-notification-btn {
 }
 .find-brewery {
     font-weight: 600;
-    color: var(--purple-border);
 }
 .find-content p {
     margin: 0 0 var(--space-sm) 0;
@@ -909,52 +928,6 @@ body.page-pub .nav-notification-btn {
 
 .map-container {
     flex: 1;
-}
-   
-
-/* ================================
-   COMMUNITY PAGE ENHANCEMENTS - ADD THESE
-   ================================ */
-
-/* Background depth and subtle gradient */
-.community-home {
-    background: linear-gradient(180deg, 
-        rgba(139, 92, 246, 0.03) 0%, 
-        rgba(255, 255, 255, 1) 15%,
-        rgba(248, 249, 250, 1) 100%
-    );
-}
-
-/* Alternating section backgrounds */
-.community-feed > *:nth-child(even) {
-    background: rgba(248, 249, 250, 0.5);
-    padding: var(--space-xl);
-    margin: 0 calc(var(--space-lg) * -1);
-    padding-left: var(--space-lg);
-    padding-right: var(--space-lg);
-    border-radius: var(--radius-xl);
-}
-
-/* Enhanced card shadows with purple tint */
-.featured-card {
-    box-shadow: 
-        0 4px 6px rgba(139, 92, 246, 0.08),
-        0 8px 24px rgba(0, 0, 0, 0.06);
-    border: 1px solid rgba(139, 92, 246, 0.06);
-}
-
-.find-card {
-    box-shadow: 
-        0 2px 4px rgba(139, 92, 246, 0.06),
-        0 4px 12px rgba(0, 0, 0, 0.04);
-    transition: all var(--transition);
-}
-
-.find-card:hover {
-    box-shadow: 
-        0 4px 8px rgba(139, 92, 246, 0.12),
-        0 8px 24px rgba(0, 0, 0, 0.08);
-    transform: translateY(-2px);
 }
 
 /* Near me button enhancement */
@@ -3347,29 +3320,6 @@ body.page-pub .nav-notification-btn {
     z-index: var(--z-status-modals);
 }
 
-/* ================================
-   PURPLE SHADOW ENHANCEMENTS - ADD THESE
-   ================================ */
-
-/* Enhanced shadows with purple tint */
-.featured-card {
-    box-shadow: 
-        0 4px 6px rgba(139, 92, 246, 0.08),
-        0 8px 24px rgba(0, 0, 0, 0.06);
-}
-
-.find-card {
-    box-shadow: 
-        0 2px 4px rgba(139, 92, 246, 0.06),
-        0 4px 12px rgba(0, 0, 0, 0.04);
-}
-
-.find-card:hover {
-    box-shadow: 
-        0 4px 8px rgba(139, 92, 246, 0.12),
-        0 8px 24px rgba(0, 0, 0, 0.08);
-}
-
 .near-me-button {
     box-shadow: 
         0 2px 4px rgba(139, 92, 246, 0.08),
@@ -3538,21 +3488,6 @@ body.page-pub .nav-notification-btn {
 .legend-marker.user-location {
    background: var(--my-location-fill);
    border-color: var(--white);
-}
-
-
-/* Smaller, more aesthetic toggle */
-/* .nav-toggle .toggle-container {
-    border-radius: calc(var(--radius-pill) * 0.8);
-    border: 1.5px solid rgba(255, 255, 255, 0.3);
-    padding: 2px;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-} */
-
-/* Add close button to search overlay */
-.search-overlay .search-card {
-    position: relative;
 }
 
 /* Info Overlay Styles */
