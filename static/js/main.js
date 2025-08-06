@@ -211,7 +211,45 @@ const App = {
         
         // Initialize forms
         FormModule.init();
-        NavStateManager.init();  // ADD THIS LINE
+        NavStateManager.init();
+
+        // ADD THIS - Import and register BreweriesModule
+        const breweries = await import('./breweries.js');
+        const BreweriesModule = breweries.default || window.BreweriesModule || (() => {
+            console.log('🏭 Initializing Breweries Module');
+            return {
+                init: () => console.log('✅ Breweries Module initialized'),
+                openBreweries: () => {
+                    console.log('🏭 Opening breweries overlay');
+                    const overlay = document.getElementById('breweriesOverlay');
+                    if (overlay) {
+                        overlay.style.display = 'flex';
+                        overlay.classList.add('active');
+                        document.body.style.overflow = 'hidden';
+                    }
+                },
+                closeBreweries: () => {
+                    const overlay = document.getElementById('breweriesOverlay');
+                    if (overlay) {
+                        overlay.style.display = 'none';
+                        overlay.classList.remove('active');
+                        document.body.style.overflow = '';
+                    }
+                },
+                loadBreweries: async () => {
+                    console.log('📦 Loading breweries...');
+                    // Implementation here
+                },
+                searchBreweryBeers: (brewery) => {
+                    console.log(`🔍 Searching for beers from: ${brewery}`);
+                    // Implementation here
+                }
+            };
+        })();
+        
+        App.registerModule('breweries', BreweriesModule);
+        BreweriesModule.init();
+    },
     },
     
     initPhase5: async () => {
