@@ -130,41 +130,32 @@ export default (function() {
         }
     };
     
-    // Fix the searchBreweryBeers function to actually trigger beer search:
     const searchBreweryBeers = (brewery) => {
         console.log(`🔍 Searching for beers from: ${brewery}`);
         
         // Close breweries overlay
         closeBreweries();
         
-        // Open search overlay first
-        const searchOverlay = document.getElementById('searchOverlay');
-        if (searchOverlay) {
-            searchOverlay.style.display = 'flex';
-            searchOverlay.classList.add('active');
+        // Directly open beer modal with brewery pre-selected
+        if (modules.modalManager) {
+            modules.modalManager.open('beerModal', {
+                onOpen: () => {
+                    // Set search type to brewery
+                    const searchType = document.getElementById('beerSearchType');
+                    if (searchType) searchType.value = 'brewery';
+                    
+                    // Set brewery name
+                    const beerInput = document.getElementById('beerInput');
+                    if (beerInput) {
+                        beerInput.value = brewery;
+                        // Focus to trigger any autocomplete
+                        beerInput.focus();
+                    }
+                }
+            });
         }
         
-        // Then trigger beer search modal
-        setTimeout(() => {
-            // Trigger beer search option
-            const beerSearchOption = document.querySelector('.search-option.beer');
-            if (beerSearchOption) {
-                beerSearchOption.click();
-            }
-            
-            // After modal opens, set the brewery
-            setTimeout(() => {
-                const beerInput = document.getElementById('beerInput');
-                const searchType = document.getElementById('beerSearchType');
-                if (beerInput && searchType) {
-                    searchType.value = 'brewery';
-                    beerInput.value = brewery;
-                    // Trigger search
-                    const searchBtn = document.querySelector('[data-action="perform-beer-search"]');
-                    if (searchBtn) searchBtn.click();
-                }
-            }, 300);
-        }, 300);
+        modules.tracking?.trackEvent('brewery_selected', 'Breweries', brewery);
     };
     
     // Show error state
