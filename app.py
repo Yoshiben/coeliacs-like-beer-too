@@ -371,7 +371,7 @@ def get_stats():
         return jsonify({
             'total_pubs': 49841,
             'gf_pubs': 1249,
-            'gf_pubs_this_month: 10
+            'gf_pubs_this_month': 10 
         })
     finally:
         if 'conn' in locals() and conn.is_connected():
@@ -974,6 +974,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
