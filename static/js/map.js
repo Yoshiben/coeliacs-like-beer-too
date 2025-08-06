@@ -1138,6 +1138,7 @@ export const MapModule = (() => {
         
         // UI
         toggleSearchResultsFullMap,
+        retryLoadPubs,
         
         // Utilities
         calculateDistance: utils.calculateDistance
