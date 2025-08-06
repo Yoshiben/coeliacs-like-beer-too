@@ -1,6 +1,7 @@
 // ================================================================================
-// COMMUNITY.JS - Community Homepage Features
+// COMMUNITY.JS - Community Homepage Features (Rebuilt - No Inline HTML/CSS)
 // Handles: Feed updates, trending, quick actions, user interactions
+// Ready for real data integration
 // ================================================================================
 
 import { Constants } from './constants.js';
@@ -22,7 +23,14 @@ export const CommunityModule = (() => {
     
     const config = {
         refreshInterval: 300000, // 5 minutes
-        animationDuration: 300
+        animationDuration: 300,
+        // API endpoints for when ready
+        endpoints: {
+            pubOfMonth: '/api/community/pub-of-month',
+            recentFinds: '/api/community/recent-finds',
+            trending: '/api/community/trending',
+            stats: '/api/stats'
+        }
     };
     
     // ================================
@@ -61,20 +69,11 @@ export const CommunityModule = (() => {
     // ================================
     const loadCommunityData = async () => {
         try {
-            // In parallel, load all community data
+            // For now, load mock data. When ready, uncomment the API calls
             const [pubOfMonth, latestFinds, trending] = await Promise.all([
-                loadPubOfMonth().catch(err => {
-                    console.error('Failed to load pub of month:', err);
-                    return null;
-                }),
-                loadLatestFinds().catch(err => {
-                    console.error('Failed to load latest finds:', err);
-                    return [];
-                }),
-                loadTrending().catch(err => {
-                    console.error('Failed to load trending:', err);
-                    return [];
-                })
+                loadPubOfMonth(),
+                loadLatestFinds(),
+                loadTrending()
             ]);
             
             // Update state
@@ -88,92 +87,100 @@ export const CommunityModule = (() => {
             
         } catch (error) {
             console.error('❌ Critical error loading community data:', error);
-            // Show fallback UI
             showFallbackUI();
         }
     };
-
-    const showFallbackUI = () => {
-        // Ensure the page still works even if community data fails
-        const communityFeed = document.querySelector('.community-feed');
-        if (communityFeed && !communityFeed.querySelector('.fallback-message')) {
-            const fallback = document.createElement('div');
-            fallback.className = 'fallback-message';
-            fallback.innerHTML = `
-                <p style="text-align: center; color: var(--text-muted); padding: var(--space-xl);">
-                    Community updates temporarily unavailable. 
-                    <a href="#" onclick="location.reload()">Refresh page</a>
-                </p>
-            `;
-            communityFeed.insertBefore(fallback, communityFeed.firstChild);
-        }
-    };    
     
+    // ================================
+    // DATA FETCHING (Ready for API integration)
+    // ================================
     const loadPubOfMonth = async () => {
-        // TODO: Add API endpoint for pub of month
-        // For now, return mock data
+        // READY FOR REAL DATA:
+        // const response = await fetch(config.endpoints.pubOfMonth);
+        // return await response.json();
+        
+        // Mock data for now
         return {
             pub_id: 12345,
             name: 'The Botanist Sheffield',
             description: '6 dedicated GF taps including Bellfield, Jump Ship & Brass Castle!',
             address: 'Sheffield City Centre',
-            gf_status: 'always',
-            photo_url: ''
+            gf_status: 'always_tap_cask',
+            photo_url: '/static/images/botanist-taps.jpg'
         };
     };
     
     const loadLatestFinds = async () => {
-        // TODO: Add API endpoint for community finds
-        // For now, return mock data
+        // READY FOR REAL DATA:
+        // const response = await fetch(config.endpoints.recentFinds);
+        // return await response.json();
+        
+        // Mock data structure matching what API would return
         return [
             {
                 id: 1,
-                user: 'Sarah M.',
-                time: '2 hours ago',
-                type: 'pub_find',
-                content: 'Just found <strong>Vagabond Pale Ale</strong> on tap at <strong>The Old Bell</strong>!',
-                location: 'Leeds',
+                user_name: 'Sarah M.',
+                created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+                type: 'beer_report',
                 pub_id: 23456,
-                thanks_count: 12
+                pub_name: 'The Old Bell',
+                location: 'Leeds',
+                beer_name: 'Vagabond Pale Ale',
+                beer_format: 'tap',
+                thanks_count: 12,
+                user_id: 'anon_123'
             },
             {
                 id: 2,
-                user: 'Mike R.',
-                time: '5 hours ago',
-                type: 'shop_find',
-                content: 'New GF section at <strong>Tesco Express</strong> - spotted Heart & Soul lager!',
+                user_name: 'Mike R.',
+                created_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
+                type: 'shop_report',
+                shop_name: 'Tesco Express',
                 location: 'Manchester',
-                // photo_url: '/static/images/tesco-gf-beer.jpg',
-                thanks_count: 24
+                beer_name: 'Heart & Soul lager',
+                photo_url: '/static/images/tesco-gf-beer.jpg',
+                thanks_count: 24,
+                user_id: 'anon_456'
             },
             {
                 id: 3,
-                type: 'brewery_alert',
-                content: '<strong>Jump Ship Brewing</strong> just launched 3 new GF beers! Now available in selected Wetherspoons.',
+                type: 'brewery_announcement',
+                brewery_name: 'Jump Ship Brewing',
+                announcement: '3 new GF beers launched',
+                venues: 'selected Wetherspoons',
+                created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
                 special: true
             }
         ];
     };
     
     const loadTrending = async () => {
-        // TODO: Add API endpoint for trending
-        // For now, return mock data
+        // READY FOR REAL DATA:
+        // const response = await fetch(config.endpoints.trending);
+        // return await response.json();
+        
         return [
             {
                 rank: 1,
-                name: 'Brass Castle - Haze',
+                beer_name: 'Brass Castle - Haze',
+                brewery: 'Brass Castle',
                 report_count: 18,
-                hot: true
+                hot: true,
+                trend: 'up'
             },
             {
                 rank: 2,
-                name: 'Bellfield - Lawless',
-                report_count: 15
+                beer_name: 'Bellfield - Lawless',
+                brewery: 'Bellfield',
+                report_count: 15,
+                trend: 'stable'
             },
             {
                 rank: 3,
-                name: 'Vagabond - American Pale Ale',
-                report_count: 12
+                beer_name: 'Vagabond - American Pale Ale',
+                brewery: 'Vagabond',
+                report_count: 12,
+                trend: 'up'
             }
         ];
     };
@@ -191,27 +198,45 @@ export const CommunityModule = (() => {
     const updatePubOfMonth = () => {
         if (!state.pubOfMonth) return;
         
-        const pub = state.pubOfMonth;
         const container = document.querySelector('.featured-content');
         if (!container) return;
         
-        container.innerHTML = `
-            <h2>${modules.helpers?.escapeHtml(pub.name)}</h2>
-            <p>${modules.helpers?.escapeHtml(pub.description)}</p>
-            <div class="featured-stats">
-                <span>📍 ${modules.helpers?.escapeHtml(pub.address)}</span>
-                <span>🍺 Always GF Available</span>
-            </div>
-            <button class="btn-featured" data-action="view-pub" data-pub-id="${pub.pub_id}">
-                View Details
-            </button>
-        `;
+        // Clear and rebuild with DOM methods
+        container.innerHTML = '';
+        
+        const title = document.createElement('h2');
+        title.textContent = state.pubOfMonth.name;
+        container.appendChild(title);
+        
+        const description = document.createElement('p');
+        description.textContent = state.pubOfMonth.description;
+        container.appendChild(description);
+        
+        const stats = document.createElement('div');
+        stats.className = 'featured-stats';
+        
+        const locationSpan = document.createElement('span');
+        locationSpan.textContent = `📍 ${state.pubOfMonth.address}`;
+        stats.appendChild(locationSpan);
+        
+        const statusSpan = document.createElement('span');
+        statusSpan.textContent = '🍺 Always GF Available';
+        stats.appendChild(statusSpan);
+        
+        container.appendChild(stats);
+        
+        const button = document.createElement('button');
+        button.className = 'btn btn-featured';
+        button.textContent = 'View Details';
+        button.dataset.action = 'view-pub';
+        button.dataset.pubId = state.pubOfMonth.pub_id;
+        container.appendChild(button);
         
         // Update image if exists
         const imageEl = document.querySelector('.featured-image img');
-        if (imageEl && pub.photo_url) {
-            imageEl.src = pub.photo_url;
-            imageEl.alt = `GF beer at ${pub.name}`;
+        if (imageEl && state.pubOfMonth.photo_url) {
+            imageEl.src = state.pubOfMonth.photo_url;
+            imageEl.alt = `GF beer at ${state.pubOfMonth.name}`;
         }
     };
     
@@ -219,89 +244,187 @@ export const CommunityModule = (() => {
         const container = document.querySelector('.finds-grid');
         if (!container || !state.feedItems.length) return;
         
-        container.innerHTML = state.feedItems.map(item => {
-            if (item.special) {
-                return createSpecialFindCard(item);
-            }
-            return createFindCard(item);
-        }).join('');
+        container.innerHTML = '';
+        
+        state.feedItems.forEach(item => {
+            const card = item.special ? 
+                createSpecialFindCard(item) : 
+                createFindCard(item);
+            container.appendChild(card);
+        });
     };
     
     const createFindCard = (item) => {
-        const helpers = modules.helpers;
-        return `
-            <div class="find-card" data-find-id="${item.id}">
-                <div class="find-header">
-                    <span class="find-user">${helpers?.escapeHtml(item.user)}</span>
-                    <span class="find-time">${helpers?.escapeHtml(item.time)}</span>
-                </div>
-                <div class="find-content">
-                    <p>${item.content}</p>
-                    <div class="find-location">📍 ${helpers?.escapeHtml(item.location)}</div>
-                </div>
-                ${item.photo_url ? `
-                    <div class="find-photo">
-                        <img src="${item.photo_url}" alt="GF beer find">
-                    </div>
-                ` : ''}
-                <div class="find-actions">
-                    ${item.pub_id ? `
-                        <button class="btn-small-outline" data-action="view-pub" data-pub-id="${item.pub_id}">
-                            View Pub
-                        </button>
-                    ` : ''}
-                    <button class="btn-small-text" data-action="thanks" data-find-id="${item.id}">
-                        🙌 Thanks! (${item.thanks_count || 0})
-                    </button>
-                </div>
-            </div>
-        `;
+        const card = document.createElement('div');
+        card.className = 'card find-card';
+        card.dataset.findId = item.id;
+        
+        // Header
+        const header = document.createElement('div');
+        header.className = 'find-header';
+        
+        const user = document.createElement('span');
+        user.className = 'find-user';
+        user.textContent = item.user_name;
+        header.appendChild(user);
+        
+        const time = document.createElement('span');
+        time.className = 'find-time';
+        time.textContent = formatTimeAgo(item.created_at);
+        header.appendChild(time);
+        
+        card.appendChild(header);
+        
+        // Content
+        const content = document.createElement('div');
+        content.className = 'find-content';
+        
+        const contentP = document.createElement('p');
+        contentP.textContent = formatFindContent(item);
+        content.appendChild(contentP);
+        
+        const location = document.createElement('div');
+        location.className = 'find-location';
+        location.textContent = `📍 ${item.location}`;
+        content.appendChild(location);
+        
+        card.appendChild(content);
+        
+        // Photo if exists
+        if (item.photo_url) {
+            const photoDiv = document.createElement('div');
+            photoDiv.className = 'find-photo';
+            
+            const img = document.createElement('img');
+            img.src = item.photo_url;
+            img.alt = 'GF beer find';
+            photoDiv.appendChild(img);
+            
+            card.appendChild(photoDiv);
+        }
+        
+        // Actions
+        const actions = document.createElement('div');
+        actions.className = 'find-actions';
+        
+        if (item.pub_id) {
+            const viewBtn = document.createElement('button');
+            viewBtn.className = 'btn btn-small-outline';
+            viewBtn.textContent = 'View Pub';
+            viewBtn.dataset.action = 'view-pub';
+            viewBtn.dataset.pubId = item.pub_id;
+            actions.appendChild(viewBtn);
+        }
+        
+        const thanksBtn = document.createElement('button');
+        thanksBtn.className = 'btn btn-small-text';
+        thanksBtn.textContent = `🙌 Thanks! (${item.thanks_count || 0})`;
+        thanksBtn.dataset.action = 'thanks';
+        thanksBtn.dataset.findId = item.id;
+        
+        // Check if already thanked
+        const thankedItems = window.App.getState('thankedFinds') || new Set();
+        if (thankedItems.has(item.id)) {
+            thanksBtn.disabled = true;
+            thanksBtn.style.opacity = '0.6';
+        }
+        
+        actions.appendChild(thanksBtn);
+        card.appendChild(actions);
+        
+        return card;
     };
     
     const createSpecialFindCard = (item) => {
-        return `
-            <div class="find-card highlight">
-                <div class="find-header">
-                    <span class="find-brewery">🎉 New Brewery Alert!</span>
-                </div>
-                <div class="find-content">
-                    <p>${item.content}</p>
-                </div>
-                <div class="find-actions">
-                    <button class="btn-small-primary" data-action="find-stockists">
-                        Find Stockists
-                    </button>
-                </div>
-            </div>
-        `;
+        const card = document.createElement('div');
+        card.className = 'card find-card highlight';
+        
+        const header = document.createElement('div');
+        header.className = 'find-header';
+        
+        const brewery = document.createElement('span');
+        brewery.className = 'find-brewery';
+        brewery.textContent = '🎉 New Brewery Alert!';
+        header.appendChild(brewery);
+        
+        card.appendChild(header);
+        
+        const content = document.createElement('div');
+        content.className = 'find-content';
+        
+        const contentP = document.createElement('p');
+        contentP.textContent = `${item.brewery_name} ${item.announcement}! Now available in ${item.venues}.`;
+        content.appendChild(contentP);
+        
+        card.appendChild(content);
+        
+        const actions = document.createElement('div');
+        actions.className = 'find-actions';
+        
+        const findBtn = document.createElement('button');
+        findBtn.className = 'btn btn-small-primary';
+        findBtn.textContent = 'Find Stockists';
+        findBtn.dataset.action = 'find-stockists';
+        
+        actions.appendChild(findBtn);
+        card.appendChild(actions);
+        
+        return card;
     };
     
     const updateTrending = () => {
         const container = document.querySelector('.trending-list');
         if (!container || !state.trendingItems.length) return;
         
-        container.innerHTML = state.trendingItems.map(item => `
-            <div class="trending-item">
-                <span class="trending-rank">${item.rank}</span>
-                <div class="trending-content">
-                    <strong>${modules.helpers?.escapeHtml(item.name)}</strong>
-                    <small>Reported ${item.report_count} times</small>
-                </div>
-                ${item.hot ? '<span class="trending-badge">🔥</span>' : ''}
-            </div>
-        `).join('');
+        container.innerHTML = '';
+        
+        state.trendingItems.forEach(item => {
+            const trendingDiv = document.createElement('div');
+            trendingDiv.className = 'trending-item';
+            
+            const rank = document.createElement('span');
+            rank.className = 'trending-rank';
+            rank.textContent = item.rank;
+            trendingDiv.appendChild(rank);
+            
+            const content = document.createElement('div');
+            content.className = 'trending-content';
+            
+            const name = document.createElement('strong');
+            name.textContent = item.beer_name;
+            content.appendChild(name);
+            
+            const count = document.createElement('small');
+            count.textContent = `Reported ${item.report_count} times`;
+            content.appendChild(count);
+            
+            trendingDiv.appendChild(content);
+            
+            if (item.hot) {
+                const badge = document.createElement('span');
+                badge.className = 'trending-badge';
+                badge.textContent = '🔥';
+                trendingDiv.appendChild(badge);
+            }
+            
+            container.appendChild(trendingDiv);
+        });
     };
     
     const updateStats = async () => {
         try {
             const stats = await modules.api?.getStats();
             if (stats) {
-                if (stats.total_pubs) {
-                    modules.helpers?.animateNumber('totalPubs', stats.total_pubs);
+                if (stats.total_pubs && modules.helpers) {
+                    modules.helpers.animateNumber('totalPubs', stats.total_pubs);
                 }
-                if (stats.gf_pubs) {
-                    modules.helpers?.animateNumber('gfPubs', stats.gf_pubs);
+                if (stats.gf_pubs && modules.helpers) {
+                    modules.helpers.animateNumber('gfPubs', stats.gf_pubs);
                 }
+                // TODO: Add endpoint for monthly finds
+                // if (stats.monthly_finds) {
+                //     modules.helpers.animateNumber('monthlyFinds', stats.monthly_finds);
+                // }
             }
         } catch (error) {
             console.error('Error updating stats:', error);
@@ -309,17 +432,67 @@ export const CommunityModule = (() => {
     };
     
     // ================================
+    // HELPER FUNCTIONS
+    // ================================
+    const formatTimeAgo = (isoString) => {
+        const date = new Date(isoString);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMs / 3600000);
+        const diffDays = Math.floor(diffMs / 86400000);
+        
+        if (diffMins < 60) return `${diffMins} minutes ago`;
+        if (diffHours < 24) return `${diffHours} hours ago`;
+        if (diffDays < 7) return `${diffDays} days ago`;
+        return date.toLocaleDateString();
+    };
+    
+    const formatFindContent = (item) => {
+        switch(item.type) {
+            case 'beer_report':
+                return `Just found ${item.beer_name} on ${item.beer_format} at ${item.pub_name}!`;
+            case 'shop_report':
+                return `New GF section at ${item.shop_name} - spotted ${item.beer_name}!`;
+            default:
+                return 'New GF beer find!';
+        }
+    };
+    
+    const showFallbackUI = () => {
+        const communityFeed = document.querySelector('.community-feed');
+        if (communityFeed && !communityFeed.querySelector('.fallback-message')) {
+            const fallback = document.createElement('div');
+            fallback.className = 'fallback-message';
+            
+            const message = document.createElement('p');
+            message.className = 'fallback-text';
+            message.textContent = 'Community updates temporarily unavailable. ';
+            
+            const link = document.createElement('a');
+            link.href = '#';
+            link.textContent = 'Refresh page';
+            link.onclick = (e) => {
+                e.preventDefault();
+                location.reload();
+            };
+            
+            message.appendChild(link);
+            fallback.appendChild(message);
+            communityFeed.insertBefore(fallback, communityFeed.firstChild);
+        }
+    };
+    
+    // ================================
     // QUICK NEARBY
     // ================================
     const initializeQuickNearby = () => {
-        // The action handler will be in main.js
         console.log('✅ Quick nearby button ready');
     };
     
     const handleQuickNearby = async () => {
         console.log('📍 Quick nearby search triggered');
         
-        // IMPORTANT: Close any open modals first to prevent conflicts
         if (modules.modalManager) {
             modules.modalManager.closeAll();
         }
@@ -327,13 +500,11 @@ export const CommunityModule = (() => {
         modules.helpers?.showLoadingToast('Finding GF beer near you...');
         
         try {
-            // Try to get location
             const searchModule = modules.search;
             if (!searchModule) {
                 throw new Error('Search module not loaded');
             }
             
-            // Use existing location search flow with fixed 5km radius
             await searchModule.searchNearbyWithDistance(5);
             
             modules.tracking?.trackEvent('quick_nearby', 'Community', 'homepage');
@@ -343,11 +514,8 @@ export const CommunityModule = (() => {
             modules.helpers?.hideLoadingToast();
             modules.helpers?.showToast('Could not get location. Try searching by area instead.', 'error');
             
-            // Open area search as fallback using modalManager
             if (modules.modalManager) {
                 modules.modalManager.open('areaModal');
-            } else if (modules.modal) {
-                modules.modal.open('areaModal');
             }
         }
     };
@@ -356,7 +524,6 @@ export const CommunityModule = (() => {
     // THANKS SYSTEM
     // ================================
     const initializeThanksButtons = () => {
-        // Track thanked items in session
         const thankedItems = new Set(
             JSON.parse(sessionStorage.getItem('thankedFinds') || '[]')
         );
@@ -364,7 +531,7 @@ export const CommunityModule = (() => {
         window.App.setState('thankedFinds', thankedItems);
     };
     
-    const handleThanks = (findId) => {
+    const handleThanks = async (findId) => {
         const thankedItems = window.App.getState('thankedFinds') || new Set();
         
         if (thankedItems.has(findId)) {
@@ -390,7 +557,12 @@ export const CommunityModule = (() => {
         modules.helpers?.showToast('Thanks recorded! 🙌', 'success');
         modules.tracking?.trackEvent('thanks_given', 'Community', `find_${findId}`);
         
-        // TODO: Send to API when backend ready
+        // READY FOR REAL DATA:
+        // try {
+        //     await fetch(`/api/community/thanks/${findId}`, { method: 'POST' });
+        // } catch (error) {
+        //     console.error('Error recording thanks:', error);
+        // }
     };
     
     // ================================
@@ -399,10 +571,11 @@ export const CommunityModule = (() => {
     const handleQuickAction = (action) => {
         const actions = {
             'browse-breweries': () => {
-                window.location.href = '/breweries';
+                const breweries = window.App?.getModule('breweries');
+                breweries?.openBreweries();
             },
             'new-to-gf': () => {
-                modules.modal?.open('gfInfoModal');
+                modules.modalManager?.open('gfInfoOverlay');
             },
             'add-find': () => {
                 modules.modal?.openReportModal();
