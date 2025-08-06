@@ -566,7 +566,7 @@ export const MapModule = (() => {
         console.log('📍 Loading UK pubs...');
         
         try {
-            // Check cache
+            // Check cache first
             const cachedPubs = window.App.getState(STATE_KEYS.MAP_DATA.ALL_PUBS);
             if (cachedPubs && cachedPubs.length > 0) {
                 console.log('✅ Using cached pub data');
@@ -574,14 +574,42 @@ export const MapModule = (() => {
                 return;
             }
             
-            // Fetch data
-            const response = await fetch('/api/all-pubs');
-            const data = await response.json();
-            
-            if (!data.success) {
-                throw new Error(data.error || 'Failed to load pubs');
+            // Show loading message
+            if (window.showLoadingToast) {
+                window.showLoadingToast('Loading pubs across the UK...');
             }
             
+            // Fetch data with better error handling
+            const response = await fetch('/api/all-pubs', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                console.error(`❌ Server error: ${response.status} ${response.statusText}`);
+                
+                // Try to get error details
+                let errorMessage = `Server error: ${response.status}`;
+                try {
+                    const errorData = await response.json();
+                    errorMessage = errorData.error || errorMessage;
+                } catch (e) {
+                    // Response wasn't JSON
+                }
+                
+                throw new Error(errorMessage);
+            }
+            
+            const data = await response.json();
+            
+            if (!data.success || !data.pubs) {
+                throw new Error(data.error || 'Invalid response format');
+            }
+            
+            // Store in state
             window.App.setState(STATE_KEYS.MAP_DATA.ALL_PUBS, data.pubs || []);
             
             const allPubs = window.App.getState(STATE_KEYS.MAP_DATA.ALL_PUBS);
@@ -590,21 +618,86 @@ export const MapModule = (() => {
             // Update display
             updateMapDisplay(true);
             
-            // Show notification
+            // Show success notification
             const gfCount = allPubs.filter(p => 
-                p.gf_status === 'always' || p.gf_status === 'currently'
+                p.gf_status === 'always_tap_cask' || 
+                p.gf_status === 'always_bottle_can' || 
+                p.gf_status === 'currently'
             ).length;
             
+            if (window.hideLoadingToast) {
+                window.hideLoadingToast();
+            }
+            
             if (window.showSuccessToast) {
-                window.showSuccessToast(`✅ ${gfCount} pubs with GF beer ready!`);
+                window.showSuccessToast(`✅ Loaded ${allPubs.length} pubs (${gfCount} with GF beer)`);
             }
             
         } catch (error) {
             console.error('❌ Error loading pubs:', error);
-            if (window.showSuccessToast) {
-                window.showSuccessToast('❌ Error loading pubs. Please try again.');
+            
+            if (window.hideLoadingToast) {
+                window.hideLoadingToast();
             }
+            
+            // Show user-friendly error with retry option
+            const errorMessage = error.message.includes('500') ? 
+                'Server temporarily unavailable. Please try again.' : 
+                'Could not load pub data. Please check your connection.';
+                
+            if (window.showErrorToast) {
+                window.showErrorToast(errorMessage);
+            } else if (window.showSuccessToast) {
+                window.showSuccessToast(`❌ ${errorMessage}`);
+            }
+            
+            // Show retry button on map
+            showMapRetryButton();
         }
+    };
+
+    const showMapRetryButton = () => {
+        const map = window.App.getState(STATE_KEYS.MAP_DATA.FULL_UK_MAP);
+        if (!map) return;
+        
+        // Create custom control for retry
+        const RetryControl = L.Control.extend({
+            options: {
+                position: 'center'
+            },
+            
+            onAdd: function(map) {
+                const container = L.DomUtil.create('div', 'map-retry-container');
+                container.innerHTML = `
+                    <div class="map-retry-content">
+                        <p>Could not load pub data</p>
+                        <button class="btn btn-primary" onclick="window.App.getModule('map').retryLoadPubs()">
+                            🔄 Try Again
+                        </button>
+                    </div>
+                `;
+                
+                // Prevent map interactions on this control
+                L.DomEvent.disableClickPropagation(container);
+                L.DomEvent.disableScrollPropagation(container);
+                
+                return container;
+            }
+        });
+        
+        map.addControl(new RetryControl());
+    };
+    
+    // Add retry function to public API
+    const retryLoadPubs = async () => {
+        // Remove retry button
+        const retryContainer = document.querySelector('.map-retry-container');
+        if (retryContainer) {
+            retryContainer.remove();
+        }
+        
+        // Try loading again
+        await loadAllPubsOnMap();
     };
     
     const cleanupFullUKMap = () => {
