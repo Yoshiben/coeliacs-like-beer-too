@@ -490,13 +490,35 @@ const App = {
             }, 500);
         },
         
-        // Also UPDATE the bottom nav map click handler when on pub details:
         'show-full-map': (el, modules) => {
             // Check if we're on pub details
             const currentContext = modules.nav?.getCurrentContext();
             if (currentContext === 'pub') {
-                // Show this pub on map instead
-                App.actionHandlers['show-pub-on-map'](el, modules);
+                // IMPORTANT: Close pub details overlay first
+                modules.modalManager?.close('pubDetailsOverlay');
+                
+                // Show full map with this pub centered
+                setTimeout(() => {
+                    App.showFullMap(modules);
+                    
+                    // After map loads, center on the current pub
+                    const currentPub = App.getState(STATE_KEYS.CURRENT_PUB);
+                    if (currentPub && currentPub.latitude && currentPub.longitude) {
+                        setTimeout(() => {
+                            const map = App.getState(STATE_KEYS.MAP_DATA.FULL_UK_MAP);
+                            if (map) {
+                                map.setView([parseFloat(currentPub.latitude), parseFloat(currentPub.longitude)], 16);
+                                
+                                // Find and open the pub's popup
+                                map.eachLayer(layer => {
+                                    if (layer.options && layer.options.pubId === currentPub.pub_id) {
+                                        layer.openPopup();
+                                    }
+                                });
+                            }
+                        }, 500);
+                    }
+                }, 100);
             } else {
                 // Normal map view
                 App.showFullMap(modules);
