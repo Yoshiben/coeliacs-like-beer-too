@@ -447,7 +447,9 @@ const App = {
             map: App.getModule('map'),
             form: App.getModule('form'),
             tracking: App.getModule('tracking'),
-            nav: App.getModule('nav')
+            nav: App.getModule('nav'),
+            breweries: App.getModule('breweries'), // ADD THIS LINE
+            community: App.getModule('community')  // AND THIS IF NEEDED
         };
 
         console.log('📦 Available modules:', Object.keys(modules).filter(key => modules[key] !== null));
