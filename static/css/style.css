@@ -184,49 +184,20 @@
 /* =====================================================================================
    ANY CSS BELOW THIS IS VALIDATED
    ===================================================================================== */
-
-/* Apply border-box to everything */
 *,
 *::before,
 *::after {
    box-sizing: border-box;
 }
-
 .modal,
 .overlay,
 .toast,
 .cookie-consent {
    display:none;
 }
-
-/* =====================================================================================
-   ANY CSS ABOVE THIS IS VALIDATED
-   ===================================================================================== */
-
-
-
-
 /* ================================
    GROUP - HOLISTIC
    ================================ */
-
-/* When active, modals use flex */
-/* .modal.active,
-.search-modal.active,
-.report-modal.active {
-    display: flex !important;
-}
- */
-/* Cookie consent uses block when visible */
-/* .cookie-consent.active {
-    display: block !important;
-} */
-
-/* Toasts handle their own visibility */
-/* .toast.show {
-    display: flex !important;
-} */
-
 body {
    background: var(--primary-gradient);
    margin: 0;
@@ -243,25 +214,16 @@ body {
    display: flex;
    flex-direction: column;
 }
-
-.home-page {
-   flex: 1;
-   display: flex;
-   flex-direction: column;
-   overflow: hidden;
-   height: 100%;
-}
-
-/* Ensure html doesn't have conflicting styles */
 html {
    scroll-behavior: smooth;
    font-size: clamp(14px, 2.5vw, 16px);
    overflow-x: hidden;
    overflow-y: auto;
 }
-
+/* ============
+   OVERLAYS
+   ============ */
 .overlay {
-   display: none;
    position: fixed;
    top: 0;
    left: 0;
@@ -271,21 +233,14 @@ html {
    height: 100dvh;
    z-index: var(--z-modal-backdrop);
 }
-
-/* When overlay is active */
 .overlay.active {
    display: flex; 
    flex-direction: column;
 }
-
-
 /* ============
    MODALS
    ============ */
-
-
 .modal {
-   display:none;
    position: fixed;
    top: 0;
    left: 0;
@@ -294,13 +249,11 @@ html {
    height: 100dvh;
    background: var(--modal-backdrop);
 }
-
 .modal.active {
     display: flex;
     align-items: center;
     justify-content: center;
 }
-
 .modal-content {
    max-height: 76vh;
    max-height: 76dvh;
@@ -316,7 +269,6 @@ html {
    box-shadow: var(--shadow-xl);
    justify-content: space-between;
 }
-
 .modal-header {
    align-items: center;
    background: var(--primary-gradient);
@@ -325,17 +277,14 @@ html {
    color: var(--white);
    padding: var(--space-lg);
 }
-
 .modal-title {
    color: var(--white);
    margin: 0;
 }
-
 .modal-subtitle {
    color: var(--white);
    margin: 0;
 }
-
 .modal-close {
    position: absolute;
    right: var(--space-lg);
@@ -346,7 +295,6 @@ html {
    width: 30px;
    height: 30px;
 }
-
 .modal-body {
    flex: 1;
    padding: var(--space-sm) var(--space-xl) var(--space-xl);
@@ -355,25 +303,20 @@ html {
    display: flex;
    flex-direction: column;
 }
-
 .modal-actions {
    display: flex;
    text-align: center;
    gap: var(--space-4xl);
    padding: var(--space-xl);
 }
-
 .modal-options {
    display: grid;
    gap: var(--space-md);
    padding: var(--space-lg);
 }
-
 /* ============
    FORMS
    ============ */
-
-
 .form-input,
 .form-select{
    border: 2px solid var(--border-light);
@@ -391,7 +334,6 @@ form-input:focus {
    border-color: var(--light-blue);
    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
-
 .form-label {
    font-weight: 600;
    color: var(--text-secondary);
@@ -399,24 +341,20 @@ form-input:focus {
    padding: var(--space-md);
    display: flex;
 }
-
 /* ================================
    TOGGLE SWITCH - PROPER TOGGLE
    ================================ */
-
 .toggle-container {
    border-radius: var(--radius-xl);
    display: flex;
    position: relative;
    border: 2px solid rgba(255, 255, 255, 0.3);
 }
-
 .toggle-track {
    position: relative;
    display: flex;
    align-items: center;
 }
-
 .toggle-option {
    padding: 8px 16px;
    font-size: var(--text-sm);
@@ -428,11 +366,9 @@ form-input:focus {
    z-index: 2;
    white-space: nowrap;
 }
-
 .toggle-option.active {
    color: var(--text-primary);
 }
-
 .toggle-thumb {
    position: absolute;
    top: 0;
@@ -448,12 +384,17 @@ form-input:focus {
    z-index: 1;
    transform: translateX(0);
 }
-
 /* Ensure thumb is visible even during initialization */
 .toggle-container .toggle-thumb {
    opacity: 1 !important;
    visibility: visible !important;
 }
+
+/* =====================================================================================
+   ANY CSS ABOVE THIS IS VALIDATED
+   ===================================================================================== */
+
+
    
 /* ================================
    GROUP - BUTTONS
@@ -1351,10 +1292,6 @@ body.page-pub .nav-notification-btn {
     overflow: hidden;
 }
 
-.search-overlay.active {
-    display: flex !important;
-}
-
 .search-section {
    display: flex;
    align-items: stretch;
@@ -1499,10 +1436,6 @@ body.page-pub .nav-notification-btn {
 /*     background: var(--primary-gradient); */
 }
 
-.map-overlay.active {
-    display: flex !important;
-}
-
 .map-overlay-content {
     position: absolute;
     top: 8vh; 
@@ -1591,11 +1524,6 @@ body.page-pub .nav-notification-btn {
 /* ================================
    PUB DETAILS OVERLAY - VALIDATED
    ================================ */
-
-.pub-details-overlay.active {
-   display: flex !important;
-   flex-direction: column;
-}
 
 .pub-details-container {
    flex: 1;
@@ -1922,11 +1850,6 @@ body.page-pub .nav-notification-btn {
     flex-direction: column;
     overflow: hidden;
 }
-
-.breweries-overlay.active {
-    display: flex !important;
-}
-
 .breweries-container {
     flex: 1;
     display: flex;
@@ -3784,10 +3707,6 @@ body.page-pub .nav-notification-btn {
     justify-content: center;
     padding: 8vh 0;
     overflow: hidden;
-}
-
-.info-overlay.active {
-    display: flex !important;
 }
 
 .info-container {
