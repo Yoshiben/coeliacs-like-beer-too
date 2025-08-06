@@ -441,6 +441,31 @@
                 </div>
             </div>
         </div>
+
+        <!-- Brewery Beers Modal -->
+        <div id="breweryBeersModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">🍺 <span id="breweryName"></span> Beers</h3>
+                    <button class="modal-close" data-action="close-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="breweryBeersLoading" class="loading-state">
+                        <div class="loading-spinner"></div>
+                        <div class="loading-text">Loading beers...</div>
+                    </div>
+                    <div id="breweryBeersList" class="brewery-beers-list"></div>
+                    <div id="breweryBeersEmpty" class="empty-state" style="display: none;">
+                        <p>No beers found for this brewery</p>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-primary" data-action="search-pubs-with-brewery">
+                        🔍 Find Pubs Serving These Beers
+                    </button>
+                </div>
+            </div>
+        </div>
     
         <!-- Results Overlay -->
         <div id="resultsOverlay" class="overlay results-overlay">
@@ -1179,6 +1204,7 @@
         </script>
     </body>
 </html>
+
 
 
 
