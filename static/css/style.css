@@ -967,12 +967,16 @@ body.page-pub .nav-notification-btn {
     color: var(--text-primary);
 }
 /* MAP */
+.map-overlay {
+   padding: 0;
+}
 .map-container {
    height:100%;
    flex: 1;
    background: var(--white);
    position: relative;
    align-content: space-evenly;
+   padding: 8vh 0;
 }
 /* ================================
    BOTTOM NAVIGATION - VALIDATED
