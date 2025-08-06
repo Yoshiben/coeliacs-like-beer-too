@@ -968,7 +968,11 @@ body.page-pub .nav-notification-btn {
 }
 /* MAP */
 .map-container {
-    flex: 1;
+   height:100%;
+   flex: 1;
+   background: var(--white);
+   position: relative;
+   align-content: space-evenly;
 }
 /* ================================
    BOTTOM NAVIGATION - VALIDATED
