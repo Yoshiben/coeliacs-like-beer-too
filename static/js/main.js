@@ -414,11 +414,27 @@ const App = {
             modules.nav?.goBackFromPub();
         },
         
-        // ADD this new one
+        // Replace with:
         'nav-back': (el, modules) => {
             const currentContext = modules.nav?.getCurrentContext();
+            
             if (currentContext === 'pub') {
                 modules.nav?.goBackFromPub();
+            } else if (currentContext === 'map') {
+                // Check if we came from pub details
+                const mapReturnContext = App.getState('mapReturnContext');
+                if (mapReturnContext === 'pub') {
+                    // Close map and return to pub details
+                    modules.modalManager?.close('fullMapOverlay');
+                    const currentPub = App.getState(STATE_KEYS.CURRENT_PUB);
+                    if (currentPub) {
+                        modules.search?.showPubDetails(currentPub.pub_id);
+                    } else {
+                        modules.nav?.goToHome();
+                    }
+                } else {
+                    modules.nav?.goToHome();
+                }
             } else {
                 modules.nav?.goToHome();
             }
@@ -921,6 +937,10 @@ const App = {
     
     showFullMap: async (modules) => {
         console.log('🗺️ Showing full UK map...');
+
+        // Store where we came from
+        const currentContext = modules.nav?.getCurrentContext();
+        App.setState('mapReturnContext', currentContext);
         
         // Check for location if needed
         if (!App.getState(STATE_KEYS.USER_LOCATION)) {
