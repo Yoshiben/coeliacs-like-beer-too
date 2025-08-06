@@ -194,7 +194,7 @@ const App = {
     initPhase4: async () => {
         console.log('🔧 Phase 4: Features...');
         
-        const [{ MapModule }, { SearchModule }, { FormModule }, { CommunityModule }, { NavStateManager }, { BreweriesModule }] = await Promise.all([
+        const modules = await Promise.all([
             import('./map.js'),
             import('./search.js'),
             import('./forms.js'),
@@ -203,53 +203,99 @@ const App = {
             import('./breweries.js')
         ]);
         
+        const [
+            { MapModule },
+            { SearchModule },
+            { FormModule },
+            { CommunityModule },
+            { NavStateManager },
+            breweriesImport
+        ] = modules;
+        
         App.registerModule('map', MapModule);
         App.registerModule('search', SearchModule);
         App.registerModule('form', FormModule);
-        App.registerModule('community', CommunityModule); 
-        App.registerModule('breweries', BreweriesModule);
+        App.registerModule('community', CommunityModule);
+        
+        // Handle BreweriesModule - check different possible exports
+        const BreweriesModule = breweriesImport.BreweriesModule || 
+                               breweriesImport.default || 
+                               window.BreweriesModule ||
+                               (() => {
+                                   // Fallback implementation
+                                   console.log('⚠️ Using fallback BreweriesModule');
+                                   const module = (function() {
+                                       'use strict';
+                                       
+                                       let modules = {};
+                                       let breweries = [];
+                                       
+                                       const init = (appModules) => {
+                                           console.log('🏭 Initializing Breweries Module (fallback)');
+                                           modules = appModules || {};
+                                           setupEventListeners();
+                                           console.log('✅ Breweries Module initialized');
+                                       };
+                                       
+                                       const setupEventListeners = () => {
+                                           const overlay = document.getElementById('breweriesOverlay');
+                                           overlay?.addEventListener('click', (e) => {
+                                               if (e.target === overlay) {
+                                                   closeBreweries();
+                                               }
+                                           });
+                                       };
+                                       
+                                       const openBreweries = () => {
+                                           console.log('🏭 Opening breweries overlay');
+                                           const overlay = document.getElementById('breweriesOverlay');
+                                           if (overlay) {
+                                               overlay.style.display = 'flex';
+                                               overlay.classList.add('active');
+                                               document.body.style.overflow = 'hidden';
+                                           }
+                                       };
+                                       
+                                       const closeBreweries = () => {
+                                           console.log('🏭 Closing breweries overlay');
+                                           const overlay = document.getElementById('breweriesOverlay');
+                                           if (overlay) {
+                                               overlay.style.display = 'none';
+                                               overlay.classList.remove('active');
+                                               document.body.style.overflow = '';
+                                           }
+                                       };
+                                       
+                                       const loadBreweries = async () => {
+                                           console.log('📦 Loading breweries...');
+                                       };
+                                       
+                                       const searchBreweryBeers = (brewery) => {
+                                           console.log(`🔍 Searching for beers from: ${brewery}`);
+                                       };
+                                       
+                                       return {
+                                           init,
+                                           openBreweries,
+                                           closeBreweries,
+                                           loadBreweries,
+                                           searchBreweryBeers
+                                       };
+                                   })();
+                                   
+                                   return module;
+                               })();
+        
+        if (BreweriesModule) {
+            App.registerModule('breweries', BreweriesModule);
+            BreweriesModule.init(App.modules);
+        } else {
+            console.error('❌ BreweriesModule not found');
+        }
         
         // Initialize forms
         FormModule.init();
         NavStateManager.init();
-
-        // ADD THIS - Import and register BreweriesModule
-        const breweries = await import('./breweries.js');
-        const BreweriesModule = breweries.default || window.BreweriesModule || (() => {
-            console.log('🏭 Initializing Breweries Module');
-            return {
-                init: () => console.log('✅ Breweries Module initialized'),
-                openBreweries: () => {
-                    console.log('🏭 Opening breweries overlay');
-                    const overlay = document.getElementById('breweriesOverlay');
-                    if (overlay) {
-                        overlay.style.display = 'flex';
-                        overlay.classList.add('active');
-                        document.body.style.overflow = 'hidden';
-                    }
-                },
-                closeBreweries: () => {
-                    const overlay = document.getElementById('breweriesOverlay');
-                    if (overlay) {
-                        overlay.style.display = 'none';
-                        overlay.classList.remove('active');
-                        document.body.style.overflow = '';
-                    }
-                },
-                loadBreweries: async () => {
-                    console.log('📦 Loading breweries...');
-                    // Implementation here
-                },
-                searchBreweryBeers: (brewery) => {
-                    console.log(`🔍 Searching for beers from: ${brewery}`);
-                    // Implementation here
-                }
-            };
-        })();
-        
-        App.registerModule('breweries', BreweriesModule);
-        BreweriesModule.init();
-    },
     },
     
     initPhase5: async () => {
