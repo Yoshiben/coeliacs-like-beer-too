@@ -692,8 +692,9 @@ export const FormModule = (() => {
         currentPub: null,
         selectedStatus: null,
         initialized: false, 
-
+    
         init() {
+            console.trace('🔍 DEBUG: GFStatusFlow.init() called!');
             // Only initialize once
             if (this.initialized) return;
             this.initialized = true;
