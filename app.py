@@ -346,20 +346,32 @@ def get_stats():
         cursor.execute("""
             SELECT COUNT(DISTINCT pub_id) as gf_total 
             FROM pub_gf_status 
-            WHERE status IN ('always', 'currently')
+            WHERE status IN ('always_tap_cask','always_bottle_can', 'currently')
         """)
         gf_pubs = cursor.fetchone()[0]
+
+        # Pubs with GF options this month
+        cursor.execute("""
+            SELECT COUNT(DISTINCT pub_id) as gf_total_this_month
+            FROM pub_gf_status 
+            WHERE status IN ('always_tap_cask','always_bottle_can', 'currently')
+            AND YEAR(updated_at) = YEAR(CURRENT_DATE())
+            AND MONTH(updated_at) = MONTH(CURRENT_DATE())
+        """)
+        gf_pubs_this_month = cursor.fetchone()[0]
         
         return jsonify({
             'total_pubs': total_pubs,
-            'gf_pubs': gf_pubs
+            'gf_pubs': gf_pubs,
+            'gf_pubs_this_month': gf_pubs_this_month
         })
         
     except Exception as e:
         logger.error(f"Error in stats: {str(e)}")
         return jsonify({
             'total_pubs': 49841,
-            'gf_pubs': 1249
+            'gf_pubs': 1249,
+            'gf_pubs_this_month: 10
         })
     finally:
         if 'conn' in locals() and conn.is_connected():
@@ -962,6 +974,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
