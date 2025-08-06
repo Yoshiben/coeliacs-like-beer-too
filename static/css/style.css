@@ -1120,8 +1120,8 @@ body.page-pub .nav-notification-btn {
 /*    grid-template-columns: 1fr 1fr;
    grid-template-rows: 1fr 1fr; */
    gap: var(--space-md);
-/*    width: 100%;
-   height: 100%; */
+   width: 100%;
+   height: 100%;
 }   
 .search-option {
    border: 3px solid var(--border-light);
@@ -1184,11 +1184,11 @@ body.page-pub .nav-notification-btn {
 /*    line-height: 1.1; */
 }
 .search-description {
-/*    font-size: var(--text-sm); */
+   font-size: var(--text-sm);
    color: var(--text-secondary);
-   line-height: 1.2;
+/*    line-height: 1.2; */
    text-align: center;
-   padding: 0 var(--space-xs);
+   padding: 0 var(--spac?e-xs);
 }
 
 
