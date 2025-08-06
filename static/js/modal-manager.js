@@ -32,8 +32,8 @@ export const ModalManager = (() => {
         breweriesOverlay: { type: 'overlay', group: 'primary', exclusive: true },
 
         // Info overlays
-        aboutOverlay: { type: 'overlay', group: 'info', exclusive: true },
-        gfInfoOverlay: { type: 'overlay', group: 'info', exclusive: true },
+        aboutOverlay: { type: 'overlay', group: 'info', exclusive: true, zIndex: 1500 },
+        gfInfoOverlay: { type: 'overlay', group: 'info', exclusive: true, zIndex: 1500 },
         
         // Search modals (mutually exclusive within group)
         nameModal: { type: 'modal', group: 'search-input', exclusive: true },
