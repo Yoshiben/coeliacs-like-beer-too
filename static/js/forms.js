@@ -701,7 +701,9 @@ export const FormModule = (() => {
         },
         
         openStatusModal() {
-            console.log('🔍 Opening GF status modal');
+            console.trace('🔍 DEBUG: Opening GF status modal from GFStatusFlow.openStatusModal');
+            console.log('Current pub:', this.currentPub);
+            // console.log('🔍 Opening GF status modal');
             
             // IMPORTANT: Get fresh pub data when button is clicked
             this.currentPub = utils.getCurrentPub();
@@ -723,6 +725,7 @@ export const FormModule = (() => {
             
             // Use modalManager if available
             if (modules.modalManager) {
+                console.log('🔍 DEBUG: About to call modalManager.open');
                 modules.modalManager.open('gfStatusModal');
             } else {
                 const modal = document.getElementById('gfStatusModal');
@@ -1041,7 +1044,10 @@ export const FormModule = (() => {
                 utils.showToast(`🎉 Adding first beer for ${brewery}!`);
             },
             'select-style': () => selectStyle(action.dataset.style),
-            'change-gf-status': () => GFStatusFlow.openStatusModal(),
+            'change-gf-status': () => {
+                console.trace('🔍 DEBUG: Opening GF status modal from forms.js action handler');
+                GFStatusFlow.openStatusModal()
+            },
             'select-status': () => GFStatusFlow.selectStatus(action.dataset.status),
             'confirm-status': () => GFStatusFlow.confirmStatusUpdate(),
             'cancel-status': () => modules.modal.close('gfStatusConfirmModal'),
