@@ -439,6 +439,9 @@ def get_brewery_beers(brewery_name):
             cursor.close()
             conn.close()
 
+
+
+
 @app.route('/api/submit_beer_update', methods=['POST'])
 def submit_beer_update():
     """Submit beer report with new schema"""
@@ -492,9 +495,9 @@ def submit_beer_update():
         cursor.execute("""
             INSERT INTO beer_reports (
                 pub_id, beer_id, brewery, beer_name, beer_style, beer_abv, 
-                format, validation_tier, status, submitted_by, notes
+                format, validation_tier, status, submitted_by
             ) VALUES (
-                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
+                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
             )
         """, (
             pub_id,
@@ -506,8 +509,7 @@ def submit_beer_update():
             data.get('beer_format'),
             validation_tier,
             status,
-            user_info['submitted_by'],
-            data.get('notes', '')
+            user_info['submitted_by']
         ))
         
         report_id = cursor.lastrowid
@@ -800,21 +802,12 @@ def approve_submission():
     try:
         data = request.get_json()
         report_id = data.get('submission_id')  # Keep frontend field name
-        admin_notes = data.get('admin_notes', '')
         
         if not report_id:
             return jsonify({'error': 'report_id required'}), 400
         
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor()
-        
-        # Add admin notes if provided
-        if admin_notes:
-            cursor.execute("""
-                UPDATE beer_reports 
-                SET notes = CONCAT(COALESCE(notes, ''), '\nAdmin: ', %s)
-                WHERE report_id = %s
-            """, (admin_notes, report_id))
         
         conn.commit()
         
@@ -842,23 +835,12 @@ def reject_submission():
     try:
         data = request.get_json()
         report_id = data.get('submission_id')
-        admin_notes = data.get('admin_notes', '')
         
         if not report_id:
             return jsonify({'error': 'report_id required'}), 400
         
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor()
-        
-        # Update report status
-        cursor.execute("""
-            UPDATE beer_reports 
-            SET status = 'rejected',
-                processed_at = NOW(),
-                processed_by = 'admin',
-                notes = CONCAT(COALESCE(notes, ''), '\nRejected: ', %s)
-            WHERE report_id = %s
-        """, (admin_notes, report_id))
         
         # Update validation queue
         cursor.execute("""
@@ -979,6 +961,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
