@@ -3883,5 +3883,7 @@ body.page-pub .nav-notification-btn {
 }
 
 
-
+* {
+    border: 1px solid red !important;
+}
 
