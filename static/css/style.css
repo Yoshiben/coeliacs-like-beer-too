@@ -197,7 +197,8 @@
 
 .modal,
 .overlay,
-.toast {
+.toast
+.cookie-consent {
    display:none;
 }
 
@@ -211,15 +212,6 @@
 /* ================================
    GROUP - HOLISTIC
    ================================ */
-
-/* All modals should be hidden by default */
-/* .modal,
-.search-modal,
-.report-modal,
-.cookie-consent,
-.toast {
-    display: none;
-} */
 
 /* When active, modals use flex */
 /* .modal.active,
