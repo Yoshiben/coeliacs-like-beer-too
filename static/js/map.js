@@ -663,19 +663,25 @@ export const MapModule = (() => {
         // Create custom control for retry
         const RetryControl = L.Control.extend({
             options: {
-                position: 'center'
+                position: 'topright'
             },
             
             onAdd: function(map) {
                 const container = L.DomUtil.create('div', 'map-retry-container');
-                container.innerHTML = `
-                    <div class="map-retry-content">
-                        <p>Could not load pub data</p>
-                        <button class="btn btn-primary" onclick="window.App.getModule('map').retryLoadPubs()">
-                            🔄 Try Again
-                        </button>
-                    </div>
-                `;
+                
+                const content = L.DomUtil.create('div', 'map-retry-content', container);
+                
+                const icon = L.DomUtil.create('div', 'retry-icon', content);
+                icon.textContent = '⚠️';
+                
+                const message = L.DomUtil.create('p', '', content);
+                message.textContent = 'Could not load pub data';
+                
+                const button = L.DomUtil.create('button', 'btn btn-primary', content);
+                button.textContent = '🔄 Try Again';
+                button.addEventListener('click', () => {
+                    window.App.getModule('map').retryLoadPubs();
+                });
                 
                 // Prevent map interactions on this control
                 L.DomEvent.disableClickPropagation(container);
@@ -685,29 +691,35 @@ export const MapModule = (() => {
             }
         });
         
-        map.addControl(new RetryControl());
+        // Add control to map
+        try {
+            const control = new RetryControl();
+            map.addControl(control);
+            
+            // Store reference so we can remove it later
+            window.App.setState('mapRetryControl', control);
+        } catch (error) {
+            console.error('Error adding retry control:', error);
+        }
     };
     
     // Add retry function to public API
     const retryLoadPubs = async () => {
-        // Remove retry button
-        const retryContainer = document.querySelector('.map-retry-container');
-        if (retryContainer) {
-            retryContainer.remove();
+        // Remove retry control properly
+        const map = window.App.getState(STATE_KEYS.MAP_DATA.FULL_UK_MAP);
+        const retryControl = window.App.getState('mapRetryControl');
+        
+        if (map && retryControl) {
+            try {
+                map.removeControl(retryControl);
+            } catch (e) {
+                // Control might already be removed
+            }
+            window.App.setState('mapRetryControl', null);
         }
         
         // Try loading again
         await loadAllPubsOnMap();
-    };
-    
-    const cleanupFullUKMap = () => {
-        console.log('🧹 Cleaning up full UK map...');
-        
-        const fullUKMap = window.App.getState(STATE_KEYS.MAP_DATA.FULL_UK_MAP);
-        if (fullUKMap) {
-            utils.cleanupMap(fullUKMap);
-            window.App.setState(STATE_KEYS.MAP_DATA.FULL_UK_MAP, null);
-        }
     };
     
     // ================================
