@@ -634,21 +634,36 @@ export const SearchModule = (function() {
                 contentEl.style.display = 'block';
                 emptyEl.style.display = 'none';
                 
-                contentEl.innerHTML = beers.map((beer, index) => `
-                    <div class="beer-list-item">
-                        <div class="beer-info">
-                            <strong>${beer.name}</strong>
-                            <div class="beer-meta">
-                                ${beer.brewery} • ${beer.style || 'Unknown style'} • ${beer.format}
+                contentEl.innerHTML = beers.map((beer, index) => {
+                    // Format icons
+                    const formatIcons = {
+                        'tap': '🚰',
+                        'bottle': '🍺',
+                        'can': '🥫',
+                        'cask': '🛢️'
+                    };
+                    
+                    const formatIcon = formatIcons[beer.format.toLowerCase()] || '🍺';
+                    
+                    return `
+                        <div class="beer-list-item">
+                            <div class="beer-info">
+                                <strong>${beer.name}</strong>
+                                <div class="beer-meta">
+                                    <span class="beer-format">${formatIcon} ${beer.format}</span>
+                                    <span class="beer-brewery">${beer.brewery}</span>
+                                    ${beer.style ? `<span class="beer-style">${beer.style}</span>` : ''}
+                                </div>
                             </div>
+                            <button class="btn-delete-beer" data-action="delete-beer" 
+                                data-beer-id="${beer.id || index}" 
+                                data-beer-name="${beer.name}"
+                                title="Remove this beer">
+                                ❌
+                            </button>
                         </div>
-                        <button class="btn-delete-beer" data-action="delete-beer" 
-                            data-beer-id="${beer.id || index}" 
-                            data-beer-name="${beer.name}">
-                            ❌
-                        </button>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
             } else {
                 contentEl.style.display = 'none';
                 emptyEl.style.display = 'block';
