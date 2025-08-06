@@ -973,6 +973,7 @@ export const MapModule = (() => {
     };
     
     const displayAllPubsClustered = (map, allPubs) => {
+        // Clear previous layers
         const gfPubsLayer = L.layerGroup().addTo(map);
         window.App.setState(STATE_KEYS.MAP_DATA.GF_PUBS_LAYER, gfPubsLayer);
         
@@ -982,8 +983,8 @@ export const MapModule = (() => {
                 const count = cluster.getChildCount();
                 let size = 'small';
                 
-                if (count > 1000) size = 'large';
-                else if (count > 100) size = 'medium';
+                if (count > 100) size = 'large';
+                else if (count > 50) size = 'medium';
                 
                 return L.divIcon({
                     html: `<div><span>${count}</span></div>`,
@@ -995,64 +996,31 @@ export const MapModule = (() => {
         
         window.App.setState(STATE_KEYS.MAP_DATA.CLUSTERED_PUBS_LAYER, clusteredPubsLayer);
         
-        // Separate GF and other pubs
-        const gfPubs = [];
-        const otherPubs = [];
-        
+        // Add ALL pubs to cluster layer
         allPubs.forEach(pub => {
             if (!pub.latitude || !pub.longitude) return;
             
+            const lat = parseFloat(pub.latitude);
+            const lng = parseFloat(pub.longitude);
             const gfStatus = determineGFStatus(pub);
-            if (gfStatus === 'always' || gfStatus === 'currently') {
-                gfPubs.push(pub);
+            const markerStyle = getMarkerStyleForGFStatus(gfStatus);
+            
+            // Create marker
+            const marker = L.circleMarker([lat, lng], markerStyle);
+            marker.options.pubId = pub.pub_id;
+            
+            const popupContent = createPubPopupContent(pub, gfStatus);
+            marker.bindPopup(popupContent);
+            
+            // Add GF pubs to their own layer, others to cluster
+            if (gfStatus === 'always_tap_cask' || gfStatus === 'always_bottle_can' || gfStatus === 'currently') {
+                gfPubsLayer.addLayer(marker);
             } else {
-                otherPubs.push(pub);
+                clusteredPubsLayer.addLayer(marker);
             }
         });
         
-        console.log(`📊 GF Pubs: ${gfPubs.length}, Others: ${otherPubs.length}`);
-        
-        // Add GF pubs as individual markers
-        gfPubs.forEach(pub => {
-            const lat = parseFloat(pub.latitude);
-            const lng = parseFloat(pub.longitude);
-            const gfStatus = determineGFStatus(pub);
-            const markerStyle = getMarkerStyleForGFStatus(gfStatus);
-            
-            const marker = L.circleMarker([lat, lng], markerStyle);
-            const popupContent = createPubPopupContent(pub, gfStatus);
-            marker.bindPopup(popupContent);
-            
-            gfPubsLayer.addLayer(marker);
-        });
-        
-        // Add other pubs to cluster
-        otherPubs.forEach(pub => {
-            const lat = parseFloat(pub.latitude);
-            const lng = parseFloat(pub.longitude);
-            const gfStatus = determineGFStatus(pub);
-            const markerStyle = getMarkerStyleForGFStatus(gfStatus);
-            
-            const marker = L.marker([lat, lng], {
-                icon: L.divIcon({
-                    className: 'clusterable-marker',
-                    html: `<div style="
-                        width: ${markerStyle.radius * 2}px;
-                        height: ${markerStyle.radius * 2}px;
-                        background: ${markerStyle.fillColor};
-                        border: ${markerStyle.weight}px solid ${markerStyle.color};
-                        border-radius: 50%;
-                        opacity: ${markerStyle.fillOpacity};
-                    "></div>`,
-                    iconSize: [markerStyle.radius * 2, markerStyle.radius * 2]
-                })
-            });
-            
-            const popupContent = createPubPopupContent(pub, gfStatus);
-            marker.bindPopup(popupContent);
-            
-            clusteredPubsLayer.addLayer(marker);
-        });
+        console.log(`📊 Displayed ${allPubs.length} total pubs`);
     };
     
     const setupZoomHandler = () => {
