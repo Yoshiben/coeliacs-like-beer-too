@@ -823,9 +823,12 @@ const App = {
             
             modules.tracking?.trackEvent('search_overlay_opened', 'Navigation', 'bottom_nav');
         },
-
+        
         'close-search': (el, modules) => {
             console.log('🔍 Closing search overlay');
+            
+            // Remove search context
+            document.body.classList.remove('page-search');
             
             // Use ModalManager to close
             if (modules.modalManager) {
