@@ -305,6 +305,7 @@ export const Constants = {
         // Fallback stats
         TOTAL_PUBS: 49841,
         GF_PUBS: 1249,
+        GF_PUBS_THIS_MONTH: 10,
         
         // Admin token (should be in env var)
         ADMIN_TOKEN: 'beer_admin_2025',
