@@ -65,14 +65,6 @@
    --bg-overlay: rgba(0, 0, 0, 0.8);
    --bg-home: rgba(248, 249, 250, 1);
    
-   /* Button System */
-   --btn-height: 44px;
-   --btn-height-sm: 36px;
-   --btn-height-lg: 56px;
-   --btn-padding: 12px 20px;
-   --btn-padding-sm: 8px 16px;
-   --btn-padding-lg: 16px 24px;
-   
    /* Spacing System */
    --space-xs: 4px;
    --space-sm: 8px;
@@ -160,19 +152,10 @@
    --border-light: rgba(0, 0, 0, 0.1);    
    --hover-subtle: rgba(102, 126, 234, 0.05);
    --modal-line: rgba(226,232,240);
-   
-   /* Container Widths */
-   --container-sm: 640px;
-   --container-md: 768px;
-   --container-lg: 1024px;
-   --container-xl: 1200px;
 
    /* Modal Variables */
    --modal-backdrop: rgba(0, 0, 0, 0.8);
    --modal-blur: blur(5px);
-   --modal-padding-mobile: var(--space-lg);
-   --modal-padding-top: 15vh;
-   --modal-border-radius: var(--radius-xl);
 
     /* Enhanced Purple Colors */
    --purple-bg: rgba(139, 92, 246, 0.1);
@@ -233,24 +216,6 @@ html {
    height: 100dvh;
    z-index: var(--z-modal-backdrop);
 }
-.overlay-content {
-}
-
-
-.map-overlay-content {
-    position: absolute;
-    top: 8vh; 
-    top: 8dvh;
-    left: 0;
-    right: 0;
-    bottom: 8vh; 
-    bottom: 8dvh;
-    width: 100%;
-    flex: 1;
-    display: flex;
-}
-
-
 .overlay.active {
    display: flex; 
    flex-direction: column;
@@ -408,6 +373,9 @@ form-input:focus {
    visibility: visible !important;
 }
 
+.map-container {
+    flex: 1;
+}
 /* =====================================================================================
    ANY CSS ABOVE THIS IS VALIDATED
    ===================================================================================== */
