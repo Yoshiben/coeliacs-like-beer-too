@@ -569,6 +569,12 @@ body.page-pub .nav-back-btn {
 body.page-pub .nav-notification-btn {
     display: none !important;
 }
+body.page-search .nav-back-btn {
+    display: flex !important;
+}
+body.page-search .nav-toggle {
+    display: block !important;
+}
 
 /* ================================
    COMMUNITY HOMEPAGE
