@@ -437,6 +437,7 @@ form-input:focus {
 
 .btn {
    border: none;
+   background: none;
    border-radius: var(--radius-xl);
    padding: var(--space-lg);
    font-weight: 600;
@@ -481,18 +482,6 @@ form-input:focus {
     background: linear-gradient(135deg, #059669 0%, #047857 100%);
     transform: translateY(-2px);
     box-shadow: var(--shadow-lg);
-}
-
-.btn-danger {
-   background: var(--error-gradient);
-   color: var(--text-white);
-   box-shadow: var(--shadow);
-}
-
-.btn-danger:hover {
-   background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-   transform: translateY(-2px);
-   box-shadow: var(--shadow-lg);
 }
 
 .btn-nav-small {
