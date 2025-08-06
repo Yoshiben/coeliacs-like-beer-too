@@ -759,8 +759,15 @@ const App = {
             window.location.href = '/terms';
         },
         'show-beer-list': (el, modules) => {
+            console.log('🍺 Show beer list clicked');
             const currentPub = window.App.getState('currentPub');
-            if (!currentPub) return;
+            
+            if (!currentPub) {
+                console.error('❌ No current pub data');
+                return;
+            }
+            
+            console.log('📊 Current pub:', currentPub);
             
             // Open beer list modal
             modules.modalManager?.open('beerListModal');
@@ -769,8 +776,13 @@ const App = {
             const pubNameEl = document.getElementById('beerListPubName');
             if (pubNameEl) pubNameEl.textContent = currentPub.name;
             
-            // Load beer list
-            modules.search?.loadBeerList?.(currentPub);
+            // Load beer list - make sure we're calling the right module
+            const searchModule = modules.search || window.App?.getModule('search');
+            if (searchModule?.loadBeerList) {
+                searchModule.loadBeerList(currentPub);
+            } else {
+                console.error('❌ loadBeerList function not found');
+            }
         },
         
         'delete-beer': (el, modules) => {
