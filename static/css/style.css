@@ -1077,6 +1077,9 @@ body.page-pub .nav-notification-btn {
 .search-container {
    height:100%;
    flex: 1;
+   background: var(--white);
+   position: relative;
+   align-content: space-evenly;
 }
 .search-card {
 /*    width: 100%;
