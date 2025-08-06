@@ -611,21 +611,30 @@ export const SearchModule = (function() {
         `;
     };
 
+    // REPLACE the loadBeerList function in search.js (around line 513)
+
     const loadBeerList = (pub) => {
+        console.log('🍺 Loading beer list for pub:', pub);
+        console.log('📦 Beer details:', pub.beer_details);
+        
         const contentEl = document.getElementById('beerListContent');
         const emptyEl = document.getElementById('beerListEmpty');
         
-        if (!contentEl || !emptyEl) return;
+        if (!contentEl || !emptyEl) {
+            console.error('❌ Beer list elements not found');
+            return;
+        }
         
         // Parse beer details
         if (pub.beer_details) {
             const beers = parseBeerDetails(pub.beer_details);
+            console.log('📊 Parsed beers:', beers);
             
             if (beers.length > 0) {
                 contentEl.style.display = 'block';
                 emptyEl.style.display = 'none';
                 
-                contentEl.innerHTML = beers.map(beer => `
+                contentEl.innerHTML = beers.map((beer, index) => `
                     <div class="beer-list-item">
                         <div class="beer-info">
                             <strong>${beer.name}</strong>
@@ -633,7 +642,9 @@ export const SearchModule = (function() {
                                 ${beer.brewery} • ${beer.style || 'Unknown style'} • ${beer.format}
                             </div>
                         </div>
-                        <button class="btn-delete-beer" data-action="delete-beer" data-beer-id="${beer.id}" data-beer-name="${beer.name}">
+                        <button class="btn-delete-beer" data-action="delete-beer" 
+                            data-beer-id="${beer.id || index}" 
+                            data-beer-name="${beer.name}">
                             ❌
                         </button>
                     </div>
@@ -643,6 +654,7 @@ export const SearchModule = (function() {
                 emptyEl.style.display = 'block';
             }
         } else {
+            console.log('ℹ️ No beer details found');
             contentEl.style.display = 'none';
             emptyEl.style.display = 'block';
         }
