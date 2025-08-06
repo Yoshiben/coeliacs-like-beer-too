@@ -88,24 +88,36 @@ export default (function() {
     // Open breweries overlay
     const openBreweries = () => {
         console.log('🏭 Opening breweries overlay');
-        const overlay = document.getElementById('breweriesOverlay');
         
-        if (overlay) {
-            overlay.style.display = 'flex';
-            overlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
-            
-            // Update nav context
-            modules.nav?.setPageContext('breweries');
-            
-            // Load breweries if not already loaded
-            if (breweries.length === 0) {
-                loadBreweries();
+        // Use ModalManager if available
+        if (modules.modalManager) {
+            modules.modalManager.open('breweriesOverlay');
+        } else {
+            // Fallback
+            const overlay = document.getElementById('breweriesOverlay');
+            if (overlay) {
+                overlay.style.display = 'flex';
+                overlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                
+                // Hide community home manually if modalManager not available
+                const communityHome = document.querySelector('.community-home');
+                if (communityHome) {
+                    communityHome.style.display = 'none';
+                }
             }
-            
-            // Track event
-            modules.tracking?.trackEvent('breweries_opened', 'Navigation');
         }
+        
+        // Update nav context
+        modules.nav?.setPageContext('breweries');
+        
+        // Load breweries if not already loaded
+        if (breweries.length === 0) {
+            loadBreweries();
+        }
+        
+        // Track event
+        modules.tracking?.trackEvent('breweries_opened', 'Navigation');
     };
     
     // Close breweries overlay
