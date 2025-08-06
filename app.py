@@ -653,12 +653,13 @@ def get_all_pubs_for_map():
             SELECT 
                 p.pub_id, p.name, p.address, p.postcode, p.local_authority,
                 p.latitude, p.longitude,
-                COALESCE(s.status, 'unknown') as gf_status,
+                COALESCE(s.status, 'unknown') as gf_status
             FROM pubs p
             LEFT JOIN pub_gf_status s ON p.pub_id = s.pub_id
             WHERE p.latitude IS NOT NULL AND p.longitude IS NOT NULL 
-            AND p.latitude != 0 AND p.longitude != 0
+            AND p.latitude != 0 AND p.longitude != 0            
             ORDER BY s.status ASC
+            LIMIT 1000
         """)
         
         pubs = cursor.fetchall()
@@ -961,6 +962,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
