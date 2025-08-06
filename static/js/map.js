@@ -656,6 +656,16 @@ export const MapModule = (() => {
         }
     };
 
+    const cleanupFullUKMap = () => {
+        console.log('🧹 Cleaning up full UK map...');
+        
+        const fullUKMap = window.App.getState(STATE_KEYS.MAP_DATA.FULL_UK_MAP);
+        if (fullUKMap) {
+            utils.cleanupMap(fullUKMap);
+            window.App.setState(STATE_KEYS.MAP_DATA.FULL_UK_MAP, null);
+        }
+    };
+
     const showMapRetryButton = () => {
         const map = window.App.getState(STATE_KEYS.MAP_DATA.FULL_UK_MAP);
         if (!map) return;
