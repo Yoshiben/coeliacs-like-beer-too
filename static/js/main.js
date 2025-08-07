@@ -707,10 +707,15 @@ const App = {
         
         // Places search actions
         'add-new-pub-from-results': (el, modules) => {
-            // Open places search instead of report modal
-            const searchModule = modules.search || window.App?.getModule('search');
-            if (searchModule?.PlacesSearchModule) {
-                searchModule.PlacesSearchModule.openPlacesSearch();
+            // Use modalManager to open the modal properly
+            if (modules.modalManager) {
+                modules.modalManager.open('placesSearchModal');
+            } else {
+                // Fallback to the search module
+                const searchModule = modules.search || window.App?.getModule('search');
+                if (searchModule?.PlacesSearchModule) {
+                    searchModule.PlacesSearchModule.openPlacesSearch();
+                }
             }
         },
         'search-google-places': (el, modules) => {
