@@ -1697,6 +1697,12 @@ export const SearchModule = (function() {
         
         async submitNewPub(pubData) {
             try {
+                // Get the user's nickname
+                let nickname = window.App.getState('userNickname');
+                if (!nickname) {
+                    nickname = localStorage.getItem('userNickname') || 'anonymous';
+                }
+                
                 const response = await fetch('/api/add-pub', {
                     method: 'POST',
                     headers: {
@@ -1710,7 +1716,7 @@ export const SearchModule = (function() {
                         longitude: pubData.longitude,
                         osm_id: pubData.osm_id,
                         source: 'user_submission',
-                        submitted_by: 'anonymous'
+                        submitted_by: nickname  // Include the nickname
                     })
                 });
                 
@@ -1738,7 +1744,7 @@ export const SearchModule = (function() {
                 console.error('❌ Error adding pub:', error);
                 utils.showToast('❌ Failed to add pub. Please try again.');
             }
-        },
+        }
         
         showPubAddedPrompt(result) {
             const promptModal = document.getElementById('pubAddedPromptModal');
