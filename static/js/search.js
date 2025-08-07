@@ -1604,12 +1604,10 @@ export const SearchModule = (function() {
 
             // ADD THIS right after the join(''):
             resultsDiv.innerHTML += `
-                <div class="place-result manual-entry" data-action="manual-pub-entry" style="background: var(--bg-section); border: 2px dashed var(--border-light);">
-                    <div class="place-icon">✏️</div>
-                    <div class="place-info">
-                        <strong>Can't find it? Enter manually</strong>
-                        <small>Add pub details yourself</small>
-                    </div>
+                <div style="padding: var(--space-lg); border-top: 1px solid var(--border-light); margin-top: var(--space-md);">
+                    <button class="btn btn-secondary" data-action="manual-pub-entry" style="width: 100%;">
+                        ✏️ Can't find it? Enter manually
+                    </button>
                 </div>
             `;
             
