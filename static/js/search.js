@@ -1165,19 +1165,20 @@ export const SearchModule = (function() {
             resultsTitle.textContent = title;
         }
 
-        // ADD THIS: Add "Add New Pub" button to results header
-        const resultsHeader = document.querySelector('.results-header');
-        if (resultsHeader && !resultsHeader.querySelector('.add-pub-btn')) {
-            const addPubBtn = document.createElement('button');
-            addPubBtn.className = 'btn btn-sm btn-primary add-pub-btn';
-            addPubBtn.textContent = '➕ Add New Pub';
-            addPubBtn.dataset.action = 'add-new-pub-from-results';
-            addPubBtn.style.position = 'absolute';
-            addPubBtn.style.right = '1rem';
-            addPubBtn.style.top = '50%';
-            addPubBtn.style.transform = 'translateY(-50%)';
-            resultsHeader.appendChild(addPubBtn);
-        }
+        setTimeout(() => {
+            const resultsHeader = document.querySelector('.results-header');
+            if (resultsHeader && !resultsHeader.querySelector('.add-pub-btn')) {
+                const addPubBtn = document.createElement('button');
+                addPubBtn.className = 'btn btn-sm btn-primary add-pub-btn';
+                addPubBtn.textContent = '➕ Add Pub';
+                addPubBtn.dataset.action = 'add-new-pub-from-results';
+                addPubBtn.style.position = 'absolute';
+                addPubBtn.style.right = '1rem';
+                addPubBtn.style.top = '50%';
+                addPubBtn.style.transform = 'translateY(-50%)';
+                resultsHeader.appendChild(addPubBtn);
+            }
+        }, 100); // Small delay to ensure header is rendered
         
         // Use ModalManager to open the overlay
         modules.modalManager.open('resultsOverlay', {
