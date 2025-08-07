@@ -1164,6 +1164,20 @@ export const SearchModule = (function() {
         if (resultsTitle) {
             resultsTitle.textContent = title;
         }
+
+        // ADD THIS: Add "Add New Pub" button to results header
+        const resultsHeader = document.querySelector('.results-header');
+        if (resultsHeader && !resultsHeader.querySelector('.add-pub-btn')) {
+            const addPubBtn = document.createElement('button');
+            addPubBtn.className = 'btn btn-sm btn-primary add-pub-btn';
+            addPubBtn.textContent = '➕ Add New Pub';
+            addPubBtn.dataset.action = 'add-new-pub-from-results';
+            addPubBtn.style.position = 'absolute';
+            addPubBtn.style.right = '1rem';
+            addPubBtn.style.top = '50%';
+            addPubBtn.style.transform = 'translateY(-50%)';
+            resultsHeader.appendChild(addPubBtn);
+        }
         
         // Use ModalManager to open the overlay
         modules.modalManager.open('resultsOverlay', {
@@ -1479,29 +1493,74 @@ export const SearchModule = (function() {
             }, 300);
         },
         
+        // In search.js, update the searchOSM method (around line 1820):
         async searchOSM(query) {
             try {
-                const response = await fetch(
-                    `https://nominatim.openstreetmap.org/search?` +
-                    `q=${encodeURIComponent(query + ' UK')}` +
-                    `&format=json&countrycodes=gb&limit=10&extratags=1&namedetails=1`
+                // IMPROVE: Add multiple search attempts
+                const searches = [
+                    // First try: specific venue search
+                    {
+                        q: `${query} pub UK`,
+                        tags: ['pub', 'bar', 'restaurant', 'cafe', 'club']
+                    },
+                    // Fallback: broader search
+                    {
+                        q: `${query} UK`,
+                        tags: ['amenity', 'building', 'leisure']
+                    }
+                ];
+                
+                let allPlaces = [];
+                
+                for (const search of searches) {
+                    const response = await fetch(
+                        `https://nominatim.openstreetmap.org/search?` +
+                        `q=${encodeURIComponent(search.q)}` +
+                        `&format=json&countrycodes=gb&limit=20&extratags=1&namedetails=1`
+                    );
+                    
+                    const places = await response.json();
+                    
+                    // Better filtering
+                    const relevantPlaces = places.filter(place => {
+                        const type = place.type?.toLowerCase() || '';
+                        const category = place.category?.toLowerCase() || '';
+                        const name = place.display_name?.toLowerCase() || '';
+                        const extraTags = place.extratags || {};
+                        
+                        // Check main categories
+                        if (search.tags.some(tag => 
+                            category.includes(tag) || 
+                            type.includes(tag) || 
+                            name.includes(tag)
+                        )) return true;
+                        
+                        // Check extra tags
+                        if (extraTags.amenity && ['pub', 'bar', 'restaurant', 'cafe', 'nightclub'].includes(extraTags.amenity)) {
+                            return true;
+                        }
+                        
+                        // Check if it's likely a venue based on name
+                        const venueKeywords = ['pub', 'bar', 'inn', 'tavern', 'arms', 'club', 'brewery', 'tap', 'house'];
+                        if (venueKeywords.some(keyword => name.includes(keyword))) {
+                            return true;
+                        }
+                        
+                        return false;
+                    });
+                    
+                    allPlaces = [...allPlaces, ...relevantPlaces];
+                    
+                    // If we found good results, stop searching
+                    if (relevantPlaces.length >= 3) break;
+                }
+                
+                // Remove duplicates based on OSM ID
+                const uniquePlaces = Array.from(
+                    new Map(allPlaces.map(p => [p.osm_id, p])).values()
                 );
                 
-                const places = await response.json();
-                
-                const relevantPlaces = places.filter(place => {
-                    const type = place.type?.toLowerCase() || '';
-                    const category = place.category?.toLowerCase() || '';
-                    const name = place.display_name?.toLowerCase() || '';
-                    
-                    return category.includes('pub') || category.includes('bar') ||
-                           category.includes('restaurant') || category.includes('cafe') ||
-                           type.includes('pub') || type.includes('bar') ||
-                           type.includes('restaurant') || name.includes('pub') ||
-                           name.includes('bar') || name.includes('club');
-                });
-                
-                this.displayResults(relevantPlaces);
+                this.displayResults(uniquePlaces);
                 
             } catch (error) {
                 console.error('OSM search error:', error);
@@ -1542,6 +1601,17 @@ export const SearchModule = (function() {
                     </div>
                 `;
             }).join('');
+
+            // ADD THIS right after the join(''):
+            resultsDiv.innerHTML += `
+                <div class="place-result manual-entry" data-action="manual-pub-entry">
+                    <div class="place-icon">✏️</div>
+                    <div class="place-info">
+                        <strong>Can't find it? Enter manually</strong>
+                        <small>Add pub details yourself</small>
+                    </div>
+                </div>
+            `;
             
             resultsDiv.style.display = 'block';
         },
