@@ -1744,7 +1744,7 @@ export const SearchModule = (function() {
                 console.error('❌ Error adding pub:', error);
                 utils.showToast('❌ Failed to add pub. Please try again.');
             }
-        }
+        },
         
         showPubAddedPrompt(result) {
             const promptModal = document.getElementById('pubAddedPromptModal');
