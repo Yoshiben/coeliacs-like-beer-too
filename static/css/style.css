@@ -451,7 +451,6 @@ form-input:focus {
    padding: var(--space-sm) var(--space-3xl);
 }
 .nav-notification-btn {
-   display: none;
    background: none;
    position: absolute;
    right: 0;
