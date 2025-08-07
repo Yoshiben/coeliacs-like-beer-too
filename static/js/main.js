@@ -725,6 +725,8 @@ const App = {
             const searchModule = modules.search || window.App?.getModule('search');
             if (searchModule?.PlacesSearchModule?.useSelectedPlace) {
                 searchModule.PlacesSearchModule.useSelectedPlace();
+            } else {
+                console.error('❌ useSelectedPlace method not found');
             }
         },
         'select-place': (el, modules) => {
