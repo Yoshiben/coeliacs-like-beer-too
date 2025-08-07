@@ -776,9 +776,6 @@ def add_pub():
         # Log the addition
         logger.info(f"New pub added: {data['name']} (ID: {pub_id})")
         
-        # Track event
-        modules.tracking?.trackEvent('pub_added', 'User Action', data['name'])
-        
         return jsonify({
             'success': True,
             'message': f'{data["name"]} added successfully!',
@@ -808,7 +805,6 @@ def add_pub():
         if 'conn' in locals() and conn.is_connected():
             cursor.close()
             conn.close()
-
 # ================================================================================
 # ADMIN ROUTES
 # ================================================================================
@@ -1072,3 +1068,4 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
