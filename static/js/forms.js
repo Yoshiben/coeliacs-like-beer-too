@@ -104,6 +104,23 @@ export const FormModule = (() => {
     const handleReportSubmission = async (event) => {
         event.preventDefault();
 
+        // Check for nickname first
+        let nickname = window.App.getState('userNickname');
+        if (!nickname) {
+            nickname = localStorage.getItem('userNickname');
+            if (nickname) {
+                window.App.setState('userNickname', nickname);
+            } else {
+                // Store the pending submission
+                window.App.setState('pendingActionAfterNickname', () => {
+                    handleReportSubmission(event);
+                });
+                
+                // Open nickname modal
+                modules.modalManager?.open('nicknameModal');
+                return;
+            }
+
         // Prevent duplicate submissions
         if (state.isSubmitting) {
             console.log('⚠️ Submission already in progress');
