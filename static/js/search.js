@@ -1164,21 +1164,6 @@ export const SearchModule = (function() {
         if (resultsTitle) {
             resultsTitle.textContent = title;
         }
-
-        setTimeout(() => {
-            const resultsHeader = document.querySelector('.results-header');
-            if (resultsHeader && !resultsHeader.querySelector('.add-pub-btn')) {
-                const addPubBtn = document.createElement('button');
-                addPubBtn.className = 'btn btn-sm btn-primary add-pub-btn';
-                addPubBtn.textContent = '➕ Add Pub';
-                addPubBtn.dataset.action = 'add-new-pub-from-results';
-                addPubBtn.style.position = 'absolute';
-                addPubBtn.style.right = '1rem';
-                addPubBtn.style.top = '50%';
-                addPubBtn.style.transform = 'translateY(-50%)';
-                resultsHeader.appendChild(addPubBtn);
-            }
-        }, 100); // Small delay to ensure header is rendered
         
         // Use ModalManager to open the overlay
         modules.modalManager.open('resultsOverlay', {
@@ -1188,6 +1173,19 @@ export const SearchModule = (function() {
                 // Update navigation context
                 const navModule = window.App?.getModule('nav');
                 navModule?.showResultsWithContext();
+
+                // ADD THE BUTTON TO THE ACTUAL STRUCTURE
+                setTimeout(() => {
+                    const resultsContainer = document.querySelector('.results-container');
+                    if (resultsContainer && !resultsContainer.querySelector('.add-pub-btn')) {
+                        const addPubBtn = document.createElement('button');
+                        addPubBtn.className = 'btn btn-primary add-pub-btn';
+                        addPubBtn.textContent = '➕ Add New Pub';
+                        addPubBtn.dataset.action = 'add-new-pub-from-results';
+                        addPubBtn.style.cssText = 'position: fixed; bottom: 10vh; right: 2rem; z-index: 100; border-radius: 25px; padding: 12px 24px; box-shadow: var(--shadow-lg);';
+                        resultsContainer.appendChild(addPubBtn);
+                    }
+                }, 200);
             }
         });
     };
