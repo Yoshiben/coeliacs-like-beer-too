@@ -3912,6 +3912,21 @@ body.page-search .nav-toggle {
     white-space: nowrap;
 }
 
+/* Place result items */
+.place-result {
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.place-result:hover {
+    background: var(--hover-subtle);
+}
+
+/* Selected venue button */
+.selected-place-preview button {
+    cursor: pointer;
+}
+
 /* testin modal for mobile */
 
 @media (max-height: 600px) {
