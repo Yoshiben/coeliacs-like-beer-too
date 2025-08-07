@@ -542,14 +542,19 @@ export const CommunityModule = (() => {
         // Add to thanked items
         thankedItems.add(findId);
         window.App.setState('thankedFinds', thankedItems);
-        sessionStorage.setItem('thankedFinds', JSON.stringify([...thankedItems]));
         
-        // Update UI
+        // IMPROVE: Store in localStorage too
+        localStorage.setItem('thankedFinds', JSON.stringify([...thankedItems]));
+        
+        // Also store the count
+        const thanksCounts = JSON.parse(localStorage.getItem('thanksCounts') || '{}');
+        thanksCounts[findId] = (thanksCounts[findId] || 0) + 1;
+        localStorage.setItem('thanksCounts', JSON.stringify(thanksCounts));
+        
+        // Update UI with persisted count
         const button = document.querySelector(`[data-action="thanks"][data-find-id="${findId}"]`);
         if (button) {
-            const match = button.textContent.match(/\((\d+)\)/);
-            const currentCount = match ? parseInt(match[1]) : 0;
-            button.textContent = `🙌 Thanks! (${currentCount + 1})`;
+            button.textContent = `🙌 Thanks! (${thanksCounts[findId]})`;
             button.disabled = true;
             button.style.opacity = '0.6';
         }
