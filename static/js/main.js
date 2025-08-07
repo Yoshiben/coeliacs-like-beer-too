@@ -722,11 +722,28 @@ const App = {
             modules.search?.PlacesSearchModule?.openPlacesSearch?.();
         },
         'use-selected-place': (el, modules) => {
+            // Check for nickname first
+            let nickname = window.App.getState('userNickname');
+            if (!nickname) {
+                nickname = localStorage.getItem('userNickname');
+                if (nickname) {
+                    window.App.setState('userNickname', nickname);
+                } else {
+                    // Store the pending action
+                    window.App.setState('pendingActionAfterNickname', () => {
+                        const searchModule = modules.search || window.App?.getModule('search');
+                        searchModule?.PlacesSearchModule?.useSelectedPlace?.();
+                    });
+                    
+                    // Open nickname modal
+                    modules.modalManager?.open('nicknameModal');
+                    return;
+                }
+            }
+            
             const searchModule = modules.search || window.App?.getModule('search');
             if (searchModule?.PlacesSearchModule?.useSelectedPlace) {
                 searchModule.PlacesSearchModule.useSelectedPlace();
-            } else {
-                console.error('❌ useSelectedPlace method not found');
             }
         },
         'select-place': (el, modules) => {
