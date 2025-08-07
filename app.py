@@ -717,6 +717,9 @@ def add_pub():
     try:
         data = request.get_json()
         
+        # Log incoming data for debugging
+        logger.info(f"Add pub request: {data}")
+        
         # Validate required fields
         required_fields = ['name', 'address', 'postcode']
         missing_fields = [field for field in required_fields if not data.get(field)]
@@ -744,14 +747,17 @@ def add_pub():
                 'pub_id': existing[0]
             }), 409
         
-        # Insert new pub
+        # Get the submitted_by value (nickname or 'anonymous')
+        submitted_by = data.get('submitted_by', 'anonymous')
+        
+        # Insert new pub with created_by field
         cursor.execute("""
             INSERT INTO pubs (
                 name, address, postcode, 
                 latitude, longitude, 
-                local_authority, source, created_at
+                local_authority, created_by
             ) VALUES (
-                %s, %s, %s, %s, %s, %s, %s, NOW()
+                %s, %s, %s, %s, %s, %s, %s
             )
         """, (
             data['name'],
@@ -759,8 +765,8 @@ def add_pub():
             data['postcode'],
             data.get('latitude'),
             data.get('longitude'),
-            data.get('local_authority', ''),  # You might want to geocode this
-            data.get('source', 'user_submission')
+            data.get('local_authority', ''),
+            submitted_by
         ))
         
         pub_id = cursor.lastrowid
@@ -769,12 +775,12 @@ def add_pub():
         cursor.execute("""
             INSERT INTO pub_gf_status (pub_id, status, updated_at, updated_by)
             VALUES (%s, 'unknown', NOW(), %s)
-        """, (pub_id, data.get('submitted_by', 'anonymous')))
+        """, (pub_id, submitted_by))
         
         conn.commit()
         
         # Log the addition
-        logger.info(f"New pub added: {data['name']} (ID: {pub_id})")
+        logger.info(f"New pub added: {data['name']} (ID: {pub_id}) by {submitted_by}")
         
         return jsonify({
             'success': True,
@@ -792,8 +798,20 @@ def add_pub():
             'error': 'This pub may already exist in our database'
         }), 409
         
+    except mysql.connector.Error as e:
+        logger.error(f"MySQL error in add_pub: {str(e)}")
+        if 'conn' in locals():
+            conn.rollback()
+        return jsonify({
+            'success': False,
+            'error': f'Database error: {str(e)}'
+        }), 500
+        
     except Exception as e:
-        logger.error(f"Error adding pub: {str(e)}")
+        logger.error(f"Unexpected error in add_pub: {str(e)}")
+        logger.error(f"Error type: {type(e)}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
         if 'conn' in locals():
             conn.rollback()
         return jsonify({
@@ -1068,4 +1086,5 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
