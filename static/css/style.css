@@ -12,12 +12,12 @@
    --z-dropdown: 100;
    --z-search-suggestions: 150;
    --z-sticky: 200;
-   --z-toast: 900;
    --z-overlay: 1000;
    --z-pub-details: 1100;           
    --z-modal-backdrop: 1200;        
    --z-modal-content: 1210;        
-   --z-status-modals: 1300;         
+   --z-status-modals: 1220;
+   --z-toast: 1300;
    --z-cookie: 1400;   
    --z-navigation: 1800;
    
@@ -3875,6 +3875,34 @@ body.page-search .nav-toggle {
     border-radius: var(--radius-sm);
     color: var(--text-secondary);
 }
+
+
+/* In style.css, update: */
+.toggle-thumb {
+    /* ... existing styles ... */
+    opacity: 1 !important;  /* Force visibility */
+    visibility: visible !important;
+    display: block !important;
+    will-change: transform;  /* Optimize animation */
+}
+
+/* Add for better mobile performance: */
+.toggle-container {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+.report-modal {
+    z-index: var(--z-modal-backdrop);
+}
+
+.report-modal .suggestions {
+    z-index: calc(var(--z-modal-content) + 10);  /* Above modal content */
+}
+
+
+
+
 
 @media (min-width:1025px) {
    .nav-back-btn {
