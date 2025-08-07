@@ -229,7 +229,7 @@ def search():
                     ) as beer_details
                 FROM pubs p
                 LEFT JOIN pub_gf_status s ON p.pub_id = s.pub_id
-                LEFT JOIN beer_reports br ON p.pub_id = br.pub_id 
+                LEFT JOIN beer_submissions br ON p.pub_id = br.pub_id 
                     AND br.status = 'auto_approved'
                 WHERE p.pub_id = %s
                 GROUP BY p.pub_id
@@ -452,8 +452,6 @@ def get_brewery_beers(brewery_name):
             conn.close()
 
 
-
-
 @app.route('/api/submit_beer_update', methods=['POST'])
 def submit_beer_update():
     """Submit beer report with new schema"""
@@ -464,124 +462,72 @@ def submit_beer_update():
         user_info = {
             'ip': request.remote_addr,
             'user_agent': request.headers.get('User-Agent', ''),
-            'submitted_by': 'anonymous'
+            'submitted_by': data.get('submitted_by', 'anonymous')  # Get nickname
         }
         
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor(dictionary=True)
         
-        # Determine validation tier
-        validation_tier = 3  # Default to manual review
-        status = 'manual_review'
+        # STEP 1: Check if beer exists, if not add it
+        beer_id = None
+        brewery = data.get('brewery')
+        beer_name = data.get('beer_name')
         
-        # Check if known pub
-        pub_id = data.get('pub_id')
-        if pub_id:
-            # Check if known beer
-            brewery = data.get('brewery')
-            beer_name = data.get('beer_name')
+        if brewery and beer_name:
+            # Check if beer already exists
+            cursor.execute("""
+                SELECT beer_id FROM beers 
+                WHERE LOWER(brewery) = LOWER(%s) AND LOWER(name) = LOWER(%s)
+            """, (brewery, beer_name))
             
-            if brewery and beer_name:
+            existing_beer = cursor.fetchone()
+            
+            if existing_beer:
+                beer_id = existing_beer['beer_id']
+            else:
+                # Add new beer to beers table
                 cursor.execute("""
-                    SELECT beer_id FROM beers 
-                    WHERE LOWER(brewery) = LOWER(%s) AND LOWER(name) = LOWER(%s)
-                """, (brewery, beer_name))
-                
-                existing_beer = cursor.fetchone()
-                if existing_beer:
-                    # Known pub + known beer = auto-approve
-                    validation_tier = 1
-                    status = 'auto_approved'
-                else:
-                    # Known pub + new beer from known brewery = soft validation
-                    cursor.execute("""
-                        SELECT COUNT(*) as count FROM beers 
-                        WHERE LOWER(brewery) = LOWER(%s)
-                    """, (brewery,))
-                    
-                    if cursor.fetchone()['count'] > 0:
-                        validation_tier = 2
-                        status = 'soft_validation'
+                    INSERT INTO beers (brewery, name, style, abv, gluten_status)
+                    VALUES (%s, %s, %s, %s, 'certified_gf')
+                """, (
+                    brewery,
+                    beer_name,
+                    data.get('beer_style'),
+                    data.get('beer_abv')
+                ))
+                beer_id = cursor.lastrowid
+                logger.info(f"Added new beer: {brewery} - {beer_name} (ID: {beer_id})")
         
-        # Insert beer report
+        # STEP 2: Insert into submissions (formerly beer_reports)
         cursor.execute("""
-            INSERT INTO beer_reports (
+            INSERT INTO submissions (
                 pub_id, beer_id, brewery, beer_name, beer_style, beer_abv, 
-                format, validation_tier, status, submitted_by
+                format, submitted_at, submitted_by
             ) VALUES (
-                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
+                %s, %s, %s, %s, %s, %s, %s, %s, NOW()
             )
         """, (
-            pub_id,
-            existing_beer['beer_id'] if 'existing_beer' in locals() and existing_beer else None,
-            data.get('brewery'),
-            data.get('beer_name'),
+            data.get('pub_id'),
+            beer_id,  # Now we have the beer_id!
+            brewery,
+            beer_name,
             data.get('beer_style'),
             data.get('beer_abv'),
             data.get('beer_format'),
-            validation_tier,
-            status,
             user_info['submitted_by']
         ))
         
-        report_id = cursor.lastrowid
+        submission_id = cursor.lastrowid
+        conn.commit()
         
-        # Handle auto-approval
-        if status == 'auto_approved':
-            conn.commit()
-            
-            return jsonify({
-                'success': True,
-                'message': '🎉 Beer report approved instantly! Thanks for contributing.',
-                'submission_id': report_id,
-                'tier': validation_tier,
-                'status': status
-            })
+        return jsonify({
+            'success': True,
+            'message': '🎉 Beer report submitted successfully!',
+            'submission_id': submission_id,
+            'beer_id': beer_id,
+            'new_beer': existing_beer is None
+        })
         
-        # Handle soft validation
-        elif status == 'soft_validation':
-            scheduled_time = datetime.now() + timedelta(hours=24)
-            cursor.execute("""
-                INSERT INTO validation_queue (
-                    report_id, validation_type, scheduled_approval_time, review_reasons
-                ) VALUES (
-                    %s, 'soft_validation', %s, 'New beer from known brewery'
-                )
-            """, (report_id, scheduled_time))
-            
-            conn.commit()
-            
-            return jsonify({
-                'success': True,
-                'message': '📋 Beer report received! Will be verified within 24 hours.',
-                'submission_id': report_id,
-                'tier': validation_tier,
-                'status': status
-            })
-        
-        # Manual review
-        else:
-            cursor.execute("""
-                INSERT INTO validation_queue (
-                    report_id, validation_type, review_reasons
-                ) VALUES (
-                    %s, 'manual_review', %s
-                )
-            """, (
-                report_id,
-                'New pub or new brewery requires manual verification'
-            ))
-            
-            conn.commit()
-            
-            return jsonify({
-                'success': True,
-                'message': '📋 Beer report submitted for review. We\'ll verify the details and add it soon!',
-                'submission_id': report_id,
-                'tier': validation_tier,
-                'status': status
-            })
-            
     except Exception as e:
         logger.error(f"Error in submit_beer_update: {str(e)}")
         if 'conn' in locals():
@@ -594,7 +540,6 @@ def submit_beer_update():
         if 'conn' in locals() and conn.is_connected():
             cursor.close()
             conn.close()
-
 # REPLACE the update-gf-status route in app.py (around line 580)
 
 @app.route('/api/update-gf-status', methods=['POST'])
@@ -848,7 +793,7 @@ def get_validation_stats():
         # Pending manual reviews
         cursor.execute("""
             SELECT COUNT(*) as count 
-            FROM beer_reports br
+            FROM beer_submissions br
             JOIN validation_queue vq ON br.report_id = vq.report_id
             WHERE vq.validation_type = 'manual_review' AND vq.status = 'pending'
         """)
@@ -865,7 +810,7 @@ def get_validation_stats():
         # Today's submissions
         cursor.execute("""
             SELECT COUNT(*) as count 
-            FROM beer_reports 
+            FROM beer_submissions
             WHERE DATE(submitted_at) = CURDATE()
         """)
         today_submissions = cursor.fetchone()['count']
@@ -873,7 +818,7 @@ def get_validation_stats():
         # Today's auto-approved
         cursor.execute("""
             SELECT COUNT(*) as count 
-            FROM beer_reports 
+            FROM beer_submissions
             WHERE DATE(submitted_at) = CURDATE() 
             AND status = 'auto_approved'
         """)
@@ -903,7 +848,7 @@ def get_pending_manual_reviews():
         cursor = conn.cursor(dictionary=True)
         
         cursor.execute("""
-            SELECT * FROM v_pending_beer_reports 
+            SELECT * FROM v_pending_beer_submissions 
             WHERE status = 'manual_review'
             ORDER BY submitted_at ASC
             LIMIT 50
@@ -1086,5 +1031,6 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
