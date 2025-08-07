@@ -126,7 +126,18 @@ export const ModalModule = (() => {
     const focusInput = (inputId) => {
         const input = document.getElementById(inputId);
         if (input) {
-            input.focus();
+            // Delay to ensure modal is fully rendered
+            setTimeout(() => {
+                input.focus();
+                
+                // Scroll into view on mobile
+                if (window.innerHeight < 600) {
+                    input.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'center' 
+                    });
+                }
+            }, 300);
         }
     };
     
