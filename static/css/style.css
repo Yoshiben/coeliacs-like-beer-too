@@ -3900,6 +3900,25 @@ body.page-search .nav-toggle {
     z-index: calc(var(--z-modal-content) + 10);  /* Above modal content */
 }
 
+/* testin modal for mobile */
+
+@media (max-height: 600px) {
+    .modal-content {
+        max-height: 85vh;
+        max-height: 85dvh;
+    }
+    
+    .modal-body {
+        padding-bottom: 60px; /* Space for keyboard */
+    }
+    
+    /* When input is focused, adjust modal position */
+    .modal-content:has(input:focus) {
+        transform: translateY(-10%);
+        transition: transform 0.3s ease-out;
+    }
+}
+
 
 
 
