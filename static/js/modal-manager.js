@@ -43,6 +43,7 @@ export const ModalManager = (() => {
         beerListModal: { type: 'modal', group: 'pub-sub', exclusive: true },
         breweryBeersModal: { type: 'modal', group: 'brewery', exclusive: true },
         manualPubEntryModal: { type: 'modal', group: 'form', exclusive: true },
+        nicknameModal: { type: 'modal', group: 'user', exclusive: true },
         
         // Status modals (can stack in specific order)
         gfStatusModal: { type: 'modal', group: 'status', stackable: true, order: 1, priority: true },
