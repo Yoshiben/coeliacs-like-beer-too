@@ -162,7 +162,7 @@ def nearby():
             FROM pubs p
             LEFT JOIN pub_gf_status s ON p.pub_id = s.pub_id
             LEFT JOIN submissions sub ON p.pub_id = sub.pub_id 
-                AND sub.status = 'approved'  -- Only show approved submissions
+                AND sub.status = 'approved'
             WHERE p.latitude IS NOT NULL AND p.longitude IS NOT NULL
         """
         params = [lat, lng, lat]
@@ -262,7 +262,7 @@ def search():
         """
         
         if gf_only:
-            count_sql += " AND s.status IN ('always', 'currently')"
+            count_sql += " AND s.status IN ('always_tap_cask', 'always_bottle_can', 'currently')"
         
         cursor.execute(count_sql, params)
         total_results = cursor.fetchone()['total']
@@ -272,22 +272,23 @@ def search():
         total_pages = (total_results + per_page - 1) // per_page
         offset = (page - 1) * per_page
         
-        # Main search query
+        # Main search query - FIXED
         sql = f"""
             SELECT DISTINCT
                 p.pub_id, p.name, p.address, p.postcode, p.local_authority, 
                 p.latitude, p.longitude,
                 COALESCE(s.status, 'unknown') as gf_status,
                 GROUP_CONCAT(
-                    DISTINCT CONCAT(ba.format, ' - ', 
-                    COALESCE(b.brewery, 'Unknown'), ' ', 
-                    COALESCE(b.name, 'Unknown'), ' (', 
-                    COALESCE(b.style, 'Unknown'), ')')
+                    DISTINCT CONCAT(sub.format, ' - ', 
+                    COALESCE(sub.brewery, 'Unknown'), ' ', 
+                    COALESCE(sub.beer_name, 'Unknown'), ' (', 
+                    COALESCE(sub.beer_style, 'Unknown'), ')')
                     SEPARATOR ', '
                 ) as beer_details
             FROM pubs p
             LEFT JOIN pub_gf_status s ON p.pub_id = s.pub_id
-            LEFT JOIN beers b ON ba.beer_id = b.beer_id
+            LEFT JOIN submissions sub ON p.pub_id = sub.pub_id 
+                AND sub.status = 'approved'
             WHERE {search_condition}
         """
         
