@@ -3900,6 +3900,18 @@ body.page-search .nav-toggle {
     z-index: calc(var(--z-modal-content) + 10);  /* Above modal content */
 }
 
+/* In style.css */
+.results-header {
+    position: relative;
+    padding-right: 120px; /* Space for button */
+}
+
+.add-pub-btn {
+    font-size: var(--text-sm);
+    padding: var(--space-sm) var(--space-lg);
+    white-space: nowrap;
+}
+
 /* testin modal for mobile */
 
 @media (max-height: 600px) {
