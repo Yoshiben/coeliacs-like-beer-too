@@ -560,23 +560,14 @@ body.page-map .nav-back-btn {
 body.page-map .nav-toggle {
     display: block !important;
 }
-body.page-map .nav-notification-btn {
-    display: none !important;
-}
 /* Pub Details Page */
 body.page-pub .nav-back-btn {
     display: flex !important;
 }
-body.page-pub .nav-notification-btn {
-    display: none !important;
-}
+/* Search Page */
 body.page-search .nav-back-btn {
     display: flex !important;
 }
-body.page-search .nav-toggle {
-    display: block !important;
-}
-
 /* ================================
    COMMUNITY HOMEPAGE
    ================================ */
