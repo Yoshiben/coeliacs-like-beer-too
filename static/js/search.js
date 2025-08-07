@@ -1492,10 +1492,8 @@ export const SearchModule = (function() {
             }, 300);
         },
         
-        // In search.js, update the searchOSM method (around line 1820):
         async searchOSM(query) {
             try {
-                // IMPROVE: Add multiple search attempts
                 const searches = [
                     // First try: specific venue search
                     {
@@ -1559,7 +1557,10 @@ export const SearchModule = (function() {
                     new Map(allPlaces.map(p => [p.osm_id, p])).values()
                 );
                 
-                this.displayResults(uniquePlaces);
+                // ADD THIS: Remove venues with similar names at similar locations
+                const deduplicatedPlaces = this.deduplicateVenues(uniquePlaces);
+                
+                this.displayResults(deduplicatedPlaces);
                 
             } catch (error) {
                 console.error('OSM search error:', error);
@@ -1799,6 +1800,74 @@ export const SearchModule = (function() {
                 resultsDiv.innerHTML = `<div class="search-error">${message}</div>`;
                 resultsDiv.style.display = 'block';
             }
+        },
+
+        deduplicateVenues(places) {
+            const deduplicated = [];
+            
+            places.forEach(place => {
+                const placeName = (place.namedetails?.name || place.display_name.split(',')[0]).toLowerCase().trim();
+                const placeLat = parseFloat(place.lat);
+                const placeLon = parseFloat(place.lon);
+                
+                // Check if we already have a venue with similar name nearby
+                const isDuplicate = deduplicated.some(existing => {
+                    const existingName = (existing.namedetails?.name || existing.display_name.split(',')[0]).toLowerCase().trim();
+                    
+                    // Calculate distance in meters
+                    const distance = this.calculateDistance(
+                        placeLat, placeLon,
+                        parseFloat(existing.lat), parseFloat(existing.lon)
+                    );
+                    
+                    // Similar name check (using simple comparison, could use Levenshtein distance for better matching)
+                    const nameSimilarity = this.calculateNameSimilarity(placeName, existingName);
+                    
+                    // Consider duplicate if within 100m AND name is 80%+ similar
+                    return distance < 100 && nameSimilarity > 0.8;
+                });
+                
+                if (!isDuplicate) {
+                    deduplicated.push(place);
+                }
+            });
+            
+            return deduplicated;
+        },
+        
+        calculateDistance(lat1, lon1, lat2, lon2) {
+            // Haversine formula for distance in meters
+            const R = 6371000; // Earth's radius in meters
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon/2) * Math.sin(dLon/2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            return R * c;
+        },
+        
+        calculateNameSimilarity(str1, str2) {
+            // Simple similarity check - ratio of matching characters
+            // You could use Levenshtein distance for better results
+            const longer = str1.length > str2.length ? str1 : str2;
+            const shorter = str1.length > str2.length ? str2 : str1;
+            
+            if (longer.includes(shorter)) {
+                return shorter.length / longer.length;
+            }
+            
+            // Check if they share significant words
+            const words1 = str1.split(/\s+/);
+            const words2 = str2.split(/\s+/);
+            const significantWords1 = words1.filter(w => w.length > 3);
+            const significantWords2 = words2.filter(w => w.length > 3);
+            
+            const matchingWords = significantWords1.filter(w => 
+                significantWords2.some(w2 => w2.includes(w) || w.includes(w2))
+            );
+            
+            return matchingWords.length / Math.max(significantWords1.length, significantWords2.length, 1);
         }
     };
     
