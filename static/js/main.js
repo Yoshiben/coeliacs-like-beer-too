@@ -722,7 +722,10 @@ const App = {
             modules.search?.PlacesSearchModule?.openPlacesSearch?.();
         },
         'use-selected-place': (el, modules) => {
-            modules.search?.PlacesSearchModule?.useSelectedPlace?.();
+            const searchModule = modules.search || window.App?.getModule('search');
+            if (searchModule?.PlacesSearchModule?.useSelectedPlace) {
+                searchModule.PlacesSearchModule.useSelectedPlace();
+            }
         },
         'select-place': (el, modules) => {
             const placeIndex = el.dataset.placeIndex;
