@@ -1615,11 +1615,17 @@ export const SearchModule = (function() {
         },
         
         selectPlace(placeOrIndex) {
+            console.log('🏠 Selecting place:', placeOrIndex);
             const place = typeof placeOrIndex === 'number' 
                 ? this.searchResults[placeOrIndex]
                 : placeOrIndex;
                 
-            if (!place) return;
+            if (!place) {
+                console.error('❌ No place found to select');
+                return;
+            }
+            
+            console.log('✅ Place selected:', place);
             
             this.selectedPlace = {
                 name: place.namedetails?.name || place.display_name.split(',')[0],
