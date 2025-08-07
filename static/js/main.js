@@ -936,6 +936,34 @@ const App = {
             }
         },
 
+        'save-nickname': (el, modules) => {
+            const nickname = document.getElementById('nicknameInput')?.value.trim();
+            if (nickname) {
+                window.App.setState('userNickname', nickname);
+                localStorage.setItem('userNickname', nickname);
+                modules.modalManager?.close('nicknameModal');
+                modules.helpers?.showToast(`👋 Welcome, ${nickname}!`);
+                
+                // Continue with whatever triggered the nickname prompt
+                const pendingAction = window.App.getState('pendingActionAfterNickname');
+                if (pendingAction) {
+                    window.App.setState('pendingActionAfterNickname', null);
+                    pendingAction();
+                }
+            }
+        },
+        
+        'skip-nickname': (el, modules) => {
+            window.App.setState('userNickname', 'Anonymous');
+            modules.modalManager?.close('nicknameModal');
+            
+            const pendingAction = window.App.getState('pendingActionAfterNickname');
+            if (pendingAction) {
+                window.App.setState('pendingActionAfterNickname', null);
+                pendingAction();
+            }
+        },
+
     },
     
     // ================================
