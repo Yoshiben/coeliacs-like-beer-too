@@ -787,6 +787,29 @@
             </div>
         </div>
 
+        <div id="nicknameModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">👋 Choose Your Nickname</h3>
+                    <p class="modal-subtitle">How should we credit your contributions?</p>
+                </div>
+                <div class="modal-body">
+                    <input type="text" 
+                           id="nicknameInput" 
+                           class="form-input" 
+                           placeholder="e.g. BeerHunter, GFGuru..."
+                           maxlength="30">
+                    <p style="text-align: center; color: var(--text-muted); font-size: var(--text-sm); margin-top: var(--space-md);">
+                        This will be shown on your beer reports
+                    </p>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" data-action="skip-nickname">Skip for Now</button>
+                    <button class="btn btn-primary" data-action="save-nickname">Save Nickname</button>
+                </div>
+            </div>
+        </div>
+
         <!-- About Overlay -->
         <div id="aboutOverlay" class="overlay info-overlay">
             <div class="info-container">
@@ -1204,6 +1227,7 @@
         </script>
     </body>
 </html>
+
 
 
 
