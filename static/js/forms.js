@@ -163,7 +163,8 @@ export const FormModule = (() => {
         } finally {
             state.currentSubmission = null;
             state.isSubmitting = false;  // Reset flag
-        }
+        }    
+        };
     };
     
     const collectReportData = (formData) => {
@@ -1224,12 +1225,11 @@ export const FormModule = (() => {
         initReportDropdowns,
         resetReportForm,
         GFStatusFlow,
-        
-        // Expose for external access if needed
         getSelectedPub: utils.getSelectedPub,
         getCurrentBrewery: utils.getCurrentBrewery
     };
-})();
+    })
+}();
 
 // Initialize when DOM is ready
 if (document.readyState === 'loading') {
@@ -1237,5 +1237,3 @@ if (document.readyState === 'loading') {
 } else {
     FormModule.init();
 }
-
-// DO NOT add window.FormModule = FormModule here!
