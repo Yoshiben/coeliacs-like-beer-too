@@ -1604,7 +1604,7 @@ export const SearchModule = (function() {
 
             // ADD THIS right after the join(''):
             resultsDiv.innerHTML += `
-                <div class="place-result manual-entry" data-action="manual-pub-entry">
+                <div class="place-result manual-entry" data-action="manual-pub-entry" style="background: var(--bg-section); border: 2px dashed var(--border-light);">
                     <div class="place-icon">✏️</div>
                     <div class="place-info">
                         <strong>Can't find it? Enter manually</strong>
