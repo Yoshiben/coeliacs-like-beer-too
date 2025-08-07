@@ -711,6 +711,104 @@ def api_breweries():
         logger.error(f"Error fetching breweries: {e}")
         return jsonify([]), 500
 
+@app.route('/api/add-pub', methods=['POST'])
+def add_pub():
+    """Add a new pub to the database"""
+    try:
+        data = request.get_json()
+        
+        # Validate required fields
+        required_fields = ['name', 'address', 'postcode']
+        missing_fields = [field for field in required_fields if not data.get(field)]
+        
+        if missing_fields:
+            return jsonify({
+                'success': False,
+                'error': f'Missing required fields: {", ".join(missing_fields)}'
+            }), 400
+        
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor()
+        
+        # Check if pub already exists
+        cursor.execute("""
+            SELECT pub_id FROM pubs 
+            WHERE LOWER(name) = LOWER(%s) AND postcode = %s
+        """, (data['name'], data['postcode']))
+        
+        existing = cursor.fetchone()
+        if existing:
+            return jsonify({
+                'success': False,
+                'error': 'A pub with this name and postcode already exists',
+                'pub_id': existing[0]
+            }), 409
+        
+        # Insert new pub
+        cursor.execute("""
+            INSERT INTO pubs (
+                name, address, postcode, 
+                latitude, longitude, 
+                local_authority, source, created_at
+            ) VALUES (
+                %s, %s, %s, %s, %s, %s, %s, NOW()
+            )
+        """, (
+            data['name'],
+            data['address'],
+            data['postcode'],
+            data.get('latitude'),
+            data.get('longitude'),
+            data.get('local_authority', ''),  # You might want to geocode this
+            data.get('source', 'user_submission')
+        ))
+        
+        pub_id = cursor.lastrowid
+        
+        # Add initial GF status as unknown
+        cursor.execute("""
+            INSERT INTO pub_gf_status (pub_id, status, updated_at, updated_by)
+            VALUES (%s, 'unknown', NOW(), %s)
+        """, (pub_id, data.get('submitted_by', 'anonymous')))
+        
+        conn.commit()
+        
+        # Log the addition
+        logger.info(f"New pub added: {data['name']} (ID: {pub_id})")
+        
+        # Track event
+        modules.tracking?.trackEvent('pub_added', 'User Action', data['name'])
+        
+        return jsonify({
+            'success': True,
+            'message': f'{data["name"]} added successfully!',
+            'pub_id': pub_id,
+            'name': data['name']
+        })
+        
+    except mysql.connector.IntegrityError as e:
+        logger.error(f"Database integrity error: {str(e)}")
+        if 'conn' in locals():
+            conn.rollback()
+        return jsonify({
+            'success': False,
+            'error': 'This pub may already exist in our database'
+        }), 409
+        
+    except Exception as e:
+        logger.error(f"Error adding pub: {str(e)}")
+        if 'conn' in locals():
+            conn.rollback()
+        return jsonify({
+            'success': False,
+            'error': 'Failed to add pub. Please try again.'
+        }), 500
+        
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
+
 # ================================================================================
 # ADMIN ROUTES
 # ================================================================================
@@ -974,11 +1072,3 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
-
-
-
-
-
-
-
-
