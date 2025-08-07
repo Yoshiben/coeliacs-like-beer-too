@@ -378,7 +378,7 @@ export const APIModule = (function() {
                 submitted_at: new Date().toISOString(),
                 user_agent: navigator.userAgent,
                 session_id: window.App.getState('sessionId') || 'anonymous',
-                submitted_by: window.App.getState('userNickname') || null
+                submitted_by: window.App.getState('userNickname') || 'Anonymous'
             };
             
             console.log('📝 API: Submitting beer report:', payload);
