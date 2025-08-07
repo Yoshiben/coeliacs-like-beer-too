@@ -143,8 +143,7 @@ def nearby():
     try:
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor(dictionary=True)
-        
-        # Updated query for new schema
+
         sql = """
             SELECT DISTINCT
                 p.pub_id, p.name, p.address, p.postcode, p.local_authority, 
@@ -154,16 +153,16 @@ def nearby():
                 cos(radians(p.longitude) - radians(%s)) + sin(radians(%s)) * 
                 sin(radians(p.latitude)))) AS distance,
                 GROUP_CONCAT(
-                    DISTINCT CONCAT(ba.format, ' - ', 
-                    COALESCE(b.brewery, 'Unknown'), ' ', 
-                    COALESCE(b.name, 'Unknown'), ' (', 
-                    COALESCE(b.style, 'Unknown'), ')')
+                    DISTINCT CONCAT(sub.format, ' - ', 
+                    COALESCE(sub.brewery, 'Unknown'), ' ', 
+                    COALESCE(sub.beer_name, 'Unknown'), ' (', 
+                    COALESCE(sub.beer_style, 'Unknown'), ')')
                     SEPARATOR ', '
                 ) as beer_details
             FROM pubs p
             LEFT JOIN pub_gf_status s ON p.pub_id = s.pub_id
-            LEFT JOIN beer_availability ba ON p.pub_id = ba.pub_id
-            LEFT JOIN beers b ON ba.beer_id = b.beer_id
+            LEFT JOIN submissions sub ON p.pub_id = sub.pub_id 
+                AND sub.status = 'approved'  -- Only show approved submissions
             WHERE p.latitude IS NOT NULL AND p.longitude IS NOT NULL
         """
         params = [lat, lng, lat]
@@ -219,18 +218,16 @@ def search():
                     p.latitude, p.longitude,
                     COALESCE(s.status, 'unknown') as gf_status,
                     GROUP_CONCAT(
-                        DISTINCT CONCAT(
-                            br.format, ' - ', 
-                            COALESCE(br.brewery, 'Unknown'), ' ', 
-                            COALESCE(br.beer_name, 'Unknown'), ' (', 
-                            COALESCE(br.beer_style, 'Unknown'), ')'
-                        )
+                        DISTINCT CONCAT(sub.format, ' - ', 
+                        COALESCE(sub.brewery, 'Unknown'), ' ', 
+                        COALESCE(sub.beer_name, 'Unknown'), ' (', 
+                        COALESCE(sub.beer_style, 'Unknown'), ')')
                         SEPARATOR ', '
                     ) as beer_details
                 FROM pubs p
                 LEFT JOIN pub_gf_status s ON p.pub_id = s.pub_id
-                LEFT JOIN beer_submissions br ON p.pub_id = br.pub_id 
-                    AND br.status = 'auto_approved'
+                LEFT JOIN submissions sub ON p.pub_id = sub.pub_id 
+                    AND sub.status = 'approved'
                 WHERE p.pub_id = %s
                 GROUP BY p.pub_id
             """
@@ -290,13 +287,12 @@ def search():
                 ) as beer_details
             FROM pubs p
             LEFT JOIN pub_gf_status s ON p.pub_id = s.pub_id
-            LEFT JOIN beer_availability ba ON p.pub_id = ba.pub_id
             LEFT JOIN beers b ON ba.beer_id = b.beer_id
             WHERE {search_condition}
         """
         
         if gf_only:
-            sql += " AND s.status IN ('always', 'currently')"
+            sql += " AND s.status IN ('always_tap_cask', 'always_bottle_can', 'currently')"
         
         sql += """
             GROUP BY p.pub_id
@@ -462,7 +458,7 @@ def submit_beer_update():
         user_info = {
             'ip': request.remote_addr,
             'user_agent': request.headers.get('User-Agent', ''),
-            'submitted_by': data.get('submitted_by', 'anonymous')  # Get nickname
+            'submitted_by': data.get('submitted_by', 'anonymous')
         }
         
         conn = mysql.connector.connect(**db_config)
@@ -498,17 +494,17 @@ def submit_beer_update():
                 beer_id = cursor.lastrowid
                 logger.info(f"Added new beer: {brewery} - {beer_name} (ID: {beer_id})")
         
-        # STEP 2: Insert into submissions (formerly beer_reports)
+        # STEP 2: Insert into submissions table
         cursor.execute("""
             INSERT INTO submissions (
                 pub_id, beer_id, brewery, beer_name, beer_style, beer_abv, 
-                format, submitted_at, submitted_by
+                format, submitted_at, submitted_by, status
             ) VALUES (
-                %s, %s, %s, %s, %s, %s, %s, %s, NOW()
+                %s, %s, %s, %s, %s, %s, %s, NOW(), %s, 'pending'
             )
         """, (
             data.get('pub_id'),
-            beer_id,  # Now we have the beer_id!
+            beer_id,
             brewery,
             beer_name,
             data.get('beer_style'),
@@ -540,7 +536,6 @@ def submit_beer_update():
         if 'conn' in locals() and conn.is_connected():
             cursor.close()
             conn.close()
-# REPLACE the update-gf-status route in app.py (around line 580)
 
 @app.route('/api/update-gf-status', methods=['POST'])
 def update_gf_status():
@@ -793,7 +788,7 @@ def get_validation_stats():
         # Pending manual reviews
         cursor.execute("""
             SELECT COUNT(*) as count 
-            FROM beer_submissions br
+            FROM submissions sub
             JOIN validation_queue vq ON br.report_id = vq.report_id
             WHERE vq.validation_type = 'manual_review' AND vq.status = 'pending'
         """)
@@ -810,7 +805,7 @@ def get_validation_stats():
         # Today's submissions
         cursor.execute("""
             SELECT COUNT(*) as count 
-            FROM beer_submissions
+            FROM submissions
             WHERE DATE(submitted_at) = CURDATE()
         """)
         today_submissions = cursor.fetchone()['count']
@@ -818,7 +813,7 @@ def get_validation_stats():
         # Today's auto-approved
         cursor.execute("""
             SELECT COUNT(*) as count 
-            FROM beer_submissions
+            FROM submissions
             WHERE DATE(submitted_at) = CURDATE() 
             AND status = 'auto_approved'
         """)
@@ -1031,6 +1026,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
