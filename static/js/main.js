@@ -964,6 +964,44 @@ const App = {
             }
         },
 
+        'manual-pub-entry': (el, modules) => {
+            modules.modalManager?.close('placesSearchModal');
+            modules.modalManager?.open('manualPubEntryModal');
+        },
+        
+        'submit-manual-pub': (el, modules) => {
+            const name = document.getElementById('manualPubName')?.value.trim();
+            const address = document.getElementById('manualPubAddress')?.value.trim();
+            const city = document.getElementById('manualPubCity')?.value.trim();
+            const postcode = document.getElementById('manualPubPostcode')?.value.trim().toUpperCase();
+            
+            if (!name || !address || !city || !postcode) {
+                modules.helpers?.showToast('Please fill in all fields', 'error');
+                return;
+            }
+            
+            // Validate postcode
+            if (!modules.helpers?.isValidPostcode(postcode)) {
+                modules.helpers?.showToast('Please enter a valid UK postcode', 'error');
+                return;
+            }
+            
+            const pubData = {
+                name: name,
+                address: `${address}, ${city}`,
+                postcode: postcode,
+                latitude: null,  // We'll geocode later
+                longitude: null,
+                source: 'manual_entry'
+            };
+            
+            modules.modalManager?.close('manualPubEntryModal');
+            modules.helpers?.showLoadingToast('Adding pub to database...');
+            
+            // Use the existing submitNewPub function
+            modules.search?.PlacesSearchModule?.submitNewPub(pubData);
+        },
+
     },
     
     // ================================
