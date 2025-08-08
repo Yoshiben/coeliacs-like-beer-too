@@ -97,13 +97,12 @@ export const SearchModule = (function() {
     
     const searchNearbyWithDistance = async (radiusKm) => {
         console.log(`🎯 Searching within ${radiusKm}km...`);
-
-        // Get CURRENT filter preference - NOT defaulting to true!
+    
+        // Get CURRENT filter preference
         const gfOnly = window.App.getState('gfOnlyFilter') !== false;
         console.log(`🍺 Current filter: ${gfOnly ? 'GF Only' : 'All Pubs'}`);
-
-        
-        try {
+    
+        try {  // <-- ADD THIS
             // Close distance modal using modalManager
             modules.modalManager?.close('distanceModal') || modules.modal?.close('distanceModal');
             
@@ -134,10 +133,10 @@ export const SearchModule = (function() {
             
             // Save search state
             state.lastSearchState = {
-            type: 'nearby',
-            radius: radiusKm,
-            userLocation: userLocation,
-            timestamp: Date.now()
+                type: 'nearby',
+                radius: radiusKm,
+                userLocation: userLocation,
+                timestamp: Date.now()
             };
             
             // Also store in global state for filter module
@@ -150,7 +149,7 @@ export const SearchModule = (function() {
                 userLocation.lat, 
                 userLocation.lng, 
                 radiusKm, 
-                gfOnly  // Pass the filter preference
+                gfOnly
             );
             
             // Check if we got a valid response
@@ -176,9 +175,12 @@ export const SearchModule = (function() {
             
             modules.tracking?.trackSearch(`nearby_${radiusKm}km`, 'location', pubs.length);
             
-        } catch (error) {
+        } catch (error) {  // <-- ALREADY HERE
             console.error('❌ Error in nearby search:', error);
             showNoResults('Could not complete search. Please try again.');
+        } finally {  // <-- ADD THIS
+            // ALWAYS hide loading toast
+            utils.hideLoadingToast();
         }
     };
     
@@ -1133,6 +1135,17 @@ export const SearchModule = (function() {
             return null;
         }
     };
+
+    const ensureLoadingToastHidden = () => {
+        // Force hide any stuck loading toasts
+        const loadingToast = document.getElementById('loadingToast');
+        if (loadingToast) {
+            loadingToast.classList.remove('show');
+            loadingToast.style.display = 'none';
+        }
+        // Also use the helper
+        utils.hideLoadingToast();
+    };
     
     // ================================
     // UI HELPERS
@@ -1140,6 +1153,9 @@ export const SearchModule = (function() {
 
     const showResultsOverlay = (title) => {
         console.log('📋 Showing results overlay:', title);
+
+        // Clean up any stuck loading toasts first
+        ensureLoadingToastHidden();
         
         // Reset to list view (not map view)
         const elements = {
