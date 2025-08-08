@@ -441,6 +441,11 @@ export const NavStateManager = (() => {
     };
     
     const showSearchWithContext = () => {
+        // Remove all page classes first
+        document.body.classList.remove('page-home', 'page-results', 'page-map', 'page-pub');
+        
+        // Add search class
+        document.body.classList.add('page-search');
         // Store previous context
         state.previousContext = state.currentContext;
         state.currentContext = 'search';
