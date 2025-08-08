@@ -458,6 +458,9 @@ export const NavStateManager = (() => {
 
     const init = () => {
         console.log('🔧 Initializing NavStateManager');
+
+        // Ensure home page class is set on start
+        document.body.className = 'page-home';
         
         // Set initial context
         setPageContext('home');
