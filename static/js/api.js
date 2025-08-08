@@ -387,13 +387,17 @@ export const APIModule = (function() {
                 method: 'POST',
                 body: JSON.stringify(payload)
             });
+
+            console.log('📥 API: Response status:', response.status);
             
             if (!response.ok) {
                 const errorText = await response.text();
+                console.error('❌ API: Error response:', errorText);
                 throw new Error(`HTTP ${response.status}: ${errorText}`);
             }
             
             const result = await response.json();
+            console.log('✅ API: Success response:', result);
             
             // Track submission
             modules.tracking?.trackFormSubmission('beer_report', {
@@ -404,6 +408,7 @@ export const APIModule = (function() {
             
             return result;
         } catch (error) {
+            console.error('❌ API: Error in submitBeerReport:', error);
             return handleAPIError(error, 'submitBeerReport', reportData);
         }
     };
