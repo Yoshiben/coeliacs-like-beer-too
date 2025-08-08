@@ -514,17 +514,19 @@ const App = {
             modules.nav?.goBackFromPub();
         },
         
-        // Replace with:
+        // In main.js actionHandlers - update nav-back
         'nav-back': (el, modules) => {
             const currentContext = modules.nav?.getCurrentContext();
+            console.log('🔙 Navigating back from:', currentContext);
             
-            if (currentContext === 'pub') {
+            if (currentContext === 'search') {
+                // Use the existing close-search logic
+                App.handleAction('close-search', el, modules);
+            } else if (currentContext === 'pub') {
                 modules.nav?.goBackFromPub();
             } else if (currentContext === 'map') {
-                // Check if we came from pub details
                 const mapReturnContext = App.getState('mapReturnContext');
                 if (mapReturnContext === 'pub') {
-                    // Close map and return to pub details
                     modules.modalManager?.close('fullMapOverlay');
                     const currentPub = App.getState(STATE_KEYS.CURRENT_PUB);
                     if (currentPub) {
