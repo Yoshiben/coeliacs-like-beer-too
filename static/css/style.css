@@ -1699,6 +1699,211 @@ body.page-search .nav-back-btn { display: flex !important; }
 }
 
 /* ================================
+   BREWERIES OVERLAY - SUBTLE REDESIGN
+   ================================ */
+.breweries-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    z-index: var(--z-overlay);
+    padding: 0;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--bg-home);
+}
+
+.breweries-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding-top: 8vh;
+    padding-bottom: 8vh;
+}
+
+.breweries-header {
+    text-align: center;
+    padding: var(--space-lg);
+    background: var(--bg-white);
+    border-bottom: 1px solid var(--border-light);
+    margin: 0;
+}
+
+.breweries-header h1 {
+    font-size: clamp(1.3rem, 3vw, 1.8rem);
+    margin-bottom: var(--space-xs);
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.breweries-header p {
+    color: var(--text-secondary);
+    font-size: clamp(0.85rem, 2vw, 0.95rem);
+    margin: 0;
+}
+
+/* Search bar */
+.breweries-search {
+    padding: var(--space-lg);
+    background: var(--bg-white);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.brewery-search-input {
+    width: 100%;
+    padding: var(--space-md) var(--space-lg);
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius-pill);
+    font-size: var(--text-sm);
+    background: var(--bg-section);
+    transition: all var(--transition);
+}
+
+.brewery-search-input:focus {
+    outline: none;
+    border-color: var(--purple-border);
+    background: var(--bg-white);
+}
+
+.breweries-content {
+    flex: 1;
+    background: var(--bg-section);
+    padding: var(--space-lg);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.breweries-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(clamp(140px, 30vw, 200px), 1fr));
+    gap: clamp(0.75rem, 2vw, 1rem);
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.brewery-card {
+    background: var(--bg-white);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: clamp(1rem, 3vw, 1.5rem);
+    text-align: center;
+    transition: all var(--transition);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    min-height: clamp(100px, 20vw, 140px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.brewery-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+    border-color: var(--purple-border);
+    background: var(--purple-bg);
+}
+
+.brewery-icon {
+    font-size: clamp(2rem, 5vw, 2.5rem);
+    margin-bottom: var(--space-xs);
+    opacity: 0.8;
+    transition: transform var(--transition);
+}
+
+.brewery-card:hover .brewery-icon {
+    transform: scale(1.1);
+    opacity: 1;
+}
+
+.brewery-name {
+    font-size: clamp(0.8rem, 2vw, 0.95rem);
+    margin: 0;
+    color: var(--text-primary);
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+/* Brewery count */
+.brewery-stats {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-md) var(--space-lg);
+    background: var(--purple-bg);
+    border-bottom: 1px solid var(--purple-border);
+}
+
+.brewery-count {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: var(--text-sm);
+}
+
+.view-toggle {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.view-toggle button {
+    padding: var(--space-xs) var(--space-md);
+    border: 1px solid var(--border-light);
+    background: var(--bg-white);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-xs);
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.view-toggle button.active {
+    background: var(--purple-gradient);
+    color: var(--white);
+    border-color: transparent;
+}
+
+.brewery-beers-list {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding: var(--space-sm);
+}
+
+.beer-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-lg);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-md);
+    background: var(--bg-white);
+}
+
+.beer-item:hover {
+    border-color: var(--purple-border);
+    background: var(--purple-bg);
+}
+
+.beer-meta {
+    display: flex;
+    gap: var(--space-sm);
+    margin-top: var(--space-xs);
+    flex-wrap: wrap;
+}
+
+.beer-meta span {
+    font-size: var(--text-sm);
+    padding: var(--space-xs) var(--space-sm);
+    background: var(--bg-section);
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
+}
+
+/* ================================
    LOADING & EMPTY STATES
    ================================ */
 .loading-spinner {
