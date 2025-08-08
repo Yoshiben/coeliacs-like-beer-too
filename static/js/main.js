@@ -546,6 +546,7 @@ const App = {
             } else {
                 modules.nav?.goToHome();
             }
+            }
         },
         'close-modal': (el, modules) => {
             const modal = el.closest('.modal, .search-modal, .report-modal');
