@@ -10,7 +10,6 @@ import logging
 import time
 import json
 from datetime import datetime, timedelta
-from validation_engine import BeerValidationEngine, SubmissionProcessor
 
 # Initialize Flask app
 app = Flask(__name__, 
@@ -153,16 +152,15 @@ def nearby():
                 cos(radians(p.longitude) - radians(%s)) + sin(radians(%s)) * 
                 sin(radians(p.latitude)))) AS distance,
                 GROUP_CONCAT(
-                    DISTINCT CONCAT(sub.format, ' - ', 
-                    COALESCE(sub.brewery, 'Unknown'), ' ', 
-                    COALESCE(sub.beer_name, 'Unknown'), ' (', 
-                    COALESCE(sub.beer_style, 'Unknown'), ')')
-                    SEPARATOR ', '
-                ) as beer_details
+                            DISTINCT CONCAT(sub.format, ' - ', 
+                            COALESCE(sub.brewery, 'Unknown'), ' ', 
+                            COALESCE(sub.beer_name, 'Unknown'), ' (', 
+                            COALESCE(sub.beer_style, 'Unknown'), ')')
+                            SEPARATOR ', '
+                        ) as beer_details
             FROM pubs p
             LEFT JOIN pub_gf_status s ON p.pub_id = s.pub_id
             LEFT JOIN submissions sub ON p.pub_id = sub.pub_id 
-                AND sub.status = 'approved'
             WHERE p.latitude IS NOT NULL AND p.longitude IS NOT NULL
         """
         params = [lat, lng, lat]
@@ -218,16 +216,15 @@ def search():
                     p.latitude, p.longitude,
                     COALESCE(s.status, 'unknown') as gf_status,
                     GROUP_CONCAT(
-                        DISTINCT CONCAT(sub.format, ' - ', 
-                        COALESCE(sub.brewery, 'Unknown'), ' ', 
-                        COALESCE(sub.beer_name, 'Unknown'), ' (', 
-                        COALESCE(sub.beer_style, 'Unknown'), ')')
-                        SEPARATOR ', '
-                    ) as beer_details
+                            DISTINCT CONCAT(sub.format, ' - ', 
+                            COALESCE(sub.brewery, 'Unknown'), ' ', 
+                            COALESCE(sub.beer_name, 'Unknown'), ' (', 
+                            COALESCE(sub.beer_style, 'Unknown'), ')')
+                            SEPARATOR ', '
+                        ) as beer_details
                 FROM pubs p
                 LEFT JOIN pub_gf_status s ON p.pub_id = s.pub_id
                 LEFT JOIN submissions sub ON p.pub_id = sub.pub_id 
-                    AND sub.status = 'approved'
                 WHERE p.pub_id = %s
                 GROUP BY p.pub_id
             """
@@ -279,16 +276,15 @@ def search():
                 p.latitude, p.longitude,
                 COALESCE(s.status, 'unknown') as gf_status,
                 GROUP_CONCAT(
-                    DISTINCT CONCAT(sub.format, ' - ', 
-                    COALESCE(sub.brewery, 'Unknown'), ' ', 
-                    COALESCE(sub.beer_name, 'Unknown'), ' (', 
-                    COALESCE(sub.beer_style, 'Unknown'), ')')
-                    SEPARATOR ', '
-                ) as beer_details
+                        DISTINCT CONCAT(sub.format, ' - ', 
+                        COALESCE(sub.brewery, 'Unknown'), ' ', 
+                        COALESCE(sub.beer_name, 'Unknown'), ' (', 
+                        COALESCE(sub.beer_style, 'Unknown'), ')')
+                        SEPARATOR ', '
+                        ) as beer_details
             FROM pubs p
             LEFT JOIN pub_gf_status s ON p.pub_id = s.pub_id
             LEFT JOIN submissions sub ON p.pub_id = sub.pub_id 
-                AND sub.status = 'approved'
             WHERE {search_condition}
         """
         
@@ -451,7 +447,7 @@ def get_brewery_beers(brewery_name):
 
 @app.route('/api/submit_beer_update', methods=['POST'])
 def submit_beer_update():
-    """Submit beer report with new schema"""
+    """Submit beer report - simplified, no validation tiers"""
     try:
         data = request.get_json()
         
@@ -471,7 +467,6 @@ def submit_beer_update():
         beer_name = data.get('beer_name')
         
         if brewery and beer_name:
-            # Check if beer already exists
             cursor.execute("""
                 SELECT beer_id FROM beers 
                 WHERE LOWER(brewery) = LOWER(%s) AND LOWER(name) = LOWER(%s)
@@ -482,7 +477,7 @@ def submit_beer_update():
             if existing_beer:
                 beer_id = existing_beer['beer_id']
             else:
-                # Add new beer to beers table
+                # Add new beer
                 cursor.execute("""
                     INSERT INTO beers (brewery, name, style, abv, gluten_status)
                     VALUES (%s, %s, %s, %s, 'certified_gf')
@@ -495,13 +490,13 @@ def submit_beer_update():
                 beer_id = cursor.lastrowid
                 logger.info(f"Added new beer: {brewery} - {beer_name} (ID: {beer_id})")
         
-        # STEP 2: Insert into submissions table
+        # STEP 2: Insert submission - AUTO-APPROVED!
         cursor.execute("""
             INSERT INTO submissions (
                 pub_id, beer_id, brewery, beer_name, beer_style, beer_abv, 
-                format, submitted_at, submitted_by, status
+                format, submitted_at, submitted_by, status, notes
             ) VALUES (
-                %s, %s, %s, %s, %s, %s, %s, NOW(), %s, 'pending'
+                %s, %s, %s, %s, %s, %s, %s, NOW(), %s, 'approved', %s
             )
         """, (
             data.get('pub_id'),
@@ -511,7 +506,8 @@ def submit_beer_update():
             data.get('beer_style'),
             data.get('beer_abv'),
             data.get('beer_format'),
-            user_info['submitted_by']
+            user_info['submitted_by'],
+            data.get('notes', '')
         ))
         
         submission_id = cursor.lastrowid
@@ -519,10 +515,10 @@ def submit_beer_update():
         
         return jsonify({
             'success': True,
-            'message': '🎉 Beer report submitted successfully!',
+            'message': '🎉 Beer report added successfully!',
             'submission_id': submission_id,
             'beer_id': beer_id,
-            'new_beer': existing_beer is None
+            'status': 'approved'  # Always approved now!
         })
         
     except Exception as e:
@@ -777,31 +773,17 @@ def admin_dashboard():
         return "🔒 Access denied. Admin token required.", 403
     
     return render_template('admin.html')
-
-@app.route('/api/admin/validation-stats')
+@app.route('/api/admin/stats')
 @admin_required
-def get_validation_stats():
-    """Get validation statistics with new schema"""
+def get_admin_stats():
+    """Get basic admin statistics"""
     try:
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor(dictionary=True)
         
-        # Pending manual reviews
-        cursor.execute("""
-            SELECT COUNT(*) as count 
-            FROM submissions sub
-            JOIN validation_queue vq ON br.report_id = vq.report_id
-            WHERE vq.validation_type = 'manual_review' AND vq.status = 'pending'
-        """)
-        pending_manual = cursor.fetchone()['count']
-        
-        # Pending soft validations
-        cursor.execute("""
-            SELECT COUNT(*) as count 
-            FROM validation_queue
-            WHERE validation_type = 'soft_validation' AND status = 'pending'
-        """)
-        pending_soft = cursor.fetchone()['count']
+        # Total submissions
+        cursor.execute("SELECT COUNT(*) as count FROM submissions")
+        total_submissions = cursor.fetchone()['count']
         
         # Today's submissions
         cursor.execute("""
@@ -811,126 +793,19 @@ def get_validation_stats():
         """)
         today_submissions = cursor.fetchone()['count']
         
-        # Today's auto-approved
-        cursor.execute("""
-            SELECT COUNT(*) as count 
-            FROM submissions
-            WHERE DATE(submitted_at) = CURDATE() 
-            AND status = 'auto_approved'
-        """)
-        auto_approved_today = cursor.fetchone()['count']
+        # Total beers
+        cursor.execute("SELECT COUNT(*) as count FROM beers")
+        total_beers = cursor.fetchone()['count']
         
         return jsonify({
-            'pending_manual': pending_manual,
-            'pending_soft': pending_soft,
+            'total_submissions': total_submissions,
             'today_submissions': today_submissions,
-            'auto_approved_today': auto_approved_today
+            'total_beers': total_beers
         })
         
     except Exception as e:
-        logger.error(f"Error getting validation stats: {str(e)}")
+        logger.error(f"Error getting admin stats: {str(e)}")
         return jsonify({'error': 'Failed to load stats'}), 500
-    finally:
-        if 'conn' in locals() and conn.is_connected():
-            cursor.close()
-            conn.close()
-
-@app.route('/api/admin/pending-manual-reviews')
-@admin_required
-def get_pending_manual_reviews():
-    """Get pending reviews using new view"""
-    try:
-        conn = mysql.connector.connect(**db_config)
-        cursor = conn.cursor(dictionary=True)
-        
-        cursor.execute("""
-            SELECT * FROM v_pending_beer_submissions 
-            WHERE status = 'manual_review'
-            ORDER BY submitted_at ASC
-            LIMIT 50
-        """)
-        
-        reviews = cursor.fetchall()
-        return jsonify(reviews)
-        
-    except Exception as e:
-        logger.error(f"Error getting pending reviews: {str(e)}")
-        return jsonify({'error': 'Failed to load pending reviews'}), 500
-    finally:
-        if 'conn' in locals() and conn.is_connected():
-            cursor.close()
-            conn.close()
-
-@app.route('/api/admin/approve-submission', methods=['POST'])
-@admin_required
-def approve_submission():
-    """Approve submission using stored procedure"""
-    try:
-        data = request.get_json()
-        report_id = data.get('submission_id')  # Keep frontend field name
-        
-        if not report_id:
-            return jsonify({'error': 'report_id required'}), 400
-        
-        conn = mysql.connector.connect(**db_config)
-        cursor = conn.cursor()
-        
-        conn.commit()
-        
-        logger.info(f"Report {report_id} approved by admin")
-        
-        return jsonify({
-            'success': True, 
-            'message': 'Submission approved successfully!'
-        })
-        
-    except Exception as e:
-        logger.error(f"Error approving submission: {str(e)}")
-        if 'conn' in locals():
-            conn.rollback()
-        return jsonify({'error': 'Failed to approve submission'}), 500
-    finally:
-        if 'conn' in locals() and conn.is_connected():
-            cursor.close()
-            conn.close()
-
-@app.route('/api/admin/reject-submission', methods=['POST'])
-@admin_required
-def reject_submission():
-    """Reject a beer report"""
-    try:
-        data = request.get_json()
-        report_id = data.get('submission_id')
-        
-        if not report_id:
-            return jsonify({'error': 'report_id required'}), 400
-        
-        conn = mysql.connector.connect(**db_config)
-        cursor = conn.cursor()
-        
-        # Update validation queue
-        cursor.execute("""
-            UPDATE validation_queue 
-            SET status = 'rejected',
-                reviewed_at = NOW(),
-                reviewed_by = 'admin'
-            WHERE report_id = %s
-        """, (report_id,))
-        
-        conn.commit()
-        
-        logger.info(f"Report {report_id} rejected by admin")
-        
-        return jsonify({
-            'success': True, 
-            'message': 'Submission rejected'
-        })
-        
-    except Exception as e:
-        logger.error(f"Error rejecting submission: {str(e)}")
-        if 'conn' in locals():
-            conn.rollback()
-        return jsonify({'error': 'Failed to reject submission'}), 500
     finally:
         if 'conn' in locals() and conn.is_connected():
             cursor.close()
@@ -1027,6 +902,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
