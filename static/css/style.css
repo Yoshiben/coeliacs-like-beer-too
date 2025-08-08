@@ -1493,6 +1493,87 @@ body.page-search .nav-back-btn { display: flex !important; }
 }
 
 /* ================================
+   STATUS MODAL
+   ================================ */
+
+.status-prompt {
+   text-align: center;
+   color: var(--text-secondary);
+   margin-bottom: var(--space-2xl);
+   font-size: var(--text-md);
+}
+.status-option {
+   display: flex;
+   align-items: center;
+   gap: var(--space-lg);
+   padding: var(--space-xl);
+   background: var(--bg-white);
+   border: 3px solid var(--border-light);
+   border-radius: var(--radius-xl);
+   cursor: pointer;
+   transition: all var(--transition);
+   text-align: left;
+}
+
+.status-option:hover {
+   transform: translateY(-2px);
+   box-shadow: var(--shadow-lg);
+}
+
+.option-icon {
+   font-size: var(--text-4xl);
+   min-width: 60px;
+   text-align: center;
+}
+
+.option-content h4 {
+   font-size: var(--text-lg);
+   font-weight: 700;
+   color: var(--text-primary);
+   margin: 0 0 var(--space-xs) 0;
+}
+
+.option-content p {
+   font-size: var(--text-sm);
+   color: var(--text-secondary);
+   margin: 0;
+}
+
+/* USING CONSOLIDATED COLORS FOR STATUS OPTIONS */
+.status-option.always:hover {
+   background: var(--status-always-bg);
+   border-color: var(--always-gf-fill);
+}
+
+.status-option.currently:hover {
+   background: var(--status-current-bg);
+   border-color: var(--currently-gf-fill);
+}
+
+.status-option.not-currently:hover {
+   background: var(--status-no-bg);
+   border-color: var(--no-gf-fill);
+}
+
+.status-option.unknown:hover {
+   background: var(--status-unknown-bg);
+   border-color: var(--unknown-gf-fill);
+}
+
+.confirm-status {
+   display: inline-flex;
+   align-items: center;
+   gap: var(--space-md);
+   padding: var(--space-lg);
+   margin: var(--space-xl) 0;
+   background: var(--bg-section);
+   border-radius: var(--radius-lg);
+   font-size: var(--text-xl);
+   font-weight: 700;
+}
+
+
+/* ================================
    GF STATUS INDICATORS
    ================================ */
 
