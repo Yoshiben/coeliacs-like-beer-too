@@ -134,8 +134,10 @@ export const FormModule = (() => {
         
         // Collect and validate form data
         const reportData = collectReportData(formData);
-        console.log('🔍 DEBUG - Report data being sent:', JSON.stringify(reportData, null, 2));
+        console.log('🔍 Report data collected:', reportData);
+        
         const validation = validateReportForm(reportData);
+        console.log('✅ Validation result:', validation);
         
         if (!validation.isValid) {
             utils.showToast(`❌ Please fill in: ${validation.errors.join(', ')}`, 'error');
@@ -147,13 +149,16 @@ export const FormModule = (() => {
         state.currentSubmission = reportData;
         
         try {
+            console.log('📤 Sending to API...');
             const result = await modules.api.submitBeerReport(reportData);
+            console.log('📥 API Response:', result);
             
             utils.hideLoadingToast();
             
             if (result.success) {
                 handleSubmissionSuccess(result, reportData);
             } else {
+                console.error('❌ Submission failed:', result);
                 utils.showToast(result.message || 'Failed to submit report', 'error');
             }
         } catch (error) {
@@ -162,7 +167,7 @@ export const FormModule = (() => {
             utils.showToast('Error submitting report. Please try again.', 'error');
         } finally {
             state.currentSubmission = null;
-            state.isSubmitting = false;  // Reset flag
+            state.isSubmitting = false;
         }    
         };
     };
