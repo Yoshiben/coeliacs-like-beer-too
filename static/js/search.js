@@ -618,6 +618,7 @@ export const SearchModule = (function() {
     const loadBeerList = (pub) => {
         console.log('🍺 Loading beer list for pub:', pub);
         console.log('📦 Beer details:', pub.beer_details);
+        console.log('📊 Pub object keys:', Object.keys(pub));
         
         const contentEl = document.getElementById('beerListContent');
         const emptyEl = document.getElementById('beerListEmpty');
