@@ -179,11 +179,12 @@ export const NavStateManager = (() => {
     // ================================
     // NAVIGATION METHODS
     // ================================
+    // In nav.js - Update the goToHome function
     const goToHome = (shouldPushState = true) => {
         console.log('🏠 Navigating to home');
         
-        // Hide all overlays
-        const overlays = ['resultsOverlay', 'pubDetailsOverlay', 'fullMapOverlay'];
+        // Close ALL overlays including search overlay
+        const overlays = ['resultsOverlay', 'pubDetailsOverlay', 'fullMapOverlay', 'searchOverlay'];
         overlays.forEach(id => {
             const overlay = document.getElementById(id);
             if (overlay) {
@@ -192,13 +193,19 @@ export const NavStateManager = (() => {
             }
         });
         
+        // Also use modalManager to ensure proper cleanup
+        const modalManager = window.App?.getModule('modalManager');
+        if (modalManager) {
+            modalManager.closeAllOverlays();
+        }
+        
         // Show community home
         const communityHome = document.querySelector('.community-home');
         if (communityHome) {
             communityHome.style.display = 'block';
         }
         
-        // Update context
+        // Update context AFTER closing overlays
         setPageContext('home');
         
         // Update browser history
