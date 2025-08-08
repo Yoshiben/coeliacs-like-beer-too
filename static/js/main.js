@@ -852,27 +852,28 @@ const App = {
             community?.handleQuickAction('find-stockists');
         },
 
+        // In main.js - update open-search action
         'open-search': (el, modules) => {
             console.log('🔍 Opening search overlay');
             
-            // Use ModalManager to open search overlay
-            if (modules.modalManager) {
-                modules.modalManager.open('searchOverlay', {
+            // Close any open overlays first
+            const currentContext = modules.nav?.getCurrentContext();
+            if (currentContext === 'map') {
+                modules.modalManager?.close('fullMapOverlay');
+            } else if (currentContext === 'pub') {
+                modules.modalManager?.close('pubDetailsOverlay');
+            } else if (currentContext === 'results') {
+                modules.modalManager?.close('resultsOverlay');
+            }
+            
+            // Small delay then open search
+            setTimeout(() => {
+                modules.modalManager?.open('searchOverlay', {
                     onOpen: () => {
-                        // Update nav context
                         modules.nav?.showSearchWithContext();
                     }
                 });
-            } else {
-                // Fallback if ModalManager not available
-                const searchOverlay = document.getElementById('searchOverlay');
-                if (searchOverlay) {
-                    searchOverlay.style.display = 'flex';
-                    searchOverlay.classList.add('active');
-                    document.body.style.overflow = 'hidden';
-                    modules.nav?.showSearchWithContext();
-                }
-            }
+            }, 100);
             
             modules.tracking?.trackEvent('search_overlay_opened', 'Navigation', 'bottom_nav');
         },
