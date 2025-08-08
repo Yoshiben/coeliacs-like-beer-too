@@ -921,6 +921,16 @@ body.page-search .nav-back-btn { display: flex !important; }
    height: 100%;
 }
 
+.search-header {
+   text-align: center;
+}
+
+.search-header-title {
+   font-size: var(--text-md);
+   color: var(--text-primary);
+   margin-bottom: 0; 
+}
+
 .search-body {
    flex: 1;
    display: flex;
@@ -978,6 +988,24 @@ body.page-search .nav-back-btn { display: flex !important; }
    border-color: rgba(245, 158, 11, 0.2);
 }
 
+.search-icon {
+   font-size: var(--text-2xl);
+   line-height: 1;
+}
+
+.search-title {
+   font-size: var(--text-md);
+   color: var(--text-primary);
+   margin-bottom: 0; 
+}
+
+.search-description {
+   font-size: var(--text-sm);
+   color: var(--text-secondary);
+   text-align: center;
+   padding: 0 var(--spac?e-xs);
+}
+
 /* ================================
    RESULTS & PUB DETAILS
    ================================ */
@@ -1029,7 +1057,6 @@ body.page-search .nav-back-btn { display: flex !important; }
    height: 100%;
    width: 100%;
 }
-
 .pub-details-card {
     background: var(--bg-white);
     backdrop-filter: blur(10px);
@@ -1040,13 +1067,39 @@ body.page-search .nav-back-btn { display: flex !important; }
     overflow: hidden;
     min-height: 0;
 }
-
 .pub-details-content {
     flex: 1;
     -webkit-overflow-scrolling: touch;
    padding: 0 var(--space-xl)
 }
-
+.pub-header {
+    text-align: center;
+    padding-bottom: var(--space-md);
+}
+.pub-title {
+   font-size: var(--text-2xl);
+   font-weight: 800;
+   color: var(--text-primary);
+   margin-top: var(--space-sm);
+   margin-bottom: 0;
+   background: var(--primary-gradient);
+   -webkit-background-clip: text;
+   -webkit-text-fill-color: transparent;
+   background-clip: text;
+}
+.pub-address {
+    color: var(--text-secondary);
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-xs);
+    font-weight: 500;
+}
+.pub-location {
+    color: var(--text-muted);
+    font-size: var(--text-md);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
 .status-card {
    background: linear-gradient(135deg, var(--purple-bg) 0%, rgba(139, 92, 246, 0.05) 100%);
    border: 2px solid var(--purple-border);
@@ -1055,6 +1108,96 @@ body.page-search .nav-back-btn { display: flex !important; }
    text-align: center;
    position: relative;
    overflow: hidden;
+}
+.status-card::before {
+    content: '🍺';
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    font-size: 5rem;
+    opacity: 0.1;
+    transform: rotate(-15deg);
+}
+.status-question {
+   font-weight: 700;
+   color: var(--text-primary);
+   margin: var(--space-md);
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   gap: var(--space-sm);
+}
+.current-status {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-xs);
+    margin-bottom: var(--space-md);
+}
+.current-status .status-icon {
+    font-size: 2rem;
+    line-height: 1;
+}
+.current-status .status-text {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+.current-status .status-meta {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+.status-card .btn-sm {
+   padding: var(--space-sm) var(--space-3xl);
+   font-weight: 600;
+}
+.status-card .btn-sm:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+.beer-section {
+   background: linear-gradient(135deg, var(--success-bg) 0%, var(--success-bg) 100%);
+   border: 2px solid var(--success-border);
+   border-radius: var(--radius-xl);
+   padding: var(--space-xl);
+   margin: var(--space-xl) 0;
+   border-left: 6px solid var(--success-gradient);
+   position: relative;
+   overflow: hidden;
+}
+.beer-section::before {
+   content: '🍺';
+   position: absolute;
+   top: -10px;
+   right: -10px;
+   font-size: 4rem;
+   opacity: 0.1;
+   pointer-events: none;
+}
+.beer-section-title {
+   display: flex;
+   align-items: center;
+   font-size: 1.1rem;
+   font-weight: 700;
+   color: var(--text-primary);
+   margin-bottom: var(--space-lg);
+   gap: var(--space-sm);
+   line-height: 1.2;
+}
+.beer-status {
+   color: var(--text-secondary);
+   font-size: 0.95rem;
+   line-height: 1.6;
+   position: relative;
+   z-index: 1;
+}
+.beer-status strong {
+   color: var(--success-text);
+   font-weight: 700;
+}
+.beer-status em {
+   color: var(--text-muted);
+   font-size: 0.85rem;
 }
 
 /* ================================
