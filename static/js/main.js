@@ -300,6 +300,20 @@ const App = {
     
     initPhase5: async () => {
         console.log('🔧 Phase 5: Final Setup...');
+    
+        // FIX: Ensure all overlays are hidden on start
+        document.querySelectorAll('.overlay, .modal').forEach(el => {
+            if (!el.classList.contains('community-home')) {
+                el.style.display = 'none';
+                el.classList.remove('active');
+            }
+        });
+        
+        // Ensure community home is visible
+        const communityHome = document.querySelector('.community-home');
+        if (communityHome) {
+            communityHome.style.display = 'block';
+        }
         
         // Set up event delegation
         App.setupEventDelegation();
