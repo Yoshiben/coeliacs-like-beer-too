@@ -525,15 +525,21 @@ const App = {
             } else if (currentContext === 'pub') {
                 modules.nav?.goBackFromPub();
             } else if (currentContext === 'map') {
-                const mapReturnContext = App.getState('mapReturnContext');
-                if (mapReturnContext === 'pub') {
-                    modules.modalManager?.close('fullMapOverlay');
-                    const currentPub = App.getState(STATE_KEYS.CURRENT_PUB);
-                    if (currentPub) {
-                        modules.search?.showPubDetails(currentPub.pub_id);
-                    } else {
-                        modules.nav?.goToHome();
-                    }
+            const mapReturnContext = App.getState('mapReturnContext');
+            console.log('🔙 Map return context:', mapReturnContext);
+            
+            modules.modalManager?.close('fullMapOverlay');
+            
+            if (mapReturnContext === 'search') {
+                // Go back to search
+                setTimeout(() => {
+                    modules.modalManager?.open('searchOverlay');
+                    modules.nav?.showSearchWithContext();
+                }, 100);
+            } else if (mapReturnContext === 'pub') {
+                const currentPub = App.getState(STATE_KEYS.CURRENT_PUB);
+                if (currentPub) {
+                    modules.search?.showPubDetails(currentPub.pub_id);
                 } else {
                     modules.nav?.goToHome();
                 }
@@ -608,26 +614,29 @@ const App = {
             }, 500);
         },
         
+        // In main.js actionHandlers - update show-full-map
         'show-full-map': (el, modules) => {
-            // Check if we're on pub details
+            // Check current context
             const currentContext = modules.nav?.getCurrentContext();
-            if (currentContext === 'pub') {
-                // IMPORTANT: Close pub details overlay first
-                modules.modalManager?.close('pubDetailsOverlay');
-                
-                // Show full map with this pub centered
+            console.log('🗺️ Opening map from context:', currentContext);
+            
+            // If we're coming from search, close it first
+            if (currentContext === 'search') {
+                modules.modalManager?.close('searchOverlay');
+                // Small delay to let the close finish
                 setTimeout(() => {
                     App.showFullMap(modules);
-                    
-                    // After map loads, center on the current pub
+                }, 100);
+            } else if (currentContext === 'pub') {
+                modules.modalManager?.close('pubDetailsOverlay');
+                setTimeout(() => {
+                    App.showFullMap(modules);
                     const currentPub = App.getState(STATE_KEYS.CURRENT_PUB);
                     if (currentPub && currentPub.latitude && currentPub.longitude) {
                         setTimeout(() => {
                             const map = App.getState(STATE_KEYS.MAP_DATA.FULL_UK_MAP);
                             if (map) {
                                 map.setView([parseFloat(currentPub.latitude), parseFloat(currentPub.longitude)], 16);
-                                
-                                // Find and open the pub's popup
                                 map.eachLayer(layer => {
                                     if (layer.options && layer.options.pubId === currentPub.pub_id) {
                                         layer.openPopup();
@@ -638,7 +647,6 @@ const App = {
                     }
                 }, 100);
             } else {
-                // Normal map view
                 App.showFullMap(modules);
             }
         },
@@ -1139,10 +1147,11 @@ const App = {
     
     showFullMap: async (modules) => {
         console.log('🗺️ Showing full UK map...');
-
-        // Store where we came from
+    
+        // Store where we came from INCLUDING search
         const currentContext = modules.nav?.getCurrentContext();
         App.setState('mapReturnContext', currentContext);
+        console.log('📍 Storing map return context:', currentContext);
         
         // Check for location if needed
         if (!App.getState(STATE_KEYS.USER_LOCATION)) {
