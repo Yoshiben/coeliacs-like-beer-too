@@ -382,6 +382,11 @@ export const APIModule = (function() {
             };
             
             console.log('📝 API: Submitting beer report:', payload);
+
+            console.log('📤 Sending to API:', {
+                url: Constants.API.SUBMIT_BEER,
+                payload: payload
+            });
             
             const response = await fetchWithTimeout(Constants.API.SUBMIT_BEER, {
                 method: 'POST',
