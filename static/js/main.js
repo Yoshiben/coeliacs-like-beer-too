@@ -523,7 +523,10 @@ const App = {
             } else if (currentContext === 'pub') {
                 modules.nav?.goBackFromPub();
             } else if (currentContext === 'results') {
-                // ADD THIS: Handle going back from results
+                modules.nav?.goToHome();
+            } else if (currentContext === 'breweries') {
+                // Close breweries and go home
+                modules.modalManager?.close('breweriesOverlay');
                 modules.nav?.goToHome();
             } else if (currentContext === 'map') {
                 const mapReturnContext = App.getState('mapReturnContext');
