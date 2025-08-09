@@ -409,6 +409,7 @@ const App = {
     handleFormSubmit: (e) => {
         if (e.target.id === 'reportForm') {
             e.preventDefault();
+            e.stopPropagation(); // Add this
             const form = App.getModule('form');
             if (form?.handleReportSubmission) {
                 form.handleReportSubmission(e);
