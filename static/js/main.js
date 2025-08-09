@@ -897,10 +897,15 @@ const App = {
             // Return to home context
             modules.nav?.goToHome();
         },
-
         'open-breweries': (el, modules) => {
-            const breweries = modules.breweries || window.App?.getModule('breweries');
-            breweries?.openBreweries();
+            // First, close any open primary overlays
+            modules.modalManager?.closeGroup('primary');
+            
+            // Small delay to ensure DOM updates
+            setTimeout(() => {
+                const breweries = modules.breweries || window.App?.getModule('breweries');
+                breweries?.openBreweries();
+            }, 50);
         },
         'search-brewery': (el, modules) => {
             const brewery = el.dataset.brewery;
