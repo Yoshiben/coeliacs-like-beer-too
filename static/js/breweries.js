@@ -233,7 +233,7 @@ export default (function() {
             }
         }
         
-        // Update nav context
+        // Update nav context - THIS IS THE KEY
         modules.nav?.setPageContext('breweries');
         
         // Load breweries if not already loaded
