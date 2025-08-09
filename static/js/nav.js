@@ -33,7 +33,7 @@ export const NavStateManager = (() => {
         state.currentContext = context;
         
         // Remove all page classes
-        document.body.classList.remove('page-home', 'page-results', 'page-map', 'page-pub');
+        document.body.classList.remove('page-home', 'page-results', 'page-map', 'page-pub', 'page-search', 'page-breweries');
         
         // Add the current page class
         document.body.classList.add(`page-${context}`);
@@ -165,10 +165,14 @@ export const NavStateManager = (() => {
             switch(currentContext) {
                 case 'results':
                 case 'map':
+                case 'breweries':
                     goToHome();
                     break;
                 case 'pub':
                     goBackFromPub();
+                    break;
+                case 'search':
+                    goToHome();
                     break;
                 default:
                     goToHome();
