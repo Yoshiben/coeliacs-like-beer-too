@@ -1976,3 +1976,205 @@ body.page-breweries .nav-back-btn { display: flex !important; }
       margin: var(--space-xl);
    }
 }
+
+
+/* ================================
+   BEER LIST MODAL STYLES
+   ================================ */
+
+/* Beer List Content */
+.beer-list-content {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding: var(--space-xs);
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Beer List Items */
+.beer-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg-white);
+    border: 2px solid var(--border-light);
+    border-radius: var(--radius-xl);
+    padding: var(--space-xl);
+    margin-bottom: var(--space-lg);
+    transition: all var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.beer-list-item::before {
+    content: '🍺';
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    font-size: 3rem;
+    opacity: 0.05;
+    transform: rotate(-15deg);
+}
+
+.beer-list-item:hover {
+    border-color: var(--purple-border);
+    background: linear-gradient(135deg, var(--purple-bg) 0%, rgba(139, 92, 246, 0.02) 100%);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+/* Beer Info */
+.beer-info {
+    flex: 1;
+    padding-right: var(--space-lg);
+}
+
+.beer-info strong {
+    display: block;
+    font-size: var(--text-lg);
+    color: var(--text-primary);
+    margin-bottom: var(--space-xs);
+    font-weight: 700;
+}
+
+.beer-meta {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+}
+
+.beer-meta::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 4px;
+    height: 60%;
+    background: var(--purple-gradient);
+    border-radius: 2px;
+    opacity: 0;
+    transition: opacity var(--transition);
+}
+
+.beer-list-item:hover .beer-meta::before {
+    opacity: 1;
+}
+
+/* Delete Button */
+.btn-delete-beer {
+    background: rgba(239, 68, 68, 0.1);
+    border: 2px solid transparent;
+    font-size: var(--text-lg);
+    cursor: pointer;
+    padding: var(--space-sm);
+    border-radius: var(--radius-lg);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all var(--transition);
+    flex-shrink: 0;
+}
+
+.btn-delete-beer:hover {
+    background: var(--red);
+    border-color: var(--red);
+    transform: scale(1.1);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Empty State */
+.beer-list-empty {
+    text-align: center;
+    padding: var(--space-4xl);
+    color: var(--text-muted);
+}
+
+.beer-list-empty p {
+    font-size: var(--text-lg);
+    margin-bottom: var(--space-xl);
+    opacity: 0.8;
+}
+
+.beer-list-empty::before {
+    content: '🍺';
+    display: block;
+    font-size: 4rem;
+    opacity: 0.2;
+    margin-bottom: var(--space-lg);
+}
+
+/* Format Pills */
+.beer-format {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    background: var(--purple-gradient);
+    color: var(--text-white);
+    padding: var(--space-xs) var(--space-md);
+    border-radius: var(--radius-pill);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    margin-right: var(--space-sm);
+}
+
+/* Brewery Tag */
+.beer-brewery {
+    font-weight: 600;
+    color: var(--purple-border);
+}
+
+/* Style Tag */
+.beer-style {
+    background: var(--bg-section);
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: var(--radius-sm);
+    font-size: var(--text-xs);
+    color: var(--text-secondary);
+}
+
+/* Scrollbar Styling */
+.beer-list-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.beer-list-content::-webkit-scrollbar-track {
+    background: var(--bg-section);
+    border-radius: 4px;
+}
+
+.beer-list-content::-webkit-scrollbar-thumb {
+    background: var(--purple-gradient);
+    border-radius: 4px;
+}
+
+.beer-list-content::-webkit-scrollbar-thumb:hover {
+    background: var(--purple-border);
+}
+
+/* Add subtle animation when list loads */
+.beer-list-item {
+    animation: slideInUp 0.3s ease-out;
+    animation-fill-mode: both;
+}
+
+.beer-list-item:nth-child(1) { animation-delay: 0.05s; }
+.beer-list-item:nth-child(2) { animation-delay: 0.1s; }
+.beer-list-item:nth-child(3) { animation-delay: 0.15s; }
+.beer-list-item:nth-child(4) { animation-delay: 0.2s; }
+.beer-list-item:nth-child(5) { animation-delay: 0.25s; }
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
