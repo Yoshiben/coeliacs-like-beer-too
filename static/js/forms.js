@@ -103,7 +103,8 @@ export const FormModule = (() => {
     // ================================
     const handleReportSubmission = async (event) => {
         event.preventDefault();
-
+        event.stopPropagation(); // Add this to prevent duplicate submissions
+    
         // Check for nickname first
         let nickname = window.App.getState('userNickname');
         if (!nickname) {
@@ -120,16 +121,25 @@ export const FormModule = (() => {
                 modules.modalManager?.open('nicknameModal');
                 return;
             }
-
+        }
+    
         // Prevent duplicate submissions
         if (state.isSubmitting) {
             console.log('⚠️ Submission already in progress');
             return;
         }
         
+        state.isSubmitting = true; // Set flag immediately
+        
         console.log('📝 Handling report submission...');
         
-        const form = event.target;
+        const form = event.target.closest('form') || document.getElementById('reportForm');
+        if (!form) {
+            console.error('❌ Form not found');
+            state.isSubmitting = false;
+            return;
+        }
+        
         const formData = new FormData(form);
         
         // Collect and validate form data
@@ -141,6 +151,7 @@ export const FormModule = (() => {
         
         if (!validation.isValid) {
             utils.showToast(`❌ Please fill in: ${validation.errors.join(', ')}`, 'error');
+            state.isSubmitting = false; // Reset flag
             return;
         }
         
@@ -173,15 +184,16 @@ export const FormModule = (() => {
     };
     
     const collectReportData = (formData) => {
+        // First try FormData, then fallback to direct element access
         const reportData = {
-            beer_format: formData.get('reportFormat') || document.getElementById('reportFormat')?.value,
-            brewery: formData.get('reportBrewery') || document.getElementById('reportBrewery')?.value,
-            beer_name: formData.get('reportBeerName') || document.getElementById('reportBeerName')?.value,
-            beer_style: formData.get('reportBeerStyle') || document.getElementById('reportBeerStyle')?.value,
-            beer_abv: formData.get('reportBeerABV') || document.getElementById('reportBeerABV')?.value,
-            notes: formData.get('reportNotes') || ''
+            beer_format: formData.get('reportFormat') || document.getElementById('reportFormat')?.value || '',
+            brewery: formData.get('reportBrewery') || document.getElementById('reportBrewery')?.value || '',
+            beer_name: formData.get('reportBeerName') || document.getElementById('reportBeerName')?.value || '',
+            beer_style: formData.get('reportBeerStyle') || document.getElementById('reportBeerStyle')?.value || '',
+            beer_abv: formData.get('reportBeerABV') || document.getElementById('reportBeerABV')?.value || '',
+            notes: formData.get('reportNotes') || document.getElementById('reportNotes')?.value || ''
         };
-
+    
         // ADD THIS: Check for beer_id
         const beerNameInput = document.getElementById('reportBeerName');
         if (beerNameInput?.dataset.beerId) {
@@ -202,7 +214,7 @@ export const FormModule = (() => {
             const addressField = document.getElementById('reportAddress');
             const postcodeField = document.getElementById('reportPostcode');
             
-            reportData.pub_name = pubNameField?.value || formData.get('reportPubName') || 'Unknown Pub';
+            reportData.pub_name = pubNameField?.value || formData.get('reportPubName') || '';
             reportData.address = addressField?.value || formData.get('reportAddress') || '';
             reportData.postcode = postcodeField?.value || formData.get('reportPostcode') || '';
             
