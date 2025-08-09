@@ -412,10 +412,12 @@ html {
 body.page-home .nav-notification-btn { display: flex !important; }
 body.page-results .nav-back-btn,
 body.page-results .nav-toggle { display: flex !important; }
+body.page-search .nav-back-btn { display: flex !important; }
 body.page-map .nav-back-btn,
 body.page-map .nav-toggle { display: block !important; }
 body.page-pub .nav-back-btn { display: flex !important; }
-body.page-search .nav-back-btn { display: flex !important; }
+body.page-breweries .nav-back-btn { display: flex !important; }
+
 
 .bottom-nav {
    position: fixed;
