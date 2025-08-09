@@ -1154,7 +1154,7 @@ export const SearchModule = (function() {
 
     const showResultsOverlay = (title) => {
         console.log('📋 Showing results overlay:', title);
-
+    
         // Clean up any stuck loading toasts first
         ensureLoadingToastHidden();
         
@@ -1187,10 +1187,11 @@ export const SearchModule = (function() {
             onOpen: () => {
                 console.log('✅ Results overlay opened via ModalManager');
                 
-                // Update navigation context
+                // Update navigation context - THIS IS THE KEY FIX
                 const navModule = window.App?.getModule('nav');
+                navModule?.setPageContext('results'); // ADD THIS LINE
                 navModule?.showResultsWithContext();
-
+    
                 // ADD THE BUTTON TO THE ACTUAL STRUCTURE
                 setTimeout(() => {
                     const resultsContainer = document.querySelector('.results-container');
