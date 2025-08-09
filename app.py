@@ -490,7 +490,7 @@ def submit_beer_update():
                 beer_id = cursor.lastrowid
                 logger.info(f"Added new beer: {brewery} - {beer_name} (ID: {beer_id})")
         
-        beer_abv = data.get('beer_abv')
+            beer_abv = data.get('beer_abv')
             if beer_abv:
                 try:
                     beer_abv = float(beer_abv)
@@ -908,6 +908,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
