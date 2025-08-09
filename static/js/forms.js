@@ -121,7 +121,7 @@ export const FormModule = (() => {
                 modules.modalManager?.open('nicknameModal');
                 return;
             }
-        }
+        } // <-- This closing brace was missing!
     
         // Prevent duplicate submissions
         if (state.isSubmitting) {
@@ -179,8 +179,7 @@ export const FormModule = (() => {
         } finally {
             state.currentSubmission = null;
             state.isSubmitting = false;
-        }    
-        };
+        }
     };
     
     const collectReportData = (formData) => {
