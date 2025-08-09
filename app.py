@@ -490,13 +490,20 @@ def submit_beer_update():
                 beer_id = cursor.lastrowid
                 logger.info(f"Added new beer: {brewery} - {beer_name} (ID: {beer_id})")
         
-        # STEP 2: Insert submission - AUTO-APPROVED!
+        beer_abv = data.get('beer_abv')
+            if beer_abv:
+                try:
+                    beer_abv = float(beer_abv)
+                except (ValueError, TypeError):
+                    beer_abv = None
+                
+            # STEP 2: Insert submission - AUTO-APPROVED!
         cursor.execute("""
             INSERT INTO submissions (
                 pub_id, beer_id, brewery, beer_name, beer_style, beer_abv, 
-                format, submitted_at, submitted_by, status, notes
+                format, submitted_at, submitted_by, status
             ) VALUES (
-                %s, %s, %s, %s, %s, %s, %s, NOW(), %s, 'approved', %s
+                %s, %s, %s, %s, %s, %s, %s, NOW(), %s, 'approved'
             )
         """, (
             data.get('pub_id'),
@@ -504,10 +511,9 @@ def submit_beer_update():
             brewery,
             beer_name,
             data.get('beer_style'),
-            data.get('beer_abv'),
-            data.get('beer_format'),
-            user_info['submitted_by'],
-            data.get('notes', '')
+            beer_abv,  # Use the validated value
+            data.get('format') or data.get('beer_format'),  # Handle both field names
+            user_info['submitted_by']
         ))
         
         submission_id = cursor.lastrowid
@@ -902,6 +908,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
