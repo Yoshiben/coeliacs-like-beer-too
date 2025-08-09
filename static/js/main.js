@@ -513,8 +513,6 @@ const App = {
         'back-to-results': (el, modules) => {
             modules.nav?.goBackFromPub();
         },
-        
-        // In main.js actionHandlers - update nav-back
         'nav-back': (el, modules) => {
             const currentContext = modules.nav?.getCurrentContext();
             console.log('🔙 Navigating back from:', currentContext);
@@ -524,28 +522,34 @@ const App = {
                 App.handleAction('close-search', el, modules);
             } else if (currentContext === 'pub') {
                 modules.nav?.goBackFromPub();
+            } else if (currentContext === 'results') {
+                // ADD THIS: Handle going back from results
+                modules.nav?.goToHome();
             } else if (currentContext === 'map') {
-            const mapReturnContext = App.getState('mapReturnContext');
-            console.log('🔙 Map return context:', mapReturnContext);
-            
-            modules.modalManager?.close('fullMapOverlay');
-            
-            if (mapReturnContext === 'search') {
-                // Go back to search
-                setTimeout(() => {
-                    modules.modalManager?.open('searchOverlay');
-                    modules.nav?.showSearchWithContext();
-                }, 100);
-            } else if (mapReturnContext === 'pub') {
-                const currentPub = App.getState(STATE_KEYS.CURRENT_PUB);
-                if (currentPub) {
-                    modules.search?.showPubDetails(currentPub.pub_id);
+                const mapReturnContext = App.getState('mapReturnContext');
+                console.log('🔙 Map return context:', mapReturnContext);
+                
+                modules.modalManager?.close('fullMapOverlay');
+                
+                if (mapReturnContext === 'search') {
+                    // Go back to search
+                    setTimeout(() => {
+                        modules.modalManager?.open('searchOverlay');
+                        modules.nav?.showSearchWithContext();
+                    }, 100);
+                } else if (mapReturnContext === 'pub') {
+                    const currentPub = App.getState(STATE_KEYS.CURRENT_PUB);
+                    if (currentPub) {
+                        modules.search?.showPubDetails(currentPub.pub_id);
+                    } else {
+                        modules.nav?.goToHome();
+                    }
                 } else {
                     modules.nav?.goToHome();
                 }
             } else {
+                // Default: go home
                 modules.nav?.goToHome();
-            }
             }
         },
         'close-modal': (el, modules) => {
