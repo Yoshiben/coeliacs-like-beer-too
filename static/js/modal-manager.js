@@ -145,7 +145,7 @@ export const ModalManager = (() => {
         
         // Handle exclusive groups
         if (config.exclusive && config.group) {
-            // Close all overlays in the same group
+            // Close ALL overlays in the same group (not just active ones)
             const overlaysToClose = state.activeOverlays.filter(id => {
                 const overlayConfig = registry[id];
                 return overlayConfig && overlayConfig.group === config.group && id !== overlayId;
@@ -155,6 +155,22 @@ export const ModalManager = (() => {
                 console.log(`🔒 Closing ${id} to open ${overlayId}`);
                 closeOverlay(id);
             });
+            
+            // IMPORTANT: Also close any overlay that's visually shown but not in our state
+            if (config.group === 'primary') {
+                // Manually ensure all primary overlays are hidden
+                const primaryOverlays = ['searchOverlay', 'resultsOverlay', 'fullMapOverlay', 'pubDetailsOverlay', 'breweriesOverlay'];
+                primaryOverlays.forEach(id => {
+                    if (id !== overlayId) {
+                        const overlay = document.getElementById(id);
+                        if (overlay && (overlay.style.display === 'flex' || overlay.classList.contains('active'))) {
+                            console.log(`🧹 Force closing ${id}`);
+                            overlay.style.display = 'none';
+                            overlay.classList.remove('active');
+                        }
+                    }
+                });
+            }
         }
         
         const overlay = document.getElementById(overlayId);
