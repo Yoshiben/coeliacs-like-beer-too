@@ -1,5 +1,5 @@
 # ================================================================================
-# COELIACS LIKE BEER TOO - UPDATED APP.PY FOR NEW SCHEMA
+# COELIACS LIKE BEER TOO - UPDATED APP.PY FOR OSM SCHEMA
 # ================================================================================
 
 from flask import Flask, request, jsonify, render_template
@@ -83,36 +83,38 @@ def autocomplete():
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor(dictionary=True)
         
-        # Build search condition
+        # Build search condition for new schema
         if search_type == 'name':
-            search_condition = "p.name LIKE %s"
+            search_condition = "v.name LIKE %s"
             params = (f'%{query}%',)
         elif search_type == 'postcode':
-            search_condition = "p.postcode LIKE %s"
+            search_condition = "v.postcode LIKE %s"
             params = (f'%{query}%',)
         elif search_type == 'area':
-            search_condition = "p.local_authority LIKE %s"
+            search_condition = "v.city LIKE %s"  # Changed from local_authority to city
             params = (f'%{query}%',)
         else:
-            search_condition = "(p.name LIKE %s OR p.postcode LIKE %s OR p.local_authority LIKE %s OR p.address LIKE %s)"
+            search_condition = "(v.name LIKE %s OR v.postcode LIKE %s OR v.city LIKE %s OR v.address LIKE %s)"
             params = (f'%{query}%', f'%{query}%', f'%{query}%', f'%{query}%')
         
         # Updated query for new schema
         sql = f"""
-            SELECT p.pub_id, p.name, p.address, p.postcode
-            FROM pubs p
-            LEFT JOIN pub_gf_status s ON p.pub_id = s.pub_id
+            SELECT v.venue_id, v.name, 
+                   CONCAT_WS(', ', v.housenumber, v.street, v.city) as address, 
+                   v.postcode
+            FROM venues v
+            LEFT JOIN gf_status s ON v.venue_id = s.venue_id
             WHERE {search_condition}
         """
         
         if gf_only:
-            sql += " AND s.status IN ('always', 'currently')"
+            sql += " AND s.status IN ('always_tap_cask', 'always_bottle_can', 'currently')"
         
-        sql += " ORDER BY p.name LIMIT 100"
+        sql += " ORDER BY v.name LIMIT 100"
         cursor.execute(sql, params)
-        pubs = cursor.fetchall()
+        venues = cursor.fetchall()
         
-        return jsonify(pubs)
+        return jsonify(venues)
         
     except mysql.connector.Error as e:
         logger.error(f"Database error in autocomplete: {str(e)}")
@@ -124,7 +126,7 @@ def autocomplete():
 
 @app.route('/nearby')
 def nearby():
-    """Find nearby pubs with new schema"""
+    """Find nearby venues with new schema"""
     lat = request.args.get('lat', type=float)
     lng = request.args.get('lng', type=float)
     radius = request.args.get('radius', 5, type=int)
@@ -145,23 +147,26 @@ def nearby():
 
         sql = """
             SELECT DISTINCT
-                p.pub_id, p.name, p.address, p.postcode, p.local_authority, 
-                p.latitude, p.longitude,
+                v.venue_id, v.name, 
+                CONCAT_WS(', ', v.housenumber, v.street, v.city) as address, 
+                v.postcode, v.city as local_authority,
+                v.latitude, v.longitude,
                 COALESCE(s.status, 'unknown') as gf_status,
-                (6371 * acos(cos(radians(%s)) * cos(radians(p.latitude)) * 
-                cos(radians(p.longitude) - radians(%s)) + sin(radians(%s)) * 
-                sin(radians(p.latitude)))) AS distance,
+                (6371 * acos(cos(radians(%s)) * cos(radians(v.latitude)) * 
+                cos(radians(v.longitude) - radians(%s)) + sin(radians(%s)) * 
+                sin(radians(v.latitude)))) AS distance,
                 GROUP_CONCAT(
-                            DISTINCT CONCAT(sub.format, ' - ', 
-                            COALESCE(sub.brewery, 'Unknown'), ' ', 
-                            COALESCE(sub.beer_name, 'Unknown'), ' (', 
-                            COALESCE(sub.beer_style, 'Unknown'), ')')
-                            SEPARATOR ', '
-                        ) as beer_details
-            FROM pubs p
-            LEFT JOIN pub_gf_status s ON p.pub_id = s.pub_id
-            LEFT JOIN submissions sub ON p.pub_id = sub.pub_id 
-            WHERE p.latitude IS NOT NULL AND p.longitude IS NOT NULL
+                    DISTINCT CONCAT(vb.format, ' - ', 
+                    COALESCE(b.brewery, 'Unknown'), ' ', 
+                    COALESCE(b.name, 'Unknown'), ' (', 
+                    COALESCE(b.style, 'Unknown'), ')')
+                    SEPARATOR ', '
+                ) as beer_details
+            FROM venues v
+            LEFT JOIN gf_status s ON v.venue_id = s.venue_id
+            LEFT JOIN venue_beers vb ON v.venue_id = vb.venue_id
+            LEFT JOIN beers b ON vb.beer_id = b.beer_id
+            WHERE v.latitude IS NOT NULL AND v.longitude IS NOT NULL
         """
         params = [lat, lng, lat]
         
@@ -169,7 +174,7 @@ def nearby():
             sql += " AND s.status IN ('always_tap_cask', 'always_bottle_can', 'currently')"
         
         sql += """
-            GROUP BY p.pub_id
+            GROUP BY v.venue_id
             HAVING distance <= %s
             ORDER BY distance
             LIMIT 50
@@ -177,9 +182,9 @@ def nearby():
         params.append(radius)
         
         cursor.execute(sql, params)
-        pubs = cursor.fetchall()
+        venues = cursor.fetchall()
         
-        return jsonify(pubs)
+        return jsonify(venues)
         
     except mysql.connector.Error as e:
         logger.error(f"Database error in nearby search: {str(e)}")
@@ -196,7 +201,7 @@ def search():
     search_type = request.args.get('search_type', 'all')
     gf_only = request.args.get('gf_only', 'false').lower() == 'true'
     page = request.args.get('page', 1, type=int)
-    pub_id = request.args.get('pub_id', type=int)
+    venue_id = request.args.get('venue_id', type=int)  # Changed from pub_id
     
     if query and (len(query) < 1 or len(query) > 100):
         return jsonify({'error': 'Invalid query length'}), 400
@@ -208,29 +213,32 @@ def search():
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor(dictionary=True)
         
-        # Handle specific pub ID search
-        if pub_id:
+        # Handle specific venue ID search
+        if venue_id:
             sql = """
                 SELECT DISTINCT
-                    p.pub_id, p.name, p.address, p.postcode, p.local_authority, 
-                    p.latitude, p.longitude,
+                    v.venue_id, v.name, 
+                    CONCAT_WS(', ', v.housenumber, v.street, v.city) as address, 
+                    v.postcode, v.city as local_authority,
+                    v.latitude, v.longitude,
                     COALESCE(s.status, 'unknown') as gf_status,
                     GROUP_CONCAT(
-                            DISTINCT CONCAT(sub.format, ' - ', 
-                            COALESCE(sub.brewery, 'Unknown'), ' ', 
-                            COALESCE(sub.beer_name, 'Unknown'), ' (', 
-                            COALESCE(sub.beer_style, 'Unknown'), ')')
-                            SEPARATOR ', '
-                        ) as beer_details
-                FROM pubs p
-                LEFT JOIN pub_gf_status s ON p.pub_id = s.pub_id
-                LEFT JOIN submissions sub ON p.pub_id = sub.pub_id 
-                WHERE p.pub_id = %s
-                GROUP BY p.pub_id
+                        DISTINCT CONCAT(vb.format, ' - ', 
+                        COALESCE(b.brewery, 'Unknown'), ' ', 
+                        COALESCE(b.name, 'Unknown'), ' (', 
+                        COALESCE(b.style, 'Unknown'), ')')
+                        SEPARATOR ', '
+                    ) as beer_details
+                FROM venues v
+                LEFT JOIN gf_status s ON v.venue_id = s.venue_id
+                LEFT JOIN venue_beers vb ON v.venue_id = vb.venue_id
+                LEFT JOIN beers b ON vb.beer_id = b.beer_id
+                WHERE v.venue_id = %s
+                GROUP BY v.venue_id
             """
-            cursor.execute(sql, (pub_id,))
-            pubs = cursor.fetchall()
-            return jsonify(pubs)
+            cursor.execute(sql, (venue_id,))
+            venues = cursor.fetchall()
+            return jsonify(venues)
         
         # Regular search logic
         if not query:
@@ -238,23 +246,23 @@ def search():
         
         # Build search condition
         if search_type == 'name':
-            search_condition = "p.name LIKE %s"
+            search_condition = "v.name LIKE %s"
             params = [f'%{query}%']
         elif search_type == 'postcode':
-            search_condition = "p.postcode LIKE %s"
+            search_condition = "v.postcode LIKE %s"
             params = [f'%{query}%']
         elif search_type == 'area':
-            search_condition = "p.local_authority LIKE %s"
+            search_condition = "v.city LIKE %s"  # Changed from local_authority
             params = [f'%{query}%']
         else:
-            search_condition = "(p.name LIKE %s OR p.postcode LIKE %s OR p.local_authority LIKE %s OR p.address LIKE %s)"
+            search_condition = "(v.name LIKE %s OR v.postcode LIKE %s OR v.city LIKE %s OR v.address LIKE %s)"
             params = [f'%{query}%', f'%{query}%', f'%{query}%', f'%{query}%']
         
         # Count total results
         count_sql = f"""
-            SELECT COUNT(DISTINCT p.pub_id) as total
-            FROM pubs p
-            LEFT JOIN pub_gf_status s ON p.pub_id = s.pub_id
+            SELECT COUNT(DISTINCT v.venue_id) as total
+            FROM venues v
+            LEFT JOIN gf_status s ON v.venue_id = s.venue_id
             WHERE {search_condition}
         """
         
@@ -269,22 +277,25 @@ def search():
         total_pages = (total_results + per_page - 1) // per_page
         offset = (page - 1) * per_page
         
-        # Main search query - FIXED
+        # Main search query
         sql = f"""
             SELECT DISTINCT
-                p.pub_id, p.name, p.address, p.postcode, p.local_authority, 
-                p.latitude, p.longitude,
+                v.venue_id, v.name, 
+                CONCAT_WS(', ', v.housenumber, v.street, v.city) as address, 
+                v.postcode, v.city as local_authority,
+                v.latitude, v.longitude,
                 COALESCE(s.status, 'unknown') as gf_status,
                 GROUP_CONCAT(
-                        DISTINCT CONCAT(sub.format, ' - ', 
-                        COALESCE(sub.brewery, 'Unknown'), ' ', 
-                        COALESCE(sub.beer_name, 'Unknown'), ' (', 
-                        COALESCE(sub.beer_style, 'Unknown'), ')')
-                        SEPARATOR ', '
-                        ) as beer_details
-            FROM pubs p
-            LEFT JOIN pub_gf_status s ON p.pub_id = s.pub_id
-            LEFT JOIN submissions sub ON p.pub_id = sub.pub_id 
+                    DISTINCT CONCAT(vb.format, ' - ', 
+                    COALESCE(b.brewery, 'Unknown'), ' ', 
+                    COALESCE(b.name, 'Unknown'), ' (', 
+                    COALESCE(b.style, 'Unknown'), ')')
+                    SEPARATOR ', '
+                ) as beer_details
+            FROM venues v
+            LEFT JOIN gf_status s ON v.venue_id = s.venue_id
+            LEFT JOIN venue_beers vb ON v.venue_id = vb.venue_id
+            LEFT JOIN beers b ON vb.beer_id = b.beer_id
             WHERE {search_condition}
         """
         
@@ -292,17 +303,21 @@ def search():
             sql += " AND s.status IN ('always_tap_cask', 'always_bottle_can', 'currently')"
         
         sql += """
-            GROUP BY p.pub_id
-            ORDER BY p.name
+            GROUP BY v.venue_id
+            ORDER BY v.name
             LIMIT %s OFFSET %s
         """
         
         params.extend([per_page, offset])
         cursor.execute(sql, params)
-        pubs = cursor.fetchall()
+        venues = cursor.fetchall()
+        
+        # Map results to use pub_id for backwards compatibility
+        for venue in venues:
+            venue['pub_id'] = venue['venue_id']
         
         return jsonify({
-            'pubs': pubs,
+            'pubs': venues,  # Keep as 'pubs' for frontend compatibility
             'pagination': {
                 'page': page,
                 'pages': total_pages,
@@ -331,32 +346,32 @@ def get_stats():
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor()
         
-        # Total pubs
-        cursor.execute("SELECT COUNT(*) as total FROM pubs")
-        total_pubs = cursor.fetchone()[0]
+        # Total venues
+        cursor.execute("SELECT COUNT(*) as total FROM venues")
+        total_venues = cursor.fetchone()[0]
         
-        # Pubs with GF options
+        # Venues with GF options
         cursor.execute("""
-            SELECT COUNT(DISTINCT pub_id) as gf_total 
-            FROM pub_gf_status 
+            SELECT COUNT(DISTINCT venue_id) as gf_total 
+            FROM gf_status 
             WHERE status IN ('always_tap_cask','always_bottle_can', 'currently')
         """)
-        gf_pubs = cursor.fetchone()[0]
+        gf_venues = cursor.fetchone()[0]
 
-        # Pubs with GF options this month
+        # Venues with GF options this month
         cursor.execute("""
-            SELECT COUNT(DISTINCT pub_id) as gf_total_this_month
-            FROM pub_gf_status 
+            SELECT COUNT(DISTINCT venue_id) as gf_total_this_month
+            FROM gf_status 
             WHERE status IN ('always_tap_cask','always_bottle_can', 'currently')
             AND YEAR(updated_at) = YEAR(CURRENT_DATE())
             AND MONTH(updated_at) = MONTH(CURRENT_DATE())
         """)
-        gf_pubs_this_month = cursor.fetchone()[0]
+        gf_venues_this_month = cursor.fetchone()[0]
         
         return jsonify({
-            'total_pubs': total_pubs,
-            'gf_pubs': gf_pubs,
-            'gf_pubs_this_month': gf_pubs_this_month
+            'total_pubs': total_venues,  # Keep as total_pubs for frontend
+            'gf_pubs': gf_venues,
+            'gf_pubs_this_month': gf_venues_this_month
         })
         
     except Exception as e:
@@ -444,10 +459,9 @@ def get_brewery_beers(brewery_name):
             cursor.close()
             conn.close()
 
-
 @app.route('/api/submit_beer_update', methods=['POST'])
 def submit_beer_update():
-    """Submit beer report - simplified, no validation tiers"""
+    """Submit beer report - updated for new schema"""
     try:
         data = request.get_json()
         
@@ -477,54 +491,70 @@ def submit_beer_update():
             if existing_beer:
                 beer_id = existing_beer['beer_id']
             else:
-                # Add new beer
+                # Add new beer - need to generate next ID
+                cursor.execute("SELECT MAX(beer_id) as max_id FROM beers")
+                max_id = cursor.fetchone()['max_id'] or 0
+                beer_id = max_id + 1
+                
                 cursor.execute("""
-                    INSERT INTO beers (brewery, name, style, abv, gluten_status)
-                    VALUES (%s, %s, %s, %s, 'certified_gf')
+                    INSERT INTO beers (beer_id, brewery, name, style, abv, gluten_status)
+                    VALUES (%s, %s, %s, %s, %s, 'gluten_removed')
                 """, (
+                    beer_id,
                     brewery,
                     beer_name,
                     data.get('beer_style'),
                     data.get('beer_abv')
                 ))
-                beer_id = cursor.lastrowid
                 logger.info(f"Added new beer: {brewery} - {beer_name} (ID: {beer_id})")
         
-            beer_abv = data.get('beer_abv')
-            if beer_abv:
-                try:
-                    beer_abv = float(beer_abv)
-                except (ValueError, TypeError):
-                    beer_abv = None
-                
-            # STEP 2: Insert submission - AUTO-APPROVED!
-        cursor.execute("""
-            INSERT INTO submissions (
-                pub_id, beer_id, brewery, beer_name, beer_style, beer_abv, 
-                format, submitted_at, submitted_by, status
-            ) VALUES (
-                %s, %s, %s, %s, %s, %s, %s, NOW(), %s, 'approved'
-            )
-        """, (
-            data.get('pub_id'),
-            beer_id,
-            brewery,
-            beer_name,
-            data.get('beer_style'),
-            beer_abv,  # Use the validated value
-            data.get('format') or data.get('beer_format'),  # Handle both field names
-            user_info['submitted_by']
-        ))
+        beer_abv = data.get('beer_abv')
+        if beer_abv:
+            try:
+                beer_abv = float(beer_abv)
+            except (ValueError, TypeError):
+                beer_abv = None
         
-        submission_id = cursor.lastrowid
+        # STEP 2: Insert into venue_beers - AUTO-APPROVED!
+        venue_id = data.get('pub_id')  # Frontend still sends pub_id
+        format_type = data.get('format') or data.get('beer_format')
+        
+        # Check if this beer is already reported for this venue
+        cursor.execute("""
+            SELECT report_id FROM venue_beers 
+            WHERE venue_id = %s AND beer_id = %s AND format = %s
+        """, (venue_id, beer_id, format_type))
+        
+        existing_report = cursor.fetchone()
+        
+        if existing_report:
+            # Update existing report
+            cursor.execute("""
+                UPDATE venue_beers 
+                SET last_seen = CURRENT_DATE, 
+                    times_reported = times_reported + 1
+                WHERE report_id = %s
+            """, (existing_report['report_id'],))
+            report_id = existing_report['report_id']
+        else:
+            # Insert new report
+            cursor.execute("""
+                INSERT INTO venue_beers (
+                    venue_id, beer_id, format, added_by
+                ) VALUES (
+                    %s, %s, %s, %s
+                )
+            """, (venue_id, beer_id, format_type, user_info['submitted_by']))
+            report_id = cursor.lastrowid
+        
         conn.commit()
         
         return jsonify({
             'success': True,
             'message': '🎉 Beer report added successfully!',
-            'submission_id': submission_id,
+            'report_id': report_id,
             'beer_id': beer_id,
-            'status': 'approved'  # Always approved now!
+            'status': 'approved'
         })
         
     except Exception as e:
@@ -542,14 +572,14 @@ def submit_beer_update():
 
 @app.route('/api/update-gf-status', methods=['POST'])
 def update_gf_status():
-    """Update GF status using stored procedure"""
+    """Update GF status using new schema"""
     try:
         data = request.get_json()
-        pub_id = data.get('pub_id')
+        venue_id = data.get('pub_id')  # Frontend still sends pub_id
         status = data.get('status')
         
-        if not pub_id or not status:
-            return jsonify({'error': 'Missing pub_id or status'}), 400
+        if not venue_id or not status:
+            return jsonify({'error': 'Missing venue_id or status'}), 400
             
         # Updated to include new 5-tier statuses
         valid_statuses = ['always_tap_cask', 'always_bottle_can', 'currently', 'not_currently', 'unknown']
@@ -560,25 +590,25 @@ def update_gf_status():
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor()
         
-       # Update the GF status directly
+        # Update the GF status directly
         cursor.execute("""
-            UPDATE pub_gf_status 
+            UPDATE gf_status 
             SET status = %s,
                 updated_at = NOW(),
                 updated_by = 'user'
-            WHERE pub_id = %s
-        """, (status, pub_id))
+            WHERE venue_id = %s
+        """, (status, venue_id))
         
         # If no rows updated, insert new record
         if cursor.rowcount == 0:
             cursor.execute("""
-                INSERT INTO pub_gf_status (pub_id, status, updated_at, updated_by)
+                INSERT INTO gf_status (venue_id, status, updated_at, updated_by)
                 VALUES (%s, %s, NOW(), 'user')
-            """, (pub_id, status))
+            """, (venue_id, status))
         
         conn.commit()
         
-        logger.info(f"Updated pub {pub_id} GF status to {status}")
+        logger.info(f"Updated venue {venue_id} GF status to {status}")
         
         return jsonify({
             'success': True,
@@ -598,7 +628,7 @@ def update_gf_status():
 
 @app.route('/api/all-pubs')
 def get_all_pubs_for_map():
-    """Get all pubs with coordinates for map display"""
+    """Get all venues with coordinates for map display"""
     try:
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor(dictionary=True)
@@ -606,62 +636,46 @@ def get_all_pubs_for_map():
         # Updated query for new schema
         cursor.execute("""
             SELECT 
-                p.pub_id, p.name, p.address, p.postcode, p.local_authority,
-                p.latitude, p.longitude,
+                v.venue_id as pub_id, v.name, 
+                CONCAT_WS(', ', v.housenumber, v.street, v.city) as address, 
+                v.postcode, v.city as local_authority,
+                v.latitude, v.longitude,
                 COALESCE(s.status, 'unknown') as gf_status
-            FROM pubs p
-            LEFT JOIN pub_gf_status s ON p.pub_id = s.pub_id
-            WHERE p.latitude IS NOT NULL AND p.longitude IS NOT NULL 
-            AND p.latitude != 0 AND p.longitude != 0            
+            FROM venues v
+            LEFT JOIN gf_status s ON v.venue_id = s.venue_id
+            WHERE v.latitude IS NOT NULL AND v.longitude IS NOT NULL 
+            AND v.latitude != 0 AND v.longitude != 0            
             ORDER BY s.status ASC
             LIMIT 1000
         """)
         
-        pubs = cursor.fetchall()
+        venues = cursor.fetchall()
         
         return jsonify({
             'success': True,
-            'pubs': pubs,
-            'total': len(pubs)
+            'pubs': venues,  # Keep as 'pubs' for frontend
+            'total': len(venues)
         })
         
     except Exception as e:
-        logger.error(f"Error fetching all pubs: {str(e)}")
+        logger.error(f"Error fetching all venues: {str(e)}")
         return jsonify({
             'success': False,
-            'error': 'Failed to load pubs'
+            'error': 'Failed to load venues'
         }), 500
     finally:
         if 'conn' in locals() and conn.is_connected():
             cursor.close()
             conn.close()
 
-@app.route('/api/breweries')
-def api_breweries():
-    """Get unique brewery names from beers data"""
-    try:
-        # Query unique breweries from your beers data
-        result = supabase.table('beers')\
-            .select('brewery')\
-            .execute()
-        
-        # Extract unique brewery names
-        breweries = list(set(beer['brewery'] for beer in result.data if beer.get('brewery')))
-        breweries.sort()
-        
-        return jsonify(breweries)
-    except Exception as e:
-        logger.error(f"Error fetching breweries: {e}")
-        return jsonify([]), 500
-
 @app.route('/api/add-pub', methods=['POST'])
 def add_pub():
-    """Add a new pub to the database"""
+    """Add a new venue to the database"""
     try:
         data = request.get_json()
         
         # Log incoming data for debugging
-        logger.info(f"Add pub request: {data}")
+        logger.info(f"Add venue request: {data}")
         
         # Validate required fields
         required_fields = ['name', 'address', 'postcode']
@@ -676,9 +690,9 @@ def add_pub():
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor()
         
-        # Check if pub already exists
+        # Check if venue already exists
         cursor.execute("""
-            SELECT pub_id FROM pubs 
+            SELECT venue_id FROM venues 
             WHERE LOWER(name) = LOWER(%s) AND postcode = %s
         """, (data['name'], data['postcode']))
         
@@ -686,49 +700,55 @@ def add_pub():
         if existing:
             return jsonify({
                 'success': False,
-                'error': 'A pub with this name and postcode already exists',
-                'pub_id': existing[0]
+                'error': 'A venue with this name and postcode already exists',
+                'pub_id': existing[0]  # Return as pub_id for frontend
             }), 409
         
         # Get the submitted_by value (nickname or 'anonymous')
         submitted_by = data.get('submitted_by', 'anonymous')
         
-        # Insert new pub with created_by field
+        # Parse the address to extract components
+        address_parts = data['address'].split(',')
+        street = address_parts[0].strip() if len(address_parts) > 0 else ''
+        city = address_parts[-1].strip() if len(address_parts) > 1 else ''
+        
+        # Insert new venue
         cursor.execute("""
-            INSERT INTO pubs (
-                name, address, postcode, 
-                latitude, longitude, 
-                local_authority, created_by
+            INSERT INTO venues (
+                name, street, city, postcode, 
+                address, latitude, longitude, 
+                venue_type, created_by
             ) VALUES (
-                %s, %s, %s, %s, %s, %s, %s
+                %s, %s, %s, %s, %s, %s, %s, 'pub', %s
             )
         """, (
             data['name'],
-            data['address'],
+            street,
+            city,
             data['postcode'],
+            data['address'],
             data.get('latitude'),
             data.get('longitude'),
-            data.get('local_authority', ''),
             submitted_by
         ))
         
-        pub_id = cursor.lastrowid
+        venue_id = cursor.lastrowid
         
         # Add initial GF status as unknown
         cursor.execute("""
-            INSERT INTO pub_gf_status (pub_id, status, updated_at, updated_by)
+            INSERT INTO gf_status (venue_id, status, updated_at, updated_by)
             VALUES (%s, 'unknown', NOW(), %s)
-        """, (pub_id, submitted_by))
+        """, (venue_id, submitted_by))
         
         conn.commit()
         
         # Log the addition
-        logger.info(f"New pub added: {data['name']} (ID: {pub_id}) by {submitted_by}")
+        logger.info(f"New venue added: {data['name']} (ID: {venue_id}) by {submitted_by}")
         
         return jsonify({
             'success': True,
             'message': f'{data["name"]} added successfully!',
-            'pub_id': pub_id,
+            'pub_id': venue_id,  # Return as pub_id for frontend
             'name': data['name']
         })
         
@@ -738,7 +758,7 @@ def add_pub():
             conn.rollback()
         return jsonify({
             'success': False,
-            'error': 'This pub may already exist in our database'
+            'error': 'This venue may already exist in our database'
         }), 409
         
     except mysql.connector.Error as e:
@@ -759,13 +779,14 @@ def add_pub():
             conn.rollback()
         return jsonify({
             'success': False,
-            'error': 'Failed to add pub. Please try again.'
+            'error': 'Failed to add venue. Please try again.'
         }), 500
         
     finally:
         if 'conn' in locals() and conn.is_connected():
             cursor.close()
             conn.close()
+
 # ================================================================================
 # ADMIN ROUTES
 # ================================================================================
@@ -779,6 +800,7 @@ def admin_dashboard():
         return "🔒 Access denied. Admin token required.", 403
     
     return render_template('admin.html')
+
 @app.route('/api/admin/stats')
 @admin_required
 def get_admin_stats():
@@ -787,25 +809,25 @@ def get_admin_stats():
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor(dictionary=True)
         
-        # Total submissions
-        cursor.execute("SELECT COUNT(*) as count FROM submissions")
-        total_submissions = cursor.fetchone()['count']
+        # Total venue_beers reports
+        cursor.execute("SELECT COUNT(*) as count FROM venue_beers")
+        total_reports = cursor.fetchone()['count']
         
-        # Today's submissions
+        # Today's reports
         cursor.execute("""
             SELECT COUNT(*) as count 
-            FROM submissions
-            WHERE DATE(submitted_at) = CURDATE()
+            FROM venue_beers
+            WHERE DATE(added_at) = CURDATE()
         """)
-        today_submissions = cursor.fetchone()['count']
+        today_reports = cursor.fetchone()['count']
         
         # Total beers
         cursor.execute("SELECT COUNT(*) as count FROM beers")
         total_beers = cursor.fetchone()['count']
         
         return jsonify({
-            'total_submissions': total_submissions,
-            'today_submissions': today_submissions,
+            'total_submissions': total_reports,
+            'today_submissions': today_reports,
             'total_beers': total_beers
         })
         
@@ -908,10 +930,3 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
-
-
-
-
-
-
-
