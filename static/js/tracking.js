@@ -199,13 +199,13 @@ export const TrackingModule = (function() {
         }
     };
     
-    const trackPubView = (pubName, pubId) => {
-        trackEvent('pub_view', 'Content', pubName);
+    const trackVenueView = (venueName, venueId) => {
+        trackEvent('venue_view', 'Content', venueName);
         
         // Track engagement depth
         const searchType = window.App.getState(STATE_KEYS.LAST_SEARCH.TYPE);
         if (searchType) {
-            trackEvent('search_to_pub_view', 'User Flow', searchType);
+            trackEvent('search_to_venue_view', 'User Flow', searchType);
         }
     };
     
@@ -376,7 +376,7 @@ export const TrackingModule = (function() {
         
         // Specialized tracking
         trackSearch,
-        trackPubView,
+        trackVenueView,
         trackMapInteraction,
         trackFormSubmission,
         trackExternalLink,
