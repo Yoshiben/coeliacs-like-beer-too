@@ -514,9 +514,12 @@ const App = {
         'back-to-results': (el, modules) => {
             modules.nav?.goBackFromVenue();
         },
+
+        
         'nav-back': (el, modules) => {
             const currentContext = modules.nav?.getCurrentContext();
-            console.log('🔙 Navigating back from:', currentContext);
+            const previousContext = modules.nav?.getPreviousContext();
+            console.log('🔙 Navigating back from:', currentContext, 'to:', previousContext);
             
             if (currentContext === 'search') {
                 // Use the existing close-search logic
@@ -524,9 +527,19 @@ const App = {
             } else if (currentContext === 'venue') {
                 modules.nav?.goBackFromVenue();
             } else if (currentContext === 'results') {
-                modules.nav?.goToHome();
+                // Go back to search, not home
+                modules.modalManager?.close('resultsOverlay');
+                setTimeout(() => {
+                    modules.modalManager?.open('searchOverlay');
+                    // If it was a location search, reopen distance modal
+                    const lastSearch = window.App.getState(STATE_KEYS.LAST_SEARCH);
+                    if (lastSearch && lastSearch.type === 'nearby') {
+                        setTimeout(() => {
+                            modules.modalManager?.open('distanceModal');
+                        }, 100);
+                    }
+                }, 100);
             } else if (currentContext === 'breweries') {
-                // Close breweries and go home
                 modules.modalManager?.close('breweriesOverlay');
                 modules.nav?.goToHome();
             } else if (currentContext === 'map') {
@@ -536,7 +549,6 @@ const App = {
                 modules.modalManager?.close('fullMapOverlay');
                 
                 if (mapReturnContext === 'search') {
-                    // Go back to search
                     setTimeout(() => {
                         modules.modalManager?.open('searchOverlay');
                         modules.nav?.showSearchWithContext();
@@ -556,6 +568,8 @@ const App = {
                 modules.nav?.goToHome();
             }
         },
+
+        
         'close-modal': (el, modules) => {
             const modal = el.closest('.modal, .search-modal, .report-modal');
             if (modal?.id) {
@@ -875,8 +889,11 @@ const App = {
         'open-search': (el, modules) => {
             console.log('🔍 Opening search overlay');
             
-            // Close any open overlays first
+            // Store where we came from
             const currentContext = modules.nav?.getCurrentContext();
+            window.App.setState('searchReturnContext', currentContext);
+            
+            // Close any open overlays first
             if (currentContext === 'map') {
                 modules.modalManager?.close('fullMapOverlay');
             } else if (currentContext === 'venue') {
