@@ -51,7 +51,7 @@ export const ModalManager = (() => {
         beerDetailsPromptModal: { type: 'modal', group: 'status', stackable: true, order: 3 },
         
         // Form modals
-        reportModal: { type: 'modal', group: 'form', exclusive: true },
+        reportModal: { type: 'modal', group: 'form', exclusive: true, priority: false },
         placesSearchModal: { type: 'modal', group: 'form', exclusive: true },
         venueAddedPromptModal: { type: 'modal', group: 'form', exclusive: true },
         
