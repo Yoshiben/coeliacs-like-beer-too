@@ -1,5 +1,5 @@
 // ================================================================================
-// HELPERS.JS - Complete Refactor with STATE_KEYS
+// HELPERS.JS - Streamlined Version
 // Handles: UI utilities, storage, animations, overlays, responsive helpers
 // ================================================================================
 
@@ -24,9 +24,6 @@ export const HelpersModule = (function() {
             duration: Constants.UI.TOAST_DURATION,
             animationDuration: Constants.UI.ANIMATION_DURATION
         },
-        animation: {
-            numberDuration: Constants.UI.NUMBER_ANIMATION_DURATION
-        },
         debounce: {
             resize: 250,
             scroll: 150
@@ -41,23 +38,75 @@ export const HelpersModule = (function() {
     };
     
     // ================================
-    // INITIALIZATION
+    // UTILITIES
     // ================================
-    const init = () => {
-        console.log('🔧 Initializing Helpers Module');
-        
-        setupEventListeners();
-        initializeViewport();
-        
-        console.log('✅ Helpers Module initialized');
+    const debounce = (func, wait) => {
+        let timeout;
+        return (...args) => {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func(...args), wait);
+        };
+    };
+    
+    const throttle = (func, limit) => {
+        let inThrottle;
+        return (...args) => {
+            if (!inThrottle) {
+                func(...args);
+                inThrottle = true;
+                setTimeout(() => inThrottle = false, limit);
+            }
+        };
+    };
+    
+    const escapeHtml = (text) => {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    };
+    
+    const calculateDistance = (lat1, lon1, lat2, lon2) => {
+        const R = 6371; // Earth's radius in km
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                  Math.sin(dLon/2) * Math.sin(dLon/2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        return R * c;
     };
     
     // ================================
     // TOAST SYSTEM
     // ================================
+    const createToast = (id, message, type) => {
+        const toast = document.createElement('div');
+        toast.id = id;
+        toast.className = `toast toast-${type}`;
+        
+        const icons = {
+            loading: '<div class="spinner"></div>',
+            success: '✅',
+            error: '❌',
+            info: 'ℹ️',
+            warning: '⚠️'
+        };
+        
+        const icon = icons[type] || '';
+        toast.innerHTML = `
+            <div class="toast-content">
+                ${icon ? `<span class="toast-icon">${icon}</span>` : ''}
+                <span class="toast-message">${escapeHtml(message)}</span>
+            </div>
+        `;
+        
+        return toast;
+    };
+    
     const showToast = (message, type = 'info', duration = config.toast.duration) => {
         const toastId = `toast-${Date.now()}`;
-        const toast = createToastElement(toastId, message, type);
+        const toast = createToast(toastId, message, type);
         
         document.body.appendChild(toast);
         state.activeToasts.add(toastId);
@@ -71,31 +120,6 @@ export const HelpersModule = (function() {
         }
         
         return toastId;
-    };
-    
-    const showLoadingToast = (message = 'Loading...') => {
-        if (state.loadingToastId) {
-            updateToastMessage(state.loadingToastId, message);
-            return state.loadingToastId;
-        }
-        
-        state.loadingToastId = showToast(message, 'loading', 0);
-        return state.loadingToastId;
-    };
-    
-    const hideLoadingToast = () => {
-        if (state.loadingToastId) {
-            hideToast(state.loadingToastId);
-            state.loadingToastId = null;
-        }
-    };
-    
-    const showSuccessToast = (message) => {
-        return showToast(message, 'success');
-    };
-    
-    const showErrorToast = (message) => {
-        return showToast(message, 'error');
     };
     
     const hideToast = (toastId) => {
@@ -119,32 +143,26 @@ export const HelpersModule = (function() {
         }
     };
     
-    const createToastElement = (id, message, type) => {
-        const toast = document.createElement('div');
-        toast.id = id;
-        toast.className = `toast toast-${type}`;
+    const showLoadingToast = (message = 'Loading...') => {
+        if (state.loadingToastId) {
+            updateToastMessage(state.loadingToastId, message);
+            return state.loadingToastId;
+        }
         
-        const icon = getToastIcon(type);
-        toast.innerHTML = `
-            <div class="toast-content">
-                ${icon ? `<span class="toast-icon">${icon}</span>` : ''}
-                <span class="toast-message">${escapeHtml(message)}</span>
-            </div>
-        `;
-        
-        return toast;
+        state.loadingToastId = showToast(message, 'loading', 0);
+        return state.loadingToastId;
     };
     
-    const getToastIcon = (type) => {
-        const icons = {
-            loading: '<div class="spinner"></div>',
-            success: '✅',
-            error: '❌',
-            info: 'ℹ️',
-            warning: '⚠️'
-        };
-        return icons[type] || '';
+    const hideLoadingToast = () => {
+        if (state.loadingToastId) {
+            hideToast(state.loadingToastId);
+            state.loadingToastId = null;
+        }
     };
+    
+    // Shorthand methods
+    const showSuccessToast = (message) => showToast(message, 'success');
+    const showErrorToast = (message) => showToast(message, 'error');
     
     // ================================
     // OVERLAY MANAGEMENT
@@ -181,9 +199,7 @@ export const HelpersModule = (function() {
         }
         
         // Track event
-        if (modules.tracking) {
-            modules.tracking.trackEvent('overlay_show', 'UI', overlayId);
-        }
+        modules.tracking?.trackEvent('overlay_show', 'UI', overlayId);
         
         return true;
     };
@@ -260,16 +276,12 @@ export const HelpersModule = (function() {
         
         // Clean up any map instances
         const mapModule = window.App?.getModule('map');
-        if (mapModule) {
-            mapModule.cleanupResultsMap?.();
-        }
+        mapModule?.cleanupResultsMap?.();
         
         showHomeView();
         
         // Track navigation
-        if (modules.tracking) {
-            modules.tracking.trackEvent('navigation_home', 'UI', 'overlay_close');
-        }
+        modules.tracking?.trackEvent('navigation_home', 'UI', 'overlay_close');
         
         return true;
     };
@@ -298,26 +310,17 @@ export const HelpersModule = (function() {
     // ================================
     // ANIMATIONS
     // ================================
-    // In helpers.js, update the animateNumber function around line 176
-    // REPLACE the existing animateNumber function with this:
-    
-    const animateNumber = (elementId, targetValue, duration = config.animation.numberDuration) => {
+    const animateNumber = (elementId, targetValue, duration = 1000) => {
         const element = document.getElementById(elementId);
         if (!element) {
             console.warn(`Element ${elementId} not found for animation`);
             return;
         }
         
-        // Check if targetValue is a string with 'k+' suffix
-        let targetNumber;
-        let suffix = '';
-        
+        // Handle string values directly
         if (typeof targetValue === 'string') {
-            // Just set it directly without animation for string values
             element.textContent = targetValue;
             return;
-        } else {
-            targetNumber = targetValue;
         }
         
         const startNumber = parseInt(element.textContent.replace(/[^0-9]/g, '')) || 0;
@@ -329,14 +332,14 @@ export const HelpersModule = (function() {
             
             // Ease-out cubic
             const easeOut = 1 - Math.pow(1 - progress, 3);
-            const currentNumber = Math.floor(startNumber + (targetNumber - startNumber) * easeOut);
+            const currentNumber = Math.floor(startNumber + (targetValue - startNumber) * easeOut);
             
-            element.textContent = currentNumber.toLocaleString() + suffix;
+            element.textContent = currentNumber.toLocaleString();
             
             if (progress < 1) {
                 requestAnimationFrame(updateNumber);
             } else {
-                element.textContent = targetNumber.toLocaleString() + suffix;
+                element.textContent = targetValue.toLocaleString();
             }
         };
         
@@ -387,49 +390,7 @@ export const HelpersModule = (function() {
             }
         },
         
-        has: (key) => {
-            return localStorage.getItem(key) !== null;
-        }
-    };
-    
-    // ================================
-    // UTILITY FUNCTIONS
-    // ================================
-    const debounce = (func, wait) => {
-        let timeout;
-        return (...args) => {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => func(...args), wait);
-        };
-    };
-    
-    const throttle = (func, limit) => {
-        let inThrottle;
-        return (...args) => {
-            if (!inThrottle) {
-                func(...args);
-                inThrottle = true;
-                setTimeout(() => inThrottle = false, limit);
-            }
-        };
-    };
-    
-    const escapeHtml = (text) => {
-        if (!text) return '';
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    };
-    
-    const calculateDistance = (lat1, lon1, lat2, lon2) => {
-        const R = 6371; // Earth's radius in km
-        const dLat = (lat2 - lat1) * Math.PI / 180;
-        const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                  Math.sin(dLon/2) * Math.sin(dLon/2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        return R * c;
+        has: (key) => localStorage.getItem(key) !== null
     };
     
     // ================================
@@ -449,6 +410,7 @@ export const HelpersModule = (function() {
         };
     };
     
+    // Shorthand methods
     const isMobile = () => window.innerWidth <= 768;
     const isTablet = () => window.innerWidth > 768 && window.innerWidth <= 1024;
     const isDesktop = () => window.innerWidth > 1024;
@@ -498,7 +460,7 @@ export const HelpersModule = (function() {
     };
     
     const isValidEmail = (email) => {
-        const regex = Constants.VALIDATION.EMAIL_REGEX;
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return regex.test(email);
     };
     
@@ -548,6 +510,18 @@ export const HelpersModule = (function() {
             viewport.isMobile ? 'mobile' : 
             viewport.isTablet ? 'tablet' : 'desktop'
         );
+    };
+    
+    // ================================
+    // INITIALIZATION
+    // ================================
+    const init = () => {
+        console.log('🔧 Initializing Helpers Module');
+        
+        setupEventListeners();
+        initializeViewport();
+        
+        console.log('✅ Helpers Module initialized');
     };
     
     // ================================
@@ -613,5 +587,3 @@ if (document.readyState === 'loading') {
 } else {
     HelpersModule.init();
 }
-
-// DO NOT add window.HelpersModule here - let main.js handle registration
