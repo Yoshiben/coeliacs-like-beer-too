@@ -1,6 +1,6 @@
 // ================================================================================
 // SEARCH.JS - Complete Refactor with STATE_KEYS
-// Handles: Location search, name search, area search, beer search, pub details
+// Handles: Location search, name search, area search, beer search, venue details
 // ================================================================================
 
 import { Constants } from './constants.js';
@@ -14,7 +14,7 @@ export const SearchModule = (function() {
     // ================================
     const state = {
         lastSearchState: null,
-        currentSearchPubs: [],
+        currentSearchVenues: [],
         locationRequestInProgress: false
     };
     
@@ -44,12 +44,12 @@ export const SearchModule = (function() {
             window.App.setState(STATE_KEYS.LOCATION_ACCURACY, location.accuracy);
         },
         
-        getCurrentPub() {
+        getCurrentVenue() {
             return window.App.getState(STATE_KEYS.CURRENT_PUB);
         },
         
-        setCurrentPub(pub) {
-            window.App.setState(STATE_KEYS.CURRENT_PUB, pub);
+        setCurrentVenue(venue) {
+            window.App.setState(STATE_KEYS.CURRENT_PUB, venue);
         },
         
         showToast(message, type = 'success') {
@@ -100,13 +100,13 @@ export const SearchModule = (function() {
     
         // Get CURRENT filter preference
         const gfOnly = window.App.getState('gfOnlyFilter') !== false;
-        console.log(`🍺 Current filter: ${gfOnly ? 'GF Only' : 'All Pubs'}`);
+        console.log(`🍺 Current filter: ${gfOnly ? 'GF Only' : 'All Venues'}`);
     
         try {  // <-- ADD THIS
             // Close distance modal using modalManager
             modules.modalManager?.close('distanceModal') || modules.modal?.close('distanceModal');
             
-            showResultsOverlay(`Pubs within ${radiusKm}km`);
+            showResultsOverlay(`Venues within ${radiusKm}km`);
             showResultsLoading('📍 Getting precise location...');
             
             // Get user location
@@ -145,7 +145,7 @@ export const SearchModule = (function() {
                     
             // Perform search
             showResultsLoading('🔍 Searching for GF beer options...');
-            const pubs = await modules.api.findNearbyPubs(
+            const venues = await modules.api.findNearbyVenues(
                 userLocation.lat, 
                 userLocation.lng, 
                 radiusKm, 
@@ -153,27 +153,27 @@ export const SearchModule = (function() {
             );
             
             // Check if we got a valid response
-            if (!pubs || !Array.isArray(pubs)) {
-                console.error('❌ Invalid response from API:', pubs);
-                showNoResults('Error loading pubs. Please try again.');
+            if (!venues || !Array.isArray(venues)) {
+                console.error('❌ Invalid response from API:', venues);
+                showNoResults('Error loading venues. Please try again.');
                 return;
             }
             
-            console.log(`✅ Found ${pubs.length} pubs`);
+            console.log(`✅ Found ${venues.length} venues`);
             
-            if (pubs.length === 0) {
-                showNoResults(`No pubs found within ${radiusKm}km of your location`);
+            if (venues.length === 0) {
+                showNoResults(`No venues found within ${radiusKm}km of your location`);
                 return;
             }
             
-            state.currentSearchPubs = pubs;
+            state.currentSearchVenues = venues;
             
             const accuracyText = userLocation.accuracy > 500 ? 
                 ` (±${Math.round(userLocation.accuracy)}m accuracy)` : '';
             
-            displayResultsInOverlay(pubs, `${pubs.length} pubs within ${radiusKm}km${accuracyText}`);
+            displayResultsInOverlay(venues, `${venues.length} venues within ${radiusKm}km${accuracyText}`);
             
-            modules.tracking?.trackSearch(`nearby_${radiusKm}km`, 'location', pubs.length);
+            modules.tracking?.trackSearch(`nearby_${radiusKm}km`, 'location', venues.length);
             
         } catch (error) {  // <-- ALREADY HERE
             console.error('❌ Error in nearby search:', error);
@@ -196,22 +196,22 @@ export const SearchModule = (function() {
             }
             
             // Perform search
-            const results = await modules.api.searchPubs({
+            const results = await modules.api.searchVenues({
                 query: query,
                 searchType: searchConfig.searchType || 'all',
                 page: 1
             });
             
-            let pubs = Array.isArray(results) ? results : results.pubs;
+            let venues = Array.isArray(results) ? results : results.venues;
             
-            if (pubs.length === 0) {
+            if (venues.length === 0) {
                 showNoResults(searchConfig.noResultsMessage);
                 return;
             }
             
             // Sort by distance if we have location
             if (userLocation) {
-                pubs = sortPubsByDistance(pubs, userLocation);
+                venues = sortVenuesByDistance(venues, userLocation);
             }
             
             // Save state
@@ -225,17 +225,17 @@ export const SearchModule = (function() {
             window.App.setState(STATE_KEYS.LAST_SEARCH.TYPE, 'name');
             window.App.setState(STATE_KEYS.LAST_SEARCH.QUERY, query);
             
-            state.currentSearchPubs = pubs;
+            state.currentSearchVenues = venues;
             
             // Display results
             const title = userLocation ? 
-                searchConfig.titleWithLocation(pubs.length) :
-                searchConfig.titleWithoutLocation(pubs.length);
+                searchConfig.titleWithLocation(venues.length) :
+                searchConfig.titleWithoutLocation(venues.length);
                 
-            displayResultsInOverlay(pubs, title);
+            displayResultsInOverlay(venues, title);
             
-            utils.showToast(`✅ Found ${pubs.length} ${searchConfig.successMessage}`);
-            modules.tracking?.trackSearch(query, type, pubs.length);
+            utils.showToast(`✅ Found ${venues.length} ${searchConfig.successMessage}`);
+            modules.tracking?.trackSearch(query, type, venues.length);
             
         } catch (error) {
             console.error(`❌ Error in ${type} search:`, error);
@@ -247,25 +247,25 @@ export const SearchModule = (function() {
         const query = document.getElementById('nameInput')?.value.trim();
         
         if (!query) {
-            utils.showToast('Please enter a pub name to search');
+            utils.showToast('Please enter a venue name to search');
             return;
         }
         
-        console.log('🏠 Searching for pub name:', query);
+        console.log('🏠 Searching for venue name:', query);
         
         // Close modal using modalManager
         modules.modalManager?.close('nameModal') || modules.modal?.close('nameModal');
         
-        showResultsOverlay(`Pub name: "${query}"`);
-        showResultsLoading('Searching for pubs...');
+        showResultsOverlay(`Venue name: "${query}"`);
+        showResultsLoading('Searching for venues...');
         
         await performTextSearch('name', query, {
             searchType: 'name',
-            noResultsMessage: `No pubs found matching "${query}"`,
+            noResultsMessage: `No venues found matching "${query}"`,
             stateQuery: query,
-            titleWithLocation: (count) => `${count} pubs matching "${query}" (nearest first)`,
-            titleWithoutLocation: (count) => `${count} pubs matching "${query}"`,
-            successMessage: `pubs matching "${query}"`,
+            titleWithLocation: (count) => `${count} venues matching "${query}" (nearest first)`,
+            titleWithoutLocation: (count) => `${count} venues matching "${query}"`,
+            successMessage: `venues matching "${query}"`,
             errorMessage: `Error searching for "${query}". Please try again.`
         });
         
@@ -288,18 +288,18 @@ export const SearchModule = (function() {
         
         const searchTypeText = searchType === 'postcode' ? 'postcode' : 'area';
         showResultsOverlay(`${searchTypeText}: "${query}"`);
-        showResultsLoading('Finding pubs in this area...');
+        showResultsLoading('Finding venues in this area...');
         
         if (searchType === 'postcode') {
             await performPostcodeSearch(query);
         } else {
             await performTextSearch('area', query, {
                 searchType: 'area',
-                noResultsMessage: `No pubs found in "${query}"`,
+                noResultsMessage: `No venues found in "${query}"`,
                 stateQuery: `${query} (city)`,
-                titleWithLocation: (count) => `${count} pubs in ${query} (nearest first)`,
-                titleWithoutLocation: (count) => `${count} pubs in ${query}`,
-                successMessage: `pubs in ${query}`,
+                titleWithLocation: (count) => `${count} venues in ${query} (nearest first)`,
+                titleWithoutLocation: (count) => `${count} venues in ${query}`,
+                successMessage: `venues in ${query}`,
                 errorMessage: `Error searching for "${query}"`
             });
         }
@@ -314,12 +314,12 @@ export const SearchModule = (function() {
             
             console.log(`✅ Postcode geocoded to: ${location.lat}, ${location.lng}`);
             
-            showResultsLoading('Finding pubs near this postcode...');
+            showResultsLoading('Finding venues near this postcode...');
             const radius = 5;
-            const pubs = await modules.api.findNearbyPubs(location.lat, location.lng, radius);
+            const venues = await modules.api.findNearbyVenues(location.lat, location.lng, radius);
             
-            if (pubs.length === 0) {
-                showNoResults(`No pubs found within ${radius}km of ${postcode}`);
+            if (venues.length === 0) {
+                showNoResults(`No venues found within ${radius}km of ${postcode}`);
                 return;
             }
             
@@ -335,11 +335,11 @@ export const SearchModule = (function() {
             window.App.setState(STATE_KEYS.LAST_SEARCH.TYPE, 'area');
             window.App.setState(STATE_KEYS.LAST_SEARCH.QUERY, query);
             
-            state.currentSearchPubs = pubs;
+            state.currentSearchVenues = venues;
             
-            displayResultsInOverlay(pubs, `${pubs.length} pubs near ${postcode} (${radius}km radius)`);
-            utils.showToast(`✅ Found ${pubs.length} pubs near ${postcode}`);
-            modules.tracking?.trackSearch(postcode, 'postcode', pubs.length);
+            displayResultsInOverlay(venues, `${venues.length} venues near ${postcode} (${radius}km radius)`);
+            utils.showToast(`✅ Found ${venues.length} venues near ${postcode}`);
+            modules.tracking?.trackSearch(postcode, 'postcode', venues.length);
             
         } catch (error) {
             console.error('❌ Error searching by postcode:', error);
@@ -364,7 +364,7 @@ export const SearchModule = (function() {
         const searchTypeText = searchType === 'brewery' ? 'brewery' : 
                              searchType === 'beer' ? 'beer' : 'style';
         showResultsOverlay(`${searchTypeText}: "${query}"`);
-        showResultsLoading('Finding pubs with this beer...');
+        showResultsLoading('Finding venues with this beer...');
         
         await performBeerSearch(query, searchType);
         
@@ -382,30 +382,30 @@ export const SearchModule = (function() {
             
             // Get results
             let results;
-            if (modules.api.searchPubsByBeer) {
-                results = await modules.api.searchPubsByBeer(query, searchType);
+            if (modules.api.searchVenuesByBeer) {
+                results = await modules.api.searchVenuesByBeer(query, searchType);
             } else {
-                results = await modules.api.searchPubs({
+                results = await modules.api.searchVenues({
                     query: query,
                     searchType: 'all',
                     page: 1
                 });
             }
             
-            let allPubs = Array.isArray(results) ? results : results.pubs || [];
-            console.log(`📊 Got ${allPubs.length} pubs from API`);
+            let allVenues = Array.isArray(results) ? results : results.venues || [];
+            console.log(`📊 Got ${allVenues.length} venues from API`);
             
             // Filter based on beer search criteria
-            const filteredPubs = filterPubsByBeerCriteria(allPubs, query, searchType);
+            const filteredVenues = filterVenuesByBeerCriteria(allVenues, query, searchType);
             
-            if (filteredPubs.length === 0) {
-                showNoResults(`No pubs found serving "${query}". Try searching for a brewery name or beer style.`);
+            if (filteredVenues.length === 0) {
+                showNoResults(`No venues found serving "${query}". Try searching for a brewery name or beer style.`);
                 return;
             }
             
             // Sort by distance if location available
             if (userLocation) {
-                filteredPubs.sort((a, b) => {
+                filteredVenues.sort((a, b) => {
                     const distA = calculateDistance(userLocation, a);
                     const distB = calculateDistance(userLocation, b);
                     return distA - distB;
@@ -424,15 +424,15 @@ export const SearchModule = (function() {
             window.App.setState(STATE_KEYS.LAST_SEARCH.TYPE, 'beer');
             window.App.setState(STATE_KEYS.LAST_SEARCH.QUERY, query);
             
-            state.currentSearchPubs = filteredPubs;
+            state.currentSearchVenues = filteredVenues;
             
             const title = userLocation ? 
-                `${filteredPubs.length} pubs serving "${query}" (nearest first)` :
-                `${filteredPubs.length} pubs serving "${query}"`;
+                `${filteredVenues.length} venues serving "${query}" (nearest first)` :
+                `${filteredVenues.length} venues serving "${query}"`;
                 
-            displayResultsInOverlay(filteredPubs, title);
-            utils.showToast(`✅ Found ${filteredPubs.length} pubs serving "${query}"`);
-            modules.tracking?.trackSearch(query, `beer_${searchType}`, filteredPubs.length);
+            displayResultsInOverlay(filteredVenues, title);
+            utils.showToast(`✅ Found ${filteredVenues.length} venues serving "${query}"`);
+            modules.tracking?.trackSearch(query, `beer_${searchType}`, filteredVenues.length);
             
         } catch (error) {
             console.error('❌ Error in beer search:', error);
@@ -440,12 +440,12 @@ export const SearchModule = (function() {
         }
     };
     
-    const filterPubsByBeerCriteria = (pubs, query, searchType) => {
+    const filterVenuesByBeerCriteria = (venues, query, searchType) => {
         const searchQuery = query.toLowerCase().trim();
         
-        return pubs.filter(pub => {
-            if (!pub.beer_details) return false;
-            const beerDetails = pub.beer_details.toLowerCase();
+        return venues.filter(venue => {
+            if (!venue.beer_details) return false;
+            const beerDetails = venue.beer_details.toLowerCase();
             
             switch (searchType) {
                 case 'brewery':
@@ -472,89 +472,89 @@ export const SearchModule = (function() {
     // ================================
     // PUB DETAILS
     // ================================
-    const showPubDetails = async (pubId) => {
-        console.log('🏠 Showing pub details:', pubId);
+    const showVenueDetails = async (venueId) => {
+        console.log('🏠 Showing venue details:', venueId);
         
         try {
-            utils.showLoadingToast('Loading pub details...');
+            utils.showLoadingToast('Loading venue details...');
             
-            const results = await modules.api.searchPubs({ pubId: pubId });
-            const pubs = Array.isArray(results) ? results : results.pubs;
+            const results = await modules.api.searchVenues({ venueId: venueId });
+            const Venues = Array.isArray(results) ? results : results.venues;
             
             utils.hideLoadingToast();
             
-            if (pubs && pubs.length > 0) {
-                const pub = pubs[0];
-                utils.setCurrentPub(pub);
+            if (venues && venues.length > 0) {
+                const venues = venues[0];
+                utils.setCurrentVenue(venue);
                 
-                displayPubDetails(pub);
-                return pub;
+                displayVenueDetails(venue);
+                return venue;
             } else {
-                utils.showToast('Pub not found.');
+                utils.showToast('Venue not found.');
                 return null;
             }
             
         } catch (error) {
-            console.error('❌ Error loading pub:', error);
+            console.error('❌ Error loading venue:', error);
             utils.hideLoadingToast();
-            utils.showToast('Error loading pub details.');
+            utils.showToast('Error loading venue details.');
             return null;
         }
     };
     
-    const displayPubDetails = (pub) => {
+    const displayVenueDetails = (venue) => {
         // Use ModalManager to handle the overlay
-        modules.modalManager.open('pubDetailsOverlay', {
+        modules.modalManager.open('venueDetailsOverlay', {
             onOpen: () => {
                 // Reset split-view state
-                resetPubDetailsView();
+                resetVenueDetailsView();
                 
                 // Update navigation title
-                const navTitle = document.getElementById('pubNavTitle');
-                if (navTitle) navTitle.textContent = pub.name;
+                const navTitle = document.getElementById('venueNavTitle');
+                if (navTitle) navTitle.textContent = venue.name;
                 
                 // Populate content
-                populatePubDetails(pub);
-                setupPubButtons(pub);
-                setupMapButtonHandler(pub);
+                populateVenueDetails(venue);
+                setupVenueButtons(venue);
+                setupMapButtonHandler(venue);
                 
-                modules.tracking?.trackPubView(pub.name);
+                modules.tracking?.trackVenueView(venue.name);
                 
                 const navModule = window.App?.getModule('nav');
-                navModule?.showPubDetailsWithContext();
+                navModule?.showVenueDetailsWithContext();
             }
         });
     };
     
-    const populatePubDetails = (pub) => {
+    const populateVenueDetails = (venue) => {
         const elements = {
-            title: document.getElementById('pubDetailsTitle'),
-            address: document.getElementById('pubDetailsAddress'),
-            location: document.getElementById('pubDetailsLocation'),
-            beer: document.getElementById('pubDetailsBeer')
+            title: document.getElementById('venueDetailsTitle'),
+            address: document.getElementById('venueDetailsAddress'),
+            location: document.getElementById('venueDetailsLocation'),
+            beer: document.getElementById('venueDetailsBeer')
         };
         
-        if (elements.title) elements.title.textContent = pub.name;
-        if (elements.address) elements.address.textContent = pub.address;
-        if (elements.location) elements.location.textContent = `${pub.postcode} • ${pub.local_authority}`;
+        if (elements.title) elements.title.textContent = venue.name;
+        if (elements.address) elements.address.textContent = venue.address;
+        if (elements.location) elements.location.textContent = `${venue.postcode} • ${venue.local_authority}`;
         
-        setupBeerDetails(pub, elements.beer);
-        setupGFStatusDisplay(pub);
+        setupBeerDetails(venue, elements.beer);
+        setupGFStatusDisplay(venue);
     };
     
-    const setupBeerDetails = (pub, beerEl) => {
+    const setupBeerDetails = (venue, beerEl) => {
         const beerSection = document.getElementById('beerSection');
         if (!beerSection || !beerEl) return;
         
-        const hasGFOptions = pub.bottle || pub.tap || pub.cask || pub.can || pub.beer_details;
+        const hasGFOptions = venue.bottle || venue.tap || venue.cask || venue.can || venue.beer_details;
         
-        if (hasGFOptions || pub.gf_status === 'currently' || pub.gf_status === 'always_tap_cask' || pub.gf_status === 'always_bottle_can') {
+        if (hasGFOptions || venue.gf_status === 'currently' || venue.gf_status === 'always_tap_cask' || venue.gf_status === 'always_bottle_can') {
             beerSection.style.display = 'block';
             beerSection.style.cursor = 'pointer';
             beerSection.setAttribute('data-action', 'show-beer-list');
             
             // Parse beer details if available
-            const beerCount = pub.beer_details ? pub.beer_details.split(',').length : 0;
+            const beerCount = venue.beer_details ? venue.beer_details.split(',').length : 0;
             
             beerEl.innerHTML = `
                 <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -571,7 +571,7 @@ export const SearchModule = (function() {
         }
 };
     
-    const setupGFStatusDisplay = (pub) => {
+    const setupGFStatusDisplay = (venue) => {
         const statusEl = document.getElementById('currentGFStatus');
         if (!statusEl) return;
         
@@ -603,7 +603,7 @@ export const SearchModule = (function() {
             }
         };
         
-        const status = pub.gf_status || 'unknown';
+        const status = venue.gf_status || 'unknown';
         const display = displays[status] || displays.unknown;
         
         statusEl.innerHTML = `
@@ -615,10 +615,10 @@ export const SearchModule = (function() {
 
     // REPLACE the loadBeerList function in search.js (around line 513)
 
-    const loadBeerList = (pub) => {
-        console.log('🍺 Loading beer list for pub:', pub);
-        console.log('📦 Beer details:', pub.beer_details);
-        console.log('📊 Pub object keys:', Object.keys(pub));
+    const loadBeerList = (venue) => {
+        console.log('🍺 Loading beer list for venue:', venue);
+        console.log('📦 Beer details:', venue.beer_details);
+        console.log('📊 Venue object keys:', Object.keys(venue));
         
         const contentEl = document.getElementById('beerListContent');
         const emptyEl = document.getElementById('beerListEmpty');
@@ -629,8 +629,8 @@ export const SearchModule = (function() {
         }
         
         // Parse beer details
-        if (pub.beer_details) {
-            const beers = parseBeerDetails(pub.beer_details);
+        if (venue.beer_details) {
+            const beers = parseBeerDetails(venue.beer_details);
             console.log('📊 Parsed beers:', beers);
             
             if (beers.length > 0) {
@@ -713,15 +713,15 @@ export const SearchModule = (function() {
         return beers;
     };
     
-    const setupPubButtons = (pub) => {
-        utils.setCurrentPub(pub);
+    const setupVenueButtons = (venue) => {
+        utils.setCurrentVenue(venue);
     };
     
-    const setupMapButtonHandler = (pub) => {
-        // This is now handled by data-action="toggle-pub-map" in main.js
-        // Just ensure pub has coordinates
-        if (!pub.latitude || !pub.longitude) {
-            const mapBtn = document.querySelector('[data-action="toggle-pub-map"]');
+    const setupMapButtonHandler = (venue) => {
+        // This is now handled by data-action="toggle-venue-map" in main.js
+        // Just ensure venue has coordinates
+        if (!venue.latitude || !venue.longitude) {
+            const mapBtn = document.querySelector('[data-action="toggle-venue-map"]');
             if (mapBtn) {
                 mapBtn.disabled = true;
                 mapBtn.textContent = '🗺️ No Location';
@@ -729,13 +729,13 @@ export const SearchModule = (function() {
         }
     };
     
-    const resetPubDetailsView = () => {
-        const pubContainer = document.getElementById('pubContainer');
-        const pubMapContainer = document.getElementById('pubMapContainer');
-        const mapBtnText = document.getElementById('pubMapBtnText');
+    const resetVenueDetailsView = () => {
+        const venueContainer = document.getElementById('venueContainer');
+        const venueMapContainer = document.getElementById('venueMapContainer');
+        const mapBtnText = document.getElementById('venueMapBtnText');
         
-        if (pubContainer) pubContainer.classList.remove('split-view');
-        if (pubMapContainer) pubMapContainer.style.display = 'none';
+        if (venueContainer) venueContainer.classList.remove('split-view');
+        if (venueMapContainer) venueMapContainer.style.display = 'none';
         if (mapBtnText) mapBtnText.textContent = 'Show on Map';
     };
     
@@ -747,8 +747,8 @@ export const SearchModule = (function() {
     const goBackToResults = () => {
         console.log('🔙 Going back to results...');
         
-        // Close pub details
-        hideOverlays(['pubDetailsOverlay']);
+        // Close venue details
+        hideOverlays(['venueDetailsOverlay']);
         
         // Show results overlay
         const resultsOverlay = document.getElementById('resultsOverlay');
@@ -783,12 +783,12 @@ export const SearchModule = (function() {
         navModule?.showResultsWithContext();
         
         // Restore cached results if available
-        if (state.currentSearchPubs && state.currentSearchPubs.length > 0) {
+        if (state.currentSearchVenues && state.currentSearchVenues.length > 0) {
             console.log('📋 Using cached results');
             const title = state.lastSearchState?.type === 'nearby' ? 
-                `Pubs within ${state.lastSearchState.radius}km` : 
+                `Venues within ${state.lastSearchState.radius}km` : 
                 state.lastSearchState?.query || 'Search Results';
-            displayResultsInOverlay(state.currentSearchPubs, title);
+            displayResultsInOverlay(state.currentSearchVenues, title);
             
             modules.tracking?.trackEvent('back_to_results_cached', 'Navigation', state.lastSearchState?.type);
             return true;
@@ -1195,13 +1195,13 @@ export const SearchModule = (function() {
                 // ADD THE BUTTON TO THE ACTUAL STRUCTURE
                 setTimeout(() => {
                     const resultsContainer = document.querySelector('.results-container');
-                    if (resultsContainer && !resultsContainer.querySelector('.add-pub-btn')) {
-                        const addPubBtn = document.createElement('button');
-                        addPubBtn.className = 'btn btn-primary add-pub-btn';
-                        addPubBtn.textContent = '➕ Add New Pub';
-                        addPubBtn.dataset.action = 'add-new-pub-from-results';
-                        addPubBtn.style.cssText = 'position: fixed; bottom: 10vh; right: 2rem; z-index: 100; border-radius: 25px; padding: 12px 24px; box-shadow: var(--shadow-lg);';
-                        resultsContainer.appendChild(addPubBtn);
+                    if (resultsContainer && !resultsContainer.querySelector('.add-venue-btn')) {
+                        const addVenueBtn = document.createElement('button');
+                        addVenueBtn.className = 'btn btn-primary add-venue-btn';
+                        addVenueBtn.textContent = '➕ Add New Venue';
+                        addVenueBtn.dataset.action = 'add-new-venue-from-results';
+                        addVenueBtn.style.cssText = 'position: fixed; bottom: 10vh; right: 2rem; z-index: 100; border-radius: 25px; padding: 12px 24px; box-shadow: var(--shadow-lg);';
+                        resultsContainer.appendChild(addVenueBtn);
                     }
                 }, 200);
             }
@@ -1240,10 +1240,10 @@ export const SearchModule = (function() {
     
     // UPDATE: In search.js, replace the displayResultsInOverlay function (around line 1031)
 
-    const displayResultsInOverlay = (pubs, title) => {
-        state.currentSearchPubs = pubs;
+    const displayResultsInOverlay = (venues, title) => {
+        state.currentSearchVenues = venues;
         
-        console.log('💾 Stored search results:', pubs.length, 'pubs');
+        console.log('💾 Stored search results:', venues.length, 'venues');
         
         // IMPORTANT: Don't call resetResultsMapState here as it cleans up the map
         // Just ensure we're showing the list view
@@ -1281,8 +1281,8 @@ export const SearchModule = (function() {
             elements.list.style.display = 'block';
             elements.list.innerHTML = '';
             
-            pubs.forEach(pub => {
-                const resultItem = createResultItem(pub);
+            venues.forEach(venue => {
+                const resultItem = createResultItem(venue);
                 elements.list.appendChild(resultItem);
             });
         }
@@ -1291,20 +1291,20 @@ export const SearchModule = (function() {
         const titleEl = document.getElementById('resultsTitle');
         if (titleEl) titleEl.textContent = title;
         
-        console.log(`✅ Displayed ${pubs.length} results`);
+        console.log(`✅ Displayed ${venues.length} results`);
     };
     
     // REPLACE the createResultItem function (around line 1076):
 
-    const createResultItem = (pub) => {
-        const template = document.getElementById('pub-result-template');
+    const createResultItem = (venue) => {
+        const template = document.getElementById('venue-result-template');
         const clone = template.content.cloneNode(true);
         
-        clone.querySelector('.result-title').textContent = pub.name;
+        clone.querySelector('.result-title').textContent = venue.name;
         
         const distanceEl = clone.querySelector('.result-distance');
-        if (pub.distance !== undefined) {
-            distanceEl.textContent = `${pub.distance.toFixed(1)}km away`;
+        if (venue.distance !== undefined) {
+            distanceEl.textContent = `${venue.distance.toFixed(1)}km away`;
         } else {
             distanceEl.style.display = 'none';
         }
@@ -1312,7 +1312,7 @@ export const SearchModule = (function() {
         const gfIndicator = clone.querySelector('.gf-indicator');
         
         // Determine GF status properly
-        const gfStatus = pub.gf_status || 'unknown';
+        const gfStatus = venue.gf_status || 'unknown';
         
         // Set indicator based on status
         switch(gfStatus) {
@@ -1344,12 +1344,12 @@ export const SearchModule = (function() {
                 gfIndicator.className = 'gf-indicator unknown';
         }
         
-        clone.querySelector('.result-address').textContent = pub.address;
-        clone.querySelector('.result-postcode').textContent = pub.postcode;
-        clone.querySelector('.result-authority').textContent = pub.local_authority;
+        clone.querySelector('.result-address').textContent = venue.address;
+        clone.querySelector('.result-postcode').textContent = venue.postcode;
+        clone.querySelector('.result-authority').textContent = venue.local_authority;
         
-        const viewButton = clone.querySelector('[data-action="view-pub"]');
-        viewButton.dataset.pubId = pub.pub_id;
+        const viewButton = clone.querySelector('[data-action="view-venue"]');
+        viewButton.dataset.venueId = venue.venue_id;
         
         return clone;
     };
@@ -1433,22 +1433,22 @@ export const SearchModule = (function() {
     // ================================
     // HELPERS
     // ================================
-    const sortPubsByDistance = (pubs, location) => {
-        return pubs.map(pub => {
-            if (pub.latitude && pub.longitude) {
-                pub.distance = calculateDistance(location, pub);
+    const sortVenuesByDistance = (venues, location) => {
+        return venues.map(venue => {
+            if (venue.latitude && venue.longitude) {
+                venue.distance = calculateDistance(location, venue);
             } else {
-                pub.distance = 999;
+                venue.distance = 999;
             }
-            return pub;
+            return venue;
         }).sort((a, b) => a.distance - b.distance);
     };
     
-    const calculateDistance = (location, pub) => {
+    const calculateDistance = (location, venue) => {
         const lat1 = location.lat;
         const lon1 = location.lng;
-        const lat2 = parseFloat(pub.latitude);
-        const lon2 = parseFloat(pub.longitude);
+        const lat2 = parseFloat(venue.latitude);
+        const lon2 = parseFloat(venue.longitude);
         
         const R = 6371;
         const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -1515,8 +1515,8 @@ export const SearchModule = (function() {
                 const searches = [
                     // First try: specific venue search
                     {
-                        q: `${query} pub UK`,
-                        tags: ['pub', 'bar', 'restaurant', 'cafe', 'club']
+                        q: `${query} venue UK`,
+                        tags: ['venue', 'bar', 'restaurant', 'cafe', 'club']
                     },
                     // Fallback: broader search
                     {
@@ -1551,12 +1551,12 @@ export const SearchModule = (function() {
                         )) return true;
                         
                         // Check extra tags
-                        if (extraTags.amenity && ['pub', 'bar', 'restaurant', 'cafe', 'nightclub'].includes(extraTags.amenity)) {
+                        if (extraTags.amenity && ['venue', 'bar', 'restaurant', 'cafe', 'nightclub'].includes(extraTags.amenity)) {
                             return true;
                         }
                         
                         // Check if it's likely a venue based on name
-                        const venueKeywords = ['pub', 'bar', 'inn', 'tavern', 'arms', 'club', 'brewery', 'tap', 'house'];
+                        const venueKeywords = ['venue', 'bar', 'inn', 'tavern', 'arms', 'club', 'brewery', 'tap', 'house'];
                         if (venueKeywords.some(keyword => name.includes(keyword))) {
                             return true;
                         }
@@ -1623,7 +1623,7 @@ export const SearchModule = (function() {
             // ADD THIS right after the join(''):
             resultsDiv.innerHTML += `
                 <div style="padding: var(--space-lg); border-top: 1px solid var(--border-light); margin-top: var(--space-md);">
-                    <button class="btn btn-secondary" data-action="manual-pub-entry" style="width: 100%;">
+                    <button class="btn btn-secondary" data-action="manual-venue-entry" style="width: 100%;">
                         ✏️ Can't find it? Enter manually
                     </button>
                 </div>
@@ -1669,7 +1669,7 @@ export const SearchModule = (function() {
         useSelectedPlace() {
             if (!this.selectedPlace) return;
             
-            console.log('📝 Using selected place to add new pub');
+            console.log('📝 Using selected place to add new venue');
             
             const place = this.selectedPlace;
             const name = place.namedetails?.name || place.display_name.split(',')[0];
@@ -1693,7 +1693,7 @@ export const SearchModule = (function() {
                 }
             }
             
-            const newPubData = {
+            const newVenueData = {
                 name: name,
                 address: address,
                 postcode: postcode,
@@ -1703,17 +1703,17 @@ export const SearchModule = (function() {
                 osm_type: place.osm_type
             };
             
-            console.log('🏠 New pub data:', newPubData);
+            console.log('🏠 New venue data:', newVenueData);
             
             document.getElementById('placesSearchModal').style.display = 'none';
             document.body.style.overflow = '';
             
-            utils.showLoadingToast('Adding new pub to database...');
+            utils.showLoadingToast('Adding new venue to database...');
             
-            this.submitNewPub(newPubData);
+            this.submitNewVenue(newVenueData);
         },
         
-        async submitNewPub(pubData) {
+        async submitNewVenue(venueData) {
             try {
                 // Get the user's nickname
                 let nickname = window.App.getState('userNickname');
@@ -1721,18 +1721,18 @@ export const SearchModule = (function() {
                     nickname = localStorage.getItem('userNickname') || 'anonymous';
                 }
                 
-                const response = await fetch('/api/add-pub', {
+                const response = await fetch('/api/add-venue', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        name: pubData.name,
-                        address: pubData.address,
-                        postcode: pubData.postcode,
-                        latitude: pubData.latitude,
-                        longitude: pubData.longitude,
-                        osm_id: pubData.osm_id,
+                        name: venueData.name,
+                        address: venueData.address,
+                        postcode: venueData.postcode,
+                        latitude: venueData.latitude,
+                        longitude: venueData.longitude,
+                        osm_id: venueData.osm_id,
                         source: 'user_submission',
                         submitted_by: nickname  // Include the nickname
                     })
@@ -1741,37 +1741,37 @@ export const SearchModule = (function() {
                 utils.hideLoadingToast();
                 
                 if (!response.ok) {
-                    throw new Error('Failed to add pub');
+                    throw new Error('Failed to add venue');
                 }
                 
                 const result = await response.json();
-                console.log('✅ Pub added:', result);
+                console.log('✅ Venue added:', result);
                 
-                window.newlyAddedPub = {
-                    pub_id: result.pub_id,
-                    name: pubData.name,
-                    address: pubData.address,
-                    postcode: pubData.postcode,
-                    latitude: pubData.latitude,
-                    longitude: pubData.longitude
+                window.newlyAddedVenue = {
+                    venue_id: result.venue_id,
+                    name: venueData.name,
+                    address: venueData.address,
+                    postcode: venueData.postcode,
+                    latitude: venueData.latitude,
+                    longitude: venueData.longitude
                 };
                 
-                this.showPubAddedPrompt(result);
+                this.showVenueAddedPrompt(result);
                 
             } catch (error) {
-                console.error('❌ Error adding pub:', error);
-                utils.showToast('❌ Failed to add pub. Please try again.');
+                console.error('❌ Error adding venue:', error);
+                utils.showToast('❌ Failed to add venue. Please try again.');
             }
         },
         
-        showPubAddedPrompt(result) {
-            const promptModal = document.getElementById('pubAddedPromptModal');
+        showVenueAddedPrompt(result) {
+            const promptModal = document.getElementById('venueAddedPromptModal');
             if (promptModal) {
-                document.getElementById('addedPubName').textContent = window.newlyAddedPub.name;
+                document.getElementById('addedVenueName').textContent = window.newlyAddedVenue.name;
                 promptModal.style.display = 'flex';
                 document.body.style.overflow = 'hidden';
             } else {
-                utils.showToast(`✅ ${window.newlyAddedPub.name} added successfully!`);
+                utils.showToast(`✅ ${window.newlyAddedVenue.name} added successfully!`);
             }
         },
         
@@ -1791,7 +1791,7 @@ export const SearchModule = (function() {
             const category = place.category?.toLowerCase() || '';
             const type = place.type?.toLowerCase() || '';
             
-            if (category.includes('pub') || type.includes('pub')) return 'Pub';
+            if (category.includes('venue') || type.includes('venue')) return 'Venue';
             if (category.includes('bar') || type.includes('bar')) return 'Bar';
             if (category.includes('restaurant')) return 'Restaurant';
             if (category.includes('cafe')) return 'Café';
@@ -1800,7 +1800,7 @@ export const SearchModule = (function() {
         
         getPlaceIcon(type) {
             const icons = {
-                'Pub': '🍺',
+                'Venue': '🍺',
                 'Bar': '🍹',
                 'Restaurant': '🍽️',
                 'Café': '☕',
@@ -1920,8 +1920,8 @@ export const SearchModule = (function() {
         searchByArea,
         searchByBeer,
         
-        // Pub details
-        showPubDetails,
+        // Venue details
+        showVenueDetails,
         
         // Navigation
         goBackToResults,
@@ -1930,7 +1930,7 @@ export const SearchModule = (function() {
         PlacesSearchModule,
         
         // State getters
-        getCurrentResults: () => state.currentSearchPubs,
+        getCurrentResults: () => state.currentSearchVenues,
         getLastSearchState: () => state.lastSearchState,
 
         loadBeerList
