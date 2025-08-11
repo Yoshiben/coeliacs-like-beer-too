@@ -528,60 +528,33 @@ const App = {
         
         'nav-back': (el, modules) => {
             const currentContext = modules.nav?.getCurrentContext();
-            const previousContext = modules.nav?.getPreviousContext();
-            console.log('🔙 Navigating back from:', currentContext, 'to:', previousContext);
+            console.log('🔙 Navigating back from:', currentContext);
             
-            if (currentContext === 'search') {
-                // We're in the main search overlay, go back to wherever we came from
-                const searchReturnContext = window.App.getState('searchReturnContext') || 'home';
-                
-                modules.modalManager?.close('searchOverlay');
-                
-                if (searchReturnContext === 'results') {
-                    setTimeout(() => {
-                        modules.modalManager?.open('resultsOverlay');
-                        modules.nav?.setPageContext('results');
-                    }, 100);
-                } else {
-                    modules.nav?.goToHome();
-                }
-            } else if (currentContext === 'search-modal') {
-                // We're in a specific search modal (name, area, beer, distance)
-                // Go back to the main search overlay
-                
-                // Close any open search modals
+            if (currentContext === 'search-modal') {
+                // From search modal -> back to search overlay
                 const searchModals = ['nameModal', 'areaModal', 'beerModal', 'distanceModal'];
-                searchModals.forEach(modalId => {
-                    modules.modalManager?.close(modalId);
-                });
+                searchModals.forEach(modalId => modules.modalManager?.close(modalId));
                 
-                // Small delay then show search overlay
                 setTimeout(() => {
                     modules.modalManager?.open('searchOverlay');
                     modules.nav?.setPageContext('search');
                 }, 100);
-            } else if (currentContext === 'venue') {
-                modules.nav?.goBackFromVenue();
+                
             } else if (currentContext === 'results') {
-                modules.nav?.goToHome();
-            } else if (currentContext === 'breweries') {
-                modules.modalManager?.close('breweriesOverlay');
-                modules.nav?.goToHome();
-            } else if (currentContext === 'map') {
-                const mapReturnContext = App.getState('mapReturnContext');
+                // From results -> back to search overlay (always)
+                modules.modalManager?.close('resultsOverlay');
+                setTimeout(() => {
+                    modules.modalManager?.open('searchOverlay');
+                    modules.nav?.setPageContext('search');
+                }, 100);
                 
-                modules.modalManager?.close('fullMapOverlay');
+            } else if (currentContext === 'search') {
+                // From search overlay -> back to home
+                modules.modalManager?.close('searchOverlay');
+                modules.nav?.goToHome();
                 
-                if (mapReturnContext === 'search') {
-                    setTimeout(() => {
-                        modules.modalManager?.open('searchOverlay');
-                        modules.nav?.setPageContext('search');
-                    }, 100);
-                } else {
-                    modules.nav?.goToHome();
-                }
             } else {
-                // Default: go home
+                // Everything else -> home
                 modules.nav?.goToHome();
             }
         },
