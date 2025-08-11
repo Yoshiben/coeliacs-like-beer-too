@@ -16,8 +16,8 @@ export const Constants = {
         BREWERY_BEERS: '/api/brewery/:brewery/beers',
         SUBMIT_BEER: '/api/submit_beer_update',
         UPDATE_GF_STATUS: '/api/update-gf-status',
-        ALL_PUBS: '/api/all-pubs',
-        ADD_PUB: '/api/add-pub',
+        ALL_VENUES: '/api/all-pubs',
+        ADD_VENUE: '/api/add-pub',
         ADMIN: {
             VALIDATION_STATS: '/api/admin/validation-stats',
             PENDING_REVIEWS: '/api/admin/pending-manual-reviews',
@@ -53,18 +53,18 @@ export const Constants = {
         SEARCH_RESULTS: 'searchResults',
         
         // Current selections
-        CURRENT_PUB: 'currentPub',
-        SELECTED_PUB_FOR_REPORT: 'selectedPubForReport',
+        CURRENT_VENUE: 'currentPub',
+        SELECTED_VENUE_FOR_REPORT: 'selectedPubForReport',
         
         // Map state
         MAP_DATA: {
-            ALL_PUBS: 'mapData.allPubs',
+            ALL_VENUES: 'mapData.allPubs',
             FULL_UK_MAP: 'mapData.fullUKMapInstance',
             RESULTS_MAP: 'mapData.resultsMapInstance',
-            PUB_DETAIL_MAP: 'mapData.pubDetailMapInstance',
+            VENUE_DETAIL_MAP: 'mapData.pubDetailMapInstance',
             USER_MARKER: 'mapData.userMarker',
-            GF_PUBS_LAYER: 'mapData.gfPubsLayer',
-            CLUSTERED_PUBS_LAYER: 'mapData.clusteredPubsLayer'
+            GF_VENUES_LAYER: 'mapData.gfPubsLayer',
+            CLUSTERED_VENUES_LAYER: 'mapData.clusteredPubsLayer'
         },
         
         // Form state
@@ -115,7 +115,7 @@ export const Constants = {
         DEFAULT_CENTER: [54.5, -3], // UK center
         DEFAULT_ZOOM: 6,
         MAX_ZOOM: 19,
-        PUB_MARKER_RADIUS: 12,
+        VENUE_MARKER_RADIUS: 12,
         USER_MARKER_RADIUS: 8,
         TILE_LAYER: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
         ATTRIBUTION: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -230,8 +230,8 @@ export const Constants = {
     VALIDATION: {
         POSTCODE_REGEX: /^[A-Z]{1,2}[0-9R][0-9A-Z]?\s?[0-9][A-Z]{2}$/i,
         EMAIL_REGEX: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-        MIN_PUB_NAME_LENGTH: 2,
-        MAX_PUB_NAME_LENGTH: 100,
+        MIN_VENUE_NAME_LENGTH: 2,
+        MAX_VENUE_NAME_LENGTH: 100,
         MIN_BEER_NAME_LENGTH: 2,
         MAX_BEER_NAME_LENGTH: 100,
         MIN_ABV: 0,
@@ -289,7 +289,7 @@ export const Constants = {
         GA_ID: 'G-WSHR39KSXS',
         EVENTS: {
             SEARCH: 'search',
-            PUB_VIEW: 'pub_view',
+            VENUE_VIEW: 'pub_view',
             BEER_REPORT: 'beer_report_submitted',
             LOCATION_SEARCH: 'location_search_start',
             MAP_TOGGLE: 'map_toggle',
@@ -303,9 +303,9 @@ export const Constants = {
     // ================================
     DEFAULTS: {
         // Fallback stats
-        TOTAL_PUBS: 49841,
-        GF_PUBS: 0,
-        GF_PUBS_THIS_MONTH: 0,
+        TOTAL_VENUES: 49841,
+        GF_VENUES: 0,
+        GF_VENUES_THIS_MONTH: 0,
         
         // Admin token (should be in env var)
         ADMIN_TOKEN: 'beer_admin_2025',
@@ -346,7 +346,7 @@ export const Constants = {
         INVALID_POSTCODE: 'Please enter a valid UK postcode.',
         REQUIRED_FIELDS: 'Please fill in all required fields.',
         SUBMISSION_FAILED: 'Failed to submit report. Please try again.',
-        PUB_NOT_FOUND: 'Pub not found.',
+        VENUE_NOT_FOUND: 'Pub not found.',
         MAP_LOAD_ERROR: 'Error loading map. Please try again.'
     },
     
@@ -360,7 +360,7 @@ export const Constants = {
         COPIED_TO_CLIPBOARD: '📋 Copied to clipboard!',
         PREFERENCES_SAVED: '✅ Preferences saved successfully',
         STATUS_UPDATED: '✅ Status updated successfully!',
-        PUB_ADDED: '✅ {name} added successfully!'
+        VENUE_ADDED: '✅ {name} added successfully!'
     }
 };
 
