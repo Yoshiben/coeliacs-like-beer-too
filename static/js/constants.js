@@ -16,8 +16,8 @@ export const Constants = {
         BREWERY_BEERS: '/api/brewery/:brewery/beers',
         SUBMIT_BEER: '/api/submit_beer_update',
         UPDATE_GF_STATUS: '/api/update-gf-status',
-        ALL_VENUES: '/api/all-pubs',
-        ADD_VENUE: '/api/add-pub',
+        ALL_VENUES: '/api/all-venues',
+        ADD_VENUE: '/api/add-venue',
         ADMIN: {
             VALIDATION_STATS: '/api/admin/validation-stats',
             PENDING_REVIEWS: '/api/admin/pending-manual-reviews',
@@ -53,18 +53,18 @@ export const Constants = {
         SEARCH_RESULTS: 'searchResults',
         
         // Current selections
-        CURRENT_VENUE: 'currentPub',
-        SELECTED_VENUE_FOR_REPORT: 'selectedPubForReport',
+        CURRENT_VENUE: 'currentVenue',
+        SELECTED_VENUE_FOR_REPORT: 'selectedVenueForReport',
         
         // Map state
         MAP_DATA: {
-            ALL_VENUES: 'mapData.allPubs',
+            ALL_VENUES: 'mapData.allVenues',
             FULL_UK_MAP: 'mapData.fullUKMapInstance',
             RESULTS_MAP: 'mapData.resultsMapInstance',
-            VENUE_DETAIL_MAP: 'mapData.pubDetailMapInstance',
+            VENUE_DETAIL_MAP: 'mapData.venueDetailMapInstance',
             USER_MARKER: 'mapData.userMarker',
-            GF_VENUES_LAYER: 'mapData.gfPubsLayer',
-            CLUSTERED_VENUES_LAYER: 'mapData.clusteredPubsLayer'
+            GF_VENUES_LAYER: 'mapData.gfVenuesLayer',
+            CLUSTERED_VENUES_LAYER: 'mapData.clusteredVenuesLayer'
         },
         
         // Form state
@@ -289,7 +289,7 @@ export const Constants = {
         GA_ID: 'G-WSHR39KSXS',
         EVENTS: {
             SEARCH: 'search',
-            VENUE_VIEW: 'pub_view',
+            VENUE_VIEW: 'venue_view',
             BEER_REPORT: 'beer_report_submitted',
             LOCATION_SEARCH: 'location_search_start',
             MAP_TOGGLE: 'map_toggle',
@@ -346,7 +346,7 @@ export const Constants = {
         INVALID_POSTCODE: 'Please enter a valid UK postcode.',
         REQUIRED_FIELDS: 'Please fill in all required fields.',
         SUBMISSION_FAILED: 'Failed to submit report. Please try again.',
-        VENUE_NOT_FOUND: 'Pub not found.',
+        VENUE_NOT_FOUND: 'Venue not found.',
         MAP_LOAD_ERROR: 'Error loading map. Please try again.'
     },
     
