@@ -487,22 +487,26 @@ const App = {
     // Action handler map - split into logical groups
     actionHandlers: {
         // Search actions
-        'location-search': (el, modules) => {
+        location-search': (el, modules) => {
+            modules.nav?.setPageContext('search-modal'); // Set context to search-modal
             modules.modalManager?.open('distanceModal');
         },
         'search-name': (el, modules) => {
+            modules.nav?.setPageContext('search-modal'); // Set context to search-modal
             modules.modalManager?.open('nameModal');
         },
         'perform-name-search': (el, modules) => {
             modules.search?.searchByName();
         },
         'search-area': (el, modules) => {
-            modules.modalManager?.open('areaModal')
+            modules.nav?.setPageContext('search-modal'); // Set context to search-modal
+            modules.modalManager?.open('areaModal');
         },
         'perform-area-search': (el, modules) => {
             modules.search?.searchByArea();
         },
         'search-beer': (el, modules) => {
+            modules.nav?.setPageContext('search-modal'); // Set context to search-modal
             modules.modalManager?.open('beerModal');
         },
         'perform-beer-search': (el, modules) => {
@@ -528,58 +532,51 @@ const App = {
             console.log('🔙 Navigating back from:', currentContext, 'to:', previousContext);
             
             if (currentContext === 'search') {
-                // Check if we came from somewhere specific
+                // We're in the main search overlay, go back to wherever we came from
                 const searchReturnContext = window.App.getState('searchReturnContext') || 'home';
                 
                 modules.modalManager?.close('searchOverlay');
                 
-                if (searchReturnContext === 'home' || !searchReturnContext) {
-                    modules.nav?.goToHome();
-                } else if (searchReturnContext === 'results') {
+                if (searchReturnContext === 'results') {
                     setTimeout(() => {
                         modules.modalManager?.open('resultsOverlay');
                         modules.nav?.setPageContext('results');
                     }, 100);
+                } else {
+                    modules.nav?.goToHome();
                 }
+            } else if (currentContext === 'search-modal') {
+                // We're in a specific search modal (name, area, beer, distance)
+                // Go back to the main search overlay
+                
+                // Close any open search modals
+                const searchModals = ['nameModal', 'areaModal', 'beerModal', 'distanceModal'];
+                searchModals.forEach(modalId => {
+                    modules.modalManager?.close(modalId);
+                });
+                
+                // Small delay then show search overlay
+                setTimeout(() => {
+                    modules.modalManager?.open('searchOverlay');
+                    modules.nav?.setPageContext('search');
+                }, 100);
             } else if (currentContext === 'venue') {
                 modules.nav?.goBackFromVenue();
             } else if (currentContext === 'results') {
-                // Go back to search, not home
-                modules.modalManager?.close('resultsOverlay');
-                setTimeout(() => {
-                    // Only open if not already open
-                    if (!modules.modalManager?.isOpen('searchOverlay')) {
-                        modules.modalManager?.open('searchOverlay');
-                    }
-                    // If it was a location search, reopen distance modal
-                    const lastSearchType = window.App.getState(STATE_KEYS.LAST_SEARCH.TYPE);
-                    if (lastSearchType === 'nearby') {
-                        setTimeout(() => {
-                            modules.modalManager?.open('distanceModal');
-                        }, 100);
-                    }
-                }, 100);
+                modules.nav?.goToHome();
             } else if (currentContext === 'breweries') {
                 modules.modalManager?.close('breweriesOverlay');
                 modules.nav?.goToHome();
             } else if (currentContext === 'map') {
                 const mapReturnContext = App.getState('mapReturnContext');
-                console.log('🔙 Map return context:', mapReturnContext);
                 
                 modules.modalManager?.close('fullMapOverlay');
                 
                 if (mapReturnContext === 'search') {
                     setTimeout(() => {
                         modules.modalManager?.open('searchOverlay');
-                        modules.nav?.showSearchWithContext();
+                        modules.nav?.setPageContext('search');
                     }, 100);
-                } else if (mapReturnContext === 'venue') {
-                    const currentVenue = App.getState(STATE_KEYS.CURRENT_VENUE || STATE_KEYS.CURRENT_PUB);
-                    if (currentVenue) {
-                        modules.search?.showVenueDetails(currentVenue.venue_id);
-                    } else {
-                        modules.nav?.goToHome();
-                    }
                 } else {
                     modules.nav?.goToHome();
                 }
@@ -587,7 +584,7 @@ const App = {
                 // Default: go home
                 modules.nav?.goToHome();
             }
-        },
+        }
 
         
         'close-modal': (el, modules) => {
@@ -905,7 +902,6 @@ const App = {
             community?.handleQuickAction('find-stockists');
         },
 
-        // In main.js - update open-search action
         'open-search': (el, modules) => {
             console.log('🔍 Opening search overlay');
             
@@ -926,7 +922,7 @@ const App = {
             setTimeout(() => {
                 modules.modalManager?.open('searchOverlay', {
                     onOpen: () => {
-                        modules.nav?.showSearchWithContext();
+                        modules.nav?.setPageContext('search'); // Make sure we set to 'search', not 'search-modal'
                     }
                 });
             }, 100);
