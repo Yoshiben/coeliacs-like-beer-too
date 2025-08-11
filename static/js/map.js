@@ -304,7 +304,7 @@ export const MapModule = (() => {
     };
     
     // ================================
-    // PUB DETAIL MAP
+    // VENUE DETAIL MAP
     // ================================
     const initVenueDetailMap = (venue) => {
         console.log('🗺️ Initializing venue detail map for:', venue.name);
@@ -567,7 +567,7 @@ export const MapModule = (() => {
         
         try {
             // Check cache first
-            const cachedVenues = window.App.getState(STATE_KEYS.MAP_DATA.ALL_PUBS);
+            const cachedVenues = window.App.getState(STATE_KEYS.MAP_DATA.ALL_VENUES);
             if (cachedVenues && cachedVenues.length > 0) {
                 console.log('✅ Using cached venue data');
                 updateMapDisplay(true);
@@ -610,9 +610,9 @@ export const MapModule = (() => {
             }
             
             // Store in state
-            window.App.setState(STATE_KEYS.MAP_DATA.ALL_PUBS, data.venues || []);
+            window.App.setState(STATE_KEYS.MAP_DATA.ALL_VENUES, data.venues || []);
             
-            const allVenues = window.App.getState(STATE_KEYS.MAP_DATA.ALL_PUBS);
+            const allVenues = window.App.getState(STATE_KEYS.MAP_DATA.ALL_VENUES);
             console.log(`📊 Loaded ${allVenues.length} venues`);
             
             // Update display
@@ -920,7 +920,7 @@ export const MapModule = (() => {
     
     const updateMapDisplay = (showGFOnly) => {
         const fullUKMap = window.App.getState(STATE_KEYS.MAP_DATA.FULL_UK_MAP);
-        const allVenues = window.App.getState(STATE_KEYS.MAP_DATA.ALL_PUBS);
+        const allVenues = window.App.getState(STATE_KEYS.MAP_DATA.ALL_VENUES);
         if (!fullUKMap || !allVenues) return;
         
         console.log(`🍺 Updating map: ${showGFOnly ? 'GF Venues Only' : 'All Venues'}`);
@@ -937,8 +937,8 @@ export const MapModule = (() => {
     
     const clearMapLayers = (map) => {
         const layers = {
-            gf: window.App.getState(STATE_KEYS.MAP_DATA.GF_PUBS_LAYER),
-            clustered: window.App.getState(STATE_KEYS.MAP_DATA.CLUSTERED_PUBS_LAYER)
+            gf: window.App.getState(STATE_KEYS.MAP_DATA.GF_VENUES_LAYER),
+            clustered: window.App.getState(STATE_KEYS.MAP_DATA.CLUSTERED_VENUES_LAYER)
         };
         
         Object.values(layers).forEach(layer => {
@@ -948,7 +948,7 @@ export const MapModule = (() => {
     
     const displayGFVenuesOnly = (map, allVenues) => {
         const gfVenuesLayer = L.layerGroup().addTo(map);
-        window.App.setState(STATE_KEYS.MAP_DATA.GF_PUBS_LAYER, gfVenuesLayer);
+        window.App.setState(STATE_KEYS.MAP_DATA.GF_VENUES_LAYER, gfVenuesLayer);
         
         const gfVenues = allVenues.filter(venue => 
             venue.gf_status === 'always' || venue.gf_status === 'currently'
@@ -975,7 +975,7 @@ export const MapModule = (() => {
     const displayAllVenuesClustered = (map, allVenues) => {
         // Clear previous layers
         const gfVenuesLayer = L.layerGroup().addTo(map);
-        window.App.setState(STATE_KEYS.MAP_DATA.GF_PUBS_LAYER, gfVenuesLayer);
+        window.App.setState(STATE_KEYS.MAP_DATA.GF_VENUES_LAYER, gfVenuesLayer);
         
         const clusteredVenuesLayer = L.markerClusterGroup({
             ...config.clusterConfig,
@@ -994,7 +994,7 @@ export const MapModule = (() => {
             }
         }).addTo(map);
         
-        window.App.setState(STATE_KEYS.MAP_DATA.CLUSTERED_PUBS_LAYER, clusteredVenuesLayer);
+        window.App.setState(STATE_KEYS.MAP_DATA.CLUSTERED_VENUES_LAYER, clusteredVenuesLayer);
         
         // Add ALL venues to cluster layer
         allVenues.forEach(venue => {
@@ -1106,7 +1106,7 @@ export const MapModule = (() => {
     };
     
     // ================================
-    // PUBLIC API
+    // VENUELIC API
     // ================================
     return {
         // Main maps
