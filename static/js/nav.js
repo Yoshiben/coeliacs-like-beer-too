@@ -33,7 +33,7 @@ export const NavStateManager = (() => {
         state.currentContext = context;
         
         // Remove all page classes
-        document.body.classList.remove('page-home', 'page-results', 'page-map', 'page-pub', 'page-search', 'page-breweries');
+        document.body.classList.remove('page-home', 'page-results', 'page-map', 'page-venue', 'page-search', 'page-breweries');
         
         // Add the current page class
         document.body.classList.add(`page-${context}`);
@@ -83,7 +83,7 @@ export const NavStateManager = (() => {
             'home': '/',
             'results': '/search',
             'search': '/search',
-            'pub': '/pub',
+            'venue': '/venue',
             'map': '/map',
             'breweries': '/breweries'
         };
@@ -117,12 +117,12 @@ export const NavStateManager = (() => {
                     goToHome(shouldPushState);
                 }
                 break;
-            case 'pub':
-                // Check if we have a current pub
-                const currentPub = window.App?.getState('currentPub');
-                if (currentPub) {
-                    modules.modalManager?.open('pubDetailsOverlay');
-                    setPageContext('pub');
+            case 'venue':
+                // Check if we have a current venue
+                const currentVenue = window.App?.getState('currentVenue');
+                if (currentVenue) {
+                    modules.modalManager?.open('venueDetailsOverlay');
+                    setPageContext('venue');
                 } else {
                     goToHome(shouldPushState);
                 }
@@ -168,8 +168,8 @@ export const NavStateManager = (() => {
                 case 'breweries':
                     goToHome();
                     break;
-                case 'pub':
-                    goBackFromPub();
+                case 'venue':
+                    goBackFromVenue();
                     break;
                 case 'search':
                     goToHome();
@@ -188,7 +188,7 @@ export const NavStateManager = (() => {
         console.log('🏠 Navigating to home');
         
         // Close ALL overlays including search overlay
-        const overlays = ['resultsOverlay', 'pubDetailsOverlay', 'fullMapOverlay', 'searchOverlay'];
+        const overlays = ['resultsOverlay', 'venueDetailsOverlay', 'fullMapOverlay', 'searchOverlay'];
         overlays.forEach(id => {
             const overlay = document.getElementById(id);
             if (overlay) {
@@ -224,13 +224,13 @@ export const NavStateManager = (() => {
         modules.tracking?.trackEvent('nav_home', 'Navigation', `from_${state.previousContext}`);
     };
     
-    const goBackFromPub = () => {
-        console.log('🔙 Going back from pub details');
+    const goBackFromVenue = () => {
+        console.log('🔙 Going back from venue details');
         
-        // IMPORTANT: Use ModalManager to properly close pub details
+        // IMPORTANT: Use ModalManager to properly close venue details
         const modalManager = window.App?.getModule('modalManager');
         if (modalManager) {
-            modalManager.close('pubDetailsOverlay');
+            modalManager.close('venueDetailsOverlay');
         }
         
         // Check if we have previous results
@@ -245,7 +245,7 @@ export const NavStateManager = (() => {
             // Update context
             setPageContext('results');
             
-            modules.tracking?.trackEvent('nav_back_to_results', 'Navigation', 'from_pub');
+            modules.tracking?.trackEvent('nav_back_to_results', 'Navigation', 'from_venue');
         } else {
             // No results to go back to, go home
             goToHome();
@@ -441,9 +441,9 @@ export const NavStateManager = (() => {
         pushState('map');
     };
     
-    const showPubDetailsWithContext = () => {
-        setPageContext('pub');
-        pushState('pub');
+    const showVenueDetailsWithContext = () => {
+        setPageContext('venue');
+        pushState('venue');
     };
     
     const showHomeWithContext = () => {
@@ -453,7 +453,7 @@ export const NavStateManager = (() => {
     
     const showSearchWithContext = () => {
         // Remove all page classes first
-        document.body.classList.remove('page-home', 'page-results', 'page-map', 'page-pub');
+        document.body.classList.remove('page-home', 'page-results', 'page-map', 'page-venue');
         
         // Add search class
         document.body.classList.add('page-search');
@@ -527,11 +527,11 @@ export const NavStateManager = (() => {
         setPageContext,
         showResultsWithContext,
         showMapWithContext,
-        showPubDetailsWithContext,
+        showVenueDetailsWithContext,
         showHomeWithContext,
         showSearchWithContext,
         goToHome,
-        goBackFromPub,
+        goBackFromVenue,
         getCurrentContext: () => state.currentContext,
         getPreviousContext: () => state.previousContext
     };
