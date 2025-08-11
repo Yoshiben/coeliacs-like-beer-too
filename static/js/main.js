@@ -487,7 +487,7 @@ const App = {
     // Action handler map - split into logical groups
     actionHandlers: {
         // Search actions
-        location-search': (el, modules) => {
+        'location-search': (el, modules) => {
             modules.nav?.setPageContext('search-modal'); // Set context to search-modal
             modules.modalManager?.open('distanceModal');
         },
@@ -584,7 +584,7 @@ const App = {
                 // Default: go home
                 modules.nav?.goToHome();
             }
-        }
+        },
 
         
         'close-modal': (el, modules) => {
