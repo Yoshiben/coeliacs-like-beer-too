@@ -559,6 +559,17 @@ const App = {
         'close-modal': (el, modules) => {
             const modal = el.closest('.modal, .search-modal, .report-modal');
             if (modal?.id) {
+                // Special handling for report modal
+                if (modal.id === 'reportModal') {
+                    const currentVenue = window.App.getState(STATE_KEYS.CURRENT_VENUE || STATE_KEYS.CURRENT_PUB);
+                    if (currentVenue) {
+                        // We have a current venue, so we came from venue details
+                        modules.modalManager?.close(modal.id);
+                        // Don't need to do anything else - venue details should still be visible
+                        return;
+                    }
+                }
+                
                 modules.modalManager?.close(modal.id) || modules.modal?.close(modal.id);
             }
         },
@@ -670,11 +681,10 @@ const App = {
         'report-beer': (el, modules) => {
             const venueData = window.App.getState('currentVenue');
             
-            // Close overlays if needed
-            modules.modalManager?.closeAllOverlays();
-            document.body.style.overflow = '';
+            // DON'T close overlays - we want venue details to stay open!
+            // modules.modalManager?.closeAllOverlays(); // <-- Remove this line
             
-            // Open report modal with venue data
+            // Open report modal on top of venue details
             if (modules.modalManager) {
                 modules.modalManager.open('reportModal', {
                     onOpen: () => {
