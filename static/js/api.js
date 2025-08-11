@@ -1,6 +1,6 @@
 // ================================================================================
-// API.JS - Complete Refactor with STATE_KEYS
-// Handles: All backend communication, error handling, response parsing
+// API.JS - Simplified Version
+// Handles: Backend communication, basic error handling
 // ================================================================================
 
 import { Constants } from './constants.js';
@@ -10,135 +10,19 @@ export const APIModule = (function() {
     'use strict';
     
     // ================================
-    // PRIVATE STATE
+    // SIMPLE FETCH WRAPPER
     // ================================
-    const state = {
-        pendingRequests: new Map(),
-        requestCache: new Map(),
-        cacheTimeout: 300000, // 5 minutes
-        retryQueue: []
-    };
-    
-    const config = {
-        timeout: Constants.UI.TIMEOUTS.API_REQUEST,
-        retryAttempts: 2,
-        retryDelay: 1000,
-        headers: {
-            'Content-Type': 'application/json',
-            'X-App-Version': Constants.VERSION || '1.0.0'
-        }
-    };
-    
-    // ================================
-    // MODULE GETTERS
-    // ================================
-    const modules = {
-        get helpers() { return window.App?.getModule('helpers'); },
-        get tracking() { return window.App?.getModule('tracking'); }
-    };
-    
-    // ================================
-    // CORE FETCH WRAPPER
-    // ================================
-    const fetchWithTimeout = async (url, options = {}) => {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), config.timeout);
-        
-        // Check cache first
-        const cacheKey = `${options.method || 'GET'}_${url}`;
-        if (options.method === 'GET' && state.requestCache.has(cacheKey)) {
-            const cached = state.requestCache.get(cacheKey);
-            if (Date.now() - cached.timestamp < state.cacheTimeout) {
-                clearTimeout(timeoutId);
-                console.log('📦 Using cached response for:', url);
-                return cached.response.clone();
-            }
-        }
-        
+    const apiCall = async (url, options = {}) => {
         try {
             const response = await fetch(url, {
-                ...options,
-                headers: {
-                    ...config.headers,
-                    ...options.headers
-                },
-                signal: controller.signal
+                headers: { 'Content-Type': 'application/json' },
+                ...options
             });
             
-            clearTimeout(timeoutId);
-            
-            // Cache GET requests
-            if (options.method === 'GET' && response.ok) {
-                state.requestCache.set(cacheKey, {
-                    response: response.clone(),
-                    timestamp: Date.now()
-                });
-            }
-            
-            return response;
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            return await response.json();
         } catch (error) {
-            clearTimeout(timeoutId);
-            
-            if (error.name === 'AbortError') {
-                throw new Error('Request timeout');
-            }
-            throw error;
-        }
-    };
-    
-    // ================================
-    // ERROR HANDLING
-    // ================================
-    const handleAPIError = (error, endpoint, context = {}) => {
-        console.error(`❌ API Error [${endpoint}]:`, error);
-        
-        // Track error
-        modules.tracking?.trackError('api_error', `${endpoint}: ${error.message}`);
-        
-        // Determine user-friendly message
-        let userMessage = Constants.ERRORS.GENERIC;
-        
-        if (error.message.includes('timeout')) {
-            userMessage = Constants.ERRORS.NETWORK;
-        } else if (error.message.includes('404')) {
-            userMessage = Constants.ERRORS.NO_RESULTS;
-        }
-        
-        // Store error in state for debugging
-        window.App.setState('lastAPIError', {
-            endpoint,
-            error: error.message,
-            timestamp: Date.now(),
-            context
-        });
-        
-        return {
-            success: false,
-            error: userMessage,
-            originalError: error.message
-        };
-    };
-    
-    // ================================
-    // REQUEST DEDUPLICATION
-    // ================================
-    const deduplicatedFetch = async (key, fetchFunction) => {
-        // Check if identical request is pending
-        if (state.pendingRequests.has(key)) {
-            console.log('🔄 Reusing pending request:', key);
-            return state.pendingRequests.get(key);
-        }
-        
-        // Create and store promise
-        const promise = fetchFunction();
-        state.pendingRequests.set(key, promise);
-        
-        try {
-            const result = await promise;
-            state.pendingRequests.delete(key);
-            return result;
-        } catch (error) {
-            state.pendingRequests.delete(key);
+            console.error(`❌ API Error [${url}]:`, error);
             throw error;
         }
     };
@@ -147,34 +31,17 @@ export const APIModule = (function() {
     // STATS API
     // ================================
     const getStats = async () => {
-        const cacheKey = 'stats';
-        
-        return deduplicatedFetch(cacheKey, async () => {
-            try {
-                const response = await fetchWithTimeout(Constants.API.STATS);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                
-                const stats = await response.json();
-                
-                // Update global state
-                window.App.setState('stats', stats);
-                
-                return stats;
-            } catch (error) {
-                console.error('API: Error fetching stats:', error);
-                
-                // Return cached stats from state if available
-                const cachedStats = window.App.getState('stats');
-                if (cachedStats) return cachedStats;
-                
-                // Return fallback data
-                return {
-                    total_venues: Constants.DEFAULTS.TOTAL_VENUES,
-                    gf_venues: Constants.DEFAULTS.GF_VENUES,
-                    gf_venues_this_month: Constants.DEFAULTS.GF_VENUES_THIS_MONTH
-                };
-            }
-        });
+        try {
+            const stats = await apiCall(Constants.API.STATS);
+            window.App.setState('stats', stats);
+            return stats;
+        } catch (error) {
+            return {
+                total_venues: 49841,
+                gf_venues: 0,
+                gf_venues_this_month: 0
+            };
+        }
     };
     
     // ================================
@@ -183,124 +50,66 @@ export const APIModule = (function() {
     const searchVenues = async (params) => {
         const { query, searchType = 'all', page = 1, venueId = null, gfOnly = false } = params;
         
-        try {
-            let url;
-            if (venueId) {
-                url = `${Constants.API.SEARCH}?venue_id=${venueId}`;
-            } else {
-                const searchParams = new URLSearchParams({
-                    query: query || '',
-                    search_type: searchType,
-                    page: page.toString(),
-                    gf_only: gfOnly.toString()
-                });
-                url = `${Constants.API.SEARCH}?${searchParams}`;
-            }
-            
-            console.log('🔍 API: Searching venues:', url);
-            
-            const response = await fetchWithTimeout(url);
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            
-            const data = await response.json();
-            if (data.error) throw new Error(data.error);
-            
-            // Update search state
-            window.App.setState(STATE_KEYS.SEARCH_RESULTS, data.venues || data);
-            
-            return data;
-        } catch (error) {
-            return handleAPIError(error, 'searchVenues', params);
+        let url;
+        if (venueId) {
+            url = `${Constants.API.SEARCH}?venue_id=${venueId}`;
+        } else {
+            const searchParams = new URLSearchParams({
+                query: query || '',
+                search_type: searchType,
+                page: page.toString(),
+                gf_only: gfOnly.toString()
+            });
+            url = `${Constants.API.SEARCH}?${searchParams}`;
         }
+        
+        const data = await apiCall(url);
+        window.App.setState(STATE_KEYS.SEARCH_RESULTS, data.venues || data);
+        return data;
     };
     
     const findNearbyVenues = async (lat, lng, radius = 5, gfOnly = false) => {
-        const cacheKey = `nearby_${lat}_${lng}_${radius}_${gfOnly}`;
-        
-        return deduplicatedFetch(cacheKey, async () => {
-            try {
-                const params = new URLSearchParams({
-                    lat: lat.toString(),
-                    lng: lng.toString(),
-                    radius: radius.toString(),
-                    gf_only: gfOnly.toString()
-                });
-                
-                const url = `${Constants.API.NEARBY}?${params}`;
-                console.log('📍 API: Finding nearby venues:', url);
-                
-                const response = await fetchWithTimeout(url);
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                
-                const data = await response.json();
-                if (data.error) throw new Error(data.error);
-                
-                // Ensure we always return an array
-                let venues = [];
-                if (Array.isArray(data)) {
-                    venues = data;
-                } else if (data.venues && Array.isArray(data.venues)) {
-                    venues = data.venues;
-                } else if (data.success === false) {
-                    // API error response
-                    throw new Error(data.error || 'Failed to load venues');
-                }
-                
-                // Update state
-                window.App.setState(STATE_KEYS.SEARCH_RESULTS, venues);
-                
-                return venues;
-            } catch (error) {
-                const errorResult = handleAPIError(error, 'findNearbyVenues', { lat, lng, radius });
-                // Ensure we return an empty array on error, not an error object
-                return [];
-            }
+        const params = new URLSearchParams({
+            lat: lat.toString(),
+            lng: lng.toString(),
+            radius: radius.toString(),
+            gf_only: gfOnly.toString()
         });
+        
+        const venues = await apiCall(`${Constants.API.NEARBY}?${params}`);
+        window.App.setState(STATE_KEYS.SEARCH_RESULTS, Array.isArray(venues) ? venues : []);
+        return Array.isArray(venues) ? venues : [];
     };
     
     // ================================
     // GEOCODING
     // ================================
     const geocodePostcode = async (postcode) => {
-        const cacheKey = `geocode_${postcode}`;
-        
-        return deduplicatedFetch(cacheKey, async () => {
-            try {
-                const params = new URLSearchParams({
-                    format: 'json',
-                    q: postcode,
-                    countrycodes: 'gb',
-                    limit: '1'
-                });
-                
-                const url = `${Constants.EXTERNAL.GEOCODING_API}?${params}`;
-                console.log('🌍 API: Geocoding postcode:', postcode);
-                
-                const response = await fetchWithTimeout(url);
-                const data = await response.json();
-                
-                if (!data || data.length === 0) {
-                    throw new Error('Postcode not found');
-                }
-                
-                const result = {
-                    lat: parseFloat(data[0].lat),
-                    lng: parseFloat(data[0].lon),
-                    display_name: data[0].display_name
-                };
-                
-                return result;
-            } catch (error) {
-                return handleAPIError(error, 'geocodePostcode', { postcode });
-            }
+        const params = new URLSearchParams({
+            format: 'json',
+            q: postcode,
+            countrycodes: 'gb',
+            limit: '1'
         });
+        
+        const data = await apiCall(`${Constants.EXTERNAL.GEOCODING_API}?${params}`);
+        
+        if (!data || data.length === 0) {
+            throw new Error('Postcode not found');
+        }
+        
+        return {
+            lat: parseFloat(data[0].lat),
+            lng: parseFloat(data[0].lon),
+            display_name: data[0].display_name
+        };
     };
     
     // ================================
     // AUTOCOMPLETE
     // ================================
     const getVenueSuggestions = async (query, searchType = 'all', gfOnly = false) => {
-        if (!query || query.length < Constants.SEARCH.MIN_QUERY_LENGTH) return [];
+        if (!query || query.length < 2) return [];
         
         try {
             const params = new URLSearchParams({
@@ -309,10 +118,8 @@ export const APIModule = (function() {
                 gf_only: gfOnly.toString()
             });
             
-            const response = await fetchWithTimeout(`${Constants.API.AUTOCOMPLETE}?${params}`);
-            return await response.json();
+            return await apiCall(`${Constants.API.AUTOCOMPLETE}?${params}`);
         } catch (error) {
-            console.error('API: Autocomplete error:', error);
             return [];
         }
     };
@@ -326,15 +133,10 @@ export const APIModule = (function() {
                 `${Constants.API.BREWERIES}?q=${encodeURIComponent(query)}` : 
                 Constants.API.BREWERIES;
             
-            const response = await fetchWithTimeout(url);
-            const breweries = await response.json();
-            
-            // Store in state for form module
+            const breweries = await apiCall(url);
             window.App.setState('availableBreweries', breweries);
-            
             return breweries;
         } catch (error) {
-            console.error('API: Brewery fetch error:', error);
             return [];
         }
     };
@@ -343,341 +145,73 @@ export const APIModule = (function() {
         try {
             const baseUrl = Constants.API.BREWERY_BEERS.replace(':brewery', encodeURIComponent(brewery));
             const url = query ? `${baseUrl}?q=${encodeURIComponent(query)}` : baseUrl;
-            
-            const response = await fetchWithTimeout(url);
-            return await response.json();
+            return await apiCall(url);
         } catch (error) {
-            console.error('API: Beer fetch error:', error);
             return [];
         }
     };
     
     // ================================
-    // SUBMISSION APIs
+    // SUBMISSION APIS
     // ================================
     const submitBeerReport = async (reportData) => {
-        try {
-            // ADD THIS DEBUG LOGGING:
-            console.log('🔍 DEBUG - Raw report data:', reportData);
-            console.log('🔍 DEBUG - Data types:', {
-                venue_id: typeof reportData.venue_id,
-                beer_abv: typeof reportData.beer_abv,
-                venue_id_value: reportData.venue_id
-            });
-            // Validate required fields
-            const requiredFields = ['venue_id', 'beer_format', 'brewery', 'beer_name'];
-            const missingFields = requiredFields.filter(field => !reportData[field] && !reportData.venue_name);
-            
-            if (missingFields.length > 0) {
-                throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
-            }
-            
-            // Build payload
-            const payload = {
-                ...reportData,
-                submitted_at: new Date().toISOString(),
-                user_agent: navigator.userAgent,
-                session_id: window.App.getState('sessionId') || 'anonymous',
-                submitted_by: window.App.getState('userNickname') || 'Anonymous'
-            };
-            
-            console.log('📝 API: Submitting beer report:', payload);
-
-            console.log('📤 Sending to API:', {
-                url: Constants.API.SUBMIT_BEER,
-                payload: payload
-            });
-            
-            const response = await fetchWithTimeout(Constants.API.SUBMIT_BEER, {
-                method: 'POST',
-                body: JSON.stringify(payload)
-            });
-
-            console.log('📥 API: Response status:', response.status);
-            
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('❌ API: Error response:', errorText);
-                throw new Error(`HTTP ${response.status}: ${errorText}`);
-            }
-            
-            const result = await response.json();
-            console.log('✅ API: Success response:', result);
-            
-            // Track submission
-            modules.tracking?.trackFormSubmission('beer_report', {
-                tier: result.tier,
-                status: result.status,
-                brewery: reportData.brewery
-            });
-            
-            return result;
-        } catch (error) {
-            console.error('❌ API: Error in submitBeerReport:', error);
-            return handleAPIError(error, 'submitBeerReport', reportData);
-        }
+        const payload = {
+            ...reportData,
+            submitted_at: new Date().toISOString(),
+            submitted_by: window.App.getState('userNickname') || 'Anonymous'
+        };
+        
+        return await apiCall(Constants.API.SUBMIT_BEER, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
     };
     
     const updateGFStatus = async (venueId, status) => {
-        try {
-            const validStatuses = ['always', 'currently', 'not_currently', 'unknown'];
-            if (!validStatuses.includes(status)) {
-                throw new Error(`Invalid status: ${status}`);
-            }
-            
-            const response = await fetchWithTimeout(Constants.API.UPDATE_GF_STATUS, {
-                method: 'POST',
-                body: JSON.stringify({ venue_id: venueId, status })
+        const result = await apiCall(Constants.API.UPDATE_GF_STATUS, {
+            method: 'POST',
+            body: JSON.stringify({ venue_id: venueId, status })
+        });
+        
+        // Update current venue state
+        const currentVenue = window.App.getState(STATE_KEYS.CURRENT_VENUE);
+        if (currentVenue && currentVenue.venue_id === venueId) {
+            window.App.setState(STATE_KEYS.CURRENT_VENUE, {
+                ...currentVenue,
+                gf_status: status
             });
-            
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || `HTTP ${response.status}`);
-            }
-            
-            const result = await response.json();
-            
-            // Update current venue state
-            const currentVenue = window.App.getState(STATE_KEYS.CURRENT_VENUE);
-            if (currentVenue && currentVenue.venue_id === venueId) {
-                window.App.setState(STATE_KEYS.CURRENT_PUB, {
-                    ...currentVenue,
-                    gf_status: status
-                });
-            }
-            
-            // Track update
-            modules.tracking?.trackEvent('gf_status_updated', 'User Action', status);
-            
-            return result;
-        } catch (error) {
-            return handleAPIError(error, 'updateGFStatus', { venueId, status });
         }
+        
+        return result;
     };
     
     // ================================
     // MAP DATA API
     // ================================
     const getAllVenuesForMap = async () => {
-        const cacheKey = 'all_venues_map';
-        
-        // Check if we have cached data in state
-        const cachedVenues = window.App.getState(STATE_KEYS.MAP_DATA.ALL_PUBS);
+        const cachedVenues = window.App.getState(STATE_KEYS.MAP_DATA.ALL_VENUES);
         if (cachedVenues && cachedVenues.length > 0) {
-            console.log('📦 Using cached venue data');
             return { success: true, venues: cachedVenues };
         }
         
-        return deduplicatedFetch(cacheKey, async () => {
-            try {
-                const response = await fetchWithTimeout(Constants.API.ALL_PUBS);
-                const data = await response.json();
-                
-                if (!data.success) {
-                    throw new Error(data.error || 'Failed to load venues');
-                }
-                
-                // Store in state
-                window.App.setState(STATE_KEYS.MAP_DATA.ALL_PUBS, data.venues || []);
-                
-                return data;
-            } catch (error) {
-                return handleAPIError(error, 'getAllVenuesForMap');
-            }
-        });
-    };
-    
-    // ================================
-    // ADMIN APIs
-    // ================================
-    const admin = {
-        getValidationStats: async (token) => {
-            try {
-                const response = await fetchWithTimeout(Constants.API.ADMIN.VALIDATION_STATS, {
-                    headers: { 'Authorization': token }
-                });
-                
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                return await response.json();
-            } catch (error) {
-                return handleAPIError(error, 'admin.getValidationStats');
-            }
-        },
-        
-        getPendingReviews: async (token) => {
-            try {
-                const response = await fetchWithTimeout(Constants.API.ADMIN.PENDING_REVIEWS, {
-                    headers: { 'Authorization': token }
-                });
-                
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                return await response.json();
-            } catch (error) {
-                return handleAPIError(error, 'admin.getPendingReviews');
-            }
-        },
-        
-        getSoftValidationQueue: async (token) => {
-            try {
-                const response = await fetchWithTimeout(Constants.API.ADMIN.SOFT_VALIDATION, {
-                    headers: { 'Authorization': token }
-                });
-                
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                return await response.json();
-            } catch (error) {
-                return handleAPIError(error, 'admin.getSoftValidationQueue');
-            }
-        },
-        
-        getRecentSubmissions: async (token) => {
-            try {
-                const response = await fetchWithTimeout(Constants.API.ADMIN.RECENT_SUBMISSIONS, {
-                    headers: { 'Authorization': token }
-                });
-                
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                return await response.json();
-            } catch (error) {
-                return handleAPIError(error, 'admin.getRecentSubmissions');
-            }
-        },
-        
-        approveSubmission: async (token, submissionId, notes = '') => {
-            try {
-                const response = await fetchWithTimeout(Constants.API.ADMIN.APPROVE, {
-                    method: 'POST',
-                    headers: { 'Authorization': token },
-                    body: JSON.stringify({ 
-                        submission_id: submissionId, 
-                        admin_notes: notes 
-                    })
-                });
-                
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                return await response.json();
-            } catch (error) {
-                return handleAPIError(error, 'admin.approveSubmission', { submissionId });
-            }
-        },
-        
-        rejectSubmission: async (token, submissionId, notes) => {
-            try {
-                const response = await fetchWithTimeout(Constants.API.ADMIN.REJECT, {
-                    method: 'POST',
-                    headers: { 'Authorization': token },
-                    body: JSON.stringify({ 
-                        submission_id: submissionId, 
-                        admin_notes: notes 
-                    })
-                });
-                
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                return await response.json();
-            } catch (error) {
-                return handleAPIError(error, 'admin.rejectSubmission', { submissionId });
-            }
-        },
-        
-        approveSoftValidation: async (token, submissionId) => {
-            try {
-                const response = await fetchWithTimeout(Constants.API.ADMIN.APPROVE_SOFT, {
-                    method: 'POST',
-                    headers: { 'Authorization': token },
-                    body: JSON.stringify({ submission_id: submissionId })
-                });
-                
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                return await response.json();
-            } catch (error) {
-                return handleAPIError(error, 'admin.approveSoftValidation', { submissionId });
-            }
-        }
-    };
-    
-    // ================================
-    // CACHE MANAGEMENT
-    // ================================
-    const clearCache = (pattern = null) => {
-        if (pattern) {
-            // Clear specific cache entries matching pattern
-            for (const [key] of state.requestCache) {
-                if (key.includes(pattern)) {
-                    state.requestCache.delete(key);
-                }
-            }
-        } else {
-            // Clear all cache
-            state.requestCache.clear();
-        }
-        
-        console.log('🧹 Cache cleared:', pattern || 'all');
-    };
-    
-    const getCacheStats = () => {
-        return {
-            size: state.requestCache.size,
-            entries: Array.from(state.requestCache.keys()),
-            totalSize: JSON.stringify([...state.requestCache]).length
-        };
-    };
-    
-    // ================================
-    // RETRY MECHANISM
-    // ================================
-    const retryFailedRequest = async (request, attempt = 1) => {
-        if (attempt > config.retryAttempts) {
-            throw new Error(`Max retry attempts (${config.retryAttempts}) exceeded`);
-        }
-        
-        try {
-            return await request();
-        } catch (error) {
-            console.warn(`🔄 Retry attempt ${attempt}/${config.retryAttempts}:`, error.message);
-            
-            // Wait before retry
-            await new Promise(resolve => 
-                setTimeout(resolve, config.retryDelay * attempt)
-            );
-            
-            return retryFailedRequest(request, attempt + 1);
-        }
+        const data = await apiCall(Constants.API.ALL_VENUES);
+        window.App.setState(STATE_KEYS.MAP_DATA.ALL_VENUES, data.venues || []);
+        return data;
     };
     
     // ================================
     // PUBLIC API
     // ================================
     return {
-        // Core methods
         getStats,
         searchVenues,
         findNearbyVenues,
         geocodePostcode,
-        
-        // Autocomplete
         getVenueSuggestions,
-        
-        // Brewery & Beer
         getBreweries,
         getBreweryBeers,
-        
-        // Submissions
         submitBeerReport,
         updateGFStatus,
-        
-        // Map data
-        getAllVenuesForMap,
-        
-        // Admin namespace
-        admin,
-        
-        // Cache management
-        clearCache,
-        getCacheStats,
-        
-        // Utilities
-        retryFailedRequest
+        getAllVenuesForMap
     };
 })();
-
-// DO NOT add window.APIModule here - let main.js handle registration
