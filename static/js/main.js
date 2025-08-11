@@ -85,6 +85,12 @@ const App = {
     },
     
     getState: (path) => {
+        // Add type checking
+        if (!path || typeof path !== 'string') {
+            console.warn('⚠️ Invalid state path:', path);
+            return null;
+        }
+        
         const keys = path.split('.');
         let current = App.state;
         
@@ -522,8 +528,20 @@ const App = {
             console.log('🔙 Navigating back from:', currentContext, 'to:', previousContext);
             
             if (currentContext === 'search') {
-                // Use the existing close-search logic
-                App.handleAction('close-search', el, modules);
+                // Check if we came from somewhere specific
+                const searchReturnContext = window.App.getState('searchReturnContext') || 'home';
+                
+                modules.modalManager?.close('searchOverlay');
+                
+                if (searchReturnContext === 'home' || !searchReturnContext) {
+                    modules.nav?.goToHome();
+                } else if (searchReturnContext === 'results') {
+                    setTimeout(() => {
+                        modules.modalManager?.open('resultsOverlay');
+                        modules.nav?.setPageContext('results');
+                    }, 100);
+                }
+            }
             } else if (currentContext === 'venue') {
                 modules.nav?.goBackFromVenue();
             } else if (currentContext === 'results') {
@@ -917,6 +935,9 @@ const App = {
         'close-search': (el, modules) => {
             console.log('🔍 Closing search overlay');
             
+            // Check where we came from before opening search
+            const searchReturnContext = window.App.getState('searchReturnContext') || 'home';
+            
             // Remove search context
             document.body.classList.remove('page-search');
             
@@ -925,9 +946,19 @@ const App = {
                 modules.modalManager.close('searchOverlay');
             }
             
-            // Return to home context
-            modules.nav?.goToHome();
+            // Return to where we came from
+            if (searchReturnContext === 'results') {
+                // Go back to results
+                setTimeout(() => {
+                    modules.modalManager?.open('resultsOverlay');
+                    modules.nav?.setPageContext('results');
+                }, 100);
+            } else {
+                // Default: go home
+                modules.nav?.goToHome();
+            }
         },
+        
         'open-breweries': (el, modules) => {
             // First, close any open primary overlays
             modules.modalManager?.closeGroup('primary');
