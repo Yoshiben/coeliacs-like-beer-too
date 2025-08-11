@@ -522,6 +522,10 @@ body.page-breweries .nav-back-btn { display: flex !important; }
    justify-content: space-between;
 }
 
+#cookieConsent {
+    display: none; /* Hidden by default, JS will show if needed */
+}
+
 .cookie-text h4 {
     margin: 0 0 var(--space-sm) 0;
     font-size: var(--text-xl);
