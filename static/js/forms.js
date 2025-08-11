@@ -20,7 +20,7 @@ export const FormModule = (() => {
             brewery: null,
             beer: null,
             style: null,
-            pub: null
+            venue: null
         },
         dropdownsOpen: new Set(),
         currentSubmission: null,
@@ -48,11 +48,11 @@ export const FormModule = (() => {
     // UTILITIES
     // ================================
     const utils = {
-        getSelectedPub: () => window.App.getState(STATE_KEYS.SELECTED_PUB_FOR_REPORT),
+        getSelectedVenue: () => window.App.getState(STATE_KEYS.SELECTED_PUB_FOR_REPORT),
         
-        setSelectedPub: (pubData) => window.App.setState(STATE_KEYS.SELECTED_PUB_FOR_REPORT, pubData),
+        setSelectedVenue: (venueData) => window.App.setState(STATE_KEYS.SELECTED_PUB_FOR_REPORT, venueData),
         
-        getCurrentPub: () => window.App.getState(STATE_KEYS.CURRENT_PUB),
+        getCurrentVenue: () => window.App.getState(STATE_KEYS.CURRENT_PUB),
         
         getCurrentBrewery: () => window.App.getState(STATE_KEYS.CURRENT_BREWERY),
         
@@ -199,28 +199,28 @@ export const FormModule = (() => {
             reportData.beer_id = parseInt(beerNameInput.dataset.beerId);
         }
         
-        // Add pub data - check both selected pub state and current pub state
-        const selectedPub = utils.getSelectedPub() || utils.getCurrentPub();
+        // Add venue data - check both selected venue state and current venue state
+        const selectedVenue = utils.getSelectedVenue() || utils.getCurrentVenue();
         
-        if (selectedPub && selectedPub.pub_id) {
-            // Using existing pub from database
-            reportData.pub_id = parseInt(selectedPub.pub_id) || parseInt(selectedPub.id);
-            reportData.pub_name = selectedPub.name;
-            console.log('🏠 Using selected pub:', selectedPub.name, 'ID:', reportData.pub_id);
+        if (selectedVenue && selectedVenue.venue_id) {
+            // Using existing venue from database
+            reportData.venue_id = parseInt(selectedVenue.venue_id) || parseInt(selectedVenue.id);
+            reportData.venue_name = selectedVenue.name;
+            console.log('🏠 Using selected venue:', selectedVenue.name, 'ID:', reportData.venue_id);
         } else {
-            // Manual pub entry or new pub
-            const pubNameField = document.getElementById('reportPubName');
+            // Manual venue entry or new venue
+            const venueNameField = document.getElementById('reportVenueName');
             const addressField = document.getElementById('reportAddress');
             const postcodeField = document.getElementById('reportPostcode');
             
-            reportData.pub_name = pubNameField?.value || formData.get('reportPubName') || '';
+            reportData.venue_name = venueNameField?.value || formData.get('reportVenueName') || '';
             reportData.address = addressField?.value || formData.get('reportAddress') || '';
             reportData.postcode = postcodeField?.value || formData.get('reportPostcode') || '';
             
-            // Don't send pub_id if it's a new pub
-            reportData.pub_id = null;
+            // Don't send venue_id if it's a new venue
+            reportData.venue_id = null;
             
-            console.log('🏠 Using manual pub data:', reportData.pub_name);
+            console.log('🏠 Using manual venue data:', reportData.venue_name);
         }
         
         // Clean up ABV field - ensure it's a proper number or null
@@ -239,12 +239,12 @@ export const FormModule = (() => {
         if (!data.brewery) errors.push('Brewery');
         if (!data.beer_name) errors.push('Beer Name');
         
-        // Either need pub_id OR pub details
-        if (!data.pub_id) {
-            if (!data.pub_name) errors.push('Pub Name');
-            // Only require address/postcode for new pubs
-            if (data.pub_name && (!data.address || !data.postcode)) {
-                console.warn('⚠️ New pub missing address/postcode - may fail validation');
+        // Either need venue_id OR venue details
+        if (!data.venue_id) {
+            if (!data.venue_name) errors.push('Venue Name');
+            // Only require address/postcode for new venues
+            if (data.venue_name && (!data.address || !data.postcode)) {
+                console.warn('⚠️ New venue missing address/postcode - may fail validation');
             }
         }
         
@@ -269,18 +269,18 @@ export const FormModule = (() => {
         // Reset form
         resetReportForm();
         
-        // IMPORTANT: Refresh the current pub to show the new beer
-        const currentPub = utils.getCurrentPub();
-        if (currentPub && currentPub.pub_id) {
-            // Refresh pub details to get updated beer list
+        // IMPORTANT: Refresh the current venue to show the new beer
+        const currentVenue = utils.getCurrentVenue();
+        if (currentVenue && currentVenue.venue_id) {
+            // Refresh venue details to get updated beer list
             const searchModule = window.App?.getModule('search');
             if (searchModule) {
-                searchModule.showPubDetails(currentPub.pub_id);
+                searchModule.showVenueDetails(currentVenue.venue_id);
             }
         }
         
-        // Return to home view if not on pub details
-        if (!currentPub) {
+        // Return to home view if not on venue details
+        if (!currentVenue) {
             returnToHomeView();
         }
         
@@ -294,7 +294,7 @@ export const FormModule = (() => {
     
     const returnToHomeView = () => {
         // Close any overlays
-        ['pubDetailsOverlay', 'resultsOverlay'].forEach(id => {
+        ['venueDetailsOverlay', 'resultsOverlay'].forEach(id => {
             const overlay = document.getElementById(id);
             if (overlay) {
                 overlay.style.display = 'none';
@@ -317,13 +317,13 @@ export const FormModule = (() => {
         if (form) form.reset();
         
         // Clear state
-        utils.setSelectedPub(null);
+        utils.setSelectedVenue(null);
         utils.setCurrentBrewery(null);
         
         // Reset UI
-        document.getElementById('selectedPubInfo').style.display = 'none';
-        document.getElementById('newPubFields').style.display = 'none';
-        document.getElementById('pubSearchGroup').style.display = 'block';
+        document.getElementById('selectedVenueInfo').style.display = 'none';
+        document.getElementById('newVenueFields').style.display = 'none';
+        document.getElementById('venueSearchGroup').style.display = 'block';
         
         // Clear dropdowns
         hideAllDropdowns();
@@ -349,92 +349,92 @@ export const FormModule = (() => {
     // ================================
     // PUB SEARCH & SELECTION
     // ================================
-    const searchPubs = utils.debounce(async (query) => {
-        const suggestionsDiv = document.getElementById('pubSuggestions');
+    const searchVenues = utils.debounce(async (query) => {
+        const suggestionsDiv = document.getElementById('venueSuggestions');
         if (!suggestionsDiv) return;
         
         if (query.length < config.minSearchLength) {
-            hideDropdown('pubSuggestions');
+            hideDropdown('venueSuggestions');
             return;
         }
         
         try {
-            const suggestions = await modules.api.getPubSuggestions(query, 'name', false);
+            const suggestions = await modules.api.getVenueSuggestions(query, 'name', false);
             
             if (suggestions.length === 0) {
                 displayNoResultsOption(suggestionsDiv, query);
             } else {
-                displayPubSuggestions(suggestionsDiv, suggestions);
+                displayVenueSuggestions(suggestionsDiv, suggestions);
             }
             
-            showDropdown('pubSuggestions');
+            showDropdown('venueSuggestions');
         } catch (error) {
-            console.error('Error searching pubs:', error);
-            hideDropdown('pubSuggestions');
+            console.error('Error searching venues:', error);
+            hideDropdown('venueSuggestions');
         }
     }, config.debounceDelay);
     
     const displayNoResultsOption = (container, query) => {
         container.innerHTML = `
-            <div class="suggestion-item add-new" data-action="add-new-pub">
-                <strong>➕ Add "${utils.escapeHtml(query)}" as new pub</strong>
+            <div class="suggestion-item add-new" data-action="add-new-venue">
+                <strong>➕ Add "${utils.escapeHtml(query)}" as new venue</strong>
                 <small>Can't find it? Add it to our database!</small>
             </div>
         `;
     };
     
-    const displayPubSuggestions = (container, suggestions) => {
-        container.innerHTML = suggestions.map(pub => `
-            <div class="suggestion-item" data-pub-id="${pub.pub_id}" data-action="select-pub">
-                <strong>${utils.escapeHtml(pub.name)}</strong>
-                <small>${utils.escapeHtml(pub.address)}, ${utils.escapeHtml(pub.postcode)}</small>
+    const displayVenueSuggestions = (container, suggestions) => {
+        container.innerHTML = suggestions.map(venue => `
+            <div class="suggestion-item" data-venue-id="${venue.venue_id}" data-action="select-venue">
+                <strong>${utils.escapeHtml(venue.name)}</strong>
+                <small>${utils.escapeHtml(venue.address)}, ${utils.escapeHtml(venue.postcode)}</small>
             </div>
         `).join('');
     };
     
-    const selectPub = (pubElement) => {
-        const pubId = pubElement.dataset.pubId;
-        const pubName = pubElement.querySelector('strong').textContent;
-        const pubDetails = pubElement.querySelector('small').textContent;
-        const [address, postcode] = pubDetails.split(', ');
+    const selectVenue = (venueElement) => {
+        const venueId = venueElement.dataset.venueId;
+        const venueName = venueElement.querySelector('strong').textContent;
+        const venueDetails = venueElement.querySelector('small').textContent;
+        const [address, postcode] = venueDetails.split(', ');
         
-        const pubData = {
-            pub_id: parseInt(pubId),
-            name: pubName,
+        const venueData = {
+            venue_id: parseInt(venueId),
+            name: venueName,
             address,
             postcode
         };
         
-        utils.setSelectedPub(pubData);
-        updateSelectedPubUI(pubData);
-        hideDropdown('pubSuggestions');
+        utils.setSelectedVenue(venueData);
+        updateSelectedVenueUI(venueData);
+        hideDropdown('venueSuggestions');
         
-        modules.tracking?.trackEvent('pub_selected', 'Form', pubName);
+        modules.tracking?.trackEvent('venue_selected', 'Form', venueName);
     };
     
-    const updateSelectedPubUI = (pubData) => {
-        document.getElementById('selectedPubInfo').style.display = 'block';
-        document.getElementById('selectedPubName').textContent = pubData.name;
-        document.getElementById('selectedPubAddress').textContent = `${pubData.address}, ${pubData.postcode}`;
-        document.getElementById('pubSearchGroup').style.display = 'none';
+    const updateSelectedVenueUI = (venueData) => {
+        document.getElementById('selectedVenueInfo').style.display = 'block';
+        document.getElementById('selectedVenueName').textContent = venueData.name;
+        document.getElementById('selectedVenueAddress').textContent = `${venueData.address}, ${venueData.postcode}`;
+        document.getElementById('venueSearchGroup').style.display = 'none';
     };
     
-    const showNewPubFields = () => {
-        document.getElementById('newPubFields').style.display = 'block';
-        document.getElementById('pubSearchGroup').style.display = 'none';
-        document.getElementById('reportPubName').value = document.getElementById('reportPubSearch').value;
+    const showNewVenueFields = () => {
+        document.getElementById('newVenueFields').style.display = 'block';
+        document.getElementById('venueSearchGroup').style.display = 'none';
+        document.getElementById('reportVenueName').value = document.getElementById('reportVenueSearch').value;
         
-        hideDropdown('pubSuggestions');
+        hideDropdown('venueSuggestions');
         document.getElementById('reportAddress').focus();
     };
     
-    const clearSelectedPub = () => {
-        utils.setSelectedPub(null);
+    const clearSelectedVenue = () => {
+        utils.setSelectedVenue(null);
         
-        document.getElementById('selectedPubInfo').style.display = 'none';
-        document.getElementById('pubSearchGroup').style.display = 'block';
-        document.getElementById('reportPubSearch').value = '';
-        document.getElementById('reportPubSearch').focus();
+        document.getElementById('selectedVenueInfo').style.display = 'none';
+        document.getElementById('venueSearchGroup').style.display = 'block';
+        document.getElementById('reportVenueSearch').value = '';
+        document.getElementById('reportVenueSearch').focus();
     };
     
     // ================================
@@ -723,7 +723,7 @@ export const FormModule = (() => {
     // GF STATUS FLOW
     // ================================
     const GFStatusFlow = {
-        currentPub: null,
+        currentVenue: null,
         selectedStatus: null,
         initialized: false, 
     
@@ -737,25 +737,25 @@ export const FormModule = (() => {
         
         openStatusModal() {
             console.trace('🔍 DEBUG: Opening GF status modal from GFStatusFlow.openStatusModal');
-            console.log('Current pub:', this.currentPub);
+            console.log('Current venue:', this.currentVenue);
             // console.log('🔍 Opening GF status modal');
             
-            // IMPORTANT: Get fresh pub data when button is clicked
-            this.currentPub = utils.getCurrentPub();
+            // IMPORTANT: Get fresh venue data when button is clicked
+            this.currentVenue = utils.getCurrentVenue();
             
-            if (!this.currentPub || !this.currentPub.pub_id) {
-                console.error('❌ No current pub data');
-                utils.showToast('❌ No pub selected', 'error');
+            if (!this.currentVenue || !this.currentVenue.venue_id) {
+                console.error('❌ No current venue data');
+                utils.showToast('❌ No venue selected', 'error');
                 return;
             }
             
             // Reset selected status
             this.selectedStatus = null;
             
-            // Set pub name in modal
-            const pubNameEl = document.getElementById('statusPubName');
-            if (pubNameEl) {
-                pubNameEl.textContent = this.currentPub.name;
+            // Set venue name in modal
+            const venueNameEl = document.getElementById('statusVenueName');
+            if (venueNameEl) {
+                venueNameEl.textContent = this.currentVenue.name;
             }
             
             // Use modalManager if available
@@ -814,12 +814,12 @@ export const FormModule = (() => {
         async confirmStatusUpdate() {
             console.log('🔍 Confirming status update');
             
-            // Get the current pub data properly
-            const pubToUpdate = this.currentPub || utils.getCurrentPub();
+            // Get the current venue data properly
+            const venueToUpdate = this.currentVenue || utils.getCurrentVenue();
             
-            if (!pubToUpdate || !pubToUpdate.pub_id) {
-                console.error('❌ No pub data available:', pubToUpdate);
-                utils.showToast('❌ Error: No pub selected', 'error');
+            if (!venueToUpdate || !venueToUpdate.venue_id) {
+                console.error('❌ No venue data available:', venueToUpdate);
+                utils.showToast('❌ Error: No venue selected', 'error');
                 return;
             }
             
@@ -831,7 +831,7 @@ export const FormModule = (() => {
             
             // Log what we're sending
             console.log('📤 Sending update:', {
-                pub_id: pubToUpdate.pub_id,
+                venue_id: venueToUpdate.venue_id,
                 status: this.selectedStatus
             });
             
@@ -854,7 +854,7 @@ export const FormModule = (() => {
                         'Accept': 'application/json'
                     },
                     body: JSON.stringify({
-                        pub_id: parseInt(pubToUpdate.pub_id), // Ensure it's a number
+                        venue_id: parseInt(venueToUpdate.venue_id), // Ensure it's a number
                         status: this.selectedStatus
                     })
                 });
@@ -874,11 +874,11 @@ export const FormModule = (() => {
                 // UPDATE THE DISPLAY IMMEDIATELY
                 this.updateStatusDisplay(this.selectedStatus);
                 
-                // Update the current pub state
-                const currentPub = window.App.getState(STATE_KEYS.CURRENT_PUB);
-                if (currentPub) {
+                // Update the current venue state
+                const currentVenue = window.App.getState(STATE_KEYS.CURRENT_PUB);
+                if (currentVenue) {
                     window.App.setState(STATE_KEYS.CURRENT_PUB, {
-                        ...currentPub,
+                        ...currentVenue,
                         gf_status: this.selectedStatus
                     });
                 }
@@ -982,7 +982,7 @@ export const FormModule = (() => {
     };
     
     const hideAllDropdowns = () => {
-        ['breweryDropdown', 'beerNameDropdown', 'beerStyleDropdown', 'pubSuggestions']
+        ['breweryDropdown', 'beerNameDropdown', 'beerStyleDropdown', 'venueSuggestions']
             .forEach(id => hideDropdown(id));
     };
     
@@ -1058,9 +1058,9 @@ export const FormModule = (() => {
         e.stopPropagation();
         
         const actionHandlers = {
-            'select-pub': () => selectPub(action),
-            'add-new-pub': () => showNewPubFields(),
-            'clear-selected-pub': () => clearSelectedPub(),
+            'select-venue': () => selectVenue(action),
+            'add-new-venue': () => showNewVenueFields(),
+            'clear-selected-venue': () => clearSelectedVenue(),
             'select-brewery': () => selectBrewery(action.dataset.brewery),
             'select-beer': () => selectBeer(action.dataset.beerData),
             'add-new-beer': () => {
@@ -1092,7 +1092,7 @@ export const FormModule = (() => {
             },
             'add-beer-details': () => {
                 modules.modal.close('beerDetailsPromptModal');
-                modules.modal.openReportModal(GFStatusFlow.currentPub);
+                modules.modal.openReportModal(GFStatusFlow.currentVenue);
             }
         };
         
@@ -1108,7 +1108,7 @@ export const FormModule = (() => {
             { input: 'reportBrewery', dropdown: 'breweryDropdown', container: '.brewery-dropdown-container' },
             { input: 'reportBeerName', dropdown: 'beerNameDropdown', container: '.beer-name-container' },
             { input: 'reportBeerStyle', dropdown: 'beerStyleDropdown', container: '.beer-style-container' },
-            { input: 'reportPubSearch', dropdown: 'pubSuggestions', container: null }
+            { input: 'reportVenueSearch', dropdown: 'venueSuggestions', container: null }
         ];
         
         dropdownChecks.forEach(({ input, dropdown, container }) => {
@@ -1126,13 +1126,13 @@ export const FormModule = (() => {
     // INPUT LISTENERS
     // ================================
     const setupInputListeners = () => {
-        // Pub search
-        const pubSearchInput = document.getElementById('reportPubSearch');
-        if (pubSearchInput) {
-            pubSearchInput.addEventListener('input', (e) => searchPubs(e.target.value));
-            pubSearchInput.addEventListener('focus', (e) => {
+        // Venue search
+        const venueSearchInput = document.getElementById('reportVenueSearch');
+        if (venueSearchInput) {
+            venueSearchInput.addEventListener('input', (e) => searchVenues(e.target.value));
+            venueSearchInput.addEventListener('focus', (e) => {
                 if (e.target.value.length >= config.minSearchLength) {
-                    searchPubs(e.target.value);
+                    searchVenues(e.target.value);
                 }
             });
         }
@@ -1237,11 +1237,11 @@ export const FormModule = (() => {
         searchBeerStyles,
         selectBrewery,
         selectBeer,
-        clearSelectedPub,
+        clearSelectedVenue,
         initReportDropdowns,
         resetReportForm,
         GFStatusFlow,
-        getSelectedPub: utils.getSelectedPub,
+        getSelectedVenue: utils.getSelectedVenue,
         getCurrentBrewery: utils.getCurrentBrewery
     };
 })();
