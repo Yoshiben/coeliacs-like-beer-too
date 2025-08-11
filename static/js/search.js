@@ -479,7 +479,7 @@ export const SearchModule = (function() {
             utils.showLoadingToast('Loading venue details...');
             
             const results = await modules.api.searchVenues({ venueId: venueId });
-            const Venues = Array.isArray(results) ? results : results.venues;
+            const venues = Array.isArray(results) ? results : results.venues;
             
             utils.hideLoadingToast();
             
