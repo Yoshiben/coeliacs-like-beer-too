@@ -47,16 +47,16 @@ const App = {
             timestamp: null
         },
         searchResults: [],
-        currentPub: null,
-        selectedPubForReport: null,
+        currentVenue: null,
+        selectedVenueForReport: null,
         mapData: {
-            allPubs: [],
+            allVenues: [],
             fullUKMapInstance: null,
             resultsMapInstance: null,
-            pubDetailMapInstance: null,
+            venueDetailMapInstance: null,
             userMarker: null,
-            gfPubsLayer: null,
-            clusteredPubsLayer: null
+            gfVenuesLayer: null,
+            clusteredVenuesLayer: null
         },
         currentBrewery: null,
         reportFormData: {},
@@ -349,11 +349,11 @@ const App = {
             
             if (helpers && stats) {
                 // Just use the numbers as they are
-                if (stats.total_pubs) {
-                    helpers.animateNumber('totalPubs', stats.total_pubs);
+                if (stats.total_venues) {
+                    helpers.animateNumber('totalVenues', stats.total_venues);
                 }
-                if (stats.gf_pubs) {
-                    helpers.animateNumber('gfPubs', stats.gf_pubs);
+                if (stats.gf_venues) {
+                    helpers.animateNumber('gfVenues', stats.gf_venues);
                 }
             }
         } catch (error) {
@@ -508,11 +508,11 @@ const App = {
             modules.nav?.goToHome();
             modules.tracking?.trackEvent('close_results', 'Navigation', 'button');
         },
-        'close-pub-details': (el, modules) => {
+        'close-venue-details': (el, modules) => {
             modules.nav?.goToHome();
         },
         'back-to-results': (el, modules) => {
-            modules.nav?.goBackFromPub();
+            modules.nav?.goBackFromVenue();
         },
         'nav-back': (el, modules) => {
             const currentContext = modules.nav?.getCurrentContext();
@@ -521,8 +521,8 @@ const App = {
             if (currentContext === 'search') {
                 // Use the existing close-search logic
                 App.handleAction('close-search', el, modules);
-            } else if (currentContext === 'pub') {
-                modules.nav?.goBackFromPub();
+            } else if (currentContext === 'venue') {
+                modules.nav?.goBackFromVenue();
             } else if (currentContext === 'results') {
                 modules.nav?.goToHome();
             } else if (currentContext === 'breweries') {
@@ -541,10 +541,10 @@ const App = {
                         modules.modalManager?.open('searchOverlay');
                         modules.nav?.showSearchWithContext();
                     }, 100);
-                } else if (mapReturnContext === 'pub') {
-                    const currentPub = App.getState(STATE_KEYS.CURRENT_PUB);
-                    if (currentPub) {
-                        modules.search?.showPubDetails(currentPub.pub_id);
+                } else if (mapReturnContext === 'venue') {
+                    const currentVenue = App.getState(STATE_KEYS.CURRENT_PUB);
+                    if (currentVenue) {
+                        modules.search?.showVenueDetails(currentVenue.venue_id);
                     } else {
                         modules.nav?.goToHome();
                     }
@@ -564,14 +564,14 @@ const App = {
         },
 
         
-        // Pub actions
-        'view-pub': (el, modules) => {
-            const pubId = el.dataset.pubId || el.closest('[data-pub-id]')?.dataset.pubId;
-            if (pubId) modules.search?.showPubDetails?.(pubId);
+        // Venue actions
+        'view-venue': (el, modules) => {
+            const venueId = el.dataset.venueId || el.closest('[data-venue-id]')?.dataset.venueId;
+            if (venueId) modules.search?.showVenueDetails?.(venueId);
         },
-        'view-pub-from-map': (el, modules) => {
-            const pubId = el.dataset.pubId;
-            if (pubId) {
+        'view-venue-from-map': (el, modules) => {
+            const venueId = el.dataset.venueId;
+            if (venueId) {
                 // First close the map overlay
                 const mapOverlay = document.getElementById('fullMapOverlay');
                 if (mapOverlay) {
@@ -579,43 +579,43 @@ const App = {
                     mapOverlay.classList.remove('active');
                 }
                 
-                // Then show pub details
-                modules.search?.showPubDetails?.(pubId);
+                // Then show venue details
+                modules.search?.showVenueDetails?.(venueId);
             }
         },
-        'find-pub-online': (el, modules) => {
-            App.openPubExternalSearch(modules);
+        'find-venue-online': (el, modules) => {
+            App.openVenueExternalSearch(modules);
         },
-        'get-pub-directions': (el, modules) => {
-            App.openPubDirections(modules);
+        'get-venue-directions': (el, modules) => {
+            App.openVenueDirections(modules);
         },
         
         // Map actions
         'toggle-results-map': (el, modules) => {
             modules.map?.toggleSearchResultsFullMap?.();
         },
-        'toggle-pub-map': (el, modules) => {
-            App.togglePubDetailMap(modules);
+        'toggle-venue-map': (el, modules) => {
+            App.toggleVenueDetailMap(modules);
         },
-        'show-pub-on-map': (el, modules) => {
-            const currentPub = App.getState(STATE_KEYS.CURRENT_PUB);
-            if (!currentPub || !currentPub.latitude || !currentPub.longitude) {
-                modules.helpers?.showToast('📍 Location not available for this pub', 'error');
+        'show-venue-on-map': (el, modules) => {
+            const currentVenue = App.getState(STATE_KEYS.CURRENT_PUB);
+            if (!currentVenue || !currentVenue.latitude || !currentVenue.longitude) {
+                modules.helpers?.showToast('📍 Location not available for this venue', 'error');
                 return;
             }
             
             // Show full map
             App.showFullMap(modules);
             
-            // After map loads, center on this pub
+            // After map loads, center on this venue
             setTimeout(() => {
                 const map = App.getState(STATE_KEYS.MAP_DATA.FULL_UK_MAP);
                 if (map) {
-                    map.setView([parseFloat(currentPub.latitude), parseFloat(currentPub.longitude)], 16);
+                    map.setView([parseFloat(currentVenue.latitude), parseFloat(currentVenue.longitude)], 16);
                     
-                    // Find and open the pub's popup
+                    // Find and open the venue's popup
                     map.eachLayer(layer => {
-                        if (layer.options && layer.options.pubId === currentPub.pub_id) {
+                        if (layer.options && layer.options.venueId === currentVenue.venue_id) {
                             layer.openPopup();
                         }
                     });
@@ -636,18 +636,18 @@ const App = {
                 setTimeout(() => {
                     App.showFullMap(modules);
                 }, 100);
-            } else if (currentContext === 'pub') {
-                modules.modalManager?.close('pubDetailsOverlay');
+            } else if (currentContext === 'venue') {
+                modules.modalManager?.close('venueDetailsOverlay');
                 setTimeout(() => {
                     App.showFullMap(modules);
-                    const currentPub = App.getState(STATE_KEYS.CURRENT_PUB);
-                    if (currentPub && currentPub.latitude && currentPub.longitude) {
+                    const currentVenue = App.getState(STATE_KEYS.CURRENT_PUB);
+                    if (currentVenue && currentVenue.latitude && currentVenue.longitude) {
                         setTimeout(() => {
                             const map = App.getState(STATE_KEYS.MAP_DATA.FULL_UK_MAP);
                             if (map) {
-                                map.setView([parseFloat(currentPub.latitude), parseFloat(currentPub.longitude)], 16);
+                                map.setView([parseFloat(currentVenue.latitude), parseFloat(currentVenue.longitude)], 16);
                                 map.eachLayer(layer => {
-                                    if (layer.options && layer.options.pubId === currentPub.pub_id) {
+                                    if (layer.options && layer.options.venueId === currentVenue.venue_id) {
                                         layer.openPopup();
                                     }
                                 });
@@ -668,34 +668,34 @@ const App = {
         
         // Form actions
         'report-beer': (el, modules) => {
-            const pubData = window.App.getState('currentPub');
+            const venueData = window.App.getState('currentVenue');
             
             // Close overlays if needed
             modules.modalManager?.closeAllOverlays();
             document.body.style.overflow = '';
             
-            // Open report modal with pub data
+            // Open report modal with venue data
             if (modules.modalManager) {
                 modules.modalManager.open('reportModal', {
                     onOpen: () => {
                         if (modules.modal?.initializeReportModal) {
-                            modules.modal.initializeReportModal(pubData);
+                            modules.modal.initializeReportModal(venueData);
                         } else if (window.initializeReportModal) {
-                            window.initializeReportModal(pubData);
+                            window.initializeReportModal(venueData);
                         }
                     }
                 });
             }
             
-            modules.tracking?.trackEvent('report_beer_click', 'User Action', pubData?.name || 'unknown');
+            modules.tracking?.trackEvent('report_beer_click', 'User Action', venueData?.name || 'unknown');
         },
 
         'submit-report': (el, modules) => {
             const form = document.getElementById('reportForm');
             if (form) form.dispatchEvent(new Event('submit', { bubbles: true }));
         },
-        'clear-selected-pub': (el, modules) => {
-            modules.form?.clearSelectedPub?.();
+        'clear-selected-venue': (el, modules) => {
+            modules.form?.clearSelectedVenue?.();
         },
 
         
@@ -718,18 +718,18 @@ const App = {
         'add-beer-details': (el, modules) => {
             modules.modalManager?.close('beerDetailsPromptModal');
             
-            // Get the current pub from state
-            const currentPub = window.App.getState('currentPub');
+            // Get the current venue from state
+            const currentVenue = window.App.getState('currentVenue');
             
-            // Open report modal with current pub data
+            // Open report modal with current venue data
             if (modules.modalManager) {
                 modules.modalManager.open('reportModal', {
                     onOpen: () => {
-                        // Initialize with current pub
+                        // Initialize with current venue
                         if (modules.modal?.initializeReportModal) {
-                            modules.modal.initializeReportModal(currentPub);
+                            modules.modal.initializeReportModal(currentVenue);
                         } else if (window.initializeReportModal) {
-                            window.initializeReportModal(currentPub);
+                            window.initializeReportModal(currentVenue);
                         }
                     }
                 });
@@ -739,7 +739,7 @@ const App = {
         
         
         // Places search actions
-        'add-new-pub-from-results': (el, modules) => {
+        'add-new-venue-from-results': (el, modules) => {
             // Use modalManager to open the modal properly
             if (modules.modalManager) {
                 modules.modalManager.open('placesSearchModal');
@@ -851,9 +851,9 @@ const App = {
             community?.handleQuickAction('add-find');
         },
         
-        'saved-pubs': (el, modules) => {
+        'saved-venues': (el, modules) => {
             const community = modules.community || window.App?.getModule('community');
-            community?.handleQuickAction('saved-pubs');
+            community?.handleQuickAction('saved-venues');
         },
         
         'find-stockists': (el, modules) => {
@@ -869,8 +869,8 @@ const App = {
             const currentContext = modules.nav?.getCurrentContext();
             if (currentContext === 'map') {
                 modules.modalManager?.close('fullMapOverlay');
-            } else if (currentContext === 'pub') {
-                modules.modalManager?.close('pubDetailsOverlay');
+            } else if (currentContext === 'venue') {
+                modules.modalManager?.close('venueDetailsOverlay');
             } else if (currentContext === 'results') {
                 modules.modalManager?.close('resultsOverlay');
             }
@@ -968,26 +968,26 @@ const App = {
         },
         'show-beer-list': (el, modules) => {
             console.log('🍺 Show beer list clicked');
-            const currentPub = window.App.getState('currentPub');
+            const currentVenue = window.App.getState('currentVenue');
             
-            if (!currentPub) {
-                console.error('❌ No current pub data');
+            if (!currentVenue) {
+                console.error('❌ No current venue data');
                 return;
             }
             
-            console.log('📊 Current pub:', currentPub);
+            console.log('📊 Current venue:', currentVenue);
             
             // Open beer list modal
             modules.modalManager?.open('beerListModal');
             
-            // Set pub name
-            const pubNameEl = document.getElementById('beerListPubName');
-            if (pubNameEl) pubNameEl.textContent = currentPub.name;
+            // Set venue name
+            const venueNameEl = document.getElementById('beerListVenueName');
+            if (venueNameEl) venueNameEl.textContent = currentVenue.name;
             
             // Load beer list - make sure we're calling the right module
             const searchModule = modules.search || window.App?.getModule('search');
             if (searchModule?.loadBeerList) {
-                searchModule.loadBeerList(currentPub);
+                searchModule.loadBeerList(currentVenue);
             } else {
                 console.error('❌ loadBeerList function not found');
             }
@@ -997,8 +997,8 @@ const App = {
             const beerId = el.dataset.beerId;
             const beerName = el.dataset.beerName;
             
-            if (confirm(`Remove "${beerName}" from this pub?`)) {
-                modules.api?.deleteBeerFromPub?.(beerId);
+            if (confirm(`Remove "${beerName}" from this venue?`)) {
+                modules.api?.deleteBeerFromVenue?.(beerId);
             }
         },
 
@@ -1030,16 +1030,16 @@ const App = {
             }
         },
 
-        'manual-pub-entry': (el, modules) => {
+        'manual-venue-entry': (el, modules) => {
             modules.modalManager?.close('placesSearchModal');
-            modules.modalManager?.open('manualPubEntryModal');
+            modules.modalManager?.open('manualVenueEntryModal');
         },
         
-        'submit-manual-pub': (el, modules) => {
-            const name = document.getElementById('manualPubName')?.value.trim();
-            const address = document.getElementById('manualPubAddress')?.value.trim();
-            const city = document.getElementById('manualPubCity')?.value.trim();
-            const postcode = document.getElementById('manualPubPostcode')?.value.trim().toUpperCase();
+        'submit-manual-venue': (el, modules) => {
+            const name = document.getElementById('manualVenueName')?.value.trim();
+            const address = document.getElementById('manualVenueAddress')?.value.trim();
+            const city = document.getElementById('manualVenueCity')?.value.trim();
+            const postcode = document.getElementById('manualVenuePostcode')?.value.trim().toUpperCase();
             
             if (!name || !address || !city || !postcode) {
                 modules.helpers?.showToast('Please fill in all fields', 'error');
@@ -1052,7 +1052,7 @@ const App = {
                 return;
             }
             
-            const pubData = {
+            const venueData = {
                 name: name,
                 address: `${address}, ${city}`,
                 postcode: postcode,
@@ -1061,11 +1061,11 @@ const App = {
                 source: 'manual_entry'
             };
             
-            modules.modalManager?.close('manualPubEntryModal');
-            modules.helpers?.showLoadingToast('Adding pub to database...');
+            modules.modalManager?.close('manualVenueEntryModal');
+            modules.helpers?.showLoadingToast('Adding venue to database...');
             
-            // Use the existing submitNewPub function
-            modules.search?.PlacesSearchModule?.submitNewPub(pubData);
+            // Use the existing submitNewVenue function
+            modules.search?.PlacesSearchModule?.submitNewVenue(venueData);
         },
 
     },
@@ -1131,11 +1131,11 @@ const App = {
     // ================================
     // MAP HANDLERS
     // ================================
-    togglePubDetailMap: (modules) => {
-        const currentPub = App.getState(STATE_KEYS.CURRENT_PUB);
-        const mapContainer = document.getElementById('pubMapContainer');
-        const mapBtnText = document.getElementById('pubMapBtnText');
-        const pubContainer = document.getElementById('pubContainer');
+    toggleVenueDetailMap: (modules) => {
+        const currentVenue = App.getState(STATE_KEYS.CURRENT_PUB);
+        const mapContainer = document.getElementById('venueMapContainer');
+        const mapBtnText = document.getElementById('venueMapBtnText');
+        const venueContainer = document.getElementById('venueContainer');
         
         if (!mapContainer || !mapBtnText) return;
         
@@ -1145,19 +1145,19 @@ const App = {
             // Show map
             mapContainer.style.display = 'block';
             mapBtnText.textContent = 'Hide Map';
-            if (pubContainer) pubContainer.classList.add('split-view');
+            if (venueContainer) venueContainer.classList.add('split-view');
             
-            if (currentPub?.latitude && currentPub?.longitude && modules.map) {
-                modules.map.initPubDetailMap?.(currentPub);
+            if (currentVenue?.latitude && currentVenue?.longitude && modules.map) {
+                modules.map.initVenueDetailMap?.(currentVenue);
             }
         } else {
             // Hide map
             mapContainer.style.display = 'none';
             mapBtnText.textContent = 'Show on Map';
-            if (pubContainer) pubContainer.classList.remove('split-view');
+            if (venueContainer) venueContainer.classList.remove('split-view');
         }
         
-        modules.tracking?.trackEvent('pub_map_toggle', 'Map', isHidden ? 'show' : 'hide');
+        modules.tracking?.trackEvent('venue_map_toggle', 'Map', isHidden ? 'show' : 'hide');
     },
     
     showFullMap: async (modules) => {
@@ -1233,7 +1233,7 @@ const App = {
     // PUB ACTIONS
     // ================================
     handleReportBeer: (modules) => {
-        const pubData = App.getState(STATE_KEYS.CURRENT_PUB);
+        const venueData = App.getState(STATE_KEYS.CURRENT_PUB);
         
         // Close overlays using modalManager
         modules.modalManager?.closeAllOverlays();
@@ -1241,29 +1241,29 @@ const App = {
         document.body.style.overflow = '';
         
         // Open report modal
-        modules.modalManager?.open('reportModal', { data: pubData });
+        modules.modalManager?.open('reportModal', { data: venueData });
         
-        modules.tracking?.trackEvent('report_beer_click', 'User Action', pubData?.name || 'unknown');
+        modules.tracking?.trackEvent('report_beer_click', 'User Action', venueData?.name || 'unknown');
     },
     
-    openPubExternalSearch: (modules) => {
-        const pub = App.getState(STATE_KEYS.CURRENT_PUB);
-        if (!pub) return;
+    openVenueExternalSearch: (modules) => {
+        const venue = App.getState(STATE_KEYS.CURRENT_PUB);
+        if (!venue) return;
         
-        const searchQuery = encodeURIComponent(`${pub.name} ${pub.postcode} pub`);
+        const searchQuery = encodeURIComponent(`${venue.name} ${venue.postcode} venue`);
         window.open(Constants.EXTERNAL.GOOGLE_SEARCH + searchQuery, '_blank');
         
-        modules.tracking?.trackExternalLink?.('google_search', pub.name);
+        modules.tracking?.trackExternalLink?.('google_search', venue.name);
     },
     
-    openPubDirections: (modules) => {
-        const pub = App.getState(STATE_KEYS.CURRENT_PUB);
-        if (!pub) return;
+    openVenueDirections: (modules) => {
+        const venue = App.getState(STATE_KEYS.CURRENT_PUB);
+        if (!venue) return;
         
-        const destination = encodeURIComponent(`${pub.name}, ${pub.address}, ${pub.postcode}`);
+        const destination = encodeURIComponent(`${venue.name}, ${venue.address}, ${venue.postcode}`);
         window.open(Constants.EXTERNAL.GOOGLE_MAPS_DIRECTIONS + destination, '_blank');
         
-        modules.tracking?.trackExternalLink?.('google_maps_directions', pub.name);
+        modules.tracking?.trackExternalLink?.('google_maps_directions', venue.name);
     },
     
     // ================================
@@ -1272,7 +1272,7 @@ const App = {
     setupGlobalFunctions: () => {
         // Legacy support - these should eventually be removed
         window.closeResults = () => App.getModule('helpers')?.closeResults?.();
-        window.showPubDetails = (pubId) => App.getModule('search')?.showPubDetails?.(pubId);
+        window.showVenueDetails = (venueId) => App.getModule('search')?.showVenueDetails?.(venueId);
         window.toggleSearchResultsFullMap = () => App.getModule('map')?.toggleSearchResultsFullMap?.();
         window.acceptAllCookies = () => App.handleCookieConsent(true);
         window.acceptEssentialOnly = () => App.handleCookieConsent(false);
