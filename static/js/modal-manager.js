@@ -28,7 +28,7 @@ export const ModalManager = (() => {
         searchOverlay: { type: 'overlay', group: 'primary', exclusive: true },
         resultsOverlay: { type: 'overlay', group: 'primary', exclusive: true },
         fullMapOverlay: { type: 'overlay', group: 'primary', exclusive: true },
-        pubDetailsOverlay: { type: 'overlay', group: 'primary', exclusive: true },
+        venueDetailsOverlay: { type: 'overlay', group: 'primary', exclusive: true },
         breweriesOverlay: { type: 'overlay', group: 'primary', exclusive: true },
 
         // Info overlays
@@ -40,9 +40,9 @@ export const ModalManager = (() => {
         areaModal: { type: 'modal', group: 'search-input', exclusive: true },
         beerModal: { type: 'modal', group: 'search-input', exclusive: true },
         distanceModal: { type: 'modal', group: 'search-input', exclusive: true },
-        beerListModal: { type: 'modal', group: 'pub-sub', exclusive: true },
+        beerListModal: { type: 'modal', group: 'venue-sub', exclusive: true },
         breweryBeersModal: { type: 'modal', group: 'brewery', exclusive: true },
-        manualPubEntryModal: { type: 'modal', group: 'form', exclusive: true },
+        manualVenueEntryModal: { type: 'modal', group: 'form', exclusive: true },
         nicknameModal: { type: 'modal', group: 'user', exclusive: true },
         
         // Status modals (can stack in specific order)
@@ -53,7 +53,7 @@ export const ModalManager = (() => {
         // Form modals
         reportModal: { type: 'modal', group: 'form', exclusive: true },
         placesSearchModal: { type: 'modal', group: 'form', exclusive: true },
-        pubAddedPromptModal: { type: 'modal', group: 'form', exclusive: true },
+        venueAddedPromptModal: { type: 'modal', group: 'form', exclusive: true },
         
         // System modals
         locationPermissionModal: { type: 'modal', group: 'system', priority: true },
@@ -159,7 +159,7 @@ export const ModalManager = (() => {
             // IMPORTANT: Also close any overlay that's visually shown but not in our state
             if (config.group === 'primary') {
                 // Manually ensure all primary overlays are hidden
-                const primaryOverlays = ['searchOverlay', 'resultsOverlay', 'fullMapOverlay', 'pubDetailsOverlay', 'breweriesOverlay'];
+                const primaryOverlays = ['searchOverlay', 'resultsOverlay', 'fullMapOverlay', 'venueDetailsOverlay', 'breweriesOverlay'];
                 primaryOverlays.forEach(id => {
                     if (id !== overlayId) {
                         const overlay = document.getElementById(id);
