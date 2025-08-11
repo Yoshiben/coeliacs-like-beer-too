@@ -25,6 +25,7 @@ export const NavStateManager = (() => {
     // ================================
     // CORE FUNCTIONS
     // ================================
+    // In the setPageContext function, add support for search-modal:
     const setPageContext = (context) => {
         console.log(`🧭 Setting nav context: ${context}`);
         
@@ -35,7 +36,7 @@ export const NavStateManager = (() => {
         state.currentContext = context;
         
         // Remove all page classes
-        document.body.classList.remove('page-home', 'page-results', 'page-map', 'page-venue', 'page-search', 'page-breweries');
+        document.body.classList.remove('page-home', 'page-results', 'page-map', 'page-venue', 'page-search', 'page-search-modal', 'page-breweries');
         
         // Add the current page class
         document.body.classList.add(`page-${context}`);
@@ -43,12 +44,10 @@ export const NavStateManager = (() => {
         // Update back button functionality
         setupBackButton(context);
         
-        // IMPORTANT: Re-initialize toggle when it becomes visible
+        // Handle toggle visibility
         if (context === 'results' || context === 'map') {
-            // Give the DOM a moment to update visibility
             setTimeout(() => {
                 refreshToggleState();
-                // Force thumb visibility
                 const thumb = document.querySelector('.nav-toggle .toggle-thumb');
                 if (thumb) {
                     thumb.style.opacity = '1';
