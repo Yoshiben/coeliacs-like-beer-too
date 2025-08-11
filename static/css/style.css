@@ -2182,3 +2182,158 @@ body.page-breweries .nav-back-btn { display: flex !important; }
         transform: translateY(0);
     }
 }
+
+/* Place Search Results - make them clickable */
+.place-result {
+    cursor: pointer;
+    padding: var(--space-lg);
+    margin-bottom: var(--space-md);
+    border-radius: var(--radius-lg);
+    transition: all var(--transition);
+    border: 2px solid transparent;
+}
+
+.place-result:hover {
+    background: var(--purple-bg);
+    border-color: var(--purple-border);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Place icon styling */
+.place-icon {
+    font-size: var(--text-2xl);
+    margin-right: var(--space-md);
+    opacity: 0.8;
+}
+
+.place-result:hover .place-icon {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+/* Selected Place Preview */
+.selected-place-preview {
+    background: var(--purple-bg);
+    border: 2px solid var(--purple-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-xl);
+    margin-top: var(--space-xl);
+    text-align: center;
+}
+
+.selected-place-preview h4 {
+    color: var(--text-primary);
+    margin-bottom: var(--space-lg);
+    font-size: var(--text-lg);
+}
+
+.place-details {
+    margin-bottom: var(--space-xl);
+}
+
+.place-details strong {
+    display: block;
+    font-size: var(--text-xl);
+    color: var(--text-primary);
+    margin-bottom: var(--space-sm);
+}
+
+.place-details div {
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-xs);
+}
+
+/* Center the Use This Venue button */
+.selected-place-preview .btn {
+    margin: 0 auto;
+    display: block;
+    max-width: 200px;
+}
+
+/* Manual entry button styling */
+.place-result[data-action="manual-venue-entry"] {
+    background: var(--bg-section);
+    border: 2px dashed var(--border-light);
+    text-align: center;
+    margin-top: var(--space-lg);
+}
+
+.place-result[data-action="manual-venue-entry"]:hover {
+    border-style: solid;
+    background: var(--purple-bg);
+}
+
+/* Place type badge */
+.place-type {
+    display: inline-block;
+    background: var(--purple-gradient);
+    color: var(--text-white);
+    padding: var(--space-xs) var(--space-md);
+    border-radius: var(--radius-pill);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    margin-top: var(--space-xs);
+}
+
+/* Search input styling */
+.places-search-container {
+    position: relative;
+}
+
+#placesSearchInput {
+    padding-left: var(--space-4xl);
+}
+
+.places-search-container::before {
+    content: '🔍';
+    position: absolute;
+    left: var(--space-lg);
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: var(--text-xl);
+    opacity: 0.6;
+}
+
+/* Results container */
+.places-results {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-top: var(--space-md);
+    padding: var(--space-sm);
+    background: var(--bg-section);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-light);
+}
+
+/* Empty state */
+.no-places-found {
+    text-align: center;
+    padding: var(--space-2xl);
+    color: var(--text-muted);
+}
+
+.no-places-found p {
+    margin-bottom: var(--space-sm);
+    font-size: var(--text-lg);
+}
+
+.no-places-found small {
+    opacity: 0.8;
+}
+
+/* Loading state */
+.places-results .loading-state {
+    text-align: center;
+    padding: var(--space-xl);
+    color: var(--text-secondary);
+}
+
+/* Powered by text */
+.search-powered-by {
+    text-align: center;
+    margin-top: var(--space-md);
+    opacity: 0.7;
+    font-size: var(--text-xs);
+}
