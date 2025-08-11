@@ -112,6 +112,12 @@ export const SearchModule = (function() {
             );
         });
     };
+
+    const ensureLoadingToastHidden = () => {
+        if (window.hideLoadingToast) {
+            window.hideLoadingToast();
+        }
+    };
     
     // ================================
     // SEARCH METHODS
@@ -351,19 +357,71 @@ export const SearchModule = (function() {
     // UI HELPERS
     // ================================
     const showResultsOverlay = (title) => {
+        console.log('📋 Showing results overlay:', title);
+    
+        // Reset to list view (not map view)
+        const elements = {
+            list: document.getElementById('resultsListContainer'),
+            map: document.getElementById('resultsMapContainer'),
+            btnText: document.getElementById('resultsMapBtnText')
+        };
+        
+        if (elements.list) {
+            elements.list.style.display = 'block';
+            elements.list.style.flex = '1';
+        }
+        if (elements.map) {
+            elements.map.style.display = 'none';
+        }
+        if (elements.btnText) {
+            elements.btnText.textContent = 'Map';
+        }
+    
         modules.modalManager.open('resultsOverlay', {
             onOpen: () => {
-                document.getElementById('resultsTitle').textContent = title;
+                console.log('✅ Results overlay opened via ModalManager');
+                
+                // Update title - with safety check
+                const resultsTitle = document.getElementById('resultsTitle');
+                if (resultsTitle) {
+                    resultsTitle.textContent = title;
+                } else {
+                    console.warn('resultsTitle element not found');
+                }
+                
+                // Update navigation context
                 modules.nav?.setPageContext('results');
+                modules.nav?.showResultsWithContext?.();
+    
+                // Add the venue button
+                setTimeout(() => {
+                    const resultsContainer = document.querySelector('.results-container');
+                    if (resultsContainer && !resultsContainer.querySelector('.add-venue-btn')) {
+                        const addVenueBtn = document.createElement('button');
+                        addVenueBtn.className = 'btn btn-primary add-venue-btn';
+                        addVenueBtn.textContent = '➕ Add New Venue';
+                        addVenueBtn.dataset.action = 'add-new-venue-from-results';
+                        addVenueBtn.style.cssText = 'position: fixed; bottom: 10vh; right: 2rem; z-index: 100; border-radius: 25px; padding: 12px 24px; box-shadow: var(--shadow-lg);';
+                        resultsContainer.appendChild(addVenueBtn);
+                    }
+                }, 200);
             }
         });
     };
     
     const showLoading = (message) => {
-        document.getElementById('resultsLoading').style.display = 'flex';
-        document.getElementById('resultsList').style.display = 'none';
-        document.getElementById('noResultsFound').style.display = 'none';
-        document.querySelector('.loading-text').textContent = message;
+        ensureLoadingToastHidden(); // Clean up first
+        
+        const loadingEl = document.getElementById('resultsLoading');
+        const listEl = document.getElementById('resultsList');
+        const noResultsEl = document.getElementById('noResultsFound');
+        
+        if (loadingEl) loadingEl.style.display = 'flex';
+        if (listEl) listEl.style.display = 'none';
+        if (noResultsEl) noResultsEl.style.display = 'none';
+        
+        const loadingText = document.querySelector('.loading-text');
+        if (loadingText) loadingText.textContent = message;
     };
     
     const showNoResults = (message) => {
