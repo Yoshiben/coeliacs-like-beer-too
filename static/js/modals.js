@@ -18,45 +18,45 @@ export const ModalModule = (() => {
     // ================================
     // INITIALIZATION FUNCTIONS
     // ================================
-    const initializeReportModal = (pubData) => {
-        console.log('🔧 Initializing report modal', pubData);
+    const initializeReportModal = (venueData) => {
+        console.log('🔧 Initializing report modal', venueData);
         
         const modal = document.getElementById('reportModal');
         if (!modal) return;
         
         const modalTitle = modal.querySelector('.modal-title');
         const modalSubtitle = document.getElementById('reportModalSubtitle');
-        const pubSearchGroup = document.getElementById('pubSearchGroup');
+        const venueSearchGroup = document.getElementById('venueSearchGroup');
         const reportForm = document.getElementById('reportForm');
         
-        if (pubData) {
-            // Pre-populated from specific pub
-            if (pubSearchGroup) {
-                pubSearchGroup.style.display = 'none';
+        if (venueData) {
+            // Pre-populated from specific venue
+            if (venueSearchGroup) {
+                venueSearchGroup.style.display = 'none';
             }
             
-            // Show subtitle with pub name
+            // Show subtitle with venue name
             if (modalSubtitle) {
-                modalSubtitle.textContent = `at ${pubData.name}`;
+                modalSubtitle.textContent = `at ${venueData.name}`;
                 modalSubtitle.style.display = 'block';
             }
             
-            // Store pub data globally for form submission
-            window.App.setState('selectedPubForReport', {
-                pub_id: pubData.pub_id || pubData.id,
-                name: pubData.name,
-                address: pubData.address,
-                postcode: pubData.postcode
+            // Store venue data globally for form submission
+            window.App.setState('selectedVenueForReport', {
+                venue_id: venueData.venue_id || venueData.id,
+                name: venueData.name,
+                address: venueData.address,
+                postcode: venueData.postcode
             });
         } else {
             // Normal flow - hide subtitle
             if (modalSubtitle) {
                 modalSubtitle.style.display = 'none';
             }
-            if (pubSearchGroup) {
-                pubSearchGroup.style.display = 'block';
+            if (venueSearchGroup) {
+                venueSearchGroup.style.display = 'block';
             }
-            window.App.setState('selectedPubForReport', null);
+            window.App.setState('selectedVenueForReport', null);
         }
     
         // Reset form
@@ -64,9 +64,9 @@ export const ModalModule = (() => {
             reportForm.reset();
         }
         
-        // Reset selected pub info
-        document.getElementById('selectedPubInfo').style.display = 'none';
-        document.getElementById('newPubFields').style.display = 'none';
+        // Reset selected venue info
+        document.getElementById('selectedVenueInfo').style.display = 'none';
+        document.getElementById('newVenueFields').style.display = 'none';
         
         // Initialize form module event listeners
         const formModule = modules.form || window.FormModule;
@@ -79,10 +79,10 @@ export const ModalModule = (() => {
         
         // Focus appropriate field
         setTimeout(() => {
-            if (pubData) {
+            if (venueData) {
                 focusInput('reportFormat');
             } else {
-                focusInput('reportPubSearch');
+                focusInput('reportVenueSearch');
             }
         }, 150);
     };
@@ -212,9 +212,9 @@ export const ModalModule = (() => {
         }
     };
     
-    const openReportModal = (pubData = null) => {
-        console.log('📸 Opening report modal with data:', pubData);
-        open('reportModal', pubData);
+    const openReportModal = (venueData = null) => {
+        console.log('📸 Opening report modal with data:', venueData);
+        open('reportModal', venueData);
     };
     
     // ================================
