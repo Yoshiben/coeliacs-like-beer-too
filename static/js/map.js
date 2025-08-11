@@ -814,33 +814,19 @@ export const MapModule = (() => {
         const legend = L.control({ position: 'bottomright' });
         
         legend.onAdd = (map) => {
-            // Create container
+            // Use the existing template instead of creating from scratch
+            const template = document.getElementById('map-legend-template');
+            if (template) {
+                const legendContent = template.content.cloneNode(true);
+                const container = L.DomUtil.create('div', 'legend-container');
+                container.appendChild(legendContent);
+                return container;
+            }
+            
+            // Fallback if template not found
+            console.warn('Map legend template not found, using fallback');
             const container = L.DomUtil.create('div', 'legend-container');
-            const legendDiv = L.DomUtil.create('div', 'map-legend', container);
-            
-            // Title
-            const title = L.DomUtil.create('div', 'legend-title', legendDiv);
-            title.textContent = '🍺 GF Beer Status';
-            
-            // Legend items data
-            const items = [
-                { class: 'always-gf', text: 'Always Has GF Beer' },
-                { class: 'current-gf', text: 'Currently Has GF Beer' },
-                { class: 'no-gf', text: 'No GF Currently' },
-                { class: 'unknown', text: 'Unknown Status' },
-                { class: 'user-location', text: 'Your Location' }
-            ];
-            
-            // Create legend items
-            items.forEach(item => {
-                const itemDiv = L.DomUtil.create('div', 'legend-item', legendDiv);
-                
-                const marker = L.DomUtil.create('div', `legend-marker ${item.class}`, itemDiv);
-                
-                const text = L.DomUtil.create('span', 'legend-text', itemDiv);
-                text.textContent = item.text;
-            });
-            
+            container.innerHTML = '<div class="map-legend"><div class="legend-title">🍺 GF Beer Status</div></div>';
             return container;
         };
         
