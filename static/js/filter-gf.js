@@ -55,11 +55,11 @@ export const FilterStateManager = (() => {
     // ================================
     // FILTER HELPERS
     // ================================
-    const filterPubs = (pubs) => {
-        if (!isGFOnly()) return pubs;
+    const filterVenues = (venues) => {
+        if (!isGFOnly()) return venues;
         
-        return pubs.filter(pub => {
-            const status = pub.gf_status || 'unknown';
+        return venues.filter(venue => {
+            const status = venue.gf_status || 'unknown';
             return status === 'always' || 
                    status === 'currently' || 
                    status === 'always_tap_cask' || 
@@ -120,12 +120,12 @@ export const FilterStateManager = (() => {
     
     const getResultsTitle = (count) => {
         const lastSearch = window.App.getState('lastSearch');
-        let title = `${count} pubs`;
+        let title = `${count} venues`;
         
         if (lastSearch?.type === 'nearby') {
-            title = `${count} pubs within ${lastSearch.radius}km`;
+            title = `${count} venues within ${lastSearch.radius}km`;
         } else if (lastSearch?.query) {
-            title = `${count} pubs for "${lastSearch.query}"`;
+            title = `${count} venues for "${lastSearch.query}"`;
         }
         
         if (isGFOnly()) title += ' (GF only)';
@@ -141,6 +141,6 @@ export const FilterStateManager = (() => {
         getFilter,
         isGFOnly,
         subscribe,
-        filterPubs
+        filterVenues
     };
 })();
