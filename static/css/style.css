@@ -192,8 +192,8 @@ html {
 }
 
 .modal-content {
-   max-height: 76vh;
-   max-height: 76dvh;
+   max-height: 82vh;
+   max-height: 82dvh;
    max-width: 96vw;
    max-width: 96dvw;
    padding: 0;
@@ -206,6 +206,8 @@ html {
    box-shadow: var(--shadow-xl);
    justify-content: space-between;
    min-height: 0;
+   width: -webkit-fill-available;
+   height: -webkit-fill-available;
 }
 
 .modal-header {
