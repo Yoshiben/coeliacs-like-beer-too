@@ -951,7 +951,9 @@ export const MapModule = (() => {
         window.App.setState(STATE_KEYS.MAP_DATA.GF_VENUES_LAYER, gfVenuesLayer);
         
         const gfVenues = allVenues.filter(venue => 
-            venue.gf_status === 'always' || venue.gf_status === 'currently'
+            venue.gf_status === 'always_tap_cask' || 
+            venue.gf_status === 'always_bottle_can' || 
+            venue.gf_status === 'currently'
         );
         
         console.log(`📍 Showing ${gfVenues.length} GF venues only`);
