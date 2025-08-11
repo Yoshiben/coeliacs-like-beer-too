@@ -549,8 +549,8 @@ const App = {
                 setTimeout(() => {
                     modules.modalManager?.open('searchOverlay');
                     // If it was a location search, reopen distance modal
-                    const lastSearch = window.App.getState(STATE_KEYS.LAST_SEARCH);
-                    if (lastSearch && lastSearch.type === 'nearby') {
+                    const lastSearchType = window.App.getState(STATE_KEYS.LAST_SEARCH.TYPE);  // Use the specific path
+                    if (lastSearchType === 'nearby') {
                         setTimeout(() => {
                             modules.modalManager?.open('distanceModal');
                         }, 100);
