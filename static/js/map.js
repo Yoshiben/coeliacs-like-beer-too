@@ -1,6 +1,6 @@
 // ================================================================================
 // MAP.JS - Complete Refactor with STATE_KEYS and Arrow Functions
-// Handles: Map initialization, markers, user location, pub locations
+// Handles: Map initialization, markers, user location, venue locations
 // ================================================================================
 
 import { Constants } from './constants.js';
@@ -15,14 +15,14 @@ export const MapModule = (() => {
     const maps = {
         main: null,
         results: null,
-        pubDetail: null
+        venueDetail: null
     };
     
     const config = {
         defaultCenter: [54.5, -3], // UK center
         defaultZoom: 6,
         maxZoom: 19,
-        pubMarkerRadius: 8,
+        venueMarkerRadius: 8,
         userMarkerRadius: 8,
         tileLayer: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
         attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -113,8 +113,8 @@ export const MapModule = (() => {
         if (!cachedStyles) {
             const rootStyles = getComputedStyle(document.documentElement);
             cachedStyles = {
-                pubFillColor: rootStyles.getPropertyValue('--marker-pub-fill').trim() || '#4CAF50',
-                pubStrokeColor: rootStyles.getPropertyValue('--marker-pub-stroke').trim() || '#ffffff',
+                venueFillColor: rootStyles.getPropertyValue('--marker-venue-fill').trim() || '#4CAF50',
+                venueStrokeColor: rootStyles.getPropertyValue('--marker-venue-stroke').trim() || '#ffffff',
                 userFillColor: rootStyles.getPropertyValue('--marker-user-fill').trim() || '#667eea',
                 userStrokeColor: rootStyles.getPropertyValue('--marker-user-stroke').trim() || '#ffffff',
                 alwaysGfFill: rootStyles.getPropertyValue('--always-gf-fill').trim(),
@@ -136,7 +136,7 @@ export const MapModule = (() => {
             weight: 2,
             opacity: 1,
             fillOpacity: 0.9,
-            radius: config.pubMarkerRadius
+            radius: config.venueMarkerRadius
         };
         
         const statusStyles = {
@@ -228,7 +228,7 @@ export const MapModule = (() => {
     // ================================
     // RESULTS MAP
     // ================================
-    const initResultsMap = (pubsData = null) => {
+    const initResultsMap = (venuesData = null) => {
         console.log('🗺️ Initializing results map...');
         
         const mapElement = document.getElementById('resultsMap');
@@ -260,16 +260,16 @@ export const MapModule = (() => {
                     throw new Error('Failed to create results map');
                 }
                 
-                // Add pubs
-                let pubs = pubsData;
-                if (!pubs) {
+                // Add venues
+                let venues = venuesData;
+                if (!venues) {
                     const searchModule = modules.search;
-                    pubs = searchModule?.getCurrentResults() || [];
+                    venues = searchModule?.getCurrentResults() || [];
                 }
                 
-                if (pubs.length > 0) {
-                    addPubMarkers(pubs, maps.results);
-                    console.log(`✅ Added ${pubs.length} pub markers`);
+                if (venues.length > 0) {
+                    addVenueMarkers(venues, maps.results);
+                    console.log(`✅ Added ${venues.length} venue markers`);
                 }
                 
                 // Add legend
@@ -306,65 +306,65 @@ export const MapModule = (() => {
     // ================================
     // PUB DETAIL MAP
     // ================================
-    const initPubDetailMap = (pub) => {
-        console.log('🗺️ Initializing pub detail map for:', pub.name);
+    const initVenueDetailMap = (venue) => {
+        console.log('🗺️ Initializing venue detail map for:', venue.name);
         
-        const mapContainer = document.querySelector('.pub-map-placeholder');
+        const mapContainer = document.querySelector('.venue-map-placeholder');
         if (!mapContainer) {
-            console.error('❌ Pub map container not found');
+            console.error('❌ Venue map container not found');
             return null;
         }
         
-        if (!pub.latitude || !pub.longitude) {
-            showNoLocationMessage(mapContainer, pub.name);
+        if (!venue.latitude || !venue.longitude) {
+            showNoLocationMessage(mapContainer, venue.name);
             return null;
         }
         
         // Create map container
-        mapContainer.innerHTML = '<div id="pubMapLeaflet" style="width: 100%; height: 100%; border-radius: 0 0 var(--radius-xl) var(--radius-xl);"></div>';
+        mapContainer.innerHTML = '<div id="venueMapLeaflet" style="width: 100%; height: 100%; border-radius: 0 0 var(--radius-xl) var(--radius-xl);"></div>';
         
         try {
-            utils.cleanupMap(maps.pubDetail);
+            utils.cleanupMap(maps.venueDetail);
             
-            maps.pubDetail = createMap('pubMapLeaflet', {
-                center: [parseFloat(pub.latitude), parseFloat(pub.longitude)],
+            maps.venueDetail = createMap('venueMapLeaflet', {
+                center: [parseFloat(venue.latitude), parseFloat(venue.longitude)],
                 zoom: 16
             });
             
-            if (!maps.pubDetail) {
-                throw new Error('Failed to create pub detail map');
+            if (!maps.venueDetail) {
+                throw new Error('Failed to create venue detail map');
             }
             
-            // Add pub marker
-            const gfStatus = determineGFStatus(pub);
+            // Add venue marker
+            const gfStatus = determineGFStatus(venue);
             const markerStyle = getMarkerStyleForGFStatus(gfStatus);
             
-            const pubMarker = L.circleMarker(
-                [parseFloat(pub.latitude), parseFloat(pub.longitude)], 
+            const venueMarker = L.circleMarker(
+                [parseFloat(venue.latitude), parseFloat(venue.longitude)], 
                 { ...markerStyle, radius: 12 }
-            ).addTo(maps.pubDetail);
+            ).addTo(maps.venueDetail);
             
-            const popupContent = createPubPopupContent(pub, gfStatus);
-            pubMarker.bindPopup(popupContent).openPopup();
+            const popupContent = createVenuePopupContent(venue, gfStatus);
+            venueMarker.bindPopup(popupContent).openPopup();
             
             // Force render
             setTimeout(() => {
-                if (maps.pubDetail) {
-                    maps.pubDetail.invalidateSize();
+                if (maps.venueDetail) {
+                    maps.venueDetail.invalidateSize();
                 }
             }, 150);
             
-            console.log('✅ Pub detail map initialized');
-            return maps.pubDetail;
+            console.log('✅ Venue detail map initialized');
+            return maps.venueDetail;
             
         } catch (error) {
-            console.error('❌ Error creating pub detail map:', error);
+            console.error('❌ Error creating venue detail map:', error);
             showMapError(mapContainer, error.message);
             return null;
         }
     };
     
-    const showNoLocationMessage = (container, pubName) => {
+    const showNoLocationMessage = (container, venueName) => {
         container.innerHTML = `
             <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; padding: 20px; text-align: center; color: var(--text-secondary);">
                 <div style="font-size: 2rem; margin-bottom: 10px;">📍</div>
@@ -387,27 +387,27 @@ export const MapModule = (() => {
     // ================================
     // MARKER MANAGEMENT
     // ================================
-    const addPubMarkers = (pubs, mapInstance) => {
-        if (!mapInstance || !pubs || pubs.length === 0) return 0;
+    const addVenueMarkers = (venues, mapInstance) => {
+        if (!mapInstance || !venues || venues.length === 0) return 0;
         
-        console.log(`📍 Adding ${pubs.length} pub markers...`);
+        console.log(`📍 Adding ${venues.length} venue markers...`);
         
         const bounds = [];
         let markersAdded = 0;
         
-        pubs.forEach(pub => {
-            if (pub.latitude && pub.longitude && 
-                !isNaN(parseFloat(pub.latitude)) && 
-                !isNaN(parseFloat(pub.longitude))) {
+        venues.forEach(venue => {
+            if (venue.latitude && venue.longitude && 
+                !isNaN(parseFloat(venue.latitude)) && 
+                !isNaN(parseFloat(venue.longitude))) {
                 
-                const lat = parseFloat(pub.latitude);
-                const lng = parseFloat(pub.longitude);
+                const lat = parseFloat(venue.latitude);
+                const lng = parseFloat(venue.longitude);
                 
-                const gfStatus = determineGFStatus(pub);
+                const gfStatus = determineGFStatus(venue);
                 const markerStyle = getMarkerStyleForGFStatus(gfStatus);
                 
                 const marker = L.circleMarker([lat, lng], markerStyle).addTo(mapInstance);
-                const popupContent = createPubPopupContent(pub, gfStatus);
+                const popupContent = createVenuePopupContent(venue, gfStatus);
                 marker.bindPopup(popupContent);
                 
                 bounds.push([lat, lng]);
@@ -427,25 +427,25 @@ export const MapModule = (() => {
         return markersAdded;
     };
     
-    const determineGFStatus = (pub) => {
-        if (pub.gf_status) return pub.gf_status;
-        if (pub.bottle || pub.tap || pub.cask || pub.can) return 'currently';
+    const determineGFStatus = (venue) => {
+        if (venue.gf_status) return venue.gf_status;
+        if (venue.bottle || venue.tap || venue.cask || venue.can) return 'currently';
         return 'unknown';
     };
     
-    const createPubPopupContent = (pub, gfStatus = null) => {
-        if (!gfStatus) gfStatus = determineGFStatus(pub);
+    const createVenuePopupContent = (venue, gfStatus = null) => {
+        if (!gfStatus) gfStatus = determineGFStatus(venue);
         
         let content = `<div class="popup-content">`;
-        content += `<div class="popup-title">${utils.escapeHtml(pub.name)}</div>`;
+        content += `<div class="popup-title">${utils.escapeHtml(venue.name)}</div>`;
         
-        if (pub.address) {
-            content += `<div class="popup-address">${utils.escapeHtml(pub.address)}</div>`;
+        if (venue.address) {
+            content += `<div class="popup-address">${utils.escapeHtml(venue.address)}</div>`;
         }
-        content += `<div class="popup-postcode">${utils.escapeHtml(pub.postcode)}</div>`;
+        content += `<div class="popup-postcode">${utils.escapeHtml(venue.postcode)}</div>`;
         
-        if (pub.distance !== undefined) {
-            content += `<div class="popup-distance">${pub.distance.toFixed(1)}km away</div>`;
+        if (venue.distance !== undefined) {
+            content += `<div class="popup-distance">${venue.distance.toFixed(1)}km away</div>`;
         }
         
         // GF status
@@ -465,16 +465,16 @@ export const MapModule = (() => {
         
         content += `<div class="popup-gf-status ${statusClasses[gfStatus]}">${statusMessages[gfStatus]}</div>`;
         
-        if ((gfStatus === 'always' || gfStatus === 'currently') && (pub.bottle || pub.tap || pub.cask || pub.can)) {
+        if ((gfStatus === 'always' || gfStatus === 'currently') && (venue.bottle || venue.tap || venue.cask || venue.can)) {
             const formats = [];
-            if (pub.bottle) formats.push('🍺');
-            if (pub.tap) formats.push('🚰');
-            if (pub.cask) formats.push('🛢️');
-            if (pub.can) formats.push('🥫');
+            if (venue.bottle) formats.push('🍺');
+            if (venue.tap) formats.push('🚰');
+            if (venue.cask) formats.push('🛢️');
+            if (venue.can) formats.push('🥫');
             content += `<div class="popup-formats">${formats.join(' ')}</div>`;
         }
         
-        content += `<button class="popup-button" data-action="view-pub-from-map" data-pub-id="${pub.pub_id}">View Details</button>`;
+        content += `<button class="popup-button" data-action="view-venue-from-map" data-venue-id="${venue.venue_id}">View Details</button>`;
         content += `</div>`;
         
         return content;
@@ -549,8 +549,8 @@ export const MapModule = (() => {
         addMapLegend(fullUKMap);
         addZoomHint(fullUKMap);
         
-        // Load pubs
-        await loadAllPubsOnMap();
+        // Load venues
+        await loadAllVenuesOnMap();
         
         // Force render
         setTimeout(() => {
@@ -562,25 +562,25 @@ export const MapModule = (() => {
         return fullUKMap;
     };
     
-    const loadAllPubsOnMap = async () => {
-        console.log('📍 Loading UK pubs...');
+    const loadAllVenuesOnMap = async () => {
+        console.log('📍 Loading UK venues...');
         
         try {
             // Check cache first
-            const cachedPubs = window.App.getState(STATE_KEYS.MAP_DATA.ALL_PUBS);
-            if (cachedPubs && cachedPubs.length > 0) {
-                console.log('✅ Using cached pub data');
+            const cachedVenues = window.App.getState(STATE_KEYS.MAP_DATA.ALL_PUBS);
+            if (cachedVenues && cachedVenues.length > 0) {
+                console.log('✅ Using cached venue data');
                 updateMapDisplay(true);
                 return;
             }
             
             // Show loading message
             if (window.showLoadingToast) {
-                window.showLoadingToast('Loading pubs across the UK...');
+                window.showLoadingToast('Loading venues across the UK...');
             }
             
             // Fetch data with better error handling
-            const response = await fetch('/api/all-pubs', {
+            const response = await fetch('/api/all-venues', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -605,21 +605,21 @@ export const MapModule = (() => {
             
             const data = await response.json();
             
-            if (!data.success || !data.pubs) {
+            if (!data.success || !data.venues) {
                 throw new Error(data.error || 'Invalid response format');
             }
             
             // Store in state
-            window.App.setState(STATE_KEYS.MAP_DATA.ALL_PUBS, data.pubs || []);
+            window.App.setState(STATE_KEYS.MAP_DATA.ALL_PUBS, data.venues || []);
             
-            const allPubs = window.App.getState(STATE_KEYS.MAP_DATA.ALL_PUBS);
-            console.log(`📊 Loaded ${allPubs.length} pubs`);
+            const allVenues = window.App.getState(STATE_KEYS.MAP_DATA.ALL_PUBS);
+            console.log(`📊 Loaded ${allVenues.length} venues`);
             
             // Update display
             updateMapDisplay(true);
             
             // Show success notification
-            const gfCount = allPubs.filter(p => 
+            const gfCount = allVenues.filter(p => 
                 p.gf_status === 'always_tap_cask' || 
                 p.gf_status === 'always_bottle_can' || 
                 p.gf_status === 'currently'
@@ -630,11 +630,11 @@ export const MapModule = (() => {
             }
             
             if (window.showSuccessToast) {
-                window.showSuccessToast(`✅ Loaded ${allPubs.length} pubs (${gfCount} with GF beer)`);
+                window.showSuccessToast(`✅ Loaded ${allVenues.length} venues (${gfCount} with GF beer)`);
             }
             
         } catch (error) {
-            console.error('❌ Error loading pubs:', error);
+            console.error('❌ Error loading venues:', error);
             
             if (window.hideLoadingToast) {
                 window.hideLoadingToast();
@@ -643,7 +643,7 @@ export const MapModule = (() => {
             // Show user-friendly error with retry option
             const errorMessage = error.message.includes('500') ? 
                 'Server temporarily unavailable. Please try again.' : 
-                'Could not load pub data. Please check your connection.';
+                'Could not load venue data. Please check your connection.';
                 
             if (window.showErrorToast) {
                 window.showErrorToast(errorMessage);
@@ -685,12 +685,12 @@ export const MapModule = (() => {
                 icon.textContent = '⚠️';
                 
                 const message = L.DomUtil.create('p', '', content);
-                message.textContent = 'Could not load pub data';
+                message.textContent = 'Could not load venue data';
                 
                 const button = L.DomUtil.create('button', 'btn btn-primary', content);
                 button.textContent = '🔄 Try Again';
                 button.addEventListener('click', () => {
-                    window.App.getModule('map').retryLoadPubs();
+                    window.App.getModule('map').retryLoadVenues();
                 });
                 
                 // Prevent map interactions on this control
@@ -713,8 +713,8 @@ export const MapModule = (() => {
         }
     };
     
-    // Add retry function to public API
-    const retryLoadPubs = async () => {
+    // Add retry function to venuelic API
+    const retryLoadVenues = async () => {
         // Remove retry control properly
         const map = window.App.getState(STATE_KEYS.MAP_DATA.FULL_UK_MAP);
         const retryControl = window.App.getState('mapRetryControl');
@@ -729,7 +729,7 @@ export const MapModule = (() => {
         }
         
         // Try loading again
-        await loadAllPubsOnMap();
+        await loadAllVenuesOnMap();
     };
     
     // ================================
@@ -856,7 +856,7 @@ export const MapModule = (() => {
                 container.innerHTML = `
                     <div class="zoom-hint">
                         <span class="zoom-hint-icon">💡</span>
-                        <span class="zoom-hint-text">Zoom in to discover more pubs</span>
+                        <span class="zoom-hint-text">Zoom in to discover more venues</span>
                     </div>
                 `;
                 
@@ -920,18 +920,18 @@ export const MapModule = (() => {
     
     const updateMapDisplay = (showGFOnly) => {
         const fullUKMap = window.App.getState(STATE_KEYS.MAP_DATA.FULL_UK_MAP);
-        const allPubs = window.App.getState(STATE_KEYS.MAP_DATA.ALL_PUBS);
-        if (!fullUKMap || !allPubs) return;
+        const allVenues = window.App.getState(STATE_KEYS.MAP_DATA.ALL_PUBS);
+        if (!fullUKMap || !allVenues) return;
         
-        console.log(`🍺 Updating map: ${showGFOnly ? 'GF Pubs Only' : 'All Pubs'}`);
+        console.log(`🍺 Updating map: ${showGFOnly ? 'GF Venues Only' : 'All Venues'}`);
         
         // Clear existing layers
         clearMapLayers(fullUKMap);
         
         if (showGFOnly) {
-            displayGFPubsOnly(fullUKMap, allPubs);
+            displayGFVenuesOnly(fullUKMap, allVenues);
         } else {
-            displayAllPubsClustered(fullUKMap, allPubs);
+            displayAllVenuesClustered(fullUKMap, allVenues);
         }
     };
     
@@ -946,38 +946,38 @@ export const MapModule = (() => {
         });
     };
     
-    const displayGFPubsOnly = (map, allPubs) => {
-        const gfPubsLayer = L.layerGroup().addTo(map);
-        window.App.setState(STATE_KEYS.MAP_DATA.GF_PUBS_LAYER, gfPubsLayer);
+    const displayGFVenuesOnly = (map, allVenues) => {
+        const gfVenuesLayer = L.layerGroup().addTo(map);
+        window.App.setState(STATE_KEYS.MAP_DATA.GF_PUBS_LAYER, gfVenuesLayer);
         
-        const gfPubs = allPubs.filter(pub => 
-            pub.gf_status === 'always' || pub.gf_status === 'currently'
+        const gfVenues = allVenues.filter(venue => 
+            venue.gf_status === 'always' || venue.gf_status === 'currently'
         );
         
-        console.log(`📍 Showing ${gfPubs.length} GF pubs only`);
+        console.log(`📍 Showing ${gfVenues.length} GF venues only`);
         
-        gfPubs.forEach(pub => {
-            if (!pub.latitude || !pub.longitude) return;
+        gfVenues.forEach(venue => {
+            if (!venue.latitude || !venue.longitude) return;
             
-            const lat = parseFloat(pub.latitude);
-            const lng = parseFloat(pub.longitude);
-            const gfStatus = determineGFStatus(pub);
+            const lat = parseFloat(venue.latitude);
+            const lng = parseFloat(venue.longitude);
+            const gfStatus = determineGFStatus(venue);
             const markerStyle = getMarkerStyleForGFStatus(gfStatus);
             
             const marker = L.circleMarker([lat, lng], markerStyle);
-            const popupContent = createPubPopupContent(pub, gfStatus);
+            const popupContent = createVenuePopupContent(venue, gfStatus);
             marker.bindPopup(popupContent);
             
-            gfPubsLayer.addLayer(marker);
+            gfVenuesLayer.addLayer(marker);
         });
     };
     
-    const displayAllPubsClustered = (map, allPubs) => {
+    const displayAllVenuesClustered = (map, allVenues) => {
         // Clear previous layers
-        const gfPubsLayer = L.layerGroup().addTo(map);
-        window.App.setState(STATE_KEYS.MAP_DATA.GF_PUBS_LAYER, gfPubsLayer);
+        const gfVenuesLayer = L.layerGroup().addTo(map);
+        window.App.setState(STATE_KEYS.MAP_DATA.GF_PUBS_LAYER, gfVenuesLayer);
         
-        const clusteredPubsLayer = L.markerClusterGroup({
+        const clusteredVenuesLayer = L.markerClusterGroup({
             ...config.clusterConfig,
             iconCreateFunction: (cluster) => {
                 const count = cluster.getChildCount();
@@ -994,33 +994,33 @@ export const MapModule = (() => {
             }
         }).addTo(map);
         
-        window.App.setState(STATE_KEYS.MAP_DATA.CLUSTERED_PUBS_LAYER, clusteredPubsLayer);
+        window.App.setState(STATE_KEYS.MAP_DATA.CLUSTERED_PUBS_LAYER, clusteredVenuesLayer);
         
-        // Add ALL pubs to cluster layer
-        allPubs.forEach(pub => {
-            if (!pub.latitude || !pub.longitude) return;
+        // Add ALL venues to cluster layer
+        allVenues.forEach(venue => {
+            if (!venue.latitude || !venue.longitude) return;
             
-            const lat = parseFloat(pub.latitude);
-            const lng = parseFloat(pub.longitude);
-            const gfStatus = determineGFStatus(pub);
+            const lat = parseFloat(venue.latitude);
+            const lng = parseFloat(venue.longitude);
+            const gfStatus = determineGFStatus(venue);
             const markerStyle = getMarkerStyleForGFStatus(gfStatus);
             
             // Create marker
             const marker = L.circleMarker([lat, lng], markerStyle);
-            marker.options.pubId = pub.pub_id;
+            marker.options.venueId = venue.venue_id;
             
-            const popupContent = createPubPopupContent(pub, gfStatus);
+            const popupContent = createVenuePopupContent(venue, gfStatus);
             marker.bindPopup(popupContent);
             
-            // Add GF pubs to their own layer, others to cluster
+            // Add GF venues to their own layer, others to cluster
             if (gfStatus === 'always_tap_cask' || gfStatus === 'always_bottle_can' || gfStatus === 'currently') {
-                gfPubsLayer.addLayer(marker);
+                gfVenuesLayer.addLayer(marker);
             } else {
-                clusteredPubsLayer.addLayer(marker);
+                clusteredVenuesLayer.addLayer(marker);
             }
         });
         
-        console.log(`📊 Displayed ${allPubs.length} total pubs`);
+        console.log(`📊 Displayed ${allVenues.length} total venues`);
     };
     
     const setupZoomHandler = () => {
@@ -1079,8 +1079,8 @@ export const MapModule = (() => {
             // Initialize map
             setTimeout(() => {
                 const searchModule = modules.search;
-                const pubs = searchModule?.getCurrentResults() || [];
-                initResultsMap(pubs);
+                const venues = searchModule?.getCurrentResults() || [];
+                initResultsMap(venues);
             }, 50);
             
             // Track event
@@ -1112,7 +1112,7 @@ export const MapModule = (() => {
         // Main maps
         initMainMap,
         initResultsMap,
-        initPubDetailMap,
+        initVenueDetailMap,
         initFullUKMap,
         
         // Cleanup
@@ -1120,7 +1120,7 @@ export const MapModule = (() => {
         cleanupFullUKMap,
         
         // Markers
-        addPubMarkers,
+        addVenueMarkers,
         
         // Location
         setUserLocation: utils.setUserLocation,
@@ -1128,7 +1128,7 @@ export const MapModule = (() => {
         
         // UI
         toggleSearchResultsFullMap,
-        retryLoadPubs,
+        retryLoadVenues,
         
         // Utilities
         calculateDistance: utils.calculateDistance
