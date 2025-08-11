@@ -646,7 +646,6 @@ def get_all_venues_for_map():
             WHERE v.latitude IS NOT NULL AND v.longitude IS NOT NULL 
             AND v.latitude != 0 AND v.longitude != 0            
             ORDER BY s.status ASC
-            LIMIT 1000
         """)
         
         venues = cursor.fetchall()
@@ -930,4 +929,5 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
