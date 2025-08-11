@@ -501,7 +501,7 @@ body.page-breweries .nav-back-btn { display: flex !important; }
    background: var(--hover-subtle);
 }
 
-.cooke-consent {
+.cookie-consent {
    position: fixed;
    bottom: 0;
    left: 0;
