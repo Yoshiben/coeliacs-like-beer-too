@@ -478,13 +478,17 @@ export const SearchModule = (function() {
         try {
             utils.showLoadingToast('Loading venue details...');
             
-            const results = await modules.api.searchVenues({ venue_id: venueId }); // Also fixed: venue_id not venueId
+            // Fix: Don't use the general searchVenues for getting a specific venue
+            // Use the venueId parameter directly
+            const results = await modules.api.searchVenues({ 
+                venueId: venueId  // This should match what the API expects
+            });
             const venues = Array.isArray(results) ? results : results.venues || results.pubs;
             
             utils.hideLoadingToast();
             
             if (venues && venues.length > 0) {
-                const venue = venues[0]; // Changed: venues → venue (different variable name)
+                const venue = venues[0];
                 utils.setCurrentVenue(venue);
                 
                 displayVenueDetails(venue);
