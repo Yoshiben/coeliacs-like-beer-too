@@ -202,7 +202,15 @@ export const SearchModule = (function() {
                 page: 1
             });
             
-            let venues = Array.isArray(results) ? results : results.venues;
+            // Fix: Handle the response structure properly
+            let venues = [];
+            if (Array.isArray(results)) {
+                venues = results;
+            } else if (results.pubs) {
+                venues = results.pubs; // <-- The API returns 'pubs' not 'venues'
+            } else if (results.venues) {
+                venues = results.venues;
+            }
             
             if (venues.length === 0) {
                 showNoResults(searchConfig.noResultsMessage);
@@ -216,13 +224,13 @@ export const SearchModule = (function() {
             
             // Save state
             state.lastSearchState = {
-                type: 'name',
+                type: type,
                 query: query,
                 timestamp: Date.now()
             };
             
             // Store globally
-            window.App.setState(STATE_KEYS.LAST_SEARCH.TYPE, 'name');
+            window.App.setState(STATE_KEYS.LAST_SEARCH.TYPE, type);
             window.App.setState(STATE_KEYS.LAST_SEARCH.QUERY, query);
             
             state.currentSearchVenues = venues;
