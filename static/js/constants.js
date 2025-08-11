@@ -90,6 +90,21 @@ export const Constants = {
     },
     
     // ================================
+    // FEATURE FLAGS
+    // ================================
+    FEATURES: {
+        ENABLE_ANALYTICS: true,
+        ENABLE_HAPTIC_FEEDBACK: true,
+        ENABLE_PHOTO_UPLOAD: true,
+        ENABLE_ADMIN_DASHBOARD: true,
+        ENABLE_BEER_AUTOCOMPLETE: true,
+        ENABLE_MAP_CLUSTERING: true,
+        ENABLE_SOCIAL_SHARING: false, // Future feature
+        ENABLE_USER_ACCOUNTS: false, // Future feature
+        ENABLE_REVIEWS: false // Future feature
+    },
+    
+    // ================================
     // GF STATUS SYSTEM
     // ================================
     GF_STATUS_CONFIG: {
