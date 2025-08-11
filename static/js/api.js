@@ -438,7 +438,7 @@ export const APIModule = (function() {
             const result = await response.json();
             
             // Update current venue state
-            const currentVenue = window.App.getState(STATE_KEYS.CURRENT_PUB);
+            const currentVenue = window.App.getState(STATE_KEYS.CURRENT_VENUE);
             if (currentVenue && currentVenue.venue_id === venueId) {
                 window.App.setState(STATE_KEYS.CURRENT_PUB, {
                     ...currentVenue,
