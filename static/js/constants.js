@@ -339,9 +339,7 @@ export const Constants = {
     ERRORS: {
         GENERIC: 'An error occurred. Please try again.',
         NETWORK: 'Network error. Please check your connection.',
-        LOCATION_DENIED: '📍 Location access denied. Please allow location access and try again.',
-        LOCATION_UNAVAILABLE: '📍 Location unavailable. Please check your GPS settings.',
-        LOCATION_TIMEOUT: '📍 Location request timed out. Please try again.',
+        LOCATION_ERROR: '📍 Location unavailable. Please enable GPS and try again.',
         NO_RESULTS: 'No results found.',
         INVALID_POSTCODE: 'Please enter a valid UK postcode.',
         REQUIRED_FIELDS: 'Please fill in all required fields.',
