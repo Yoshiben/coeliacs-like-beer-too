@@ -1965,18 +1965,22 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 /* ================================
    RESPONSIVE UTILITIES
    ================================ */
-@media (max-height: 600px) {
+/* @media (max-height: 600px) {
     .modal-content {
         max-height: 85vh;
         max-height: 85dvh;
     }
-}
+} */
 
 @media (min-width:1025px) {
    .nav-back-btn {
       position: absolute;
       right: 0;
       margin: var(--space-xl);
+   }
+   .modal-content {
+      max-width: 50vh;
+      max-height: 80vh;
    }
 }
 
