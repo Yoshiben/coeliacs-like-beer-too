@@ -45,11 +45,11 @@ export const SearchModule = (function() {
         },
         
         getCurrentVenue() {
-            return window.App.getState(STATE_KEYS.CURRENT_PUB);
+            return window.App.getState(STATE_KEYS.CURRENT_VENUE);
         },
         
         setCurrentVenue(venue) {
-            window.App.setState(STATE_KEYS.CURRENT_PUB, venue);
+            window.App.setState(STATE_KEYS.CURRENT_VENUE, venue);
         },
         
         showToast(message, type = 'success') {
@@ -478,7 +478,7 @@ export const SearchModule = (function() {
     };
     
     // ================================
-    // PUB DETAILS
+    // VENUE DETAILS
     // ================================
     const showVenueDetails = async (venueId) => {
         console.log('🏠 Showing venue details:', venueId);
@@ -1919,7 +1919,7 @@ export const SearchModule = (function() {
     });
     
     // ================================
-    // PUBLIC API
+    // VENUELIC API
     // ================================
     return {
         // Location search
