@@ -1116,6 +1116,7 @@ export const MapModule = (() => {
         initResultsMap,
         initVenueDetailMap,
         initFullUKMap,
+        updateMapDisplay,
         
         // Cleanup
         cleanupResultsMap,
