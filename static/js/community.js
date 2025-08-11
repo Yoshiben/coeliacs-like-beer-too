@@ -16,7 +16,7 @@ export const CommunityModule = (() => {
     const state = {
         feedItems: [],
         trendingItems: [],
-        pubOfMonth: null,
+        venueOfMonth: null,
         refreshInterval: null,
         lastRefresh: null
     };
@@ -26,7 +26,7 @@ export const CommunityModule = (() => {
         animationDuration: 300,
         // API endpoints for when ready
         endpoints: {
-            pubOfMonth: '/api/community/pub-of-month',
+            venueOfMonth: '/api/community/venue-of-month',
             recentFinds: '/api/community/recent-finds',
             trending: '/api/community/trending',
             stats: '/api/stats'
@@ -70,14 +70,14 @@ export const CommunityModule = (() => {
     const loadCommunityData = async () => {
         try {
             // For now, load mock data. When ready, uncomment the API calls
-            const [pubOfMonth, latestFinds, trending] = await Promise.all([
-                loadPubOfMonth(),
+            const [venueOfMonth, latestFinds, trending] = await Promise.all([
+                loadVenueOfMonth(),
                 loadLatestFinds(),
                 loadTrending()
             ]);
             
             // Update state
-            state.pubOfMonth = pubOfMonth;
+            state.venueOfMonth = venueOfMonth;
             state.feedItems = latestFinds;
             state.trendingItems = trending;
             state.lastRefresh = Date.now();
@@ -94,14 +94,14 @@ export const CommunityModule = (() => {
     // ================================
     // DATA FETCHING (Ready for API integration)
     // ================================
-    const loadPubOfMonth = async () => {
+    const loadVenueOfMonth = async () => {
         // READY FOR REAL DATA:
-        // const response = await fetch(config.endpoints.pubOfMonth);
+        // const response = await fetch(config.endpoints.venueOfMonth);
         // return await response.json();
         
         // Mock data for now
         return {
-            pub_id: 12345,
+            venue_id: 12345,
             name: 'The Botanist Sheffield',
             description: '6 dedicated GF taps including Bellfield, Jump Ship & Brass Castle!',
             address: 'Sheffield City Centre',
@@ -122,8 +122,8 @@ export const CommunityModule = (() => {
                 user_name: 'Sarah M.',
                 created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
                 type: 'beer_report',
-                pub_id: 23456,
-                pub_name: 'The Old Bell',
+                venue_id: 23456,
+                venue_name: 'The Old Bell',
                 location: 'Leeds',
                 beer_name: 'Vagabond Pale Ale',
                 beer_format: 'tap',
@@ -189,14 +189,14 @@ export const CommunityModule = (() => {
     // UI UPDATES
     // ================================
     const updateCommunityUI = () => {
-        updatePubOfMonth();
+        updateVenueOfMonth();
         updateLatestFinds();
         updateTrending();
         updateStats();
     };
     
-    const updatePubOfMonth = () => {
-        if (!state.pubOfMonth) return;
+    const updateVenueOfMonth = () => {
+        if (!state.venueOfMonth) return;
         
         const container = document.querySelector('.featured-content');
         if (!container) return;
@@ -205,18 +205,18 @@ export const CommunityModule = (() => {
         container.innerHTML = '';
         
         const title = document.createElement('h2');
-        title.textContent = state.pubOfMonth.name;
+        title.textContent = state.venueOfMonth.name;
         container.appendChild(title);
         
         const description = document.createElement('p');
-        description.textContent = state.pubOfMonth.description;
+        description.textContent = state.venueOfMonth.description;
         container.appendChild(description);
         
         const stats = document.createElement('div');
         stats.className = 'featured-stats';
         
         const locationSpan = document.createElement('span');
-        locationSpan.textContent = `📍 ${state.pubOfMonth.address}`;
+        locationSpan.textContent = `📍 ${state.venueOfMonth.address}`;
         stats.appendChild(locationSpan);
         
         const statusSpan = document.createElement('span');
@@ -228,15 +228,15 @@ export const CommunityModule = (() => {
         const button = document.createElement('button');
         button.className = 'btn btn-featured';
         button.textContent = 'View Details';
-        button.dataset.action = 'view-pub';
-        button.dataset.pubId = state.pubOfMonth.pub_id;
+        button.dataset.action = 'view-venue';
+        button.dataset.venueId = state.venueOfMonth.venue_id;
         container.appendChild(button);
         
         // Update image if exists
         const imageEl = document.querySelector('.featured-image img');
-        if (imageEl && state.pubOfMonth.photo_url) {
-            imageEl.src = state.pubOfMonth.photo_url;
-            imageEl.alt = `GF beer at ${state.pubOfMonth.name}`;
+        if (imageEl && state.venueOfMonth.photo_url) {
+            imageEl.src = state.venueOfMonth.photo_url;
+            imageEl.alt = `GF beer at ${state.venueOfMonth.name}`;
         }
     };
     
@@ -307,12 +307,12 @@ export const CommunityModule = (() => {
         const actions = document.createElement('div');
         actions.className = 'find-actions';
         
-        if (item.pub_id) {
+        if (item.venue_id) {
             const viewBtn = document.createElement('button');
             viewBtn.className = 'btn btn-small-outline';
-            viewBtn.textContent = 'View Pub';
-            viewBtn.dataset.action = 'view-pub';
-            viewBtn.dataset.pubId = item.pub_id;
+            viewBtn.textContent = 'View Venue';
+            viewBtn.dataset.action = 'view-venue';
+            viewBtn.dataset.venueId = item.venue_id;
             actions.appendChild(viewBtn);
         }
         
@@ -415,15 +415,15 @@ export const CommunityModule = (() => {
         try {
             const stats = await modules.api?.getStats();
             if (stats) {
-                if (stats.total_pubs && modules.helpers) {
-                    modules.helpers.animateNumber('totalPubs', stats.total_pubs);
+                if (stats.total_venues && modules.helpers) {
+                    modules.helpers.animateNumber('totalVenues', stats.total_venues);
                 }
-                if (stats.gf_pubs && modules.helpers) {
-                    modules.helpers.animateNumber('gfPubs', stats.gf_pubs);
+                if (stats.gf_venues && modules.helpers) {
+                    modules.helpers.animateNumber('gfVenues', stats.gf_venues);
                 }
                 // ADD THIS for monthly stats
-                if (stats.gf_pubs_this_month && modules.helpers) {
-                    modules.helpers.animateNumber('monthlyFinds', stats.gf_pubs_this_month);
+                if (stats.gf_venues_this_month && modules.helpers) {
+                    modules.helpers.animateNumber('monthlyFinds', stats.gf_venues_this_month);
                 }
             }
         } catch (error) {
@@ -451,7 +451,7 @@ export const CommunityModule = (() => {
     const formatFindContent = (item) => {
         switch(item.type) {
             case 'beer_report':
-                return `Just found ${item.beer_name} on ${item.beer_format} at ${item.pub_name}!`;
+                return `Just found ${item.beer_name} on ${item.beer_format} at ${item.venue_name}!`;
             case 'shop_report':
                 return `New GF section at ${item.shop_name} - spotted ${item.beer_name}!`;
             default:
@@ -585,8 +585,8 @@ export const CommunityModule = (() => {
             'add-find': () => {
                 modules.modal?.openReportModal();
             },
-            'saved-pubs': () => {
-                modules.helpers?.showToast('Saved pubs coming soon! 🚀', 'info');
+            'saved-venues': () => {
+                modules.helpers?.showToast('Saved venues coming soon! 🚀', 'info');
             },
             'find-stockists': () => {
                 modules.helpers?.showToast('Stockist finder coming soon! 🚀', 'info');
