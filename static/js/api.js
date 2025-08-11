@@ -169,9 +169,9 @@ export const APIModule = (function() {
                 
                 // Return fallback data
                 return {
-                    total_pubs: Constants.DEFAULTS.TOTAL_PUBS,
-                    gf_pubs: Constants.DEFAULTS.GF_PUBS,
-                    gf_pubs_this_month: Constants.DEFAULTS.GF_PUBS_THIS_MONTH
+                    total_venues: Constants.DEFAULTS.TOTAL_PUBS,
+                    gf_venues: Constants.DEFAULTS.GF_PUBS,
+                    gf_venues_this_month: Constants.DEFAULTS.GF_PUBS_THIS_MONTH
                 };
             }
         });
@@ -180,13 +180,13 @@ export const APIModule = (function() {
     // ================================
     // SEARCH APIS
     // ================================
-    const searchPubs = async (params) => {
-        const { query, searchType = 'all', page = 1, pubId = null, gfOnly = false } = params;
+    const searchVenues = async (params) => {
+        const { query, searchType = 'all', page = 1, venueId = null, gfOnly = false } = params;
         
         try {
             let url;
-            if (pubId) {
-                url = `${Constants.API.SEARCH}?pub_id=${pubId}`;
+            if (venueId) {
+                url = `${Constants.API.SEARCH}?venue_id=${venueId}`;
             } else {
                 const searchParams = new URLSearchParams({
                     query: query || '',
@@ -197,7 +197,7 @@ export const APIModule = (function() {
                 url = `${Constants.API.SEARCH}?${searchParams}`;
             }
             
-            console.log('🔍 API: Searching pubs:', url);
+            console.log('🔍 API: Searching venues:', url);
             
             const response = await fetchWithTimeout(url);
             if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -206,15 +206,15 @@ export const APIModule = (function() {
             if (data.error) throw new Error(data.error);
             
             // Update search state
-            window.App.setState(STATE_KEYS.SEARCH_RESULTS, data.pubs || data);
+            window.App.setState(STATE_KEYS.SEARCH_RESULTS, data.venues || data);
             
             return data;
         } catch (error) {
-            return handleAPIError(error, 'searchPubs', params);
+            return handleAPIError(error, 'searchVenues', params);
         }
     };
     
-    const findNearbyPubs = async (lat, lng, radius = 5, gfOnly = false) => {
+    const findNearbyVenues = async (lat, lng, radius = 5, gfOnly = false) => {
         const cacheKey = `nearby_${lat}_${lng}_${radius}_${gfOnly}`;
         
         return deduplicatedFetch(cacheKey, async () => {
@@ -227,7 +227,7 @@ export const APIModule = (function() {
                 });
                 
                 const url = `${Constants.API.NEARBY}?${params}`;
-                console.log('📍 API: Finding nearby pubs:', url);
+                console.log('📍 API: Finding nearby venues:', url);
                 
                 const response = await fetchWithTimeout(url);
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -236,22 +236,22 @@ export const APIModule = (function() {
                 if (data.error) throw new Error(data.error);
                 
                 // Ensure we always return an array
-                let pubs = [];
+                let venues = [];
                 if (Array.isArray(data)) {
-                    pubs = data;
-                } else if (data.pubs && Array.isArray(data.pubs)) {
-                    pubs = data.pubs;
+                    venues = data;
+                } else if (data.venues && Array.isArray(data.venues)) {
+                    venues = data.venues;
                 } else if (data.success === false) {
                     // API error response
-                    throw new Error(data.error || 'Failed to load pubs');
+                    throw new Error(data.error || 'Failed to load venues');
                 }
                 
                 // Update state
-                window.App.setState(STATE_KEYS.SEARCH_RESULTS, pubs);
+                window.App.setState(STATE_KEYS.SEARCH_RESULTS, venues);
                 
-                return pubs;
+                return venues;
             } catch (error) {
-                const errorResult = handleAPIError(error, 'findNearbyPubs', { lat, lng, radius });
+                const errorResult = handleAPIError(error, 'findNearbyVenues', { lat, lng, radius });
                 // Ensure we return an empty array on error, not an error object
                 return [];
             }
@@ -299,7 +299,7 @@ export const APIModule = (function() {
     // ================================
     // AUTOCOMPLETE
     // ================================
-    const getPubSuggestions = async (query, searchType = 'all', gfOnly = false) => {
+    const getVenueSuggestions = async (query, searchType = 'all', gfOnly = false) => {
         if (!query || query.length < Constants.SEARCH.MIN_QUERY_LENGTH) return [];
         
         try {
@@ -360,13 +360,13 @@ export const APIModule = (function() {
             // ADD THIS DEBUG LOGGING:
             console.log('🔍 DEBUG - Raw report data:', reportData);
             console.log('🔍 DEBUG - Data types:', {
-                pub_id: typeof reportData.pub_id,
+                venue_id: typeof reportData.venue_id,
                 beer_abv: typeof reportData.beer_abv,
-                pub_id_value: reportData.pub_id
+                venue_id_value: reportData.venue_id
             });
             // Validate required fields
-            const requiredFields = ['pub_id', 'beer_format', 'brewery', 'beer_name'];
-            const missingFields = requiredFields.filter(field => !reportData[field] && !reportData.pub_name);
+            const requiredFields = ['venue_id', 'beer_format', 'brewery', 'beer_name'];
+            const missingFields = requiredFields.filter(field => !reportData[field] && !reportData.venue_name);
             
             if (missingFields.length > 0) {
                 throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
@@ -418,7 +418,7 @@ export const APIModule = (function() {
         }
     };
     
-    const updateGFStatus = async (pubId, status) => {
+    const updateGFStatus = async (venueId, status) => {
         try {
             const validStatuses = ['always', 'currently', 'not_currently', 'unknown'];
             if (!validStatuses.includes(status)) {
@@ -427,7 +427,7 @@ export const APIModule = (function() {
             
             const response = await fetchWithTimeout(Constants.API.UPDATE_GF_STATUS, {
                 method: 'POST',
-                body: JSON.stringify({ pub_id: pubId, status })
+                body: JSON.stringify({ venue_id: venueId, status })
             });
             
             if (!response.ok) {
@@ -437,11 +437,11 @@ export const APIModule = (function() {
             
             const result = await response.json();
             
-            // Update current pub state
-            const currentPub = window.App.getState(STATE_KEYS.CURRENT_PUB);
-            if (currentPub && currentPub.pub_id === pubId) {
+            // Update current venue state
+            const currentVenue = window.App.getState(STATE_KEYS.CURRENT_PUB);
+            if (currentVenue && currentVenue.venue_id === venueId) {
                 window.App.setState(STATE_KEYS.CURRENT_PUB, {
-                    ...currentPub,
+                    ...currentVenue,
                     gf_status: status
                 });
             }
@@ -451,21 +451,21 @@ export const APIModule = (function() {
             
             return result;
         } catch (error) {
-            return handleAPIError(error, 'updateGFStatus', { pubId, status });
+            return handleAPIError(error, 'updateGFStatus', { venueId, status });
         }
     };
     
     // ================================
     // MAP DATA API
     // ================================
-    const getAllPubsForMap = async () => {
-        const cacheKey = 'all_pubs_map';
+    const getAllVenuesForMap = async () => {
+        const cacheKey = 'all_venues_map';
         
         // Check if we have cached data in state
-        const cachedPubs = window.App.getState(STATE_KEYS.MAP_DATA.ALL_PUBS);
-        if (cachedPubs && cachedPubs.length > 0) {
-            console.log('📦 Using cached pub data');
-            return { success: true, pubs: cachedPubs };
+        const cachedVenues = window.App.getState(STATE_KEYS.MAP_DATA.ALL_PUBS);
+        if (cachedVenues && cachedVenues.length > 0) {
+            console.log('📦 Using cached venue data');
+            return { success: true, venues: cachedVenues };
         }
         
         return deduplicatedFetch(cacheKey, async () => {
@@ -474,15 +474,15 @@ export const APIModule = (function() {
                 const data = await response.json();
                 
                 if (!data.success) {
-                    throw new Error(data.error || 'Failed to load pubs');
+                    throw new Error(data.error || 'Failed to load venues');
                 }
                 
                 // Store in state
-                window.App.setState(STATE_KEYS.MAP_DATA.ALL_PUBS, data.pubs || []);
+                window.App.setState(STATE_KEYS.MAP_DATA.ALL_PUBS, data.venues || []);
                 
                 return data;
             } catch (error) {
-                return handleAPIError(error, 'getAllPubsForMap');
+                return handleAPIError(error, 'getAllVenuesForMap');
             }
         });
     };
@@ -650,12 +650,12 @@ export const APIModule = (function() {
     return {
         // Core methods
         getStats,
-        searchPubs,
-        findNearbyPubs,
+        searchVenues,
+        findNearbyVenues,
         geocodePostcode,
         
         // Autocomplete
-        getPubSuggestions,
+        getVenueSuggestions,
         
         // Brewery & Beer
         getBreweries,
@@ -666,7 +666,7 @@ export const APIModule = (function() {
         updateGFStatus,
         
         // Map data
-        getAllPubsForMap,
+        getAllVenuesForMap,
         
         // Admin namespace
         admin,
