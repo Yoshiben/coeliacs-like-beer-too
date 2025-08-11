@@ -187,9 +187,9 @@ export default (function() {
                         ${beer.gluten_status ? `<span class="beer-gf-status">${beer.gluten_status.replace('_', ' ')}</span>` : ''}
                     </div>
                 </div>
-                <button class="btn btn-sm" data-action="find-pubs-with-beer" 
+                <button class="btn btn-sm" data-action="find-venues-with-beer" 
                         data-beer="${beer.name}" data-brewery="${brewery}">
-                    Find Pubs
+                    Find Venues
                 </button>
             </div>
         `).join('');
@@ -259,7 +259,7 @@ export default (function() {
             modules.nav?.goToHome();
         }
     };
-    // Public API
+    // Venuelic API
     return {
         init,
         openBreweries,
