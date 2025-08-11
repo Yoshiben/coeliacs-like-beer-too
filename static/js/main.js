@@ -542,7 +542,7 @@ const App = {
                         modules.nav?.showSearchWithContext();
                     }, 100);
                 } else if (mapReturnContext === 'venue') {
-                    const currentVenue = App.getState(STATE_KEYS.CURRENT_PUB);
+                    const currentVenue = App.getState(STATE_KEYS.CURRENT_VENUE);
                     if (currentVenue) {
                         modules.search?.showVenueDetails(currentVenue.venue_id);
                     } else {
@@ -598,7 +598,7 @@ const App = {
             App.toggleVenueDetailMap(modules);
         },
         'show-venue-on-map': (el, modules) => {
-            const currentVenue = App.getState(STATE_KEYS.CURRENT_PUB);
+            const currentVenue = App.getState(STATE_KEYS.CURRENT_VENUE);
             if (!currentVenue || !currentVenue.latitude || !currentVenue.longitude) {
                 modules.helpers?.showToast('📍 Location not available for this venue', 'error');
                 return;
@@ -640,7 +640,7 @@ const App = {
                 modules.modalManager?.close('venueDetailsOverlay');
                 setTimeout(() => {
                     App.showFullMap(modules);
-                    const currentVenue = App.getState(STATE_KEYS.CURRENT_PUB);
+                    const currentVenue = App.getState(STATE_KEYS.CURRENT_VENUE);
                     if (currentVenue && currentVenue.latitude && currentVenue.longitude) {
                         setTimeout(() => {
                             const map = App.getState(STATE_KEYS.MAP_DATA.FULL_UK_MAP);
@@ -1132,7 +1132,7 @@ const App = {
     // MAP HANDLERS
     // ================================
     toggleVenueDetailMap: (modules) => {
-        const currentVenue = App.getState(STATE_KEYS.CURRENT_PUB);
+        const currentVenue = App.getState(STATE_KEYS.CURRENT_VENUE);
         const mapContainer = document.getElementById('venueMapContainer');
         const mapBtnText = document.getElementById('venueMapBtnText');
         const venueContainer = document.getElementById('venueContainer');
@@ -1230,10 +1230,10 @@ const App = {
     },
     
     // ================================
-    // PUB ACTIONS
+    // VENUE ACTIONS
     // ================================
     handleReportBeer: (modules) => {
-        const venueData = App.getState(STATE_KEYS.CURRENT_PUB);
+        const venueData = App.getState(STATE_KEYS.CURRENT_VENUE);
         
         // Close overlays using modalManager
         modules.modalManager?.closeAllOverlays();
@@ -1247,7 +1247,7 @@ const App = {
     },
     
     openVenueExternalSearch: (modules) => {
-        const venue = App.getState(STATE_KEYS.CURRENT_PUB);
+        const venue = App.getState(STATE_KEYS.CURRENT_VENUE);
         if (!venue) return;
         
         const searchQuery = encodeURIComponent(`${venue.name} ${venue.postcode} venue`);
@@ -1257,7 +1257,7 @@ const App = {
     },
     
     openVenueDirections: (modules) => {
-        const venue = App.getState(STATE_KEYS.CURRENT_PUB);
+        const venue = App.getState(STATE_KEYS.CURRENT_VENUE);
         if (!venue) return;
         
         const destination = encodeURIComponent(`${venue.name}, ${venue.address}, ${venue.postcode}`);
