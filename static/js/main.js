@@ -541,7 +541,6 @@ const App = {
                         modules.nav?.setPageContext('results');
                     }, 100);
                 }
-            }
             } else if (currentContext === 'venue') {
                 modules.nav?.goBackFromVenue();
             } else if (currentContext === 'results') {
