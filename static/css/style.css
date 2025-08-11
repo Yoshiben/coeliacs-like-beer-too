@@ -87,13 +87,10 @@
    /* 5-Tier Status System Colors */
    --always-tap-cask-fill: #FFD700;
    --always-tap-cask-border: #FDB904;
-   --always-bottle-can-fill: #00F500;
    --always-bottle-can-border: #00C400;
    --currently-fill: #3B82F6;
    --currently-border: #2563EB;
-   --not-currently-fill: #EF4444;
    --not-currently-border: #DC2626;
-   --unknown-fill: #9CA3AF;
    --unknown-border: #6B7280;
    --my-location-fill: #667eea;
    --my-location-border: #ffffff;
@@ -1665,7 +1662,7 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 }
 
 .legend-marker.always-bottle-can {
-   background: var(--always-bottle-can-fill);
+   background: var(--green);
    border-color: var(--always-bottle-can-border);
    box-shadow: 0 0 3px rgba(0, 245, 0, 0.4);
    width: calc(var(--space-md) * 1.25);
@@ -1678,12 +1675,12 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 }
 
 .legend-marker.not-currently {
-   background: var(--not-currently-fill);
+   background: var(--red);
    border-color: var(--not-currently-border);
 }
 
 .legend-marker.unknown {
-   background: var(--unknown-fill);
+   background: var(--light-grey);
    border-color: var(--unknown-border);
 }
 
@@ -2344,16 +2341,16 @@ body.page-breweries .nav-back-btn { display: flex !important; }
    ================================ */
 
 .distance-options {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: var(--space-sm);
-    margin: var(--space-lg) 0;
+   display: flex;
+   flex-direction: column;
+   gap: var(--space-sm);
+   margin: var(--space-sm);
 }
 
 .distance-option {
     background: var(--bg-white);
     border: 2px solid var(--border-light);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-xl);
     padding: var(--space-md);
     text-align: center;
     cursor: pointer;
