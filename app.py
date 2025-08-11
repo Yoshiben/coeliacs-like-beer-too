@@ -201,7 +201,7 @@ def search():
     search_type = request.args.get('search_type', 'all')
     gf_only = request.args.get('gf_only', 'false').lower() == 'true'
     page = request.args.get('page', 1, type=int)
-    venue_id = request.args.get('venue_id', type=int)  # Changed from pub_id
+    venue_id = request.args.get('venue_id', type=int)  # Changed from venue_id
     
     if query and (len(query) < 1 or len(query) > 100):
         return jsonify({'error': 'Invalid query length'}), 400
@@ -312,12 +312,12 @@ def search():
         cursor.execute(sql, params)
         venues = cursor.fetchall()
         
-        # Map results to use pub_id for backwards compatibility
+        # Map results to use venue_id for backwards compatibility
         for venue in venues:
-            venue['pub_id'] = venue['venue_id']
+            venue['venue_id'] = venue['venue_id']
         
         return jsonify({
-            'pubs': venues,  # Keep as 'pubs' for frontend compatibility
+            'venues': venues,  # Keep as 'venues' for frontend compatibility
             'pagination': {
                 'page': page,
                 'pages': total_pages,
@@ -369,17 +369,17 @@ def get_stats():
         gf_venues_this_month = cursor.fetchone()[0]
         
         return jsonify({
-            'total_pubs': total_venues,  # Keep as total_pubs for frontend
-            'gf_pubs': gf_venues,
-            'gf_pubs_this_month': gf_venues_this_month
+            'total_venues': total_venues,  # Keep as total_venues for frontend
+            'gf_venues': gf_venues,
+            'gf_venues_this_month': gf_venues_this_month
         })
         
     except Exception as e:
         logger.error(f"Error in stats: {str(e)}")
         return jsonify({
-            'total_pubs': 49841,
-            'gf_pubs': 1249,
-            'gf_pubs_this_month': 10 
+            'total_venues': 49841,
+            'gf_venues': 1249,
+            'gf_venues_this_month': 10 
         })
     finally:
         if 'conn' in locals() and conn.is_connected():
@@ -516,7 +516,7 @@ def submit_beer_update():
                 beer_abv = None
         
         # STEP 2: Insert into venue_beers - AUTO-APPROVED!
-        venue_id = data.get('pub_id')  # Frontend still sends pub_id
+        venue_id = data.get('venue_id')  # Frontend still sends venue_id
         format_type = data.get('format') or data.get('beer_format')
         
         # Check if this beer is already reported for this venue
@@ -575,7 +575,7 @@ def update_gf_status():
     """Update GF status using new schema"""
     try:
         data = request.get_json()
-        venue_id = data.get('pub_id')  # Frontend still sends pub_id
+        venue_id = data.get('venue_id')  # Frontend still sends venue_id
         status = data.get('status')
         
         if not venue_id or not status:
@@ -626,8 +626,8 @@ def update_gf_status():
             cursor.close()
             conn.close()
 
-@app.route('/api/all-pubs')
-def get_all_pubs_for_map():
+@app.route('/api/all-venues')
+def get_all_venues_for_map():
     """Get all venues with coordinates for map display"""
     try:
         conn = mysql.connector.connect(**db_config)
@@ -636,7 +636,7 @@ def get_all_pubs_for_map():
         # Updated query for new schema
         cursor.execute("""
             SELECT 
-                v.venue_id as pub_id, v.name, 
+                v.venue_id as venue_id, v.name, 
                 CONCAT_WS(', ', v.housenumber, v.street, v.city) as address, 
                 v.postcode, v.city as local_authority,
                 v.latitude, v.longitude,
@@ -653,7 +653,7 @@ def get_all_pubs_for_map():
         
         return jsonify({
             'success': True,
-            'pubs': venues,  # Keep as 'pubs' for frontend
+            'venues': venues,  # Keep as 'venues' for frontend
             'total': len(venues)
         })
         
@@ -668,8 +668,8 @@ def get_all_pubs_for_map():
             cursor.close()
             conn.close()
 
-@app.route('/api/add-pub', methods=['POST'])
-def add_pub():
+@app.route('/api/add-venue', methods=['POST'])
+def add_venue():
     """Add a new venue to the database"""
     try:
         data = request.get_json()
@@ -701,7 +701,7 @@ def add_pub():
             return jsonify({
                 'success': False,
                 'error': 'A venue with this name and postcode already exists',
-                'pub_id': existing[0]  # Return as pub_id for frontend
+                'venue_id': existing[0]  # Return as venue_id for frontend
             }), 409
         
         # Get the submitted_by value (nickname or 'anonymous')
@@ -719,7 +719,7 @@ def add_pub():
                 address, latitude, longitude, 
                 venue_type, created_by
             ) VALUES (
-                %s, %s, %s, %s, %s, %s, %s, 'pub', %s
+                %s, %s, %s, %s, %s, %s, %s, 'venue', %s
             )
         """, (
             data['name'],
@@ -748,7 +748,7 @@ def add_pub():
         return jsonify({
             'success': True,
             'message': f'{data["name"]} added successfully!',
-            'pub_id': venue_id,  # Return as pub_id for frontend
+            'venue_id': venue_id,  # Return as venue_id for frontend
             'name': data['name']
         })
         
@@ -762,7 +762,7 @@ def add_pub():
         }), 409
         
     except mysql.connector.Error as e:
-        logger.error(f"MySQL error in add_pub: {str(e)}")
+        logger.error(f"MySQL error in add_venue: {str(e)}")
         if 'conn' in locals():
             conn.rollback()
         return jsonify({
@@ -771,7 +771,7 @@ def add_pub():
         }), 500
         
     except Exception as e:
-        logger.error(f"Unexpected error in add_pub: {str(e)}")
+        logger.error(f"Unexpected error in add_venue: {str(e)}")
         logger.error(f"Error type: {type(e)}")
         import traceback
         logger.error(f"Traceback: {traceback.format_exc()}")
@@ -899,7 +899,7 @@ def gf_breweries():
     return render_template('breweries.html', cache_buster=version)
 
 @app.route('/search')
-@app.route('/pub')
+@app.route('/venue')
 @app.route('/map')
 @app.route('/breweries')
 def spa_routes():
@@ -930,3 +930,4 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
