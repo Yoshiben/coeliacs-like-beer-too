@@ -250,7 +250,7 @@ export const HelpersModule = (function() {
         console.log('🏠 Closing all overlays and returning home');
         
         // Close specific overlays
-        ['pubDetailsOverlay', 'resultsOverlay', 'fullMapOverlay'].forEach(id => {
+        ['venueDetailsOverlay', 'resultsOverlay', 'fullMapOverlay'].forEach(id => {
             const overlay = document.getElementById(id);
             if (overlay) {
                 overlay.style.display = 'none';
@@ -534,7 +534,7 @@ export const HelpersModule = (function() {
                 showHomeView();
                 break;
             case 'results':
-            case 'pub':
+            case 'venue':
                 // Let search module handle these
                 break;
             default:
