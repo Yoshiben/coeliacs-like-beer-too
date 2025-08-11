@@ -1119,11 +1119,22 @@ const App = {
         const helpers = App.getModule('helpers');
         const hasConsent = helpers?.Storage.get('cookieConsent');
         
+        const banner = document.getElementById('cookieConsent');
+        const floatBtn = document.getElementById('cookieSettingsFloat');
+        
         if (!hasConsent) {
-            const banner = document.getElementById('cookieConsent');
-            if (banner) banner.style.display = 'block';
+            // No consent yet - show banner, hide float button
+            if (banner) {
+                banner.style.display = 'block';
+                console.log('🍪 Showing cookie banner - no consent found');
+            }
+            if (floatBtn) floatBtn.style.display = 'none';
         } else {
-            const floatBtn = document.getElementById('cookieSettingsFloat');
+            // Has consent - hide banner, show float button
+            if (banner) {
+                banner.style.display = 'none';
+                console.log('🍪 Hiding cookie banner - consent already given');
+            }
             if (floatBtn) floatBtn.style.display = 'block';
         }
     },
