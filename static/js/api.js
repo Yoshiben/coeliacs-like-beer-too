@@ -169,9 +169,9 @@ export const APIModule = (function() {
                 
                 // Return fallback data
                 return {
-                    total_venues: Constants.DEFAULTS.TOTAL_PUBS,
-                    gf_venues: Constants.DEFAULTS.GF_PUBS,
-                    gf_venues_this_month: Constants.DEFAULTS.GF_PUBS_THIS_MONTH
+                    total_venues: Constants.DEFAULTS.TOTAL_VENUES,
+                    gf_venues: Constants.DEFAULTS.GF_VENUES,
+                    gf_venues_this_month: Constants.DEFAULTS.GF_VENUES_THIS_MONTH
                 };
             }
         });
