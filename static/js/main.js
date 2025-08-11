@@ -547,9 +547,12 @@ const App = {
                 // Go back to search, not home
                 modules.modalManager?.close('resultsOverlay');
                 setTimeout(() => {
-                    modules.modalManager?.open('searchOverlay');
+                    // Only open if not already open
+                    if (!modules.modalManager?.isOpen('searchOverlay')) {
+                        modules.modalManager?.open('searchOverlay');
+                    }
                     // If it was a location search, reopen distance modal
-                    const lastSearchType = window.App.getState(STATE_KEYS.LAST_SEARCH.TYPE);  // Use the specific path
+                    const lastSearchType = window.App.getState(STATE_KEYS.LAST_SEARCH.TYPE);
                     if (lastSearchType === 'nearby') {
                         setTimeout(() => {
                             modules.modalManager?.open('distanceModal');
@@ -571,7 +574,7 @@ const App = {
                         modules.nav?.showSearchWithContext();
                     }, 100);
                 } else if (mapReturnContext === 'venue') {
-                    const currentVenue = App.getState(STATE_KEYS.CURRENT_VENUE);
+                    const currentVenue = App.getState(STATE_KEYS.CURRENT_VENUE || STATE_KEYS.CURRENT_PUB);
                     if (currentVenue) {
                         modules.search?.showVenueDetails(currentVenue.venue_id);
                     } else {
