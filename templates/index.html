@@ -51,7 +51,7 @@
                             <div class="toggle-track">
                                 <div class="toggle-thumb" id="mainToggleThumb"></div>
                                 <div class="toggle-option active" data-value="gf">GF Only</div>
-                                <div class="toggle-option" data-value="all">All Pubs</div>
+                                <div class="toggle-option" data-value="all">All Venues</div>
                             </div>
                         </div>
                     </div>
@@ -73,11 +73,11 @@
             <!-- Quick Stats Bar -->
             <div class="stats-bar">
                 <div class="stat-pill">
-                    <span class="stat-number-small" id="totalPubs">&nbsp;</span>
-                    <span class="stat-label-small">Pubs currently<br>in database</br></span>
+                    <span class="stat-number-small" id="totalVenues">&nbsp;</span>
+                    <span class="stat-label-small">Venues currently<br>in database</br></span>
                 </div>
                 <div class="stat-pill highlighted">
-                    <span class="stat-number-small" id="gfPubs">&nbsp;</span>
+                    <span class="stat-number-small" id="gfVenues">&nbsp;</span>
                     <span class="stat-label-small">Known to serve<br>gf beer</br></span>
                 </div>
                 <div class="stat-pill">
@@ -100,9 +100,9 @@
             
             <!-- Community Feed -->
             <div class="community-feed">
-                <!-- Pub of the Month -->
+                <!-- Venue of the Month -->
                 <div class="card featured-card">
-                    <div class="featured-badge">🏆 Pub of the Month</div>
+                    <div class="featured-badge">🏆 Venue of the Month</div>
                     <div class="featured-content">
                         <h2>The Botanist Sheffield</h2>
                         <p>6 dedicated GF taps including Bellfield, Jump Ship & Brass Castle!</p>
@@ -110,7 +110,7 @@
                             <span>📍 Sheffield City Centre</span>
                             <span>🍺 Always GF Available</span>
                         </div>
-                        <button class="btn btn-featured" data-action="view-pub" data-pub-id="12345">
+                        <button class="btn btn-featured" data-action="view-venue" data-venue-id="12345">
                             View Details
                         </button>
                     </div>
@@ -137,8 +137,8 @@
                             <div class="find-location">📍 Leeds</div>
                         </div>
                         <div class="find-actions">
-                            <button class="btn btn-small-outline" data-action="view-pub" data-pub-id="23456">
-                                View Pub
+                            <button class="btn btn-small-outline" data-action="view-venue" data-venue-id="23456">
+                                View Venue
                             </button>
                             <button class="btn btn-small-text">
                                 🙌 Thanks! (12)
@@ -226,9 +226,9 @@
                         <span class="action-icon">➕</span>
                         <span class="action-label">Add a Find</span>
                     </button>
-                    <button class="action-card" data-action="saved-pubs">
+                    <button class="action-card" data-action="saved-venues">
                         <span class="action-icon">❤️</span>
-                        <span class="action-label">Saved Pubs</span>
+                        <span class="action-label">Saved Venues</span>
                     </button>
                 </div>
             </div>
@@ -295,29 +295,29 @@
                             <!-- Location Search -->
                             <div class="search-option location" data-action="location-search">
                                 <span class="search-icon">📍</span>
-                                <h3 class="search-title">Pubs Near Me</h3>
-                                <p class="search-description">Find pubs close to you, control the search distance.</p>
+                                <h3 class="search-title">Venues Near Me</h3>
+                                <p class="search-description">Find venues close to you, control the search distance.</p>
                             </div>
                             
                             <!-- Name Search -->
                             <div class="search-option name" data-action="search-name">
                                 <span class="search-icon">🏠</span>
-                                <h3 class="search-title">Pubs by Name</h3>
-                                <p class="search-description">Search for a specific pub name - "Milestone" etc</p>
+                                <h3 class="search-title">Venues by Name</h3>
+                                <p class="search-description">Search for a specific venue name - "Milestone" etc</p>
                             </div>
                             
                             <!-- Area Search -->
                             <div class="search-option area" data-action="search-area">
                                 <span class="search-icon">🗺️</span>
-                                <h3 class="search-title">Pubs by Area</h3>
-                                <p class="search-description">Explore pubs in regions, cities, or postcodes</p>
+                                <h3 class="search-title">Venues by Area</h3>
+                                <p class="search-description">Explore venues in regions, cities, or postcodes</p>
                             </div>
                             
                             <!-- Beer Search -->
                             <div class="search-option beer" data-action="search-beer">
                                 <span class="search-icon">🍺</span>
-                                <h3 class="search-title">Pubs by Beer</h3>
-                                <p class="search-description">Find pubs serving specific GF beers - "Zapato", "IPA" etc.</p>
+                                <h3 class="search-title">Venues by Beer</h3>
+                                <p class="search-description">Find venues serving specific GF beers - "Zapato", "IPA" etc.</p>
                             </div>
                         </div>
                     </div>
@@ -329,8 +329,8 @@
         <div id="nameModal" class="modal search-modal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3 class="modal-title">🏠 Search by Pub Name</h3>
-                    <p class="modal-subtitle">Enter the name of the pub you're looking for</p>
+                    <h3 class="modal-title">🏠 Search by Venue Name</h3>
+                    <p class="modal-subtitle">Enter the name of the venue you're looking for</p>
                 </div>
                 <input type="text" class="form-input" placeholder="e.g. The Red Lion, Wetherspoons" id="nameInput">
                 <div class="modal-actions">
@@ -344,7 +344,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h3 class="modal-title">🗺️ Search by Area</h3>
-                    <p class="modal-subtitle">Find pubs in a specific location</p>
+                    <p class="modal-subtitle">Find venues in a specific location</p>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Search by:</label>
@@ -365,7 +365,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h3 class="modal-title">🍺 Search by Beer</h3>
-                    <p class="modal-subtitle">Find pubs serving specific gluten-free beers</p>
+                    <p class="modal-subtitle">Find venues serving specific gluten-free beers</p>
                 </div>
                 <div class="form-group">
                     <label class="form-label">Search by:</label>
@@ -460,8 +460,8 @@
                     </div>
                 </div>
                 <div class="modal-actions">
-                    <button class="btn btn-primary" data-action="search-pubs-with-brewery">
-                        🔍 Find Pubs Serving These Beers
+                    <button class="btn btn-primary" data-action="search-venues-with-brewery">
+                        🔍 Find Venues Serving These Beers
                     </button>
                 </div>
             </div>
@@ -481,10 +481,10 @@
                         
                         <div class="no-results-found" id="noResultsFound">
                             <div class="no-results-icon">🔍</div>
-                            <div class="no-results-title">No pubs found</div>
+                            <div class="no-results-title">No venues found</div>
                             <div class="no-results-text">Try expanding your search or check the spelling</div>
                             <div class="no-results-actions">
-                                <button class="btn btn-primary" data-action="add-new-pub-from-results">➕ Add New Pub/Bar</button>
+                                <button class="btn btn-primary" data-action="add-new-venue-from-results">➕ Add New Venue/Bar</button>
                                 <button class="btn btn-secondary" data-action="search-google-places">🔍 Search Google Maps</button>
                             </div>
                         </div>
@@ -497,17 +497,17 @@
             </div>
         </div>
 
-        <!-- Pub Details Overlay -->
-        <div id="pubDetailsOverlay" class="overlay pub-details-overlay">
-            <div class="pub-details-container">
+        <!-- Venue Details Overlay -->
+        <div id="venueDetailsOverlay" class="overlay venue-details-overlay">
+            <div class="venue-details-container">
                 
                 <!-- Main content card -->
-                <div class="pub-details-card">
-                    <div class="pub-details-content">
-                        <div class="pub-header">
-                            <h1 class="pub-title" id="pubDetailsTitle">Pub Name</h1>
-                            <div class="pub-address" id="pubDetailsAddress">Address</div>
-                            <div class="pub-location" id="pubDetailsLocation">Location</div>
+                <div class="venue-details-card">
+                    <div class="venue-details-content">
+                        <div class="venue-header">
+                            <h1 class="venue-title" id="venueDetailsTitle">Venue Name</h1>
+                            <div class="venue-address" id="venueDetailsAddress">Address</div>
+                            <div class="venue-location" id="venueDetailsLocation">Location</div>
                         </div>
         
                         <div class="gf-status-section">
@@ -527,14 +527,14 @@
 
                         <div class="beer-section" id="beerSection">
                             <div class="beer-section-title">🍺 Available Gluten Free Beers</div>
-                            <div class="beer-status" id="pubDetailsBeer"></div>
+                            <div class="beer-status" id="venueDetailsBeer"></div>
                         </div>
                     </div>
                     
                     <!-- Action buttons stick to bottom -->
-                    <div class="pub-action-grid pub-action-grid-simple">
-                        <button class="btn btn-external" data-action="find-pub-online">🔍 Find Online</button>
-                        <button class="btn btn-external" data-action="get-pub-directions">🧭 Get Directions</button>
+                    <div class="venue-action-grid venue-action-grid-simple">
+                        <button class="btn btn-external" data-action="find-venue-online">🔍 Find Online</button>
+                        <button class="btn btn-external" data-action="get-venue-directions">🧭 Get Directions</button>
                     </div>
                 </div>  
             </div>
@@ -551,25 +551,25 @@
                 
                 <div class="modal-body">
                     <form id="reportForm" class="modal-form" data-action="submit-report">
-                        <div class="form-group" id="pubSearchGroup">
-                            <label class="form-label">Find Your Pub *</label>
-                            <input type="text" id="reportPubSearch" class="form-input" placeholder="Start typing pub name..." autocomplete="off">
-                            <div id="pubSuggestions" class="suggestions"></div>
+                        <div class="form-group" id="venueSearchGroup">
+                            <label class="form-label">Find Your Venue *</label>
+                            <input type="text" id="reportVenueSearch" class="form-input" placeholder="Start typing venue name..." autocomplete="off">
+                            <div id="venueSuggestions" class="suggestions"></div>
                         </div>
                         
-                        <div id="selectedPubInfo" class="selected-pub-info">
-                            <div class="selected-pub-card">
-                                <strong id="selectedPubName"></strong>
-                                <div id="selectedPubAddress"></div>
-                                <button type="button" class="btn btn-secondary btn-sm" data-action="clear-selected-pub">Choose Different Pub</button>
+                        <div id="selectedVenueInfo" class="selected-venue-info">
+                            <div class="selected-venue-card">
+                                <strong id="selectedVenueName"></strong>
+                                <div id="selectedVenueAddress"></div>
+                                <button type="button" class="btn btn-secondary btn-sm" data-action="clear-selected-venue">Choose Different Venue</button>
                             </div>
                         </div>
                         
-                        <div id="newPubFields" class="new-pub-fields">
-                            <h4>📍 Add New Pub</h4>
+                        <div id="newVenueFields" class="new-venue-fields">
+                            <h4>📍 Add New Venue</h4>
                             <div class="form-group">
-                                <label class="form-label">Pub Name *</label>
-                                <input type="text" id="reportPubName" class="form-input" placeholder="The Red Lion">
+                                <label class="form-label">Venue Name *</label>
+                                <input type="text" id="reportVenueName" class="form-input" placeholder="The Red Lion">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Address *</label>
@@ -649,7 +649,7 @@
                     <button class="modal-close" data-action="close-modal">&times;</button>
                 </div>
                 <div class="modal-body">
-                    <p class="search-prompt">Search for bars, pubs, or restaurants:</p>
+                    <p class="search-prompt">Search for bars, venues, or restaurants:</p>
                     <div class="places-search-container">
                         <input type="text" id="placesSearchInput" class="form-input" placeholder="e.g. Lawn Club Sheffield" autocomplete="off">
                         <div id="placesResults" class="places-results"></div>
@@ -668,17 +668,17 @@
             </div>
         </div>
 
-        <div id="pubAddedPromptModal" class="modal prompt-modal">
+        <div id="venueAddedPromptModal" class="modal prompt-modal">
             <div class="modal-content">
                 <div class="modal-body">
                     <div class="success-icon"> </div>
-                    <h3 Pub Added Successfully!> </h3>
-                    <p <strong id="addedPubName"> </strong> has been added to our database.</p>
+                    <h3 Venue Added Successfully!> </h3>
+                    <p <strong id="addedVenueName"> </strong> has been added to our database.</p>
                     <p>What would you like to do next?</p>
                     <div class="modal-actions status-modal-action">
-                        <button class="btn btn-primary" data-action="update-gf-status-new-pub">📊 Update GF Beer Status</button>
-                        <button class="btn btn-success" data-action="report-gf-beer-new-pub">🍺 Report GF Beer Available</button>
-                        <button class="btn btn-secondary" data-action="close-pub-added-modal">✅ Done For Now</button>
+                        <button class="btn btn-primary" data-action="update-gf-status-new-venue">📊 Update GF Beer Status</button>
+                        <button class="btn btn-success" data-action="report-gf-beer-new-venue">🍺 Report GF Beer Available</button>
+                        <button class="btn btn-secondary" data-action="close-venue-added-modal">✅ Done For Now</button>
                     </div>
                 </div>
             </div>
@@ -772,7 +772,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h3 class="modal-title">🍺 Current GF Beers</h3>
-                    <p class="modal-subtitle" id="beerListPubName"></p>
+                    <p class="modal-subtitle" id="beerListVenueName"></p>
                     <button class="modal-close" data-action="close-modal">&times;</button>
                 </div>
                 <div class="modal-body">
@@ -811,32 +811,32 @@
         </div>
 
         <!-- Add to index.html -->
-        <div id="manualPubEntryModal" class="modal">
+        <div id="manualVenueEntryModal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3 class="modal-title">✏️ Add Pub Manually</h3>
+                    <h3 class="modal-title">✏️ Add Venue Manually</h3>
                     <button class="modal-close" data-action="close-modal">&times;</button>
                 </div>
                 <div class="modal-body">
-                    <form id="manualPubForm">
+                    <form id="manualVenueForm">
                         <div class="form-group">
-                            <label class="form-label">Pub Name *</label>
-                            <input type="text" id="manualPubName" class="form-input" 
+                            <label class="form-label">Venue Name *</label>
+                            <input type="text" id="manualVenueName" class="form-input" 
                                    placeholder="e.g. The Jolly Roger" required>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Address *</label>
-                            <input type="text" id="manualPubAddress" class="form-input" 
+                            <input type="text" id="manualVenueAddress" class="form-input" 
                                    placeholder="e.g. 123 High Street" required>
                         </div>
                         <div class="form-group">
                             <label class="form-label">City/Town *</label>
-                            <input type="text" id="manualPubCity" class="form-input" 
+                            <input type="text" id="manualVenueCity" class="form-input" 
                                    placeholder="e.g. Sheffield" required>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Postcode *</label>
-                            <input type="text" id="manualPubPostcode" class="form-input" 
+                            <input type="text" id="manualVenuePostcode" class="form-input" 
                                    placeholder="e.g. S1 2AB" required 
                                    pattern="[A-Za-z]{1,2}[0-9Rr][0-9A-Za-z]? ?[0-9][ABD-HJLNP-UW-Zabd-hjlnp-uw-z]{2}">
                         </div>
@@ -847,7 +847,7 @@
                 </div>
                 <div class="modal-actions">
                     <button class="btn btn-secondary" data-action="close-modal">Cancel</button>
-                    <button class="btn btn-primary" data-action="submit-manual-pub">Add Pub</button>
+                    <button class="btn btn-primary" data-action="submit-manual-venue">Add Venue</button>
                 </div>
             </div>
         </div>
@@ -867,15 +867,15 @@
                         </div>
                         <div class="info-section">
                             <h3>👥 Our Story</h3>
-                            <p>Started by coeliacs, for coeliacs. We understand the frustration of walking into a pub and not knowing if they have any safe options. That's why we built this platform - to help our community find amazing gluten free beer wherever they are in the UK.</p>
+                            <p>Started by coeliacs, for coeliacs. We understand the frustration of walking into a venue and not knowing if they have any safe options. That's why we built this platform - to help our community find amazing gluten free beer wherever they are in the UK.</p>
                         </div>
                         <div class="info-section">
                             <h3>🤝 Community Driven</h3>
-                            <p>Every beer report, every pub update, every photo comes from real people in the coeliac community. Together, we're building something that helps everyone discover new places and feel confident about their choices.</p>
+                            <p>Every beer report, every venue update, every photo comes from real people in the coeliac community. Together, we're building something that helps everyone discover new places and feel confident about their choices.</p>
                         </div>
                         <div class="info-section">
                             <h3>📈 Growing Together</h3>
-                            <p>With thousands of pubs in our database and growing reports every day, we're becoming the go-to resource for gluten free beer discovery. Join us in making the UK more accessible for coeliacs!</p>
+                            <p>With thousands of venues in our database and growing reports every day, we're becoming the go-to resource for gluten free beer discovery. Join us in making the UK more accessible for coeliacs!</p>
                         </div>
                     </div>
                 </div>
@@ -945,13 +945,13 @@
                 <div class="permission-icon">📍</div>
                 <h2 class="permission-title">Enable Location Services</h2>
                 <p class="permission-text">
-                    To find pubs near you, we need access to your location. 
+                    To find venues near you, we need access to your location. 
                     Your location data stays on your device and is never stored.
                 </p>
                 <div class="permission-benefits">
                     <div class="benefit-item">
                         <span class="benefit-icon">🎯</span>
-                        <span>Find the closest pubs with GF beer</span>
+                        <span>Find the closest venues with GF beer</span>
                     </div>
                     <div class="benefit-item">
                         <span class="benefit-icon">📏</span>
@@ -980,7 +980,7 @@
                 <h2 class="permission-title">Location Access Blocked</h2>
                 <p class="permission-text">
                     Your browser is currently blocking location access for this website. 
-                    To find pubs near you, you'll need to update your browser settings.
+                    To find venues near you, you'll need to update your browser settings.
                     If you don't wish to share your location, please select "Search
                     by Area" below to continue.
                 </p>
@@ -1138,7 +1138,7 @@
         
 
         <!-- Templates -->
-        <template id="pub-result-template">
+        <template id="venue-result-template">
             <div class="result-item">
                 <div class="result-header">
                     <div class="result-main-info">
@@ -1153,7 +1153,7 @@
                     <div class="result-authority"></div>
                 </div>
                 <div class="result-actions">
-                    <button class="btn btn-primary" data-action="view-pub">📍 View Details</button>
+                    <button class="btn btn-primary" data-action="view-venue">📍 View Details</button>
                 </div>
             </div>
         </template>
