@@ -28,8 +28,10 @@ export const NavStateManager = (() => {
     const setPageContext = (context) => {
         console.log(`🧭 Setting nav context: ${context}`);
         
-        // Store previous context
-        state.previousContext = state.currentContext;
+        // Store previous context BEFORE updating
+        if (state.currentContext !== context) {
+            state.previousContext = state.currentContext;
+        }
         state.currentContext = context;
         
         // Remove all page classes
