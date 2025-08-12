@@ -59,6 +59,7 @@
    --bg-card-home: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(248, 249, 250, 0.8) 100%);
    
    /* Spacing System */
+   --space-xxs: 2px;
    --space-xs: 4px;
    --space-sm: 8px;
    --space-md: 12px;
@@ -1639,24 +1640,29 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 
 .map-legend {
    background: var(--bg-white);
-   padding: var(--space-md);
-   border-radius: var(--radius);
    box-shadow: var(--shadow);
    font-size: var(--text-xs);
    line-height: 1.4;
    backdrop-filter: blur(10px);
+   position: fixed;
+   right: 0;
+   bottom: 8vh;
+   background: var(--bg-white);
 }
 
 .map-location-btn {
    background: var(--primary-gradient);
 }
 
+.legend-title {
+   padding: var(--space-xs);
+}
+
 .legend-item {
    display: flex;
-   padding: var(--space-xs) 0;
+   padding: var(--space-xxs) 0;
    margin: var(--space-xs);
    gap: var(--space-xs);
-}
    
 
 .legend-marker {
@@ -1701,6 +1707,14 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 .legend-marker.user-location {
    background: var(--my-location-fill);
    border-color: var(--white);
+}
+
+.leaflet-container .leaflet-control-attribution {
+   margin: 0;
+   left: 0;
+   position: fixed;
+   background: var(--bg-white);
+   bottom: 8vh;
 }
 
 /* Leaflet popup styling */
