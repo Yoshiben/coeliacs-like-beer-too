@@ -231,13 +231,6 @@ export const CommunityModule = (() => {
         button.dataset.action = 'view-venue';
         button.dataset.venueId = state.venueOfMonth.venue_id;
         container.appendChild(button);
-        
-        // Update image if exists
-        const imageEl = document.querySelector('.featured-image img');
-        if (imageEl && state.venueOfMonth.photo_url) {
-            imageEl.src = state.venueOfMonth.photo_url;
-            imageEl.alt = `GF beer at ${state.venueOfMonth.name}`;
-        }
     };
     
     const updateLatestFinds = () => {
