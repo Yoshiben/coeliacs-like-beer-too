@@ -41,9 +41,9 @@ export const FormModule = (() => {
     // UTILITIES
     // ================================
     const utils = {
-        getSelectedVenue: () => window.App.getState(STATE_KEYS.SELECTED_PUB_FOR_REPORT),
-        setSelectedVenue: (venueData) => window.App.setState(STATE_KEYS.SELECTED_PUB_FOR_REPORT, venueData),
-        getCurrentVenue: () => window.App.getState(STATE_KEYS.CURRENT_PUB),
+        getSelectedVenue: () => window.App.getState(STATE_KEYS.SELECTED_VENUE_FOR_REPORT),
+        setSelectedVenue: (venueData) => window.App.setState(STATE_KEYS.SELECTED_VENUE_FOR_REPORT, venueData),
+        getCurrentVenue: () => window.App.getState(STATE_KEYS.CURRENT_VENUE),
         getCurrentBrewery: () => window.App.getState(STATE_KEYS.CURRENT_BREWERY),
         setCurrentBrewery: (brewery) => window.App.setState(STATE_KEYS.CURRENT_BREWERY, brewery),
         
@@ -661,9 +661,9 @@ export const FormModule = (() => {
                 
                 this.updateStatusDisplay(this.selectedStatus);
                 
-                const currentVenue = window.App.getState(STATE_KEYS.CURRENT_PUB);
+                const currentVenue = window.App.getState(STATE_KEYS.CURRENT_VENUE);
                 if (currentVenue) {
-                    window.App.setState(STATE_KEYS.CURRENT_PUB, {
+                    window.App.setState(STATE_KEYS.CURRENT_VENUE, {
                         ...currentVenue,
                         gf_status: this.selectedStatus
                     });
@@ -863,7 +863,7 @@ export const FormModule = (() => {
     };
     
     // ================================
-    // PUBLIC API
+    // VENUELIC API
     // ================================
     return {
         init,
