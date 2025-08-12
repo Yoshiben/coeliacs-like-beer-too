@@ -676,7 +676,7 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 /* Icon styling - make them consistent */
 .near-me-icon,
 .buy-beer-icon {
-    font-size: var(--text-xl);
+    font-size: var(--text-3xl);
     width: 60px; /* Fixed width for alignment */
     text-align: center;
 }
