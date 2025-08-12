@@ -1639,7 +1639,7 @@ body.page-breweries .nav-back-btn { display: flex !important; }
    line-height: 1.4;
    backdrop-filter: blur(10px);
    position: fixed;
-   right: 0;
+   left: 0;
    bottom: 8vh;
    display: flex;
    flex-direction: column;
@@ -1697,27 +1697,6 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 .legend-marker.user-location {
    background: var(--primary-gradient);
    border-color: var(--white);
-}
-
-.leaflet-control-attribution .leaflet_control {
-   margin: 0;
-   left: 0;
-   position: fixed;
-   background: var(--bg-white);
-   bottom: 8vh;
-}
-
-/* Leaflet popup styling */
-.leaflet-popup-content-wrapper {
-    background: var(--bg-white);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-}
-
-.leaflet-popup-content {
-    margin: var(--space-sm);
-    min-width: 200px;
-    text-align: center;
 }
 
 /* ================================
