@@ -148,8 +148,8 @@ def nearby():
         sql = """
             SELECT DISTINCT
                 v.venue_id, v.name, 
-                CONCAT_WS(', ', v.housenumber, v.street, v.city) as address, 
-                v.postcode, v.city as local_authority,
+                v.address, 
+                v.postcode, v.city,
                 v.latitude, v.longitude,
                 COALESCE(s.status, 'unknown') as gf_status,
                 (6371 * acos(cos(radians(%s)) * cos(radians(v.latitude)) * 
@@ -157,7 +157,7 @@ def nearby():
                 sin(radians(v.latitude)))) AS distance,
                 GROUP_CONCAT(
                     DISTINCT CONCAT(vb.format, ' - ', 
-                    COALESCE(b.brewery, 'Unknown'), ' ', 
+                    COALESCE(br.name, 'Unknown'), ' ', 
                     COALESCE(b.name, 'Unknown'), ' (', 
                     COALESCE(b.style, 'Unknown'), ')')
                     SEPARATOR ', '
@@ -166,6 +166,7 @@ def nearby():
             LEFT JOIN gf_status s ON v.venue_id = s.venue_id
             LEFT JOIN venue_beers vb ON v.venue_id = vb.venue_id
             LEFT JOIN beers b ON vb.beer_id = b.beer_id
+            LEFT JOIN breweries br ON b.brewery_id = br.brewery_id
             WHERE v.latitude IS NOT NULL AND v.longitude IS NOT NULL
         """
         params = [lat, lng, lat]
@@ -184,11 +185,15 @@ def nearby():
         cursor.execute(sql, params)
         venues = cursor.fetchall()
         
+        # Add local_authority field for frontend compatibility
+        for venue in venues:
+            venue['local_authority'] = venue['city']
+        
         return jsonify(venues)
         
     except mysql.connector.Error as e:
         logger.error(f"Database error in nearby search: {str(e)}")
-        return jsonify({'error': 'Database error occurred'}), 500
+        return jsonify({'error': f'Database error: {str(e)}'}), 500
     finally:
         if 'conn' in locals() and conn.is_connected():
             cursor.close()
@@ -218,13 +223,13 @@ def search():
             sql = """
                 SELECT DISTINCT
                     v.venue_id, v.name, 
-                    CONCAT_WS(', ', v.housenumber, v.street, v.city) as address, 
+                    v.address, 
                     v.postcode, v.city as local_authority,
                     v.latitude, v.longitude,
                     COALESCE(s.status, 'unknown') as gf_status,
                     GROUP_CONCAT(
                         DISTINCT CONCAT(vb.format, ' - ', 
-                        COALESCE(b.brewery, 'Unknown'), ' ', 
+                        COALESCE(br.name, 'Unknown'), ' ', 
                         COALESCE(b.name, 'Unknown'), ' (', 
                         COALESCE(b.style, 'Unknown'), ')')
                         SEPARATOR ', '
@@ -233,6 +238,7 @@ def search():
                 LEFT JOIN gf_status s ON v.venue_id = s.venue_id
                 LEFT JOIN venue_beers vb ON v.venue_id = vb.venue_id
                 LEFT JOIN beers b ON vb.beer_id = b.beer_id
+                LEFT JOIN breweries br ON b.brewery_id = br.brewery_id
                 WHERE v.venue_id = %s
                 GROUP BY v.venue_id
             """
@@ -929,5 +935,6 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
