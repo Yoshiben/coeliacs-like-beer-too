@@ -655,9 +655,8 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 .hero-section {
    display: grid;
    grid-template-columns: 1fr 1fr;
-   gap: var(--space-sm);
-   padding: var(--space-md);
-   align-items: stretch; /* Makes both buttons same height */
+   padding: var(--space-md) 0;
+   place-items: anchor-center;
 }
 
 /* Make both buttons identical in size and styling */
@@ -683,8 +682,7 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 .near-me-icon,
 .buy-beer-icon {
     font-size: var(--text-3xl);
-    width: 60px; /* Fixed width for alignment */
-    text-align: center;
+    width: 60px;
 }
 
 /* Content styling - make them consistent */
@@ -2018,29 +2016,6 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 }
 
 /* ================================
-   RESPONSIVE UTILITIES
-   ================================ */
-/* @media (max-height: 600px) {
-    .modal-content {
-        max-height: 85vh;
-        max-height: 85dvh;
-    }
-} */
-
-@media (min-width:1025px) {
-   .nav-back-btn {
-      position: absolute;
-      right: 0;
-      margin: var(--space-xl);
-   }
-   .modal-content {
-      max-width: 50vh;
-      height: auto;
-   }
-}
-
-
-/* ================================
    BEER LIST MODAL STYLES
    ================================ */
 
@@ -2461,3 +2436,21 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 .distance-actions .btn-secondary {
    width:100%;
 }
+
+
+@media (min-width:1025px) {
+   .nav-back-btn {
+      position: absolute;
+      right: 0;
+      margin: var(--space-xl);
+   }
+   .modal-content {
+      max-width: 50vh;
+      height: auto;
+   }
+   .near-me-content,
+   .buy-beer-content {
+      text-align: center;
+   }
+}
+
