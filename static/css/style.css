@@ -388,6 +388,10 @@ html {
     align-items: center;
 }
 
+nav-notification-btn {
+   box-shadow: none;
+}
+
 .nav-back-btn {
    background: rgba(255, 255, 255, 0.2);
    color: var(--white);
