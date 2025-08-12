@@ -148,6 +148,11 @@ export const FormModule = (() => {
             notes: formData.get('reportNotes') || document.getElementById('reportNotes')?.value || ''
         };
 
+        // DEBUG: Log what we actually collected
+        console.log('🔍 Report data collected:', reportData);
+        console.log('🔍 FormData entries:', Array.from(formData.entries()));
+        console.log('🔍 Format element value:', document.getElementById('reportFormat')?.value);
+
         // Add beer_id if available
         if (elements.beerName?.dataset.beerId) {
             reportData.beer_id = parseInt(elements.beerName.dataset.beerId);
