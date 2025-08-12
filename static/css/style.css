@@ -1699,7 +1699,7 @@ body.page-breweries .nav-back-btn { display: flex !important; }
    border-color: var(--white);
 }
 
-.leaflet-container .leaflet-control-attribution {
+.leaflet-control-attribution .leaflet_control {
    margin: 0;
    left: 0;
    position: fixed;
