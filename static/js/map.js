@@ -321,7 +321,7 @@ export const MapModule = (() => {
         }
         
         // Create map container
-        mapContainer.innerHTML = '<div id="venueMapLeaflet" style="width: 100%; height: 100%; border-radius: 0 0 var(--radius-xl) var(--radius-xl);"></div>';
+        mapContainer.innerHTML = '<div id="venueMapLeaflet" style="width: 100%; height: 100%;"></div>';
         
         try {
             utils.cleanupMap(maps.venueDetail);
