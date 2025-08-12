@@ -403,18 +403,16 @@ def get_breweries():
         
         if query:
             cursor.execute("""
-                SELECT DISTINCT brewery 
-                FROM beers 
-                WHERE brewery LIKE %s
-                ORDER BY brewery
-                LIMIT 20
+                SELECT DISTINCT brewery_name
+                FROM breweries 
+                WHERE brewery_name LIKE %s
+                ORDER BY brewery_name
             """, (f'%{query}%',))
         else:
             cursor.execute("""
-                SELECT DISTINCT brewery 
-                FROM beers 
-                ORDER BY brewery
-                LIMIT 50
+                SELECT DISTINCT brewery_name 
+                FROM breweries 
+                ORDER BY brewery_name
             """)
         
         breweries = [row[0] for row in cursor.fetchall()]
@@ -439,19 +437,21 @@ def get_brewery_beers(brewery_name):
         
         if query:
             cursor.execute("""
-                SELECT beer_id, name, style, abv, gluten_status, vegan_status
-                FROM beers 
-                WHERE brewery = %s AND name LIKE %s
-                ORDER BY name
-                LIMIT 20
+                SELECT beer_id, beer_name, style, abv, gluten_status, vegan_status
+                FROM beers b
+                LEFT JOIN breweries br
+                ON b.brewery_id = br.brewery_id
+                WHERE brewery_name = %s AND beer_name LIKE %s
+                ORDER BY beer_name
             """, (brewery_name, f'%{query}%'))
         else:
             cursor.execute("""
-                SELECT beer_id, name, style, abv, gluten_status, vegan_status
-                FROM beers 
-                WHERE brewery = %s 
-                ORDER BY name
-                LIMIT 50
+                SELECT beer_id, beer_name, style, abv, gluten_status, vegan_status
+                FROM beers b
+                LEFT JOIN breweries br
+                ON b.brewery_id = br.brewery_id
+                WHERE brewery_name = %s
+                ORDER BY beer_name
             """, (brewery_name,))
         
         beers = cursor.fetchall()
@@ -483,14 +483,17 @@ def submit_beer_update():
         
         # STEP 1: Check if beer exists, if not add it
         beer_id = None
-        brewery = data.get('brewery')
+        brewery_name = data.get('brewery_name')
         beer_name = data.get('beer_name')
         
-        if brewery and beer_name:
+        if brewery_name and beer_name:
             cursor.execute("""
-                SELECT beer_id FROM beers 
-                WHERE LOWER(brewery) = LOWER(%s) AND LOWER(name) = LOWER(%s)
-            """, (brewery, beer_name))
+                SELECT beer_id 
+                FROM beers b
+                LEFT JOIN breweries br
+                ON b.brewery_id = br.brewery_id
+                WHERE LOWER(brewery_name) = LOWER(%s) AND LOWER(beer_name) = LOWER(%s)
+            """, (brewery_name, beer_name))
             
             existing_beer = cursor.fetchone()
             
@@ -935,6 +938,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
