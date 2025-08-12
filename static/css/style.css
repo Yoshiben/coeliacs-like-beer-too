@@ -675,6 +675,8 @@ body.page-breweries .nav-back-btn { display: flex !important; }
         rgba(255, 255, 255, 1) 0%, 
         rgba(248, 249, 250, 0.8) 100%
     );
+   height: 100%;
+   width: 100%;
 }
 
 /* Icon styling - make them consistent */
@@ -692,7 +694,7 @@ body.page-breweries .nav-back-btn { display: flex !important; }
     display: flex;
     flex-direction: column;
     justify-content: center;
-    text-align: left;
+    text-align: center;
 }
 
 .near-me-content h3,
