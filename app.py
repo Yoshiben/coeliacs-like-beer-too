@@ -224,7 +224,7 @@ def search():
             sql = """
                 SELECT DISTINCT
                     v.venue_id
-                    ,v.name
+                    ,v.venue_name
                     ,v.address 
                     ,v.postcode
                     ,v.city
@@ -291,10 +291,10 @@ def search():
         sql = f"""
             SELECT DISTINCT
                 v.venue_id 
-                ,v.name 
+                ,v.venue_name 
                 ,v.address 
                 ,v.postcode
-                v.city
+                ,v.city
                 ,v.latitude
                 ,v.longitude
                 ,COALESCE(s.status, 'unknown') as gf_status
