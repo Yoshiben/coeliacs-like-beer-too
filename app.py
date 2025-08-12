@@ -147,18 +147,19 @@ def nearby():
 
         sql = """
             SELECT DISTINCT
-                v.venue_id, v.name, 
-                v.address, 
-                v.postcode, v.city,
-                v.latitude, v.longitude,
-                COALESCE(s.status, 'unknown') as gf_status,
-                (6371 * acos(cos(radians(%s)) * cos(radians(v.latitude)) * 
-                cos(radians(v.longitude) - radians(%s)) + sin(radians(%s)) * 
-                sin(radians(v.latitude)))) AS distance,
-                GROUP_CONCAT(
+                v.venue_id
+                ,v.venue_name, 
+                ,v.address
+                ,v.postcode
+                ,v.city
+                ,v.latitude
+                ,v.longitude
+                ,COALESCE(s.status, 'unknown') as gf_status,
+                ,(6371 * acos(cos(radians(%s)) * cos(radians(v.latitude)) * cos(radians(v.longitude) - radians(%s)) + sin(radians(%s)) * sin(radians(v.latitude)))) AS distance
+                ,GROUP_CONCAT(
                     DISTINCT CONCAT(vb.format, ' - ', 
-                    COALESCE(br.name, 'Unknown'), ' ', 
-                    COALESCE(b.name, 'Unknown'), ' (', 
+                    COALESCE(br.brewery_name, 'Unknown'), ' ', 
+                    COALESCE(b.beer_name, 'Unknown'), ' (', 
                     COALESCE(b.style, 'Unknown'), ')')
                     SEPARATOR ', '
                 ) as beer_details
@@ -938,6 +939,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
