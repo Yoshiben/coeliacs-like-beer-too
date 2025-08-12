@@ -694,7 +694,7 @@ body.page-breweries .nav-back-btn { display: flex !important; }
     display: flex;
     flex-direction: column;
     justify-content: center;
-    text-align: center;
+    text-align: left;
 }
 
 .near-me-content h3,
