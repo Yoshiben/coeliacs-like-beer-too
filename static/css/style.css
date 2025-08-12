@@ -694,16 +694,17 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 .near-me-content h3,
 .buy-beer-content h3 {
    margin: var(--space-xs) 0 var(--space-xs) 0;
-   font-size: var(--text-sm);
+   font-size: var(--text-md);
    font-weight: 700;
    line-height: 1.2;
+   color: var(--text-primary);
 }
 
 .near-me-content p,
 .buy-beer-content p {
    margin: 0;
    color: var(--text-secondary);
-   font-size: var(--space-sm);
+   font-size: var(--text-xs);
    line-height: 1.3;
 }
 
