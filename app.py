@@ -223,15 +223,18 @@ def search():
         if venue_id:
             sql = """
                 SELECT DISTINCT
-                    v.venue_id, v.name, 
-                    v.address, 
-                    v.postcode, v.city as local_authority,
-                    v.latitude, v.longitude,
-                    COALESCE(s.status, 'unknown') as gf_status,
-                    GROUP_CONCAT(
+                    v.venue_id
+                    ,v.name
+                    ,v.address 
+                    ,v.postcode
+                    ,v.city
+                    ,v.latitude
+                    ,v.longitude
+                    ,COALESCE(s.status, 'unknown') as gf_status
+                    ,GROUP_CONCAT(
                         DISTINCT CONCAT(vb.format, ' - ', 
-                        COALESCE(br.name, 'Unknown'), ' ', 
-                        COALESCE(b.name, 'Unknown'), ' (', 
+                        COALESCE(br.brewery_name, 'Unknown'), ' ', 
+                        COALESCE(b.beer_name, 'Unknown'), ' (', 
                         COALESCE(b.style, 'Unknown'), ')')
                         SEPARATOR ', '
                     ) as beer_details
@@ -253,7 +256,7 @@ def search():
         
         # Build search condition
         if search_type == 'name':
-            search_condition = "v.name LIKE %s"
+            search_condition = "v.venue_name LIKE %s"
             params = [f'%{query}%']
         elif search_type == 'postcode':
             search_condition = "v.postcode LIKE %s"
@@ -262,7 +265,7 @@ def search():
             search_condition = "v.city LIKE %s"  # Changed from local_authority
             params = [f'%{query}%']
         else:
-            search_condition = "(v.name LIKE %s OR v.postcode LIKE %s OR v.city LIKE %s OR v.address LIKE %s)"
+            search_condition = "(v.venue_name LIKE %s OR v.postcode LIKE %s OR v.city LIKE %s OR v.address LIKE %s)"
             params = [f'%{query}%', f'%{query}%', f'%{query}%', f'%{query}%']
         
         # Count total results
@@ -287,15 +290,18 @@ def search():
         # Main search query
         sql = f"""
             SELECT DISTINCT
-                v.venue_id, v.name, 
-                CONCAT_WS(', ', v.housenumber, v.street, v.city) as address, 
-                v.postcode, v.city as local_authority,
-                v.latitude, v.longitude,
-                COALESCE(s.status, 'unknown') as gf_status,
-                GROUP_CONCAT(
+                v.venue_id 
+                ,v.name 
+                ,v.address 
+                ,v.postcode
+                v.city
+                ,v.latitude
+                ,v.longitude
+                ,COALESCE(s.status, 'unknown') as gf_status
+                ,GROUP_CONCAT(
                     DISTINCT CONCAT(vb.format, ' - ', 
-                    COALESCE(b.brewery, 'Unknown'), ' ', 
-                    COALESCE(b.name, 'Unknown'), ' (', 
+                    COALESCE(br.brewery_name, 'Unknown'), ' ', 
+                    COALESCE(b.beer_name, 'Unknown'), ' (', 
                     COALESCE(b.style, 'Unknown'), ')')
                     SEPARATOR ', '
                 ) as beer_details
@@ -303,6 +309,7 @@ def search():
             LEFT JOIN gf_status s ON v.venue_id = s.venue_id
             LEFT JOIN venue_beers vb ON v.venue_id = vb.venue_id
             LEFT JOIN beers b ON vb.beer_id = b.beer_id
+            LEFT JOIN breweries br ON b.brewery_id = br.brewery_id
             WHERE {search_condition}
         """
         
@@ -311,7 +318,7 @@ def search():
         
         sql += """
             GROUP BY v.venue_id
-            ORDER BY v.name
+            ORDER BY v.venue_name
             LIMIT %s OFFSET %s
         """
         
@@ -319,12 +326,11 @@ def search():
         cursor.execute(sql, params)
         venues = cursor.fetchall()
         
-        # Map results to use venue_id for backwards compatibility
         for venue in venues:
             venue['venue_id'] = venue['venue_id']
         
         return jsonify({
-            'venues': venues,  # Keep as 'venues' for frontend compatibility
+            'venues': venues,
             'pagination': {
                 'page': page,
                 'pages': total_pages,
@@ -939,6 +945,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
