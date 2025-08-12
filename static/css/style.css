@@ -1651,6 +1651,14 @@ body.page-breweries .nav-back-btn { display: flex !important; }
    background: var(--primary-gradient);
 }
 
+.legend-item {
+   display: flex;
+   padding: var(--space-xs) 0;
+   margin: var(--space-xs);
+   gap: var(--space-xs);
+}
+   
+
 .legend-marker {
    width: var(--space-md);
    height: var(--space-md);
