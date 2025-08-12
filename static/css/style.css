@@ -676,7 +676,7 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 /* Icon styling - make them consistent */
 .near-me-icon,
 .buy-beer-icon {
-    font-size: var(--text-2xl);
+    font-size: var(--text-xl);
     width: 60px; /* Fixed width for alignment */
     text-align: center;
 }
@@ -693,8 +693,8 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 
 .near-me-content h3,
 .buy-beer-content h3 {
-   margin: 0 0 var(--space-xs) 0;
-   font-size: var(--text-xs);
+   margin: var(--space-xs) 0 var(--space-xs) 0;
+   font-size: var(--text-sm);
    font-weight: 700;
    line-height: 1.2;
 }
@@ -702,7 +702,7 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 .near-me-content p,
 .buy-beer-content p {
    margin: 0;
-   color: var(--light-grey);
+   color: var(--text-secondary);
    font-size: var(--space-sm);
    line-height: 1.3;
 }
