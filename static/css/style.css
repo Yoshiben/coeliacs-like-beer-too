@@ -15,10 +15,15 @@
 
    /* Classic colours */
    --white: rgba(255, 255, 255, 1);
-   --gold: rgba(255,215,0,1);
-   --dark-gold: rgba(253,187,4,1);
+   --gold: rgba(255,215,0,1);   
    --green: rgba(0,245,0,1);
+   --blue: rgba(59,130,246,1);
    --red: rgba(239,68,68,1);
+
+   --dark-gold: rgba(253,187,4,1);
+   --dark-green: rgba(0,196,0,1);
+   --dark-blue: rgba(37,99,235,1);
+   
    --light-grey: rgba(156,163,175,1);
    --light-blue: rgba(102,126,234,1);
    --light-purple: #BCAFCA;
@@ -84,17 +89,6 @@
    --shadow-xl: 0 12px 40px rgba(0, 0, 0, 0.25);
    --shadow-hero-title: 0 2px 4px rgba(0, 0, 0, 0.3);
    --shadow-card-home: 0 4px 8px rgba(139, 92, 246, 0.12), 0 8px 24px rgba(0, 0, 0, 0.08);
-   
-   /* 5-Tier Status System Colors */
-   --always-tap-cask-fill: #FFD700;
-   --always-tap-cask-border: #FDB904;
-   --always-bottle-can-border: #00C400;
-   --currently-fill: #3B82F6;
-   --currently-border: #2563EB;
-   --not-currently-border: #DC2626;
-   --unknown-border: #6B7280;
-   --my-location-fill: #667eea;
-   --my-location-border: #ffffff;
 
    /* Status backgrounds for cards */
    --status-always-tap-cask-bg: rgba(255, 215, 0, 0.1);
@@ -1647,7 +1641,8 @@ body.page-breweries .nav-back-btn { display: flex !important; }
    position: fixed;
    right: 0;
    bottom: 8vh;
-   background: var(--bg-white);
+   display: flex;
+   flex-direction: column;
 }
 
 .map-location-btn {
@@ -1656,6 +1651,9 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 
 .legend-title {
    padding: var(--space-xs);
+   font-weight: 600;
+   background: var(--primary-gradient);
+   color: var(--text-white);
 }
 
 .legend-item {
@@ -1664,7 +1662,6 @@ body.page-breweries .nav-back-btn { display: flex !important; }
    margin: var(--space-xs);
    gap: var(--space-xs);
    
-
 .legend-marker {
    width: var(--space-md);
    height: var(--space-md);
@@ -1674,38 +1671,31 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 }
 
 .legend-marker.always-tap-cask {
-   background: var(--always-tap-cask-fill);
-   border-color: var(--always-tap-cask-border);
+   background: var(--gold);
+   border-color: var(--dark-gold);
    box-shadow: 0 0 4px rgba(255, 215, 0, 0.6);
-   width: calc(var(--space-md) * 1.5);
-   height: calc(var(--space-md) * 1.5);
 }
 
 .legend-marker.always-bottle-can {
    background: var(--green);
-   border-color: var(--always-bottle-can-border);
-   box-shadow: 0 0 3px rgba(0, 245, 0, 0.4);
-   width: calc(var(--space-md) * 1.25);
-   height: calc(var(--space-md) * 1.25);
+   border-color: var(--dark-green);
 }
 
 .legend-marker.currently {
-   background: var(--currently-fill);
+   background: var(--blue);
    border-color: var(--currently-border);
 }
 
 .legend-marker.not-currently {
    background: var(--red);
-   border-color: var(--not-currently-border);
 }
 
 .legend-marker.unknown {
    background: var(--light-grey);
-   border-color: var(--unknown-border);
 }
 
 .legend-marker.user-location {
-   background: var(--my-location-fill);
+   background: var(--primary-gradient);
    border-color: var(--white);
 }
 
