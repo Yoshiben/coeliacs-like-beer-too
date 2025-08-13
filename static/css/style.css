@@ -2599,14 +2599,27 @@ body.page-breweries .nav-back-btn { display: flex !important; }
       max-width: 50vh;
       height: auto;
    }
-   .near-me-content,
-   .buy-beer-content {
-      text-align: center;
-   }
+
    .near-me-section,
    .buy-beer-section {
       width: 100%;
       padding: 0 var(--space-lg);
+   }
+   
+   .near-me-content,
+   .buy-beer-content {
+      text-align: center;
+   }
+
+   .near-me-content h3,
+   .buy-beer-content h3 {
+      font-size: var(--text-lg);
+   }
+
+   .near-me-content p,
+   .buy-beer-content p {
+      display: none;
+   }
 }
 
 
