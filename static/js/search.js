@@ -1559,39 +1559,38 @@ export const SearchModule = (function() {
         },
         
         async searchGooglePlaces(query) {
+            console.log('🌍 searchGooglePlaces called with:', query);
+            
             try {
-                // Call your backend to avoid exposing API key
+                console.log('📡 Making API request to /api/search-places');
+                
                 const response = await fetch('/api/search-places', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ query: query })
                 });
                 
+                console.log('📡 API response status:', response.status);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('❌ API Error Response:', response.status, errorText);
+                    throw new Error(`API Error: ${response.status} - ${errorText}`);
+                }
+                
                 const data = await response.json();
+                console.log('✅ API response data:', data);
+                
                 const places = data.results || [];
+                console.log(`📍 Found ${places.length} places:`, places);
                 
-                // Convert Google Places format to your existing format
-                const convertedPlaces = places.map(place => ({
-                    osm_id: place.place_id,
-                    namedetails: { name: place.name },
-                    display_name: `${place.name}, ${place.formatted_address}`,
-                    lat: place.geometry.location.lat,
-                    lon: place.geometry.location.lng,
-                    extratags: {
-                        amenity: place.types?.includes('bar') ? 'bar' : 
-                                place.types?.includes('restaurant') ? 'restaurant' : 'venue'
-                    },
-                    category: place.types?.[0] || 'venue',
-                    osm_type: 'google_place'
-                }));
-                
-                this.displayResults(convertedPlaces);
+                this.displayResults(places);
                 
             } catch (error) {
-                console.error('Google Places error:', error);
-                this.showError('Search failed. Please try again.');
+                console.error('❌ Google Places search error:', error);
+                this.showError(`Search failed: ${error.message}. Please try again.`);
             }
-        },
+},
         
         // REPLACE the displayResults method in search.js PlacesSearchModule (around line 1565)
 
