@@ -1,5 +1,5 @@
 // ================================================================================
-// SEARCH.JS - Complete Refactor with STATE_KEYS
+// SEARCH.JS - Complete Refactor with STATE_KEYS AND PAGINATION SUPPORT
 // Handles: Location search, name search, area search, beer search, venue details
 // ================================================================================
 
@@ -102,7 +102,7 @@ export const SearchModule = (function() {
         const gfOnly = window.App.getState('gfOnlyFilter') !== false;
         console.log(`🍺 Current filter: ${gfOnly ? 'GF Only' : 'All Venues'}`);
     
-        try {  // <-- ADD THIS
+        try {
             // Close distance modal using modalManager
             modules.modalManager?.close('distanceModal') || modules.modal?.close('distanceModal');
             
@@ -143,18 +143,23 @@ export const SearchModule = (function() {
             window.App.setState(STATE_KEYS.LAST_SEARCH.TYPE, 'nearby');
             window.App.setState(STATE_KEYS.LAST_SEARCH.RADIUS, radiusKm);
                     
-            // Perform search
+            // Perform search with page parameter
             showResultsLoading('🔍 Searching for GF beer options...');
-            const venues = await modules.api.findNearbyVenues(
+            const response = await modules.api.findNearbyVenues(
                 userLocation.lat, 
                 userLocation.lng, 
                 radiusKm, 
-                gfOnly
+                gfOnly,
+                1  // Add page parameter
             );
+
+            // Handle the new response format
+            const venues = response.venues || [];
+            const pagination = response.pagination || null;
             
             // Check if we got a valid response
             if (!venues || !Array.isArray(venues)) {
-                console.error('❌ Invalid response from API:', venues);
+                console.error('❌ Invalid response from API:', response);
                 showNoResults('Error loading venues. Please try again.');
                 return;
             }
@@ -171,14 +176,15 @@ export const SearchModule = (function() {
             const accuracyText = userLocation.accuracy > 500 ? 
                 ` (±${Math.round(userLocation.accuracy)}m accuracy)` : '';
             
-            displayResultsInOverlay(venues, `${venues.length} venues within ${radiusKm}km${accuracyText}`);
+            // Pass the full response (with pagination) to displayResultsInOverlay
+            displayResultsInOverlay(response, `${venues.length} venues within ${radiusKm}km${accuracyText}`);
             
             modules.tracking?.trackSearch(`nearby_${radiusKm}km`, 'location', venues.length);
             
-        } catch (error) {  // <-- ALREADY HERE
+        } catch (error) {
             console.error('❌ Error in nearby search:', error);
             showNoResults('Could not complete search. Please try again.');
-        } finally {  // <-- ADD THIS
+        } finally {
             // ALWAYS hide loading toast
             utils.hideLoadingToast();
         }
@@ -324,7 +330,10 @@ export const SearchModule = (function() {
             
             showResultsLoading('Finding venues near this postcode...');
             const radius = 5;
-            const venues = await modules.api.findNearbyVenues(location.lat, location.lng, radius);
+            const gfOnly = window.App.getState('gfOnlyFilter') !== false;
+            
+            const response = await modules.api.findNearbyVenues(location.lat, location.lng, radius, gfOnly, 1);
+            const venues = response.venues || response || []; // Handle both formats
             
             if (venues.length === 0) {
                 showNoResults(`No venues found within ${radius}km of ${postcode}`);
@@ -334,18 +343,18 @@ export const SearchModule = (function() {
             // UPDATE: In searchByArea around line 260
             state.lastSearchState = {
                 type: 'area',
-                query: query,
-                searchType: searchType,
+                query: postcode,
+                searchType: 'postcode',
                 timestamp: Date.now()
             };
 
             // Store globally
             window.App.setState(STATE_KEYS.LAST_SEARCH.TYPE, 'area');
-            window.App.setState(STATE_KEYS.LAST_SEARCH.QUERY, query);
+            window.App.setState(STATE_KEYS.LAST_SEARCH.QUERY, postcode);
             
             state.currentSearchVenues = venues;
             
-            displayResultsInOverlay(venues, `${venues.length} venues near ${postcode} (${radius}km radius)`);
+            displayResultsInOverlay(response, `${venues.length} venues near ${postcode} (${radius}km radius)`);
             utils.showToast(`✅ Found ${venues.length} venues near ${postcode}`);
             modules.tracking?.trackSearch(postcode, 'postcode', venues.length);
             
@@ -478,6 +487,69 @@ export const SearchModule = (function() {
     };
     
     // ================================
+    // PAGINATION
+    // ================================
+    const performCurrentSearchWithPage = async (page) => {
+        console.log(`📄 Performing search with page: ${page}`);
+        
+        const lastSearch = state.lastSearchState;
+        if (!lastSearch) {
+            console.error('❌ No last search state found');
+            return;
+        }
+        
+        try {
+            showResultsLoading(`Loading page ${page}...`);
+            
+            let results;
+            
+            if (lastSearch.type === 'nearby') {
+                // For nearby search, we need to re-run the proximity search
+                const userLocation = lastSearch.userLocation;
+                const radius = lastSearch.radius;
+                const gfOnly = window.App.getState('gfOnlyFilter') !== false;
+                
+                results = await modules.api.findNearbyVenues(
+                    userLocation.lat, 
+                    userLocation.lng, 
+                    radius, 
+                    gfOnly,
+                    page  // Add page parameter
+                );
+                
+            } else if (lastSearch.type === 'name') {
+                results = await modules.api.searchVenues({
+                    query: lastSearch.query,
+                    searchType: 'name',
+                    page: page
+                });
+                
+            } else if (lastSearch.type === 'area') {
+                results = await modules.api.searchVenues({
+                    query: lastSearch.query,
+                    searchType: lastSearch.searchType || 'area',
+                    page: page
+                });
+                
+            } else if (lastSearch.type === 'beer') {
+                // For beer searches, you might need a different approach
+                // since they use custom filtering
+                utils.showToast('Pagination not yet supported for beer searches');
+                return;
+            }
+            
+            // Display results
+            if (results) {
+                displayResultsInOverlay(results, `Page ${page} - ${lastSearch.query || 'Search Results'}`);
+            }
+            
+        } catch (error) {
+            console.error('❌ Error loading page:', error);
+            utils.showToast('Error loading page. Please try again.');
+        }
+    };
+    
+    // ================================
     // VENUE DETAILS
     // ================================
     const showVenueDetails = async (venueId) => {
@@ -581,7 +653,7 @@ export const SearchModule = (function() {
             beerSection.style.display = 'none';
             beerEl.innerHTML = '';
         }
-};
+    };
     
     const setupGFStatusDisplay = (venue) => {
         const statusEl = document.getElementById('currentGFStatus');
@@ -624,8 +696,6 @@ export const SearchModule = (function() {
             <span class="status-meta">${display.meta}</span>
         `;
     };
-
-    // REPLACE the loadBeerList function in search.js (around line 513)
 
     const loadBeerList = (venue) => {
         console.log('🍺 Loading beer list for venue:', venue);
@@ -754,8 +824,6 @@ export const SearchModule = (function() {
     // ================================
     // NAVIGATION
     // ================================
-    // UPDATE: In search.js, replace the goBackToResults function (around line 608)
-
     const goBackToResults = () => {
         console.log('🔙 Going back to results...');
         
@@ -812,9 +880,6 @@ export const SearchModule = (function() {
     // ================================
     // LOCATION UTILITIES
     // ================================
-    // UPDATE the requestLocationWithUI function in search.js
-    // Replace the existing function with this updated version:
-    
     const requestLocationWithUI = () => {
         if (state.locationRequestInProgress) {
             console.log('📍 Location request already in progress');
@@ -1026,8 +1091,6 @@ export const SearchModule = (function() {
         );
     };
     
-    // REPLACE the showLocationPermissionUI function in search.js (around line 779)
-
     const showLocationPermissionUI = (resolve, reject) => {
         // Use modalManager to ensure no conflicts
         if (modules.modalManager) {
@@ -1119,15 +1182,15 @@ export const SearchModule = (function() {
         document.addEventListener('locationPermissionGranted', grantedHandler);
         document.addEventListener('locationPermissionDenied', deniedHandler);
         
-        modal.onclick = (e) => {
-            if (e.target === modal) {
-                deniedHandler();
-            }
-        };
+        const modal = document.getElementById('locationPermissionModal');
+        if (modal) {
+            modal.onclick = (e) => {
+                if (e.target === modal) {
+                    deniedHandler();
+                }
+            };
+        }
     };
-    
-    // ALSO REPLACE the requestLocationWithUI function (around line 608)
-    
     
     const tryGetUserLocation = async () => {
         const cachedLocation = utils.getUserLocation();
@@ -1224,12 +1287,14 @@ export const SearchModule = (function() {
         const elements = {
             loading: document.getElementById('resultsLoading'),
             list: document.getElementById('resultsList'),
-            noResults: document.getElementById('noResultsFound')
+            noResults: document.getElementById('noResultsFound'),
+            paginationContainer: document.getElementById('paginationContainer')
         };
         
         if (elements.loading) elements.loading.style.display = 'flex';
         if (elements.list) elements.list.style.display = 'none';
         if (elements.noResults) elements.noResults.style.display = 'none';
+        if (elements.paginationContainer) elements.paginationContainer.style.display = 'none';
         
         const loadingText = document.querySelector('.loading-text');
         if (loadingText) loadingText.textContent = message;
@@ -1239,30 +1304,30 @@ export const SearchModule = (function() {
         const elements = {
             loading: document.getElementById('resultsLoading'),
             list: document.getElementById('resultsList'),
-            noResults: document.getElementById('noResultsFound')
+            noResults: document.getElementById('noResultsFound'),
+            paginationContainer: document.getElementById('paginationContainer')
         };
         
         if (elements.loading) elements.loading.style.display = 'none';
         if (elements.list) elements.list.style.display = 'none';
         if (elements.noResults) elements.noResults.style.display = 'flex';
+        if (elements.paginationContainer) elements.paginationContainer.style.display = 'none';
         
         const noResultsText = document.querySelector('.no-results-text');
         if (noResultsText) noResultsText.textContent = message;
     };
     
-    // UPDATE: In search.js, replace the displayResultsInOverlay function (around line 1031)
-
-       const displayResultsInOverlay = (data, title) => {
+    const displayResultsInOverlay = (data, title) => {
         // Handle both old format (just venues array) and new format (with pagination)
         let venues, pagination;
         
         if (Array.isArray(data)) {
-            // Old format: just an array of venues (nearby search)
+            // Old format: just an array of venues
             venues = data;
             pagination = null;
             console.log('💾 Processing venue array:', venues.length, 'venues');
         } else if (data && data.venues) {
-            // New format: object with venues and pagination (text search)
+            // New format: object with venues and pagination
             venues = data.venues;
             pagination = data.pagination;
             console.log('💾 Processing paginated data:', venues.length, 'venues, pagination:', !!pagination);
@@ -1276,8 +1341,6 @@ export const SearchModule = (function() {
         state.currentSearchVenues = venues;
         console.log('💾 Stored search results:', venues.length, 'venues');
         
-        // IMPORTANT: Don't call resetResultsMapState here as it cleans up the map
-        // Just ensure we're showing the list view
         const elements = {
             loading: document.getElementById('resultsLoading'),
             noResults: document.getElementById('noResultsFound'),
@@ -1358,8 +1421,6 @@ export const SearchModule = (function() {
         container.style.display = 'block';
     };
     
-    // REPLACE the createResultItem function (around line 1076):
-
     const createResultItem = (venue) => {
         const template = document.getElementById('venue-result-template');
         const clone = template.content.cloneNode(true);
@@ -1418,8 +1479,6 @@ export const SearchModule = (function() {
         return clone;
     };
     
-    // UPDATE: In search.js, update the resetResultsMapState function (around line 1094)
-
     const resetResultsMapState = () => {
         const elements = {
             list: document.getElementById('resultsListContainer'),
@@ -1493,63 +1552,19 @@ export const SearchModule = (function() {
         
         showResultsLoading(message);
     };
-
-    const performCurrentSearchWithPage = async (page) => {
-        console.log(`📄 Performing search with page: ${page}`);
-        
-        const lastSearch = state.lastSearchState;
-        if (!lastSearch) {
-            console.error('❌ No last search state found');
-            return;
-        }
-        
-        try {
-            showResultsLoading(`Loading page ${page}...`);
-            
-            let results;
-            
-            if (lastSearch.type === 'nearby') {
-                // For nearby search, we need to re-run the proximity search
-                // But since your nearby API doesn't support pagination yet, 
-                // just show a message for now
-                utils.showToast('Pagination not yet supported for nearby searches');
-                return;
-                
-            } else if (lastSearch.type === 'name') {
-                results = await modules.api.searchVenues({
-                    query: lastSearch.query,
-                    searchType: 'name',
-                    page: page
-                });
-                
-            } else if (lastSearch.type === 'area') {
-                results = await modules.api.searchVenues({
-                    query: lastSearch.query,
-                    searchType: lastSearch.searchType || 'area',
-                    page: page
-                });
-                
-            } else if (lastSearch.type === 'beer') {
-                // For beer searches, you might need a different approach
-                // since they use custom filtering
-                utils.showToast('Pagination not yet supported for beer searches');
-                return;
-            }
-            
-            // Display results
-            if (results) {
-                displayResultsInOverlay(results, `Page ${page} - ${lastSearch.query || 'Search Results'}`);
-            }
-            
-        } catch (error) {
-            console.error('❌ Error loading page:', error);
-            utils.showToast('Error loading page. Please try again.');
-        }
-    };
     
     // ================================
     // HELPERS
     // ================================
+    const hideOverlays = (overlayIds) => {
+        overlayIds.forEach(id => {
+            const overlay = document.getElementById(id);
+            if (overlay) {
+                overlay.style.display = 'none';
+            }
+        });
+    };
+    
     const sortVenuesByDistance = (venues, location) => {
         return venues.map(venue => {
             if (venue.latitude && venue.longitude) {
@@ -1629,73 +1644,14 @@ export const SearchModule = (function() {
         
         async searchOSM(query) {
             try {
-                const searches = [
-                    // First try: specific venue search
-                    {
-                        q: `${query} venue UK`,
-                        tags: ['venue', 'bar', 'restaurant', 'cafe', 'club']
-                    },
-                    // Fallback: broader search
-                    {
-                        q: `${query} UK`,
-                        tags: ['amenity', 'building', 'leisure']
-                    }
-                ];
-                
-                let allPlaces = [];
-                
-                for (const search of searches) {
-                    const response = await fetch(
-                        `https://nominatim.openstreetmap.org/search?` +
-                        `q=${encodeURIComponent(search.q)}` +
-                        `&format=json&countrycodes=gb&limit=20&extratags=1&namedetails=1`
-                    );
-                    
-                    const places = await response.json();
-                    
-                    // Better filtering
-                    const relevantPlaces = places.filter(place => {
-                        const type = place.type?.toLowerCase() || '';
-                        const category = place.category?.toLowerCase() || '';
-                        const name = place.display_name?.toLowerCase() || '';
-                        const extraTags = place.extratags || {};
-                        
-                        // Check main categories
-                        if (search.tags.some(tag => 
-                            category.includes(tag) || 
-                            type.includes(tag) || 
-                            name.includes(tag)
-                        )) return true;
-                        
-                        // Check extra tags
-                        if (extraTags.amenity && ['venue', 'bar', 'restaurant', 'cafe', 'nightclub'].includes(extraTags.amenity)) {
-                            return true;
-                        }
-                        
-                        // Check if it's likely a venue based on name
-                        const venueKeywords = ['venue', 'bar', 'inn', 'tavern', 'arms', 'club', 'brewery', 'tap', 'house'];
-                        if (venueKeywords.some(keyword => name.includes(keyword))) {
-                            return true;
-                        }
-                        
-                        return false;
-                    });
-                    
-                    allPlaces = [...allPlaces, ...relevantPlaces];
-                    
-                    // If we found good results, stop searching
-                    if (relevantPlaces.length >= 3) break;
-                }
-                
-                // Remove duplicates based on OSM ID
-                const uniquePlaces = Array.from(
-                    new Map(allPlaces.map(p => [p.osm_id, p])).values()
+                const response = await fetch(
+                    `https://nominatim.openstreetmap.org/search?` +
+                    `q=${encodeURIComponent(query + ' venue UK')}` +
+                    `&format=json&countrycodes=gb&limit=10&extratags=1&namedetails=1`
                 );
                 
-                // ADD THIS: Remove venues with similar names at similar locations
-                const deduplicatedPlaces = this.deduplicateVenues(uniquePlaces);
-                
-                this.displayResults(deduplicatedPlaces);
+                const places = await response.json();
+                this.displayResults(places);
                 
             } catch (error) {
                 console.error('OSM search error:', error);
@@ -1737,7 +1693,6 @@ export const SearchModule = (function() {
                 `;
             }).join('');
 
-            // ADD THIS right after the join(''):
             resultsDiv.innerHTML += `
                 <div style="padding: var(--space-lg); border-top: 1px solid var(--border-light); margin-top: var(--space-md);">
                     <button class="btn btn-secondary" data-action="manual-venue-entry" style="width: 100%;">
@@ -1851,7 +1806,7 @@ export const SearchModule = (function() {
                         longitude: venueData.longitude,
                         osm_id: venueData.osm_id,
                         source: 'user_submission',
-                        submitted_by: nickname  // Include the nickname
+                        submitted_by: nickname
                     })
                 });
                 
@@ -1884,11 +1839,11 @@ export const SearchModule = (function() {
         showVenueAddedPrompt(result) {
             const promptModal = document.getElementById('venueAddedPromptModal');
             if (promptModal) {
-                document.getElementById('addedVenueName').textContent = window.newlyAddedvenue.venue_name;
+                document.getElementById('addedVenueName').textContent = window.newlyAddedVenue.name;
                 promptModal.style.display = 'flex';
                 document.body.style.overflow = 'hidden';
             } else {
-                utils.showToast(`✅ ${window.newlyAddedvenue.venue_name} added successfully!`);
+                utils.showToast(`✅ ${window.newlyAddedVenue.name} added successfully!`);
             }
         },
         
@@ -1920,8 +1875,7 @@ export const SearchModule = (function() {
                 'Venue': '🍺',
                 'Bar': '🍹',
                 'Restaurant': '🍽️',
-                'Café': '☕',
-                'Venue': '📍'
+                'Café': '☕'
             };
             return icons[type] || '📍';
         },
@@ -1945,76 +1899,7 @@ export const SearchModule = (function() {
                 resultsDiv.innerHTML = `<div class="search-error">${message}</div>`;
                 resultsDiv.style.display = 'block';
             }
-        },
-
-        deduplicateVenues(places) {
-            const deduplicated = [];
-            
-            places.forEach(place => {
-                const placeName = (place.namedetails?.name || place.display_name.split(',')[0]).toLowerCase().trim();
-                const placeLat = parseFloat(place.lat);
-                const placeLon = parseFloat(place.lon);
-                
-                // Check if we already have a venue with similar name nearby
-                const isDuplicate = deduplicated.some(existing => {
-                    const existingName = (existing.namedetails?.name || existing.display_name.split(',')[0]).toLowerCase().trim();
-                    
-                    // Calculate distance in meters
-                    const distance = this.calculateDistance(
-                        placeLat, placeLon,
-                        parseFloat(existing.lat), parseFloat(existing.lon)
-                    );
-                    
-                    // Similar name check (using simple comparison, could use Levenshtein distance for better matching)
-                    const nameSimilarity = this.calculateNameSimilarity(placeName, existingName);
-                    
-                    // Consider duplicate if within 100m AND name is 80%+ similar
-                    return distance < 100 && nameSimilarity > 0.8;
-                });
-                
-                if (!isDuplicate) {
-                    deduplicated.push(place);
-                }
-            });
-            
-            return deduplicated;
-        },
-        
-        calculateDistance(lat1, lon1, lat2, lon2) {
-            // Haversine formula for distance in meters
-            const R = 6371000; // Earth's radius in meters
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                      Math.sin(dLon/2) * Math.sin(dLon/2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-            return R * c;
-        },
-        
-        calculateNameSimilarity(str1, str2) {
-            // Simple similarity check - ratio of matching characters
-            // You could use Levenshtein distance for better results
-            const longer = str1.length > str2.length ? str1 : str2;
-            const shorter = str1.length > str2.length ? str2 : str1;
-            
-            if (longer.includes(shorter)) {
-                return shorter.length / longer.length;
-            }
-            
-            // Check if they share significant words
-            const words1 = str1.split(/\s+/);
-            const words2 = str2.split(/\s+/);
-            const significantWords1 = words1.filter(w => w.length > 3);
-            const significantWords2 = words2.filter(w => w.length > 3);
-            
-            const matchingWords = significantWords1.filter(w => 
-                significantWords2.some(w2 => w2.includes(w) || w.includes(w2))
-            );
-            
-            return matchingWords.length / Math.max(significantWords1.length, significantWords2.length, 1);
         }
-        
     };
     
     // ================================
@@ -2025,7 +1910,7 @@ export const SearchModule = (function() {
     });
     
     // ================================
-    // VENUELIC API
+    // PUBLIC API
     // ================================
     return {
         // Location search
