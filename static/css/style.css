@@ -1310,11 +1310,11 @@ body.page-breweries .nav-back-btn { display: flex !important; }
    height: 100%;
 }
 
-.no-results-actions {
+/* .no-results-actions {
    display: flex;
    padding: var(--space-xl);
    gap: var(--space-xl);
-}
+} */
 
 .no-results-icon {
    font-size: 4rem;
