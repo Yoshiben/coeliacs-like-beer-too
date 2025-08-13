@@ -72,7 +72,7 @@ export const FormModule = (() => {
         },
         
         getFormElements: () => ({
-            brewery: document.getElementById('reportBrewery'),
+            breweryName: document.getElementById('reportBrewery'),
             beerName: document.getElementById('reportBeerName'),
             beerStyle: document.getElementById('reportBeerStyle'),
             beerABV: document.getElementById('reportBeerABV'),
@@ -141,10 +141,11 @@ export const FormModule = (() => {
         
         const reportData = {
             beer_format: formData.get('reportFormat') || document.getElementById('reportFormat')?.value || '',
-            brewery: formData.get('reportBrewery') || elements.brewery?.value || '',
+            brewery_name: formData.get('reportBrewery') || elements.breweryName?.value || '',
             beer_name: formData.get('reportBeerName') || elements.beerName?.value || '',
             beer_style: formData.get('reportBeerStyle') || elements.beerStyle?.value || '',
             beer_abv: formData.get('reportBeerABV') || elements.beerABV?.value || '',
+            format: formData.get('reportFormat') || document.getElementById('reportFormat')?.value || '',
             notes: formData.get('reportNotes') || document.getElementById('reportNotes')?.value || ''
         };
 
@@ -868,13 +869,6 @@ export const FormModule = (() => {
     const initReportDropdowns = () => {
         console.log('🔧 Initializing report form dropdowns');
         hideAllDropdowns();
-        
-        // // Pre-populate brewery dropdown when modal opens
-        // const breweryInput = document.getElementById('reportBrewery');
-        // if (breweryInput) {
-        //     // Trigger brewery search with empty string to show all breweries
-        //     searchBreweries('');
-        // }
     };
     
     // ================================
