@@ -1080,7 +1080,7 @@ const App = {
                 // Re-run the last search with next page
                 performCurrentSearchWithPage(pagination.page + 1);
             }
-        }
+        },
 
         'manual-venue-entry': (el, modules) => {
             modules.modalManager?.close('placesSearchModal');
