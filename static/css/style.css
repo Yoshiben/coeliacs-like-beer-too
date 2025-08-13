@@ -2317,16 +2317,6 @@ body.page-breweries .nav-back-btn { display: flex !important; }
     padding-left: var(--space-4xl);
 }
 
-.places-search-container::before {
-    content: '🔍';
-    position: absolute;
-    left: var(--space-lg);
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: var(--text-xl);
-    opacity: 0.6;
-}
-
 /* Results container */
 .places-results {
     max-height: 300px;
