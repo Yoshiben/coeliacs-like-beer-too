@@ -334,7 +334,7 @@ def autocomplete():
         if gf_only:
             sql += " AND s.status IN ('always_tap_cask', 'always_bottle_can', 'currently')"
         
-        sql += " ORDER BY v.name LIMIT 100"
+        sql += " ORDER BY v.name
         cursor.execute(sql, params)
         venues = cursor.fetchall()
         
@@ -391,7 +391,7 @@ def get_stats():
         logger.error(f"Error in stats: {str(e)}")
         return jsonify({
             'total_venues': 67031,
-            'gf_venues': 1249,
+            'gf_venues': 100,
             'gf_venues_this_month': 10 
         })
     finally:
@@ -591,7 +591,7 @@ def update_gf_status():
     """Update GF status using new schema"""
     try:
         data = request.get_json()
-        venue_id = data.get('venue_id')  # Frontend still sends venue_id
+        venue_id = data.get('venue_id')
         status = data.get('status')
         
         if not venue_id or not status:
@@ -606,25 +606,27 @@ def update_gf_status():
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor()
         
+        submitted_by = data.get('submitted_by', 'anonymous')
+        
         # Update the GF status directly
         cursor.execute("""
             UPDATE gf_status 
             SET status = %s,
                 updated_at = NOW(),
-                updated_by = 'user'
+                updated_by = %s
             WHERE venue_id = %s
-        """, (status, venue_id))
+        """, (status, submitted_by, venue_id))
         
         # If no rows updated, insert new record
         if cursor.rowcount == 0:
             cursor.execute("""
                 INSERT INTO gf_status (venue_id, status, updated_at, updated_by)
-                VALUES (%s, %s, NOW(), 'user')
-            """, (venue_id, status))
+                VALUES (%s, %s, NOW(), %s)
+            """, (venue_id, status, submitted_by))
         
         conn.commit()
         
-        logger.info(f"Updated venue {venue_id} GF status to {status}")
+        logger.info(f"Updated venue {venue_id} GF status to {status} and added_by to {submitted_by}")
         
         return jsonify({
             'success': True,
@@ -652,9 +654,9 @@ def get_all_venues_for_map():
         # Updated query for new schema
         cursor.execute("""
             SELECT 
-                v.venue_id as venue_id, v.name, 
-                CONCAT_WS(', ', v.housenumber, v.street, v.city) as address, 
-                v.postcode, v.city as local_authority,
+                v.venue_id as venue_id, v.venue_name, 
+                v.address, 
+                v.postcode, v.city,
                 v.latitude, v.longitude,
                 COALESCE(s.status, 'unknown') as gf_status
             FROM venues v
@@ -668,7 +670,7 @@ def get_all_venues_for_map():
         
         return jsonify({
             'success': True,
-            'venues': venues,  # Keep as 'venues' for frontend
+            'venues': venues,
             'total': len(venues)
         })
         
@@ -708,8 +710,8 @@ def add_venue():
         # Check if venue already exists
         cursor.execute("""
             SELECT venue_id FROM venues 
-            WHERE LOWER(name) = LOWER(%s) AND postcode = %s
-        """, (data['name'], data['postcode']))
+            WHERE LOWER(venue_name) = LOWER(%s) AND postcode = %s
+        """, (data['venue_name'], data['postcode']))
         
         existing = cursor.fetchone()
         if existing:
@@ -945,6 +947,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
