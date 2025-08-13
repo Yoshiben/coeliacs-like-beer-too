@@ -523,14 +523,14 @@ export const SearchModule = (function() {
                 
                 // Update navigation title
                 const navTitle = document.getElementById('venueNavTitle');
-                if (navTitle) navTitle.textContent = venue.name;
+                if (navTitle) navTitle.textContent = venue.venue_name;
                 
                 // Populate content
                 populateVenueDetails(venue);
                 setupVenueButtons(venue);
                 setupMapButtonHandler(venue);
                 
-                modules.tracking?.trackVenueView(venue.name);
+                modules.tracking?.trackVenueView(venue.venue_name);
                 
                 const navModule = window.App?.getModule('nav');
                 navModule?.showVenueDetailsWithContext();
@@ -546,7 +546,7 @@ export const SearchModule = (function() {
             beer: document.getElementById('venueDetailsBeer')
         };
         
-        if (elements.title) elements.title.textContent = venue.name;
+        if (elements.title) elements.title.textContent = venue.venue_name;
         if (elements.address) elements.address.textContent = venue.address;
         if (elements.location) elements.location.textContent = `${venue.postcode} • ${venue.local_authority}`;
         
@@ -1312,7 +1312,7 @@ export const SearchModule = (function() {
         const template = document.getElementById('venue-result-template');
         const clone = template.content.cloneNode(true);
         
-        clone.querySelector('.result-title').textContent = venue.name;
+        clone.querySelector('.result-title').textContent = venue.venue_name;
         
         const distanceEl = clone.querySelector('.result-distance');
         if (venue.distance !== undefined) {
@@ -1779,11 +1779,11 @@ export const SearchModule = (function() {
         showVenueAddedPrompt(result) {
             const promptModal = document.getElementById('venueAddedPromptModal');
             if (promptModal) {
-                document.getElementById('addedVenueName').textContent = window.newlyAddedVenue.name;
+                document.getElementById('addedVenueName').textContent = window.newlyAddedvenue.venue_name;
                 promptModal.style.display = 'flex';
                 document.body.style.overflow = 'hidden';
             } else {
-                utils.showToast(`✅ ${window.newlyAddedVenue.name} added successfully!`);
+                utils.showToast(`✅ ${window.newlyAddedvenue.venue_name} added successfully!`);
             }
         },
         
