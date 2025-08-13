@@ -835,6 +835,39 @@ def add_venue():
             cursor.close()
             conn.close()
 
+@app.route('/api/search-places', methods=['POST'])
+def search_places():
+    """Proxy to Google Places API to hide API key"""
+    try:
+        data = request.get_json()
+        query = data.get('query', '').strip()
+        
+        if not query:
+            return jsonify({'results': []})
+        
+        api_key = os.getenv('GOOGLE_PLACES_API_KEY')
+        if not api_key:
+            return jsonify({'error': 'Places API not configured'}), 500
+        
+        # Search for venues in UK
+        places_url = f"https://maps.googleapis.com/maps/api/place/textsearch/json"
+        params = {
+            'query': f"{query} bar pub restaurant UK",
+            'key': api_key,
+            'region': 'uk'
+        }
+        
+        response = requests.get(places_url, params=params)
+        
+        if response.status_code == 200:
+            return jsonify(response.json())
+        else:
+            return jsonify({'error': 'Places search failed'}), 500
+            
+    except Exception as e:
+        logger.error(f"Places API error: {str(e)}")
+        return jsonify({'error': 'Search failed'}), 500
+
 # ================================================================================
 # ADMIN ROUTES
 # ================================================================================
@@ -992,6 +1025,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
