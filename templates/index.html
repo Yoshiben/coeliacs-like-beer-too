@@ -485,6 +485,24 @@
                         </div>
                         
                         <div class="results-list" id="resultsList"></div>
+
+                        <!-- Add pagination controls here -->
+                        <div class="pagination-container" id="paginationContainer" style="display: none;">
+                            <div class="pagination-info">
+                                <span id="paginationInfo">Showing 1-20 of 45 results</span>
+                            </div>
+                            <div class="pagination-controls">
+                                <button class="btn btn-secondary" id="prevPageBtn" data-action="prev-page" disabled>
+                                    ← Previous
+                                </button>
+                                <div class="page-numbers" id="pageNumbers">
+                                    <!-- Page numbers will be inserted here -->
+                                </div>
+                                <button class="btn btn-secondary" id="nextPageBtn" data-action="next-page">
+                                    Next →
+                                </button>
+                            </div>
+                        </div>
                         
                         <div class="no-results-found" id="noResultsFound">
                             <div class="no-results-icon">🔍</div>
