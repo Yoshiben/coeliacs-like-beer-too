@@ -1518,97 +1518,41 @@ export const SearchModule = (function() {
             resultsDiv.style.display = 'block';
             
             this.searchTimeout = setTimeout(() => {
-                this.searchOSM(query);
+                this.searchGooglePlaces(query);
             }, 300);
         },
         
-        async searchOSM(query) {
+        async searchGooglePlaces(query) {
             try {
-                // Create query variations for fuzzy matching
-                const queryVariations = [
-                    query,                           // "scaredy cat"
-                    query + 's',                     // "scaredy cats" 
-                    query.replace(/s$/, ''),         // Remove trailing s
-                    query + ' bar',                  // "scaredy cat bar"
-                    query + ' pub'                   // "scaredy cat pub"
-                ];
+                // Call your backend to avoid exposing API key
+                const response = await fetch('/api/search-places', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: query })
+                });
                 
-                let allPlaces = [];
+                const data = await response.json();
+                const places = data.results || [];
                 
-                // Try each query variation
-                for (const queryVar of queryVariations) {
-                    const searches = [
-                        // First try: specific venue search
-                        {
-                            q: `${queryVar} venue UK`,
-                            tags: ['venue', 'bar', 'restaurant', 'cafe', 'club']
-                        },
-                        // Fallback: broader search
-                        {
-                            q: `${queryVar} UK`,
-                            tags: ['amenity', 'building', 'leisure']
-                        }
-                    ];
-                    
-                    for (const search of searches) {
-                        const response = await fetch(
-                            `https://nominatim.openstreetmap.org/search?` +
-                            `q=${encodeURIComponent(search.q)}` +
-                            `&format=json&countrycodes=gb&limit=20&extratags=1&namedetails=1`
-                        );
-                        
-                        const places = await response.json();
-                        
-                        // Keep your existing filtering logic exactly as is
-                        const relevantPlaces = places.filter(place => {
-                            const type = place.type?.toLowerCase() || '';
-                            const category = place.category?.toLowerCase() || '';
-                            const name = place.display_name?.toLowerCase() || '';
-                            const extraTags = place.extratags || {};
-                            
-                            // Check main categories
-                            if (search.tags.some(tag => 
-                                category.includes(tag) || 
-                                type.includes(tag) || 
-                                name.includes(tag)
-                            )) return true;
-                            
-                            // Check extra tags
-                            if (extraTags.amenity && ['venue', 'bar', 'restaurant', 'cafe', 'nightclub'].includes(extraTags.amenity)) {
-                                return true;
-                            }
-                            
-                            // Check if it's likely a venue based on name
-                            const venueKeywords = ['venue', 'bar', 'inn', 'tavern', 'arms', 'club', 'brewery', 'tap', 'house'];
-                            if (venueKeywords.some(keyword => name.includes(keyword))) {
-                                return true;
-                            }
-                            
-                            return false;
-                        });
-                        
-                        allPlaces = [...allPlaces, ...relevantPlaces];
-                        
-                        // If we found good results, stop searching
-                        if (relevantPlaces.length >= 3) break;
-                    }
-                    
-                    // If we found enough results, stop trying query variations
-                    if (allPlaces.length >= 5) break;
-                }
+                // Convert Google Places format to your existing format
+                const convertedPlaces = places.map(place => ({
+                    osm_id: place.place_id,
+                    namedetails: { name: place.name },
+                    display_name: `${place.name}, ${place.formatted_address}`,
+                    lat: place.geometry.location.lat,
+                    lon: place.geometry.location.lng,
+                    extratags: {
+                        amenity: place.types?.includes('bar') ? 'bar' : 
+                                place.types?.includes('restaurant') ? 'restaurant' : 'venue'
+                    },
+                    category: place.types?.[0] || 'venue',
+                    osm_type: 'google_place'
+                }));
                 
-                // Remove duplicates based on OSM ID
-                const uniquePlaces = Array.from(
-                    new Map(allPlaces.map(p => [p.osm_id, p])).values()
-                );
-                
-                // Remove venues with similar names at similar locations
-                const deduplicatedPlaces = this.deduplicateVenues(uniquePlaces);
-                
-                this.displayResults(deduplicatedPlaces);
+                this.displayResults(convertedPlaces);
                 
             } catch (error) {
-                console.error('OSM search error:', error);
+                console.error('Google Places error:', error);
                 this.showError('Search failed. Please try again.');
             }
         },
