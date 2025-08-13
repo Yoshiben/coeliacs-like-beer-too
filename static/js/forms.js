@@ -459,7 +459,7 @@ export const FormModule = (() => {
         utils.showToast(`✅ Selected: ${beer.beer_name} (${beer.abv}% ${beer.style})!`);
         focusNextEmptyField(['reportFormat', 'reportPhoto']);
         
-        modules.tracking?.trackEvent('beer_selected', 'Form', beer.name);
+        modules.tracking?.trackEvent('beer_selected', 'Form', beer.beer_name);
     };
     
     // ================================
@@ -502,7 +502,7 @@ export const FormModule = (() => {
     const createBeerItem = (beer) => {
         return `
             <div class="suggestion-item beer-item" data-action="select-beer" data-beer-data='${JSON.stringify(beer)}'>
-                <strong>${utils.escapeHtml(beer.name)}</strong><br>
+                <strong>${utils.escapeHtml(beer.beer_name)}</strong><br>
                 <small style="color: var(--text-muted);">
                     ${utils.escapeHtml(beer.style || 'Unknown style')} • ${beer.abv || '?'}% ABV
                     ${beer.gluten_status ? ' • ' + beer.gluten_status.replace('_', ' ') : ''}
