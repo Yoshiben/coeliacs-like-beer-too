@@ -1719,6 +1719,7 @@ body.page-breweries .nav-back-btn { display: flex !important; }
    padding: var(--space-xxs) 0;
    margin: var(--space-xs);
    gap: var(--space-xs);
+}
    
 .legend-marker {
    width: var(--space-md);
@@ -2436,6 +2437,11 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 .distance-actions .btn-secondary {
    width:100%;
 }
+
+
+
+
+
 
 /* Brewery & Beer Dropdown Styling */
 .brewery-dropdown-container,
