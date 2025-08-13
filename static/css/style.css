@@ -2437,6 +2437,142 @@ body.page-breweries .nav-back-btn { display: flex !important; }
    width:100%;
 }
 
+/* Brewery & Beer Dropdown Styling */
+.brewery-dropdown-container,
+.beer-name-container {
+    position: relative;
+}
+
+.suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--surface-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-lg);
+    z-index: 1000;
+    max-height: 320px;
+    overflow-y: auto;
+    display: none;
+}
+
+.suggestions.brewery-suggestions,
+.suggestions.beer-suggestions {
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(74, 144, 226, 0.2);
+}
+
+.dropdown-header {
+    padding: var(--space-sm) var(--space-md);
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    color: white;
+    font-weight: 600;
+    font-size: var(--text-sm);
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.suggestion-item {
+    padding: var(--space-md);
+    border-bottom: 1px solid var(--border-light);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.suggestion-item:hover {
+    background: var(--primary-light);
+    transform: translateX(4px);
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+}
+
+.suggestion-item strong {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: var(--text-base);
+}
+
+.suggestion-item small {
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    line-height: 1.4;
+}
+
+/* Special styling for different types */
+.suggestion-item.beer-item {
+    background: linear-gradient(90deg, transparent, rgba(74, 144, 226, 0.05), transparent);
+}
+
+.suggestion-item.beer-item:hover {
+    background: linear-gradient(90deg, rgba(74, 144, 226, 0.1), rgba(74, 144, 226, 0.15), rgba(74, 144, 226, 0.1));
+}
+
+.suggestion-item.add-new-item {
+    background: linear-gradient(90deg, transparent, rgba(46, 204, 113, 0.05), transparent);
+    border-left: 3px solid var(--success-color);
+}
+
+.suggestion-item.add-new-item:hover {
+    background: linear-gradient(90deg, rgba(46, 204, 113, 0.1), rgba(46, 204, 113, 0.15), rgba(46, 204, 113, 0.1));
+    transform: translateX(6px);
+}
+
+/* Match dropdown header text */
+.dropdown-header::before {
+    content: '';
+    width: 12px;
+    height: 12px;
+    background: currentColor;
+    border-radius: 50%;
+    opacity: 0.8;
+}
+
+/* Loading states */
+.suggestions.loading {
+    padding: var(--space-lg);
+    text-align: center;
+    color: var(--text-muted);
+}
+
+.suggestions.loading::after {
+    content: '🔍 Searching...';
+    display: block;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}
+
+/* Mobile optimizations */
+/* @media (max-width: 768px) {
+    .suggestions {
+        max-height: 280px;
+        font-size: var(--text-sm);
+    }
+    
+    .suggestion-item {
+        padding: var(--space-sm) var(--space-md);
+    }
+    
+    .dropdown-header {
+        padding: var(--space-xs) var(--space-md);
+        font-size: var(--text-xs);
+    }
+} */
+
 
 @media (min-width:1025px) {
    .nav-back-btn {
