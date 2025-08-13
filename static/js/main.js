@@ -760,21 +760,23 @@ const App = {
 
         
         
-        // Places search actions
-        'add-new-venue-from-results': (el, modules) => {
-            // Use modalManager to open the modal properly
-            if (modules.modalManager) {
-                modules.modalManager.open('placesSearchModal');
-            } else {
-                // Fallback to the search module
-                const searchModule = modules.search || window.App?.getModule('search');
-                if (searchModule?.PlacesSearchModule) {
-                    searchModule.PlacesSearchModule.openPlacesSearch();
-                }
+        'add-new-venue-from-results': () => {
+            // Close results overlay
+            modules.modalManager?.close('resultsOverlay');
+            
+            // Open the places search modal with Google Places
+            const searchModule = window.App?.getModule('search');
+            if (searchModule?.PlacesSearchModule) {
+                searchModule.PlacesSearchModule.openPlacesSearch();
             }
         },
-        'search-google-places': (el, modules) => {
-            modules.search?.PlacesSearchModule?.openPlacesSearch?.();
+        
+        'search-google-places': () => {
+            // This should also use the new Google Places search
+            const searchModule = window.App?.getModule('search');
+            if (searchModule?.PlacesSearchModule) {
+                searchModule.PlacesSearchModule.openPlacesSearch();
+            }
         },
         'use-selected-place': (el, modules) => {
             // Check for nickname first
