@@ -149,11 +149,6 @@ export const FormModule = (() => {
             notes: formData.get('reportNotes') || document.getElementById('reportNotes')?.value || ''
         };
 
-        // DEBUG: Log what we actually collected
-        console.log('🔍 Report data collected:', reportData);
-        console.log('🔍 FormData entries:', Array.from(formData.entries()));
-        console.log('🔍 Format element value:', document.getElementById('reportFormat')?.value);
-
         // Add beer_id if available
         if (elements.beerName?.dataset.beerId) {
             reportData.beer_id = parseInt(elements.beerName.dataset.beerId);
@@ -170,6 +165,10 @@ export const FormModule = (() => {
             reportData.postcode = elements.postcode?.value || formData.get('reportPostcode') || '';
             reportData.venue_id = null;
         }
+
+        // Add nickname for attribution
+        reportData.submitted_by = window.App.getState('userNickname') || localStorage.getItem('userNickname') || 'anonymous';
+    
         
         if (reportData.beer_abv) {
             reportData.beer_abv = parseFloat(reportData.beer_abv) || null;
