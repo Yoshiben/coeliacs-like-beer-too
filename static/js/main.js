@@ -1067,21 +1067,6 @@ const App = {
             }
         },
 
-        'prev-page': () => {
-            const pagination = window.App.getState('currentPagination');
-            if (pagination && pagination.has_prev) {
-                // Re-run the last search with previous page
-                performCurrentSearchWithPage(pagination.page - 1);
-            }
-        },
-        'next-page': () => {
-            const pagination = window.App.getState('currentPagination');
-            if (pagination && pagination.has_next) {
-                // Re-run the last search with next page
-                performCurrentSearchWithPage(pagination.page + 1);
-            }
-        },
-
         'manual-venue-entry': (el, modules) => {
             modules.modalManager?.close('placesSearchModal');
             modules.modalManager?.open('manualVenueEntryModal');
