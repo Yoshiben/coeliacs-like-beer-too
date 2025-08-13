@@ -1484,13 +1484,16 @@ export const SearchModule = (function() {
             console.log('🔧 Initializing PlacesSearchModule...');
         },
         
+        // REPLACE the openPlacesSearch method in search.js PlacesSearchModule (around line 1488)
+
         openPlacesSearch(initialQuery = '') {
             console.log('🔍 Opening places search modal...');
             
-            // Use ModalManager instead of direct DOM manipulation
             if (modules.modalManager) {
                 modules.modalManager.open('placesSearchModal', {
                     onOpen: () => {
+                        this.setupInputListener();
+                        
                         const input = document.getElementById('placesSearchInput');
                         if (input) {
                             input.value = initialQuery;
@@ -1503,43 +1506,54 @@ export const SearchModule = (function() {
                     }
                 });
             } else {
-                // Fallback to direct modal opening
-                const modal = document.getElementById('placesSearchModal');
-                if (modal) {
-                    modal.style.display = 'flex';
-                    document.body.style.overflow = 'hidden';
-                    
-                    const input = document.getElementById('placesSearchInput');
-                    if (input) {
-                        input.value = initialQuery;
-                        setTimeout(() => input.focus(), 100);
-                        
-                        if (initialQuery) {
-                            this.handleSearch(initialQuery);
-                        }
-                    }
-                } else {
-                    console.error('❌ placesSearchModal not found in DOM');
-                    utils.showToast('Error: Search modal not available', 'error');
-                }
+                console.error('❌ ModalManager not available');
+                utils.showToast('Error: Modal system not available', 'error');
             }
         },
         
+        // ADD this new method to PlacesSearchModule
+        setupInputListener() {
+            const input = document.getElementById('placesSearchInput');
+            if (!input) return;
+            
+            // Remove any existing listeners
+            input.removeEventListener('input', this.inputHandler);
+            
+            // Bind the handler to this context
+            this.inputHandler = (e) => {
+                console.log('🔍 Input changed:', e.target.value);
+                this.handleSearch(e.target.value);
+            };
+            
+            // Add the listener
+            input.addEventListener('input', this.inputHandler);
+            console.log('✅ Input listener setup complete');
+        },
+        
+        // REPLACE the handleSearch method (around line 1520)
         handleSearch(query) {
+            console.log('🔍 handleSearch called with:', query);
+            
             clearTimeout(this.searchTimeout);
             
             const resultsDiv = document.getElementById('placesResults');
-            if (!resultsDiv) return;
-            
-            if (!query || query.length < 3) {
-                resultsDiv.style.display = 'none';
+            if (!resultsDiv) {
+                console.error('❌ placesResults div not found');
                 return;
             }
             
+            if (!query || query.length < 3) {
+                resultsDiv.style.display = 'none';
+                console.log('ℹ️ Query too short, hiding results');
+                return;
+            }
+            
+            console.log('⏳ Starting search timeout for:', query);
             resultsDiv.innerHTML = '<div style="padding: 20px; text-align: center; color: #666;">Searching...</div>';
             resultsDiv.style.display = 'block';
             
             this.searchTimeout = setTimeout(() => {
+                console.log('🚀 Executing search for:', query);
                 this.searchGooglePlaces(query);
             }, 300);
         },
