@@ -1766,6 +1766,8 @@ export const SearchModule = (function() {
             this.submitNewVenue(newVenueData);
         },
         
+        // REPLACE the submitNewVenue function in search.js PlacesSearchModule (around line 1740)
+
         async submitNewVenue(venueData) {
             try {
                 // Get the user's nickname
@@ -1775,12 +1777,15 @@ export const SearchModule = (function() {
                 }
                 
                 const payload = {
-                    venue_name: venueData.name,  // API expects venue_name
+                    venue_name: venueData.name,
                     address: venueData.address,
                     postcode: venueData.postcode,
                     latitude: venueData.latitude,
                     longitude: venueData.longitude,
-                    submitted_by: nickname
+                    submitted_by: nickname,
+                    // Pass Google Places types to help backend determine venue_type
+                    types: venueData.types || [],
+                    place_id: venueData.place_id || null
                 };
                 
                 console.log('📡 Submitting venue data:', payload);
@@ -1806,12 +1811,13 @@ export const SearchModule = (function() {
                 // Store for potential use
                 window.newlyAddedVenue = {
                     venue_id: result.venue_id,
-                    venue_name: venueData.name,  // Use venue_name consistently
+                    venue_name: venueData.name,
                     name: venueData.name,
                     address: venueData.address,
                     postcode: venueData.postcode,
                     latitude: venueData.latitude,
-                    longitude: venueData.longitude
+                    longitude: venueData.longitude,
+                    venue_type: result.venue_type  // Include the determined type
                 };
                 
                 this.showVenueAddedPrompt(result);
