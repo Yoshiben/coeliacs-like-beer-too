@@ -189,8 +189,13 @@ def search():
                 LEFT JOIN beers b ON vb.beer_id = b.beer_id
                 LEFT JOIN breweries br ON b.brewery_id = br.brewery_id
                 WHERE v.venue_id = %s
-                GROUP BY v.venue_id
-            """
+                """
+    
+            # Add GF filter if needed
+            if gf_only:
+            sql += " AND s.status IN ('always_tap_cask', 'always_bottle_can', 'currently')"
+            
+            sql += " GROUP BY v.venue_id"
             cursor.execute(sql, (venue_id,))
             venues = cursor.fetchall()
             return jsonify(venues)
@@ -976,6 +981,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
