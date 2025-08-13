@@ -69,61 +69,6 @@ def index():
     version = str(int(time.time()))
     return render_template('index.html', cache_buster=version)
 
-@app.route('/autocomplete')
-def autocomplete():
-    """Autocomplete suggestions for search"""
-    query = request.args.get('q', '').strip()
-    search_type = request.args.get('search_type', 'all')
-    gf_only = request.args.get('gf_only', 'false').lower() == 'true'
-    
-    if not query or len(query) < 2 or len(query) > 100:
-        return jsonify([])
-
-    try:
-        conn = mysql.connector.connect(**db_config)
-        cursor = conn.cursor(dictionary=True)
-        
-        # Build search condition for new schema
-        if search_type == 'name':
-            search_condition = "v.name LIKE %s"
-            params = (f'%{query}%',)
-        elif search_type == 'postcode':
-            search_condition = "v.postcode LIKE %s"
-            params = (f'%{query}%',)
-        elif search_type == 'area':
-            search_condition = "v.city LIKE %s"  # Changed from local_authority to city
-            params = (f'%{query}%',)
-        else:
-            search_condition = "(v.name LIKE %s OR v.postcode LIKE %s OR v.city LIKE %s OR v.address LIKE %s)"
-            params = (f'%{query}%', f'%{query}%', f'%{query}%', f'%{query}%')
-        
-        # Updated query for new schema
-        sql = f"""
-            SELECT v.venue_id, v.name, 
-                   CONCAT_WS(', ', v.housenumber, v.street, v.city) as address, 
-                   v.postcode
-            FROM venues v
-            LEFT JOIN gf_status s ON v.venue_id = s.venue_id
-            WHERE {search_condition}
-        """
-        
-        if gf_only:
-            sql += " AND s.status IN ('always_tap_cask', 'always_bottle_can', 'currently')"
-        
-        sql += " ORDER BY v.name LIMIT 100"
-        cursor.execute(sql, params)
-        venues = cursor.fetchall()
-        
-        return jsonify(venues)
-        
-    except mysql.connector.Error as e:
-        logger.error(f"Database error in autocomplete: {str(e)}")
-        return jsonify([])
-    finally:
-        if 'conn' in locals() and conn.is_connected():
-            cursor.close()
-            conn.close()
-
 @app.route('/nearby')
 def nearby():
     """Find nearby venues with new schema"""
@@ -348,6 +293,61 @@ def search():
             cursor.close()
             conn.close()
 
+@app.route('/autocomplete')
+def autocomplete():
+    """Autocomplete suggestions for search"""
+    query = request.args.get('q', '').strip()
+    search_type = request.args.get('search_type', 'all')
+    gf_only = request.args.get('gf_only', 'false').lower() == 'true'
+    
+    if not query or len(query) < 2 or len(query) > 100:
+        return jsonify([])
+
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        # Build search condition for new schema
+        if search_type == 'name':
+            search_condition = "v.name LIKE %s"
+            params = (f'%{query}%',)
+        elif search_type == 'postcode':
+            search_condition = "v.postcode LIKE %s"
+            params = (f'%{query}%',)
+        elif search_type == 'area':
+            search_condition = "v.city LIKE %s"
+            params = (f'%{query}%',)
+        else:
+            search_condition = "(v.name LIKE %s OR v.postcode LIKE %s OR v.city LIKE %s OR v.address LIKE %s)"
+            params = (f'%{query}%', f'%{query}%', f'%{query}%', f'%{query}%')
+        
+        # Updated query for new schema
+        sql = f"""
+            SELECT v.venue_id, v.venue_name, 
+                   v.address, 
+                   v.postcode
+            FROM venues v
+            LEFT JOIN gf_status s ON v.venue_id = s.venue_id
+            WHERE {search_condition}
+        """
+        
+        if gf_only:
+            sql += " AND s.status IN ('always_tap_cask', 'always_bottle_can', 'currently')"
+        
+        sql += " ORDER BY v.name LIMIT 100"
+        cursor.execute(sql, params)
+        venues = cursor.fetchall()
+        
+        return jsonify(venues)
+        
+    except mysql.connector.Error as e:
+        logger.error(f"Database error in autocomplete: {str(e)}")
+        return jsonify([])
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
+
 # ================================================================================
 # API ROUTES
 # ================================================================================
@@ -382,7 +382,7 @@ def get_stats():
         gf_venues_this_month = cursor.fetchone()[0]
         
         return jsonify({
-            'total_venues': total_venues,  # Keep as total_venues for frontend
+            'total_venues': total_venues,
             'gf_venues': gf_venues,
             'gf_venues_this_month': gf_venues_this_month
         })
@@ -390,7 +390,7 @@ def get_stats():
     except Exception as e:
         logger.error(f"Error in stats: {str(e)}")
         return jsonify({
-            'total_venues': 49841,
+            'total_venues': 67031,
             'gf_venues': 1249,
             'gf_venues_this_month': 10 
         })
@@ -945,6 +945,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
