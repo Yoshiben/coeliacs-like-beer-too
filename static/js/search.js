@@ -1252,7 +1252,11 @@ export const SearchModule = (function() {
     
     // UPDATE: In search.js, replace the displayResultsInOverlay function (around line 1031)
 
-    const displayResultsInOverlay = (venues, title) => {
+   const displayResultsInOverlay = (data, title) => {
+        // Handle both old format (just venues array) and new format (with pagination)
+        const venues = Array.isArray(data) ? data : data.venues || [];
+        const pagination = data.pagination || null;
+        
         state.currentSearchVenues = venues;
         
         console.log('💾 Stored search results:', venues.length, 'venues');
@@ -1265,7 +1269,8 @@ export const SearchModule = (function() {
             list: document.getElementById('resultsList'),
             listContainer: document.getElementById('resultsListContainer'),
             mapContainer: document.getElementById('resultsMapContainer'),
-            btnText: document.getElementById('resultsMapBtnText')
+            btnText: document.getElementById('resultsMapBtnText'),
+            paginationContainer: document.getElementById('paginationContainer')  // Add this
         };
         
         // Hide loading and no results
@@ -1299,11 +1304,43 @@ export const SearchModule = (function() {
             });
         }
         
+        // Handle pagination
+        if (pagination && elements.paginationContainer) {
+            showPagination(pagination);
+        } else if (elements.paginationContainer) {
+            elements.paginationContainer.style.display = 'none';
+        }
+        
         // Update title
         const titleEl = document.getElementById('resultsTitle');
         if (titleEl) titleEl.textContent = title;
         
         console.log(`✅ Displayed ${venues.length} results`);
+    };
+    
+    // Add this new function
+    const showPagination = (pagination) => {
+        const container = document.getElementById('paginationContainer');
+        const info = document.getElementById('paginationInfo');
+        const prevBtn = document.getElementById('prevPageBtn');
+        const nextBtn = document.getElementById('nextPageBtn');
+        
+        if (!container || !info || !prevBtn || !nextBtn) return;
+        
+        // Update info text
+        const start = ((pagination.page - 1) * 20) + 1;
+        const end = Math.min(pagination.page * 20, pagination.total);
+        info.textContent = `Showing ${start}-${end} of ${pagination.total} results`;
+        
+        // Update buttons
+        prevBtn.disabled = !pagination.has_prev;
+        nextBtn.disabled = !pagination.has_next;
+        
+        // Store current pagination state
+        window.App.setState('currentPagination', pagination);
+        
+        // Show the container
+        container.style.display = 'block';
     };
     
     // REPLACE the createResultItem function (around line 1076):
