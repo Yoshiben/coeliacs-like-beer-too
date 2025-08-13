@@ -1524,62 +1524,77 @@ export const SearchModule = (function() {
         
         async searchOSM(query) {
             try {
-                const searches = [
-                    // First try: specific venue search
-                    {
-                        q: `${query} venue UK`,
-                        tags: ['venue', 'bar', 'restaurant', 'cafe', 'club']
-                    },
-                    // Fallback: broader search
-                    {
-                        q: `${query} UK`,
-                        tags: ['amenity', 'building', 'leisure']
-                    }
+                // Create query variations for fuzzy matching
+                const queryVariations = [
+                    query,                           // "scaredy cat"
+                    query + 's',                     // "scaredy cats" 
+                    query.replace(/s$/, ''),         // Remove trailing s
+                    query + ' bar',                  // "scaredy cat bar"
+                    query + ' pub'                   // "scaredy cat pub"
                 ];
                 
                 let allPlaces = [];
                 
-                for (const search of searches) {
-                    const response = await fetch(
-                        `https://nominatim.openstreetmap.org/search?` +
-                        `q=${encodeURIComponent(search.q)}` +
-                        `&format=json&countrycodes=gb&limit=20&extratags=1&namedetails=1`
-                    );
-                    
-                    const places = await response.json();
-                    
-                    // Better filtering
-                    const relevantPlaces = places.filter(place => {
-                        const type = place.type?.toLowerCase() || '';
-                        const category = place.category?.toLowerCase() || '';
-                        const name = place.display_name?.toLowerCase() || '';
-                        const extraTags = place.extratags || {};
-                        
-                        // Check main categories
-                        if (search.tags.some(tag => 
-                            category.includes(tag) || 
-                            type.includes(tag) || 
-                            name.includes(tag)
-                        )) return true;
-                        
-                        // Check extra tags
-                        if (extraTags.amenity && ['venue', 'bar', 'restaurant', 'cafe', 'nightclub'].includes(extraTags.amenity)) {
-                            return true;
+                // Try each query variation
+                for (const queryVar of queryVariations) {
+                    const searches = [
+                        // First try: specific venue search
+                        {
+                            q: `${queryVar} venue UK`,
+                            tags: ['venue', 'bar', 'restaurant', 'cafe', 'club']
+                        },
+                        // Fallback: broader search
+                        {
+                            q: `${queryVar} UK`,
+                            tags: ['amenity', 'building', 'leisure']
                         }
-                        
-                        // Check if it's likely a venue based on name
-                        const venueKeywords = ['venue', 'bar', 'inn', 'tavern', 'arms', 'club', 'brewery', 'tap', 'house'];
-                        if (venueKeywords.some(keyword => name.includes(keyword))) {
-                            return true;
-                        }
-                        
-                        return false;
-                    });
+                    ];
                     
-                    allPlaces = [...allPlaces, ...relevantPlaces];
+                    for (const search of searches) {
+                        const response = await fetch(
+                            `https://nominatim.openstreetmap.org/search?` +
+                            `q=${encodeURIComponent(search.q)}` +
+                            `&format=json&countrycodes=gb&limit=20&extratags=1&namedetails=1`
+                        );
+                        
+                        const places = await response.json();
+                        
+                        // Keep your existing filtering logic exactly as is
+                        const relevantPlaces = places.filter(place => {
+                            const type = place.type?.toLowerCase() || '';
+                            const category = place.category?.toLowerCase() || '';
+                            const name = place.display_name?.toLowerCase() || '';
+                            const extraTags = place.extratags || {};
+                            
+                            // Check main categories
+                            if (search.tags.some(tag => 
+                                category.includes(tag) || 
+                                type.includes(tag) || 
+                                name.includes(tag)
+                            )) return true;
+                            
+                            // Check extra tags
+                            if (extraTags.amenity && ['venue', 'bar', 'restaurant', 'cafe', 'nightclub'].includes(extraTags.amenity)) {
+                                return true;
+                            }
+                            
+                            // Check if it's likely a venue based on name
+                            const venueKeywords = ['venue', 'bar', 'inn', 'tavern', 'arms', 'club', 'brewery', 'tap', 'house'];
+                            if (venueKeywords.some(keyword => name.includes(keyword))) {
+                                return true;
+                            }
+                            
+                            return false;
+                        });
+                        
+                        allPlaces = [...allPlaces, ...relevantPlaces];
+                        
+                        // If we found good results, stop searching
+                        if (relevantPlaces.length >= 3) break;
+                    }
                     
-                    // If we found good results, stop searching
-                    if (relevantPlaces.length >= 3) break;
+                    // If we found enough results, stop trying query variations
+                    if (allPlaces.length >= 5) break;
                 }
                 
                 // Remove duplicates based on OSM ID
@@ -1587,7 +1602,7 @@ export const SearchModule = (function() {
                     new Map(allPlaces.map(p => [p.osm_id, p])).values()
                 );
                 
-                // ADD THIS: Remove venues with similar names at similar locations
+                // Remove venues with similar names at similar locations
                 const deduplicatedPlaces = this.deduplicateVenues(uniquePlaces);
                 
                 this.displayResults(deduplicatedPlaces);
