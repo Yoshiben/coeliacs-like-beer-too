@@ -1486,19 +1486,41 @@ export const SearchModule = (function() {
         
         openPlacesSearch(initialQuery = '') {
             console.log('🔍 Opening places search modal...');
-            const modal = document.getElementById('placesSearchModal');
-            if (modal) {
-                modal.style.display = 'flex';
-                document.body.style.overflow = 'hidden';
-                
-                const input = document.getElementById('placesSearchInput');
-                if (input) {
-                    input.value = initialQuery;
-                    setTimeout(() => input.focus(), 100);
-                    
-                    if (initialQuery) {
-                        this.handleSearch(initialQuery);
+            
+            // Use ModalManager instead of direct DOM manipulation
+            if (modules.modalManager) {
+                modules.modalManager.open('placesSearchModal', {
+                    onOpen: () => {
+                        const input = document.getElementById('placesSearchInput');
+                        if (input) {
+                            input.value = initialQuery;
+                            setTimeout(() => input.focus(), 100);
+                            
+                            if (initialQuery) {
+                                this.handleSearch(initialQuery);
+                            }
+                        }
                     }
+                });
+            } else {
+                // Fallback to direct modal opening
+                const modal = document.getElementById('placesSearchModal');
+                if (modal) {
+                    modal.style.display = 'flex';
+                    document.body.style.overflow = 'hidden';
+                    
+                    const input = document.getElementById('placesSearchInput');
+                    if (input) {
+                        input.value = initialQuery;
+                        setTimeout(() => input.focus(), 100);
+                        
+                        if (initialQuery) {
+                            this.handleSearch(initialQuery);
+                        }
+                    }
+                } else {
+                    console.error('❌ placesSearchModal not found in DOM');
+                    utils.showToast('Error: Search modal not available', 'error');
                 }
             }
         },
