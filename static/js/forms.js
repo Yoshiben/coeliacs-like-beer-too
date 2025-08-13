@@ -869,11 +869,11 @@ export const FormModule = (() => {
         console.log('🔧 Initializing report form dropdowns');
         hideAllDropdowns();
         
-        // Pre-populate brewery dropdown when modal opens
-        const breweryInput = document.getElementById('reportBrewery');
-        if (breweryInput) {
-            // Trigger brewery search with empty string to show all breweries
-            searchBreweries('');
+        // // Pre-populate brewery dropdown when modal opens
+        // const breweryInput = document.getElementById('reportBrewery');
+        // if (breweryInput) {
+        //     // Trigger brewery search with empty string to show all breweries
+        //     searchBreweries('');
         }
     };
     
