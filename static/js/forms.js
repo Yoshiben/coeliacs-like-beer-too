@@ -345,6 +345,8 @@ export const FormModule = (() => {
     // BREWERY & BEER AUTOCOMPLETE
     // ================================
     const searchBreweries = utils.debounce(async (query) => {
+        console.log('🍺 Breweries loaded:', breweries.length, breweries.slice(0, 3));
+        
         const dropdown = document.getElementById('breweryDropdown');
         if (!dropdown) return;
         
@@ -466,13 +468,19 @@ export const FormModule = (() => {
     // DROPDOWN HELPERS
     // ================================
     const displayDropdown = (dropdown, type, items, headerText) => {
+        console.log('🎨 displayDropdown called:', { dropdown: dropdown.id, type, itemsLength: items.length, headerText });
+        
         if (!dropdown || items.length === 0) {
             hideDropdown(dropdown.id);
             return;
         }
         
-        // Remove any inline styles and use CSS classes
+        /// Remove any inline styles and use CSS classes
         dropdown.className = `suggestions ${type}-suggestions`;
+        console.log('🎨 Applied classes:', dropdown.className);
+        console.log('🎨 Dropdown element:', dropdown);
+
+        
         dropdown.innerHTML = `
             <div class="dropdown-header">${headerText}</div>
             ${items.map(item => createSuggestionItem(item, `select-${type}`, { [type]: item })).join('')}
