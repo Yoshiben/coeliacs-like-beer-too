@@ -1579,9 +1579,17 @@ export const SearchModule = (function() {
             }
         },
         
+        // REPLACE the displayResults method in search.js PlacesSearchModule (around line 1565)
+
         displayResults(places) {
             const resultsDiv = document.getElementById('placesResults');
             if (!resultsDiv) return;
+            
+            // Hide the selected place preview initially
+            const selectedPreview = document.getElementById('selectedPlacePreview');
+            if (selectedPreview) {
+                selectedPreview.style.display = 'none';
+            }
             
             if (places.length === 0) {
                 resultsDiv.innerHTML = `
@@ -1597,9 +1605,9 @@ export const SearchModule = (function() {
             this.searchResults = places;
             
             resultsDiv.innerHTML = places.map((place, index) => {
-                const name = place.namedetails?.name || place.display_name.split(',')[0];
-                const address = this.formatAddress(place);
-                const type = this.getPlaceType(place);
+                const name = place.name || place.display_name?.split(',')[0] || 'Unknown Venue';
+                const address = place.formatted_address || this.formatAddress(place);
+                const type = this.getPlaceTypeFromGoogle(place);
                 
                 return `
                     <div class="place-result" data-action="select-place" data-place-index="${index}">
@@ -1612,8 +1620,8 @@ export const SearchModule = (function() {
                     </div>
                 `;
             }).join('');
-
-            // ADD THIS right after the join(''):
+        
+            // Add manual entry option
             resultsDiv.innerHTML += `
                 <div style="padding: var(--space-lg); border-top: 1px solid var(--border-light); margin-top: var(--space-md);">
                     <button class="btn btn-secondary" data-action="manual-venue-entry" style="width: 100%;">
@@ -1623,6 +1631,61 @@ export const SearchModule = (function() {
             `;
             
             resultsDiv.style.display = 'block';
+        },
+        
+        // ADD this new method to handle Google Places types
+        getPlaceTypeFromGoogle(place) {
+            if (!place.types) return 'Venue';
+            
+            const types = place.types;
+            if (types.includes('bar')) return 'Bar';
+            if (types.includes('restaurant')) return 'Restaurant';
+            if (types.includes('cafe')) return 'Café';
+            if (types.includes('night_club')) return 'Club';
+            if (types.includes('meal_takeaway')) return 'Takeaway';
+            if (types.includes('lodging')) return 'Hotel';
+            
+            return 'Venue';
+        },
+        
+        // REPLACE the selectPlace method (around line 1590)
+        selectPlace(placeOrIndex) {
+            console.log('🏠 Selecting place:', placeOrIndex);
+            const place = typeof placeOrIndex === 'number' 
+                ? this.searchResults[placeOrIndex]
+                : placeOrIndex;
+                
+            if (!place) {
+                console.error('❌ No place found to select');
+                return;
+            }
+            
+            console.log('✅ Place selected:', place);
+            
+            // Handle both Google Places and OSM format
+            const placeName = place.name || place.namedetails?.name || place.display_name?.split(',')[0] || 'Unknown Venue';
+            const placeAddress = place.formatted_address || this.formatAddress(place);
+            const placeType = this.getPlaceTypeFromGoogle(place) || this.getPlaceType(place);
+            
+            this.selectedPlace = {
+                name: placeName,
+                address: placeAddress,
+                lat: place.geometry?.location?.lat || place.lat,
+                lon: place.geometry?.location?.lng || place.lon,
+                type: placeType,
+                place_id: place.place_id || place.osm_id,
+                display_name: place.formatted_address || place.display_name,
+                types: place.types || [],
+                source: place.place_id ? 'google_places' : 'osm'
+            };
+            
+            // Update the preview
+            document.getElementById('selectedPlaceName').textContent = this.selectedPlace.name;
+            document.getElementById('selectedPlaceAddress').textContent = this.selectedPlace.address;
+            document.getElementById('selectedPlaceType').textContent = this.selectedPlace.type;
+            document.getElementById('selectedPlacePreview').style.display = 'block';
+            
+            this.hideResults();
         },
         
         selectPlace(placeOrIndex) {
