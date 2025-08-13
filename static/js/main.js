@@ -760,20 +760,20 @@ const App = {
 
         
         
-        'add-new-venue-from-results': () => {
+        'add-new-venue-from-results': (el, modules) => {
             // Close results overlay
             modules.modalManager?.close('resultsOverlay');
             
             // Open the places search modal with Google Places
-            const searchModule = window.App?.getModule('search');
+            const searchModule = modules.search || window.App?.getModule('search');
             if (searchModule?.PlacesSearchModule) {
                 searchModule.PlacesSearchModule.openPlacesSearch();
             }
         },
         
-        'search-google-places': () => {
+        'search-google-places': (el, modules) => {
             // This should also use the new Google Places search
-            const searchModule = window.App?.getModule('search');
+            const searchModule = modules.search || window.App?.getModule('search');
             if (searchModule?.PlacesSearchModule) {
                 searchModule.PlacesSearchModule.openPlacesSearch();
             }
