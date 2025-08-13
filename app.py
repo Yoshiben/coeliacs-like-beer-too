@@ -726,7 +726,7 @@ def add_venue():
         logger.info(f"Add venue request: {data}")
         
         # Validate required fields
-        required_fields = ['name', 'address', 'postcode']
+        required_fields = ['venue_name', 'address', 'postcode']
         missing_fields = [field for field in required_fields if not data.get(field)]
         
         if missing_fields:
@@ -763,14 +763,14 @@ def add_venue():
         # Insert new venue
         cursor.execute("""
             INSERT INTO venues (
-                name, street, city, postcode, 
+                venue_name, street, city, postcode, 
                 address, latitude, longitude, 
                 venue_type, created_by
             ) VALUES (
                 %s, %s, %s, %s, %s, %s, %s, 'venue', %s
             )
         """, (
-            data['name'],
+            data['venue_name'],
             street,
             city,
             data['postcode'],
@@ -978,6 +978,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
