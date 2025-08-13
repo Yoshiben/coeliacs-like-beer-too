@@ -717,6 +717,8 @@ def get_all_venues_for_map():
             cursor.close()
             conn.close()
 
+# REPLACE the add-venue route in app.py (around line 560-600)
+
 @app.route('/api/add-venue', methods=['POST'])
 def add_venue():
     """Add a new venue to the database"""
@@ -750,7 +752,7 @@ def add_venue():
             return jsonify({
                 'success': False,
                 'error': 'A venue with this name and postcode already exists',
-                'venue_id': existing[0]  # Return as venue_id for frontend
+                'venue_id': existing[0]
             }), 409
         
         # Get the submitted_by value (nickname or 'anonymous')
@@ -761,14 +763,31 @@ def add_venue():
         street = address_parts[0].strip() if len(address_parts) > 0 else ''
         city = address_parts[-1].strip() if len(address_parts) > 1 else ''
         
-        # Insert new venue
+        # Determine venue_type from Google Places data or default to 'pub'
+        venue_type = 'pub'  # Default fallback
+        
+        # Try to map from source data if available
+        if 'types' in data and data['types']:
+            # Map Google Places types to our ENUM values
+            google_types = data['types']
+            if 'bar' in google_types:
+                venue_type = 'bar'
+            elif 'restaurant' in google_types:
+                venue_type = 'restaurant' 
+            elif 'lodging' in google_types:
+                venue_type = 'hotel'
+            elif 'night_club' in google_types:
+                venue_type = 'club'
+            # Keep 'pub' as default for everything else
+        
+        # Insert new venue with correct ENUM value
         cursor.execute("""
             INSERT INTO venues (
                 venue_name, street, city, postcode, 
                 address, latitude, longitude, 
                 venue_type, created_by
             ) VALUES (
-                %s, %s, %s, %s, %s, %s, %s, 'venue', %s
+                %s, %s, %s, %s, %s, %s, %s, %s, %s
             )
         """, (
             data['venue_name'],
@@ -778,6 +797,7 @@ def add_venue():
             data['address'],
             data.get('latitude'),
             data.get('longitude'),
+            venue_type,  # Use the determined enum value
             submitted_by
         ))
         
@@ -792,13 +812,13 @@ def add_venue():
         conn.commit()
         
         # Log the addition
-        logger.info(f"New venue added: {data['name']} (ID: {venue_id}) by {submitted_by}")
+        logger.info(f"New venue added: {data['venue_name']} (ID: {venue_id}) as {venue_type} by {submitted_by}")
         
         return jsonify({
             'success': True,
-            'message': f'{data["name"]} added successfully!',
-            'venue_id': venue_id,  # Return as venue_id for frontend
-            'name': data['name']
+            'message': f'{data["venue_name"]} added successfully!',
+            'venue_id': venue_id,
+            'venue_type': venue_type
         })
         
     except mysql.connector.IntegrityError as e:
@@ -1039,6 +1059,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
