@@ -836,6 +836,8 @@ def add_venue():
             cursor.close()
             conn.close()
 
+# REPLACE the search-places route in app.py (around line 502)
+
 @app.route('/api/search-places', methods=['POST'])
 def search_places():
     """Proxy to Google Places API to hide API key"""
@@ -848,6 +850,7 @@ def search_places():
         
         api_key = os.getenv('GOOGLE_PLACES_API_KEY')
         if not api_key:
+            logger.error('Google Places API key not configured')
             return jsonify({'error': 'Places API not configured'}), 500
         
         # Search for venues in UK
@@ -858,16 +861,26 @@ def search_places():
             'region': 'uk'
         }
         
-        response = requests.get(places_url, params=params)
+        logger.info(f"Searching Google Places for: {query}")
+        response = requests.get(places_url, params=params, timeout=10)
         
         if response.status_code == 200:
-            return jsonify(response.json())
+            places_data = response.json()
+            logger.info(f"Google Places returned {len(places_data.get('results', []))} results")
+            return jsonify(places_data)
         else:
-            return jsonify({'error': 'Places search failed'}), 500
+            logger.error(f"Google Places API error: {response.status_code} - {response.text}")
+            return jsonify({'error': 'Places search failed', 'status': response.status_code}), 500
             
+    except requests.exceptions.Timeout:
+        logger.error('Google Places API timeout')
+        return jsonify({'error': 'Search timeout - please try again'}), 504
+    except requests.exceptions.RequestException as e:
+        logger.error(f'Google Places API request error: {str(e)}')
+        return jsonify({'error': 'Network error - please try again'}), 503
     except Exception as e:
-        logger.error(f"Places API error: {str(e)}")
-        return jsonify({'error': 'Search failed'}), 500
+        logger.error(f'Places API error: {str(e)}')
+        return jsonify({'error': 'Search failed - please try again'}), 500
 
 # ================================================================================
 # ADMIN ROUTES
@@ -1026,6 +1039,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
