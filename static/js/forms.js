@@ -471,6 +471,8 @@ export const FormModule = (() => {
             return;
         }
         
+        // Remove any inline styles and use CSS classes
+        dropdown.className = `suggestions ${type}-suggestions`;
         dropdown.innerHTML = `
             <div class="dropdown-header">${headerText}</div>
             ${items.map(item => createSuggestionItem(item, `select-${type}`, { [type]: item })).join('')}
@@ -487,11 +489,12 @@ export const FormModule = (() => {
             `🔍 ${beers.length} matches for "${searchQuery}"` :
             `🍺 ${beers.length} ${brewery} Beers`;
         
+        dropdown.className = 'suggestions beer-suggestions';
         dropdown.innerHTML = `
             <div class="dropdown-header">${headerText}</div>
             <div class="suggestion-item add-new-item" data-action="add-new-beer">
-                <strong>➕ Add New Beer for ${brewery}</strong><br>
-                <small style="color: var(--text-muted);">Add a beer not in our database</small>
+                <strong>➕ Add New Beer for ${brewery}</strong>
+                <small>Add a beer not in our database</small>
             </div>
             ${beers.map(beer => createBeerItem(beer)).join('')}
         `;
