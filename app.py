@@ -10,6 +10,7 @@ import logging
 import time
 import json
 from datetime import datetime, timedelta
+import requests
 
 # Initialize Flask app
 app = Flask(__name__, 
@@ -1025,6 +1026,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
