@@ -474,67 +474,83 @@ def get_brewery_beers(brewery_name):
 
 @app.route('/api/submit_beer_update', methods=['POST'])
 def submit_beer_update():
-    """Submit beer report - updated for new schema"""
+    """Submit beer report - updated for new schema with brewery checking"""
     try:
         data = request.get_json()
+        logger.info(f"Received beer report data: {data}")
         
         # Get user info
-        user_info = {
-            'ip': request.remote_addr,
-            'user_agent': request.headers.get('User-Agent', ''),
-            'submitted_by': data.get('submitted_by', 'anonymous')
-        }
+        submitted_by = data.get('submitted_by', 'anonymous')
+        venue_id = data.get('venue_id')
+        format_type = data.get('format') or data.get('beer_format')
+        brewery_name = data.get('brewery_name')
+        beer_name = data.get('beer_name')
+        beer_style = data.get('beer_style')
+        beer_abv = data.get('beer_abv')
+        
+        if not all([venue_id, format_type, brewery_name, beer_name]):
+            return jsonify({'error': 'Missing required fields'}), 400
         
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor(dictionary=True)
         
-        # STEP 1: Check if beer exists, if not add it
-        beer_id = None
-        brewery_name = data.get('brewery_name')
-        beer_name = data.get('beer_name')
+        # STEP 1: Check if brewery exists, if not add it
+        cursor.execute("""
+            SELECT brewery_id FROM breweries 
+            WHERE LOWER(brewery_name) = LOWER(%s)
+        """, (brewery_name,))
         
-        if brewery_name and beer_name:
+        brewery_row = cursor.fetchone()
+        
+        if brewery_row:
+            brewery_id = brewery_row['brewery_id']
+            logger.info(f"Found existing brewery: {brewery_name} (ID: {brewery_id})")
+        else:
+            # Add new brewery
+            cursor.execute("SELECT MAX(brewery_id) as max_id FROM breweries")
+            max_brewery_id = cursor.fetchone()['max_id'] or 0
+            brewery_id = max_brewery_id + 1
+            
             cursor.execute("""
-                SELECT beer_id 
-                FROM beers b
-                LEFT JOIN breweries br
-                ON b.brewery_id = br.brewery_id
-                WHERE LOWER(brewery_name) = LOWER(%s) AND LOWER(beer_name) = LOWER(%s)
-            """, (brewery_name, beer_name))
+                INSERT INTO breweries (brewery_id, brewery_name, created_by)
+                VALUES (%s, %s, %s)
+            """, (brewery_id, brewery_name, submitted_by))
             
-            existing_beer = cursor.fetchone()
+            logger.info(f"Added new brewery: {brewery_name} (ID: {brewery_id}) by {submitted_by}")
+        
+        # STEP 2: Check if beer exists, if not add it
+        cursor.execute("""
+            SELECT beer_id FROM beers 
+            WHERE brewery_id = %s AND LOWER(beer_name) = LOWER(%s)
+        """, (brewery_id, beer_name))
+        
+        beer_row = cursor.fetchone()
+        
+        if beer_row:
+            beer_id = beer_row['beer_id']
+            logger.info(f"Found existing beer: {beer_name} (ID: {beer_id})")
+        else:
+            # Add new beer
+            cursor.execute("SELECT MAX(beer_id) as max_id FROM beers")
+            max_beer_id = cursor.fetchone()['max_id'] or 0
+            beer_id = max_beer_id + 1
             
-            if existing_beer:
-                beer_id = existing_beer['beer_id']
-            else:
-                # Add new beer - need to generate next ID
-                cursor.execute("SELECT MAX(beer_id) as max_id FROM beers")
-                max_id = cursor.fetchone()['max_id'] or 0
-                beer_id = max_id + 1
-                
-                cursor.execute("""
-                    INSERT INTO beers (beer_id, beer_name, style, abv, gluten_status)
-                    VALUES (%s, %s, %s, %s, 'gluten_removed')
-                """, (
-                    beer_id,
-                    beer_name,
-                    data.get('beer_style'),
-                    data.get('beer_abv')
-                ))
-                logger.info(f"Added new beer: {brewery} - {beer_name} (ID: {beer_id})")
+            # Parse ABV
+            abv_value = None
+            if beer_abv:
+                try:
+                    abv_value = float(beer_abv)
+                except (ValueError, TypeError):
+                    abv_value = None
+            
+            cursor.execute("""
+                INSERT INTO beers (brewery_id, beer_id, beer_name, style, abv, gluten_status, added_by)
+                VALUES (%s, %s, %s, %s, %s, 'gluten_removed', %s)
+            """, (brewery_id, beer_id, beer_name, beer_style, abv_value, submitted_by))
+            
+            logger.info(f"Added new beer: {brewery_name} - {beer_name} (ID: {beer_id}) by {submitted_by}")
         
-        beer_abv = data.get('beer_abv')
-        if beer_abv:
-            try:
-                beer_abv = float(beer_abv)
-            except (ValueError, TypeError):
-                beer_abv = None
-        
-        # STEP 2: Insert into venue_beers - AUTO-APPROVED!
-        venue_id = data.get('venue_id')  # Frontend still sends venue_id
-        format_type = data.get('format') or data.get('beer_format')
-        
-        # Check if this beer is already reported for this venue
+        # STEP 3: Check if this beer is already reported for this venue
         cursor.execute("""
             SELECT report_id FROM venue_beers 
             WHERE venue_id = %s AND beer_id = %s AND format = %s
@@ -547,10 +563,12 @@ def submit_beer_update():
             cursor.execute("""
                 UPDATE venue_beers 
                 SET last_seen = CURRENT_DATE, 
-                    times_reported = times_reported + 1
+                    times_reported = times_reported + 1,
+                    last_updated_by = %s
                 WHERE report_id = %s
-            """, (existing_report['report_id'],))
+            """, (submitted_by, existing_report['report_id']))
             report_id = existing_report['report_id']
+            logger.info(f"Updated existing report {report_id} by {submitted_by}")
         else:
             # Insert new report
             cursor.execute("""
@@ -559,8 +577,9 @@ def submit_beer_update():
                 ) VALUES (
                     %s, %s, %s, %s
                 )
-            """, (venue_id, beer_id, format_type, user_info['submitted_by']))
+            """, (venue_id, beer_id, format_type, submitted_by))
             report_id = cursor.lastrowid
+            logger.info(f"Added new venue_beer report {report_id} by {submitted_by}")
         
         conn.commit()
         
@@ -569,11 +588,14 @@ def submit_beer_update():
             'message': '🎉 Beer report added successfully!',
             'report_id': report_id,
             'beer_id': beer_id,
+            'brewery_id': brewery_id,
             'status': 'approved'
         })
         
     except Exception as e:
         logger.error(f"Error in submit_beer_update: {str(e)}")
+        import traceback
+        logger.error(f"Traceback: {traceback.format_exc()}")
         if 'conn' in locals():
             conn.rollback()
         return jsonify({
@@ -585,52 +607,60 @@ def submit_beer_update():
             cursor.close()
             conn.close()
 
+
 @app.route('/api/update-gf-status', methods=['POST'])
 def update_gf_status():
     """Update GF status using new schema"""
     try:
         data = request.get_json()
         venue_id = data.get('venue_id')
-        status = data.get('status')
+        new_status = data.get('status')
+        submitted_by = data.get('submitted_by', 'anonymous')
         
-        if not venue_id or not status:
+        if not venue_id or not new_status:
             return jsonify({'error': 'Missing venue_id or status'}), 400
             
-        # Updated to include new 5-tier statuses
         valid_statuses = ['always_tap_cask', 'always_bottle_can', 'currently', 'not_currently', 'unknown']
         
-        if status not in valid_statuses:
+        if new_status not in valid_statuses:
             return jsonify({'error': f'Invalid status. Must be one of: {", ".join(valid_statuses)}'}), 400
         
         conn = mysql.connector.connect(**db_config)
-        cursor = conn.cursor()
+        cursor = conn.cursor(dictionary=True)
         
-        submitted_by = data.get('submitted_by', 'anonymous')
+        # Get current status for audit trail
+        cursor.execute("SELECT status FROM gf_status WHERE venue_id = %s", (venue_id,))
+        current_row = cursor.fetchone()
+        old_status = current_row['status'] if current_row else 'unknown'
         
-        # Update the GF status directly
+        # Insert into status_updates table for audit trail
+        cursor.execute("""
+            INSERT INTO status_updates (venue_id, old_status, new_status, updated_by)
+            VALUES (%s, %s, %s, %s)
+        """, (venue_id, old_status, new_status, submitted_by))
+        
+        # Update the GF status
         cursor.execute("""
             UPDATE gf_status 
-            SET status = %s,
-                updated_at = NOW(),
-                updated_by = %s
+            SET status = %s, updated_at = NOW(), updated_by = %s
             WHERE venue_id = %s
-        """, (status, submitted_by, venue_id))
+        """, (new_status, submitted_by, venue_id))
         
         # If no rows updated, insert new record
         if cursor.rowcount == 0:
             cursor.execute("""
                 INSERT INTO gf_status (venue_id, status, updated_at, updated_by)
                 VALUES (%s, %s, NOW(), %s)
-            """, (venue_id, status, submitted_by))
+            """, (venue_id, new_status, submitted_by))
         
         conn.commit()
         
-        logger.info(f"Updated venue {venue_id} GF status to {status} and added_by to {submitted_by}")
+        logger.info(f"Updated venue {venue_id} GF status from {old_status} to {new_status} by {submitted_by}")
         
         return jsonify({
             'success': True,
-            'message': f'Status updated to {status}',
-            'status': status
+            'message': f'Status updated to {new_status}',
+            'status': new_status
         })
         
     except Exception as e:
@@ -946,6 +976,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
