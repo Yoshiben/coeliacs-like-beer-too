@@ -1828,6 +1828,74 @@ export const SearchModule = (function() {
                 utils.showToast(`❌ Failed to add venue: ${error.message}`);
             }
         },
+
+        // ADD this function to PlacesSearchModule in search.js (after the submitNewVenue function)
+
+        showVenueAddedPrompt(result) {
+            console.log('🎉 Showing venue added prompt for:', result);
+            
+            // Update the modal with venue info
+            const venueNameEl = document.getElementById('addedVenueName');
+            if (venueNameEl) {
+                venueNameEl.textContent = result.message.split(' added successfully!')[0]; // Extract venue name
+            }
+            
+            // Close places search modal first
+            if (modules.modalManager) {
+                modules.modalManager.close('placesSearchModal');
+            }
+            
+            // Show success message
+            utils.showToast(`🎉 ${result.message}`, 'success');
+            
+            // Small delay then show the prompt modal
+            setTimeout(() => {
+                if (modules.modalManager) {
+                    modules.modalManager.open('venueAddedPromptModal', {
+                        onOpen: () => {
+                            // Set up the action buttons for the newly added venue
+                            const updateStatusBtn = document.querySelector('[data-action="update-gf-status-new-venue"]');
+                            const reportBeerBtn = document.querySelector('[data-action="report-gf-beer-new-venue"]');
+                            const doneBtn = document.querySelector('[data-action="close-venue-added-modal"]');
+                            
+                            if (updateStatusBtn) {
+                                updateStatusBtn.onclick = () => {
+                                    modules.modalManager.close('venueAddedPromptModal');
+                                    // Set the newly added venue as current and open status modal
+                                    window.App.setState('currentVenue', window.newlyAddedVenue);
+                                    setTimeout(() => {
+                                        modules.modalManager.open('gfStatusModal');
+                                    }, 100);
+                                };
+                            }
+                            
+                            if (reportBeerBtn) {
+                                reportBeerBtn.onclick = () => {
+                                    modules.modalManager.close('venueAddedPromptModal');
+                                    // Open report modal with the new venue pre-selected
+                                    setTimeout(() => {
+                                        modules.modalManager.open('reportModal', {
+                                            onOpen: () => {
+                                                if (modules.modal?.initializeReportModal) {
+                                                    modules.modal.initializeReportModal(window.newlyAddedVenue);
+                                                }
+                                            }
+                                        });
+                                    }, 100);
+                                };
+                            }
+                            
+                            if (doneBtn) {
+                                doneBtn.onclick = () => {
+                                    modules.modalManager.close('venueAddedPromptModal');
+                                    // Optionally navigate back to home or results
+                                };
+                            }
+                        }
+                    });
+                }
+            }, 500);
+        },
         
         formatAddress(place) {
             // Handle Google Places format
