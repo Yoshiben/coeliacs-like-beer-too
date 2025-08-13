@@ -445,7 +445,7 @@ export const FormModule = (() => {
         const beer = JSON.parse(beerData);
         const elements = utils.getFormElements();
         
-        elements.beerName.value = beer.name;
+        elements.beerName.value = beer.beer_name;
         elements.beerStyle.value = beer.style || '';
         elements.beerABV.value = beer.abv || '';
         
@@ -456,7 +456,7 @@ export const FormModule = (() => {
         hideDropdown('beerNameDropdown');
         
         addAutoFillAnimation(['reportBeerName', 'reportBeerStyle', 'reportBeerABV']);
-        utils.showToast(`✅ Selected: ${beer.name} (${beer.abv}% ${beer.style})!`);
+        utils.showToast(`✅ Selected: ${beer.beer_name} (${beer.abv}% ${beer.style})!`);
         focusNextEmptyField(['reportFormat', 'reportPhoto']);
         
         modules.tracking?.trackEvent('beer_selected', 'Form', beer.name);
