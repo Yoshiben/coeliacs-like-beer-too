@@ -193,7 +193,7 @@ def search():
     
             # Add GF filter if needed
             if gf_only:
-                        sql += " AND s.status IN ('always_tap_cask', 'always_bottle_can', 'currently')"
+                sql += " AND s.status IN ('always_tap_cask', 'always_bottle_can', 'currently')"
             
             sql += " GROUP BY v.venue_id"
             cursor.execute(sql, (venue_id,))
@@ -202,7 +202,6 @@ def search():
         
         # Regular search logic
         if not query:
-            return jsonify({'error': 'Query is required for search'}), 400
         
         # Build search condition
         if search_type == 'name':
@@ -981,6 +980,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
