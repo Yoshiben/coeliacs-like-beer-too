@@ -2614,6 +2614,7 @@ body.page-breweries .nav-back-btn { display: flex !important; }
    .near-me-content h3,
    .buy-beer-content h3 {
       font-size: var(--text-lg);
+      color: var(--text-primary);
    }
 
    .near-me-content p,
