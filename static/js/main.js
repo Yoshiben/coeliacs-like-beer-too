@@ -1343,6 +1343,12 @@ const App = {
     }
 };
 
+const storedNickname = localStorage.getItem('userNickname');
+if (storedNickname) {
+    App.setState('userNickname', storedNickname);
+    console.log('✅ Synced nickname to app state:', storedNickname);
+}
+
 // ================================
 // INITIALIZATION
 // ================================
