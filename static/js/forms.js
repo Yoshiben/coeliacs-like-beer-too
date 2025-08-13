@@ -506,7 +506,7 @@ export const FormModule = (() => {
         return `
             <div class="suggestion-item beer-item" data-action="select-beer" data-beer-data='${JSON.stringify(beer)}'>
                 <strong>${utils.escapeHtml(beer.beer_name)}</strong><br>
-                <small style="color: var(--text-muted);">
+                <small>
                     ${utils.escapeHtml(beer.style || 'Unknown style')} • ${beer.abv || '?'}% ABV
                     ${beer.gluten_status ? ' • ' + beer.gluten_status.replace('_', ' ') : ''}
                 </small>
@@ -526,7 +526,7 @@ export const FormModule = (() => {
         dropdown.innerHTML = `
             <div class="suggestion-item add-new-item" data-action="use-beer-name">
                 <strong>➕ Add "${utils.escapeHtml(query)}" as new beer</strong>
-                <small style="color: var(--text-muted);">
+                <small>
                     ${brewery ? 'for ' + brewery : "We'll add this to our database"}
                 </small>
             </div>
@@ -543,7 +543,7 @@ export const FormModule = (() => {
             <div class="dropdown-header">📝 No ${brewery} Beers in Database</div>
             <div class="suggestion-item add-new-item" data-action="focus-beer-name">
                 <strong>➕ Add First Beer for ${brewery}</strong><br>
-                <small style="color: var(--text-muted);">Be the first to add a ${brewery} beer!</small>
+                <small>Be the first to add a ${brewery} beer!</small>
             </div>
         `;
         
