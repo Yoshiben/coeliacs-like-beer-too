@@ -1252,13 +1252,28 @@ export const SearchModule = (function() {
     
     // UPDATE: In search.js, replace the displayResultsInOverlay function (around line 1031)
 
-   const displayResultsInOverlay = (data, title) => {
+       const displayResultsInOverlay = (data, title) => {
         // Handle both old format (just venues array) and new format (with pagination)
-        const venues = Array.isArray(data) ? data : data.venues || [];
-        const pagination = data.pagination || null;
+        let venues, pagination;
+        
+        if (Array.isArray(data)) {
+            // Old format: just an array of venues (nearby search)
+            venues = data;
+            pagination = null;
+            console.log('💾 Processing venue array:', venues.length, 'venues');
+        } else if (data && data.venues) {
+            // New format: object with venues and pagination (text search)
+            venues = data.venues;
+            pagination = data.pagination;
+            console.log('💾 Processing paginated data:', venues.length, 'venues, pagination:', !!pagination);
+        } else {
+            // Fallback for unexpected format
+            console.warn('⚠️ Unexpected data format:', data);
+            venues = [];
+            pagination = null;
+        }
         
         state.currentSearchVenues = venues;
-        
         console.log('💾 Stored search results:', venues.length, 'venues');
         
         // IMPORTANT: Don't call resetResultsMapState here as it cleans up the map
@@ -1270,7 +1285,7 @@ export const SearchModule = (function() {
             listContainer: document.getElementById('resultsListContainer'),
             mapContainer: document.getElementById('resultsMapContainer'),
             btnText: document.getElementById('resultsMapBtnText'),
-            paginationContainer: document.getElementById('paginationContainer')  // Add this
+            paginationContainer: document.getElementById('paginationContainer')
         };
         
         // Hide loading and no results
@@ -1304,7 +1319,7 @@ export const SearchModule = (function() {
             });
         }
         
-        // Handle pagination
+        // Handle pagination - only show if we have pagination data
         if (pagination && elements.paginationContainer) {
             showPagination(pagination);
         } else if (elements.paginationContainer) {
