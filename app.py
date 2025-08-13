@@ -955,6 +955,20 @@ def spa_routes():
     version = str(int(time.time()))
     return render_template('index.html', cache_buster=version)
 
+@app.route('/<path:path>')
+def catch_all(path):
+    """Catch-all route for SPA - always return index for unknown routes"""
+    # List of actual API endpoints that should 404
+    api_routes = ['api', 'admin', 'health', 'nearby', 'autocomplete']
+    
+    # If it's an API route, let it 404 normally
+    if path.startswith(tuple(api_routes)):
+        return jsonify({'error': 'Not found'}), 404
+    
+    # Otherwise, serve the main app (SPA routing)
+    version = str(int(time.time()))
+    return render_template('index.html', cache_buster=version)
+
 # ================================================================================
 # ERROR HANDLERS
 # ================================================================================
@@ -978,6 +992,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
