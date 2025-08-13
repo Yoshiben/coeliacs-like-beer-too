@@ -72,7 +72,7 @@ export const FormModule = (() => {
         },
         
         getFormElements: () => ({
-            breweryName: document.getElementById('reportBrewery'),
+            brewery: document.getElementById('reportBrewery'),
             beerName: document.getElementById('reportBeerName'),
             beerStyle: document.getElementById('reportBeerStyle'),
             beerABV: document.getElementById('reportBeerABV'),
@@ -141,7 +141,7 @@ export const FormModule = (() => {
         
         const reportData = {
             beer_format: formData.get('reportFormat') || document.getElementById('reportFormat')?.value || '',
-            brewery_name: formData.get('reportBrewery') || elements.breweryName?.value || '',
+            brewery_name: formData.get('reportBrewery') || elements.brewery?.value || '',
             beer_name: formData.get('reportBeerName') || elements.beerName?.value || '',
             beer_style: formData.get('reportBeerStyle') || elements.beerStyle?.value || '',
             beer_abv: formData.get('reportBeerABV') || elements.beerABV?.value || '',
@@ -181,7 +181,7 @@ export const FormModule = (() => {
     const validateReportForm = (data) => {
         const required = [
             ['beer_format', 'Beer Format'],
-            ['brewery', 'Brewery'], 
+            ['brewery_name', 'Brewery Name'], 
             ['beer_name', 'Beer Name']
         ];
         
