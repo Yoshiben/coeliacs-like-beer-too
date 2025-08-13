@@ -309,7 +309,7 @@ def autocomplete():
         
         # Build search condition for new schema
         if search_type == 'name':
-            search_condition = "v.name LIKE %s"
+            search_condition = "v.venue_name LIKE %s"
             params = (f'%{query}%',)
         elif search_type == 'postcode':
             search_condition = "v.postcode LIKE %s"
@@ -318,7 +318,7 @@ def autocomplete():
             search_condition = "v.city LIKE %s"
             params = (f'%{query}%',)
         else:
-            search_condition = "(v.name LIKE %s OR v.postcode LIKE %s OR v.city LIKE %s OR v.address LIKE %s)"
+            search_condition = "(v.venue_name LIKE %s OR v.postcode LIKE %s OR v.city LIKE %s OR v.address LIKE %s)"
             params = (f'%{query}%', f'%{query}%', f'%{query}%', f'%{query}%')
         
         # Updated query for new schema
@@ -334,7 +334,7 @@ def autocomplete():
         if gf_only:
             sql += " AND s.status IN ('always_tap_cask', 'always_bottle_can', 'currently')"
         
-        sql += " ORDER BY v.name
+        sql += " ORDER BY v.venue_name
         cursor.execute(sql, params)
         venues = cursor.fetchall()
         
