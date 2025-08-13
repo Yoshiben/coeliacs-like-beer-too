@@ -2603,6 +2603,9 @@ body.page-breweries .nav-back-btn { display: flex !important; }
    .buy-beer-content {
       text-align: center;
    }
+   .near-me-section,
+   .buy-beer-section {
+      width: 100%;
 }
 
 
