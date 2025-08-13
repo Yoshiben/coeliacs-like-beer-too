@@ -874,7 +874,7 @@ export const FormModule = (() => {
         // if (breweryInput) {
         //     // Trigger brewery search with empty string to show all breweries
         //     searchBreweries('');
-        }
+        // }
     };
     
     // ================================
