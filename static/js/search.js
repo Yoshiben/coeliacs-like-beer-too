@@ -1493,6 +1493,59 @@ export const SearchModule = (function() {
         
         showResultsLoading(message);
     };
+
+    const performCurrentSearchWithPage = async (page) => {
+        console.log(`📄 Performing search with page: ${page}`);
+        
+        const lastSearch = state.lastSearchState;
+        if (!lastSearch) {
+            console.error('❌ No last search state found');
+            return;
+        }
+        
+        try {
+            showResultsLoading(`Loading page ${page}...`);
+            
+            let results;
+            
+            if (lastSearch.type === 'nearby') {
+                // For nearby search, we need to re-run the proximity search
+                // But since your nearby API doesn't support pagination yet, 
+                // just show a message for now
+                utils.showToast('Pagination not yet supported for nearby searches');
+                return;
+                
+            } else if (lastSearch.type === 'name') {
+                results = await modules.api.searchVenues({
+                    query: lastSearch.query,
+                    searchType: 'name',
+                    page: page
+                });
+                
+            } else if (lastSearch.type === 'area') {
+                results = await modules.api.searchVenues({
+                    query: lastSearch.query,
+                    searchType: lastSearch.searchType || 'area',
+                    page: page
+                });
+                
+            } else if (lastSearch.type === 'beer') {
+                // For beer searches, you might need a different approach
+                // since they use custom filtering
+                utils.showToast('Pagination not yet supported for beer searches');
+                return;
+            }
+            
+            // Display results
+            if (results) {
+                displayResultsInOverlay(results, `Page ${page} - ${lastSearch.query || 'Search Results'}`);
+            }
+            
+        } catch (error) {
+            console.error('❌ Error loading page:', error);
+            utils.showToast('Error loading page. Please try again.');
+        }
+    };
     
     // ================================
     // HELPERS
@@ -1961,6 +2014,7 @@ export const SearchModule = (function() {
             
             return matchingWords.length / Math.max(significantWords1.length, significantWords2.length, 1);
         }
+        
     };
     
     // ================================
@@ -1989,6 +2043,9 @@ export const SearchModule = (function() {
         
         // Navigation
         goBackToResults,
+
+        // Pagination
+        performCurrentSearchWithPage,
         
         // Sub-modules
         PlacesSearchModule,
