@@ -2449,112 +2449,70 @@ body.page-breweries .nav-back-btn { display: flex !important; }
     position: relative;
 }
 
+/* Clean, modern dropdown styling */
 .suggestions {
     position: absolute;
     top: 100%;
     left: 0;
     right: 0;
-    background: var(--surface-color);
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow-lg);
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     z-index: 1000;
-    max-height: 320px;
+    max-height: 400px;
     overflow-y: auto;
     display: none;
-}
-
-.suggestions.brewery-suggestions,
-.suggestions.beer-suggestions {
-    backdrop-filter: blur(10px);
-    background: rgba(255, 255, 255, 0.95);
-    border: 1px solid rgba(74, 144, 226, 0.2);
+    margin-top: 4px;
 }
 
 .dropdown-header {
-    padding: var(--space-sm) var(--space-md);
-    background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
+    padding: 12px 16px;
     font-weight: 600;
-    font-size: var(--text-sm);
-    border-radius: var(--border-radius) var(--border-radius) 0 0;
-    display: flex;
-    align-items: center;
-    gap: var(--space-xs);
+    font-size: 14px;
+    border-radius: 12px 12px 0 0;
+    text-align: center;
 }
 
 .suggestion-item {
-    padding: var(--space-md);
-    border-bottom: 1px solid var(--border-light);
+    padding: 16px;
+    border-bottom: 1px solid #f1f5f9;
     cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-xs);
-}
-
-.suggestion-item:hover {
-    background: var(--primary-light);
-    transform: translateX(4px);
+    transition: background-color 0.15s ease;
 }
 
 .suggestion-item:last-child {
     border-bottom: none;
-    border-radius: 0 0 var(--border-radius) var(--border-radius);
+    border-radius: 0 0 12px 12px;
+}
+
+.suggestion-item:hover {
+    background-color: #f8fafc;
 }
 
 .suggestion-item strong {
-    color: var(--text-primary);
+    display: block;
+    color: #1e293b;
     font-weight: 600;
-    font-size: var(--text-base);
+    font-size: 16px;
+    margin-bottom: 4px;
 }
 
 .suggestion-item small {
-    color: var(--text-muted);
-    font-size: var(--text-sm);
+    color: #64748b;
+    font-size: 14px;
     line-height: 1.4;
 }
 
-/* Special styling for different types */
-.suggestion-item.beer-item {
-    background: linear-gradient(90deg, transparent, rgba(74, 144, 226, 0.05), transparent);
-}
-
-.suggestion-item.beer-item:hover {
-    background: linear-gradient(90deg, rgba(74, 144, 226, 0.1), rgba(74, 144, 226, 0.15), rgba(74, 144, 226, 0.1));
-}
-
 .suggestion-item.add-new-item {
-    background: linear-gradient(90deg, transparent, rgba(46, 204, 113, 0.05), transparent);
-    border-left: 3px solid var(--success-color);
+    background-color: #f0f9ff;
+    border-left: 4px solid #0ea5e9;
 }
 
 .suggestion-item.add-new-item:hover {
-    background: linear-gradient(90deg, rgba(46, 204, 113, 0.1), rgba(46, 204, 113, 0.15), rgba(46, 204, 113, 0.1));
-    transform: translateX(6px);
-}
-
-/* Match dropdown header text */
-.dropdown-header::before {
-    content: '';
-    width: 12px;
-    height: 12px;
-    background: currentColor;
-    border-radius: 50%;
-    opacity: 0.8;
-}
-
-/* Loading states */
-.suggestions.loading {
-    padding: var(--space-lg);
-    text-align: center;
-    color: var(--text-muted);
-}
-
-.suggestions.loading::after {
-    content: '🔍 Searching...';
-    display: block;
-    animation: pulse 1.5s infinite;
+    background-color: #e0f2fe;
 }
 
 @keyframes pulse {
@@ -2562,22 +2520,7 @@ body.page-breweries .nav-back-btn { display: flex !important; }
     50% { opacity: 1; }
 }
 
-/* Mobile optimizations */
-/* @media (max-width: 768px) {
-    .suggestions {
-        max-height: 280px;
-        font-size: var(--text-sm);
-    }
-    
-    .suggestion-item {
-        padding: var(--space-sm) var(--space-md);
-    }
-    
-    .dropdown-header {
-        padding: var(--space-xs) var(--space-md);
-        font-size: var(--text-xs);
-    }
-} */
+
 
 
 @media (min-width:1025px) {
