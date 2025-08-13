@@ -334,7 +334,7 @@ def autocomplete():
         if gf_only:
             sql += " AND s.status IN ('always_tap_cask', 'always_bottle_can', 'currently')"
         
-        sql += " ORDER BY v.venue_name
+        sql += " ORDER BY v.venue_name"
         cursor.execute(sql, params)
         venues = cursor.fetchall()
         
@@ -947,6 +947,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
