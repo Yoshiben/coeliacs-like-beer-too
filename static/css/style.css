@@ -2589,6 +2589,55 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 
 
 
+
+
+.pagination-container {
+    padding: var(--space-lg);
+    border-top: 1px solid var(--border-light);
+    background: var(--bg-white);
+}
+
+.pagination-info {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    margin-bottom: var(--space-md);
+}
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+}
+
+.page-numbers {
+    display: flex;
+    gap: var(--space-xs);
+}
+
+.page-number {
+    padding: var(--space-xs) var(--space-sm);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    background: white;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.page-number.active {
+    background: var(--primary-gradient);
+    color: white;
+    border-color: var(--light-blue);
+}
+
+.page-number:hover:not(.active) {
+    background: var(--hover-subtle);
+}
+
+
+
+
 @media (min-width:1025px) {
    .nav-back-btn {
       position: absolute;
