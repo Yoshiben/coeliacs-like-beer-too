@@ -152,7 +152,7 @@ def search():
     search_type = request.args.get('search_type', 'all')
     gf_only = request.args.get('gf_only', 'false').lower() == 'true'
     page = request.args.get('page', 1, type=int)
-    venue_id = request.args.get('venue_id', type=int)  # Changed from venue_id
+    venue_id = request.args.get('venue_id', type=int)
     
     if query and (len(query) < 1 or len(query) > 100):
         return jsonify({'error': 'Invalid query length'}), 400
@@ -168,15 +168,15 @@ def search():
         if venue_id:
             sql = """
                 SELECT DISTINCT
-                    v.venue_id
-                    ,v.venue_name
-                    ,v.address 
-                    ,v.postcode
-                    ,v.city
-                    ,v.latitude
-                    ,v.longitude
-                    ,COALESCE(s.status, 'unknown') as gf_status
-                    ,GROUP_CONCAT(
+                    v.venue_id,
+                    v.venue_name,
+                    v.address,
+                    v.postcode,
+                    v.city,
+                    v.latitude,
+                    v.longitude,
+                    COALESCE(s.status, 'unknown') as gf_status,
+                    GROUP_CONCAT(
                         DISTINCT CONCAT(vb.format, ' - ', 
                         COALESCE(br.brewery_name, 'Unknown'), ' ', 
                         COALESCE(b.beer_name, 'Unknown'), ' (', 
@@ -189,8 +189,8 @@ def search():
                 LEFT JOIN beers b ON vb.beer_id = b.beer_id
                 LEFT JOIN breweries br ON b.brewery_id = br.brewery_id
                 WHERE v.venue_id = %s
-                """
-    
+            """
+            
             # Add GF filter if needed
             if gf_only:
                 sql += " AND s.status IN ('always_tap_cask', 'always_bottle_can', 'currently')"
@@ -202,6 +202,7 @@ def search():
         
         # Regular search logic
         if not query:
+            return jsonify({'error': 'Query is required for search'}), 400
         
         # Build search condition
         if search_type == 'name':
@@ -211,7 +212,7 @@ def search():
             search_condition = "v.postcode LIKE %s"
             params = [f'%{query}%']
         elif search_type == 'area':
-            search_condition = "v.city LIKE %s"  # Changed from local_authority
+            search_condition = "v.city LIKE %s"
             params = [f'%{query}%']
         else:
             search_condition = "(v.venue_name LIKE %s OR v.postcode LIKE %s OR v.city LIKE %s OR v.address LIKE %s)"
@@ -239,15 +240,15 @@ def search():
         # Main search query
         sql = f"""
             SELECT DISTINCT
-                v.venue_id 
-                ,v.venue_name 
-                ,v.address 
-                ,v.postcode
-                ,v.city
-                ,v.latitude
-                ,v.longitude
-                ,COALESCE(s.status, 'unknown') as gf_status
-                ,GROUP_CONCAT(
+                v.venue_id,
+                v.venue_name,
+                v.address,
+                v.postcode,
+                v.city,
+                v.latitude,
+                v.longitude,
+                COALESCE(s.status, 'unknown') as gf_status,
+                GROUP_CONCAT(
                     DISTINCT CONCAT(vb.format, ' - ', 
                     COALESCE(br.brewery_name, 'Unknown'), ' ', 
                     COALESCE(b.beer_name, 'Unknown'), ' (', 
@@ -274,9 +275,6 @@ def search():
         params.extend([per_page, offset])
         cursor.execute(sql, params)
         venues = cursor.fetchall()
-        
-        for venue in venues:
-            venue['venue_id'] = venue['venue_id']
         
         return jsonify({
             'venues': venues,
@@ -980,6 +978,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
