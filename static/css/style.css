@@ -1996,18 +1996,14 @@ body.page-breweries .nav-back-btn { display: flex !important; }
    ================================ */
 .toast {
    position: fixed;
-   top: 20px;
+   top: 50%;
    left: 50%;
    transform: translateX(-50%) translateY(-100px);
    background: var(--bg-white);
    border-radius: var(--radius-xl);
    box-shadow: var(--shadow-xl);
    padding: var(--space-lg) var(--space-xl);
-   z-index: var(--z-toast);
-   opacity: 0;
    transition: all var(--transition);
-   max-width: 90vw;
-   display: none;
 }
 
 .toast.show {
