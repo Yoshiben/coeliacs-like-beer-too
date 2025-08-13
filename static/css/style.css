@@ -2521,8 +2521,8 @@ body.page-breweries .nav-back-btn { display: flex !important; }
     50% { opacity: 1; }
 }
 
-#reportFormat .form-select,
-#reportFormat .form-input {
+#reportFormat.form-select,
+#reportFormat.form-input {
    padding: 0;
    margin: 0;
 }
