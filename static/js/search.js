@@ -1661,7 +1661,8 @@ export const SearchModule = (function() {
             return 'Venue';
         },
         
-        // REPLACE the selectPlace method (around line 1590)
+        // REPLACE the selectPlace method in search.js PlacesSearchModule (around line 1710)
+
         selectPlace(placeOrIndex) {
             console.log('🏠 Selecting place:', placeOrIndex);
             const place = typeof placeOrIndex === 'number' 
@@ -1675,21 +1676,31 @@ export const SearchModule = (function() {
             
             console.log('✅ Place selected:', place);
             
-            // Handle both Google Places and OSM format
-            const placeName = place.name || place.namedetails?.name || place.display_name?.split(',')[0] || 'Unknown Venue';
-            const placeAddress = place.formatted_address || this.formatAddress(place);
-            const placeType = this.getPlaceTypeFromGoogle(place) || this.getPlaceType(place);
+            // Handle Google Places format safely
+            const placeName = place.name || 'Unknown Venue';
+            const placeAddress = place.formatted_address || 'Address not available';
+            const placeType = this.getPlaceTypeFromGoogle(place);
+            
+            // Safely get coordinates
+            const lat = place.geometry?.location?.lat;
+            const lng = place.geometry?.location?.lng;
+            
+            if (!lat || !lng) {
+                console.error('❌ No coordinates available for place:', place);
+                utils.showToast('This venue has no location data available', 'error');
+                return;
+            }
             
             this.selectedPlace = {
                 name: placeName,
                 address: placeAddress,
-                lat: place.geometry?.location?.lat || place.lat,
-                lon: place.geometry?.location?.lng || place.lon,
+                lat: lat,
+                lon: lng,
                 type: placeType,
-                place_id: place.place_id || place.osm_id,
-                display_name: place.formatted_address || place.display_name,
+                place_id: place.place_id,
+                formatted_address: place.formatted_address,
                 types: place.types || [],
-                source: place.place_id ? 'google_places' : 'osm'
+                source: 'google_places'
             };
             
             // Update the preview
@@ -1701,81 +1712,54 @@ export const SearchModule = (function() {
             this.hideResults();
         },
         
-        selectPlace(placeOrIndex) {
-            console.log('🏠 Selecting place:', placeOrIndex);
-            const place = typeof placeOrIndex === 'number' 
-                ? this.searchResults[placeOrIndex]
-                : placeOrIndex;
-                
-            if (!place) {
-                console.error('❌ No place found to select');
+        useSelectedPlace() {
+            if (!this.selectedPlace) {
+                console.error('❌ No selected place');
                 return;
             }
-            
-            console.log('✅ Place selected:', place);
-            
-            this.selectedPlace = {
-                name: place.namedetails?.name || place.display_name.split(',')[0],
-                address: this.formatAddress(place),
-                lat: place.lat,
-                lon: place.lon,
-                type: this.getPlaceType(place),
-                osm_id: place.osm_id,
-                display_name: place.display_name,
-                extratags: place.extratags,
-                namedetails: place.namedetails,
-                osm_type: place.osm_type
-            };
-            
-            document.getElementById('selectedPlaceName').textContent = this.selectedPlace.name;
-            document.getElementById('selectedPlaceAddress').textContent = this.selectedPlace.address;
-            document.getElementById('selectedPlaceType').textContent = this.selectedPlace.type;
-            document.getElementById('selectedPlacePreview').style.display = 'block';
-            
-            this.hideResults();
-        },
-        
-        useSelectedPlace() {
-            if (!this.selectedPlace) return;
             
             console.log('📝 Using selected place to add new venue');
             
             const place = this.selectedPlace;
-            const name = place.namedetails?.name || place.display_name.split(',')[0];
-            const parts = place.display_name.split(',');
             
-            let address = '';
-            let postcode = place.extratags?.postcode || '';
-            
-            if (parts.length > 1) {
-                const cleanParts = parts.slice(1, 4).filter(part => {
-                    const trimmed = part.trim();
-                    return trimmed && !trimmed.match(/^[A-Z]{1,2}[0-9R][0-9A-Z]?\s?[0-9][A-Z]{2}$/i);
-                });
-                address = cleanParts.join(', ').trim();
-            }
-            
-            if (!postcode) {
-                const postcodeMatch = place.display_name.match(/[A-Z]{1,2}[0-9R][0-9A-Z]?\s?[0-9][A-Z]{2}/i);
+            // Extract postcode from Google Places formatted_address
+            let postcode = '';
+            if (place.formatted_address) {
+                const postcodeMatch = place.formatted_address.match(/[A-Z]{1,2}[0-9R][0-9A-Z]?\s?[0-9][A-Z]{2}/i);
                 if (postcodeMatch) {
                     postcode = postcodeMatch[0];
                 }
             }
             
+            // Parse address parts from formatted_address
+            let address = place.formatted_address || place.address || '';
+            if (postcode) {
+                // Remove postcode and country from address
+                address = address.replace(new RegExp(`,?\\s*${postcode.replace(/\s/g, '\\s*')}.*$`, 'i'), '').trim();
+                // Remove venue name from start if it's there
+                const nameRegex = new RegExp(`^${place.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')},?\\s*`, 'i');
+                address = address.replace(nameRegex, '').trim();
+            }
+            
             const newVenueData = {
-                name: name,
+                name: place.name,
                 address: address,
                 postcode: postcode,
                 latitude: place.lat,
                 longitude: place.lon,
-                osm_id: place.osm_id,
-                osm_type: place.osm_type
+                place_id: place.place_id,
+                source: 'google_places'
             };
             
             console.log('🏠 New venue data:', newVenueData);
             
-            document.getElementById('placesSearchModal').style.display = 'none';
-            document.body.style.overflow = '';
+            // Close modal using ModalManager
+            if (modules.modalManager) {
+                modules.modalManager.close('placesSearchModal');
+            } else {
+                document.getElementById('placesSearchModal').style.display = 'none';
+                document.body.style.overflow = '';
+            }
             
             utils.showLoadingToast('Adding new venue to database...');
             
@@ -1790,34 +1774,39 @@ export const SearchModule = (function() {
                     nickname = localStorage.getItem('userNickname') || 'anonymous';
                 }
                 
+                const payload = {
+                    venue_name: venueData.name,  // API expects venue_name
+                    address: venueData.address,
+                    postcode: venueData.postcode,
+                    latitude: venueData.latitude,
+                    longitude: venueData.longitude,
+                    submitted_by: nickname
+                };
+                
+                console.log('📡 Submitting venue data:', payload);
+                
                 const response = await fetch('/api/add-venue', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
-                        name: venueData.name,
-                        address: venueData.address,
-                        postcode: venueData.postcode,
-                        latitude: venueData.latitude,
-                        longitude: venueData.longitude,
-                        osm_id: venueData.osm_id,
-                        source: 'user_submission',
-                        submitted_by: nickname  // Include the nickname
-                    })
+                    body: JSON.stringify(payload)
                 });
                 
                 utils.hideLoadingToast();
                 
                 if (!response.ok) {
-                    throw new Error('Failed to add venue');
+                    const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+                    throw new Error(errorData.error || `Server error: ${response.status}`);
                 }
                 
                 const result = await response.json();
                 console.log('✅ Venue added:', result);
                 
+                // Store for potential use
                 window.newlyAddedVenue = {
                     venue_id: result.venue_id,
+                    venue_name: venueData.name,  // Use venue_name consistently
                     name: venueData.name,
                     address: venueData.address,
                     postcode: venueData.postcode,
@@ -1829,51 +1818,35 @@ export const SearchModule = (function() {
                 
             } catch (error) {
                 console.error('❌ Error adding venue:', error);
-                utils.showToast('❌ Failed to add venue. Please try again.');
-            }
-        },
-        
-        showVenueAddedPrompt(result) {
-            const promptModal = document.getElementById('venueAddedPromptModal');
-            if (promptModal) {
-                document.getElementById('addedVenueName').textContent = window.newlyAddedvenue.venue_name;
-                promptModal.style.display = 'flex';
-                document.body.style.overflow = 'hidden';
-            } else {
-                utils.showToast(`✅ ${window.newlyAddedvenue.venue_name} added successfully!`);
+                utils.hideLoadingToast();
+                utils.showToast(`❌ Failed to add venue: ${error.message}`);
             }
         },
         
         formatAddress(place) {
-            const parts = place.display_name.split(',');
-            const postcode = place.extratags?.postcode || '';
-            
-            let address = parts.slice(1, 3).join(',').trim();
-            if (postcode && !address.includes(postcode)) {
-                address += ', ' + postcode;
+            // Handle Google Places format
+            if (place.formatted_address) {
+                return place.formatted_address;
             }
             
-            return address;
+            // Fallback - shouldn't be needed with Google Places
+            return place.address || 'Address not available';
         },
         
         getPlaceType(place) {
-            const category = place.category?.toLowerCase() || '';
-            const type = place.type?.toLowerCase() || '';
-            
-            if (category.includes('venue') || type.includes('venue')) return 'Venue';
-            if (category.includes('bar') || type.includes('bar')) return 'Bar';
-            if (category.includes('restaurant')) return 'Restaurant';
-            if (category.includes('cafe')) return 'Café';
-            return 'Venue';
+            // This method is now redundant - use getPlaceTypeFromGoogle instead
+            return this.getPlaceTypeFromGoogle(place);
         },
         
         getPlaceIcon(type) {
             const icons = {
-                'Venue': '🍺',
                 'Bar': '🍹',
                 'Restaurant': '🍽️',
                 'Café': '☕',
-                'Venue': '📍'
+                'Club': '🎵',
+                'Takeaway': '🥡',
+                'Hotel': '🏨',
+                'Venue': '🍺'
             };
             return icons[type] || '📍';
         },
