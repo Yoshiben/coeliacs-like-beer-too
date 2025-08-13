@@ -513,11 +513,10 @@ def submit_beer_update():
                 beer_id = max_id + 1
                 
                 cursor.execute("""
-                    INSERT INTO beers (beer_id, brewery, name, style, abv, gluten_status)
-                    VALUES (%s, %s, %s, %s, %s, 'gluten_removed')
+                    INSERT INTO beers (beer_id, beer_name, style, abv, gluten_status)
+                    VALUES (%s, %s, %s, %s, 'gluten_removed')
                 """, (
                     beer_id,
-                    brewery,
                     beer_name,
                     data.get('beer_style'),
                     data.get('beer_abv')
@@ -947,6 +946,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
