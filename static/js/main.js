@@ -539,6 +539,14 @@ const App = {
                     modules.modalManager?.open('searchOverlay');
                     modules.nav?.setPageContext('search');
                 }, 100);
+
+            } else if (currentContext === 'venue-details' || currentContext === 'venue') {  // Add this case
+                // From venue details -> back to search results
+                modules.modalManager?.close('venueDetailsOverlay');
+                setTimeout(() => {
+                    modules.modalManager?.open('resultsOverlay');
+                    modules.nav?.setPageContext('results');
+                }, 100);
                 
             } else if (currentContext === 'results') {
                 // From results -> back to search overlay (always)
