@@ -1108,6 +1108,21 @@ const App = {
             }
         },
 
+        'prev-page': (el, modules) => {
+            modules.search?.goToPreviousPage();
+        },
+        
+        'next-page': (el, modules) => {
+            modules.search?.goToNextPage();
+        },
+        
+        'goto-page': (el, modules) => {
+            const pageNum = parseInt(el.dataset.page);
+            if (pageNum) {
+                modules.search?.goToPage(pageNum);
+            }
+        },
+
         'manual-venue-entry': (el, modules) => {
             modules.modalManager?.close('placesSearchModal');
             modules.modalManager?.open('manualVenueEntryModal');
