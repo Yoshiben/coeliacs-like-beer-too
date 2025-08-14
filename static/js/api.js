@@ -50,6 +50,8 @@ export const APIModule = (function() {
     const searchVenues = async (params) => {
         const { query, searchType = 'all', page = 1, venueId = null, gfOnly = false, user_lat, user_lng } = params;
         
+        let url; // <-- ADD THIS LINE
+        
         if (venueId) {
             url = `${Constants.API.SEARCH}?venue_id=${venueId}`;
         } else {
@@ -70,7 +72,7 @@ export const APIModule = (function() {
         }
         
         const data = await apiCall(url);
-        window.App.setState(STATE_KEYS.SEARCH_RESULTS, data.venues || data);
+        window.App.setState('searchResults', data.venues || data);
         return data;
     };
     
