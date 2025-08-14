@@ -1258,8 +1258,6 @@ export const SearchModule = (function() {
         const noResultsText = document.querySelector('.no-results-text');
         if (noResultsText) noResultsText.textContent = message;
     };
-    
-    // UPDATE: In search.js, replace the displayResultsInOverlay function (around line 1031)
 
     const displayResultsInOverlay = (venues, title) => {
         state.currentSearchVenues = venues;
@@ -1302,18 +1300,6 @@ export const SearchModule = (function() {
                 const resultItem = createResultItem(venue);
                 elements.list.appendChild(resultItem);
             });
-        }
-        
-        // ADD JUST THIS BLOCK - nothing else changes
-        if (elements.paginationContainer) {
-            elements.paginationContainer.innerHTML = `
-                <div class="pagination-info">Showing 1-${venues.length} results</div>
-                <div class="pagination-controls">
-                    <button class="btn btn-secondary" data-action="prev-page">← Previous</button>
-                    <button class="btn btn-secondary" data-action="next-page">Next →</button>
-                </div>
-            `;
-            elements.paginationContainer.style.display = 'block';
         }
         
         // Keep your existing title update
