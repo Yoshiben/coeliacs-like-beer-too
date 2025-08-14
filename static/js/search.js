@@ -199,16 +199,12 @@ export const SearchModule = (function() {
             // Perform search
             const searchParams = {
                 query: query,
-                searchType: searchConfig.searchType || 'all',
+                searchType: searchConfig.searchType || 'all', 
                 page: page,
-                gfOnly: window.App.getState('gfOnlyFilter') !== false
+                gfOnly: window.App.getState('gfOnlyFilter') !== false,
+                user_lat: userLocation?.lat,
+                user_lng: userLocation?.lng
             };
-            
-            // Add location if available
-            if (userLocation) {
-                searchParams.user_lat = userLocation.lat;
-                searchParams.user_lng = userLocation.lng;
-            }
             
             const results = await modules.api.searchVenues(searchParams);
             
@@ -276,6 +272,9 @@ export const SearchModule = (function() {
         
         showResultsOverlay(`Venue name: "${query}"`);
         showResultsLoading('Searching for venues...');
+        window.App.setState(STATE_KEYS.LAST_SEARCH.TYPE, 'name');
+        window.App.setState(STATE_KEYS.LAST_SEARCH.QUERY, query);
+        window.App.setState(STATE_KEYS.LAST_SEARCH.TIMESTAMP, Date.now());
         
         await performTextSearch('name', query, {
             searchType: 'name',
