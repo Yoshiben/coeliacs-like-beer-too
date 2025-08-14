@@ -809,6 +809,10 @@ const App = {
             
             modules.helpers?.showToast('✅ Beer name accepted - continue with details', 'success');
         },
+
+        'update-area-placeholder': (el, modules) => {
+            modules.modal?.updateAreaPlaceholder?.();
+        },
         
         'search-google-places': (el, modules) => {
             // This should also use the new Google Places search
