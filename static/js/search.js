@@ -197,11 +197,27 @@ export const SearchModule = (function() {
             }
             
             // Perform search
-            const results = await modules.api.searchVenues({
+            // Try to get user location for distance sorting
+            let userLocation = utils.getUserLocation();
+            if (!userLocation) {
+                userLocation = await tryGetUserLocation();
+            }
+            
+            // Perform search with location
+            const searchParams = {
                 query: query,
                 searchType: searchConfig.searchType || 'all',
-                page: page
-            });
+                page: page,
+                gfOnly: window.App.getState('gfOnlyFilter') !== false
+            };
+            
+            // Add location if available
+            if (userLocation) {
+                searchParams.user_lat = userLocation.lat;
+                searchParams.user_lng = userLocation.lng;
+            }
+            
+            const results = await modules.api.searchVenues(searchParams);
             
             // Fix: Handle the response structure properly
             let venues = [];
