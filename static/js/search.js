@@ -184,6 +184,21 @@ export const SearchModule = (function() {
             utils.hideLoadingToast();
         }
     };
+
+    const userLocation = utils.getUserLocation();
+    const params = new URLSearchParams({
+        query: query,
+        search_type: searchType,
+        page: page.toString(),
+        gf_only: gfOnly.toString()
+    });
+    
+    if (userLocation) {
+        params.append('user_lat', userLocation.lat);
+        params.append('user_lng', userLocation.lng);
+    }
+    
+    const url = `${Constants.API.SEARCH}?${params}`;
     
     // ================================
     // TEXT SEARCHES - Consolidated
