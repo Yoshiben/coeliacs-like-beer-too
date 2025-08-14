@@ -251,12 +251,16 @@ def nearby():
 
 @app.route('/search')
 def search():
-    """Main search functionality with new schema"""
+    """Main search functionality with new schema - NOW WITH DISTANCE ORDERING"""
     query = request.args.get('query', '').strip()
     search_type = request.args.get('search_type', 'all')
     gf_only = request.args.get('gf_only', 'false').lower() == 'true'
     page = request.args.get('page', 1, type=int)
     venue_id = request.args.get('venue_id', type=int)
+    
+    # Get user location for distance calculation
+    user_lat = request.args.get('user_lat', type=float)
+    user_lng = request.args.get('user_lng', type=float)
     
     if query and (len(query) < 1 or len(query) > 100):
         return jsonify({'error': 'Invalid query length'}), 400
@@ -280,7 +284,6 @@ def search():
                     v.latitude,
                     v.longitude,
                     COALESCE(s.status, 'unknown') as gf_status,
-                    (6371 * acos(cos(radians(%s)) * cos(radians(v.latitude)) * cos(radians(v.longitude) - radians(%s)) + sin(radians(%s)) * sin(radians(v.latitude)))) AS distance,
                     GROUP_CONCAT(
                         DISTINCT CONCAT(vb.format, ' - ', 
                         COALESCE(br.brewery_name, 'Unknown'), ' ', 
@@ -342,45 +345,84 @@ def search():
         total_pages = (total_results + per_page - 1) // per_page
         offset = (page - 1) * per_page
         
-        # Main search query
-        sql = f"""
-            SELECT DISTINCT
-                v.venue_id,
-                v.venue_name,
-                v.address,
-                v.postcode,
-                v.city,
-                v.latitude,
-                v.longitude,
-                COALESCE(s.status, 'unknown') as gf_status,
-                distance,
-                GROUP_CONCAT(
-                    DISTINCT CONCAT(vb.format, ' - ', 
-                    COALESCE(br.brewery_name, 'Unknown'), ' ', 
-                    COALESCE(b.beer_name, 'Unknown'), ' (', 
-                    COALESCE(b.style, 'Unknown'), ')')
-                    SEPARATOR ', '
-                ) as beer_details
-            FROM venues v
-            LEFT JOIN gf_status s ON v.venue_id = s.venue_id
-            LEFT JOIN venue_beers vb ON v.venue_id = vb.venue_id
-            LEFT JOIN beers b ON vb.beer_id = b.beer_id
-            LEFT JOIN breweries br ON b.brewery_id = br.brewery_id
-            WHERE {search_condition}
-        """
+        # Main search query - ADD DISTANCE CALCULATION IF USER LOCATION PROVIDED
+        if user_lat is not None and user_lng is not None:
+            # WITH distance calculation and ordering
+            sql = f"""
+                SELECT DISTINCT
+                    v.venue_id,
+                    v.venue_name,
+                    v.address,
+                    v.postcode,
+                    v.city,
+                    v.latitude,
+                    v.longitude,
+                    COALESCE(s.status, 'unknown') as gf_status,
+                    (6371 * acos(cos(radians(%s)) * cos(radians(v.latitude)) * cos(radians(v.longitude) - radians(%s)) + sin(radians(%s)) * sin(radians(v.latitude)))) AS distance,
+                    GROUP_CONCAT(
+                        DISTINCT CONCAT(vb.format, ' - ', 
+                        COALESCE(br.brewery_name, 'Unknown'), ' ', 
+                        COALESCE(b.beer_name, 'Unknown'), ' (', 
+                        COALESCE(b.style, 'Unknown'), ')')
+                        SEPARATOR ', '
+                    ) as beer_details
+                FROM venues v
+                LEFT JOIN gf_status s ON v.venue_id = s.venue_id
+                LEFT JOIN venue_beers vb ON v.venue_id = vb.venue_id
+                LEFT JOIN beers b ON vb.beer_id = b.beer_id
+                LEFT JOIN breweries br ON b.brewery_id = br.brewery_id
+                WHERE {search_condition}
+            """
+            # Add user location params at the start
+            distance_params = [user_lat, user_lng, user_lat] + params
+        else:
+            # WITHOUT distance calculation
+            sql = f"""
+                SELECT DISTINCT
+                    v.venue_id,
+                    v.venue_name,
+                    v.address,
+                    v.postcode,
+                    v.city,
+                    v.latitude,
+                    v.longitude,
+                    COALESCE(s.status, 'unknown') as gf_status,
+                    GROUP_CONCAT(
+                        DISTINCT CONCAT(vb.format, ' - ', 
+                        COALESCE(br.brewery_name, 'Unknown'), ' ', 
+                        COALESCE(b.beer_name, 'Unknown'), ' (', 
+                        COALESCE(b.style, 'Unknown'), ')')
+                        SEPARATOR ', '
+                    ) as beer_details
+                FROM venues v
+                LEFT JOIN gf_status s ON v.venue_id = s.venue_id
+                LEFT JOIN venue_beers vb ON v.venue_id = vb.venue_id
+                LEFT JOIN beers b ON vb.beer_id = b.beer_id
+                LEFT JOIN breweries br ON b.brewery_id = br.brewery_id
+                WHERE {search_condition}
+            """
+            distance_params = params
         
         if gf_only:
             sql += " AND s.status IN ('always_tap_cask', 'always_bottle_can', 'currently')"
         
-        sql += """
-            GROUP BY v.venue_id
-            ORDER BY distance
-            LIMIT %s OFFSET %s
-        """
+        sql += " GROUP BY v.venue_id"
         
-        params.extend([per_page, offset])
-        cursor.execute(sql, params)
+        # ORDER BY distance if we have user location, otherwise by name
+        if user_lat is not None and user_lng is not None:
+            sql += " ORDER BY distance"
+        else:
+            sql += " ORDER BY v.venue_name"
+            
+        sql += " LIMIT %s OFFSET %s"
+        
+        distance_params.extend([per_page, offset])
+        cursor.execute(sql, distance_params)
         venues = cursor.fetchall()
+        
+        # Add local_authority field for frontend compatibility
+        for venue in venues:
+            venue['local_authority'] = venue['city']
         
         return jsonify({
             'venues': venues,
