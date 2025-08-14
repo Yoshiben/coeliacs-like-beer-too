@@ -102,12 +102,10 @@ export const SearchModule = (function() {
     const searchNearbyWithDistance = async (radiusKm) => {
         console.log(`🎯 Searching within ${radiusKm}km...`);
     
-        // Get CURRENT filter preference
         const gfOnly = window.App.getState('gfOnlyFilter') !== false;
         console.log(`🍺 Current filter: ${gfOnly ? 'GF Only' : 'All Venues'}`);
     
-        try {  // <-- ADD THIS
-            // Close distance modal using modalManager
+        try {
             modules.modalManager?.close('distanceModal') || modules.modal?.close('distanceModal');
             
             showResultsOverlay(`Venues within ${radiusKm}km`);
@@ -132,7 +130,6 @@ export const SearchModule = (function() {
                 }
             }
             
-            // Show accuracy feedback
             showLocationAccuracyFeedback(userLocation.accuracy);
             
             // Save search state
@@ -143,11 +140,9 @@ export const SearchModule = (function() {
                 timestamp: Date.now()
             };
             
-            // Also store in global state for filter module
             window.App.setState(STATE_KEYS.LAST_SEARCH.TYPE, 'nearby');
             window.App.setState(STATE_KEYS.LAST_SEARCH.RADIUS, radiusKm);
                     
-            // Perform search
             showResultsLoading('🔍 Searching for GF beer options...');
             const venues = await modules.api.findNearbyVenues(
                 userLocation.lat, 
@@ -156,7 +151,6 @@ export const SearchModule = (function() {
                 gfOnly
             );
             
-            // Check if we got a valid response
             if (!venues || !Array.isArray(venues)) {
                 console.error('❌ Invalid response from API:', venues);
                 showNoResults('Error loading venues. Please try again.');
@@ -170,22 +164,41 @@ export const SearchModule = (function() {
                 return;
             }
             
+            // Update state for nearby search (no pagination needed)
             state.currentSearchVenues = venues;
+            state.currentPage = 1;
+            state.totalPages = 1;
+            state.totalResults = venues.length;
             
             const accuracyText = userLocation.accuracy > 500 ? 
                 ` (±${Math.round(userLocation.accuracy)}m accuracy)` : '';
             
-            displayResultsInOverlay(venues, `${venues.length} venues within ${radiusKm}km${accuracyText}`);
+            // Display with updated pagination UI
+            displayResultsInOverlayWithPagination(
+                venues, 
+                `${venues.length} venues within ${radiusKm}km${accuracyText}`,
+                1,  // current page
+                1,  // total pages
+                venues.length  // total results
+            );
             
             modules.tracking?.trackSearch(`nearby_${radiusKm}km`, 'location', venues.length);
             
-        } catch (error) {  // <-- ALREADY HERE
+        } catch (error) {
             console.error('❌ Error in nearby search:', error);
             showNoResults('Could not complete search. Please try again.');
-        } finally {  // <-- ADD THIS
-            // ALWAYS hide loading toast
+        } finally {
             utils.hideLoadingToast();
         }
+    };
+    
+    // Add a new function to handle display with pagination UI
+    const displayResultsInOverlayWithPagination = (venues, title, currentPage, totalPages, totalResults) => {
+        // Display the venues
+        displayResultsInOverlay(venues, title);
+        
+        // Update pagination UI
+        updatePaginationUI(currentPage, totalPages, totalResults);
     };
     
     // ================================
@@ -342,6 +355,7 @@ export const SearchModule = (function() {
         
         showResultsOverlay(`Venue name: "${query}"`);
         showResultsLoading('Searching for venues...');
+        
         window.App.setState(STATE_KEYS.LAST_SEARCH.TYPE, 'name');
         window.App.setState(STATE_KEYS.LAST_SEARCH.QUERY, query);
         window.App.setState(STATE_KEYS.LAST_SEARCH.TIMESTAMP, Date.now());
@@ -359,7 +373,6 @@ export const SearchModule = (function() {
         modules.tracking?.trackEvent('search_by_name', 'Search', query);
     };
     
-    // In search.js, replace searchByArea function (around line 273)
     const searchByArea = async () => {
         const query = document.getElementById('areaInput')?.value.trim();
         const searchType = document.getElementById('areaSearchType')?.value;
@@ -377,6 +390,11 @@ export const SearchModule = (function() {
         showResultsOverlay(`${searchTypeText}: "${query}"`);
         showResultsLoading('Finding venues in this area...');
         
+        // SET THESE BEFORE performTextSearch so the API gets location!
+        window.App.setState(STATE_KEYS.LAST_SEARCH.TYPE, 'area');
+        window.App.setState(STATE_KEYS.LAST_SEARCH.QUERY, query);
+        window.App.setState(STATE_KEYS.LAST_SEARCH.TIMESTAMP, Date.now());
+        
         // Store search state for pagination
         state.lastSearchState = {
             type: 'area',
@@ -385,13 +403,9 @@ export const SearchModule = (function() {
             timestamp: Date.now()
         };
         
-        window.App.setState(STATE_KEYS.LAST_SEARCH.TYPE, 'area');
-        window.App.setState(STATE_KEYS.LAST_SEARCH.QUERY, query);
-        
         if (searchType === 'postcode') {
             await performPostcodeSearch(query);
         } else {
-            // Use performTextSearch with page support
             await performTextSearch('area', query, {
                 searchType: 'area',
                 noResultsMessage: `No venues found in "${query}"`,
@@ -400,12 +414,13 @@ export const SearchModule = (function() {
                 titleWithoutLocation: (count) => `${count} venues in ${query}`,
                 successMessage: `venues in ${query}`,
                 errorMessage: `Error searching for "${query}"`
-            }, 1); // Start at page 1
+            }, 1);
         }
         
         modules.tracking?.trackEvent('search_by_area', 'Search', `${searchType}:${query}`);
     };
     
+    // In search.js, replace performPostcodeSearch
     const performPostcodeSearch = async (postcode) => {
         try {
             showResultsLoading('Finding postcode location...');
@@ -415,6 +430,14 @@ export const SearchModule = (function() {
             
             showResultsLoading('Finding venues near this postcode...');
             const radius = 5;
+            
+            // Get user location for distance sorting (if available)
+            let userLocation = utils.getUserLocation();
+            if (!userLocation) {
+                userLocation = await tryGetUserLocation();
+            }
+            
+            // Use the postcode location as center for search, but user location for sorting
             const venues = await modules.api.findNearbyVenues(location.lat, location.lng, radius);
             
             if (venues.length === 0) {
@@ -422,23 +445,41 @@ export const SearchModule = (function() {
                 return;
             }
             
-            // UPDATE: In searchByArea around line 260
+            // Sort by distance from USER location if available, otherwise from postcode location
+            const sortLocation = userLocation || location;
+            const sortedVenues = sortVenuesByDistance(venues, sortLocation);
+            
+            // Update state
             state.lastSearchState = {
                 type: 'area',
-                query: query,
-                searchType: searchType,
+                query: postcode,
+                searchType: 'postcode',
                 timestamp: Date.now()
             };
-
+    
             // Store globally
             window.App.setState(STATE_KEYS.LAST_SEARCH.TYPE, 'area');
-            window.App.setState(STATE_KEYS.LAST_SEARCH.QUERY, query);
+            window.App.setState(STATE_KEYS.LAST_SEARCH.QUERY, postcode);
             
-            state.currentSearchVenues = venues;
+            state.currentSearchVenues = sortedVenues;
+            state.currentPage = 1;
+            state.totalPages = 1;
+            state.totalResults = sortedVenues.length;
             
-            displayResultsInOverlay(venues, `${venues.length} venues near ${postcode} (${radius}km radius)`);
-            utils.showToast(`✅ Found ${venues.length} venues near ${postcode}`);
-            modules.tracking?.trackSearch(postcode, 'postcode', venues.length);
+            const title = userLocation ? 
+                `${sortedVenues.length} venues near ${postcode} (sorted by distance from you)` :
+                `${sortedVenues.length} venues near ${postcode} (${radius}km radius)`;
+            
+            displayResultsInOverlayWithPagination(
+                sortedVenues, 
+                title,
+                1,
+                1,
+                sortedVenues.length
+            );
+            
+            utils.showToast(`✅ Found ${sortedVenues.length} venues near ${postcode}`);
+            modules.tracking?.trackSearch(postcode, 'postcode', sortedVenues.length);
             
         } catch (error) {
             console.error('❌ Error searching by postcode:', error);
@@ -457,7 +498,6 @@ export const SearchModule = (function() {
         
         console.log(`🍺 Searching by ${searchType}:`, query);
         
-        // Close modal using modalManager
         modules.modalManager?.close('beerModal') || modules.modal?.close('beerModal');
         
         const searchTypeText = searchType === 'brewery' ? 'brewery' : 
@@ -465,73 +505,102 @@ export const SearchModule = (function() {
         showResultsOverlay(`${searchTypeText}: "${query}"`);
         showResultsLoading('Finding venues with this beer...');
         
-        await performBeerSearch(query, searchType);
+        // Set state BEFORE performBeerSearch
+        window.App.setState(STATE_KEYS.LAST_SEARCH.TYPE, 'beer');
+        window.App.setState(STATE_KEYS.LAST_SEARCH.QUERY, query);
+        window.App.setState(STATE_KEYS.LAST_SEARCH.TIMESTAMP, Date.now());
+        
+        await performBeerSearch(query, searchType, 1); // Start at page 1
         
         modules.tracking?.trackEvent('search_by_beer', 'Search', `${searchType}:${query}`);
     };
     
-    const performBeerSearch = async (query, searchType) => {
+    const performBeerSearch = async (query, searchType, page = 1) => {
         try {
-            console.log(`🍺 Performing beer search: "${query}" (${searchType})`);
+            console.log(`🍺 Performing beer search: "${query}" (${searchType}) - page ${page}`);
             
+            // Get user location for distance sorting
             let userLocation = utils.getUserLocation();
             if (!userLocation) {
                 userLocation = await tryGetUserLocation();
             }
             
-            // Get results
-            let results;
-            if (modules.api.searchVenuesByBeer) {
-                results = await modules.api.searchVenuesByBeer(query, searchType);
-            } else {
-                results = await modules.api.searchVenues({
-                    query: query,
-                    searchType: 'all',
-                    page: 1
-                });
+            // Set state BEFORE API call so backend can use location
+            window.App.setState(STATE_KEYS.LAST_SEARCH.TYPE, 'beer');
+            window.App.setState(STATE_KEYS.LAST_SEARCH.QUERY, query);
+            window.App.setState(STATE_KEYS.LAST_SEARCH.TIMESTAMP, Date.now());
+            
+            // Get results with pagination
+            const searchParams = {
+                query: query,
+                searchType: 'all', // Beer search uses 'all' then filters
+                page: page,
+                gfOnly: window.App.getState('gfOnlyFilter') !== false,
+                user_lat: userLocation?.lat,
+                user_lng: userLocation?.lng
+            };
+            
+            const results = await modules.api.searchVenues(searchParams);
+            
+            // Handle response structure
+            let allVenues = [];
+            let pagination = null;
+            
+            if (results.venues) {
+                allVenues = results.venues;
+                pagination = results.pagination;
+            } else if (results.pubs) {
+                allVenues = results.pubs;
+                pagination = results.pagination;
+            } else if (Array.isArray(results)) {
+                allVenues = results;
             }
             
-            let allVenues = Array.isArray(results) ? results : results.venues || [];
             console.log(`📊 Got ${allVenues.length} venues from API`);
             
             // Filter based on beer search criteria
             const filteredVenues = filterVenuesByBeerCriteria(allVenues, query, searchType);
             
-            if (filteredVenues.length === 0) {
+            if (filteredVenues.length === 0 && page === 1) {
                 showNoResults(`No venues found serving "${query}". Try searching for a brewery name or beer style.`);
                 return;
             }
             
             // Sort by distance if location available
-            if (userLocation) {
-                filteredVenues.sort((a, b) => {
-                    const distA = calculateDistance(userLocation, a);
-                    const distB = calculateDistance(userLocation, b);
-                    return distA - distB;
-                });
-            }
+            const sortedVenues = userLocation ? 
+                sortVenuesByDistance(filteredVenues, userLocation) : 
+                filteredVenues;
             
-            // Save state and display
+            // Update state with pagination
             state.lastSearchState = {
                 type: 'beer',
                 query: query,
                 searchType: searchType,
+                searchConfig: {
+                    searchType: 'beer',
+                    noResultsMessage: `No venues found serving "${query}"`,
+                    titleWithLocation: (count) => `${count} venues serving "${query}" (nearest first)`,
+                    titleWithoutLocation: (count) => `${count} venues serving "${query}"`,
+                    successMessage: `venues serving "${query}"`,
+                    errorMessage: `Error searching for "${query}"`
+                },
                 timestamp: Date.now()
             };
             
-            // Store globally
-            window.App.setState(STATE_KEYS.LAST_SEARCH.TYPE, 'beer');
-            window.App.setState(STATE_KEYS.LAST_SEARCH.QUERY, query);
-            
-            state.currentSearchVenues = filteredVenues;
+            state.currentSearchVenues = sortedVenues;
+            state.currentPage = page;
+            state.totalPages = pagination?.pages || Math.ceil(sortedVenues.length / 20);
+            state.totalResults = pagination?.total || sortedVenues.length;
             
             const title = userLocation ? 
-                `${filteredVenues.length} venues serving "${query}" (nearest first)` :
-                `${filteredVenues.length} venues serving "${query}"`;
+                `${state.totalResults} venues serving "${query}" (nearest first)` :
+                `${state.totalResults} venues serving "${query}"`;
                 
-            displayResultsInOverlay(filteredVenues, title);
-            utils.showToast(`✅ Found ${filteredVenues.length} venues serving "${query}"`);
-            modules.tracking?.trackSearch(query, `beer_${searchType}`, filteredVenues.length);
+            displayResultsInOverlay(sortedVenues, title);
+            updatePaginationUI(state.currentPage, state.totalPages, state.totalResults);
+            
+            utils.showToast(`✅ Found ${state.totalResults} venues serving "${query}"`);
+            modules.tracking?.trackSearch(query, `beer_${searchType}`, state.totalResults);
             
         } catch (error) {
             console.error('❌ Error in beer search:', error);
@@ -1340,8 +1409,6 @@ export const SearchModule = (function() {
         const noResultsText = document.querySelector('.no-results-text');
         if (noResultsText) noResultsText.textContent = message;
     };
-    
-    // UPDATE: In search.js, replace the displayResultsInOverlay function (around line 1031)
 
     const displayResultsInOverlay = (venues, title) => {
         state.currentSearchVenues = venues;
@@ -1384,18 +1451,6 @@ export const SearchModule = (function() {
                 const resultItem = createResultItem(venue);
                 elements.list.appendChild(resultItem);
             });
-        }
-        
-        // ADD JUST THIS BLOCK - nothing else changes
-        if (elements.paginationContainer) {
-            elements.paginationContainer.innerHTML = `
-                <div class="pagination-info">Showing 1-${venues.length} results</div>
-                <div class="pagination-controls">
-                    <button class="btn btn-secondary" data-action="prev-page">← Previous</button>
-                    <button class="btn btn-secondary" data-action="next-page">Next →</button>
-                </div>
-            `;
-            elements.paginationContainer.style.display = 'block';
         }
         
         // Keep your existing title update
