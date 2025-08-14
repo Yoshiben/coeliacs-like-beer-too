@@ -72,7 +72,6 @@ def index():
 
 # ====================================================================
 # RECENT FINDS API ENDPOINT
-# Add this to your app.py file in the API ROUTES section
 # ====================================================================
 
 @app.route('/api/recent-finds')
@@ -251,14 +250,14 @@ def nearby():
 
 @app.route('/search')
 def search():
-    """Main search functionality with new schema - NOW WITH DISTANCE ORDERING"""
+    """Main search functionality with distance ordering"""
     query = request.args.get('query', '').strip()
     search_type = request.args.get('search_type', 'all')
     gf_only = request.args.get('gf_only', 'false').lower() == 'true'
     page = request.args.get('page', 1, type=int)
     venue_id = request.args.get('venue_id', type=int)
     
-    # Get user location for distance calculation
+    # Get user location for distance ordering
     user_lat = request.args.get('user_lat', type=float)
     user_lng = request.args.get('user_lng', type=float)
     
@@ -315,16 +314,16 @@ def search():
         # Build search condition
         if search_type == 'name':
             search_condition = "v.venue_name LIKE %s"
-            params = [f'%{query}%']
+            search_params = [f'%{query}%']
         elif search_type == 'postcode':
             search_condition = "v.postcode LIKE %s"
-            params = [f'%{query}%']
+            search_params = [f'%{query}%']
         elif search_type == 'area':
             search_condition = "v.city LIKE %s"
-            params = [f'%{query}%']
+            search_params = [f'%{query}%']
         else:
             search_condition = "(v.venue_name LIKE %s OR v.postcode LIKE %s OR v.city LIKE %s OR v.address LIKE %s)"
-            params = [f'%{query}%', f'%{query}%', f'%{query}%', f'%{query}%']
+            search_params = [f'%{query}%', f'%{query}%', f'%{query}%', f'%{query}%']
         
         # Count total results
         count_sql = f"""
@@ -337,7 +336,7 @@ def search():
         if gf_only:
             count_sql += " AND s.status IN ('always_tap_cask', 'always_bottle_can', 'currently')"
         
-        cursor.execute(count_sql, params)
+        cursor.execute(count_sql, search_params)
         total_results = cursor.fetchone()['total']
         
         # Calculate pagination
@@ -345,9 +344,9 @@ def search():
         total_pages = (total_results + per_page - 1) // per_page
         offset = (page - 1) * per_page
         
-        # Main search query - ADD DISTANCE CALCULATION IF USER LOCATION PROVIDED
+        # Build main search query with optional distance calculation
         if user_lat is not None and user_lng is not None:
-            # WITH distance calculation and ordering
+            # WITH distance calculation
             sql = f"""
                 SELECT DISTINCT
                     v.venue_id,
@@ -373,8 +372,8 @@ def search():
                 LEFT JOIN breweries br ON b.brewery_id = br.brewery_id
                 WHERE {search_condition}
             """
-            # Add user location params at the start
-            distance_params = [user_lat, user_lng, user_lat] + params
+            params = [user_lat, user_lng, user_lat] + search_params
+            order_by = "ORDER BY distance"
         else:
             # WITHOUT distance calculation
             sql = f"""
@@ -401,39 +400,27 @@ def search():
                 LEFT JOIN breweries br ON b.brewery_id = br.brewery_id
                 WHERE {search_condition}
             """
-            distance_params = params
+            params = search_params
+            order_by = "ORDER BY v.venue_name"
         
         if gf_only:
             sql += " AND s.status IN ('always_tap_cask', 'always_bottle_can', 'currently')"
         
-        sql += " GROUP BY v.venue_id"
+        sql += f"""
+            GROUP BY v.venue_id
+            {order_by}
+            LIMIT %s OFFSET %s
+        """
         
-        # ORDER BY distance if we have user location, otherwise by name
-        if user_lat is not None and user_lng is not None:
-            sql += " ORDER BY distance"
-        else:
-            sql += " ORDER BY v.venue_name"
-            
-        sql += " LIMIT %s OFFSET %s"
-        
-        distance_params.extend([per_page, offset])
-        cursor.execute(sql, distance_params)
+        params.extend([per_page, offset])
+        cursor.execute(sql, params)
         venues = cursor.fetchall()
         
         # Add local_authority field for frontend compatibility
         for venue in venues:
             venue['local_authority'] = venue['city']
         
-        return jsonify({
-            'venues': venues,
-            'pagination': {
-                'page': page,
-                'pages': total_pages,
-                'total': total_results,
-                'has_prev': page > 1,
-                'has_next': page < total_pages
-            }
-        })
+        return jsonify(venues)
         
     except mysql.connector.Error as e:
         logger.error(f"Database error in search: {str(e)}")
@@ -864,8 +851,6 @@ def get_all_venues_for_map():
             cursor.close()
             conn.close()
 
-# REPLACE the add-venue route in app.py (around line 560-600)
-
 @app.route('/api/add-venue', methods=['POST'])
 def add_venue():
     """Add a new venue to the database"""
@@ -1002,8 +987,6 @@ def add_venue():
         if 'conn' in locals() and conn.is_connected():
             cursor.close()
             conn.close()
-
-# REPLACE the search-places route in app.py (around line 502)
 
 @app.route('/api/search-places', methods=['POST'])
 def search_places():
@@ -1206,28 +1189,3 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
