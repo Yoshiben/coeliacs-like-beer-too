@@ -1448,16 +1448,54 @@ export const SearchModule = (function() {
         
         const searchState = state.lastSearchState;
         
-        if (searchState.type === 'name' || searchState.type === 'area' || searchState.type === 'beer') {
+        // Handle nearby search pagination
+        if (searchState.type === 'nearby') {
+            try {
+                const gfOnly = window.App.getState('gfOnlyFilter') !== false;
+                const searchParams = {
+                    lat: searchState.userLocation.lat,
+                    lng: searchState.userLocation.lng,
+                    radius: searchState.radius,
+                    gf_only: gfOnly,
+                    page: pageNum
+                };
+    
+                const response = await fetch(`${Constants.API.NEARBY}?${new URLSearchParams(searchParams)}`);
+                if (!response.ok) throw new Error('Search failed');
+    
+                const data = await response.json();
+    
+                // Update state with new page data
+                state.currentSearchVenues = data.venues;
+                state.currentPage = data.pagination.page;
+                state.totalPages = data.pagination.pages;
+                state.totalResults = data.pagination.total;
+    
+                const accuracyText = searchState.userLocation.accuracy > 500 ? 
+                    ` (±${Math.round(searchState.userLocation.accuracy)}m accuracy)` : '';
+    
+                displayResultsInOverlay(
+                    data.venues, 
+                    `${data.pagination.total} venues within ${searchState.radius}km${accuracyText}`
+                );
+                updatePaginationUI(
+                    data.pagination.page, 
+                    data.pagination.pages, 
+                    data.pagination.total
+                );
+            } catch (error) {
+                console.error('❌ Error loading page:', error);
+                utils.showToast('Error loading page. Please try again.', 'error');
+            }
+        } else if (searchState.type === 'name' || searchState.type === 'area' || searchState.type === 'beer') {
             await performTextSearch(
                 searchState.type, 
                 searchState.query, 
                 searchState.searchConfig, 
                 pageNum
             );
-        } else if (searchState.type === 'nearby') {
-            // Nearby search doesn't paginate - it returns all results
-            utils.showToast('Nearby search shows all results within range', 'info');
+        } else {
+            utils.showToast('Unable to load page for this search type', 'error');
         }
     };
     
