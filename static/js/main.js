@@ -650,9 +650,15 @@ const App = {
         'show-full-map': (el, modules) => {
             // Check current context
             const currentContext = modules.nav?.getCurrentContext();
-            console.log('🗺️ Opening map from context:', currentContext);
+            console.log('🗺️ Map button pressed from context:', currentContext);
             
-            // If we're coming from search, close it first
+            // If we're on results page, toggle the results map instead
+            if (currentContext === 'results') {
+                modules.map?.toggleSearchResultsFullMap?.();
+                return;
+            }
+            
+            // Otherwise, show the full UK map as normal
             if (currentContext === 'search') {
                 modules.modalManager?.close('searchOverlay');
                 // Small delay to let the close finish
