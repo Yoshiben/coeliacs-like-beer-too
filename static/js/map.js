@@ -1114,7 +1114,7 @@ export const MapModule = (() => {
             // Initialize map with CURRENT SEARCH RESULTS, not all venues
             setTimeout(() => {
                 const searchModule = modules.search;
-                const venues = searchModule?.getCurrentResults() || window.App?.getState('searchResults') || [];
+                const venues = state.currentSearchVenues || [];  // THIS IS THE KEY - use the stored search results
                 console.log(`🗺️ Initializing results map with ${venues.length} venues from current search`);
                 initResultsMap(venues);
             }, 50);
@@ -1125,7 +1125,7 @@ export const MapModule = (() => {
                 trackingModule.trackEvent('results_map_toggle', 'Map Interaction', 'show');
             }
         } else {
-            // Show list
+            // Show list (rest of the function stays the same)
             console.log('📋 Showing results list');
             cleanupResultsMap();
             
