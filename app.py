@@ -356,18 +356,12 @@ def search():
             search_condition = "v.venue_name LIKE %s"
             search_params = [f'%{query}%']
         elif search_type == 'postcode':
-            # Handle both full and partial postcodes
-             clean_postcode = query.upper().replace(' ', '')
+            clean_postcode = query.upper().strip()
     
-             # Check if it's a partial postcode (e.g., S2, LS2, HX6)
-             if len(clean_postcode) <= 4:
-                 # Search for postcodes that START with this prefix
-                 search_condition = "v.postcode LIKE %s"
-                 search_params = [f'{clean_postcode}%']
-             else:
-                 # Full postcode - exact match (but ignore spaces)
-                 search_condition = "REPLACE(v.postcode, ' ', '') LIKE %s"
-                 search_params = [f'%{clean_postcode}%']
+             # Always do a prefix search - this handles ALL cases
+             # "S2" finds "S2 xxx", "S2 5" finds "S2 5xx", "S2 5HN" finds exact
+             search_condition = "v.postcode LIKE %s"
+             search_params = [f'{clean_postcode}%']
         elif search_type == 'area':
             search_condition = "v.city LIKE %s"
             search_params = [f'%{query}%']
@@ -1342,6 +1336,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
