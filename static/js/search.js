@@ -195,18 +195,13 @@ export const SearchModule = (function() {
             if (!userLocation) {
                 userLocation = await tryGetUserLocation();
             }
-
-            console.log('🔍 Searching with params:', { query, searchType: searchConfig.searchType, page });
             
             // Perform search
             const results = await modules.api.searchVenues({
                 query: query,
                 searchType: searchConfig.searchType || 'all',
-                page: page,
-                gfOnly: window.App.getState('gfOnlyFilter') !== false
+                page: page
             });
-
-            console.log('📊 API returned:', results);
             
             // Fix: Handle the response structure properly
             let venues = [];
