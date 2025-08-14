@@ -126,67 +126,40 @@
                     </div>
                 </div>
                 
-                <!-- What's New Section -->
-                <div class="section-header">
-                    <h2>🆕 Latest Finds</h2>
-                    <a href="#" class="see-all-link">See all →</a>
-                </div>
+                <!-- ====================================================================
+                     RECENT FINDS - HTML STRUCTURE
+                     Insert this into the community feed section of index.html
+                     Replace the existing "Latest Finds" section
+                     ==================================================================== -->
                 
-                <div class="finds-grid">
-                    <!-- Recent Find 1 -->
-                    <div class="card find-card">
-                        <div class="find-header">
-                            <span class="find-user">Sarah M.</span>
-                            <span class="find-time">2 hours ago</span>
-                        </div>
-                        <div class="find-content">
-                            <p>Just found <strong>Vagabond Pale Ale</strong> on tap at <strong>The Old Bell</strong>!</p>
-                            <div class="find-location">📍 Leeds</div>
-                        </div>
-                        <div class="find-actions">
-                            <button class="btn btn-small-outline" data-action="view-venue" data-venue-id="23456">
-                                View Venue
-                            </button>
-                            <button class="btn btn-small-text">
-                                🙌 Thanks! (12)
-                            </button>
-                        </div>
+                <!-- Recent Finds Section -->
+                <div class="recent-finds-section" id="recentFinds">
+                  <h2 class="recent-finds-title">
+                    <span class="recent-finds-icon">🆕</span>
+                    Latest Community Discoveries
+                  </h2>
+                  
+                  <div class="recent-finds-container">
+                    <!-- Loading State -->
+                    <div class="recent-finds-loading" id="recentFindsLoading">
+                      Loading latest discoveries...
                     </div>
                     
-                    <!-- Recent Find 2 -->
-                    <div class="card find-card">
-                        <div class="find-header">
-                            <span class="find-user">Mike R.</span>
-                            <span class="find-time">5 hours ago</span>
-                        </div>
-                        <div class="find-content">
-                            <p>New GF section at <strong>Tesco Express</strong> - spotted Heart & Soul lager!</p>
-                            <div class="find-location">📍 Manchester</div>
-                        </div>
-                        <div class="find-photo">
-                            <img src="/static/images/tesco-gf-beer.jpg" alt="GF beer at Tesco">
-                        </div>
-                        <div class="find-actions">
-                            <button class="btn btn-small-text">
-                                🙌 Thanks! (24)
-                            </button>
-                        </div>
+                    <!-- Error State -->
+                    <div class="recent-finds-error" id="recentFindsError" style="display: none;">
+                      Unable to load recent finds. Please try again later.
                     </div>
                     
-                    <!-- Recent Find 3 -->
-                    <div class="card find-card highlight">
-                        <div class="find-header">
-                            <span class="find-brewery">🎉 New Brewery Alert!</span>
-                        </div>
-                        <div class="find-content">
-                            <p><strong>Jump Ship Brewing</strong> just launched 3 new GF beers! Now available in selected Wetherspoons.</p>
-                        </div>
-                        <div class="find-actions">
-                            <button class="btn btn-small-primary">
-                                Find Stockists
-                            </button>
-                        </div>
+                    <!-- Empty State -->
+                    <div class="recent-finds-empty" id="recentFindsEmpty" style="display: none;">
+                      No recent finds yet. Be the first to share a discovery!
                     </div>
+                    
+                    <!-- Dynamic Content List -->
+                    <ul class="recent-finds-list" id="recentFindsList" style="display: none;">
+                      <!-- Dynamic content will be inserted here by JavaScript -->
+                    </ul>
+                  </div>
                 </div>
                 
                 <!-- Trending This Week -->
@@ -1294,6 +1267,7 @@
         </script>
     </body>
 </html>
+
 
 
 
