@@ -357,11 +357,44 @@ def search():
             search_params = [f'%{query}%']
         elif search_type == 'postcode':
             clean_postcode = query.upper().strip()
-    
-            # Always do a prefix search - this handles ALL cases
-            # "S2" finds "S2 xxx", "S2 5" finds "S2 5xx", "S2 5HN" finds exact
-            search_condition = "v.postcode LIKE %s"
-            search_params = [f'{clean_postcode}%']
+            
+            # For ANY postcode (partial or full), we should:
+            # 1. Try to geocode it to get coordinates
+            # 2. Search nearby those coordinates
+            
+            # Only do prefix search for very short codes (S2, LS2)
+            if len(clean_postcode) <= 4 and ' ' not in clean_postcode:
+                # This is probably an area code - do prefix search
+                search_condition = "v.postcode LIKE %s"
+                search_params = [f'{clean_postcode}%']
+            else:
+                # This looks like a real postcode - geocode it!
+                # Import at top: from app import geocodePostcode or requests
+                try:
+                    # Use Nominatim or postcodes.io to get coordinates
+                    import requests
+                    response = requests.get(f'https://api.postcodes.io/postcodes/{clean_postcode}')
+                    if response.ok:
+                        data = response.json()
+                        lat = data['result']['latitude']
+                        lon = data['result']['longitude']
+                        
+                        # Now search within 5km of these coordinates
+                        # This is the ACTUAL nearby search they want!
+                        search_condition = """
+                            (6371 * acos(cos(radians(%s)) * cos(radians(v.latitude)) * 
+                            cos(radians(v.longitude) - radians(%s)) + sin(radians(%s)) * 
+                            sin(radians(v.latitude)))) <= 5
+                        """
+                        search_params = [lat, lon, lat]
+                    else:
+                        # Fallback to prefix if geocoding fails
+                        search_condition = "v.postcode LIKE %s"
+                        search_params = [f'{clean_postcode}%']
+                except:
+                    # Fallback
+                    search_condition = "v.postcode LIKE %s"
+                    search_params = [f'{clean_postcode}%']
         elif search_type == 'area':
             search_condition = "v.city LIKE %s"
             search_params = [f'%{query}%']
@@ -1336,6 +1369,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
