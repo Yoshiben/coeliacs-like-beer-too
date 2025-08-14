@@ -228,7 +228,7 @@ def nearby():
             GROUP BY v.venue_id
             HAVING distance <= %s
             ORDER BY distance
-            LIMIT 50
+            LIMIT 20
         """
         params.append(radius)
         
@@ -1162,6 +1162,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
