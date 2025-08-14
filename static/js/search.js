@@ -99,6 +99,7 @@ export const SearchModule = (function() {
         }
     };
     
+    // In search.js, REPLACE the entire searchNearbyWithDistance function with:
     const searchNearbyWithDistance = async (radiusKm) => {
         console.log(`🎯 Searching within ${radiusKm}km...`);
     
@@ -142,47 +143,24 @@ export const SearchModule = (function() {
             
             window.App.setState(STATE_KEYS.LAST_SEARCH.TYPE, 'nearby');
             window.App.setState(STATE_KEYS.LAST_SEARCH.RADIUS, radiusKm);
-                    
+            
             showResultsLoading('🔍 Searching for GF beer options...');
-            const venues = await modules.api.findNearbyVenues(
-                userLocation.lat, 
-                userLocation.lng, 
-                radiusKm, 
-                gfOnly
-            );
             
-            if (!venues || !Array.isArray(venues)) {
-                console.error('❌ Invalid response from API:', venues);
-                showNoResults('Error loading venues. Please try again.');
-                return;
-            }
+            // Use a postcode-like search with the location coords
+            // We'll search by area but with coordinates for sorting
+            await performTextSearch('nearby', `${radiusKm}km`, {
+                searchType: 'nearby',
+                radius: radiusKm,
+                lat: userLocation.lat,
+                lng: userLocation.lng,
+                noResultsMessage: `No venues found within ${radiusKm}km of your location`,
+                titleWithLocation: (count) => `${count} venues within ${radiusKm}km`,
+                titleWithoutLocation: (count) => `${count} venues within ${radiusKm}km`,
+                successMessage: `venues within ${radiusKm}km`,
+                errorMessage: 'Could not complete nearby search. Please try again.'
+            }, 1);
             
-            console.log(`✅ Found ${venues.length} venues`);
-            
-            if (venues.length === 0) {
-                showNoResults(`No venues found within ${radiusKm}km of your location`);
-                return;
-            }
-            
-            // Update state for nearby search (no pagination needed)
-            state.currentSearchVenues = venues;
-            state.currentPage = 1;
-            state.totalPages = 1;
-            state.totalResults = venues.length;
-            
-            const accuracyText = userLocation.accuracy > 500 ? 
-                ` (±${Math.round(userLocation.accuracy)}m accuracy)` : '';
-            
-            // Display with updated pagination UI
-            displayResultsInOverlayWithPagination(
-                venues, 
-                `${venues.length} venues within ${radiusKm}km${accuracyText}`,
-                1,  // current page
-                1,  // total pages
-                venues.length  // total results
-            );
-            
-            modules.tracking?.trackSearch(`nearby_${radiusKm}km`, 'location', venues.length);
+            modules.tracking?.trackSearch(`nearby_${radiusKm}km`, 'location', state.totalResults || 0);
             
         } catch (error) {
             console.error('❌ Error in nearby search:', error);
