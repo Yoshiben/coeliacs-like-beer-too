@@ -1315,19 +1315,42 @@ export const SearchModule = (function() {
         console.log(`✅ Displayed ${venues.length} results`);
     };
 
-    const goToPage = (pageNum) => {
+    const goToPage = async (pageNum) => {
         console.log(`📄 Going to page ${pageNum}`);
-        // TODO: Implement actual pagination
+        
+        // Re-run the last search with the new page
+        if (state.lastSearchState) {
+            const searchState = state.lastSearchState;
+            
+            if (searchState.type === 'name') {
+                // Get the original query and search again with page number
+                const query = document.getElementById('nameInput')?.value.trim();
+                if (query) {
+                    showResultsLoading('Loading page ' + pageNum + '...');
+                    await performTextSearch('name', query, {
+                        searchType: 'name',
+                        noResultsMessage: `No venues found matching "${query}"`,
+                        titleWithLocation: (count) => `${count} venues matching "${query}" (nearest first)`,
+                        titleWithoutLocation: (count) => `${count} venues matching "${query}"`,
+                        successMessage: `venues matching "${query}"`,
+                        errorMessage: `Error searching for "${query}". Please try again.`
+                    }, pageNum);
+                }
+            }
+            // Add other search types later if needed
+        }
     };
     
-    const goToPreviousPage = () => {
+    const goToPreviousPage = async () => {
         console.log('📄 Previous page');
-        // TODO: Implement actual pagination  
+        // For now, just try page 1 if we don't know current page
+        await goToPage(1);
     };
     
-    const goToNextPage = () => {
+    const goToNextPage = async () => {
         console.log('📄 Next page');
-        // TODO: Implement actual pagination
+        // For now, just try page 2 if we don't know current page  
+        await goToPage(2);
     };
 
     const createResultItem = (venue) => {
