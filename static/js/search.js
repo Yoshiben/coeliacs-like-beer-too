@@ -98,8 +98,6 @@ export const SearchModule = (function() {
             }
         }
     };
-    
-    // In search.js, REPLACE the entire searchNearbyWithDistance function with:
     const searchNearbyWithDistance = async (radiusKm) => {
         console.log(`🎯 Searching within ${radiusKm}km...`);
     
@@ -143,24 +141,50 @@ export const SearchModule = (function() {
             
             window.App.setState(STATE_KEYS.LAST_SEARCH.TYPE, 'nearby');
             window.App.setState(STATE_KEYS.LAST_SEARCH.RADIUS, radiusKm);
-            
+                    
             showResultsLoading('🔍 Searching for GF beer options...');
             
-            // Use a postcode-like search with the location coords
-            // We'll search by area but with coordinates for sorting
-            await performTextSearch('nearby', `${radiusKm}km`, {
-                searchType: 'nearby',
-                radius: radiusKm,
+            // Use the paginated nearby endpoint
+            const searchParams = {
                 lat: userLocation.lat,
                 lng: userLocation.lng,
-                noResultsMessage: `No venues found within ${radiusKm}km of your location`,
-                titleWithLocation: (count) => `${count} venues within ${radiusKm}km`,
-                titleWithoutLocation: (count) => `${count} venues within ${radiusKm}km`,
-                successMessage: `venues within ${radiusKm}km`,
-                errorMessage: 'Could not complete nearby search. Please try again.'
-            }, 1);
-            
-            modules.tracking?.trackSearch(`nearby_${radiusKm}km`, 'location', state.totalResults || 0);
+                radius: radiusKm,
+                gf_only: gfOnly,
+                page: 1
+            };
+    
+            const response = await fetch(`${Constants.API.NEARBY}?${new URLSearchParams(searchParams)}`);
+            if (!response.ok) throw new Error('Search failed');
+    
+            const data = await response.json();
+    
+            if (!data.venues || data.venues.length === 0) {
+                showNoResults(`No venues found within ${radiusKm}km of your location`);
+                return;
+            }
+    
+            // Update state with pagination info
+            state.currentSearchVenues = data.venues;
+            state.currentPage = data.pagination.page;
+            state.totalPages = data.pagination.pages;
+            state.totalResults = data.pagination.total;
+    
+            const accuracyText = userLocation.accuracy > 500 ? 
+                ` (±${Math.round(userLocation.accuracy)}m accuracy)` : '';
+    
+            // Display results with proper pagination
+            displayResultsInOverlay(
+                data.venues, 
+                `${data.pagination.total} venues within ${radiusKm}km${accuracyText}`
+            );
+            updatePaginationUI(
+                data.pagination.page, 
+                data.pagination.pages, 
+                data.pagination.total
+            );
+    
+            utils.showToast(`✅ Found ${data.pagination.total} venues within ${radiusKm}km`);
+            modules.tracking?.trackSearch(`nearby_${radiusKm}km`, 'location', data.pagination.total);
             
         } catch (error) {
             console.error('❌ Error in nearby search:', error);
