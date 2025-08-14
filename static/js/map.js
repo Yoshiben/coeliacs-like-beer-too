@@ -1049,6 +1049,7 @@ export const MapModule = (() => {
         
         if (elements.map.style.display === 'none' || !elements.map.style.display) {
             // Show map
+            console.log('🗺️ Showing results map');
             cleanupResultsMap();
             
             elements.list.style.display = 'none';
@@ -1064,10 +1065,11 @@ export const MapModule = (() => {
             // Force layout
             elements.map.offsetHeight;
             
-            // Initialize map
+            // Initialize map with CURRENT SEARCH RESULTS, not all venues
             setTimeout(() => {
                 const searchModule = modules.search;
-                const venues = searchModule?.getCurrentResults() || [];
+                const venues = searchModule?.getCurrentResults() || window.App?.getState('searchResults') || [];
+                console.log(`🗺️ Initializing results map with ${venues.length} venues from current search`);
                 initResultsMap(venues);
             }, 50);
             
@@ -1078,6 +1080,7 @@ export const MapModule = (() => {
             }
         } else {
             // Show list
+            console.log('📋 Showing results list');
             cleanupResultsMap();
             
             elements.list.style.display = 'block';
