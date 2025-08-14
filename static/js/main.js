@@ -794,6 +794,21 @@ const App = {
                 modules.helpers?.showToast('💡 Type the new beer name and continue', 'info');
             }
         },
+
+        'use-beer-name': (el, modules) => {
+            // This action is triggered when user clicks "Add [beer name] as new beer"
+            // Just hide the dropdown and let them continue with the name they typed
+            const dropdown = document.getElementById('beerNameDropdown');
+            if (dropdown) dropdown.style.display = 'none';
+            
+            // Focus next field (beer style)
+            const beerStyleInput = document.getElementById('reportBeerStyle');
+            if (beerStyleInput) {
+                beerStyleInput.focus();
+            }
+            
+            modules.helpers?.showToast('✅ Beer name accepted - continue with details', 'success');
+        },
         
         'search-google-places': (el, modules) => {
             // This should also use the new Google Places search
