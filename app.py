@@ -280,6 +280,7 @@ def search():
                     v.latitude,
                     v.longitude,
                     COALESCE(s.status, 'unknown') as gf_status,
+                    (6371 * acos(cos(radians(%s)) * cos(radians(v.latitude)) * cos(radians(v.longitude) - radians(%s)) + sin(radians(%s)) * sin(radians(v.latitude)))) AS distance,
                     GROUP_CONCAT(
                         DISTINCT CONCAT(vb.format, ' - ', 
                         COALESCE(br.brewery_name, 'Unknown'), ' ', 
@@ -352,6 +353,7 @@ def search():
                 v.latitude,
                 v.longitude,
                 COALESCE(s.status, 'unknown') as gf_status,
+                distance,
                 GROUP_CONCAT(
                     DISTINCT CONCAT(vb.format, ' - ', 
                     COALESCE(br.brewery_name, 'Unknown'), ' ', 
@@ -372,7 +374,7 @@ def search():
         
         sql += """
             GROUP BY v.venue_id
-            ORDER BY v.venue_name
+            ORDER BY distance
             LIMIT %s OFFSET %s
         """
         
@@ -1162,6 +1164,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
