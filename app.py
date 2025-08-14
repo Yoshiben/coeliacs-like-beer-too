@@ -358,10 +358,10 @@ def search():
         elif search_type == 'postcode':
             clean_postcode = query.upper().strip()
     
-             # Always do a prefix search - this handles ALL cases
-             # "S2" finds "S2 xxx", "S2 5" finds "S2 5xx", "S2 5HN" finds exact
-             search_condition = "v.postcode LIKE %s"
-             search_params = [f'{clean_postcode}%']
+            # Always do a prefix search - this handles ALL cases
+            # "S2" finds "S2 xxx", "S2 5" finds "S2 5xx", "S2 5HN" finds exact
+            search_condition = "v.postcode LIKE %s"
+            search_params = [f'{clean_postcode}%']
         elif search_type == 'area':
             search_condition = "v.city LIKE %s"
             search_params = [f'%{query}%']
@@ -1336,6 +1336,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
