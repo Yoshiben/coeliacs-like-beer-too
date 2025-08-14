@@ -200,7 +200,7 @@ export const SearchModule = (function() {
             const results = await modules.api.searchVenues({
                 query: query,
                 searchType: searchConfig.searchType || 'all',
-                page: 1
+                page: page
             });
             
             // Fix: Handle the response structure properly
