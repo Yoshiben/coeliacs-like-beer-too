@@ -547,7 +547,7 @@ def submit_beer_update():
                     abv_value = None
             
             cursor.execute("""
-                INSERT INTO beers (brewery_id, beer_id, beer_name, style, abv, gluten_status, added_by)
+                INSERT INTO beers (brewery_id, beer_id, beer_name, style, abv, gluten_status, created_by)
                 VALUES (%s, %s, %s, %s, %s, 'gluten_removed', %s)
             """, (brewery_id, beer_id, beer_name, beer_style, abv_value, submitted_by))
             
@@ -1059,6 +1059,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
