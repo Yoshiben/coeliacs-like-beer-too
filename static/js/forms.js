@@ -344,6 +344,8 @@ export const FormModule = (() => {
     // ================================
     // BREWERY & BEER AUTOCOMPLETE
     // ================================
+    // REPLACE the searchBreweries function in forms.js (around line 150)
+
     const searchBreweries = utils.debounce(async (query) => {
         const dropdown = document.getElementById('breweryDropdown');
         if (!dropdown) return;
@@ -353,9 +355,25 @@ export const FormModule = (() => {
                 await modules.api.getBreweries() : 
                 await modules.api.getBreweries(query);
             
-            displayDropdown(dropdown, 'brewery', breweries.slice(0, query.length < 1 ? 100 : 50), 
-                query.length < 1 ? `🍺 ${breweries.length} Breweries Available` : 
-                `🔍 ${breweries.length} matches for "${query}"`);
+            const headerText = query.length < 1 ? 
+                `🍺 ${breweries.length} Breweries Available` : 
+                `🔍 ${breweries.length} matches for "${query}"`;
+            
+            dropdown.className = 'suggestions brewery-suggestions';
+            dropdown.innerHTML = `
+                <div class="dropdown-header">${headerText}</div>
+                ${breweries.slice(0, query.length < 1 ? 100 : 50).map(brewery => 
+                    `<div class="suggestion-item" data-action="select-brewery" data-brewery="${brewery}">
+                        <strong>${utils.escapeHtml(brewery)}</strong>
+                    </div>`
+                ).join('')}
+                <div class="suggestion-item add-new-item" data-action="add-new-brewery">
+                    <strong>➕ Add "${utils.escapeHtml(query || 'New Brewery')}" as new brewery</strong>
+                    <small>Not in our database? Add it!</small>
+                </div>
+            `;
+            
+            showDropdown('breweryDropdown');
         } catch (error) {
             console.error('Error searching breweries:', error);
             hideDropdown('breweryDropdown');
@@ -481,6 +499,8 @@ export const FormModule = (() => {
         showDropdown(dropdown.id);
     };
     
+    // REPLACE the displayBeerDropdown function in forms.js (around line 230)
+
     const displayBeerDropdown = (beers, brewery, searchQuery = null) => {
         const dropdown = document.getElementById('beerNameDropdown');
         if (!dropdown) return;
@@ -492,11 +512,11 @@ export const FormModule = (() => {
         dropdown.className = 'suggestions beer-suggestions';
         dropdown.innerHTML = `
             <div class="dropdown-header">${headerText}</div>
+            ${beers.map(beer => createBeerItem(beer)).join('')}
             <div class="suggestion-item add-new-item" data-action="add-new-beer">
                 <strong>➕ Add New Beer for ${brewery}</strong>
                 <small>Add a beer not in our database</small>
             </div>
-            ${beers.map(beer => createBeerItem(beer)).join('')}
         `;
         
         showDropdown('beerNameDropdown');
