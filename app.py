@@ -173,13 +173,15 @@ def get_recent_finds():
             cursor.close()
             conn.close()
 
+# In app.py, REPLACE the entire /nearby route with:
 @app.route('/nearby')
 def nearby():
-    """Find nearby venues with new schema"""
+    """Find nearby venues with pagination support"""
     lat = request.args.get('lat', type=float)
     lng = request.args.get('lng', type=float)
     radius = request.args.get('radius', 5, type=int)
     gf_only = request.args.get('gf_only', 'false').lower() == 'true'
+    page = request.args.get('page', 1, type=int)
     
     if not lat or not lng:
         return jsonify({'error': 'Latitude and longitude required'}), 400
@@ -193,19 +195,44 @@ def nearby():
     try:
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor(dictionary=True)
-
+        
+        # First get total count
+        count_sql = """
+            SELECT COUNT(DISTINCT v.venue_id) as total
+            FROM venues v
+            LEFT JOIN gf_status s ON v.venue_id = s.venue_id
+            WHERE v.latitude IS NOT NULL AND v.longitude IS NOT NULL
+            AND (6371 * acos(cos(radians(%s)) * cos(radians(v.latitude)) * 
+                cos(radians(v.longitude) - radians(%s)) + sin(radians(%s)) * 
+                sin(radians(v.latitude)))) <= %s
+        """
+        
+        count_params = [lat, lng, lat, radius]
+        
+        if gf_only:
+            count_sql += " AND s.status IN ('always_tap_cask','always_bottle_can', 'currently')"
+        
+        cursor.execute(count_sql, count_params)
+        total_count = cursor.fetchone()['total']
+        
+        # Now get paginated results
+        per_page = 20
+        offset = (page - 1) * per_page
+        
         sql = """
             SELECT DISTINCT
-                v.venue_id
-                ,v.venue_name
-                ,v.address
-                ,v.postcode
-                ,v.city
-                ,v.latitude
-                ,v.longitude
-                ,COALESCE(s.status, 'unknown') as gf_status
-                ,(6371 * acos(cos(radians(%s)) * cos(radians(v.latitude)) * cos(radians(v.longitude) - radians(%s)) + sin(radians(%s)) * sin(radians(v.latitude)))) AS distance
-                ,GROUP_CONCAT(
+                v.venue_id,
+                v.venue_name,
+                v.address,
+                v.postcode,
+                v.city,
+                v.latitude,
+                v.longitude,
+                COALESCE(s.status, 'unknown') as gf_status,
+                (6371 * acos(cos(radians(%s)) * cos(radians(v.latitude)) * 
+                    cos(radians(v.longitude) - radians(%s)) + sin(radians(%s)) * 
+                    sin(radians(v.latitude)))) AS distance,
+                GROUP_CONCAT(
                     DISTINCT CONCAT(vb.format, ' - ', 
                     COALESCE(br.brewery_name, 'Unknown'), ' ', 
                     COALESCE(b.beer_name, 'Unknown'), ' (', 
@@ -219,18 +246,19 @@ def nearby():
             LEFT JOIN breweries br ON b.brewery_id = br.brewery_id
             WHERE v.latitude IS NOT NULL AND v.longitude IS NOT NULL
         """
+        
         params = [lat, lng, lat]
         
         if gf_only:
-            sql += " AND s.status IN ('always_tap_cask', 'always_bottle_can', 'currently')"
+            sql += " AND s.status IN ('always_tap_cask','always_bottle_can', 'currently')"
         
         sql += """
             GROUP BY v.venue_id
             HAVING distance <= %s
             ORDER BY distance
-            LIMIT 20
+            LIMIT %s OFFSET %s
         """
-        params.append(radius)
+        params.extend([radius, per_page, offset])
         
         cursor.execute(sql, params)
         venues = cursor.fetchall()
@@ -238,8 +266,20 @@ def nearby():
         # Add local_authority field for frontend compatibility
         for venue in venues:
             venue['local_authority'] = venue['city']
+            # Round distance for display
+            if venue['distance']:
+                venue['distance'] = round(venue['distance'], 2)
         
-        return jsonify(venues)
+        return jsonify({
+            'venues': venues,
+            'pagination': {
+                'page': page,
+                'pages': (total_count + per_page - 1) // per_page,
+                'total': total_count,
+                'has_prev': page > 1,
+                'has_next': page * per_page < total_count
+            }
+        })
         
     except mysql.connector.Error as e:
         logger.error(f"Database error in nearby search: {str(e)}")
@@ -1292,6 +1332,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
