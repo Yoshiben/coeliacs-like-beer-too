@@ -770,6 +770,26 @@ const App = {
                 searchModule.PlacesSearchModule.openPlacesSearch();
             }
         },
+
+        'add-new-brewery': (el, modules) => {
+            const breweryInput = document.getElementById('reportBrewery');
+            if (breweryInput) {
+                // Just close the dropdown and let them type the new brewery name
+                hideDropdown('breweryDropdown');
+                breweryInput.focus();
+                modules.helpers?.showToast('💡 Type the new brewery name and continue', 'info');
+            }
+        },
+        
+        'add-new-beer': (el, modules) => {
+            const beerNameInput = document.getElementById('reportBeerName');
+            if (beerNameInput) {
+                // Close dropdown and focus on beer name input
+                hideDropdown('beerNameDropdown');
+                beerNameInput.focus();
+                modules.helpers?.showToast('💡 Type the new beer name and continue', 'info');
+            }
+        },
         
         'search-google-places': (el, modules) => {
             // This should also use the new Google Places search
