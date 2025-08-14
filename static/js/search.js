@@ -188,7 +188,7 @@ export const SearchModule = (function() {
     // ================================
     // TEXT SEARCHES - Consolidated
     // ================================
-    const performTextSearch = async (type, query, searchConfig) => {
+    const performTextSearch = async (type, query, searchConfig, page = 1) => {
         try {
             // Try to get user location for distance sorting
             let userLocation = utils.getUserLocation();
