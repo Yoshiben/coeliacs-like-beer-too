@@ -190,16 +190,13 @@ export const SearchModule = (function() {
     
     const performTextSearch = async (type, query, searchConfig, page = 1) => {
         try {
-            // Try to get user location for distance sorting
             let userLocation = utils.getUserLocation();
             if (!userLocation) {
                 userLocation = await tryGetUserLocation();
             }
             
-            // Get current GF filter setting
             const gfOnly = window.App.getState('gfOnlyFilter') !== false;
             
-            // Perform search with pagination
             const results = await modules.api.searchVenues({
                 query: query,
                 searchType: searchConfig.searchType || 'all',
@@ -207,7 +204,6 @@ export const SearchModule = (function() {
                 gfOnly: gfOnly
             });
             
-            // Handle the response structure properly
             let venues = [];
             let pagination = null;
             
@@ -223,7 +219,6 @@ export const SearchModule = (function() {
                 return;
             }
             
-            // Sort by distance if we have location (only for first page)
             if (userLocation && page === 1) {
                 venues = sortVenuesByDistance(venues, userLocation);
             }
@@ -239,7 +234,6 @@ export const SearchModule = (function() {
                 state.totalResults = venues.length;
             }
             
-            // Save search state
             state.lastSearchState = {
                 type: type,
                 query: query,
@@ -247,13 +241,11 @@ export const SearchModule = (function() {
                 timestamp: Date.now()
             };
             
-            // Store globally
             window.App.setState(STATE_KEYS.LAST_SEARCH.TYPE, type);
             window.App.setState(STATE_KEYS.LAST_SEARCH.QUERY, query);
             
             state.currentSearchVenues = venues;
             
-            // Display results with pagination
             const title = userLocation && page === 1 ? 
                 searchConfig.titleWithLocation(state.totalResults) :
                 searchConfig.titleWithoutLocation(state.totalResults);
@@ -271,7 +263,7 @@ export const SearchModule = (function() {
         }
     };
     
-    // UPDATE the searchByName function (around line 220)
+    // UPDATE searchByName to accept page parameter (around line 220)
     const searchByName = async (page = 1) => {
         const query = document.getElementById('nameInput')?.value.trim();
         
@@ -282,7 +274,6 @@ export const SearchModule = (function() {
         
         console.log('🏠 Searching for venue name:', query, 'page:', page);
         
-        // Only close modal on first page
         if (page === 1) {
             modules.modalManager?.close('nameModal') || modules.modal?.close('nameModal');
             showResultsOverlay(`Venue name: "${query}"`);
@@ -304,7 +295,7 @@ export const SearchModule = (function() {
         }
     };
     
-    // UPDATE the searchByArea function (around line 260)
+    // UPDATE searchByArea to accept page parameter (around line 260)
     const searchByArea = async (page = 1) => {
         const query = document.getElementById('areaInput')?.value.trim();
         const searchType = document.getElementById('areaSearchType')?.value;
@@ -316,7 +307,6 @@ export const SearchModule = (function() {
         
         console.log(`🗺️ Searching by ${searchType}:`, query, 'page:', page);
         
-        // Only close modal on first page
         if (page === 1) {
             modules.modalManager?.close('areaModal') || modules.modal?.close('areaModal');
             
@@ -344,7 +334,7 @@ export const SearchModule = (function() {
         }
     };
     
-    // UPDATE the searchByBeer function (around line 300)
+    // UPDATE searchByBeer to accept page parameter (around line 300)
     const searchByBeer = async (page = 1) => {
         const query = document.getElementById('beerInput')?.value.trim();
         const searchType = document.getElementById('beerSearchType')?.value;
@@ -356,7 +346,6 @@ export const SearchModule = (function() {
         
         console.log(`🍺 Searching by ${searchType}:`, query, 'page:', page);
         
-        // Only close modal on first page
         if (page === 1) {
             modules.modalManager?.close('beerModal') || modules.modal?.close('beerModal');
             
@@ -1295,7 +1284,6 @@ export const SearchModule = (function() {
             results: state.totalResults 
         });
         
-        // Show results elements
         const elements = {
             loading: document.getElementById('resultsLoading'),
             noResults: document.getElementById('noResultsFound'),
@@ -1306,27 +1294,22 @@ export const SearchModule = (function() {
             paginationContainer: document.getElementById('paginationContainer')
         };
         
-        // Hide loading and no results
         if (elements.loading) elements.loading.style.display = 'none';
         if (elements.noResults) elements.noResults.style.display = 'none';
         
-        // Ensure list container is visible
         if (elements.listContainer) {
             elements.listContainer.style.display = 'block';
             elements.listContainer.style.flex = '1';
         }
         
-        // Hide map container if it's visible
         if (elements.mapContainer) {
             elements.mapContainer.style.display = 'none';
         }
         
-        // Update button text
         if (elements.btnText) {
             elements.btnText.textContent = 'Map';
         }
         
-        // Populate results
         if (elements.list) {
             elements.list.style.display = 'block';
             elements.list.innerHTML = '';
@@ -1345,14 +1328,12 @@ export const SearchModule = (function() {
             elements.paginationContainer.style.display = 'none';
         }
         
-        // Update title
         const titleEl = document.getElementById('resultsTitle');
         if (titleEl) titleEl.textContent = title;
         
         console.log(`✅ Displayed ${venues.length} results (page ${state.currentPage} of ${state.totalPages})`);
     };
     
-    // ADD this new function to handle pagination controls
     const updatePaginationControls = () => {
         const paginationInfo = document.getElementById('paginationInfo');
         const pageNumbers = document.getElementById('pageNumbers');
@@ -1361,26 +1342,19 @@ export const SearchModule = (function() {
         
         if (!paginationInfo || !pageNumbers || !prevBtn || !nextBtn) return;
         
-        // Update info text
         const startResult = ((state.currentPage - 1) * state.resultsPerPage) + 1;
         const endResult = Math.min(state.currentPage * state.resultsPerPage, state.totalResults);
         paginationInfo.textContent = `Showing ${startResult}-${endResult} of ${state.totalResults} results`;
         
-        // Update previous button
         prevBtn.disabled = state.currentPage <= 1;
-        
-        // Update next button
         nextBtn.disabled = state.currentPage >= state.totalPages;
         
-        // Generate page numbers
         pageNumbers.innerHTML = '';
         
-        // Always show first page
         if (state.totalPages > 1) {
             addPageButton(1, pageNumbers);
         }
         
-        // Add ellipsis if needed
         if (state.currentPage > 4) {
             const ellipsis = document.createElement('span');
             ellipsis.textContent = '...';
@@ -1388,7 +1362,6 @@ export const SearchModule = (function() {
             pageNumbers.appendChild(ellipsis);
         }
         
-        // Show pages around current page
         const startPage = Math.max(2, state.currentPage - 2);
         const endPage = Math.min(state.totalPages - 1, state.currentPage + 2);
         
@@ -1398,7 +1371,6 @@ export const SearchModule = (function() {
             }
         }
         
-        // Add ellipsis if needed
         if (state.currentPage < state.totalPages - 3) {
             const ellipsis = document.createElement('span');
             ellipsis.textContent = '...';
@@ -1406,13 +1378,11 @@ export const SearchModule = (function() {
             pageNumbers.appendChild(ellipsis);
         }
         
-        // Always show last page
         if (state.totalPages > 1) {
             addPageButton(state.totalPages, pageNumbers);
         }
     };
     
-    // ADD this helper function
     const addPageButton = (pageNum, container) => {
         const button = document.createElement('button');
         button.textContent = pageNum;
@@ -1422,7 +1392,7 @@ export const SearchModule = (function() {
         container.appendChild(button);
     };
     
-    // ADD pagination event handlers to the public API
+    // ADD pagination functions
     const goToPage = async (pageNum) => {
         if (pageNum === state.currentPage || pageNum < 1 || pageNum > state.totalPages) {
             return;
@@ -1430,7 +1400,6 @@ export const SearchModule = (function() {
         
         console.log(`📄 Going to page ${pageNum}`);
         
-        // Re-run the last search with new page
         if (state.lastSearchState) {
             const searchState = state.lastSearchState;
             
