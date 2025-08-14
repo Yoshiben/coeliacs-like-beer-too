@@ -1304,24 +1304,13 @@ export const SearchModule = (function() {
             });
         }
         
-        // Update pagination with proper math
+        // ADD JUST THIS BLOCK - nothing else changes
         if (elements.paginationContainer) {
-            // Get pagination data from API response or calculate defaults
-            const pagination = venues.pagination || { page: 1, total: venues.length, pages: 1 };
-            const currentPage = pagination.page || 1;
-            const totalResults = pagination.total || venues.length;
-            const totalPages = pagination.pages || 1;
-            
-            // Calculate showing range
-            const perPage = 20;
-            const startResult = ((currentPage - 1) * perPage) + 1;
-            const endResult = Math.min(currentPage * perPage, totalResults);
-            
             elements.paginationContainer.innerHTML = `
-                <div class="pagination-info">Showing ${startResult}-${endResult} of ${totalResults} results</div>
+                <div class="pagination-info">Showing 1-${venues.length} results</div>
                 <div class="pagination-controls">
-                    <button class="btn btn-secondary" data-action="prev-page" ${currentPage <= 1 ? 'disabled' : ''}>← Previous</button>
-                    <button class="btn btn-secondary" data-action="next-page" ${currentPage >= totalPages ? 'disabled' : ''}>Next →</button>
+                    <button class="btn btn-secondary" data-action="prev-page">← Previous</button>
+                    <button class="btn btn-secondary" data-action="next-page">Next →</button>
                 </div>
             `;
             elements.paginationContainer.style.display = 'block';
