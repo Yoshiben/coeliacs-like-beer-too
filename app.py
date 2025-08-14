@@ -426,6 +426,112 @@ def search():
         if 'conn' in locals() and conn.is_connected():
             cursor.close()
             conn.close()
+
+@app.route('/api/search-by-beer')
+def search_by_beer():
+    """Search venues by beer/brewery/style"""
+    query = request.args.get('query', '').strip()
+    search_type = request.args.get('beer_type', 'all')  # brewery/beer/style
+    page = request.args.get('page', 1, type=int)
+    gf_only = request.args.get('gf_only', 'false').lower() == 'true'
+    
+    if not query or len(query) < 2:
+        return jsonify({'error': 'Query too short'}), 400
+    
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        # Build the WHERE clause based on search type
+        if search_type == 'brewery':
+            where_clause = "br.brewery_name LIKE %s"
+            search_param = f'%{query}%'
+        elif search_type == 'beer':
+            where_clause = "b.beer_name LIKE %s"
+            search_param = f'%{query}%'
+        elif search_type == 'style':
+            where_clause = "b.style LIKE %s"
+            search_param = f'%{query}%'
+        else:
+            # Search all
+            where_clause = "(br.brewery_name LIKE %s OR b.beer_name LIKE %s OR b.style LIKE %s)"
+            search_param = None  # Will use multiple params
+        
+        # Get venues with beers matching the search
+        sql = """
+            SELECT DISTINCT
+                v.venue_id,
+                v.venue_name,
+                v.address,
+                v.postcode,
+                v.city,
+                v.latitude,
+                v.longitude,
+                COALESCE(s.status, 'unknown') as gf_status,
+                GROUP_CONCAT(
+                    DISTINCT CONCAT(vb.format, ' - ', 
+                    COALESCE(br.brewery_name, 'Unknown'), ' ', 
+                    COALESCE(b.beer_name, 'Unknown'), ' (', 
+                    COALESCE(b.style, 'Unknown'), ')')
+                    SEPARATOR ', '
+                ) as beer_details
+            FROM venue_beers vb
+            JOIN venues v ON vb.venue_id = v.venue_id
+            LEFT JOIN beers b ON vb.beer_id = b.beer_id
+            LEFT JOIN breweries br ON b.brewery_id = br.brewery_id
+            LEFT JOIN gf_status s ON v.venue_id = s.venue_id
+            WHERE """ + where_clause
+        
+        if gf_only:
+            sql += " AND s.status IN ('always_tap_cask', 'always_bottle_can', 'currently')"
+        
+        sql += " GROUP BY v.venue_id"
+        
+        # Execute count query first
+        count_sql = f"SELECT COUNT(DISTINCT v.venue_id) as total FROM venue_beers vb JOIN venues v ON vb.venue_id = v.venue_id LEFT JOIN beers b ON vb.beer_id = b.beer_id LEFT JOIN breweries br ON b.brewery_id = br.brewery_id LEFT JOIN gf_status s ON v.venue_id = s.venue_id WHERE {where_clause}"
+        
+        if search_param:
+            cursor.execute(count_sql, (search_param,) if search_type != 'all' else (f'%{query}%', f'%{query}%', f'%{query}%'))
+        else:
+            cursor.execute(count_sql, (f'%{query}%', f'%{query}%', f'%{query}%'))
+            
+        total_count = cursor.fetchone()['total']
+        
+        # Add pagination
+        per_page = 20
+        offset = (page - 1) * per_page
+        sql += f" LIMIT {per_page} OFFSET {offset}"
+        
+        # Execute main query
+        if search_param:
+            cursor.execute(sql, (search_param,))
+        else:
+            cursor.execute(sql, (f'%{query}%', f'%{query}%', f'%{query}%'))
+        
+        venues = cursor.fetchall()
+        
+        # Add local_authority for frontend
+        for venue in venues:
+            venue['local_authority'] = venue['city']
+        
+        return jsonify({
+            'venues': venues,
+            'pagination': {
+                'page': page,
+                'pages': (total_count + per_page - 1) // per_page,
+                'total': total_count,
+                'has_prev': page > 1,
+                'has_next': page * per_page < total_count
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"Beer search error: {str(e)}")
+        return jsonify({'error': 'Search failed'}), 500
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
                     
 @app.route('/autocomplete')
 def autocomplete():
@@ -1186,5 +1292,6 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
