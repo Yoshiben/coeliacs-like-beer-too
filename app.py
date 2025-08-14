@@ -250,7 +250,7 @@ def nearby():
 
 @app.route('/search')
 def search():
-    """Main search functionality with distance ordering"""
+    """Main search functionality with proper distance ordering"""
     query = request.args.get('query', '').strip()
     search_type = request.args.get('search_type', 'all')
     gf_only = request.args.get('gf_only', 'false').lower() == 'true'
@@ -298,7 +298,6 @@ def search():
                 WHERE v.venue_id = %s
             """
             
-            # Add GF filter if needed
             if gf_only:
                 sql += " AND s.status IN ('always_tap_cask', 'always_bottle_can', 'currently')"
             
@@ -325,102 +324,94 @@ def search():
             search_condition = "(v.venue_name LIKE %s OR v.postcode LIKE %s OR v.city LIKE %s OR v.address LIKE %s)"
             search_params = [f'%{query}%', f'%{query}%', f'%{query}%', f'%{query}%']
         
-        # Count total results
-        count_sql = f"""
-            SELECT COUNT(DISTINCT v.venue_id) as total
+        # Get ALL matching results first (no pagination yet)
+        sql = f"""
+            SELECT DISTINCT
+                v.venue_id,
+                v.venue_name,
+                v.address,
+                v.postcode,
+                v.city,
+                v.latitude,
+                v.longitude,
+                COALESCE(s.status, 'unknown') as gf_status,
+                GROUP_CONCAT(
+                    DISTINCT CONCAT(vb.format, ' - ', 
+                    COALESCE(br.brewery_name, 'Unknown'), ' ', 
+                    COALESCE(b.beer_name, 'Unknown'), ' (', 
+                    COALESCE(b.style, 'Unknown'), ')')
+                    SEPARATOR ', '
+                ) as beer_details
             FROM venues v
             LEFT JOIN gf_status s ON v.venue_id = s.venue_id
+            LEFT JOIN venue_beers vb ON v.venue_id = vb.venue_id
+            LEFT JOIN beers b ON vb.beer_id = b.beer_id
+            LEFT JOIN breweries br ON b.brewery_id = br.brewery_id
             WHERE {search_condition}
         """
         
-        if gf_only:
-            count_sql += " AND s.status IN ('always_tap_cask', 'always_bottle_can', 'currently')"
-        
-        cursor.execute(count_sql, search_params)
-        total_results = cursor.fetchone()['total']
-        
-        # Calculate pagination
-        per_page = 20
-        total_pages = (total_results + per_page - 1) // per_page
-        offset = (page - 1) * per_page
-        
-        # Build main search query with optional distance calculation
-        if user_lat is not None and user_lng is not None:
-            # WITH distance calculation
-            sql = f"""
-                SELECT DISTINCT
-                    v.venue_id,
-                    v.venue_name,
-                    v.address,
-                    v.postcode,
-                    v.city,
-                    v.latitude,
-                    v.longitude,
-                    COALESCE(s.status, 'unknown') as gf_status,
-                    (6371 * acos(cos(radians(%s)) * cos(radians(v.latitude)) * cos(radians(v.longitude) - radians(%s)) + sin(radians(%s)) * sin(radians(v.latitude)))) AS distance,
-                    GROUP_CONCAT(
-                        DISTINCT CONCAT(vb.format, ' - ', 
-                        COALESCE(br.brewery_name, 'Unknown'), ' ', 
-                        COALESCE(b.beer_name, 'Unknown'), ' (', 
-                        COALESCE(b.style, 'Unknown'), ')')
-                        SEPARATOR ', '
-                    ) as beer_details
-                FROM venues v
-                LEFT JOIN gf_status s ON v.venue_id = s.venue_id
-                LEFT JOIN venue_beers vb ON v.venue_id = vb.venue_id
-                LEFT JOIN beers b ON vb.beer_id = b.beer_id
-                LEFT JOIN breweries br ON b.brewery_id = br.brewery_id
-                WHERE {search_condition}
-            """
-            params = [user_lat, user_lng, user_lat] + search_params
-            order_by = "ORDER BY distance"
-        else:
-            # WITHOUT distance calculation
-            sql = f"""
-                SELECT DISTINCT
-                    v.venue_id,
-                    v.venue_name,
-                    v.address,
-                    v.postcode,
-                    v.city,
-                    v.latitude,
-                    v.longitude,
-                    COALESCE(s.status, 'unknown') as gf_status,
-                    GROUP_CONCAT(
-                        DISTINCT CONCAT(vb.format, ' - ', 
-                        COALESCE(br.brewery_name, 'Unknown'), ' ', 
-                        COALESCE(b.beer_name, 'Unknown'), ' (', 
-                        COALESCE(b.style, 'Unknown'), ')')
-                        SEPARATOR ', '
-                    ) as beer_details
-                FROM venues v
-                LEFT JOIN gf_status s ON v.venue_id = s.venue_id
-                LEFT JOIN venue_beers vb ON v.venue_id = vb.venue_id
-                LEFT JOIN beers b ON vb.beer_id = b.beer_id
-                LEFT JOIN breweries br ON b.brewery_id = br.brewery_id
-                WHERE {search_condition}
-            """
-            params = search_params
-            order_by = "ORDER BY v.venue_name"
+        params = search_params.copy()
         
         if gf_only:
             sql += " AND s.status IN ('always_tap_cask', 'always_bottle_can', 'currently')"
         
-        sql += f"""
-            GROUP BY v.venue_id
-            {order_by}
-            LIMIT %s OFFSET %s
-        """
+        sql += " GROUP BY v.venue_id"
         
-        params.extend([per_page, offset])
         cursor.execute(sql, params)
-        venues = cursor.fetchall()
+        all_venues = cursor.fetchall()
         
         # Add local_authority field for frontend compatibility
-        for venue in venues:
+        for venue in all_venues:
             venue['local_authority'] = venue['city']
         
-        return jsonify(venues)
+        # Sort by distance if user location provided
+        if user_lat is not None and user_lng is not None:
+            # Calculate distance for each venue and sort
+            for venue in all_venues:
+                if venue['latitude'] and venue['longitude']:
+                    # Calculate distance using Haversine formula
+                    lat1, lon1 = user_lat, user_lng
+                    lat2, lon2 = float(venue['latitude']), float(venue['longitude'])
+                    
+                    R = 6371  # Earth's radius in km
+                    dLat = (lat2 - lat1) * 3.14159 / 180
+                    dLon = (lon2 - lon1) * 3.14159 / 180
+                    a = (sin(dLat/2) * sin(dLat/2) + 
+                         cos(lat1 * 3.14159 / 180) * cos(lat2 * 3.14159 / 180) * 
+                         sin(dLon/2) * sin(dLon/2))
+                    c = 2 * atan2(sqrt(a), sqrt(1-a))
+                    distance = R * c
+                    venue['distance'] = round(distance, 2)
+                else:
+                    venue['distance'] = 999  # Put venues without coordinates at the end
+            
+            # Sort by distance
+            all_venues.sort(key=lambda x: x.get('distance', 999))
+        else:
+            # Sort alphabetically if no location
+            all_venues.sort(key=lambda x: x['venue_name'])
+        
+        # Calculate pagination
+        total_results = len(all_venues)
+        per_page = 20
+        total_pages = (total_results + per_page - 1) // per_page
+        
+        # Apply pagination to sorted results
+        start_idx = (page - 1) * per_page
+        end_idx = start_idx + per_page
+        venues = all_venues[start_idx:end_idx]
+        
+        # Return with pagination info
+        return jsonify({
+            'venues': venues,
+            'pagination': {
+                'page': page,
+                'pages': total_pages,
+                'total': total_results,
+                'has_prev': page > 1,
+                'has_next': page < total_pages
+            }
+        })
         
     except mysql.connector.Error as e:
         logger.error(f"Database error in search: {str(e)}")
@@ -429,7 +420,7 @@ def search():
         if 'conn' in locals() and conn.is_connected():
             cursor.close()
             conn.close()
-
+                    
 @app.route('/autocomplete')
 def autocomplete():
     """Autocomplete suggestions for search"""
@@ -1189,3 +1180,4 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
