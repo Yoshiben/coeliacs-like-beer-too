@@ -19,16 +19,19 @@
    --green: rgba(0,245,0,1);
    --blue: rgba(59,130,246,1);
    --red: rgba(239,68,68,1);
+   --orange: rgba(249,115,22,1);
 
    --dark-gold: rgba(253,187,4,1);
    --dark-green: rgba(0,196,0,1);
    --dark-blue: rgba(37,99,235,1);
+   --dark-orange: rgba(234,88,12);
    
    --light-grey: rgba(156,163,175,1);
    --light-blue: rgba(102,126,234,1);
-   --light-purple: #BCAFCA;
-   --grey-white: #F5F5F5;
-   --grey-purple: rgba(240,235,245,1);
+   --light-purple: rgba(240,235,245,1);
+   --light-orange: rgba(254,215,170,1);
+   
+   --grey-white: rgba(245, 245, 245, 1);
    
    /* Brand Colors & Gradients */
    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -37,6 +40,8 @@
    --warning-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
    --info-gradient: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
    --purple-gradient: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+   --orange-gradient: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+   --currently-gradient: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
    
    /* Text Colors */
    --text-primary: rgba(45,55,72,1);
@@ -57,11 +62,14 @@
    
    /* Background Colors */
    --bg-white: rgba(255, 255, 255, 0.95);
+   --bg-purple: rgba(139, 92, 246, 0.1);
+   --bg-orange: rgba(249, 115, 22, 0.1);
    --bg-glass: rgba(255, 255, 255, 0.1);
    --bg-section: rgba(248, 250, 252, 0.8);
    --bg-overlay: rgba(0, 0, 0, 0.8);
    --bg-home: rgba(248, 249, 250, 1);
    --bg-card-home: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(248, 249, 250, 0.8) 100%);
+   --bg-recent-finds: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(248, 249, 250, 0.8) 100%);
    
    /* Spacing System */
    --space-xxs: 2px;
@@ -89,11 +97,13 @@
    --shadow-xl: 0 12px 40px rgba(0, 0, 0, 0.25);
    --shadow-hero-title: 0 2px 4px rgba(0, 0, 0, 0.3);
    --shadow-card-home: 0 4px 8px rgba(139, 92, 246, 0.12), 0 8px 24px rgba(0, 0, 0, 0.08);
+   --shadow-purple: rgba(139, 92, 246, 0.1);
+   --shadow-recent-finds: 0 4px 8px rgba(139, 92, 246, 0.12), 0 8px 24px rgba(0, 0, 0, 0.08);
 
    /* Status backgrounds for cards */
    --status-always-tap-cask-bg: rgba(255, 215, 0, 0.1);
    --status-always-bottle-can-bg: rgba(0, 245, 0, 0.1);
-   --status-currently-bg: rgba(59, 130, 246, 0.1);
+   --status-currently-bg: var(--orange);
    --status-not-currently-bg: rgba(239, 68, 68, 0.1);
    --status-unknown-bg: rgba(156, 163, 175, 0.1);
    
@@ -101,58 +111,33 @@
    --transition-fast: 0.15s ease-out;
    --transition: 0.25s ease-out;
    --transition-slow: 0.4s ease-out;
+
+   /* Borders */
+   --border-light: rgba(0, 0, 0, 0.1);
+   --border-purple: rgba(139, 92, 246, 0.3);
+   --border-orange: rgba(249, 115, 22, 0.3);
+   --border-recent-finds: rgba(139, 92, 246, 0.07);
+   --border-status-currently: rgba(249, 115, 22, 0.3);
    
    /* Dividers, borders & hovers */
-   --divider-color: rgba(102, 126, 234, 0.1);
-   --border-light: rgba(0, 0, 0, 0.1);    
-   --hover-subtle: rgba(102, 126, 234, 0.05);
-   --modal-line: rgba(226,232,240);
+   --divider-color: rgba(102, 126, 234, 0.1);       
+   --hover-subtle: rgba(102, 126, 234, 0.05);   
 
    /* Modal Variables */
    --modal-backdrop: rgba(0, 0, 0, 0.8);
    --modal-blur: blur(5px);
-
-   /* Purple Theme */
-   --purple-bg: rgba(139, 92, 246, 0.1);
-   --purple-border: rgba(139, 92, 246, 0.3);
-   --purple-shadow: rgba(139, 92, 246, 0.1);
-
-   /* Recent Finds Colors */
-   --recent-finds-bg: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(248, 249, 250, 0.8) 100%);
-   --recent-finds-border: rgba(139, 92, 246, 0.07);
-   --recent-finds-shadow: 0 4px 8px rgba(139, 92, 246, 0.12), 0 8px 24px rgba(0, 0, 0, 0.08);
-   --recent-finds-title-color: var(--text-primary);
-   --recent-finds-text-color: var(--text-secondary);
-   --recent-finds-accent: var(--purple-gradient);
-   --recent-finds-location-color: var(--text-muted);
+   --modal-line: rgba(226,232,240);   
    
    /* Spacing */
    --recent-finds-padding: clamp(1rem, 3vw, 1.5rem);
    --recent-finds-gap: clamp(0.75rem, 2vw, 1rem);
-   --recent-finds-border-radius: var(--radius-xl);
+   --border-recent-finds-radius: var(--radius-xl);
    
    /* Typography */
    --recent-finds-title-size: clamp(1.125rem, 2.5vw, 1.25rem);
    --recent-finds-text-size: clamp(0.875rem, 2vw, 0.95rem);
    --recent-finds-location-size: clamp(0.75rem, 1.5vw, 0.85rem);
-   --recent-finds-time-size: clamp(0.7rem, 1.5vw, 0.8rem);
-
-   /* Orange accent system */
-   --orange-primary: #f97316;
-   --orange-dark: #ea580c;
-   --orange-light: #fed7aa;
-   --orange-gradient: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-   --orange-bg: rgba(249, 115, 22, 0.1);
-   --orange-border: rgba(249, 115, 22, 0.3);
-   
-   /* Update existing gradients to include orange option */
-   --currently-gradient: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-   
-   /* Status-specific oranges */
-   --status-currently-bg: rgba(249, 115, 22, 0.1);
-   --status-currently-border: rgba(249, 115, 22, 0.3);
-
-   
+   --recent-finds-time-size: clamp(0.7rem, 1.5vw, 0.8rem);      
 }
 
 /* ================================
@@ -326,7 +311,7 @@ html {
 }
 
 .btn-secondary {
-   background: var(--grey-purple);
+   background: var(--light-purple);
    color: var(--text-secondary);
    backdrop-filter: blur(10px);
    border: 2px solid var(--border-light);
@@ -360,7 +345,7 @@ html {
 
 .form-input:focus {
    outline: none;
-   border-color: var(--purple-border);
+   border-color: var(--border-purple);
    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
@@ -662,7 +647,7 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 .stat-pill {
    text-align: center;
    border-radius: var(--radius-xl);
-   background: var(--grey-purple);
+   background: var(--light-purple);
    gap: var(--space-md);
    padding: 0 var(--space-lg) var(--space-xs);
 }
@@ -876,7 +861,7 @@ body.page-breweries .nav-back-btn { display: flex !important; }
     color: var(--text-primary);
 }
 .see-all-link {
-    color: var(--purple-border);
+    color: var(--border-purple);
     text-decoration: none;
     font-size: var(--text-sm);
     font-weight: 600;
@@ -898,8 +883,8 @@ body.page-breweries .nav-back-btn { display: flex !important; }
     transform: translateY(-2px);
 }
 .find-card.highlight {
-    background: linear-gradient(135deg, var(--purple-bg) 0%, rgba(139, 92, 246, 0.05) 100%);
-    border: 1px solid var(--purple-border);
+    background: linear-gradient(135deg, var(--bg-purple) 0%, rgba(139, 92, 246, 0.05) 100%);
+    border: 1px solid var(--border-purple);
 }
 .find-header {
     display: flex;
@@ -954,7 +939,7 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 .trending-rank {
     font-size: var(--text-xl);
     font-weight: 700;
-    color: var(--purple-border);
+    color: var(--border-purple);
     min-width: 30px;
 }
 .trending-content {
@@ -996,7 +981,7 @@ body.page-breweries .nav-back-btn { display: flex !important; }
     box-shadow: 0 2px 6px rgba(139, 92, 246, 0.06);
 }
 .action-card:hover {
-    border-color: var(--purple-border);
+    border-color: var(--border-purple);
     transform: translateY(-2px);
     background: linear-gradient(135deg, 
         rgba(139, 92, 246, 0.08) 0%, 
@@ -1453,8 +1438,8 @@ body.page-breweries .nav-back-btn { display: flex !important; }
     letter-spacing: 0.5px;
 }
 .status-card {
-   background: linear-gradient(135deg, var(--purple-bg) 0%, rgba(139, 92, 246, 0.05) 100%);
-   border: 2px solid var(--purple-border);
+   background: linear-gradient(135deg, var(--bg-purple) 0%, rgba(139, 92, 246, 0.05) 100%);
+   border: 2px solid var(--border-purple);
    border-radius: var(--radius-xl);
    padding-bottom: var(--space-xl);
    text-align: center;
@@ -1565,12 +1550,12 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 .status-actions .btn-outline {
     background: var(--bg-white);
     color: var(--purple-text);
-    border: 2px solid var(--purple-border);
+    border: 2px solid var(--border-purple);
    flex: 1;
 }
 
 .status-actions .btn-outline:hover {
-    background: var(--purple-bg);
+    background: var(--bg-purple);
     transform: translateY(-1px);
 }
 
@@ -1636,6 +1621,8 @@ body.page-breweries .nav-back-btn { display: flex !important; }
    cursor: pointer;
    transition: all var(--transition);
    text-align: left;
+   width: 100%;
+   margin: var(--space-sm) 0;
 }
 
 .status-option:hover {
@@ -1662,26 +1649,6 @@ body.page-breweries .nav-back-btn { display: flex !important; }
    margin: 0;
 }
 
-/* USING CONSOLIDATED COLORS FOR STATUS OPTIONS */
-.status-option.always:hover {
-   background: var(--status-always-bg);
-   border-color: var(--always-gf-fill);
-}
-
-.status-option.currently:hover {
-   background: var(--status-current-bg);
-   border-color: var(--currently-gf-fill);
-}
-
-.status-option.not-currently:hover {
-   background: var(--status-no-bg);
-   border-color: var(--no-gf-fill);
-}
-
-.status-option.unknown:hover {
-   background: var(--status-unknown-bg);
-   border-color: var(--unknown-gf-fill);
-}
 
 .confirm-status {
    display: inline-flex;
@@ -1722,7 +1689,7 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 }
 
 .gf-indicator.currently {
-    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+    background: var(--orange-gradient);
     color: var(--text-white);
 }
 
@@ -1889,7 +1856,7 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 
 .brewery-search-input:focus {
     outline: none;
-    border-color: var(--purple-border);
+    border-color: var(--border-purple);
     background: var(--bg-white);
 }
 
@@ -1929,8 +1896,8 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 .brewery-card:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow);
-    border-color: var(--purple-border);
-    background: var(--purple-bg);
+    border-color: var(--border-purple);
+    background: var(--bg-purple);
 }
 
 .brewery-icon {
@@ -1959,8 +1926,8 @@ body.page-breweries .nav-back-btn { display: flex !important; }
     align-items: center;
     justify-content: space-between;
     padding: var(--space-md) var(--space-lg);
-    background: var(--purple-bg);
-    border-bottom: 1px solid var(--purple-border);
+    background: var(--bg-purple);
+    border-bottom: 1px solid var(--border-purple);
 }
 
 .brewery-count {
@@ -2008,8 +1975,8 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 }
 
 .beer-item:hover {
-    border-color: var(--purple-border);
-    background: var(--purple-bg);
+    border-color: var(--border-purple);
+    background: var(--bg-purple);
 }
 
 .beer-meta {
@@ -2114,8 +2081,8 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 }
 
 .beer-list-item:hover {
-    border-color: var(--purple-border);
-    background: linear-gradient(135deg, var(--purple-bg) 0%, rgba(139, 92, 246, 0.02) 100%);
+    border-color: var(--border-purple);
+    background: linear-gradient(135deg, var(--bg-purple) 0%, rgba(139, 92, 246, 0.02) 100%);
     transform: translateY(-2px);
     box-shadow: var(--shadow);
 }
@@ -2223,7 +2190,7 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 /* Brewery Tag */
 .beer-brewery {
     font-weight: 600;
-    color: var(--purple-border);
+    color: var(--border-purple);
 }
 
 /* Style Tag */
@@ -2251,7 +2218,7 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 }
 
 .beer-list-content::-webkit-scrollbar-thumb:hover {
-    background: var(--purple-border);
+    background: var(--border-purple);
 }
 
 /* Add subtle animation when list loads */
@@ -2290,8 +2257,8 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 }
 
 .place-result:hover {
-    background: var(--purple-bg);
-    border-color: var(--purple-border);
+    background: var(--bg-purple);
+    border-color: var(--border-purple);
     transform: translateY(-1px);
     box-shadow: var(--shadow-sm);
 }
@@ -2309,8 +2276,8 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 
 /* Selected Place Preview */
 .selected-place-preview {
-    background: var(--purple-bg);
-    border: 2px solid var(--purple-border);
+    background: var(--bg-purple);
+    border: 2px solid var(--border-purple);
     border-radius: var(--radius-xl);
     padding: var(--space-xl);
     margin: var(--space-xl);
@@ -2357,7 +2324,7 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 
 .place-result[data-action="manual-venue-entry"]:hover {
     border-style: solid;
-    background: var(--purple-bg);
+    background: var(--bg-purple);
 }
 
 /* Place type badge */
@@ -2561,14 +2528,14 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 
 /* Add new item styling */
 .suggestion-item.add-new-item {
-    background-color: var(--purple-bg);
-    border-left: 4px solid var(--purple-border);
+    background-color: var(--bg-purple);
+    border-left: 4px solid var(--border-purple);
     border-top: 2px solid var(--border-light);
     margin-top: auto;
 }
 
 .suggestion-item.add-new-item:hover {
-    background-color: var(--purple-bg);
+    background-color: var(--bg-purple);
     opacity: 0.8;
 }
 
@@ -2619,7 +2586,7 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 
 .photo-upload-compact.active {
     border-color: var(--light-blue);
-    background: var(--purple-bg);
+    background: var(--bg-purple);
 }
 
 .photo-upload-icon {
@@ -2643,23 +2610,35 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 
 
 .pagination-container {
-    padding: var(--space-lg);
-    border-top: 1px solid var(--border-light);
+    position: sticky;
+    bottom: 0;
     background: var(--bg-white);
+    border-top: 1px solid var(--border-light);
+    padding: var(--space-md);
+    z-index: var(--z-overlay);
+    box-shadow: var(--shadow);
 }
 
 .pagination-info {
     text-align: center;
-    color: var(--text-muted);
+    color: var(--text-secondary);
     font-size: var(--text-sm);
-    margin-bottom: var(--space-md);
+    margin-bottom: var(--space-sm);
 }
 
 .pagination-controls {
     display: flex;
-    align-items: center;
     justify-content: center;
     gap: var(--space-sm);
+}
+
+.btn-page {
+    min-width: 40px;
+}
+
+.btn-page.active {
+    background: var(--primary-gradient);
+    color: var(--text-white);
 }
 
 .page-numbers {
@@ -2695,12 +2674,12 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 
 
 .recent-finds-section {
-  background: var(--recent-finds-bg);
-  border: 1px solid var(--recent-finds-border);
-  border-radius: var(--recent-finds-border-radius);
+  background: var(--bg-recent-finds);
+  border: 1px solid var(--border-recent-finds);
+  border-radius: var(--border-recent-finds-radius);
   padding: var(--recent-finds-padding);
   margin: var(--space-xl) 0;
-  box-shadow: var(--recent-finds-shadow);
+  box-shadow: var(--shadow-recent-finds);
   position: relative;
   overflow: hidden;
 }
@@ -2717,7 +2696,7 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 }
 
 .recent-finds-title {
-  color: var(--recent-finds-title-color);
+  color: var(--text-primary);
   font-size: var(--recent-finds-title-size);
   font-weight: 700;
   margin: 0 0 var(--recent-finds-gap) 0;
@@ -2729,7 +2708,7 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 }
 
 .recent-finds-icon {
-  background: var(--recent-finds-accent);
+  background: var(--purple-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -2749,8 +2728,8 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 
 .recent-find-item {
   background: var(--white);
-  border: 1px solid var(--recent-finds-border);
-  border-radius: calc(var(--recent-finds-border-radius) * 0.7);
+  border: 1px solid var(--border-recent-finds);
+  border-radius: calc(var(--border-recent-finds-radius) * 0.7);
   padding: var(--recent-finds-padding);
   transition: all var(--transition);
   position: relative;
@@ -2776,21 +2755,21 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 }
 
 .recent-find-user {
-  color: var(--recent-finds-title-color);
+  color: var(--text-primary);
   font-size: var(--recent-finds-text-size);
   font-weight: 600;
   margin: 0;
 }
 
 .recent-find-time {
-  color: var(--recent-finds-location-color);
+  color: var(--text-muted);
   font-size: var(--recent-finds-time-size);
   font-weight: 400;
   opacity: 0.8;
 }
 
 .recent-find-beer {
-  color: var(--recent-finds-title-color);
+  color: var(--text-primary);
   font-size: var(--recent-finds-text-size);
   font-weight: 500;
   margin: 0;
@@ -2798,19 +2777,19 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 }
 
 .recent-find-beer strong {
-  color: var(--purple-border);
+  color: var(--border-purple);
   font-weight: 700;
 }
 
 .recent-find-venue {
-  color: var(--recent-finds-text-color);
+  color: var(--text-secondary);
   font-size: var(--recent-finds-text-size);
   margin: 0;
   font-weight: 500;
 }
 
 .recent-find-location {
-  color: var(--recent-finds-location-color);
+  color: var(--text-muted);
   font-size: var(--recent-finds-location-size);
   margin: 0;
   display: flex;
@@ -2842,7 +2821,7 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 
 .recent-find-actions .btn-outline {
   background: rgba(139, 92, 246, 0.05);
-  color: var(--purple-border);
+  color: var(--border-purple);
   border: 1px solid rgba(139, 92, 246, 0.2);
 }
 
@@ -2853,16 +2832,16 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 
 .recent-find-actions .btn-text {
   background: transparent;
-  color: var(--recent-finds-location-color);
+  color: var(--text-muted);
 }
 
 .recent-find-actions .btn-text:hover {
-  color: var(--purple-border);
+  color: var(--border-purple);
 }
 
 .recent-finds-loading {
   text-align: center;
-  color: var(--recent-finds-location-color);
+  color: var(--text-muted);
   font-style: italic;
   padding: var(--space-xl);
   font-size: var(--recent-finds-text-size);
@@ -2877,7 +2856,7 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 
 .recent-finds-empty {
   text-align: center;
-  color: var(--recent-finds-location-color);
+  color: var(--text-muted);
   font-style: italic;
   padding: var(--space-xl);
   font-size: var(--recent-finds-text-size);
@@ -2914,23 +2893,23 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 
 /* Buy Beer Button - Add orange theming */
 .buy-beer-button {
-    border-color: var(--orange-border);
+    border-color: var(--border-orange);
 }
 
 .buy-beer-button:hover {
     transform: translateY(-2px);
-    border-color: var(--orange-primary);
+    border-color: var(--orange);
     background: linear-gradient(135deg, 
-        var(--orange-bg) 0%, 
+        var(--bg-orange) 0%, 
         rgba(255, 255, 255, 1) 100%
     );
-    box-shadow: 0 4px 16px var(--orange-light);
+    box-shadow: 0 4px 16px var(--light-orange);
 }
 
 /* Recent Finds - Add orange accent option */
 .recent-finds-section {
     /* Keep existing but add orange border option */
-    border: 1px solid var(--orange-border);
+    border: 1px solid var(--border-orange);
 }
 
 .recent-finds-title {
@@ -2943,33 +2922,33 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 
 /* Action Cards - Add orange hover for "Add a Find" */
 .action-card[data-action="add-find"]:hover {
-    border-color: var(--orange-border);
+    border-color: var(--border-orange);
     background: linear-gradient(135deg, 
-        var(--orange-bg) 0%, 
+        var(--bg-orange) 0%, 
         rgba(255, 255, 255, 1) 100%
     );
-    box-shadow: 0 4px 12px var(--orange-light);
+    box-shadow: 0 4px 12px var(--light-orange);
 }
 
 /* Featured Badge - Make it orange instead of gold */
 .featured-badge {
     background: var(--orange-gradient);
-    box-shadow: 0 2px 8px var(--orange-light);
+    box-shadow: 0 2px 8px var(--light-orange);
 }
 
 /* Search Option - Beer (make it orange) */
 .search-option.beer {
-    background: linear-gradient(135deg, var(--orange-bg) 0%, rgba(249, 115, 22, 0.05) 100%);
-    border-color: var(--orange-border);
+    background: linear-gradient(135deg, var(--bg-orange) 0%, rgba(249, 115, 22, 0.05) 100%);
+    border-color: var(--border-orange);
 }
 
 .search-option.beer:hover {
-    border-color: var(--orange-primary);
+    border-color: var(--orange);
     background: linear-gradient(135deg, 
         rgba(249, 115, 22, 0.15) 0%, 
         rgba(255, 255, 255, 1) 100%
     );
-    box-shadow: 0 4px 16px var(--orange-light);
+    box-shadow: 0 4px 16px var(--light-orange);
 }
 
 
