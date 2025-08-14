@@ -228,7 +228,7 @@ export const MapModule = (() => {
     // ================================
     // RESULTS MAP
     // ================================
-    const initResultsMap = (venuesData = null) => {
+    const initResultsMap = (searchVenues = null) => {
         console.log('🗺️ Initializing results map...');
         
         const mapElement = document.getElementById('resultsMap');
@@ -241,17 +241,6 @@ export const MapModule = (() => {
         utils.cleanupMap(maps.results);
         mapElement.innerHTML = '';
         
-        // Reset container classes
-        const containers = {
-            map: document.getElementById('resultsMapContainer'),
-            overlay: document.getElementById('resultsOverlay')
-        };
-        
-        Object.values(containers).forEach(container => {
-            if (container) container.classList.remove('split-view');
-        });
-        
-        // Create map with slight delay for DOM
         setTimeout(() => {
             try {
                 maps.results = createMap('resultsMap');
@@ -260,19 +249,76 @@ export const MapModule = (() => {
                     throw new Error('Failed to create results map');
                 }
                 
-                // Add venues
-                let venues = venuesData;
+                // Get search venues
+                let venues = searchVenues;
                 if (!venues) {
                     const searchModule = modules.search;
                     venues = searchModule?.getCurrentResults() || [];
                 }
                 
                 if (venues.length > 0) {
-                    addVenueMarkers(venues, maps.results);
-                    console.log(`✅ Added ${venues.length} venue markers`);
+                    // Add main search results with prominent markers
+                    const bounds = [];
+                    venues.forEach(venue => {
+                        if (venue.latitude && venue.longitude) {
+                            const lat = parseFloat(venue.latitude);
+                            const lng = parseFloat(venue.longitude);
+                            
+                            const gfStatus = determineGFStatus(venue);
+                            const markerStyle = getMarkerStyleForGFStatus(gfStatus);
+                            
+                            // Make search results more prominent
+                            markerStyle.radius = markerStyle.radius * 1.5;
+                            markerStyle.weight = markerStyle.weight + 2;
+                            
+                            const marker = L.circleMarker([lat, lng], markerStyle).addTo(maps.results);
+                            const popupContent = createVenuePopupContent(venue, gfStatus);
+                            marker.bindPopup(popupContent);
+                            
+                            bounds.push([lat, lng]);
+                        }
+                    });
+                    
+                    // For name/beer searches, also show nearby venues in grey (for context)
+                    const lastSearch = window.App.getState(STATE_KEYS.LAST_SEARCH.TYPE);
+                    if (lastSearch === 'name' || lastSearch === 'beer') {
+                        // Get the general area of results
+                        if (bounds.length > 0) {
+                            const centerLat = bounds.reduce((sum, b) => sum + b[0], 0) / bounds.length;
+                            const centerLng = bounds.reduce((sum, b) => sum + b[1], 0) / bounds.length;
+                            
+                            // Add a subtle message
+                            const contextControl = L.control({position: 'topright'});
+                            contextControl.onAdd = function(map) {
+                                const div = L.DomUtil.create('div', 'map-context-info');
+                                div.innerHTML = `
+                                    <div style="background: white; padding: 8px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                                        <strong>${venues.length}</strong> matching venues (larger markers)<br>
+                                        <small style="color: #666;">Grey markers show other nearby venues</small>
+                                    </div>
+                                `;
+                                return div;
+                            };
+                            contextControl.addTo(maps.results);
+                            
+                            // You could load nearby venues here if you want
+                            // But for now, let's just show the search results prominently
+                        }
+                    }
+                    
+                    // Fit bounds to show all results
+                    if (bounds.length > 0) {
+                        if (bounds.length === 1) {
+                            maps.results.setView(bounds[0], 15);
+                        } else {
+                            maps.results.fitBounds(bounds, { padding: [20, 20] });
+                        }
+                    }
+                    
+                    console.log(`✅ Added ${venues.length} venue markers to map`);
                 }
                 
-                // Add legend
+                // Add controls
                 addLocationButton(maps.results);
                 addMapLegend(maps.results);
                 
