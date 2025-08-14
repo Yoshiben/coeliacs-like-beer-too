@@ -180,8 +180,7 @@ export const FormModule = (() => {
     const validateReportForm = (data) => {
         const required = [
             ['beer_format', 'Beer Format'],
-            ['brewery_name', 'Brewery Name'], 
-            ['beer_name', 'Beer Name']
+            ['brewery_name', 'Brewery Name']
         ];
         
         const errors = required.filter(([key]) => !data[key]).map(([, label]) => label);
