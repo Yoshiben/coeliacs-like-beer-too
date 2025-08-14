@@ -774,8 +774,10 @@ const App = {
         'add-new-brewery': (el, modules) => {
             const breweryInput = document.getElementById('reportBrewery');
             if (breweryInput) {
-                // Just close the dropdown and let them type the new brewery name
-                hideDropdown('breweryDropdown');
+                // Hide dropdown through forms module or directly
+                const dropdown = document.getElementById('breweryDropdown');
+                if (dropdown) dropdown.style.display = 'none';
+                
                 breweryInput.focus();
                 modules.helpers?.showToast('💡 Type the new brewery name and continue', 'info');
             }
@@ -784,8 +786,10 @@ const App = {
         'add-new-beer': (el, modules) => {
             const beerNameInput = document.getElementById('reportBeerName');
             if (beerNameInput) {
-                // Close dropdown and focus on beer name input
-                hideDropdown('beerNameDropdown');
+                // Hide dropdown directly since it's not exposed from forms module
+                const dropdown = document.getElementById('beerNameDropdown');
+                if (dropdown) dropdown.style.display = 'none';
+                
                 beerNameInput.focus();
                 modules.helpers?.showToast('💡 Type the new beer name and continue', 'info');
             }
