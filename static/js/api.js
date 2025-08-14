@@ -48,9 +48,8 @@ export const APIModule = (function() {
     // SEARCH APIS
     // ================================
     const searchVenues = async (params) => {
-        const { query, searchType = 'all', page = 1, venueId = null, gfOnly = false } = params;
+        const { query, searchType = 'all', page = 1, venueId = null, gfOnly = false, user_lat, user_lng } = params;
         
-        let url;
         if (venueId) {
             url = `${Constants.API.SEARCH}?venue_id=${venueId}`;
         } else {
@@ -60,6 +59,13 @@ export const APIModule = (function() {
                 page: page.toString(),
                 gf_only: gfOnly.toString()
             });
+            
+            // Add location if provided
+            if (user_lat && user_lng) {
+                searchParams.set('user_lat', user_lat.toString());
+                searchParams.set('user_lng', user_lng.toString());
+            }
+            
             url = `${Constants.API.SEARCH}?${searchParams}`;
         }
         
