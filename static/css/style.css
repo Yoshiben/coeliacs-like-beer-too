@@ -2500,8 +2500,6 @@ body.page-breweries .nav-back-btn { display: flex !important; }
     background-color: var(--purple-bg);
     border-left: 4px solid var(--purple-border);
     border-top: 2px solid var(--border-light);
-    position: sticky;
-    bottom: 0;
     margin-top: auto;
 }
 
