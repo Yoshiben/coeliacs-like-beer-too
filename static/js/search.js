@@ -16,7 +16,10 @@ export const SearchModule = (function() {
     const state = {
         lastSearchState: null,
         currentSearchVenues: [],
-        locationRequestInProgress: false
+        locationRequestInProgress: false,
+        currentPage: 1,
+        totalPages: 1,
+        totalResults: 0
     };
     
     // ================================
@@ -196,7 +199,7 @@ export const SearchModule = (function() {
                 userLocation = await tryGetUserLocation();
             }
             
-            // Perform search
+            // Perform search with page
             const searchParams = {
                 query: query,
                 searchType: searchConfig.searchType || 'all', 
@@ -208,54 +211,121 @@ export const SearchModule = (function() {
             
             const results = await modules.api.searchVenues(searchParams);
             
-            // Fix: Handle the response structure properly
+            // Handle paginated response structure
             let venues = [];
-            if (Array.isArray(results)) {
-                venues = results;
-            } else if (results.pubs) {
-                venues = results.pubs; // <-- The API returns 'pubs' not 'venues'
-            } else if (results.venues) {
+            let pagination = null;
+            
+            if (results.venues) {
                 venues = results.venues;
+                pagination = results.pagination;
+            } else if (results.pubs) {
+                venues = results.pubs;
+                pagination = results.pagination;
+            } else if (Array.isArray(results)) {
+                venues = results;
             }
             
-            if (venues.length === 0) {
+            if (venues.length === 0 && page === 1) {
                 showNoResults(searchConfig.noResultsMessage);
                 return;
             }
             
-            // Sort by distance if we have location (backup sorting in frontend)
+            // Sort by distance if we have location (frontend backup)
             if (userLocation) {
                 venues = sortVenuesByDistance(venues, userLocation);
             }
             
-            // Save state
+            // Update state with pagination info
+            state.currentPage = page;
+            state.totalPages = pagination?.pages || 1;
+            state.totalResults = pagination?.total || venues.length;
+            state.currentSearchVenues = venues;
+            
+            // Update last search state for re-running with different pages
             state.lastSearchState = {
                 type: type,
                 query: query,
+                searchConfig: searchConfig,
                 timestamp: Date.now()
             };
             
-            // Store globally
-            window.App.setState(STATE_KEYS.LAST_SEARCH.TYPE, type);
-            window.App.setState(STATE_KEYS.LAST_SEARCH.QUERY, query);
-            
-            state.currentSearchVenues = venues;
-            
-            // Display results
+            // Display results with pagination
             const title = userLocation ? 
-                searchConfig.titleWithLocation(venues.length) :
-                searchConfig.titleWithoutLocation(venues.length);
+                searchConfig.titleWithLocation(state.totalResults) :
+                searchConfig.titleWithoutLocation(state.totalResults);
                 
             displayResultsInOverlay(venues, title);
+            updatePaginationUI(page, state.totalPages, state.totalResults);
             
-            utils.showToast(`✅ Found ${venues.length} ${searchConfig.successMessage}`);
-            modules.tracking?.trackSearch(query, type, venues.length);
+            utils.showToast(`✅ Found ${state.totalResults} ${searchConfig.successMessage}`);
+            modules.tracking?.trackSearch(query, type, state.totalResults);
             
         } catch (error) {
             console.error(`❌ Error in ${type} search:`, error);
             showNoResults(searchConfig.errorMessage);
         }
     };
+    
+    // Add pagination UI update function
+    const updatePaginationUI = (currentPage, totalPages, totalResults) => {
+        const container = document.getElementById('paginationContainer');
+        if (!container) return;
+        
+        if (totalPages <= 1) {
+            container.style.display = 'none';
+            return;
+        }
+        
+        container.style.display = 'block';
+        
+        const startResult = ((currentPage - 1) * 20) + 1;
+        const endResult = Math.min(currentPage * 20, totalResults);
+        
+        container.innerHTML = `
+            <div class="pagination-info">
+                Showing ${startResult}-${endResult} of ${totalResults} results
+            </div>
+            <div class="pagination-controls">
+                <button class="btn btn-secondary" data-action="prev-page" ${currentPage === 1 ? 'disabled' : ''}>
+                    ← Previous
+                </button>
+                <div class="page-numbers">
+                    ${generatePageNumbers(currentPage, totalPages)}
+                </div>
+                <button class="btn btn-secondary" data-action="next-page" ${currentPage === totalPages ? 'disabled' : ''}>
+                    Next →
+                </button>
+            </div>
+        `;
+    };
+    
+    const generatePageNumbers = (current, total) => {
+        let pages = [];
+        const maxVisible = 5;
+        
+        if (total <= maxVisible) {
+            for (let i = 1; i <= total; i++) {
+                pages.push(i);
+            }
+        } else {
+            if (current <= 3) {
+                pages = [1, 2, 3, 4, '...', total];
+            } else if (current >= total - 2) {
+                pages = [1, '...', total - 3, total - 2, total - 1, total];
+            } else {
+                pages = [1, '...', current - 1, current, current + 1, '...', total];
+            }
+        }
+        
+        return pages.map(page => {
+            if (page === '...') {
+                return '<span class="page-ellipsis">...</span>';
+            }
+            return `<button class="page-number ${page === current ? 'active' : ''}" 
+                    data-action="goto-page" data-page="${page}">${page}</button>`;
+        }).join('');
+    };
+
     
     const searchByName = async () => {
         const query = document.getElementById('nameInput')?.value.trim();
@@ -289,6 +359,7 @@ export const SearchModule = (function() {
         modules.tracking?.trackEvent('search_by_name', 'Search', query);
     };
     
+    // In search.js, replace searchByArea function (around line 273)
     const searchByArea = async () => {
         const query = document.getElementById('areaInput')?.value.trim();
         const searchType = document.getElementById('areaSearchType')?.value;
@@ -300,16 +371,27 @@ export const SearchModule = (function() {
         
         console.log(`🗺️ Searching by ${searchType}:`, query);
         
-        // Close modal using modalManager
         modules.modalManager?.close('areaModal') || modules.modal?.close('areaModal');
         
         const searchTypeText = searchType === 'postcode' ? 'postcode' : 'area';
         showResultsOverlay(`${searchTypeText}: "${query}"`);
         showResultsLoading('Finding venues in this area...');
         
+        // Store search state for pagination
+        state.lastSearchState = {
+            type: 'area',
+            query: query,
+            searchType: searchType,
+            timestamp: Date.now()
+        };
+        
+        window.App.setState(STATE_KEYS.LAST_SEARCH.TYPE, 'area');
+        window.App.setState(STATE_KEYS.LAST_SEARCH.QUERY, query);
+        
         if (searchType === 'postcode') {
             await performPostcodeSearch(query);
         } else {
+            // Use performTextSearch with page support
             await performTextSearch('area', query, {
                 searchType: 'area',
                 noResultsMessage: `No venues found in "${query}"`,
@@ -318,7 +400,7 @@ export const SearchModule = (function() {
                 titleWithoutLocation: (count) => `${count} venues in ${query}`,
                 successMessage: `venues in ${query}`,
                 errorMessage: `Error searching for "${query}"`
-            });
+            }, 1); // Start at page 1
         }
         
         modules.tracking?.trackEvent('search_by_area', 'Search', `${searchType}:${query}`);
@@ -1326,39 +1408,35 @@ export const SearchModule = (function() {
     const goToPage = async (pageNum) => {
         console.log(`📄 Going to page ${pageNum}`);
         
-        // Re-run the last search with the new page
-        if (state.lastSearchState) {
-            const searchState = state.lastSearchState;
-            
-            if (searchState.type === 'name') {
-                // Get the original query and search again with page number
-                const query = document.getElementById('nameInput')?.value.trim();
-                if (query) {
-                    showResultsLoading('Loading page ' + pageNum + '...');
-                    await performTextSearch('name', query, {
-                        searchType: 'name',
-                        noResultsMessage: `No venues found matching "${query}"`,
-                        titleWithLocation: (count) => `${count} venues matching "${query}" (nearest first)`,
-                        titleWithoutLocation: (count) => `${count} venues matching "${query}"`,
-                        successMessage: `venues matching "${query}"`,
-                        errorMessage: `Error searching for "${query}". Please try again.`
-                    }, pageNum);
-                }
-            }
-            // Add other search types later if needed
+        if (!state.lastSearchState) return;
+        
+        showResultsLoading(`Loading page ${pageNum}...`);
+        
+        const searchState = state.lastSearchState;
+        
+        if (searchState.type === 'name' || searchState.type === 'area' || searchState.type === 'beer') {
+            await performTextSearch(
+                searchState.type, 
+                searchState.query, 
+                searchState.searchConfig, 
+                pageNum
+            );
+        } else if (searchState.type === 'nearby') {
+            // Nearby search doesn't paginate - it returns all results
+            utils.showToast('Nearby search shows all results within range', 'info');
         }
     };
     
     const goToPreviousPage = async () => {
-        console.log('📄 Previous page');
-        // For now, just try page 1 if we don't know current page
-        await goToPage(1);
+        if (state.currentPage > 1) {
+            await goToPage(state.currentPage - 1);
+        }
     };
     
     const goToNextPage = async () => {
-        console.log('📄 Next page');
-        // For now, just try page 2 if we don't know current page  
-        await goToPage(2);
+        if (state.currentPage < state.totalPages) {
+            await goToPage(state.currentPage + 1);
+        }
     };
 
     const createResultItem = (venue) => {
