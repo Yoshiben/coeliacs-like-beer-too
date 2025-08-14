@@ -284,8 +284,16 @@ export const SearchModule = (function() {
         const container = document.getElementById('paginationContainer');
         if (!container) return;
         
+        // Show the container even for single page to display result count
+        container.style.display = 'block';
+        
+        // Only show pagination controls if more than one page
         if (totalPages <= 1) {
-            container.style.display = 'none';
+            container.innerHTML = `
+                <div class="pagination-info">
+                    Showing ${totalResults} result${totalResults !== 1 ? 's' : ''}
+                </div>
+            `;
             return;
         }
         
@@ -515,6 +523,7 @@ export const SearchModule = (function() {
         modules.tracking?.trackEvent('search_by_beer', 'Search', `${searchType}:${query}`);
     };
     
+    // Replace performBeerSearch in search.js (around line 440)
     const performBeerSearch = async (query, searchType, page = 1) => {
         try {
             console.log(`🍺 Performing beer search: "${query}" (${searchType}) - page ${page}`);
@@ -525,78 +534,46 @@ export const SearchModule = (function() {
                 userLocation = await tryGetUserLocation();
             }
             
-            // Set state BEFORE API call so backend can use location
-            window.App.setState(STATE_KEYS.LAST_SEARCH.TYPE, 'beer');
-            window.App.setState(STATE_KEYS.LAST_SEARCH.QUERY, query);
-            window.App.setState(STATE_KEYS.LAST_SEARCH.TIMESTAMP, Date.now());
-            
-            // Get results with pagination
-            const searchParams = {
+            // Use the new beer search endpoint
+            const response = await fetch(`/api/search-by-beer?${new URLSearchParams({
                 query: query,
-                searchType: 'all', // Beer search uses 'all' then filters
-                page: page,
-                gfOnly: window.App.getState('gfOnlyFilter') !== false,
-                user_lat: userLocation?.lat,
-                user_lng: userLocation?.lng
-            };
+                beer_type: searchType,
+                page: page.toString(),
+                gf_only: (window.App.getState('gfOnlyFilter') !== false).toString()
+            })}`);
             
-            const results = await modules.api.searchVenues(searchParams);
+            if (!response.ok) throw new Error('Search failed');
+            const results = await response.json();
             
-            // Handle response structure
-            let allVenues = [];
-            let pagination = null;
-            
-            if (results.venues) {
-                allVenues = results.venues;
-                pagination = results.pagination;
-            } else if (results.pubs) {
-                allVenues = results.pubs;
-                pagination = results.pagination;
-            } else if (Array.isArray(results)) {
-                allVenues = results;
-            }
-            
-            console.log(`📊 Got ${allVenues.length} venues from API`);
-            
-            // Filter based on beer search criteria
-            const filteredVenues = filterVenuesByBeerCriteria(allVenues, query, searchType);
-            
-            if (filteredVenues.length === 0 && page === 1) {
+            if (results.venues.length === 0 && page === 1) {
                 showNoResults(`No venues found serving "${query}". Try searching for a brewery name or beer style.`);
                 return;
             }
             
-            // Sort by distance if location available
-            const sortedVenues = userLocation ? 
-                sortVenuesByDistance(filteredVenues, userLocation) : 
-                filteredVenues;
+            // Sort by distance if location available (frontend enhancement)
+            let venues = results.venues;
+            if (userLocation) {
+                venues = sortVenuesByDistance(venues, userLocation);
+            }
             
             // Update state with pagination
+            state.currentSearchVenues = venues;
+            state.currentPage = page;
+            state.totalPages = results.pagination.pages;
+            state.totalResults = results.pagination.total;
+            
             state.lastSearchState = {
                 type: 'beer',
                 query: query,
                 searchType: searchType,
-                searchConfig: {
-                    searchType: 'beer',
-                    noResultsMessage: `No venues found serving "${query}"`,
-                    titleWithLocation: (count) => `${count} venues serving "${query}" (nearest first)`,
-                    titleWithoutLocation: (count) => `${count} venues serving "${query}"`,
-                    successMessage: `venues serving "${query}"`,
-                    errorMessage: `Error searching for "${query}"`
-                },
                 timestamp: Date.now()
             };
-            
-            state.currentSearchVenues = sortedVenues;
-            state.currentPage = page;
-            state.totalPages = pagination?.pages || Math.ceil(sortedVenues.length / 20);
-            state.totalResults = pagination?.total || sortedVenues.length;
             
             const title = userLocation ? 
                 `${state.totalResults} venues serving "${query}" (nearest first)` :
                 `${state.totalResults} venues serving "${query}"`;
                 
-            displayResultsInOverlay(sortedVenues, title);
+            displayResultsInOverlay(venues, title);
             updatePaginationUI(state.currentPage, state.totalPages, state.totalResults);
             
             utils.showToast(`✅ Found ${state.totalResults} venues serving "${query}"`);
