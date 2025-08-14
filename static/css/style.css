@@ -2528,7 +2528,7 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 
 .report-modal .form-select,
 .report-modal .form-input {
-   padding: var(--space-xs);
+   padding: var(--space-sm);
    margin: 0 var(--space-md);
 }
 
