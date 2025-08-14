@@ -792,7 +792,7 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 
 .featured-badge {
     position: absolute;
-    top: var(--space-lg);
+    top: var(--space-md);
     left: var(--space-lg);
     background: var(--gold);
     color: var(--text-primary);
@@ -801,9 +801,10 @@ body.page-breweries .nav-back-btn { display: flex !important; }
     font-weight: 600;
     font-size: var(--text-sm);
     z-index: 1;
-    background: linear-gradient(135deg, var(--gold) 0%, var(--dark-gold) 100%);
-    box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);
+    background: var(--orange-gradient);
+    box-shadow: 0 2px 8px var(--light-orange);
 }
+
 .featured-content {
     padding: var(--space-2xl);
 }
@@ -2928,12 +2929,6 @@ body.page-breweries .nav-back-btn { display: flex !important; }
         rgba(255, 255, 255, 1) 100%
     );
     box-shadow: 0 4px 12px var(--light-orange);
-}
-
-/* Featured Badge - Make it orange instead of gold */
-.featured-badge {
-    background: var(--orange-gradient);
-    box-shadow: 0 2px 8px var(--light-orange);
 }
 
 /* Search Option - Beer (make it orange) */
