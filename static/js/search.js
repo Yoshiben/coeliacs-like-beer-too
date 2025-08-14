@@ -430,66 +430,126 @@ export const SearchModule = (function() {
         modules.tracking?.trackEvent('search_by_area', 'Search', `${searchType}:${query}`);
     };
     
-    // In search.js, replace performPostcodeSearch
     const performPostcodeSearch = async (postcode) => {
         try {
-            showResultsLoading('Finding postcode location...');
-            const location = await modules.api.geocodePostcode(postcode);
+            // Clean up the postcode
+            const cleanPostcode = postcode.trim().toUpperCase();
             
-            console.log(`✅ Postcode geocoded to: ${location.lat}, ${location.lng}`);
+            // Check if it looks like a UK postcode (partial or full)
+            // This matches: SW, SW1, SW1A, SW1A 1, SW1A 1A, SW1A 1AA
+            const postcodePattern = /^[A-Z]{1,2}[0-9]?[0-9A-Z]?(\s?[0-9]?[A-Z]{0,2})?$/;
             
-            showResultsLoading('Finding venues near this postcode...');
-            const radius = 5;
-            
-            // Get user location for distance sorting (if available)
-            let userLocation = utils.getUserLocation();
-            if (!userLocation) {
-                userLocation = await tryGetUserLocation();
-            }
-            
-            // Use the postcode location as center for search, but user location for sorting
-            const venues = await modules.api.findNearbyVenues(location.lat, location.lng, radius);
-            
-            if (venues.length === 0) {
-                showNoResults(`No venues found within ${radius}km of ${postcode}`);
+            if (!postcodePattern.test(cleanPostcode)) {
+                // Not a postcode, treat as area search
+                await performTextSearch('area', postcode, {
+                    searchType: 'area',
+                    noResultsMessage: `No venues found in "${postcode}"`,
+                    titleWithLocation: (count) => `${count} venues in ${postcode} (nearest first)`,
+                    titleWithoutLocation: (count) => `${count} venues in ${postcode}`,
+                    successMessage: `venues in ${postcode}`,
+                    errorMessage: `Error searching for "${postcode}"`
+                }, 1);
                 return;
             }
             
-            // Sort by distance from USER location if available, otherwise from postcode location
-            const sortLocation = userLocation || location;
-            const sortedVenues = sortVenuesByDistance(venues, sortLocation);
+            showResultsLoading('Finding postcode location...');
             
-            // Update state
+            // For partial postcodes, search directly in database
+            if (cleanPostcode.length < 5) {
+                // It's a partial postcode like HX6
+                const searchParams = {
+                    query: cleanPostcode,
+                    searchType: 'postcode',
+                    page: 1,
+                    gfOnly: window.App.getState('gfOnlyFilter') !== false
+                };
+                
+                // Add user location if available for distance sorting
+                let userLocation = utils.getUserLocation();
+                if (!userLocation) {
+                    userLocation = await tryGetUserLocation();
+                }
+                if (userLocation) {
+                    searchParams.user_lat = userLocation.lat;
+                    searchParams.user_lng = userLocation.lng;
+                }
+                
+                const results = await modules.api.searchVenues(searchParams);
+                
+                let venues = results.venues || results.pubs || results;
+                let pagination = results.pagination;
+                
+                if (venues.length === 0) {
+                    showNoResults(`No venues found with postcode starting "${cleanPostcode}"`);
+                    return;
+                }
+                
+                // Sort by distance if we have location
+                if (userLocation) {
+                    venues = sortVenuesByDistance(venues, userLocation);
+                }
+                
+                state.currentSearchVenues = venues;
+                state.currentPage = pagination?.page || 1;
+                state.totalPages = pagination?.pages || 1;
+                state.totalResults = pagination?.total || venues.length;
+                
+                const title = `${state.totalResults} venues in ${cleanPostcode} area`;
+                
+                displayResultsInOverlay(venues, title);
+                updatePaginationUI(state.currentPage, state.totalPages, state.totalResults);
+                
+                utils.showToast(`✅ Found ${state.totalResults} venues in ${cleanPostcode}`);
+                
+            } else {
+                // Full postcode - try geocoding
+                const location = await modules.api.geocodePostcode(cleanPostcode);
+                
+                console.log(`✅ Postcode geocoded to: ${location.lat}, ${location.lng}`);
+                
+                showResultsLoading('Finding venues near this postcode...');
+                const radius = 5;
+                
+                // Use nearby search with the geocoded location
+                const venues = await modules.api.findNearbyVenues(location.lat, location.lng, radius);
+                
+                if (venues.length === 0) {
+                    showNoResults(`No venues found within ${radius}km of ${cleanPostcode}`);
+                    return;
+                }
+                
+                const sortedVenues = sortVenuesByDistance(venues, location);
+                
+                state.currentSearchVenues = sortedVenues;
+                state.currentPage = 1;
+                state.totalPages = 1;
+                state.totalResults = sortedVenues.length;
+                
+                const title = `${sortedVenues.length} venues near ${cleanPostcode} (${radius}km radius)`;
+                
+                displayResultsInOverlayWithPagination(
+                    sortedVenues, 
+                    title,
+                    1,
+                    1,
+                    sortedVenues.length
+                );
+                
+                utils.showToast(`✅ Found ${sortedVenues.length} venues near ${cleanPostcode}`);
+            }
+            
+            // Store search state
             state.lastSearchState = {
                 type: 'area',
-                query: postcode,
+                query: cleanPostcode,
                 searchType: 'postcode',
                 timestamp: Date.now()
             };
-    
-            // Store globally
+            
             window.App.setState(STATE_KEYS.LAST_SEARCH.TYPE, 'area');
-            window.App.setState(STATE_KEYS.LAST_SEARCH.QUERY, postcode);
+            window.App.setState(STATE_KEYS.LAST_SEARCH.QUERY, cleanPostcode);
             
-            state.currentSearchVenues = sortedVenues;
-            state.currentPage = 1;
-            state.totalPages = 1;
-            state.totalResults = sortedVenues.length;
-            
-            const title = userLocation ? 
-                `${sortedVenues.length} venues near ${postcode} (sorted by distance from you)` :
-                `${sortedVenues.length} venues near ${postcode} (${radius}km radius)`;
-            
-            displayResultsInOverlayWithPagination(
-                sortedVenues, 
-                title,
-                1,
-                1,
-                sortedVenues.length
-            );
-            
-            utils.showToast(`✅ Found ${sortedVenues.length} venues near ${postcode}`);
-            modules.tracking?.trackSearch(postcode, 'postcode', sortedVenues.length);
+            modules.tracking?.trackSearch(cleanPostcode, 'postcode', state.totalResults);
             
         } catch (error) {
             console.error('❌ Error searching by postcode:', error);
