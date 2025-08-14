@@ -70,6 +70,109 @@ def index():
     version = str(int(time.time()))
     return render_template('index.html', cache_buster=version)
 
+# ====================================================================
+# RECENT FINDS API ENDPOINT
+# Add this to your app.py file in the API ROUTES section
+# ====================================================================
+
+@app.route('/api/recent-finds')
+def get_recent_finds():
+    """Get the 2 most recent venue beer discoveries"""
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        # Get the 2 most recent venue_beers entries with venue and beer details
+        sql = """
+            SELECT 
+                vb.report_id,
+                vb.venue_id,
+                v.venue_name,
+                v.city,
+                v.postcode,
+                vb.beer_id,
+                b.beer_name,
+                br.brewery_name,
+                vb.format,
+                vb.added_at,
+                vb.added_by,
+                vb.times_reported
+            FROM venue_beers vb
+            JOIN venues v ON vb.venue_id = v.venue_id
+            LEFT JOIN beers b ON vb.beer_id = b.beer_id
+            LEFT JOIN breweries br ON b.brewery_id = br.brewery_id
+            ORDER BY vb.added_at DESC
+            LIMIT 2
+        """
+        
+        cursor.execute(sql)
+        recent_finds = cursor.fetchall()
+        
+        # Format the response
+        formatted_finds = []
+        for find in recent_finds:
+            # Calculate time ago
+            time_diff = datetime.now() - find['added_at']
+            
+            if time_diff.total_seconds() < 3600:  # Less than 1 hour
+                time_ago = f"{int(time_diff.total_seconds() / 60)} minutes ago"
+            elif time_diff.total_seconds() < 86400:  # Less than 1 day
+                time_ago = f"{int(time_diff.total_seconds() / 3600)} hours ago"
+            else:
+                time_ago = f"{time_diff.days} days ago"
+            
+            # Format beer info
+            beer_description = "Unknown beer"
+            if find['beer_name'] and find['brewery_name']:
+                beer_description = f"{find['brewery_name']} {find['beer_name']}"
+            elif find['brewery_name']:
+                beer_description = f"{find['brewery_name']} beer"
+            
+            # Format location
+            location = find['city']
+            if find['postcode']:
+                location = f"{find['city']}, {find['postcode'][:4]}..."
+            
+            formatted_find = {
+                'id': find['report_id'],
+                'user_name': find['added_by'] if find['added_by'] != 'anonymous' else 'Anonymous User',
+                'venue_id': find['venue_id'],
+                'venue_name': find['venue_name'],
+                'beer_description': beer_description,
+                'format': find['format'],
+                'location': location,
+                'time_ago': time_ago,
+                'added_at': find['added_at'].isoformat(),
+                'times_reported': find['times_reported'] or 1
+            }
+            
+            formatted_finds.append(formatted_find)
+        
+        return jsonify({
+            'success': True,
+            'finds': formatted_finds,
+            'count': len(formatted_finds)
+        })
+        
+    except mysql.connector.Error as e:
+        logger.error(f"Database error in recent finds: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Database error occurred'
+        }), 500
+        
+    except Exception as e:
+        logger.error(f"Error in recent finds: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'An error occurred'
+        }), 500
+        
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
+
 @app.route('/nearby')
 def nearby():
     """Find nearby venues with new schema"""
@@ -1059,6 +1162,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
