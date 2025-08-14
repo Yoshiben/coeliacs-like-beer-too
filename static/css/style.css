@@ -137,6 +137,21 @@
    --recent-finds-location-size: clamp(0.75rem, 1.5vw, 0.85rem);
    --recent-finds-time-size: clamp(0.7rem, 1.5vw, 0.8rem);
 
+   /* Orange accent system */
+   --orange-primary: #f97316;
+   --orange-dark: #ea580c;
+   --orange-light: #fed7aa;
+   --orange-gradient: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+   --orange-bg: rgba(249, 115, 22, 0.1);
+   --orange-border: rgba(249, 115, 22, 0.3);
+   
+   /* Update existing gradients to include orange option */
+   --currently-gradient: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+   
+   /* Status-specific oranges */
+   --status-currently-bg: rgba(249, 115, 22, 0.1);
+   --status-currently-border: rgba(249, 115, 22, 0.3);
+
    
 }
 
@@ -2889,6 +2904,87 @@ body.page-breweries .nav-back-btn { display: flex !important; }
     transform: translateY(0);
   }
 }
+
+
+
+
+
+
+/* UPDATE these existing elements with orange accents */
+
+/* Buy Beer Button - Add orange theming */
+.buy-beer-button {
+    border-color: var(--orange-border);
+}
+
+.buy-beer-button:hover {
+    transform: translateY(-2px);
+    border-color: var(--orange-primary);
+    background: linear-gradient(135deg, 
+        var(--orange-bg) 0%, 
+        rgba(255, 255, 255, 1) 100%
+    );
+    box-shadow: 0 4px 16px var(--orange-light);
+}
+
+/* Recent Finds - Add orange accent option */
+.recent-finds-section {
+    /* Keep existing but add orange border option */
+    border: 1px solid var(--orange-border);
+}
+
+.recent-finds-title {
+    /* Add orange gradient to icon */
+    background: var(--orange-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Action Cards - Add orange hover for "Add a Find" */
+.action-card[data-action="add-find"]:hover {
+    border-color: var(--orange-border);
+    background: linear-gradient(135deg, 
+        var(--orange-bg) 0%, 
+        rgba(255, 255, 255, 1) 100%
+    );
+    box-shadow: 0 4px 12px var(--orange-light);
+}
+
+/* Featured Badge - Make it orange instead of gold */
+.featured-badge {
+    background: var(--orange-gradient);
+    box-shadow: 0 2px 8px var(--orange-light);
+}
+
+/* Search Option - Beer (make it orange) */
+.search-option.beer {
+    background: linear-gradient(135deg, var(--orange-bg) 0%, rgba(249, 115, 22, 0.05) 100%);
+    border-color: var(--orange-border);
+}
+
+.search-option.beer:hover {
+    border-color: var(--orange-primary);
+    background: linear-gradient(135deg, 
+        rgba(249, 115, 22, 0.15) 0%, 
+        rgba(255, 255, 255, 1) 100%
+    );
+    box-shadow: 0 4px 16px var(--orange-light);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
