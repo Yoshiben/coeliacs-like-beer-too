@@ -791,18 +791,19 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 }
 
 .featured-badge {
-    position: absolute;
-    top: var(--space-md);
-    left: var(--space-lg);
-    background: var(--gold);
-    color: var(--text-primary);
-    padding: var(--space-xs) var(--space-md);
-    border-radius: var(--radius-pill);
-    font-weight: 600;
-    font-size: var(--text-sm);
-    z-index: 1;
-    background: var(--orange-gradient);
-    box-shadow: 0 2px 8px var(--light-orange);
+   position: absolute;
+   top: var(--space-md);
+   left: var(--space-lg);
+   background: var(--gold);
+   color: var(--text-primary);
+   padding: 0 var(--space-md);
+   border-radius: var(--radius-xl);
+   font-weight: 600;
+   font-size: var(--text-sm);
+   z-index: 1;
+   background: var(--orange-gradient);
+   box-shadow: 0 2px 8px var(--light-orange);
+   color: var(--white);
 }
 
 .featured-content {
