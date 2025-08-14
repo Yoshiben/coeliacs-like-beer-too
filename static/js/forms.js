@@ -136,6 +136,8 @@ export const FormModule = (() => {
         }
     };
     
+    // REPLACE the collectReportData function in forms.js (around line 65) with debugging
+
     const collectReportData = (formData) => {
         const elements = utils.getFormElements();
         
@@ -148,7 +150,7 @@ export const FormModule = (() => {
             format: formData.get('reportFormat') || document.getElementById('reportFormat')?.value || '',
             notes: formData.get('reportNotes') || document.getElementById('reportNotes')?.value || ''
         };
-
+    
         // Add beer_id if available
         if (elements.beerName?.dataset.beerId) {
             reportData.beer_id = parseInt(elements.beerName.dataset.beerId);
@@ -165,14 +167,16 @@ export const FormModule = (() => {
             reportData.postcode = elements.postcode?.value || formData.get('reportPostcode') || '';
             reportData.venue_id = null;
         }
-
+    
         // Add nickname for attribution
         reportData.submitted_by = window.App.getState('userNickname') || localStorage.getItem('userNickname') || 'anonymous';
     
-        
         if (reportData.beer_abv) {
             reportData.beer_abv = parseFloat(reportData.beer_abv) || null;
         }
+        
+        // DEBUG: Log the data being sent
+        console.log('🔍 DEBUG: Report data being sent:', reportData);
         
         return reportData;
     };
