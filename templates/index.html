@@ -447,7 +447,6 @@
             </div>
         </div>
     
-        <!-- Results Overlay -->
         <div id="resultsOverlay" class="overlay results-overlay">
             <div class="results-container">
                 <div class="results-content">
@@ -458,38 +457,34 @@
                         </div>
                         
                         <div class="results-list" id="resultsList"></div>
-
-                        <!-- Add pagination controls here -->
-                        <div class="pagination-container" id="paginationContainer" style="display: none;">
-                            <div class="pagination-info">
-                                <span id="paginationInfo">Showing 1-20 of 45 results</span>
-                            </div>
-                            <div class="pagination-controls">
-                                <button class="btn btn-secondary" id="prevPageBtn" data-action="prev-page" disabled>
-                                    ← Previous
-                                </button>
-                                <div class="page-numbers" id="pageNumbers">
-                                    <!-- Page numbers will be inserted here -->
-                                </div>
-                                <button class="btn btn-secondary" id="nextPageBtn" data-action="next-page">
-                                    Next →
-                                </button>
-                            </div>
-                        </div>
                         
                         <div class="no-results-found" id="noResultsFound">
                             <div class="no-results-icon">🔍</div>
                             <div class="no-results-title">No venues found</div>
                             <div class="no-results-text">Try expanding your search or check the spelling</div>
-<!--                             <div class="no-results-actions">
-                                <button class="btn btn-primary" data-action="add-new-venue-from-results">➕ Add New Venue/Bar</button>
-                                <button class="btn btn-secondary" data-action="search-google-places">🔍 Search Google Maps</button>
-                            </div> -->
                         </div>
                     </div>
                     
                     <div class="results-map-container" id="resultsMapContainer">
                         <div id="resultsMap" class="results-map"></div>
+                    </div>
+                </div>
+                
+                <!-- Move pagination HERE - outside results-content -->
+                <div class="pagination-container" id="paginationContainer" style="display: none;">
+                    <div class="pagination-info">
+                        <span id="paginationInfo">Showing 1-20 of 45 results</span>
+                    </div>
+                    <div class="pagination-controls">
+                        <button class="btn btn-secondary" id="prevPageBtn" data-action="prev-page" disabled>
+                            ← Previous
+                        </button>
+                        <div class="page-numbers" id="pageNumbers">
+                            <!-- Page numbers will be inserted here -->
+                        </div>
+                        <button class="btn btn-secondary" id="nextPageBtn" data-action="next-page">
+                            Next →
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1268,6 +1263,7 @@
         </script>
     </body>
 </html>
+
 
 
 
