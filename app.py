@@ -11,7 +11,7 @@ import time
 import json
 from datetime import datetime, timedelta
 import requests
-from math import sin, cos, sqrt, atan2
+import math
 
 # Initialize Flask app
 app = Flask(__name__, 
@@ -370,22 +370,27 @@ def search():
             # Calculate distance for each venue and sort
             for venue in all_venues:
                 if venue['latitude'] and venue['longitude']:
-                    # Calculate distance using Haversine formula
-                    lat1, lon1 = user_lat, user_lng
-                    lat2, lon2 = float(venue['latitude']), float(venue['longitude'])
-                    
-                    R = 6371  # Earth's radius in km
-                    dLat = (lat2 - lat1) * 3.14159 / 180
-                    dLon = (lon2 - lon1) * 3.14159 / 180
-                    a = (sin(dLat/2) * sin(dLat/2) + 
-                         cos(lat1 * 3.14159 / 180) * cos(lat2 * 3.14159 / 180) * 
-                         sin(dLon/2) * sin(dLon/2))
-                    c = 2 * atan2(sqrt(a), sqrt(1-a))
-                    distance = R * c
+                    # FIXED Haversine formula
+                    lat1 = math.radians(user_lat)
+                    lon1 = math.radians(user_lng)
+                    lat2 = math.radians(float(venue['latitude']))
+                    lon2 = math.radians(float(venue['longitude']))
+            
+                    dlat = lat2 - lat1
+                    dlon = lon2 - lon1
+            
+                    a = (math.sin(dlat/2)**2 + 
+                 math.cos(lat1) * math.cos(lat2) * math.sin(dlon/2)**2)
+                    c = 2 * math.asin(math.sqrt(a))
+            
+                    # Radius of earth in kilometers
+                    r = 6371
+                    distance = c * r
+            
                     venue['distance'] = round(distance, 2)
                 else:
                     venue['distance'] = 999  # Put venues without coordinates at the end
-            
+    
             # Sort by distance
             all_venues.sort(key=lambda x: x.get('distance', 999))
         else:
@@ -1181,5 +1186,6 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
