@@ -305,7 +305,7 @@ export default (function() {
         listEl.innerHTML = beers.map(beer => `
             <div class="beer-item">
                 <div class="beer-info">
-                    <strong>${beer.name}</strong>
+                    <strong>${beer.beer_name}</strong>
                     <div class="beer-meta">
                         ${beer.style ? `<span class="beer-style">${beer.style}</span>` : ''}
                         ${beer.abv ? `<span class="beer-abv">${beer.abv}% ABV</span>` : ''}
@@ -313,7 +313,7 @@ export default (function() {
                     </div>
                 </div>
                 <button class="btn btn-sm" data-action="find-venues-with-beer" 
-                        data-beer="${beer.name}" data-brewery="${brewery}">
+                        data-beer="${beer.beer_name}" data-brewery="${brewery}">
                     Find Venues
                 </button>
             </div>
