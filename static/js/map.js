@@ -598,7 +598,6 @@ export const MapModule = (() => {
         // Add controls
         addLocationButton(fullUKMap);
         addMapLegend(fullUKMap);
-        addZoomHint(fullUKMap);
         
         // Load venues
         await loadAllVenuesOnMap();
