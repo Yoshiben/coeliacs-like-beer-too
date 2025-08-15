@@ -1098,38 +1098,41 @@ export const MapModule = (() => {
         
         // If switching to map, initialize it
         if (newView === 'map') {
-            // Clean up any existing map
-            cleanupResultsMap();
+        // Clean up any existing map
+        cleanupResultsMap();
+        
+        // Show loading
+        const mapContainer = document.getElementById('resultsMapContainer');
+        if (mapContainer) {
+            mapContainer.innerHTML = '<div style="display: flex; justify-content: center; align-items: center; height: 100%; color: #666;"><div class="loading-spinner"></div> Loading all venues...</div>';
+        }
+        
+        // Get ALL venues for map
+        const searchModule = modules.search;
+        
+        // Try to get all results
+        searchModule.getAllSearchResults().then(allVenues => {
+            console.log(`🗺️ Got ${allVenues.length} venues for map`);
             
-            // Get venues
-            const searchModule = modules.search;
-            const venues = searchModule?.getCurrentResults() || 
-                          window.App?.getState('searchResults') || [];
+            // Restore map div
+            if (mapContainer) {
+                mapContainer.innerHTML = '<div id="resultsMap" class="results-map"></div>';
+            }
             
-            console.log(`🗺️ Initializing map with ${venues.length} venues`);
-            
-            // Small delay for DOM update
+            // Initialize map with all venues
             setTimeout(() => {
                 try {
-                    initResultsMap(venues);
+                    initResultsMap(allVenues);
                     modules.tracking?.trackEvent('results_map_show', 'Map', 'toggle');
                 } catch (error) {
                     console.error('❌ Map initialization failed:', error);
                     // Revert to list view
                     modalManager.toggleInternalView('resultsOverlay', 'list');
                     if (btnText) btnText.textContent = 'Map';
-                    
-                    if (window.showSuccessToast) {
-                        window.showSuccessToast('❌ Map failed to load');
-                    }
                 }
             }, 100);
-        } else {
-            // Switching to list - clean up map
-            cleanupResultsMap();
-            modules.tracking?.trackEvent('results_map_hide', 'Map', 'toggle');
-        }
-    };
+        });
+    }
     
     // ================================
     // VENUELIC API
