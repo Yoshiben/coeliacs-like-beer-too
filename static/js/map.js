@@ -146,32 +146,32 @@ export const MapModule = (() => {
         
         const statusStyles = {
             'always_tap_cask': {
-                fillColor: styles.alwaysTapCaskFill
-                color: styles.alwaysTapCaskBorder
+                fillColor: styles.alwaysTapCaskFill,
+                color: styles.alwaysTapCaskBorder,
                 radius: 10,
                 weight: 4,
                 className: 'always-tap-cask-marker',
                 fillOpacity: 1
             },
             'always_bottle_can': {
-                fillColor: styles.alwaysBottleCanFill
-                color: styles.alwaysBottleCanBorder
+                fillColor: styles.alwaysBottleCanFill,
+                color: styles.alwaysBottleCanBorder,
                 radius: 9,
                 weight: 3,
                 className: 'always-bottle-can-marker'
             },
             'currently': {
-                fillColor: styles.currentlyGfFill
-                color: styles.currentlyGfBorder
+                fillColor: styles.currentlyGfFill,
+                color: styles.currentlyGfBorder,
             },
             'not_currently': {
-                fillColor: styles.notCurrentlyFill
-                color: styles.notCurrentlyBorder
+                fillColor: styles.notCurrentlyFill,
+                color: styles.notCurrentlyBorder,
                 fillOpacity: 0.7
             },
             'unknown': {
-                fillColor: styles.unknownGfFill
-                color: styles.unknownGfBorder
+                fillColor: styles.unknownGfFill,
+                color: styles.unknownGfBorder,
                 fillOpacity: 0.6
             }
         };
