@@ -887,6 +887,26 @@ const App = {
         'show-cookie-settings': (el, modules) => {
             modules.modalManager?.open('cookieSettings'); // CHANGED
         },
+
+        // Add to action handlers in main.js:
+        'change-nickname': (el, modules) => {
+            const newNickname = prompt('Enter your new nickname:', window.App.getState('userNickname'));
+            if (newNickname && newNickname.trim()) {
+                // Update everywhere
+                window.App.setState('userNickname', newNickname.trim());
+                localStorage.setItem('userNickname', newNickname.trim());
+                
+                // Reload community hub
+                const communityHub = modules.communityHub || window.App?.getModule('communityHub');
+                if (communityHub) {
+                    // Force reload profile
+                    communityHub.loadUserProfile();
+                    communityHub.renderHub();
+                }
+                
+                modules.helpers?.showSuccessToast(`Nickname changed to ${newNickname}!`);
+            }
+        },
         
         // Update location blocked:
         'close-location-blocked': (el, modules) => {
