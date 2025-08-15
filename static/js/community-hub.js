@@ -641,12 +641,10 @@ export const CommunityHubModule = (() => {
                 state.leaderboard = data.leaderboard;
                 console.log('📊 Loaded real leaderboard:', state.leaderboard);
                 
-                // Re-render if we're on leaderboard tab
-                if (state.currentView === 'leaderboard') {
-                    const contentEl = document.getElementById('hubTabContent');
-                    if (contentEl) {
-                        contentEl.innerHTML = renderLeaderboardTab();
-                    }
+                // Re-render current tab (could be impact OR leaderboard)
+                const contentEl = document.getElementById('hubTabContent');
+                if (contentEl) {
+                    contentEl.innerHTML = renderTabContent();
                 }
             } else {
                 console.error('API returned success: false', data);
