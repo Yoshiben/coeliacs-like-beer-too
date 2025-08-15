@@ -1061,42 +1061,52 @@ export const MapModule = (() => {
     // TOGGLE RESULTS MAP
     // ================================
     const toggleSearchResultsFullMap = () => {
+        console.log('🗺️ Toggle results map called');
+        
         const elements = {
             list: document.getElementById('resultsListContainer'),
             map: document.getElementById('resultsMapContainer'),
             btnText: document.getElementById('resultsMapBtnText')
         };
         
-        // If elements don't exist, we're not on the results page properly
+        // Check if elements exist
         if (!elements.list || !elements.map) {
-            console.error('❌ Results map elements not found');
-            // Try to create/show the map container if it doesn't exist
+            console.error('❌ Results elements not found, attempting recovery...');
+            
+            // Try to find/create the map container
             const resultsContent = document.querySelector('.results-content');
-            if (resultsContent && !elements.map) {
-                // Create the map container if missing
-                const mapContainer = document.createElement('div');
-                mapContainer.id = 'resultsMapContainer';
-                mapContainer.className = 'results-map-container';
-                mapContainer.innerHTML = '<div id="resultsMap" class="results-map"></div>';
-                resultsContent.appendChild(mapContainer);
+            if (resultsContent) {
+                // Check again for the map container
+                let mapContainer = document.getElementById('resultsMapContainer');
+                if (!mapContainer) {
+                    console.log('📍 Creating map container...');
+                    mapContainer = document.createElement('div');
+                    mapContainer.id = 'resultsMapContainer';
+                    mapContainer.className = 'results-map-container';
+                    mapContainer.style.display = 'none';
+                    mapContainer.innerHTML = '<div id="resultsMap" class="results-map"></div>';
+                    resultsContent.appendChild(mapContainer);
+                }
                 
-                // Try again with the newly created element
-                setTimeout(() => toggleSearchResultsFullMap(), 50);
+                // Try again after creating
+                setTimeout(() => toggleSearchResultsFullMap(), 100);
                 return;
             }
+            
+            console.error('❌ Cannot recover - results structure missing');
             return;
         }
         
-        // Update the button text - but don't require it
-        if (!elements.btnText) {
-            console.log('⚠️ Map button text element not found, continuing anyway');
-        }
+        const isMapHidden = elements.map.style.display === 'none' || !elements.map.style.display;
         
-        if (elements.map.style.display === 'none' || !elements.map.style.display) {
+        if (isMapHidden) {
             // Show map
             console.log('🗺️ Showing results map');
+            
+            // Clean up any existing map first
             cleanupResultsMap();
             
+            // Hide list, show map
             elements.list.style.display = 'none';
             elements.map.style.display = 'block';
             elements.map.style.flex = '1';
@@ -1109,27 +1119,48 @@ export const MapModule = (() => {
                 elements.btnText.textContent = 'List';
             }
             
-            // Force layout
-            elements.map.offsetHeight;
+            // Force layout recalculation
+            void elements.map.offsetHeight;
             
-            // Initialize map with CURRENT SEARCH RESULTS
+            // Get current search results
+            const searchModule = modules.search;
+            const venues = searchModule?.getCurrentResults() || 
+                          window.App?.getState('searchResults') || 
+                          state.currentSearchVenues || [];
+            
+            console.log(`🗺️ Initializing map with ${venues.length} venues`);
+            
+            // Small delay to ensure DOM is ready
             setTimeout(() => {
-                const searchModule = modules.search;
-                const venues = searchModule?.getCurrentResults() || window.App?.getState('searchResults') || [];
-                console.log(`🗺️ Initializing results map with ${venues.length} venues from current search`);
-                initResultsMap(venues);
-            }, 50);
+                try {
+                    initResultsMap(venues);
+                } catch (error) {
+                    console.error('❌ Failed to initialize map:', error);
+                    // Revert to list view on error
+                    elements.list.style.display = 'block';
+                    elements.map.style.display = 'none';
+                    if (elements.btnText) {
+                        elements.btnText.textContent = 'Map';
+                    }
+                    
+                    // Show error message
+                    if (window.showSuccessToast) {
+                        window.showSuccessToast('❌ Map failed to load. Please try again.');
+                    }
+                }
+            }, 100);
             
             // Track event
-            const trackingModule = modules.tracking;
-            if (trackingModule) {
-                trackingModule.trackEvent('results_map_toggle', 'Map Interaction', 'show');
-            }
+            modules.tracking?.trackEvent('results_map_toggle', 'Map', 'show');
+            
         } else {
             // Show list
             console.log('📋 Showing results list');
+            
+            // Clean up map
             cleanupResultsMap();
             
+            // Show list, hide map
             elements.list.style.display = 'block';
             elements.list.style.flex = '1';
             elements.map.style.display = 'none';
@@ -1139,10 +1170,7 @@ export const MapModule = (() => {
             }
             
             // Track event
-            const trackingModule = modules.tracking;
-            if (trackingModule) {
-                trackingModule.trackEvent('results_map_toggle', 'Map Interaction', 'hide');
-            }
+            modules.tracking?.trackEvent('results_map_toggle', 'Map', 'hide');
         }
     };
     
