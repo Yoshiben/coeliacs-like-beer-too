@@ -236,13 +236,24 @@ export const MapModule = (() => {
     // RESULTS MAP
     // ================================
     const initResultsMap = (searchVenues = null) => {
-        console.log('🗺️ Initializing results map...');
+        console.log('🗺️ initResultsMap called');
+        console.log('🗺️ Search venues provided:', searchVenues?.length || 'none');
         
         const mapElement = document.getElementById('resultsMap');
         if (!mapElement) {
-            console.error('Results map element not found');
+            console.error('❌ Results map element not found');
+
+            // Let's check what IS in the DOM
+            const mapContainer = document.getElementById('resultsMapContainer');
+            console.log('🗺️ Map container found:', !!mapContainer);
+            if (mapContainer) {
+                console.log('🗺️ Map container HTML:', mapContainer.innerHTML);
+            }
             return null;
         }
+
+        console.log('🗺️ Map element display:', mapElement.style.display);
+        console.log('🗺️ Map element dimensions:', mapElement.offsetWidth, 'x', mapElement.offsetHeight);
         
         // Clean up existing map
         utils.cleanupMap(maps.results);
