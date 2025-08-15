@@ -1,7 +1,6 @@
-// ================================================================================
-// API.JS - Simplified Version
-// Handles: Backend communication, basic error handling
-// ================================================================================
+// ==================
+// API.JS
+// ==================
 
 import { Constants } from './constants.js';
 const STATE_KEYS = Constants.STATE_KEYS;
@@ -47,7 +46,6 @@ export const APIModule = (function() {
     // ================================
     // SEARCH APIS
     // ================================
-    // In api.js, update searchVenues function
     const searchVenues = async (params) => {
         const { query, searchType = 'all', page = 1, venueId = null, gfOnly = false, user_lat, user_lng } = params;
         
@@ -63,7 +61,6 @@ export const APIModule = (function() {
                 gf_only: gfOnly.toString()
             });
             
-            // Add location if provided for server-side distance sorting
             if (user_lat && user_lng) {
                 searchParams.set('user_lat', user_lat.toString());
                 searchParams.set('user_lng', user_lng.toString());
@@ -73,10 +70,8 @@ export const APIModule = (function() {
         }
         
         const data = await apiCall(url);
-        
-        // Return the full response object with pagination
         window.App.setState('searchResults', data.venues || data.pubs || data);
-        return data; // Return full response, not just venues array
+        return data; 
     };
     
     const findNearbyVenues = async (lat, lng, radius = 5, gfOnly = false) => {
@@ -183,8 +178,7 @@ export const APIModule = (function() {
             method: 'POST',
             body: JSON.stringify({ venue_id: venueId, status })
         });
-        
-        // Update current venue state
+
         const currentVenue = window.App.getState(STATE_KEYS.CURRENT_VENUE);
         if (currentVenue && currentVenue.venue_id === venueId) {
             window.App.setState(STATE_KEYS.CURRENT_VENUE, {
