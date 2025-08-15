@@ -667,6 +667,49 @@ const App = {
         'get-venue-directions': (el, modules) => {
             App.openVenueDirections(modules);
         },
+
+        'search-venues-with-brewery': (el, modules) => {
+            const breweryName = document.getElementById('breweryName')?.textContent;
+            
+            if (!breweryName) {
+                console.error('No brewery name found');
+                return;
+            }
+            
+            // Close the modal
+            modules.modalManager?.close('breweryBeersModal');
+            modules.modalManager?.close('breweriesOverlay');
+            
+            // Set search input to brewery name
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.value = breweryName;
+            }
+            
+            // Show loading
+            modules.helpers?.showLoadingToast(`Searching for ${breweryName} venues...`);
+            
+            // Search by brewery
+            const params = new URLSearchParams({
+                q: breweryName,
+                type: 'beer'  // Still search in beer mode
+            });
+            
+            fetch(`/api/search?${params}`)
+            .then(response => response.json())
+            .then(data => {
+                modules.helpers?.hideLoadingToast();
+                
+                const searchModule = modules.search || window.App?.getModule('search');
+                if (searchModule && searchModule.displayResults) {
+                    searchModule.displayResults(data);
+                }
+            })
+            .catch(error => {
+                console.error('Search error:', error);
+                modules.helpers?.hideLoadingToast();
+            });
+        },
         
         // Map actions
         'toggle-results-map': (el, modules) => {
