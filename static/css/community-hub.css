@@ -148,17 +148,19 @@
 }
 
 .tab {
-    flex: 1;
-    min-width: fit-content;
-    padding: clamp(0.5rem, 2vw, 0.75rem);
-    background: transparent;
-    border: none;
-    border-radius: 10px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: var(--transition);
-    color: var(--text-secondary);
-    white-space: nowrap;
+   flex: 1;
+   min-width: fit-content;
+   padding: clamp(0.5rem, 2vw, 0.75rem);
+   background: transparent;
+   border: none;
+   border-radius: 10px;
+   font-weight: 600;
+   cursor: pointer;
+   transition: var(--transition);
+   color: var(--text-secondary);
+   white-space: nowrap;
+   font-size: var(--text-xs);
+   
 }
 
 .tab.active {
@@ -445,32 +447,4 @@
 
 
 
-/* Keep impact grid as 4 columns but scale down on mobile */
-.impact-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: clamp(0.5rem, 1.5vw, 1rem); /* Smaller gaps on mobile */
-    padding: 1rem;
-}
 
-/* Make cards much more compact on mobile */
-@media (max-width: 767px) {
-    .impact-card {
-        padding: clamp(0.5rem, 2vw, 1rem); /* Less padding */
-    }
-    
-    .impact-icon {
-        font-size: clamp(1.2rem, 3vw, 2rem); /* Smaller icons */
-        margin-bottom: 0.2rem;
-    }
-    
-    .impact-number {
-        font-size: clamp(1rem, 2.5vw, 1.5rem); /* Smaller numbers */
-        margin-bottom: 0.1rem;
-    }
-    
-    .impact-label {
-        font-size: clamp(0.6rem, 1.8vw, 0.85rem); /* Smaller text */
-        line-height: 1.1;
-    }
-}
