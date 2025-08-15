@@ -762,7 +762,7 @@ def get_user_stats(nickname):
         # Get status updates
         cursor.execute("""
             SELECT COUNT(*) as count, COUNT(DISTINCT venue_id) as venues
-            FROM railway_status_updates
+            FROM status_updates
             WHERE updated_by = %s
         """, (nickname,))
         status_stats = cursor.fetchone()
@@ -1501,6 +1501,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
