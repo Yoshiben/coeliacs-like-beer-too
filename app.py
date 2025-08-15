@@ -744,6 +744,57 @@ def get_community_leaderboard():
             cursor.close()
             conn.close()
 
+@app.route('/api/community/my-stats/<nickname>')
+def get_user_stats(nickname):
+    """Get real stats for a specific user"""
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor()
+        
+        # Get beer contributions
+        cursor.execute("""
+            SELECT COUNT(*) as count, COUNT(DISTINCT venue_id) as venues
+            FROM venue_beers
+            WHERE added_by = %s
+        """, (nickname,))
+        beer_stats = cursor.fetchone()
+        
+        # Get status updates
+        cursor.execute("""
+            SELECT COUNT(*) as count, COUNT(DISTINCT venue_id) as venues
+            FROM railway_status_updates
+            WHERE updated_by = %s
+        """, (nickname,))
+        status_stats = cursor.fetchone()
+        
+        # Calculate totals
+        total_beers = beer_stats[0] if beer_stats else 0
+        total_statuses = status_stats[0] if status_stats else 0
+        unique_venues = (beer_stats[1] if beer_stats else 0) + (status_stats[1] if status_stats else 0)
+        
+        # Calculate points
+        points = (total_beers * 15) + (total_statuses * 5) + (unique_venues * 10)
+        
+        return jsonify({
+            'success': True,
+            'stats': {
+                'beers_reported': total_beers,
+                'status_updates': total_statuses,
+                'venues_updated': unique_venues,
+                'total_contributions': total_beers + total_statuses,
+                'points': points,
+                'people_helped': unique_venues * 5  # Rough estimate
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"User stats error: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
+
 # ================================================================================
 # API ROUTES
 # ================================================================================
@@ -1450,6 +1501,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
