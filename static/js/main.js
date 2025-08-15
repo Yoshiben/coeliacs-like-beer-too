@@ -709,24 +709,36 @@ const App = {
             const toggle = document.getElementById('searchToggle');
             if (toggle) {
                 toggle.checked = false;
-                console.log('Toggle unchecked');
             }
             
-            // Get last search type - USE THE RIGHT STATE KEY!
+            // Get last search details
             const lastSearch = window.App.getState('lastSearch');
-            const lastSearchType = lastSearch?.type;
-            console.log('Last search type:', lastSearchType);
+            const searchType = lastSearch?.type;
+            const query = lastSearch?.query;
             
-            // Re-run the appropriate search
+            console.log('Retrying search:', searchType, query);
+            
+            if (!searchType || !query) {
+                console.error('No search to retry');
+                return;
+            }
+            
+            // Set the appropriate input field based on search type
+            if (searchType === 'name') {
+                const input = document.getElementById('searchInput');
+                if (input) input.value = query;
+            } else if (searchType === 'area') {
+                const input = document.getElementById('areaInput');
+                if (input) input.value = query;
+            } else if (searchType === 'beer') {
+                const input = document.getElementById('beerInput');
+                if (input) input.value = query;
+            }
+            
+            // Now call the search
             const searchModule = modules.search || window.App?.getModule('search');
-            if (searchModule) {
-                if (lastSearchType === 'name') {
-                    searchModule.searchByName();
-                } else if (lastSearchType === 'area') {
-                    searchModule.searchByArea();
-                } else if (lastSearchType === 'beer') {
-                    searchModule.searchByBeer();
-                }
+            if (searchModule && searchModule[`searchBy${searchType.charAt(0).toUpperCase() + searchType.slice(1)}`]) {
+                searchModule[`searchBy${searchType.charAt(0).toUpperCase() + searchType.slice(1)}`]();
             }
         },
         
