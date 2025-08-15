@@ -712,8 +712,9 @@ const App = {
                 console.log('Toggle unchecked');
             }
             
-            // Get last search type
-            const lastSearchType = window.App.getState('lastSearchType');
+            // Get last search type - USE THE RIGHT STATE KEY!
+            const lastSearch = window.App.getState('lastSearch');
+            const lastSearchType = lastSearch?.type;
             console.log('Last search type:', lastSearchType);
             
             // Re-run the appropriate search
@@ -727,39 +728,6 @@ const App = {
                     searchModule.searchByBeer();
                 }
             }
-        },
-        
-        // Map actions
-        'toggle-results-map': (el, modules) => {
-            modules.map?.toggleSearchResultsFullMap?.();
-        },
-        'toggle-venue-map': (el, modules) => {
-            App.toggleVenueDetailMap(modules);
-        },
-        'show-venue-on-map': (el, modules) => {
-            const currentVenue = App.getState(STATE_KEYS.CURRENT_VENUE);
-            if (!currentVenue || !currentVenue.latitude || !currentVenue.longitude) {
-                modules.helpers?.showToast('📍 Location not available for this venue', 'error');
-                return;
-            }
-            
-            // Show full map
-            App.showFullMap(modules);
-            
-            // After map loads, center on this venue
-            setTimeout(() => {
-                const map = App.getState(STATE_KEYS.MAP_DATA.FULL_UK_MAP);
-                if (map) {
-                    map.setView([parseFloat(currentVenue.latitude), parseFloat(currentVenue.longitude)], 16);
-                    
-                    // Find and open the venue's popup
-                    map.eachLayer(layer => {
-                        if (layer.options && layer.options.venueId === currentVenue.venue_id) {
-                            layer.openPopup();
-                        }
-                    });
-                }
-            }, 500);
         },
         
         // In main.js actionHandlers - update show-full-map
