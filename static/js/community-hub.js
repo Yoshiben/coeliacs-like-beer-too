@@ -443,6 +443,27 @@ export const CommunityHubModule = (() => {
             tab.addEventListener('click', () => switchTab(tab.dataset.hubTab));
         });
     };
+
+    const calculateProgress = () => {
+        if (!state.userProfile) return 0;
+        
+        const thresholds = [0, 100, 250, 500, 1000, 2000, 5000, 10000];
+        const currentLevel = state.userProfile.level;
+        const currentThreshold = thresholds[currentLevel - 1] || 0;
+        const nextThreshold = thresholds[currentLevel] || 10000;
+        
+        const progress = ((state.userProfile.points - currentThreshold) / (nextThreshold - currentThreshold)) * 100;
+        return Math.min(Math.max(progress, 0), 100);
+    };
+    
+    const calculatePointsToNext = () => {
+        if (!state.userProfile) return 0;
+        
+        const thresholds = [0, 100, 250, 500, 1000, 2000, 5000, 10000];
+        const nextThreshold = thresholds[state.userProfile.level] || 10000;
+        
+        return Math.max(0, nextThreshold - state.userProfile.points);
+    };
     
     const renderTabContent = () => {
         switch(state.currentView) {
