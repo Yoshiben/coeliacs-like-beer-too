@@ -30,6 +30,7 @@ export const ModalManager = (() => {
         fullMapOverlay: { type: 'overlay', group: 'primary', exclusive: true },
         venueDetailsOverlay: { type: 'overlay', group: 'primary', exclusive: true },
         breweriesOverlay: { type: 'overlay', group: 'primary', exclusive: true },
+        communityHubOverlay: { type: 'overlay', group: 'primary', exclusive: true },
 
         // Info overlays
         aboutOverlay: { type: 'overlay', group: 'info', exclusive: true, zIndex: 1500 },
