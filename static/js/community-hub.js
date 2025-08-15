@@ -354,7 +354,7 @@ export const CommunityHubModule = (() => {
         if (!state.userProfile) return;
         
         const updates = state.userProfile.updates;
-        const totalUpdates = updates.venues + updates.beers + updates.statuses;
+        const venueCount = updates.venues || 0;  // Just use venues!
         
         // Check each achievement
         Object.values(ACHIEVEMENTS).forEach(achievement => {
@@ -412,12 +412,13 @@ export const CommunityHubModule = (() => {
         }
         
         container.innerHTML = `
-            <!-- Level Banner -->
+            <!-- Combined Level Banner with Stats (no separate header) -->
             <div class="level-banner">
                 <div class="floating-beer">🍺</div>
                 <div class="floating-beer">🍺</div>
                 <div class="floating-beer">🍺</div>
                 <div class="level-content">
+                    <!-- User info in top right -->
                     <div class="level-user-info">
                         <span class="username">${state.userProfile.nickname}</span>
                         <button class="change-nickname-btn" data-action="change-nickname">✏️</button>
@@ -427,13 +428,13 @@ export const CommunityHubModule = (() => {
                         <div class="level-title">Level ${state.userProfile.level}: ${getLevelName(state.userProfile.level)}</div>
                         <div class="level-stats">
                             <span class="stat-bubble">${state.userProfile.points} pts</span>
-                            <span class="stat-bubble">${getTotalUpdates()} updates</span>
+                            <span class="stat-bubble">${state.userProfile.updates.venues || 0} venues</span>
                         </div>
                     </div>
                     <div class="level-progress">
                         <div class="level-fill" style="width: ${calculateProgress()}%"></div>
                     </div>
-                    <div class="level-text">${calculatePointsToNext()} points to next level</div>
+                    <div class="level-text">${calculatePointsToNext()} points to next level • Keep going!</div>
                 </div>
             </div>
             
@@ -462,13 +463,13 @@ export const CommunityHubModule = (() => {
 
     const renderBadgesTab = () => {
         const allBadges = [
-            { id: 'first_steps', name: 'First Steps', icon: '👶', description: 'Make your first contribution', earned: state.userProfile.achievements.includes('first_update') },
-            { id: 'regular', name: 'Regular', icon: '⭐', description: '10 contributions', earned: state.userProfile.achievements.includes('ten_updates') },
-            { id: 'hero', name: 'Local Hero', icon: '🦸', description: '50 contributions', earned: state.userProfile.achievements.includes('fifty_updates') },
-            { id: 'legend', name: 'GF Legend', icon: '👑', description: '100 contributions', earned: state.userProfile.achievements.includes('hundred_updates') },
-            { id: 'explorer', name: 'Explorer', icon: '🗺️', description: 'Update 25 different venues', earned: false },
+            { id: 'first_steps', name: 'First Steps', icon: '👶', description: 'Update your first venue', earned: state.userProfile.achievements.includes('first_update') },
+            { id: 'regular', name: 'Regular', icon: '⭐', description: 'Update 10 venues', earned: state.userProfile.achievements.includes('ten_updates') },
+            { id: 'explorer', name: 'Explorer', icon: '🗺️', description: 'Update 25 venues', earned: state.userProfile.achievements.includes('fifty_updates') },
+            { id: 'legend', name: 'GF Legend', icon: '👑', description: 'Update 50 venues', earned: state.userProfile.achievements.includes('hundred_updates') },
             { id: 'nightowl', name: 'Night Owl', icon: '🦉', description: 'Update after midnight', earned: false },
             { id: 'early_bird', name: 'Early Bird', icon: '🐦', description: 'Update before 6am', earned: false },
+            { id: 'streak_week', name: 'Week Warrior', icon: '🔥', description: '7 day streak', earned: state.userProfile.achievements.includes('week_streak') },
         ];
         
         return `
