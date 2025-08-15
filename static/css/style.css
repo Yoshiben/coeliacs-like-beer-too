@@ -1777,19 +1777,21 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 
 .legend-marker.currently {
    background: var(--blue);
-   border-color: var(--currently-border);
+   border-color: var(--dark-blue);
 }
 
 .legend-marker.not-currently {
    background: var(--red);
+   border-color: var(--dark-red);
 }
 
 .legend-marker.unknown {
    background: var(--light-grey);
+   border-color: var(--dark-grey);
 }
 
 .legend-marker.user-location {
-   background: var(--primary-gradient);
+   background: var(--purple);
    border-color: var(--white);
 }
 
