@@ -494,6 +494,12 @@ export const ModalManager = (() => {
                     mapContainer.style.flex = '1';
                     mapContainer.style.height = '100%';
                 }
+
+                // HIDE PAGINATION FOR MAP VIEW
+                if (paginationContainer) {
+                    paginationContainer.style.display = 'none';
+                }
+                
             } else {
                 console.log('🔄 Switching to LIST view');
                 if (listContainer) {
