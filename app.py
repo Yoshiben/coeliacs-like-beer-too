@@ -692,7 +692,7 @@ def get_community_leaderboard():
                 updated_by as nickname,
                 COUNT(*) as status_updates,
                 COUNT(DISTINCT venue_id) as venues_updated
-            FROM railway_status_updates
+            FROM status_updates
             WHERE updated_by IS NOT NULL 
             AND updated_by != 'anonymous'
             AND updated_by != ''
@@ -1450,6 +1450,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
