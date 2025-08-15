@@ -68,78 +68,74 @@ export default (function() {
     };
     
     // Enhanced display with featured section
-    const displayBreweries = () => {
+    const displayBreweries = (filterPurchasable = false) => {
         const container = document.getElementById('breweriesContent');
         if (!container) return;
+        
+        // Check if we came from "Buy GF Beer" button
+        const showOnlyPurchasable = filterPurchasable || window.App.getState('showPurchasableOnly');
         
         container.innerHTML = `
             <!-- Hero Section -->
             <div class="breweries-hero">
-                <h1>🍺 GF Brewery Partners</h1>
-                <p>Supporting 100% gluten-free & dedicated GF breweries</p>
+                <h1>${showOnlyPurchasable ? '🛍️ Buy GF Beer Online' : '🍺 GF Breweries'}</h1>
+                <p>${showOnlyPurchasable ? 
+                    'Order directly from our partner breweries' : 
+                    'Discover all gluten-free breweries in our database'}</p>
             </div>
             
-            <!-- Featured Partners -->
-            <div class="featured-section">
-                <h2>⭐ Featured Partners</h2>
-                <p class="section-subtitle">We're partnering with these amazing breweries to bring you the best GF beer</p>
-                
-                <div class="featured-grid">
-                    ${FEATURED_BREWERIES.map(brewery => `
-                        <div class="featured-brewery-card">
-                            <div class="brewery-badge">
-                                ${brewery.rating ? `<span class="rating">⭐ ${brewery.rating}</span>` : ''}
-                                ${brewery.featured ? '<span class="featured-tag">Featured</span>' : ''}
-                            </div>
-                            
-                            <div class="brewery-header">
-                                <h3>${brewery.name}</h3>
-                                <span class="location">📍 ${brewery.location}</span>
-                            </div>
-                            
-                            <p class="brewery-description">${brewery.description}</p>
-                            
-                            <div class="beer-preview">
-                                <strong>Popular beers:</strong>
-                                <div class="beer-pills">
-                                    ${brewery.beers.slice(0, 3).map(beer => 
-                                        `<span class="beer-pill">${beer}</span>`
-                                    ).join('')}
+            <!-- Filter Toggle -->
+            <div class="brewery-filters">
+                <div class="filter-toggle">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="purchasableToggle" 
+                               ${showOnlyPurchasable ? 'checked' : ''}>
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-label">Show only breweries with online shop</span>
+                    </label>
+                </div>
+                ${showOnlyPurchasable ? `
+                    <div class="community-message">
+                        <span class="message-icon">💙</span>
+                        <span>These affiliate links help keep this site free for everyone!</span>
+                    </div>
+                ` : ''}
+            </div>
+            
+            <!-- Featured Partners (only show if filtered) -->
+            ${showOnlyPurchasable ? `
+                <div class="featured-section">
+                    <h2>🤝 Our Partner Breweries</h2>
+                    <div class="featured-grid">
+                        ${FEATURED_BREWERIES.map(brewery => `
+                            <div class="featured-brewery-card purchasable">
+                                <div class="shop-badge">🛒 Shop Available</div>
+                                <div class="brewery-header">
+                                    <h3>${brewery.name}</h3>
+                                    <span class="location">📍 ${brewery.location}</span>
+                                </div>
+                                <p class="brewery-description">${brewery.description}</p>
+                                <div class="brewery-actions">
+                                    <a href="${brewery.website}" 
+                                       target="_blank" 
+                                       class="btn btn-primary shop-btn"
+                                       onclick="trackBreweryClick('${brewery.name}')">
+                                        Shop Now →
+                                    </a>
                                 </div>
                             </div>
-                            
-                            <div class="brewery-actions">
-                                <a href="${brewery.website}" 
-                                   target="_blank" 
-                                   class="btn btn-primary"
-                                   onclick="trackBreweryClick('${brewery.name}')">
-                                    Visit Website →
-                                </a>
-                                <button class="btn btn-secondary" 
-                                        data-action="search-brewery" 
-                                        data-brewery="${brewery.name}">
-                                    Find in Venues
-                                </button>
-                            </div>
-                        </div>
-                    `).join('')}
+                        `).join('')}
+                    </div>
+                    
+                    <div class="more-coming">
+                        <h3>🚀 More Coming Soon!</h3>
+                        <p>We're actively partnering with more GF breweries. Check back regularly!</p>
+                    </div>
                 </div>
-            </div>
-            
-            <!-- Coming Soon Section -->
-            <div class="coming-soon-section">
-                <div class="coming-soon-card">
-                    <h3>🤝 More Partnerships Coming Soon!</h3>
-                    <p>We're in talks with more fantastic GF breweries.</p>
-                    <p class="cta-text">Are you a GF brewery? Get in touch!</p>
-                    <a href="mailto:partners@coeliacslikebeer.co.uk" class="btn btn-outline">
-                        Become a Partner
-                    </a>
-                </div>
-            </div>
+            ` : ''}
             
             <!-- All Breweries Section -->
-            <div class="all-breweries-section">
+            <div class="all-breweries-section" ${showOnlyPurchasable ? 'style="display:none"' : ''}>
                 <h2>📚 All Breweries in Database</h2>
                 <input type="text" 
                        id="brewerySearchInput" 
@@ -159,6 +155,13 @@ export default (function() {
                 </div>
             </div>
         `;
+        
+        // Add toggle listener
+        const toggle = document.getElementById('purchasableToggle');
+        toggle?.addEventListener('change', (e) => {
+            window.App.setState('showPurchasableOnly', e.target.checked);
+            displayBreweries(e.target.checked);
+        });
         
         // Add search functionality
         const searchInput = document.getElementById('brewerySearchInput');
@@ -198,13 +201,18 @@ export default (function() {
         localStorage.setItem('lastBreweryClicked', breweryName);
     };
     
-    const openBreweries = () => {
+    const openBreweries = (fromBuyButton = false) => {
         console.log('🏭 Opening breweries showcase');
+        
+        // Set filter state if coming from Buy button
+        if (fromBuyButton) {
+            window.App.setState('showPurchasableOnly', true);
+        }
         
         if (modules.modalManager) {
             modules.modalManager.open('breweriesOverlay', {
                 onOpen: () => {
-                    displayBreweries();
+                    displayBreweries(fromBuyButton);
                     if (breweries.length === 0) {
                         loadBreweries();
                     }
@@ -213,7 +221,7 @@ export default (function() {
         }
         
         modules.nav?.setPageContext('breweries');
-        modules.tracking?.trackEvent('breweries_opened', 'Navigation');
+        modules.tracking?.trackEvent('breweries_opened', 'Navigation', fromBuyButton ? 'buy_button' : 'nav');
     };
     
     const closeBreweries = () => {
