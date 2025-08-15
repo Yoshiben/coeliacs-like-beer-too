@@ -234,9 +234,9 @@
                 <div class="nav-icon">🗺️</div>
                 <div class="nav-label">Map</div>
             </a>
-            <div class="nav-item" data-action="open-breweries">
-                <div class="nav-icon">🍺</div>
-                <div class="nav-label">Shop</div>
+            <div class="nav-item" data-action="open-community-hub">
+                <div class="nav-icon">🏆</div>
+                <div class="nav-label">Community</div>
             </div>
             <div class="nav-item nav-more" data-action="toggle-more-menu">
                 <div class="nav-icon">⋯</div>
@@ -404,6 +404,18 @@
         <div id="fullMapOverlay" class="overlay map-overlay">
             <div class="map-container">
                 <div id="fullMap" class="full-map"></div>
+            </div>
+        </div>
+
+        <!-- Add this overlay div somewhere in your body -->
+        <div id="communityHubOverlay" class="overlay">
+            <div class="overlay-header">
+                <button class="back-button" data-action="close-community-hub">←</button>
+                <h2>Community Hub</h2>
+                <div></div>
+            </div>
+            <div id="communityHubContent">
+                <!-- Content will be injected here -->
             </div>
         </div>
 
@@ -1276,6 +1288,7 @@
         </script>
     </body>
 </html>
+
 
 
 
