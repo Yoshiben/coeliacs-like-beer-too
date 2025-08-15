@@ -70,7 +70,7 @@ export const APIModule = (function() {
         }
         
         const data = await apiCall(url);
-        window.App.setState('searchResults', data.venues || data.pubs || data);
+        window.App.setState('searchResults', data.venues || data);
         return data; 
     };
     
