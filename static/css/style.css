@@ -3016,9 +3016,13 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 
 
 
+.marker-cluster {
+    background-color: var(--light-grey) !important;
+}
 
-
-
+.marker-cluster div {
+    background-color: var(--dark-grey) !important;
+}
 
 
 
