@@ -222,6 +222,10 @@ const App = {
         App.registerModule('search', SearchModule);
         App.registerModule('form', FormModule);
         App.registerModule('community', CommunityModule);
+
+        const { CommunityHubModule } = await import('./community-hub.js');
+        App.registerModule('communityHub', CommunityHubModule);
+        CommunityHubModule.init();
         
         // Handle BreweriesModule - check different possible exports
         const BreweriesModule = breweriesImport.BreweriesModule || 
@@ -932,6 +936,19 @@ const App = {
         'find-stockists': (el, modules) => {
             const community = modules.community || window.App?.getModule('community');
             community?.handleQuickAction('find-stockists');
+        },
+
+        'open-community-hub': (el, modules) => {
+            const communityHub = window.App?.getModule('communityHub');
+            if (communityHub) {
+                communityHub.open();
+            } else {
+                console.error('Community Hub module not loaded');
+            }
+        },
+        
+        'close-community-hub': (el, modules) => {
+            modules.modalManager?.close('communityHubOverlay');
         },
 
         'open-search': (el, modules) => {
