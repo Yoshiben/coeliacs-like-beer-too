@@ -396,34 +396,24 @@ export const CommunityHubModule = (() => {
         }
         
         container.innerHTML = `
-            <!-- Sticky Header (no back button) -->
-            <div class="community-header">
-                <div class="header-content">
-                    <div class="user-summary">
-                        <div class="user-greeting">👋 Hey, ${state.userProfile.nickname}!</div>
-                        <div class="user-stats">
-                            <div class="stat-item">
-                                <span class="stat-value">${state.userProfile.points}</span>
-                                <span class="stat-label">points</span>
-                            </div>
-                            <div class="stat-item">
-                                <span class="stat-value">Level ${state.userProfile.level}</span>
-                                <span class="stat-label">${getLevelName(state.userProfile.level)}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Level Progress with floating beers -->
+            <!-- Combined Level Banner with Stats (no separate header) -->
             <div class="level-banner">
                 <div class="floating-beer">🍺</div>
                 <div class="floating-beer">🍺</div>
                 <div class="floating-beer">🍺</div>
                 <div class="level-content">
+                    <!-- User info in top right -->
+                    <div class="level-user-info">
+                        <span class="username">${state.userProfile.nickname}</span>
+                        <button class="change-nickname-btn" data-action="change-nickname">✏️</button>
+                    </div>
+                    
                     <div class="level-header">
                         <div class="level-title">Level ${state.userProfile.level}: ${getLevelName(state.userProfile.level)}</div>
-                        <div class="level-badge">Next: ${getLevelName(state.userProfile.level + 1)}</div>
+                        <div class="level-stats">
+                            <span class="stat-bubble">${state.userProfile.points} pts</span>
+                            <span class="stat-bubble">${state.userProfile.updates.venues + state.userProfile.updates.beers + state.userProfile.updates.statuses} updates</span>
+                        </div>
                     </div>
                     <div class="level-progress">
                         <div class="level-fill" style="width: ${calculateProgress()}%"></div>
@@ -432,16 +422,9 @@ export const CommunityHubModule = (() => {
                 </div>
             </div>
             
-            <!-- Rest stays the same... -->
+            <!-- Tabs stay the same -->
             <div class="section-tabs">
-                <button class="tab ${state.currentView === 'impact' ? 'active' : ''}" 
-                        data-hub-tab="impact">📊 My Impact</button>
-                <button class="tab ${state.currentView === 'leaderboard' ? 'active' : ''}" 
-                        data-hub-tab="leaderboard">🏆 Leaderboard</button>
-                <button class="tab ${state.currentView === 'breweries' ? 'active' : ''}" 
-                        data-hub-tab="breweries">🍺 Breweries</button>
-                <button class="tab ${state.currentView === 'challenges' ? 'active' : ''}" 
-                        data-hub-tab="challenges">🎯 Challenges</button>
+                <!-- ... tabs ... -->
             </div>
             
             <div id="hubTabContent">
@@ -449,7 +432,7 @@ export const CommunityHubModule = (() => {
             </div>
         `;
         
-        // Attach tab listeners
+        // Attach listeners
         container.querySelectorAll('[data-hub-tab]').forEach(tab => {
             tab.addEventListener('click', () => switchTab(tab.dataset.hubTab));
         });
