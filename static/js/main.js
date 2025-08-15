@@ -605,20 +605,21 @@ const App = {
             // Close the breweries overlay
             modules.modalManager?.close('breweriesOverlay');
             
-            // Perform search for this specific beer
+            // Use the same search beer action that already works
+            const searchQuery = `${breweryName} ${beerName}`;
+            
+            // Set the search input
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.value = searchQuery;
+            }
+            
+            // Trigger search using the existing beer search
             const searchModule = modules.search || window.App?.getModule('search');
-            if (searchModule) {
-                // Search for "brewery beer" e.g. "Abbeydale Moonshine"
-                const searchQuery = `${breweryName} ${beerName}`;
-                
-                // Set the search input
-                const searchInput = document.getElementById('searchInput');
-                if (searchInput) {
-                    searchInput.value = searchQuery;
-                }
-                
-                // Trigger the search
-                searchModule.performSearch(searchQuery);
+            if (searchModule && searchModule.searchBeer) {
+                searchModule.searchBeer(searchQuery);
+            } else {
+                console.error('Search module or searchBeer function not found');
             }
         },
 
