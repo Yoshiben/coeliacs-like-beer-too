@@ -705,13 +705,15 @@ const App = {
         'search-all-venues': (el, modules) => {
             console.log('Search all venues clicked!');
             
+            // Uncheck toggle
             const toggle = document.getElementById('searchToggle');
-            if (toggle && toggle.checked) {
-                toggle.click();  // Uncheck it
-                
-                // Manually trigger change event
-                const event = new Event('change', { bubbles: true });
-                toggle.dispatchEvent(event);
+            if (toggle) toggle.checked = false;
+            
+            // Find which search button is active and click it
+            const activeSearchBtn = document.querySelector('.search-controls .btn-primary.active');
+            if (activeSearchBtn) {
+                console.log('Clicking active search button');
+                activeSearchBtn.click();
             }
         },
         
