@@ -1507,6 +1507,11 @@ export const SearchModule = (function() {
         state.currentSearchVenues = venues;
         
         console.log('💾 Stored search results:', venues.length, 'venues');
+
+        // PRESERVE CURRENT VIEW STATE
+        const modalManager = modules.modalManager || window.App?.getModule('modalManager');
+        const currentView = modalManager?.getInternalView?.('resultsOverlay') || 'list';
+        console.log('📊 Preserving view state:', currentView);
         
         // Keep all your existing code exactly the same...
         const elements = {
