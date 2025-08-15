@@ -166,6 +166,15 @@ export default (function() {
         // Add search functionality
         const searchInput = document.getElementById('brewerySearchInput');
         searchInput?.addEventListener('input', (e) => filterBreweries(e.target.value));
+
+        container.querySelectorAll('[data-action="search-brewery"]').forEach(card => {
+            card.addEventListener('click', (e) => {
+                const breweryName = card.dataset.brewery;
+                if (breweryName) {
+                    searchBreweryBeers(breweryName);
+                }
+            });
+        });
     };
     
     // Load breweries from API
