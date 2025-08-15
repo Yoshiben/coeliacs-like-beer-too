@@ -614,25 +614,22 @@ const App = {
             // Show we're searching
             modules.helpers?.showLoadingToast(`Searching for ${beerName}...`);
             
-            // Directly call the search API
-            fetch('/api/search', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    query: searchQuery,
-                    search_type: 'beer'
-                })
-            })
+            // Use GET request like the normal search
+            const params = new URLSearchParams({
+                q: searchQuery,
+                type: 'beer'
+            });
+            
+            fetch(`/api/search?${params}`)
             .then(response => response.json())
             .then(data => {
                 modules.helpers?.hideLoadingToast();
                 
-                if (data.venues && data.venues.length > 0) {
-                    // Use the search module to display results
-                    const searchModule = modules.search || window.App?.getModule('search');
-                    if (searchModule && searchModule.displayResults) {
-                        searchModule.displayResults(data);
-                    }
+                const searchModule = modules.search || window.App?.getModule('search');
+                if (searchModule && searchModule.displayResults) {
+                    searchModule.displayResults(data);
+                } else if (data.venues && data.venues.length > 0) {
+                    modules.helpers?.showSuccessToast(`Found ${data.venues.length} venues!`);
                 } else {
                     modules.helpers?.showErrorToast(`No venues found serving ${beerName}`);
                 }
