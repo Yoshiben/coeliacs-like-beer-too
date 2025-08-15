@@ -1031,6 +1031,9 @@ const App = {
         },
 
         'buy-gf-beer': (el, modules) => {
+            // Set the state BEFORE opening
+            window.App.setState('showPurchasableOnly', true);
+            
             const breweries = modules.breweries || window.App?.getModule('breweries');
             if (breweries) {
                 breweries.openBreweries(true); // Pass true to show purchasable only
