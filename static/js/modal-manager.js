@@ -26,7 +26,7 @@ export const ModalManager = (() => {
     const registry = {
         // Search overlays (mutually exclusive)
         searchOverlay: { type: 'overlay', group: 'primary', exclusive: true },
-        resultsOverlay: { type: 'overlay', group: 'primary', exclusive: true },
+        resultsOverlay: { type: 'overlay', group: 'primary', exclusive: true, hasInternalViews: true, defaultView: 'list' },
         fullMapOverlay: { type: 'overlay', group: 'primary', exclusive: true },
         venueDetailsOverlay: { type: 'overlay', group: 'primary', exclusive: true },
         breweriesOverlay: { type: 'overlay', group: 'primary', exclusive: true },
@@ -190,6 +190,11 @@ export const ModalManager = (() => {
         // Show overlay
         overlay.style.display = 'flex';
         overlay.classList.add('active');
+        
+        // NEW CODE: Reset to default view if it has internal views
+        if (config.hasInternalViews && config.defaultView) {
+            toggleInternalView(overlayId, config.defaultView);
+        }
         
         // Add to stack
         state.overlayStack.push(overlayId);
@@ -454,6 +459,52 @@ export const ModalManager = (() => {
         
         console.log('✅ ModalManager initialized');
     };
+
+    // ================================
+    // INTERNAL VIEW MANAGEMENT
+    // ================================
+    const toggleInternalView = (overlayId, viewType) => {
+        console.log(`🔄 Toggling internal view in ${overlayId} to ${viewType}`);
+        
+        const config = registry[overlayId];
+        if (!config || !config.hasInternalViews) {
+            console.warn(`⚠️ ${overlayId} doesn't support internal views`);
+            return false;
+        }
+        
+        // Store the current view state
+        if (!state.internalViews) {
+            state.internalViews = {};
+        }
+        state.internalViews[overlayId] = viewType;
+        
+        // Special handling for results overlay
+        if (overlayId === 'resultsOverlay') {
+            const listContainer = document.getElementById('resultsListContainer');
+            const mapContainer = document.getElementById('resultsMapContainer');
+            
+            if (viewType === 'map') {
+                if (listContainer) listContainer.style.display = 'none';
+                if (mapContainer) {
+                    mapContainer.style.display = 'block';
+                    mapContainer.style.flex = '1';
+                    mapContainer.style.height = '100%';
+                }
+            } else {
+                if (listContainer) {
+                    listContainer.style.display = 'block';
+                    listContainer.style.flex = '1';
+                }
+                if (mapContainer) mapContainer.style.display = 'none';
+            }
+        }
+        
+        return true;
+    };
+
+    const getInternalView = (overlayId) => {
+        return state.internalViews?.[overlayId] || registry[overlayId]?.defaultView || null;
+    };
     
     // ================================
     // PUBLIC API
@@ -473,6 +524,8 @@ export const ModalManager = (() => {
         getActive,
         hasActiveModals,
         hasActiveOverlays,
+        toggleInternalView,
+        getInternalView,
         debug,
         
         // Configuration
