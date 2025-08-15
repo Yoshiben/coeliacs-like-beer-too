@@ -590,6 +590,38 @@ const App = {
             }
         },
 
+        'find-venues-with-beer': (el, modules) => {
+            const beerName = el.dataset.beer;
+            const breweryName = el.dataset.brewery;
+            
+            if (!beerName || !breweryName) {
+                console.error('Missing beer or brewery data');
+                return;
+            }
+            
+            // Close the brewery modal
+            modules.modalManager?.close('breweryBeersModal');
+            
+            // Close the breweries overlay
+            modules.modalManager?.close('breweriesOverlay');
+            
+            // Perform search for this specific beer
+            const searchModule = modules.search || window.App?.getModule('search');
+            if (searchModule) {
+                // Search for "brewery beer" e.g. "Abbeydale Moonshine"
+                const searchQuery = `${breweryName} ${beerName}`;
+                
+                // Set the search input
+                const searchInput = document.getElementById('searchInput');
+                if (searchInput) {
+                    searchInput.value = searchQuery;
+                }
+                
+                // Trigger the search
+                searchModule.performSearch(searchQuery);
+            }
+        },
+
         
         // Venue actions
         'view-venue': (el, modules) => {
