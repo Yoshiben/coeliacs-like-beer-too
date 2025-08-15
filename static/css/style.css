@@ -25,11 +25,12 @@
    --dark-green: rgba(0,196,0,1);
    --dark-blue: rgba(37,99,235,1);
    --dark-orange: rgba(234,88,12);
-   
-   --light-grey: rgba(156,163,175,1);
+   --dark-grey: rgba(96,96,96,1);
+
    --light-blue: rgba(102,126,234,1);
    --light-purple: rgba(240,235,245,1);
    --light-orange: rgba(254,215,170,1);
+   --light-grey: rgba(156,163,175,1);
    
    --grey-white: rgba(245, 245, 245, 1);
    
