@@ -1548,7 +1548,7 @@ export const SearchModule = (function() {
                     
                     <div class="toggle-prompt" style="margin-top: 1.5rem; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 10px;">
                         <p style="margin-bottom: 1rem;">💡 There might be venues that serve GF beer but haven't been confirmed yet!</p>
-                        <button class="btn btn-primary" id="searchAllVenuesBtn" data-search-type="${lastSearchType}">
+                        <button class="btn btn-primary" data-action="search-all-venues">
                             🔍 Search all venues instead
                         </button>
                     </div>
