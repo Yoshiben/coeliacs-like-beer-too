@@ -426,6 +426,42 @@ export const SearchModule = (function() {
         
         modules.tracking?.trackEvent('search_by_area', 'Search', `${searchType}:${query}`);
     };
+
+    // Helper function for no results
+    const showNoResultsWithToggleHint = (searchType, query) => {
+        const resultsList = document.getElementById('resultsList');
+        
+        resultsList.innerHTML = `
+            <div class="no-results">
+                <h3>No venues with confirmed GF beer found</h3>
+                <p class="search-query">Searched for: "${query}"</p>
+                
+                <div class="toggle-prompt">
+                    <div class="prompt-icon">💡</div>
+                    <p>There might be venues that serve GF beer but haven't been confirmed yet!</p>
+                    <button class="btn btn-primary" onclick="
+                        // Uncheck the GF only toggle
+                        const toggle = document.getElementById('searchToggle');
+                        if (toggle) toggle.checked = false;
+                        
+                        // Re-run the appropriate search
+                        const searchModule = window.App?.getModule('search');
+                        if (searchModule) {
+                            ${searchType === 'name' ? `searchModule.searchByName()` : 
+                              searchType === 'area' ? `searchModule.searchByArea()` :
+                              searchType === 'beer' ? `searchModule.searchByBeer()` : ''}
+                        }
+                    ">
+                        🔍 Search all venues instead
+                    </button>
+                </div>
+                
+                <div class="help-text">
+                    <p>💙 Help us out! If you find a venue with GF beer, please report it!</p>
+                </div>
+            </div>
+        `;
+    };
     
     const performPostcodeSearch = async (postcode) => {
         try {
@@ -1494,10 +1530,45 @@ export const SearchModule = (function() {
         
         if (elements.loading) elements.loading.style.display = 'none';
         if (elements.list) elements.list.style.display = 'none';
-        if (elements.noResults) elements.noResults.style.display = 'flex';
         
-        const noResultsText = document.querySelector('.no-results-text');
-        if (noResultsText) noResultsText.textContent = message;
+        // Check if we're in GF-only mode
+        const toggle = document.getElementById('searchToggle');
+        const isGfOnly = toggle ? toggle.checked : true;
+        
+        if (isGfOnly && elements.noResults) {
+            // Show the toggle hint for GF-only searches with no results
+            elements.noResults.style.display = 'flex';
+            elements.noResults.innerHTML = `
+                <div class="no-results-content">
+                    <h3>No venues with confirmed GF beer found</h3>
+                    <p class="no-results-text">${message}</p>
+                    
+                    <div class="toggle-prompt" style="margin-top: 1.5rem; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 10px;">
+                        <p style="margin-bottom: 1rem;">💡 There might be venues that serve GF beer but haven't been confirmed yet!</p>
+                        <button class="btn btn-primary" onclick="
+                            const toggle = document.getElementById('searchToggle');
+                            if (toggle) {
+                                toggle.checked = false;
+                                // Re-run the last search
+                                const searchBtn = document.querySelector('.search-controls .btn-primary.active');
+                                if (searchBtn) searchBtn.click();
+                            }
+                        ">
+                            🔍 Search all venues instead
+                        </button>
+                    </div>
+                    
+                    <p style="margin-top: 1rem; opacity: 0.8;">💙 Found a venue with GF beer? Please report it!</p>
+                </div>
+            `;
+        } else {
+            // Show normal no results
+            if (elements.noResults) {
+                elements.noResults.style.display = 'flex';
+                const noResultsText = document.querySelector('.no-results-text');
+                if (noResultsText) noResultsText.textContent = message;
+            }
+        }
     };
 
     const displayResultsInOverlay = (venues, title) => {
