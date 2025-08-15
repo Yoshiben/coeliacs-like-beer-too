@@ -522,23 +522,6 @@ export const CommunityHubModule = (() => {
         return Math.max(0, nextThreshold - state.userProfile.points);
     };
     
-    const renderTabContent = () => {
-        switch(state.currentView) {
-            case 'impact':
-                return renderImpactTab();
-            case 'leaderboard':
-                return renderLeaderboardTab();
-            case 'breweries':
-                return renderBreweriesTab();
-            case 'challenges':
-                return renderChallengesTab();
-            default:
-                return renderImpactTab();
-        }
-    };
-    
-    // Add this function to load real stats
-    // Update loadUserStats with correct property mapping and debugging
     const loadUserStats = async () => {
         if (!state.userProfile?.nickname) return;
         
