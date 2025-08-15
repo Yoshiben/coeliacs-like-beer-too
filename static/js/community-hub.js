@@ -498,8 +498,66 @@ export const CommunityHubModule = (() => {
         }
     };
     
+    // Add this function to load real stats
+    const loadUserStats = async () => {
+        if (!state.userProfile?.nickname) return;
+        
+        try {
+            const response = await fetch(`/api/community/my-stats/${encodeURIComponent(state.userProfile.nickname)}`);
+            const data = await response.json();
+            
+            if (data.success) {
+                // Update the profile with real data
+                state.userProfile.updates = {
+                    venues: data.stats.venues_updated,
+                    beers: data.stats.beers_reported,
+                    statuses: data.stats.status_updates
+                };
+                state.userProfile.points = data.stats.points;
+                
+                // Recalculate level based on real points
+                state.userProfile.level = calculateLevel(data.stats.points);
+                
+                // Save and re-render
+                saveUserProfile();
+                
+                // Update the display if we're viewing impact tab
+                if (state.currentView === 'impact') {
+                    const contentEl = document.getElementById('hubTabContent');
+                    if (contentEl) {
+                        contentEl.innerHTML = renderImpactTab();
+                    }
+                }
+                
+                console.log('📊 Loaded real user stats:', data.stats);
+            }
+        } catch (error) {
+            console.error('Failed to load user stats:', error);
+        }
+    };
+    
+    // Update the open function to load real stats
+    const open = () => {
+        console.log('🏆 Opening Community Hub');
+        
+        // Clean up any lingering toasts
+        document.querySelectorAll('.toast').forEach(toast => {
+            toast.remove();
+        });
+        
+        modules.modalManager?.open('communityHubOverlay', {
+            onOpen: () => {
+                renderHub();
+                loadUserStats();  // Load real user stats!
+                loadLeaderboard();
+            }
+        });
+    };
+    
+    // Update renderImpactTab to show real numbers
     const renderImpactTab = () => {
         const updates = state.userProfile.updates;
+        const peopleHelped = updates.venues * 5; // Estimate
         
         return `
             <div class="impact-grid">
@@ -519,9 +577,9 @@ export const CommunityHubModule = (() => {
                     <div class="impact-label">Status Updates</div>
                 </div>
                 <div class="impact-card">
-                    <div class="impact-icon">🏆</div>
-                    <div class="impact-number">${state.userProfile.achievements.length}</div>
-                    <div class="impact-label">Achievements</div>
+                    <div class="impact-icon">🙏</div>
+                    <div class="impact-number">${peopleHelped}</div>
+                    <div class="impact-label">People Helped</div>
                 </div>
             </div>
             
