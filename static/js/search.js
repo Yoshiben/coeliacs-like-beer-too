@@ -2369,6 +2369,7 @@ export const SearchModule = (function() {
         // State getters
         getCurrentResults: () => state.currentSearchVenues,
         getLastSearchState: () => state.lastSearchState,
+        getAllSearchResults,
 
         loadBeerList
     };
