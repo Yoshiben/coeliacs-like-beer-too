@@ -888,6 +888,10 @@ const App = {
             modules.modalManager?.open('cookieSettings'); // CHANGED
         },
 
+        'switch-to-leaderboard': (el, modules) => {
+            switchTab('leaderboard');
+        },
+
         // Add to action handlers in main.js:
         'change-nickname': (el, modules) => {
             const newNickname = prompt('Enter your new nickname:', window.App.getState('userNickname'));
