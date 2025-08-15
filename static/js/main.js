@@ -1029,6 +1029,13 @@ const App = {
                 modules.nav?.goToHome();
             }
         },
+
+        'buy-gf-beer': (el, modules) => {
+            const breweries = modules.breweries || window.App?.getModule('breweries');
+            if (breweries) {
+                breweries.openBreweries(true); // Pass true to show purchasable only
+            }
+        },
         
         'open-breweries': (el, modules) => {
             // First, close any open primary overlays
@@ -1037,7 +1044,7 @@ const App = {
             // Small delay to ensure DOM updates
             setTimeout(() => {
                 const breweries = modules.breweries || window.App?.getModule('breweries');
-                breweries?.openBreweries();
+                breweries?.openBreweries(false); // Add false parameter for normal view
             }, 50);
         },
         'search-brewery': (el, modules) => {
