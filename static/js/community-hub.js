@@ -442,12 +442,12 @@ export const CommunityHubModule = (() => {
                         data-hub-tab="impact">📊 My Impact</button>
                 <button class="tab ${state.currentView === 'leaderboard' ? 'active' : ''}" 
                         data-hub-tab="leaderboard">🏆 Leaderboard</button>
-                <button class="tab ${state.currentView === 'breweries' ? 'active' : ''}" 
-                        data-hub-tab="breweries">🍺 Breweries</button>
                 <button class="tab ${state.currentView === 'challenges' ? 'active' : ''}" 
                         data-hub-tab="challenges">🎯 Challenges</button>
+                <button class="tab ${state.currentView === 'badges' ? 'active' : ''}" 
+                        data-hub-tab="badges">🏅 Badges</button>
             </div>
-            
+
             <!-- Tab content area -->
             <div id="hubTabContent">
                 ${renderTabContent()}
@@ -458,6 +458,50 @@ export const CommunityHubModule = (() => {
         container.querySelectorAll('[data-hub-tab]').forEach(tab => {
             tab.addEventListener('click', () => switchTab(tab.dataset.hubTab));
         });
+    };
+
+    const renderBadgesTab = () => {
+        const allBadges = [
+            { id: 'first_steps', name: 'First Steps', icon: '👶', description: 'Make your first contribution', earned: state.userProfile.achievements.includes('first_update') },
+            { id: 'regular', name: 'Regular', icon: '⭐', description: '10 contributions', earned: state.userProfile.achievements.includes('ten_updates') },
+            { id: 'hero', name: 'Local Hero', icon: '🦸', description: '50 contributions', earned: state.userProfile.achievements.includes('fifty_updates') },
+            { id: 'legend', name: 'GF Legend', icon: '👑', description: '100 contributions', earned: state.userProfile.achievements.includes('hundred_updates') },
+            { id: 'explorer', name: 'Explorer', icon: '🗺️', description: 'Update 25 different venues', earned: false },
+            { id: 'nightowl', name: 'Night Owl', icon: '🦉', description: 'Update after midnight', earned: false },
+            { id: 'early_bird', name: 'Early Bird', icon: '🐦', description: 'Update before 6am', earned: false },
+        ];
+        
+        return `
+            <div class="badges-section">
+                <h3>🏅 Your Badge Collection</h3>
+                <div class="badges-grid">
+                    ${allBadges.map(badge => `
+                        <div class="badge-card ${badge.earned ? 'earned' : 'locked'}">
+                            <div class="badge-icon">${badge.icon}</div>
+                            <div class="badge-name">${badge.name}</div>
+                            <div class="badge-description">${badge.description}</div>
+                            ${badge.earned ? '<div class="badge-status">✅ Earned</div>' : '<div class="badge-status">🔒 Locked</div>'}
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    };
+    
+    // Update renderTabContent to include badges
+    const renderTabContent = () => {
+        switch(state.currentView) {
+            case 'impact':
+                return renderImpactTab();
+            case 'leaderboard':
+                return renderLeaderboardTab();
+            case 'badges':
+                return renderBadgesTab();
+            case 'challenges':
+                return renderChallengesTab();
+            default:
+                return renderImpactTab();
+        }
     };
 
     const getTotalUpdates = () => {
