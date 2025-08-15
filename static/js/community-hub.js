@@ -151,7 +151,11 @@ export const CommunityHubModule = (() => {
                             <div class="rank ${index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : ''}">${index + 1}</div>
                             <div class="leader-info">
                                 <div class="leader-name">${user.nickname} ${user.nickname === state.userProfile?.nickname ? '(You)' : ''}</div>
-                                <div class="leader-stats">${user.updates} updates</div>
+                                <div class="leader-stats">
+                                    ${user.beer_reports > 0 ? `🍺 ${user.beer_reports} beers` : ''}
+                                    ${user.status_updates > 0 ? `✅ ${user.status_updates} updates` : ''}
+                                    ${user.venues_touched > 0 ? `📍 ${user.venues_touched} venues` : ''}
+                                </div>
                             </div>
                             <div class="leader-points">${user.points} pts</div>
                         </div>
@@ -515,10 +519,18 @@ export const CommunityHubModule = (() => {
             
             if (data.success) {
                 state.leaderboard = data.leaderboard;
+                console.log('📊 Loaded real leaderboard:', state.leaderboard);
+                
+                // Re-render if we're on leaderboard tab
+                if (state.currentView === 'leaderboard') {
+                    const contentEl = document.getElementById('hubTabContent');
+                    if (contentEl) {
+                        contentEl.innerHTML = renderLeaderboardTab();
+                    }
+                }
             }
         } catch (error) {
             console.error('Failed to load leaderboard:', error);
-            // Use mock data for now
             state.leaderboard = getMockLeaderboard();
         }
     };
