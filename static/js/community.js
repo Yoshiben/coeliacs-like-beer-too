@@ -101,12 +101,11 @@ export const CommunityModule = (() => {
         
         // Mock data for now
         return {
-            venue_id: 12345,
-            name: 'The Botanist Sheffield',
-            description: '6 dedicated GF taps including Bellfield, Jump Ship & Brass Castle!',
-            address: 'Sheffield City Centre',
+            venue_id: 19684,
+            name: 'Dukes',
+            description: 'Lovely community bar with 2 dedicated gluten free taps; Thornbridge - Lukas & Left Handed Giant - Sky Above. Check them out!',
+            address: 'Halifax',
             gf_status: 'always_tap_cask',
-            // photo_url: '/static/images/botanist-taps.jpg'
         };
     };
     
