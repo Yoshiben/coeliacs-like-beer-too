@@ -2041,6 +2041,7 @@ body.page-breweries .nav-back-btn { display: flex !important; }
    box-shadow: var(--shadow-xl);
    padding: var(--space-lg) var(--space-xl);
    transition: all var(--transition);
+   z-index: var(--z-toast);
 }
 
 .toast.show {
