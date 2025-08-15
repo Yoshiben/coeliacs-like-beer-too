@@ -162,7 +162,7 @@
 }
 
 .tab.active {
-    background: linear-gradient(135deg, var(--purple) 0%, var(--dark-purple) 100%);
+    background: var(--primary-gradient);
     color: white;
 }
 
