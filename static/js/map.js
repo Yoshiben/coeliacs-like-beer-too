@@ -387,7 +387,7 @@ export const MapModule = (() => {
     // VENUE DETAIL MAP
     // ================================
     const initVenueDetailMap = (venue) => {
-        console.log('🗺️ Initializing venue detail map for:', venue.name);
+        console.log('🗺️ Initializing venue detail map for:', venue.venue_name);
         
         const mapContainer = document.querySelector('.venue-map-placeholder');
         if (!mapContainer) {
@@ -396,7 +396,7 @@ export const MapModule = (() => {
         }
         
         if (!venue.latitude || !venue.longitude) {
-            showNoLocationMessage(mapContainer, venue.name);
+            showNoLocationMessage(mapContainer, venue.venue_name);
             return null;
         }
         
@@ -517,7 +517,7 @@ export const MapModule = (() => {
         if (!gfStatus) gfStatus = determineGFStatus(venue);
         
         let content = `<div class="popup-content">`;
-        content += `<div class="popup-title">${utils.escapeHtml(venue.name)}</div>`;
+        content += `<div class="popup-title">${utils.escapeHtml(venue.venue_name)}</div>`;
         
         if (venue.address) {
             content += `<div class="popup-address">${utils.escapeHtml(venue.address)}</div>`;
