@@ -1063,114 +1063,60 @@ export const MapModule = (() => {
     const toggleSearchResultsFullMap = () => {
         console.log('🗺️ Toggle results map called');
         
-        const elements = {
-            list: document.getElementById('resultsListContainer'),
-            map: document.getElementById('resultsMapContainer'),
-            btnText: document.getElementById('resultsMapBtnText')
-        };
-        
-        // Check if elements exist
-        if (!elements.list || !elements.map) {
-            console.error('❌ Results elements not found, attempting recovery...');
-            
-            // Try to find/create the map container
-            const resultsContent = document.querySelector('.results-content');
-            if (resultsContent) {
-                // Check again for the map container
-                let mapContainer = document.getElementById('resultsMapContainer');
-                if (!mapContainer) {
-                    console.log('📍 Creating map container...');
-                    mapContainer = document.createElement('div');
-                    mapContainer.id = 'resultsMapContainer';
-                    mapContainer.className = 'results-map-container';
-                    mapContainer.style.display = 'none';
-                    mapContainer.innerHTML = '<div id="resultsMap" class="results-map"></div>';
-                    resultsContent.appendChild(mapContainer);
-                }
-                
-                // Try again after creating
-                setTimeout(() => toggleSearchResultsFullMap(), 100);
-                return;
-            }
-            
-            console.error('❌ Cannot recover - results structure missing');
+        // Check if results overlay is open
+        const modalManager = modules.modalManager || window.App?.getModule('modalManager');
+        if (!modalManager || !modalManager.isOpen('resultsOverlay')) {
+            console.error('❌ Results overlay not open');
             return;
         }
         
-        const isMapHidden = elements.map.style.display === 'none' || !elements.map.style.display;
+        // Get current view
+        const currentView = modalManager.getInternalView('resultsOverlay');
+        const newView = currentView === 'map' ? 'list' : 'map';
         
-        if (isMapHidden) {
-            // Show map
-            console.log('🗺️ Showing results map');
-            
-            // Clean up any existing map first
+        console.log(`🔄 Switching from ${currentView} to ${newView}`);
+        
+        // Toggle the view
+        modalManager.toggleInternalView('resultsOverlay', newView);
+        
+        // Update button text
+        const btnText = document.getElementById('resultsMapBtnText');
+        if (btnText) {
+            btnText.textContent = newView === 'map' ? 'List' : 'Map';
+        }
+        
+        // If switching to map, initialize it
+        if (newView === 'map') {
+            // Clean up any existing map
             cleanupResultsMap();
             
-            // Hide list, show map
-            elements.list.style.display = 'none';
-            elements.map.style.display = 'block';
-            elements.map.style.flex = '1';
-            elements.map.style.height = '100%';
-            elements.map.style.minHeight = '400px';
-            elements.map.style.width = '100%';
-            elements.map.style.position = 'relative';
-            
-            if (elements.btnText) {
-                elements.btnText.textContent = 'List';
-            }
-            
-            // Force layout recalculation
-            void elements.map.offsetHeight;
-            
-            // Get current search results
+            // Get venues
             const searchModule = modules.search;
             const venues = searchModule?.getCurrentResults() || 
-                          window.App?.getState('searchResults') || 
-                          state.currentSearchVenues || [];
+                          window.App?.getState('searchResults') || [];
             
             console.log(`🗺️ Initializing map with ${venues.length} venues`);
             
-            // Small delay to ensure DOM is ready
+            // Small delay for DOM update
             setTimeout(() => {
                 try {
                     initResultsMap(venues);
+                    modules.tracking?.trackEvent('results_map_show', 'Map', 'toggle');
                 } catch (error) {
-                    console.error('❌ Failed to initialize map:', error);
-                    // Revert to list view on error
-                    elements.list.style.display = 'block';
-                    elements.map.style.display = 'none';
-                    if (elements.btnText) {
-                        elements.btnText.textContent = 'Map';
-                    }
+                    console.error('❌ Map initialization failed:', error);
+                    // Revert to list view
+                    modalManager.toggleInternalView('resultsOverlay', 'list');
+                    if (btnText) btnText.textContent = 'Map';
                     
-                    // Show error message
                     if (window.showSuccessToast) {
-                        window.showSuccessToast('❌ Map failed to load. Please try again.');
+                        window.showSuccessToast('❌ Map failed to load');
                     }
                 }
             }, 100);
-            
-            // Track event
-            modules.tracking?.trackEvent('results_map_toggle', 'Map', 'show');
-            
         } else {
-            // Show list
-            console.log('📋 Showing results list');
-            
-            // Clean up map
+            // Switching to list - clean up map
             cleanupResultsMap();
-            
-            // Show list, hide map
-            elements.list.style.display = 'block';
-            elements.list.style.flex = '1';
-            elements.map.style.display = 'none';
-            
-            if (elements.btnText) {
-                elements.btnText.textContent = 'Map';
-            }
-            
-            // Track event
-            modules.tracking?.trackEvent('results_map_toggle', 'Map', 'hide');
+            modules.tracking?.trackEvent('results_map_hide', 'Map', 'toggle');
         }
     };
     
