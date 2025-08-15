@@ -680,22 +680,53 @@ const App = {
             modules.modalManager?.close('breweryBeersModal');
             modules.modalManager?.close('breweriesOverlay');
             
-            const searchModule = modules.search || window.App?.getModule('search');
+            // Open results overlay manually
+            modules.modalManager?.open('resultsOverlay');
             
-            // Do EXACTLY what searchByBeer does internally
-            if (searchModule) {
-                // Show results overlay
-                searchModule.showResultsOverlay(`Brewery: "${breweryName}"`);
-                searchModule.showResultsLoading('Finding venues with this brewery...');
+            // Show loading state
+            const loadingEl = document.getElementById('resultsLoading');
+            const listEl = document.getElementById('resultsList');
+            if (loadingEl) loadingEl.style.display = 'block';
+            if (listEl) listEl.style.display = 'none';
+            
+            // Update header
+            const headerEl = document.querySelector('#resultsOverlay .overlay-header h2');
+            if (headerEl) headerEl.textContent = `Brewery: "${breweryName}"`;
+            
+            // Fetch the results directly
+            const params = new URLSearchParams({
+                query: breweryName,
+                beer_type: 'brewery'
+            });
+            
+            fetch(`/api/search-by-beer?${params}`)
+            .then(response => response.json())
+            .then(data => {
+                // Hide loading
+                if (loadingEl) loadingEl.style.display = 'none';
+                if (listEl) listEl.style.display = 'block';
                 
-                // Set search state
-                window.App.setState('lastSearchType', 'beer');
-                window.App.setState('lastSearchQuery', breweryName);
-                window.App.setState('lastSearchTimestamp', Date.now());
-                
-                // Call performBeerSearch directly
-                searchModule.performBeerSearch(breweryName, 'brewery', 1);
-            }
+                // Display results manually
+                if (data.venues && data.venues.length > 0) {
+                    listEl.innerHTML = data.venues.map(venue => `
+                        <div class="venue-card" data-action="view-venue-details" data-venue-id="${venue.venue_id}">
+                            <h3>${venue.venue_name}</h3>
+                            <p>${venue.address}, ${venue.city}</p>
+                            <p>${venue.postcode}</p>
+                        </div>
+                    `).join('');
+                } else {
+                    listEl.innerHTML = '<div class="no-results">No venues found</div>';
+                }
+            })
+            .catch(error => {
+                console.error('Search error:', error);
+                if (loadingEl) loadingEl.style.display = 'none';
+                if (listEl) {
+                    listEl.style.display = 'block';
+                    listEl.innerHTML = '<div class="error">Search failed</div>';
+                }
+            });
         },
         
         // Map actions
