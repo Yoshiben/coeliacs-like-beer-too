@@ -831,6 +831,53 @@ export const SearchModule = (function() {
         `;
     };
 
+    // Add this function in search.js (around line 1200, after goToNextPage)
+    const getAllSearchResults = async () => {
+        const lastSearch = state.lastSearchState;
+        if (!lastSearch) return [];
+        
+        console.log('📍 Fetching all results for map view...');
+        
+        try {
+            // Determine the API call based on search type
+            if (lastSearch.type === 'nearby') {
+                const gfOnly = window.App.getState('gfOnlyFilter') !== false;
+                const searchParams = {
+                    lat: lastSearch.userLocation.lat,
+                    lng: lastSearch.userLocation.lng,
+                    radius: lastSearch.radius,
+                    gf_only: gfOnly,
+                    page: 1,
+                    per_page: 50000  // Get up to 50000 venues for map
+                };
+                
+                const response = await fetch(`${Constants.API.NEARBY}?${new URLSearchParams(searchParams)}`);
+                if (!response.ok) throw new Error('Failed to fetch all venues');
+                
+                const data = await response.json();
+                return data.venues || [];
+                
+            } else if (lastSearch.type === 'name' || lastSearch.type === 'area') {
+                // Similar for other search types
+                const searchParams = {
+                    query: lastSearch.query,
+                    searchType: lastSearch.searchConfig?.searchType || 'all',
+                    page: 1,
+                    per_page: 50000,
+                    gfOnly: window.App.getState('gfOnlyFilter') !== false
+                };
+                
+                const results = await modules.api.searchVenues(searchParams);
+                return results.venues || results.pubs || results || [];
+            }
+            
+            return state.currentSearchVenues;
+        } catch (error) {
+            console.error('❌ Error fetching all results:', error);
+            return state.currentSearchVenues; // Fallback to current page
+        }
+    };
+
     // REPLACE the loadBeerList function in search.js (around line 513)
 
     const loadBeerList = (venue) => {
