@@ -308,8 +308,22 @@ export const CommunityHubModule = (() => {
     };
     
     const calculateLevel = (points) => {
-        // Level thresholds
-        const thresholds = [0, 100, 250, 500, 1000, 2000, 5000, 10000];
+        // More spread out levels
+        const thresholds = [
+            0,      // Level 1: 0
+            50,     // Level 2: 50
+            150,    // Level 3: 150
+            300,    // Level 4: 300
+            500,    // Level 5: 500
+            800,    // Level 6: 800
+            1200,   // Level 7: 1200
+            1700,   // Level 8: 1700
+            2500,   // Level 9: 2500
+            3500,   // Level 10: 3500
+            5000,   // Level 11: 5000
+            7500,   // Level 12: 7500
+            10000   // Level 13: 10000
+        ];
         
         for (let i = thresholds.length - 1; i >= 0; i--) {
             if (points >= thresholds[i]) {
@@ -317,6 +331,20 @@ export const CommunityHubModule = (() => {
             }
         }
         return 1;
+    };
+    
+    // Also update calculatePointsToNext and calculateProgress to use the same thresholds
+    const LEVEL_THRESHOLDS = [0, 50, 150, 300, 500, 800, 1200, 1700, 2500, 3500, 5000, 7500, 10000];
+    
+    const calculateProgress = () => {
+        if (!state.userProfile) return 0;
+        
+        const currentLevel = state.userProfile.level;
+        const currentThreshold = LEVEL_THRESHOLDS[currentLevel - 1] || 0;
+        const nextThreshold = LEVEL_THRESHOLDS[currentLevel] || 10000;
+        
+        const progress = ((state.userProfile.points - currentThreshold) / (nextThreshold - currentThreshold)) * 100;
+        return Math.min(Math.max(progress, 0), 100);
     };
     
     // ================================
@@ -477,21 +505,28 @@ export const CommunityHubModule = (() => {
     };
     
     // Add this function to load real stats
+    // Update loadUserStats with correct property mapping and debugging
     const loadUserStats = async () => {
         if (!state.userProfile?.nickname) return;
+        
+        console.log('📊 Loading stats for:', state.userProfile.nickname);
         
         try {
             const response = await fetch(`/api/community/my-stats/${encodeURIComponent(state.userProfile.nickname)}`);
             const data = await response.json();
             
+            console.log('📊 Raw stats response:', data);
+            
             if (data.success) {
-                // Update the profile with real data
+                // Update the profile with real data - CHECK THESE PROPERTY NAMES!
                 state.userProfile.updates = {
-                    venues: data.stats.venues_updated,
-                    beers: data.stats.beers_reported,
-                    statuses: data.stats.status_updates
+                    venues: data.stats.venues_updated || 0,
+                    beers: data.stats.beers_reported || 0,
+                    statuses: data.stats.status_updates || 0
                 };
-                state.userProfile.points = data.stats.points;
+                state.userProfile.points = data.stats.points || 0;
+                
+                console.log('📊 Updated profile:', state.userProfile);
                 
                 // Recalculate level based on real points
                 state.userProfile.level = calculateLevel(data.stats.points);
@@ -499,15 +534,10 @@ export const CommunityHubModule = (() => {
                 // Save and re-render
                 saveUserProfile();
                 
-                // Update the display if we're viewing impact tab
-                if (state.currentView === 'impact') {
-                    const contentEl = document.getElementById('hubTabContent');
-                    if (contentEl) {
-                        contentEl.innerHTML = renderImpactTab();
-                    }
-                }
+                // Force re-render of everything
+                renderHub();
                 
-                console.log('📊 Loaded real user stats:', data.stats);
+                console.log('✅ Stats loaded and rendered');
             }
         } catch (error) {
             console.error('Failed to load user stats:', error);
