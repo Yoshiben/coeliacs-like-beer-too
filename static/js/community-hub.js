@@ -587,33 +587,43 @@ export const CommunityHubModule = (() => {
     // Update renderImpactTab to show real numbers
     const renderImpactTab = () => {
         const updates = state.userProfile.updates;
-        const peopleHelped = updates.venues * 5; // Estimate
+        
+        // Find user's rank from leaderboard
+        let userRank = '?';
+        if (state.leaderboard && state.leaderboard.length > 0) {
+            const rankIndex = state.leaderboard.findIndex(user => 
+                user.nickname === state.userProfile.nickname
+            );
+            if (rankIndex !== -1) {
+                userRank = rankIndex + 1;
+            }
+        }
         
         return `
             <div class="impact-grid">
                 <div class="impact-card" data-action="view-impact-details" data-type="venues">
                     <div class="impact-icon">📍</div>
-                    <div class="impact-number">${updates.venues}</div>
+                    <div class="impact-number">${updates.venues || 0}</div>
                     <div class="impact-label">Venues Updated</div>
                 </div>
                 <div class="impact-card" data-action="view-impact-details" data-type="beers">
                     <div class="impact-icon">🍺</div>
-                    <div class="impact-number">${updates.beers}</div>
+                    <div class="impact-number">${updates.beers || 0}</div>
                     <div class="impact-label">Beers Reported</div>
                 </div>
                 <div class="impact-card" data-action="view-impact-details" data-type="statuses">
                     <div class="impact-icon">✅</div>
-                    <div class="impact-number">${updates.statuses}</div>
+                    <div class="impact-number">${updates.statuses || 0}</div>
                     <div class="impact-label">Status Updates</div>
                 </div>
-                <div class="impact-card">
-                    <div class="impact-icon">🙏</div>
-                    <div class="impact-number">${peopleHelped}</div>
-                    <div class="impact-label">People Helped</div>
+                <div class="impact-card" data-action="switch-to-leaderboard">
+                    <div class="impact-icon">🏆</div>
+                    <div class="impact-number">#${userRank}</div>
+                    <div class="impact-label">Your Rank</div>
                 </div>
             </div>
         `;
-    };
+};
     
     // ================================
     // LEADERBOARD
