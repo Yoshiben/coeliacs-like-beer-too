@@ -373,29 +373,7 @@ export const CommunityHubModule = (() => {
     
     // ================================
     // UI RENDERING
-    // ================================
-    const open = () => {
-        console.log('🏆 Opening Community Hub');
-        
-        // Clean up any lingering toasts
-        document.querySelectorAll('.toast').forEach(toast => {
-            toast.remove();
-        });
-        
-        // Also hide the loading toast if it's stuck
-        const loadingToast = document.getElementById('loadingToast');
-        if (loadingToast) {
-            loadingToast.style.display = 'none';
-        }
-        
-        modules.modalManager?.open('communityHubOverlay', {
-            onOpen: () => {
-                renderHub();
-                loadLeaderboard();
-            }
-        });
-    };
-    
+    // ================================    
     const renderHub = () => {
         const container = document.getElementById('communityHubContent');
         if (!container) return;
@@ -544,6 +522,12 @@ export const CommunityHubModule = (() => {
         document.querySelectorAll('.toast').forEach(toast => {
             toast.remove();
         });
+
+        // Also hide the loading toast if it's stuck
+        const loadingToast = document.getElementById('loadingToast');
+        if (loadingToast) {
+            loadingToast.style.display = 'none';
+        }
         
         modules.modalManager?.open('communityHubOverlay', {
             onOpen: () => {
