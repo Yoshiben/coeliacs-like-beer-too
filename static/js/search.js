@@ -1536,7 +1536,10 @@ export const SearchModule = (function() {
         const isGfOnly = toggle ? toggle.checked : true;
         
         if (isGfOnly && elements.noResults) {
-            // Show the toggle hint for GF-only searches with no results
+            // Get the last search details from state
+            const lastSearchType = window.App.getState('lastSearchType');
+            const lastSearchQuery = window.App.getState('lastSearchQuery');
+            
             elements.noResults.style.display = 'flex';
             elements.noResults.innerHTML = `
                 <div class="no-results-content">
@@ -1546,12 +1549,22 @@ export const SearchModule = (function() {
                     <div class="toggle-prompt" style="margin-top: 1.5rem; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 10px;">
                         <p style="margin-bottom: 1rem;">💡 There might be venues that serve GF beer but haven't been confirmed yet!</p>
                         <button class="btn btn-primary" onclick="
+                            // Uncheck the toggle
                             const toggle = document.getElementById('searchToggle');
-                            if (toggle) {
-                                toggle.checked = false;
-                                // Re-run the last search
-                                const searchBtn = document.querySelector('.search-controls .btn-primary.active');
-                                if (searchBtn) searchBtn.click();
+                            if (toggle) toggle.checked = false;
+                            
+                            // Re-run the appropriate search based on type
+                            const searchModule = window.App?.getModule('search');
+                            const lastType = '${lastSearchType}';
+                            
+                            if (searchModule) {
+                                if (lastType === 'name') {
+                                    searchModule.searchByName();
+                                } else if (lastType === 'area') {
+                                    searchModule.searchByArea();
+                                } else if (lastType === 'beer') {
+                                    searchModule.searchByBeer();
+                                }
                             }
                         ">
                             🔍 Search all venues instead
@@ -1570,7 +1583,6 @@ export const SearchModule = (function() {
             }
         }
     };
-
     const displayResultsInOverlay = (venues, title) => {
         state.currentSearchVenues = venues;
         
