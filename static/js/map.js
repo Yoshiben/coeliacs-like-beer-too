@@ -22,8 +22,8 @@ export const MapModule = (() => {
         defaultCenter: [54.5, -3], // UK center
         defaultZoom: 6,
         maxZoom: 19,
-        venueMarkerRadius: 8,
-        userMarkerRadius: 8,
+        venueMarkerRadius: 6,
+        userMarkerRadius: 6,
         tileLayer: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
         attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         clusterConfig: {
@@ -112,19 +112,24 @@ export const MapModule = (() => {
     const getMapStyles = () => {
         if (!cachedStyles) {
             const rootStyles = getComputedStyle(document.documentElement);
-            cachedStyles = {
-                venueFillColor: rootStyles.getPropertyValue('--marker-venue-fill').trim() || '#4CAF50',
-                venueStrokeColor: rootStyles.getPropertyValue('--marker-venue-stroke').trim() || '#ffffff',
-                userFillColor: rootStyles.getPropertyValue('--marker-user-fill').trim() || '#667eea',
-                userStrokeColor: rootStyles.getPropertyValue('--marker-user-stroke').trim() || '#ffffff',
-                alwaysGfFill: rootStyles.getPropertyValue('--always-gf-fill').trim(),
-                alwaysGfBorder: rootStyles.getPropertyValue('--always-gf-border').trim(),
-                currentlyGfFill: rootStyles.getPropertyValue('--currently-gf-fill').trim(),
-                currentlyGfBorder: rootStyles.getPropertyValue('--currently-gf-border').trim(),
-                noGfFill: rootStyles.getPropertyValue('--no-gf-fill').trim(),
-                noGfBorder: rootStyles.getPropertyValue('--no-gf-border').trim(),
-                unknownGfFill: rootStyles.getPropertyValue('--unknown-gf-fill').trim(),
-                unknownGfBorder: rootStyles.getPropertyValue('--unknown-gf-border').trim()
+            cachedStyles = {                
+                userFillColor: rootStyles.getPropertyValue('--primary-gradient').trim(),
+                userStrokeColor: rootStyles.getPropertyValue('--white').trim(),
+                
+                alwaysTapCaskFill: rootStyles.getPropertyValue('--gold').trim(),
+                alwaysTapCaskBorder: rootStyles.getPropertyValue('--dark-gold').trim(),
+
+                alwaysBottleCanFill: rootStyles.getPropertyValue('--green').trim(),
+                alwaysBottleCanBorder: rootStyles.getPropertyValue('--dark-green').trim(),
+                
+                currentlyGfFill: rootStyles.getPropertyValue('--blue').trim(),
+                currentlyGfBorder: rootStyles.getPropertyValue('--dark-blue').trim(),
+                
+                noGfFill: rootStyles.getPropertyValue('--red').trim(),
+                noGfBorder: rootStyles.getPropertyValue('--dark-red').trim(),
+                
+                unknownGfFill: rootStyles.getPropertyValue('--light-grey').trim(),
+                unknownGfBorder: rootStyles.getPropertyValue('--dark-grey').trim()
             };
         }
         return cachedStyles;
@@ -141,32 +146,32 @@ export const MapModule = (() => {
         
         const statusStyles = {
             'always_tap_cask': {
-                fillColor: styles.alwaysTapCaskFill || '#FFD700',  // Gold fallback
-                color: styles.alwaysTapCaskBorder || '#FDB904',    // Dark gold fallback
-                radius: 12,
+                fillColor: styles.alwaysTapCaskFill
+                color: styles.alwaysTapCaskBorder
+                radius: 10,
                 weight: 4,
                 className: 'always-tap-cask-marker',
                 fillOpacity: 1
             },
             'always_bottle_can': {
-                fillColor: styles.alwaysBottleCanFill || '#00F500',  // Green fallback
-                color: styles.alwaysBottleCanBorder || '#00C400',    // Dark green fallback
-                radius: 10,
+                fillColor: styles.alwaysBottleCanFill
+                color: styles.alwaysBottleCanBorder
+                radius: 9,
                 weight: 3,
                 className: 'always-bottle-can-marker'
             },
             'currently': {
-                fillColor: styles.currentlyFill || '#3B82F6',        // Blue fallback
-                color: styles.currentlyBorder || '#2563EB'           // Dark blue fallback
+                fillColor: styles.currentlyGfFill
+                color: styles.currentlyGfBorder
             },
             'not_currently': {
-                fillColor: styles.notCurrentlyFill || '#EF4444',     // Red fallback
-                color: styles.notCurrentlyBorder || '#DC2626',       // Dark red fallback
+                fillColor: styles.notCurrentlyFill
+                color: styles.notCurrentlyBorder
                 fillOpacity: 0.7
             },
             'unknown': {
-                fillColor: styles.unknownFill || '#9CA3AF',          // Grey fallback
-                color: styles.unknownBorder || '#6B7280',            // Dark grey fallback
+                fillColor: styles.unknownGfFill
+                color: styles.unknownGfBorder
                 fillOpacity: 0.6
             }
         };
@@ -878,30 +883,6 @@ export const MapModule = (() => {
         
         legend.addTo(mapInstance);
     };
-    
-    const addZoomHint = (mapInstance) => {
-        const hintControl = L.Control.extend({
-            options: { position: 'topright' },
-            
-            onAdd: (map) => {
-                const container = L.DomUtil.create('div', 'zoom-hint-container');
-                container.innerHTML = `
-                    <div class="zoom-hint">
-                        <span class="zoom-hint-icon">💡</span>
-                        <span class="zoom-hint-text">Zoom in to discover more venues</span>
-                    </div>
-                `;
-                
-                const updateHintVisibility = () => {
-                    container.style.display = map.getZoom() < 9 ? 'block' : 'none';
-                };
-                
-                updateHintVisibility();
-                map.on('zoomend', updateHintVisibility);
-                
-                return container;
-            }
-        });
         
         mapInstance.addControl(new hintControl());
     };
@@ -1088,9 +1069,29 @@ export const MapModule = (() => {
             btnText: document.getElementById('resultsMapBtnText')
         };
         
-        if (!elements.list || !elements.map || !elements.btnText) {
-            console.error('❌ Required elements not found');
+        // If elements don't exist, we're not on the results page properly
+        if (!elements.list || !elements.map) {
+            console.error('❌ Results map elements not found');
+            // Try to create/show the map container if it doesn't exist
+            const resultsContent = document.querySelector('.results-content');
+            if (resultsContent && !elements.map) {
+                // Create the map container if missing
+                const mapContainer = document.createElement('div');
+                mapContainer.id = 'resultsMapContainer';
+                mapContainer.className = 'results-map-container';
+                mapContainer.innerHTML = '<div id="resultsMap" class="results-map"></div>';
+                resultsContent.appendChild(mapContainer);
+                
+                // Try again with the newly created element
+                setTimeout(() => toggleSearchResultsFullMap(), 50);
+                return;
+            }
             return;
+        }
+        
+        // Update the button text - but don't require it
+        if (!elements.btnText) {
+            console.log('⚠️ Map button text element not found, continuing anyway');
         }
         
         if (elements.map.style.display === 'none' || !elements.map.style.display) {
@@ -1106,15 +1107,17 @@ export const MapModule = (() => {
             elements.map.style.width = '100%';
             elements.map.style.position = 'relative';
             
-            elements.btnText.textContent = 'List';
+            if (elements.btnText) {
+                elements.btnText.textContent = 'List';
+            }
             
             // Force layout
             elements.map.offsetHeight;
             
-            // Initialize map with CURRENT SEARCH RESULTS, not all venues
+            // Initialize map with CURRENT SEARCH RESULTS
             setTimeout(() => {
                 const searchModule = modules.search;
-                const venues = state.currentSearchVenues || [];  // THIS IS THE KEY - use the stored search results
+                const venues = searchModule?.getCurrentResults() || window.App?.getState('searchResults') || [];
                 console.log(`🗺️ Initializing results map with ${venues.length} venues from current search`);
                 initResultsMap(venues);
             }, 50);
@@ -1125,14 +1128,17 @@ export const MapModule = (() => {
                 trackingModule.trackEvent('results_map_toggle', 'Map Interaction', 'show');
             }
         } else {
-            // Show list (rest of the function stays the same)
+            // Show list
             console.log('📋 Showing results list');
             cleanupResultsMap();
             
             elements.list.style.display = 'block';
             elements.list.style.flex = '1';
             elements.map.style.display = 'none';
-            elements.btnText.textContent = 'Map';
+            
+            if (elements.btnText) {
+                elements.btnText.textContent = 'Map';
+            }
             
             // Track event
             const trackingModule = modules.tracking;
