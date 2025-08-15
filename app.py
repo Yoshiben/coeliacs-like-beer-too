@@ -665,6 +665,85 @@ def autocomplete():
             cursor.close()
             conn.close()
 
+@app.route('/api/community/leaderboard')
+def get_community_leaderboard():
+    """Get top contributors from real data including status updates"""
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        # Get contributions from venue_beers
+        cursor.execute("""
+            SELECT 
+                added_by as nickname,
+                COUNT(*) as beer_contributions,
+                COUNT(DISTINCT venue_id) as venues_with_beers
+            FROM venue_beers
+            WHERE added_by IS NOT NULL 
+            AND added_by != 'anonymous'
+            AND added_by != ''
+            GROUP BY added_by
+        """)
+        beer_contributors = {row['nickname']: row for row in cursor.fetchall()}
+        
+        # Get status updates
+        cursor.execute("""
+            SELECT 
+                updated_by as nickname,
+                COUNT(*) as status_updates,
+                COUNT(DISTINCT venue_id) as venues_updated
+            FROM railway_status_updates
+            WHERE updated_by IS NOT NULL 
+            AND updated_by != 'anonymous'
+            AND updated_by != ''
+            GROUP BY updated_by
+        """)
+        status_contributors = {row['nickname']: row for row in cursor.fetchall()}
+        
+        # Combine all contributors
+        all_nicknames = set(beer_contributors.keys()) | set(status_contributors.keys())
+        
+        leaderboard = []
+        for nickname in all_nicknames:
+            beer_data = beer_contributors.get(nickname, {'beer_contributions': 0, 'venues_with_beers': 0})
+            status_data = status_contributors.get(nickname, {'status_updates': 0, 'venues_updated': 0})
+            
+            total_contributions = beer_data['beer_contributions'] + status_data['status_updates']
+            total_venues = beer_data['venues_with_beers'] + status_data['venues_updated']
+            
+            # Calculate points: beers=15pts, statuses=5pts, unique venues=10pts
+            points = (beer_data['beer_contributions'] * 15) + \
+                    (status_data['status_updates'] * 5) + \
+                    (total_venues * 10)
+            
+            leaderboard.append({
+                'nickname': nickname,
+                'contributions': total_contributions,
+                'beer_reports': beer_data['beer_contributions'],
+                'status_updates': status_data['status_updates'],
+                'venues_touched': total_venues,
+                'points': points
+            })
+        
+        # Sort by points
+        leaderboard.sort(key=lambda x: x['points'], reverse=True)
+        
+        return jsonify({
+            'success': True,
+            'leaderboard': leaderboard[:20]  # Top 20
+        })
+        
+    except Exception as e:
+        logger.error(f"Leaderboard error: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
+
 # ================================================================================
 # API ROUTES
 # ================================================================================
@@ -1371,6 +1450,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
