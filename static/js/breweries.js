@@ -312,10 +312,6 @@ export default (function() {
                         ${beer.gluten_status ? `<span class="beer-gf-status">${beer.gluten_status.replace('_', ' ')}</span>` : ''}
                     </div>
                 </div>
-                <button class="btn btn-sm" data-action="find-venues-with-beer" 
-                        data-beer="${beer.beer_name}" data-brewery="${brewery}">
-                    Find Venues
-                </button>
             </div>
         `).join('');
     };
