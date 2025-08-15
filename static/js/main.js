@@ -683,41 +683,34 @@ const App = {
             // Get search module
             const searchModule = modules.search || window.App?.getModule('search');
             
-            // Open results overlay (like the search module does)
-            if (searchModule && searchModule.showResultsOverlay) {
-                searchModule.showResultsOverlay(`Brewery: "${breweryName}"`);
-                searchModule.showResultsLoading('Finding venues...');
-            } else {
-                // Fallback - manually open the overlay
-                modules.modalManager?.open('resultsOverlay');
-            }
-            
-            // Show loading
-            modules.helpers?.showLoadingToast(`Searching for ${breweryName} venues...`);
-            
-            // Fetch results
-            const params = new URLSearchParams({
-                query: breweryName,
-                beer_type: 'brewery'
-            });
-            
-            fetch(`/api/search-by-beer?${params}`)
-            .then(response => response.json())
-            .then(data => {
-                modules.helpers?.hideLoadingToast();
+            // Call performBeerSearch if it exists
+            if (searchModule && searchModule.performBeerSearch) {
+                // Set the beer search input if it exists
+                const beerInput = document.getElementById('beerInput');
+                if (beerInput) {
+                    beerInput.value = breweryName;
+                }
                 
-                // Display results using search module
-                if (searchModule && searchModule.displayResults) {
-                    searchModule.displayResults(data);
+                // Set beer search type to brewery
+                const beerSearchType = document.getElementById('beerSearchType');
+                if (beerSearchType) {
+                    beerSearchType.value = 'brewery';
                 }
-            })
-            .catch(error => {
-                console.error('Search error:', error);
-                modules.helpers?.hideLoadingToast();
-                if (searchModule && searchModule.showError) {
-                    searchModule.showError('Search failed');
+                
+                // Call the search module's beer search directly
+                searchModule.searchByBeer();
+            } else {
+                // Fallback - just trigger the beer search button
+                const beerInput = document.getElementById('beerInput');
+                if (beerInput) {
+                    beerInput.value = breweryName;
                 }
-            });
+                
+                const searchBtn = document.querySelector('[data-action="search-beer"]');
+                if (searchBtn) {
+                    searchBtn.click();
+                }
+            }
         },
         
         // Map actions
