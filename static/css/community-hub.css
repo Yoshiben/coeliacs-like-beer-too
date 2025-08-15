@@ -569,3 +569,10 @@
         font-size: 0.65rem;
     }
 }
+
+
+@media (min-width:1025px) {
+   .tab {
+      font-size:: var(--text-md);
+   }
+}
