@@ -254,7 +254,68 @@ export default (function() {
     
     // Existing functions stay the same...
     const searchBreweryBeers = async (brewery) => {
-        // Your existing code...
+        console.log(`🔍 Loading beers for: ${brewery}`);
+        
+        // Open modal to show beers
+        if (modules.modalManager) {
+            modules.modalManager.open('breweryBeersModal');
+        }
+        
+        // Update brewery name
+        const breweryNameEl = document.getElementById('breweryName');
+        if (breweryNameEl) breweryNameEl.textContent = brewery;
+        
+        // Show loading
+        document.getElementById('breweryBeersLoading').style.display = 'block';
+        document.getElementById('breweryBeersList').style.display = 'none';
+        document.getElementById('breweryBeersEmpty').style.display = 'none';
+        
+        try {
+            // Fetch beers for this brewery
+            const response = await fetch(`/api/brewery/${encodeURIComponent(brewery)}/beers`);
+            const beers = await response.json();
+            
+            displayBreweryBeers(beers, brewery);
+            
+        } catch (error) {
+            console.error('Error loading brewery beers:', error);
+            document.getElementById('breweryBeersLoading').style.display = 'none';
+            document.getElementById('breweryBeersEmpty').style.display = 'block';
+        }
+    };
+    
+    const displayBreweryBeers = (beers, brewery) => {
+        const loadingEl = document.getElementById('breweryBeersLoading');
+        const listEl = document.getElementById('breweryBeersList');
+        const emptyEl = document.getElementById('breweryBeersEmpty');
+        
+        loadingEl.style.display = 'none';
+        
+        if (beers.length === 0) {
+            emptyEl.style.display = 'block';
+            listEl.style.display = 'none';
+            return;
+        }
+        
+        listEl.style.display = 'block';
+        emptyEl.style.display = 'none';
+        
+        listEl.innerHTML = beers.map(beer => `
+            <div class="beer-item">
+                <div class="beer-info">
+                    <strong>${beer.name}</strong>
+                    <div class="beer-meta">
+                        ${beer.style ? `<span class="beer-style">${beer.style}</span>` : ''}
+                        ${beer.abv ? `<span class="beer-abv">${beer.abv}% ABV</span>` : ''}
+                        ${beer.gluten_status ? `<span class="beer-gf-status">${beer.gluten_status.replace('_', ' ')}</span>` : ''}
+                    </div>
+                </div>
+                <button class="btn btn-sm" data-action="find-venues-with-beer" 
+                        data-beer="${beer.name}" data-brewery="${brewery}">
+                    Find Venues
+                </button>
+            </div>
+        `).join('');
     };
     
     return {
@@ -262,6 +323,7 @@ export default (function() {
         openBreweries,
         closeBreweries,
         searchBreweryBeers,
+        displayBreweryBeers,
         loadBreweries
     };
 })();
