@@ -233,9 +233,6 @@ export const SearchModule = (function() {
             if (results.venues) {
                 venues = results.venues;
                 pagination = results.pagination;
-            } else if (results.pubs) {
-                venues = results.pubs;
-                pagination = results.pagination;
             } else if (Array.isArray(results)) {
                 venues = results;
             }
@@ -473,7 +470,7 @@ export const SearchModule = (function() {
             
             const results = await modules.api.searchVenues(searchParams);
             
-            let venues = results.venues || results.pubs || results;
+            let venues = results.venues || results;
             let pagination = results.pagination;
             
             if (!venues || venues.length === 0) {
@@ -697,7 +694,7 @@ export const SearchModule = (function() {
             const results = await modules.api.searchVenues({ 
                 venueId: venueId  // This should match what the API expects
             });
-            const venues = Array.isArray(results) ? results : results.venues || results.pubs;
+            const venues = Array.isArray(results) ? results : results.venues;
             
             utils.hideLoadingToast();
             
@@ -868,7 +865,7 @@ export const SearchModule = (function() {
                 };
                 
                 const results = await modules.api.searchVenues(searchParams);
-                return results.venues || results.pubs || results || [];
+                return results.venues || results || [];
             }
             
             return state.currentSearchVenues;
