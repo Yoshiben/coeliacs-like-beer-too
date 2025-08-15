@@ -449,8 +449,19 @@
     
         <div id="resultsOverlay" class="overlay results-overlay">
             <div class="results-container">
+
+                <div class="results-header">
+                    <!-- Title and Map toggle button -->
+                    <h2 class="results-title" id="resultsTitle">Search Results</h2>
+                    <button class="btn results-map-toggle" data-action="toggle-results-map">
+                        <span id="resultsMapBtnText">Map</span>
+                    </button>
+                </div>
+                
                 <div class="results-content">
+                    <!-- This holds BOTH views -->
                     <div class="results-list-container" id="resultsListContainer">
+                        <!-- LIST VIEW - shows when in list mode -->
                         <div class="results-loading" id="resultsLoading">
                             <div class="loading-spinner"></div>
                             <div class="loading-text">Finding nearby GF beer...</div>
@@ -466,7 +477,9 @@
                     </div>
                     
                     <div class="results-map-container" id="resultsMapContainer">
+                        <!-- MAP VIEW - shows when in map mode -->
                         <div id="resultsMap" class="results-map"></div>
+                        <!-- ^^^ Leaflet map renders HERE -->
                     </div>
                 </div>
                 
@@ -1263,6 +1276,7 @@
         </script>
     </body>
 </html>
+
 
 
 
