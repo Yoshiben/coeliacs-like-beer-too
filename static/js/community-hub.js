@@ -194,6 +194,12 @@ export const CommunityHubModule = (() => {
     
     const switchTab = (tabName) => {
         state.currentView = tabName;
+        
+        // Load leaderboard data when switching to that tab
+        if (tabName === 'leaderboard' && state.leaderboard.length === 0) {
+            loadLeaderboard();
+        }
+        
         const contentEl = document.getElementById('hubTabContent');
         if (contentEl) {
             contentEl.innerHTML = renderTabContent();
@@ -400,13 +406,12 @@ export const CommunityHubModule = (() => {
         }
         
         container.innerHTML = `
-            <!-- Combined Level Banner with Stats (no separate header) -->
+            <!-- Level Banner -->
             <div class="level-banner">
                 <div class="floating-beer">🍺</div>
                 <div class="floating-beer">🍺</div>
                 <div class="floating-beer">🍺</div>
                 <div class="level-content">
-                    <!-- User info in top right -->
                     <div class="level-user-info">
                         <span class="username">${state.userProfile.nickname}</span>
                         <button class="change-nickname-btn" data-action="change-nickname">✏️</button>
@@ -416,32 +421,47 @@ export const CommunityHubModule = (() => {
                         <div class="level-title">Level ${state.userProfile.level}: ${getLevelName(state.userProfile.level)}</div>
                         <div class="level-stats">
                             <span class="stat-bubble">${state.userProfile.points} pts</span>
-                            <span class="stat-bubble">${state.userProfile.updates.venues + state.userProfile.updates.beers + state.userProfile.updates.statuses} updates</span>
+                            <span class="stat-bubble">${getTotalUpdates()} updates</span>
                         </div>
                     </div>
                     <div class="level-progress">
                         <div class="level-fill" style="width: ${calculateProgress()}%"></div>
                     </div>
-                    <div class="level-text">${calculatePointsToNext()} points to next level • Keep going!</div>
+                    <div class="level-text">${calculatePointsToNext()} points to next level</div>
                 </div>
             </div>
             
-            <!-- Tabs stay the same -->
+            <!-- THESE TABS ARE MISSING! -->
             <div class="section-tabs">
-                <!-- ... tabs ... -->
+                <button class="tab ${state.currentView === 'impact' ? 'active' : ''}" 
+                        data-hub-tab="impact">📊 My Impact</button>
+                <button class="tab ${state.currentView === 'leaderboard' ? 'active' : ''}" 
+                        data-hub-tab="leaderboard">🏆 Leaderboard</button>
+                <button class="tab ${state.currentView === 'breweries' ? 'active' : ''}" 
+                        data-hub-tab="breweries">🍺 Breweries</button>
+                <button class="tab ${state.currentView === 'challenges' ? 'active' : ''}" 
+                        data-hub-tab="challenges">🎯 Challenges</button>
             </div>
             
+            <!-- Tab content area -->
             <div id="hubTabContent">
                 ${renderTabContent()}
             </div>
         `;
         
-        // Attach listeners
+        // Attach tab listeners
         container.querySelectorAll('[data-hub-tab]').forEach(tab => {
             tab.addEventListener('click', () => switchTab(tab.dataset.hubTab));
         });
     };
 
+    const getTotalUpdates = () => {
+        if (!state.userProfile) return 0;
+        const updates = state.userProfile.updates;
+        return updates.venues + updates.beers + updates.statuses;
+    };
+
+    
     const calculateProgress = () => {
         if (!state.userProfile) return 0;
         
@@ -513,9 +533,13 @@ export const CommunityHubModule = (() => {
     // LEADERBOARD
     // ================================
     const loadLeaderboard = async () => {
+        console.log('📊 Loading leaderboard...');
         try {
             const response = await fetch('/api/community/leaderboard');
+            console.log('Response status:', response.status);
+            
             const data = await response.json();
+            console.log('Leaderboard data:', data);
             
             if (data.success) {
                 state.leaderboard = data.leaderboard;
@@ -528,6 +552,9 @@ export const CommunityHubModule = (() => {
                         contentEl.innerHTML = renderLeaderboardTab();
                     }
                 }
+            } else {
+                console.error('API returned success: false', data);
+                state.leaderboard = getMockLeaderboard();
             }
         } catch (error) {
             console.error('Failed to load leaderboard:', error);
