@@ -364,16 +364,16 @@ export const CommunityHubModule = (() => {
             
             switch(achievement.id) {
                 case 'first_update':
-                    earned = totalUpdates >= 1;
+                    earned = venueCount >= 1;
                     break;
                 case 'ten_updates':
-                    earned = totalUpdates >= 10;
+                    earned = venueCount >= 10;
                     break;
                 case 'fifty_updates':
-                    earned = totalUpdates >= 50;
+                    earned = venueCount >= 50;
                     break;
                 case 'hundred_updates':
-                    earned = totalUpdates >= 100;
+                    earned = venueCount >= 100;
                     break;
                 case 'week_streak':
                     earned = state.userProfile.streak >= 7;
@@ -511,7 +511,6 @@ export const CommunityHubModule = (() => {
         return updates.venues + updates.beers + updates.statuses;
     };
 
-    
     
     
     const calculatePointsToNext = () => {
