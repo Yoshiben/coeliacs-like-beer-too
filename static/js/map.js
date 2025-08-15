@@ -180,6 +180,21 @@ export const MapModule = (() => {
         
         return { ...baseStyle, ...(statusStyles[gfStatus] || statusStyles.unknown) };
     };
+
+    // Add this new function after getMarkerStyleForGFStatus (around line 180)
+    const getResultsMapMarkerStyle = (gfStatus) => {
+        const baseStyle = getMarkerStyleForGFStatus(gfStatus);
+        
+        // Scale down for results map
+        const scaleFactor = 0.6;
+        return {
+            ...baseStyle,
+            radius: Math.round(baseStyle.radius * scaleFactor),
+            weight: Math.max(1, Math.round(baseStyle.weight * 0.7)),
+            // Keep the same z-index ordering
+            zIndexOffset: baseStyle.zIndexOffset
+        };
+    };
     
     // ================================
     // MAP INITIALIZATION
@@ -283,7 +298,8 @@ export const MapModule = (() => {
                             const lng = parseFloat(venue.longitude);
                             
                             const gfStatus = determineGFStatus(venue);
-                            const markerStyle = getMarkerStyleForGFStatus(gfStatus);
+                            // const markerStyle = getMarkerStyleForGFStatus(gfStatus);
+                            const markerStyle = getResultsMapMarkerStyle(gfStatus);
                             
                             // Make search results more prominent
                             markerStyle.radius = markerStyle.radius * 1.5;
