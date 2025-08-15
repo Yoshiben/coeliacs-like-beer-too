@@ -676,11 +676,11 @@ const App = {
                 return;
             }
             
-            // Close the modal
+            // Close the modals
             modules.modalManager?.close('breweryBeersModal');
             modules.modalManager?.close('breweriesOverlay');
             
-            // Set search input to brewery name
+            // Set search input
             const searchInput = document.getElementById('searchInput');
             if (searchInput) {
                 searchInput.value = breweryName;
@@ -689,13 +689,13 @@ const App = {
             // Show loading
             modules.helpers?.showLoadingToast(`Searching for ${breweryName} venues...`);
             
-            // Search by brewery
+            // Use the correct endpoint
             const params = new URLSearchParams({
-                q: breweryName,
-                type: 'beer'  // Still search in beer mode
+                query: breweryName,
+                beer_type: 'brewery'  // Search by brewery specifically
             });
             
-            fetch(`/api/search?${params}`)
+            fetch(`/api/search-by-beer?${params}`)
             .then(response => response.json())
             .then(data => {
                 modules.helpers?.hideLoadingToast();
@@ -703,6 +703,13 @@ const App = {
                 const searchModule = modules.search || window.App?.getModule('search');
                 if (searchModule && searchModule.displayResults) {
                     searchModule.displayResults(data);
+                } else {
+                    // Show success message if can't display results
+                    if (data.venues && data.venues.length > 0) {
+                        modules.helpers?.showSuccessToast(`Found ${data.venues.length} venues serving ${breweryName}!`);
+                    } else {
+                        modules.helpers?.showErrorToast(`No venues found serving ${breweryName}`);
+                    }
                 }
             })
             .catch(error => {
