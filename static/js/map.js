@@ -882,7 +882,6 @@ export const MapModule = (() => {
         };
         
         legend.addTo(mapInstance);
-    };
         
         mapInstance.addControl(new hintControl());
     };
