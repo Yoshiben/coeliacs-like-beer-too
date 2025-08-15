@@ -612,8 +612,6 @@ export const CommunityHubModule = (() => {
                     <div class="impact-label">People Helped</div>
                 </div>
             </div>
-            
-            ${renderRecentAchievements()}
         `;
     };
     
