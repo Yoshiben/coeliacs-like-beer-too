@@ -603,34 +603,45 @@ const App = {
             modules.modalManager?.close('breweryBeersModal');
             modules.modalManager?.close('breweriesOverlay');
             
-            const searchModule = modules.search || window.App?.getModule('search');
-            console.log('Search module:', searchModule); // Debug - see what functions are available
+            const searchQuery = `${breweryName} ${beerName}`;
             
-            // Try different search methods
-            if (searchModule) {
-                const searchQuery = `${breweryName} ${beerName}`;
-                
-                // Set the search input
-                const searchInput = document.getElementById('searchInput');
-                if (searchInput) {
-                    searchInput.value = searchQuery;
-                }
-                
-                // Try different methods
-                if (searchModule.search) {
-                    searchModule.search(searchQuery, 'beer');
-                } else if (searchModule.performSearch) {
-                    searchModule.performSearch(searchQuery, 'beer');
-                } else if (searchModule.searchBeers) {
-                    searchModule.searchBeers(searchQuery);
-                } else {
-                    // Just trigger a click on the search button as fallback
-                    const searchBtn = document.querySelector('[data-action="search-beer"]');
-                    if (searchBtn) {
-                        searchBtn.click();
-                    }
-                }
+            // Set the search input
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.value = searchQuery;
             }
+            
+            // Show we're searching
+            modules.helpers?.showLoadingToast(`Searching for ${beerName}...`);
+            
+            // Directly call the search API
+            fetch('/api/search', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    query: searchQuery,
+                    search_type: 'beer'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                modules.helpers?.hideLoadingToast();
+                
+                if (data.venues && data.venues.length > 0) {
+                    // Use the search module to display results
+                    const searchModule = modules.search || window.App?.getModule('search');
+                    if (searchModule && searchModule.displayResults) {
+                        searchModule.displayResults(data);
+                    }
+                } else {
+                    modules.helpers?.showErrorToast(`No venues found serving ${beerName}`);
+                }
+            })
+            .catch(error => {
+                console.error('Search error:', error);
+                modules.helpers?.hideLoadingToast();
+                modules.helpers?.showErrorToast('Search failed');
+            });
         },
 
         
