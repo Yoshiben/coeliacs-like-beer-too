@@ -105,6 +105,14 @@ export const HelpersModule = (function() {
     };
     
     const showToast = (message, type = 'info', duration = config.toast.duration) => {
+        // Clean up any stuck toasts first
+        document.querySelectorAll('.toast').forEach(existingToast => {
+            existingToast.remove();
+        });
+        
+        // Clear the active toasts set
+        state.activeToasts.clear();
+        
         const toastId = `toast-${Date.now()}`;
         const toast = createToast(toastId, message, type);
         
@@ -116,7 +124,17 @@ export const HelpersModule = (function() {
         toast.classList.add('show');
         
         if (duration > 0) {
-            setTimeout(() => hideToast(toastId), duration);
+            setTimeout(() => {
+                hideToast(toastId);
+                // Extra cleanup after animation
+                setTimeout(() => {
+                    const element = document.getElementById(toastId);
+                    if (element && element.parentNode) {
+                        element.remove();
+                    }
+                    state.activeToasts.delete(toastId);
+                }, config.toast.animationDuration);
+            }, duration);
         }
         
         return toastId;
@@ -517,6 +535,9 @@ export const HelpersModule = (function() {
     // ================================
     const init = () => {
         console.log('🔧 Initializing Helpers Module');
+        
+        // Clean up any stuck toasts from previous session
+        document.querySelectorAll('.toast').forEach(toast => toast.remove());
         
         setupEventListeners();
         initializeViewport();
