@@ -701,6 +701,33 @@ const App = {
                 console.error('searchByBeer not available');
             }
         },
+
+        'search-all-venues': (el, modules) => {
+            console.log('Search all venues clicked!');
+            
+            // Uncheck the toggle
+            const toggle = document.getElementById('searchToggle');
+            if (toggle) {
+                toggle.checked = false;
+                console.log('Toggle unchecked');
+            }
+            
+            // Get last search type
+            const lastSearchType = window.App.getState('lastSearchType');
+            console.log('Last search type:', lastSearchType);
+            
+            // Re-run the appropriate search
+            const searchModule = modules.search || window.App?.getModule('search');
+            if (searchModule) {
+                if (lastSearchType === 'name') {
+                    searchModule.searchByName();
+                } else if (lastSearchType === 'area') {
+                    searchModule.searchByArea();
+                } else if (lastSearchType === 'beer') {
+                    searchModule.searchByBeer();
+                }
+            }
+        },
         
         // Map actions
         'toggle-results-map': (el, modules) => {
