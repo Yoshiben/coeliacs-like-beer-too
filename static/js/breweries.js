@@ -274,6 +274,8 @@ export default (function() {
             // Fetch beers for this brewery
             const response = await fetch(`/api/brewery/${encodeURIComponent(brewery)}/beers`);
             const beers = await response.json();
+
+            console.log('Beers data received:', beers);
             
             displayBreweryBeers(beers, brewery);
             
