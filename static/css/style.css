@@ -8,10 +8,10 @@
    --z-venue-details: 1100;           
    --z-modal-backdrop: 1200;        
    --z-modal-content: 1210;        
-   --z-status-modals: 1220;
-   --z-toast: 1300;
+   --z-status-modals: 1220;   
    --z-cookie: 1400;   
    --z-navigation: 1800;
+   --z-toast: 2000;
 
    /* Classic colours */
    --white: rgba(255, 255, 255, 1);
