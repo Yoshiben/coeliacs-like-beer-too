@@ -482,8 +482,12 @@ export const ModalManager = (() => {
         if (overlayId === 'resultsOverlay') {
             const listContainer = document.getElementById('resultsListContainer');
             const mapContainer = document.getElementById('resultsMapContainer');
+
+            console.log('🔄 List container found:', !!listContainer);
+            console.log('🔄 Map container found:', !!mapContainer);
             
             if (viewType === 'map') {
+                console.log('🔄 Switching to MAP view');
                 if (listContainer) listContainer.style.display = 'none';
                 if (mapContainer) {
                     mapContainer.style.display = 'block';
@@ -491,6 +495,7 @@ export const ModalManager = (() => {
                     mapContainer.style.height = '100%';
                 }
             } else {
+                console.log('🔄 Switching to LIST view');
                 if (listContainer) {
                     listContainer.style.display = 'block';
                     listContainer.style.flex = '1';
