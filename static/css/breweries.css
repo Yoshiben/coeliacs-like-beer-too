@@ -2,7 +2,7 @@
 .breweries-hero {
     text-align: center;
     padding: 2rem 1rem;
-    background: linear-gradient(135deg, var(--purple) 0%, var(--dark-purple) 100%);
+    background: var(--primary-gradient);
     color: white;
     border-radius: 20px;
     margin-bottom: 2rem;
