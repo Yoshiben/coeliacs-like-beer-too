@@ -173,8 +173,11 @@ export default (function() {
         try {
             console.log('📦 Loading breweries...');
             
-            // Show featured immediately
-            displayBreweries();
+            // Get the current filter state
+            const currentFilter = window.App.getState('showPurchasableOnly') || false;
+            
+            // Show featured immediately - WITH FILTER STATE
+            displayBreweries(currentFilter);
             
             // Then load all breweries
             const response = await fetch('/api/breweries');
@@ -183,8 +186,8 @@ export default (function() {
             breweries = await response.json();
             console.log(`✅ Loaded ${breweries.length} breweries`);
             
-            // Re-render with all data
-            displayBreweries();
+            // Re-render with all data - WITH FILTER STATE
+            displayBreweries(currentFilter);
             
         } catch (error) {
             console.error('❌ Error loading breweries:', error);
