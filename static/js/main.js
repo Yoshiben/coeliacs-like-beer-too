@@ -573,7 +573,7 @@ const App = {
             if (modal?.id) {
                 // Special handling for report modal
                 if (modal.id === 'reportModal') {
-                    const currentVenue = window.App.getState(STATE_KEYS.CURRENT_VENUE || STATE_KEYS.CURRENT_PUB);
+                    const currentVenue = window.App.getState(STATE_KEYS.CURRENT_VENUE || STATE_KEYS.CURRENT_VENUE);
                     if (currentVenue) {
                         // We have a current venue, so we came from venue details
                         modules.modalManager?.close(modal.id);
@@ -1364,20 +1364,20 @@ const App = {
         const venue = App.getState(STATE_KEYS.CURRENT_VENUE);
         if (!venue) return;
         
-        const searchQuery = encodeURIComponent(`${venue.name} ${venue.postcode} venue`);
+        const searchQuery = encodeURIComponent(`${venue.venue_name} ${venue.postcode} venue`);
         window.open(Constants.EXTERNAL.GOOGLE_SEARCH + searchQuery, '_blank');
         
-        modules.tracking?.trackExternalLink?.('google_search', venue.name);
+        modules.tracking?.trackExternalLink?.('google_search', venue.venue_name);
     },
     
     openVenueDirections: (modules) => {
         const venue = App.getState(STATE_KEYS.CURRENT_VENUE);
         if (!venue) return;
         
-        const destination = encodeURIComponent(`${venue.name}, ${venue.address}, ${venue.postcode}`);
+        const destination = encodeURIComponent(`${venue.venue_name}, ${venue.address}, ${venue.postcode}`);
         window.open(Constants.EXTERNAL.GOOGLE_MAPS_DIRECTIONS + destination, '_blank');
         
-        modules.tracking?.trackExternalLink?.('google_maps_directions', venue.name);
+        modules.tracking?.trackExternalLink?.('google_maps_directions', venue.venue_name);
     },
     
     // ================================
