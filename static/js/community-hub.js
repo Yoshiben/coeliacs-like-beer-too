@@ -385,7 +385,7 @@ export const CommunityHubModule = (() => {
         }
         
         container.innerHTML = `
-            <!-- Header -->
+            <!-- Sticky Header (no back button) -->
             <div class="community-header">
                 <div class="header-content">
                     <div class="user-summary">
@@ -404,10 +404,24 @@ export const CommunityHubModule = (() => {
                 </div>
             </div>
             
-            <!-- Level Progress -->
-            ${renderLevelProgress()}
+            <!-- Level Progress with floating beers -->
+            <div class="level-banner">
+                <div class="floating-beer">🍺</div>
+                <div class="floating-beer">🍺</div>
+                <div class="floating-beer">🍺</div>
+                <div class="level-content">
+                    <div class="level-header">
+                        <div class="level-title">Level ${state.userProfile.level}: ${getLevelName(state.userProfile.level)}</div>
+                        <div class="level-badge">Next: ${getLevelName(state.userProfile.level + 1)}</div>
+                    </div>
+                    <div class="level-progress">
+                        <div class="level-fill" style="width: ${calculateProgress()}%"></div>
+                    </div>
+                    <div class="level-text">${calculatePointsToNext()} points to next level • Keep going!</div>
+                </div>
+            </div>
             
-            <!-- Tabs -->
+            <!-- Rest stays the same... -->
             <div class="section-tabs">
                 <button class="tab ${state.currentView === 'impact' ? 'active' : ''}" 
                         data-hub-tab="impact">📊 My Impact</button>
@@ -419,7 +433,6 @@ export const CommunityHubModule = (() => {
                         data-hub-tab="challenges">🎯 Challenges</button>
             </div>
             
-            <!-- Dynamic Content Area -->
             <div id="hubTabContent">
                 ${renderTabContent()}
             </div>
