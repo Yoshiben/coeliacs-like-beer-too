@@ -680,36 +680,21 @@ const App = {
             modules.modalManager?.close('breweryBeersModal');
             modules.modalManager?.close('breweriesOverlay');
             
-            // Get search module
             const searchModule = modules.search || window.App?.getModule('search');
             
-            // Call performBeerSearch if it exists
-            if (searchModule && searchModule.performBeerSearch) {
-                // Set the beer search input if it exists
-                const beerInput = document.getElementById('beerInput');
-                if (beerInput) {
-                    beerInput.value = breweryName;
-                }
+            // Do EXACTLY what searchByBeer does internally
+            if (searchModule) {
+                // Show results overlay
+                searchModule.showResultsOverlay(`Brewery: "${breweryName}"`);
+                searchModule.showResultsLoading('Finding venues with this brewery...');
                 
-                // Set beer search type to brewery
-                const beerSearchType = document.getElementById('beerSearchType');
-                if (beerSearchType) {
-                    beerSearchType.value = 'brewery';
-                }
+                // Set search state
+                window.App.setState('lastSearchType', 'beer');
+                window.App.setState('lastSearchQuery', breweryName);
+                window.App.setState('lastSearchTimestamp', Date.now());
                 
-                // Call the search module's beer search directly
-                searchModule.searchByBeer();
-            } else {
-                // Fallback - just trigger the beer search button
-                const beerInput = document.getElementById('beerInput');
-                if (beerInput) {
-                    beerInput.value = breweryName;
-                }
-                
-                const searchBtn = document.querySelector('[data-action="search-beer"]');
-                if (searchBtn) {
-                    searchBtn.click();
-                }
+                // Call performBeerSearch directly
+                searchModule.performBeerSearch(breweryName, 'brewery', 1);
             }
         },
         
