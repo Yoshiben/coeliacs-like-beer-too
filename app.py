@@ -809,58 +809,49 @@ def submit_beer_update():
             return jsonify({'error': 'Missing required fields'}), 400
         
         conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
         
         # STEP 1: Check if brewery exists, if not add it
-        cursor = conn.cursor(dictionary=True)
         cursor.execute("""
             SELECT brewery_id FROM breweries 
             WHERE LOWER(brewery_name) = LOWER(%s)
         """, (brewery_name,))
-        brewery_row = cursor.fetchone()
-        cursor.close()
         
-        if brewery_row:
-            brewery_id = brewery_row['brewery_id']
+        brewery_rows = cursor.fetchall()  # Use fetchall to consume all results
+        
+        if brewery_rows:
+            brewery_id = brewery_rows[0]['brewery_id']
             logger.info(f"Found existing brewery: {brewery_name} (ID: {brewery_id})")
         else:
             # Add new brewery
-            cursor = conn.cursor(dictionary=True)
             cursor.execute("SELECT MAX(brewery_id) as max_id FROM breweries")
-            max_result = cursor.fetchone()
-            cursor.close()
-            
-            max_brewery_id = max_result['max_id'] if max_result and max_result['max_id'] else 0
+            max_rows = cursor.fetchall()
+            max_brewery_id = max_rows[0]['max_id'] if max_rows[0]['max_id'] else 0
             brewery_id = max_brewery_id + 1
             
-            cursor = conn.cursor()
             cursor.execute("""
                 INSERT INTO breweries (brewery_id, brewery_name, created_by)
                 VALUES (%s, %s, %s)
             """, (brewery_id, brewery_name, submitted_by))
-            cursor.close()
             
             logger.info(f"Added new brewery: {brewery_name} (ID: {brewery_id}) by {submitted_by}")
         
         # STEP 2: Check if beer exists, if not add it
-        cursor = conn.cursor(dictionary=True)
         cursor.execute("""
             SELECT beer_id FROM beers 
             WHERE brewery_id = %s AND LOWER(beer_name) = LOWER(%s)
         """, (brewery_id, beer_name))
-        beer_row = cursor.fetchone()
-        cursor.close()
         
-        if beer_row:
-            beer_id = beer_row['beer_id']
+        beer_rows = cursor.fetchall()  # Use fetchall to consume all results
+        
+        if beer_rows:
+            beer_id = beer_rows[0]['beer_id']
             logger.info(f"Found existing beer: {beer_name} (ID: {beer_id})")
         else:
             # Add new beer
-            cursor = conn.cursor(dictionary=True)
             cursor.execute("SELECT MAX(beer_id) as max_id FROM beers")
-            max_result = cursor.fetchone()
-            cursor.close()
-            
-            max_beer_id = max_result['max_id'] if max_result and max_result['max_id'] else 0
+            max_rows = cursor.fetchall()
+            max_beer_id = max_rows[0]['max_id'] if max_rows[0]['max_id'] else 0
             beer_id = max_beer_id + 1
             
             # Parse ABV
@@ -871,27 +862,24 @@ def submit_beer_update():
                 except (ValueError, TypeError):
                     abv_value = None
             
-            cursor = conn.cursor()
             cursor.execute("""
                 INSERT INTO beers (brewery_id, beer_id, beer_name, style, abv, gluten_status, created_by)
                 VALUES (%s, %s, %s, %s, %s, 'gluten_removed', %s)
             """, (brewery_id, beer_id, beer_name, beer_style, abv_value, submitted_by))
-            cursor.close()
             
             logger.info(f"Added new beer: {brewery_name} - {beer_name} (ID: {beer_id}) by {submitted_by}")
         
         # STEP 3: Check if this beer is already reported for this venue
-        cursor = conn.cursor(dictionary=True)
         cursor.execute("""
             SELECT report_id, times_reported FROM venue_beers 
             WHERE venue_id = %s AND beer_id = %s AND format = %s
         """, (venue_id, beer_id, format_type))
-        existing_report = cursor.fetchone()
-        cursor.close()
         
-        if existing_report:
+        existing_reports = cursor.fetchall()  # Use fetchall to consume all results
+        
+        if existing_reports:
+            existing_report = existing_reports[0]
             # Update existing report
-            cursor = conn.cursor()
             cursor.execute("""
                 UPDATE venue_beers 
                 SET last_seen = CURRENT_DATE, 
@@ -899,12 +887,10 @@ def submit_beer_update():
                     last_updated_by = %s
                 WHERE report_id = %s
             """, ((existing_report['times_reported'] or 0) + 1, submitted_by, existing_report['report_id']))
-            cursor.close()
             report_id = existing_report['report_id']
             logger.info(f"Updated existing report {report_id} by {submitted_by}")
         else:
             # Insert new report
-            cursor = conn.cursor()
             cursor.execute("""
                 INSERT INTO venue_beers (
                     venue_id, beer_id, format, added_by, times_reported
@@ -913,7 +899,6 @@ def submit_beer_update():
                 )
             """, (venue_id, beer_id, format_type, submitted_by))
             report_id = cursor.lastrowid
-            cursor.close()
             logger.info(f"Added new venue_beer report {report_id} by {submitted_by}")
         
         conn.commit()
@@ -939,8 +924,8 @@ def submit_beer_update():
         }), 500
     finally:
         if 'conn' in locals() and conn.is_connected():
+            cursor.close()
             conn.close()
-
 
 @app.route('/api/update-gf-status', methods=['POST'])
 def update_gf_status():
@@ -1386,6 +1371,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
