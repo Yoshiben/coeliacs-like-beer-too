@@ -705,40 +705,10 @@ const App = {
         'search-all-venues': (el, modules) => {
             console.log('Search all venues clicked!');
             
-            // Uncheck the toggle
+            // Just click the toggle! It already handles everything!
             const toggle = document.getElementById('searchToggle');
-            if (toggle) {
-                toggle.checked = false;
-            }
-            
-            // Get last search details
-            const lastSearch = window.App.getState('lastSearch');
-            const searchType = lastSearch?.type;
-            const query = lastSearch?.query;
-            
-            console.log('Retrying search:', searchType, query);
-            
-            if (!searchType || !query) {
-                console.error('No search to retry');
-                return;
-            }
-            
-            // Set the appropriate input field based on search type
-            if (searchType === 'name') {
-                const input = document.getElementById('searchInput');
-                if (input) input.value = query;
-            } else if (searchType === 'area') {
-                const input = document.getElementById('areaInput');
-                if (input) input.value = query;
-            } else if (searchType === 'beer') {
-                const input = document.getElementById('beerInput');
-                if (input) input.value = query;
-            }
-            
-            // Now call the search
-            const searchModule = modules.search || window.App?.getModule('search');
-            if (searchModule && searchModule[`searchBy${searchType.charAt(0).toUpperCase() + searchType.slice(1)}`]) {
-                searchModule[`searchBy${searchType.charAt(0).toUpperCase() + searchType.slice(1)}`]();
+            if (toggle && toggle.checked) {
+                toggle.click();  // This will uncheck it AND re-run the search!
             }
         },
         
