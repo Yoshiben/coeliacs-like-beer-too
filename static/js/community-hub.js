@@ -62,6 +62,153 @@ export const CommunityHubModule = (() => {
         
         console.log('✅ Community Hub initialized');
     };
+
+    // ================================
+    // MISSING FUNCTIONS TO ADD
+    // ================================
+    
+    const setupEventListeners = () => {
+        // Just a placeholder for now - will add real listeners when needed
+        console.log('✅ Community Hub event listeners setup');
+    };
+    
+    const animatePointsChange = (oldPoints, newPoints) => {
+        // Simple animation placeholder
+        console.log(`Points: ${oldPoints} → ${newPoints}`);
+    };
+    
+    const showLevelUpNotification = (level) => {
+        modules.helpers?.showSuccessToast(`🎉 Level ${level} reached!`);
+    };
+    
+    const getLevelName = (level) => {
+        const names = ['Newbie', 'Explorer', 'Regular', 'Enthusiast', 'Expert', 'Master', 'Legend', 'Mythic'];
+        return names[level - 1] || 'Unknown';
+    };
+    
+    const renderLevelProgress = () => {
+        if (!state.userProfile) return '';
+        
+        const currentLevel = state.userProfile.level;
+        const thresholds = [0, 100, 250, 500, 1000, 2000, 5000, 10000];
+        const currentThreshold = thresholds[currentLevel - 1];
+        const nextThreshold = thresholds[currentLevel] || 10000;
+        const progress = ((state.userProfile.points - currentThreshold) / (nextThreshold - currentThreshold)) * 100;
+        
+        return `
+            <div class="level-banner">
+                <div class="level-header">
+                    <div class="level-title">Level ${currentLevel}: ${getLevelName(currentLevel)}</div>
+                    <div class="level-badge">Next: ${getLevelName(currentLevel + 1)}</div>
+                </div>
+                <div class="level-progress">
+                    <div class="level-fill" style="width: ${progress}%"></div>
+                </div>
+                <div class="level-text">${nextThreshold - state.userProfile.points} points to next level</div>
+            </div>
+        `;
+    };
+    
+    const renderOnboarding = (container) => {
+        container.innerHTML = `
+            <div style="padding: 2rem; text-align: center;">
+                <h2>👋 Welcome to the Community Hub!</h2>
+                <p>Set a nickname to start tracking your contributions</p>
+                <button class="btn btn-primary" data-action="save-nickname">Set Nickname</button>
+            </div>
+        `;
+    };
+    
+    const renderRecentAchievements = () => {
+        if (!state.userProfile || state.userProfile.achievements.length === 0) {
+            return '<p style="padding: 1rem; text-align: center; color: var(--text-secondary);">No achievements yet - keep contributing!</p>';
+        }
+        
+        return `
+            <div class="achievements-grid">
+                ${state.userProfile.achievements.map(id => {
+                    const achievement = ACHIEVEMENTS[id.toUpperCase()];
+                    return achievement ? `
+                        <div class="achievement-badge">
+                            <span>${achievement.icon}</span>
+                            <span>${achievement.name}</span>
+                        </div>
+                    ` : '';
+                }).join('')}
+            </div>
+        `;
+    };
+    
+    const renderLeaderboardTab = () => {
+        return `
+            <div class="leaderboard-section">
+                <div class="leaderboard-header">
+                    <div class="leaderboard-title">🏆 Community Champions</div>
+                </div>
+                <div class="leaderboard-list">
+                    ${state.leaderboard.map((user, index) => `
+                        <div class="leader-row ${user.nickname === state.userProfile?.nickname ? 'you' : ''}">
+                            <div class="rank ${index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : ''}">${index + 1}</div>
+                            <div class="leader-info">
+                                <div class="leader-name">${user.nickname} ${user.nickname === state.userProfile?.nickname ? '(You)' : ''}</div>
+                                <div class="leader-stats">${user.updates} updates</div>
+                            </div>
+                            <div class="leader-points">${user.points} pts</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    };
+    
+    const renderBreweriesTab = () => {
+        return `
+            <div class="breweries-section">
+                <div class="breweries-header">
+                    <div class="breweries-title">🤝 Partner Breweries</div>
+                    <div class="breweries-subtitle">Support the breweries that support our community</div>
+                </div>
+                <div class="brewery-cards">
+                    <div class="brewery-card">
+                        <div class="brewery-logo">🌾</div>
+                        <div class="brewery-name">Coming Soon!</div>
+                        <div class="brewery-meta">We're partnering with GF breweries</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    };
+    
+    const renderChallengesTab = () => {
+        return `
+            <div class="challenges-section">
+                <h3>🎯 Weekly Challenges</h3>
+                <p style="padding: 1rem; text-align: center;">Coming soon!</p>
+            </div>
+        `;
+    };
+    
+    const switchTab = (tabName) => {
+        state.currentView = tabName;
+        const contentEl = document.getElementById('hubTabContent');
+        if (contentEl) {
+            contentEl.innerHTML = renderTabContent();
+        }
+        
+        // Update active tab
+        document.querySelectorAll('[data-hub-tab]').forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.hubTab === tabName);
+        });
+    };
+    
+    const getMockLeaderboard = () => {
+        return [
+            { nickname: 'GlutenFreeGuru', updates: 142, points: 1847 },
+            { nickname: 'CoeliacExplorer', updates: 98, points: 1523 },
+            { nickname: 'BeerMapper', updates: 87, points: 1290 },
+            { nickname: state.userProfile?.nickname || 'You', updates: 23, points: 452 }
+        ];
+    };
     
     // ================================
     // USER PROFILE MANAGEMENT
