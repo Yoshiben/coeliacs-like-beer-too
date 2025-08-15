@@ -162,7 +162,7 @@ export const MapModule = (() => {
             },
             'currently': {
                 fillColor: styles.currentlyGfFill,
-                color: styles.currentlyGfBorder,
+                color: styles.currentlyGfBorder
             },
             'not_currently': {
                 fillColor: styles.notCurrentlyFill,
