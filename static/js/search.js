@@ -1548,25 +1548,7 @@ export const SearchModule = (function() {
                     
                     <div class="toggle-prompt" style="margin-top: 1.5rem; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 10px;">
                         <p style="margin-bottom: 1rem;">💡 There might be venues that serve GF beer but haven't been confirmed yet!</p>
-                        <button class="btn btn-primary" onclick="
-                            // Uncheck the toggle
-                            const toggle = document.getElementById('searchToggle');
-                            if (toggle) toggle.checked = false;
-                            
-                            // Re-run the appropriate search based on type
-                            const searchModule = window.App?.getModule('search');
-                            const lastType = '${lastSearchType}';
-                            
-                            if (searchModule) {
-                                if (lastType === 'name') {
-                                    searchModule.searchByName();
-                                } else if (lastType === 'area') {
-                                    searchModule.searchByArea();
-                                } else if (lastType === 'beer') {
-                                    searchModule.searchByBeer();
-                                }
-                            }
-                        ">
+                        <button class="btn btn-primary" id="searchAllVenuesBtn" data-search-type="${lastSearchType}">
                             🔍 Search all venues instead
                         </button>
                     </div>
@@ -1574,6 +1556,30 @@ export const SearchModule = (function() {
                     <p style="margin-top: 1rem; opacity: 0.8;">💙 Found a venue with GF beer? Please report it!</p>
                 </div>
             `;
+            
+            // Add event listener to the button
+            const searchAllBtn = document.getElementById('searchAllVenuesBtn');
+            if (searchAllBtn) {
+                searchAllBtn.addEventListener('click', () => {
+                    // Uncheck the toggle
+                    const toggle = document.getElementById('searchToggle');
+                    if (toggle) toggle.checked = false;
+                    
+                    // Re-run the appropriate search
+                    const searchModule = window.App?.getModule('search');
+                    const searchType = searchAllBtn.dataset.searchType;
+                    
+                    if (searchModule) {
+                        if (searchType === 'name') {
+                            searchModule.searchByName();
+                        } else if (searchType === 'area') {
+                            searchModule.searchByArea();
+                        } else if (searchType === 'beer') {
+                            searchModule.searchByBeer();
+                        }
+                    }
+                });
+            }
         } else {
             // Show normal no results
             if (elements.noResults) {
@@ -1583,6 +1589,7 @@ export const SearchModule = (function() {
             }
         }
     };
+    
     const displayResultsInOverlay = (venues, title) => {
         state.currentSearchVenues = venues;
         
