@@ -705,10 +705,13 @@ const App = {
         'search-all-venues': (el, modules) => {
             console.log('Search all venues clicked!');
             
-            // Just click the toggle! It already handles everything!
             const toggle = document.getElementById('searchToggle');
             if (toggle && toggle.checked) {
-                toggle.click();  // This will uncheck it AND re-run the search!
+                toggle.click();  // Uncheck it
+                
+                // Manually trigger change event
+                const event = new Event('change', { bubbles: true });
+                toggle.dispatchEvent(event);
             }
         },
         
