@@ -430,6 +430,9 @@ export const SearchModule = (function() {
     // Helper function for no results
     const showNoResultsWithToggleHint = (searchType, query) => {
         const resultsList = document.getElementById('resultsList');
+        const lastSearch = window.App.getState('lastSearch');
+        const lastSearchType = lastSearch?.type;
+        const lastSearchQuery = lastSearch?.query;
         
         resultsList.innerHTML = `
             <div class="no-results">
