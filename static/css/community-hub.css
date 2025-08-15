@@ -384,3 +384,61 @@
         width: auto;
     }
 }
+
+
+/* Updated level banner with integrated stats */
+.level-banner {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    padding: clamp(1.5rem, 4vw, 2rem) clamp(1rem, 3vw, 1.5rem);
+    margin: 0; /* No margin at top */
+    position: relative;
+    overflow: hidden;
+    border-radius: 0 0 20px 20px; /* Only round bottom corners */
+}
+
+.level-user-info {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: rgba(255,255,255,0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+}
+
+.username {
+    font-weight: 600;
+}
+
+.change-nickname-btn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 0;
+    opacity: 0.8;
+    transition: opacity 0.3s;
+}
+
+.change-nickname-btn:hover {
+    opacity: 1;
+}
+
+.level-stats {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.stat-bubble {
+    background: rgba(255,255,255,0.2);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
