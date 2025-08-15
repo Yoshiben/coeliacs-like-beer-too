@@ -599,27 +599,37 @@ const App = {
                 return;
             }
             
-            // Close the brewery modal
+            // Close the modals
             modules.modalManager?.close('breweryBeersModal');
-            
-            // Close the breweries overlay
             modules.modalManager?.close('breweriesOverlay');
             
-            // Use the same search beer action that already works
-            const searchQuery = `${breweryName} ${beerName}`;
-            
-            // Set the search input
-            const searchInput = document.getElementById('searchInput');
-            if (searchInput) {
-                searchInput.value = searchQuery;
-            }
-            
-            // Trigger search using the existing beer search
             const searchModule = modules.search || window.App?.getModule('search');
-            if (searchModule && searchModule.searchBeer) {
-                searchModule.searchBeer(searchQuery);
-            } else {
-                console.error('Search module or searchBeer function not found');
+            console.log('Search module:', searchModule); // Debug - see what functions are available
+            
+            // Try different search methods
+            if (searchModule) {
+                const searchQuery = `${breweryName} ${beerName}`;
+                
+                // Set the search input
+                const searchInput = document.getElementById('searchInput');
+                if (searchInput) {
+                    searchInput.value = searchQuery;
+                }
+                
+                // Try different methods
+                if (searchModule.search) {
+                    searchModule.search(searchQuery, 'beer');
+                } else if (searchModule.performSearch) {
+                    searchModule.performSearch(searchQuery, 'beer');
+                } else if (searchModule.searchBeers) {
+                    searchModule.searchBeers(searchQuery);
+                } else {
+                    // Just trigger a click on the search button as fallback
+                    const searchBtn = document.querySelector('[data-action="search-beer"]');
+                    if (searchBtn) {
+                        searchBtn.click();
+                    }
+                }
             }
         },
 
