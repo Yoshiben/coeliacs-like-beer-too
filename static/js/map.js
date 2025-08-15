@@ -113,7 +113,7 @@ export const MapModule = (() => {
         if (!cachedStyles) {
             const rootStyles = getComputedStyle(document.documentElement);
             cachedStyles = {                
-                userFillColor: rootStyles.getPropertyValue('--primary-gradient').trim(),
+                userFillColor: rootStyles.getPropertyValue('--purple').trim(),
                 userStrokeColor: rootStyles.getPropertyValue('--white').trim(),
                 
                 alwaysTapCaskFill: rootStyles.getPropertyValue('--gold').trim(),
@@ -148,20 +148,22 @@ export const MapModule = (() => {
             'always_tap_cask': {
                 fillColor: styles.alwaysTapCaskFill,
                 color: styles.alwaysTapCaskBorder,
-                radius: 10,
-                weight: 4,
+                radius: 9,
+                weight: 2,
                 className: 'always-tap-cask-marker',
                 fillOpacity: 1
             },
             'always_bottle_can': {
                 fillColor: styles.alwaysBottleCanFill,
                 color: styles.alwaysBottleCanBorder,
-                radius: 9,
-                weight: 3,
+                radius: 8,
+                weight: 2,
                 className: 'always-bottle-can-marker'
             },
             'currently': {
                 fillColor: styles.currentlyGfFill,
+                radius: 7,
+                weight: 2,
                 color: styles.currentlyGfBorder
             },
             'not_currently': {
