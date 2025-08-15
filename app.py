@@ -823,9 +823,10 @@ def submit_beer_update():
             brewery_id = brewery_row['brewery_id']
             logger.info(f"Found existing brewery: {brewery_name} (ID: {brewery_id})")
         else:
-            # Add new brewery
+            # Add new brewery - fetch max ID first
             cursor.execute("SELECT MAX(brewery_id) as max_id FROM breweries")
-            max_brewery_id = cursor.fetchone()['max_id'] or 0
+            max_result = cursor.fetchone()  # Make sure to fetch the result
+            max_brewery_id = max_result['max_id'] if max_result and max_result['max_id'] else 0
             brewery_id = max_brewery_id + 1
             
             cursor.execute("""
@@ -847,9 +848,10 @@ def submit_beer_update():
             beer_id = beer_row['beer_id']
             logger.info(f"Found existing beer: {beer_name} (ID: {beer_id})")
         else:
-            # Add new beer
+            # Add new beer - fetch max ID first
             cursor.execute("SELECT MAX(beer_id) as max_id FROM beers")
-            max_beer_id = cursor.fetchone()['max_id'] or 0
+            max_result = cursor.fetchone()  # Make sure to fetch the result
+            max_beer_id = max_result['max_id'] if max_result and max_result['max_id'] else 0
             beer_id = max_beer_id + 1
             
             # Parse ABV
@@ -869,7 +871,7 @@ def submit_beer_update():
         
         # STEP 3: Check if this beer is already reported for this venue
         cursor.execute("""
-            SELECT report_id FROM venue_beers 
+            SELECT report_id, times_reported FROM venue_beers 
             WHERE venue_id = %s AND beer_id = %s AND format = %s
         """, (venue_id, beer_id, format_type))
         
@@ -880,19 +882,19 @@ def submit_beer_update():
             cursor.execute("""
                 UPDATE venue_beers 
                 SET last_seen = CURRENT_DATE, 
-                    times_reported = times_reported + 1,
+                    times_reported = %s,
                     last_updated_by = %s
                 WHERE report_id = %s
-            """, (submitted_by, existing_report['report_id']))
+            """, (existing_report['times_reported'] + 1, submitted_by, existing_report['report_id']))
             report_id = existing_report['report_id']
             logger.info(f"Updated existing report {report_id} by {submitted_by}")
         else:
             # Insert new report
             cursor.execute("""
                 INSERT INTO venue_beers (
-                    venue_id, beer_id, format, added_by
+                    venue_id, beer_id, format, added_by, times_reported
                 ) VALUES (
-                    %s, %s, %s, %s
+                    %s, %s, %s, %s, 1
                 )
             """, (venue_id, beer_id, format_type, submitted_by))
             report_id = cursor.lastrowid
@@ -1369,6 +1371,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
