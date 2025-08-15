@@ -85,28 +85,6 @@ export const CommunityHubModule = (() => {
         const names = ['Newbie', 'Explorer', 'Regular', 'Enthusiast', 'Expert', 'Master', 'Legend', 'Mythic'];
         return names[level - 1] || 'Unknown';
     };
-
-    const open = () => {
-        console.log('🏆 Opening Community Hub');
-        
-        // Clean up any lingering toasts
-        document.querySelectorAll('.toast').forEach(toast => {
-            toast.remove();
-        });
-        
-        // Also hide the loading toast if it's stuck
-        const loadingToast = document.getElementById('loadingToast');
-        if (loadingToast) {
-            loadingToast.style.display = 'none';
-        }
-        
-        modules.modalManager?.open('communityHubOverlay', {
-            onOpen: () => {
-                renderHub();
-                loadLeaderboard();
-            }
-        });
-    };
     
     const renderLevelProgress = () => {
         if (!state.userProfile) return '';
@@ -388,6 +366,17 @@ export const CommunityHubModule = (() => {
     // ================================
     const open = () => {
         console.log('🏆 Opening Community Hub');
+        
+        // Clean up any lingering toasts
+        document.querySelectorAll('.toast').forEach(toast => {
+            toast.remove();
+        });
+        
+        // Also hide the loading toast if it's stuck
+        const loadingToast = document.getElementById('loadingToast');
+        if (loadingToast) {
+            loadingToast.style.display = 'none';
+        }
         
         modules.modalManager?.open('communityHubOverlay', {
             onOpen: () => {
