@@ -1098,40 +1098,41 @@ export const MapModule = (() => {
         
         // If switching to map, initialize it
         if (newView === 'map') {
-        // Clean up any existing map
-        cleanupResultsMap();
-        
-        // Show loading
-        const mapContainer = document.getElementById('resultsMapContainer');
-        if (mapContainer) {
-            mapContainer.innerHTML = '<div style="display: flex; justify-content: center; align-items: center; height: 100%; color: #666;"><div class="loading-spinner"></div> Loading all venues...</div>';
-        }
-        
-        // Get ALL venues for map
-        const searchModule = modules.search;
-        
-        // Try to get all results
-        searchModule.getAllSearchResults().then(allVenues => {
-            console.log(`🗺️ Got ${allVenues.length} venues for map`);
+            // Clean up any existing map
+            cleanupResultsMap();
             
-            // Restore map div
+            // Show loading
+            const mapContainer = document.getElementById('resultsMapContainer');
             if (mapContainer) {
-                mapContainer.innerHTML = '<div id="resultsMap" class="results-map"></div>';
+                mapContainer.innerHTML = '<div style="display: flex; justify-content: center; align-items: center; height: 100%; color: #666;"><div class="loading-spinner"></div> Loading all venues...</div>';
             }
             
-            // Initialize map with all venues
-            setTimeout(() => {
-                try {
-                    initResultsMap(allVenues);
-                    modules.tracking?.trackEvent('results_map_show', 'Map', 'toggle');
-                } catch (error) {
-                    console.error('❌ Map initialization failed:', error);
-                    // Revert to list view
-                    modalManager.toggleInternalView('resultsOverlay', 'list');
-                    if (btnText) btnText.textContent = 'Map';
+            // Get ALL venues for map
+            const searchModule = modules.search;
+            
+            // Try to get all results
+            searchModule.getAllSearchResults().then(allVenues => {
+                console.log(`🗺️ Got ${allVenues.length} venues for map`);
+                
+                // Restore map div
+                if (mapContainer) {
+                    mapContainer.innerHTML = '<div id="resultsMap" class="results-map"></div>';
                 }
-            }, 100);
-        });
+                
+                // Initialize map with all venues
+                setTimeout(() => {
+                    try {
+                        initResultsMap(allVenues);
+                        modules.tracking?.trackEvent('results_map_show', 'Map', 'toggle');
+                    } catch (error) {
+                        console.error('❌ Map initialization failed:', error);
+                        // Revert to list view
+                        modalManager.toggleInternalView('resultsOverlay', 'list');
+                        if (btnText) btnText.textContent = 'Map';
+                    }
+                }, 100);
+            });
+        }
     }
     
     // ================================
