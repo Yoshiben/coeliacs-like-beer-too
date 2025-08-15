@@ -709,12 +709,26 @@ const App = {
             const toggle = document.getElementById('searchToggle');
             if (toggle) toggle.checked = false;
             
-            // Find which search button is active and click it
-            const activeSearchBtn = document.querySelector('.search-controls .btn-primary.active');
-            if (activeSearchBtn) {
-                console.log('Clicking active search button');
-                activeSearchBtn.click();
-            }
+            // Get the last search
+            const lastSearch = window.App.getState('lastSearch');
+            if (!lastSearch) return;
+            
+            // Just call the search API directly!
+            const params = new URLSearchParams({
+                q: lastSearch.query,
+                type: lastSearch.type,
+                gf_only: 'false'  // Force all venues!
+            });
+            
+            fetch(`/api/search?${params}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Display the results
+                    const searchModule = modules.search || window.App?.getModule('search');
+                    if (searchModule && searchModule.displayResults) {
+                        searchModule.displayResults(data);
+                    }
+                });
         },
         
         // In main.js actionHandlers - update show-full-map
