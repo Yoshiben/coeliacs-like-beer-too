@@ -2246,10 +2246,22 @@ export const SearchModule = (function() {
         showVenueAddedPrompt(result) {
             console.log('🎉 Showing venue added prompt for:', result);
             
+            // Store the venue details for the action handlers
+            window.App.setState('lastAddedVenueId', result.venue_id);
+            window.App.setState('lastAddedVenueName', result.message.split(' added successfully!')[0]);
+            
+            // Also store as current venue for easy access
+            const newVenue = {
+                venue_id: result.venue_id,
+                name: result.message.split(' added successfully!')[0],
+                venue_name: result.message.split(' added successfully!')[0]
+            };
+            window.App.setState('currentVenue', newVenue);
+            
             // Update the modal with venue info
             const venueNameEl = document.getElementById('addedVenueName');
             if (venueNameEl) {
-                venueNameEl.textContent = result.message.split(' added successfully!')[0]; // Extract venue name
+                venueNameEl.textContent = newVenue.name;
             }
             
             // Close places search modal first
@@ -2263,48 +2275,7 @@ export const SearchModule = (function() {
             // Small delay then show the prompt modal
             setTimeout(() => {
                 if (modules.modalManager) {
-                    modules.modalManager.open('venueAddedPromptModal', {
-                        onOpen: () => {
-                            // Set up the action buttons for the newly added venue
-                            const updateStatusBtn = document.querySelector('[data-action="update-gf-status-new-venue"]');
-                            const reportBeerBtn = document.querySelector('[data-action="report-gf-beer-new-venue"]');
-                            const doneBtn = document.querySelector('[data-action="close-venue-added-modal"]');
-                            
-                            if (updateStatusBtn) {
-                                updateStatusBtn.onclick = () => {
-                                    modules.modalManager.close('venueAddedPromptModal');
-                                    // Set the newly added venue as current and open status modal
-                                    window.App.setState('currentVenue', window.newlyAddedVenue);
-                                    setTimeout(() => {
-                                        modules.modalManager.open('gfStatusModal');
-                                    }, 100);
-                                };
-                            }
-                            
-                            if (reportBeerBtn) {
-                                reportBeerBtn.onclick = () => {
-                                    modules.modalManager.close('venueAddedPromptModal');
-                                    // Open report modal with the new venue pre-selected
-                                    setTimeout(() => {
-                                        modules.modalManager.open('reportModal', {
-                                            onOpen: () => {
-                                                if (modules.modal?.initializeReportModal) {
-                                                    modules.modal.initializeReportModal(window.newlyAddedVenue);
-                                                }
-                                            }
-                                        });
-                                    }, 100);
-                                };
-                            }
-                            
-                            if (doneBtn) {
-                                doneBtn.onclick = () => {
-                                    modules.modalManager.close('venueAddedPromptModal');
-                                    // Optionally navigate back to home or results
-                                };
-                            }
-                        }
-                    });
+                    modules.modalManager.open('venueAddedPromptModal');
                 }
             }, 500);
         },
