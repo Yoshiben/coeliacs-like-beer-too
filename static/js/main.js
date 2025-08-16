@@ -711,6 +711,65 @@ const App = {
                 allVenuesOption.click();
             }
         },
+
+        // Add these action handlers to main.js
+        'update-gf-status-new-venue': (el, modules) => {
+            // Close the prompt modal
+            modules.modalManager?.close('venueAddedPromptModal');
+            
+            // Get the venue ID from state or element
+            const venueId = window.App.getState('lastAddedVenueId');
+            if (!venueId) {
+                console.error('No venue ID found');
+                return;
+            }
+            
+            // Set as current venue for the status flow
+            window.App.setState('currentVenue', {
+                venue_id: venueId,
+                name: window.App.getState('lastAddedVenueName')
+            });
+            
+            // Open the GF status modal
+            const formModule = modules.form || window.App?.getModule('form');
+            if (formModule && formModule.GFStatusFlow) {
+                formModule.GFStatusFlow.openStatusModal();
+            }
+        },
+        
+        'report-gf-beer-new-venue': (el, modules) => {
+            // Close the prompt modal
+            modules.modalManager?.close('venueAddedPromptModal');
+            
+            // Get the venue ID from state
+            const venueId = window.App.getState('lastAddedVenueId');
+            const venueName = window.App.getState('lastAddedVenueName');
+            
+            if (!venueId) {
+                console.error('No venue ID found');
+                return;
+            }
+            
+            // Set as current venue
+            window.App.setState('currentVenue', {
+                venue_id: venueId,
+                name: venueName
+            });
+            
+            // Open the report modal
+            const modalModule = modules.modal || window.App?.getModule('modal');
+            if (modalModule && modalModule.openReportModal) {
+                modalModule.openReportModal({
+                    venue_id: venueId,
+                    name: venueName
+                });
+            }
+        },
+        
+        'close-venue-added-modal': (el, modules) => {
+            modules.modalManager?.close('venueAddedPromptModal');
+            modules.helpers?.showSuccessToast('Venue added successfully!');
+        },
         
         // In main.js actionHandlers - update show-full-map
         'show-full-map': (el, modules) => {
