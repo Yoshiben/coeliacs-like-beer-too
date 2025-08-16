@@ -1,6 +1,7 @@
 /* ================================
    MAP COMPONENTS
    ================================ */
+
 .map-container {
    height:100%;
    flex: 1;
@@ -97,24 +98,19 @@
 }
 
 .leaflet-popup-content {
-    margin: var(--space-md) 0 !important;
-    padding: 0 !important;
-    min-width: 250px;
-}
-
-.popup-content {
-    padding: 1rem;
+   margin: var(--space-md) 0 !important;
+   min-width: 250px;
+   padding: var(--space-md);
 }
 
 .popup-title {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 0.5rem;
-    background: linear-gradient(135deg, var(--purple) 0%, var(--dark-purple) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+   font-size: var(--text-lg);
+   font-weight: 700;
+   margin-bottom: var(--space-lg);
+   background: var(--primary-gradient);
+   -webkit-background-clip: text;
+   -webkit-text-fill-color: transparent;
+   background-clip: text;
 }
 
 .popup-address,
@@ -167,7 +163,7 @@
 .popup-button {
     width: 100%;
     padding: 0.75rem;
-    background: linear-gradient(135deg, var(--purple) 0%, var(--dark-purple) 100%);
+    background: var(--primary-gradient);
     color: white;
     border: none;
     border-radius: 10px;
