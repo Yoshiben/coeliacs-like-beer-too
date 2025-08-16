@@ -580,7 +580,7 @@ export const SearchModule = (function() {
     // ================================
     // VENUE DETAILS
     // ================================
-    cconst showVenueDetails = async (venueId) => {
+    const showVenueDetails = async (venueId) => {
         console.log('🏠 Showing venue details:', venueId);
         
         let loadingToast = null;
