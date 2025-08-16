@@ -161,14 +161,68 @@ export const HelpersModule = (function() {
         }
     };
     
-    const showLoadingToast = (message = 'Loading...') => {
-        if (state.loadingToastId) {
-            updateToastMessage(state.loadingToastId, message);
-            return state.loadingToastId;
+    const showLoadingToast = (message = 'Loading...', minDelay = 300) => {
+        // Don't show loading toast for instant operations on mobile
+        if (isMobile() && minDelay < 500) {
+            // Return a fake ID and hide function for compatibility
+            return {
+                id: 'fake-toast',
+                hide: () => {} 
+            };
         }
         
-        state.loadingToastId = showToast(message, 'loading', 0);
-        return state.loadingToastId;
+        let shown = false;
+        let toastId = null;
+        
+        // Only show after delay (if operation takes time)
+        const timeoutId = setTimeout(() => {
+            shown = true;
+            if (state.loadingToastId) {
+                updateToastMessage(state.loadingToastId, message);
+                toastId = state.loadingToastId;
+            } else {
+                toastId = showToast(message, 'loading', 0);
+                state.loadingToastId = toastId;
+            }
+        }, minDelay);
+        
+        // Return object with hide function
+        return {
+            id: toastId || 'pending',
+            hide: () => {
+                clearTimeout(timeoutId);
+                if (shown && state.loadingToastId) {
+                    hideToast(state.loadingToastId);
+                    state.loadingToastId = null;
+                }
+            }
+        };
+    };
+    
+    // Add this new function to helpers.js
+    const smartToast = (message, type = 'info', options = {}) => {
+        const {
+            showOnMobile = true,
+            minDuration = 2000,
+            skipIfVisible = true
+        } = options;
+        
+        // Skip redundant toasts on mobile
+        if (isMobile()) {
+            // Don't show if not wanted on mobile
+            if (!showOnMobile) return null;
+            
+            // Skip if similar toast already showing
+            if (skipIfVisible && state.activeToasts.size > 0) return null;
+            
+            // Skip certain types of messages
+            const skipPhrases = ['Loading', 'Searching', 'Found', 'Complete'];
+            if (skipPhrases.some(phrase => message.includes(phrase))) {
+                return null;
+            }
+        }
+        
+        return showToast(message, type, minDuration);
     };
     
     const hideLoadingToast = () => {
