@@ -147,6 +147,9 @@ export const SearchModule = (function() {
         const gfOnly = window.App.getState('gfOnlyFilter') !== false;
         console.log(`🍺 Current filter: ${gfOnly ? 'GF Only' : 'All Venues'}`);
     
+        // Create a loader reference we can definitely clean up
+        let loader = null;
+    
         try {
             modules.modalManager?.close('distanceModal') || modules.modal?.close('distanceModal');
             
@@ -240,7 +243,23 @@ export const SearchModule = (function() {
             console.error('❌ Error in nearby search:', error);
             showNoResults('Could not complete search. Please try again.');
         } finally {
+            // ALWAYS clean up loading states
             utils.hideLoadingToast();
+            
+            // Nuclear option - kill any stuck loading toasts
+            if (modules.helpers) {
+                modules.helpers.clearAllToasts();
+            }
+            
+            // Belt and braces - directly remove any loading toast elements
+            setTimeout(() => {
+                document.querySelectorAll('.toast-loading').forEach(t => t.remove());
+                document.querySelectorAll('.toast').forEach(toast => {
+                    if (toast.textContent && toast.textContent.includes('Finding GF beer')) {
+                        toast.remove();
+                    }
+                });
+            }, 100);
         }
     };
     
