@@ -713,20 +713,33 @@ const App = {
             const lastSearch = window.App.getState('lastSearch');
             if (!lastSearch) return;
             
-            // Just call the search API directly!
-            const params = new URLSearchParams({
-                q: lastSearch.query,
-                type: lastSearch.type,
-                gf_only: 'false'  // Force all venues!
-            });
+            let url;
+            const params = new URLSearchParams();
             
-            fetch(`/api/search?${params}`)
+            if (lastSearch.type === 'name') {
+                params.append('query', lastSearch.query);
+                params.append('search_type', 'name');
+                params.append('gf_only', 'false');
+                url = `/search?${params}`;
+            } else if (lastSearch.type === 'area') {
+                params.append('query', lastSearch.query);
+                params.append('search_type', 'area');
+                params.append('gf_only', 'false');
+                url = `/search?${params}`;
+            } else if (lastSearch.type === 'beer') {
+                // Beer search uses different endpoint
+                url = `/api/search-by-beer?query=${encodeURIComponent(lastSearch.query)}&gf_only=false`;
+            }
+            
+            if (!url) return;
+            
+            fetch(url)
                 .then(response => response.json())
                 .then(data => {
                     // Display the results
                     const searchModule = modules.search || window.App?.getModule('search');
-                    if (searchModule && searchModule.displayResults) {
-                        searchModule.displayResults(data);
+                    if (searchModule && searchModule.displayResultsInOverlay) {
+                        searchModule.displayResultsInOverlay(data.venues, `All venues: "${lastSearch.query}"`);
                     }
                 });
         },
