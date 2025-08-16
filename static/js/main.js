@@ -4,6 +4,8 @@
 // ================================================================================
 
 import { Constants } from './constants.js';
+import { OnboardingFlow } from './onboarding.js';
+import { UserSession } from './user-session.js';
 const STATE_KEYS = Constants.STATE_KEYS;
 
 // ================================
@@ -1636,11 +1638,14 @@ const App = {
     }
 };
 
+
 const storedNickname = localStorage.getItem('userNickname');
 if (storedNickname) {
     App.setState('userNickname', storedNickname);
     console.log('✅ Synced nickname to app state:', storedNickname);
 }
+
+
 
 // ================================
 // INITIALIZATION
