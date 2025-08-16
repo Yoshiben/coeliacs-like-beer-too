@@ -508,9 +508,7 @@ export const MapModule = (() => {
     };
     
     const determineGFStatus = (venue) => {
-        if (venue.gf_status) return venue.gf_status;
-        if (venue.bottle || venue.tap || venue.cask || venue.can) return 'currently';
-        return 'unknown';
+        return venue.gf_status || 'unknown';
     };
     
     const createVenuePopupContent = (venue, gfStatus = null) => {
@@ -522,42 +520,39 @@ export const MapModule = (() => {
         if (venue.address) {
             content += `<div class="popup-address">${utils.escapeHtml(venue.address)}</div>`;
         }
-        content += `<div class="popup-postcode">${utils.escapeHtml(venue.postcode)}</div>`;
-
-        // FIX: Check if postcode exists before using it
+        
         if (venue.postcode) {
             content += `<div class="popup-postcode">${utils.escapeHtml(venue.postcode)}</div>`;
         }
         
-        if (venue.distance !== undefined) {
-            content += `<div class="popup-distance">${venue.distance.toFixed(1)}km away</div>`;
+        if (venue.distance !== undefined && venue.distance !== null) {
+            content += `<div class="popup-distance">📍 ${venue.distance.toFixed(1)}km away</div>`;
         }
         
-        // GF status
+        // FIX: Update the status messages to match your actual status values
         const statusMessages = {
-            'always': '✅ Always has GF beer',
+            'always_tap_cask': '⭐ Always has GF tap/cask',
+            'always_bottle_can': '✅ Always has GF bottles/cans',
             'currently': '✅ GF Available',
             'not_currently': '❌ No GF Options',
             'unknown': '❓ GF Status Unknown'
         };
         
         const statusClasses = {
-            'always': 'always-gf',
+            'always_tap_cask': 'always-gf',
+            'always_bottle_can': 'always-gf',
             'currently': 'current-gf',
             'not_currently': 'no-gf',
             'unknown': 'unknown'
         };
         
-        content += `<div class="popup-gf-status ${statusClasses[gfStatus]}">${statusMessages[gfStatus]}</div>`;
+        // FIX: Use the correct status message or provide a fallback
+        const statusMessage = statusMessages[gfStatus] || '❓ Status Unknown';
+        const statusClass = statusClasses[gfStatus] || 'unknown';
         
-        if ((gfStatus === 'always' || gfStatus === 'currently') && (venue.bottle || venue.tap || venue.cask || venue.can)) {
-            const formats = [];
-            if (venue.bottle) formats.push('🍺');
-            if (venue.tap) formats.push('🚰');
-            if (venue.cask) formats.push('🛢️');
-            if (venue.can) formats.push('🥫');
-            content += `<div class="popup-formats">${formats.join(' ')}</div>`;
-        }
+        content += `<div class="popup-gf-status ${statusClass}">${statusMessage}</div>`;
+        
+        // Remove the formats section for now as it seems to cause issues
         
         content += `<button class="popup-button" data-action="view-venue-from-map" data-venue-id="${venue.venue_id}">View Details</button>`;
         content += `</div>`;
