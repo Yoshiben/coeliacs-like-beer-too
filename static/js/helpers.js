@@ -157,20 +157,24 @@ export const HelpersModule = (function() {
             if (messageEl) messageEl.textContent = message;
         }
     };
-    
-    // UPDATE THE showLoadingToast FUNCTION (around line 166):
 
     const showLoadingToast = (message = 'Loading...', minDelay = 500) => {
         // ALWAYS kill any existing loading toast first
         if (state.loadingToastId) {
             const existingToast = document.getElementById(state.loadingToastId);
-            if (existingToast) existingToast.remove();
+            if (existingToast) {
+                console.log('🧹 Removing existing loading toast:', state.loadingToastId);
+                existingToast.remove();
+            }
             state.activeToasts.delete(state.loadingToastId);
             state.loadingToastId = null;
         }
         
         // Kill any rogue loading toasts too
-        document.querySelectorAll('.toast-loading').forEach(t => t.remove());
+        document.querySelectorAll('.toast-loading').forEach(t => {
+            console.log('🧹 Removing rogue loading toast');
+            t.remove();
+        });
         
         // Don't show on mobile for quick operations
         if (isMobile() && minDelay < 1000) {
@@ -187,14 +191,17 @@ export const HelpersModule = (function() {
         
         // Only show after delay
         timeoutId = setTimeout(() => {
-            toastId = showToast(message, 'loading', 0);
+            toastId = showToast(message, 'loading', 0); // duration 0 means manual control
             state.loadingToastId = toastId;
             isShown = true;
+            console.log('📍 Loading toast created:', toastId, message);
         }, minDelay);
         
-        // Return control object that ACTUALLY WORKS
+        // Return control object
         return {
             hide: () => {
+                console.log('🔚 Loading toast hide called for:', toastId || 'pending');
+                
                 // Clear the timeout if it hasn't fired yet
                 if (timeoutId) {
                     clearTimeout(timeoutId);
@@ -203,45 +210,54 @@ export const HelpersModule = (function() {
                 
                 // Remove the toast if it was created
                 if (toastId && isShown) {
-                    hideToast(toastId);
+                    const toast = document.getElementById(toastId);
+                    if (toast) {
+                        console.log('🧹 Removing toast by ID:', toastId);
+                        toast.remove();
+                    }
+                    state.activeToasts.delete(toastId);
                 }
                 
                 // Clear the state
                 state.loadingToastId = null;
                 
-                // Nuclear cleanup of ANY loading toasts
-                setTimeout(() => {
-                    document.querySelectorAll('.toast-loading').forEach(t => t.remove());
-                    // Also clean up any toast with "Finding" in it
-                    document.querySelectorAll('.toast').forEach(toast => {
-                        if (toast.textContent && (
-                            toast.textContent.includes('Finding') || 
-                            toast.textContent.includes('Loading') ||
-                            toast.textContent.includes('Searching')
-                        )) {
-                            toast.remove();
-                        }
-                    });
-                }, 100);
+                // Nuclear cleanup - remove ALL loading toasts
+                document.querySelectorAll('.toast-loading').forEach(t => {
+                    console.log('🧹 Nuclear cleanup of loading toast');
+                    t.remove();
+                });
             }
         };
     };
     
     const hideLoadingToast = () => {
+        console.log('🔚 hideLoadingToast called, current ID:', state.loadingToastId);
+        
         // Kill the tracked one
         if (state.loadingToastId) {
-            hideToast(state.loadingToastId);
+            const toast = document.getElementById(state.loadingToastId);
+            if (toast) {
+                console.log('🧹 Removing tracked loading toast:', state.loadingToastId);
+                toast.remove();
+            }
+            state.activeToasts.delete(state.loadingToastId);
             state.loadingToastId = null;
         }
         
         // ALSO kill any rogue loading toasts
         document.querySelectorAll('.toast-loading').forEach(toast => {
+            console.log('🧹 Removing rogue loading toast');
             toast.remove();
         });
         
         // Nuclear option - kill any toast with "Finding" in it
         document.querySelectorAll('.toast').forEach(toast => {
-            if (toast.textContent.includes('Finding') || toast.textContent.includes('Loading')) {
+            if (toast.textContent && (
+                toast.textContent.includes('Finding') || 
+                toast.textContent.includes('Loading') ||
+                toast.textContent.includes('Searching')
+            )) {
+                console.log('🧹 Nuclear removal of toast:', toast.textContent.trim());
                 toast.remove();
             }
         });
@@ -273,8 +289,13 @@ export const HelpersModule = (function() {
     
     // Nuclear cleanup function
     const clearAllToasts = () => {
-        // Remove all toast elements
-        document.querySelectorAll('.toast').forEach(toast => toast.remove());
+        console.log('🧹 clearAllToasts called');
+        
+        // Remove all toast elements - more aggressive selector
+        document.querySelectorAll('.toast, [class*="toast"], [id*="toast"]').forEach(toast => {
+            console.log('🧹 Removing toast:', toast.id || toast.className);
+            toast.remove();
+        });
         
         // Clear state
         state.activeToasts.clear();
