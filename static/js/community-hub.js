@@ -138,6 +138,56 @@ export const CommunityHubModule = (() => {
             </div>
         `;
     };
+
+    // In community-hub.js or community.js
+    const openCommunityHub = () => {
+        const isNewUser = window.App.getState('isNewUser');
+        const nickname = window.App.getState('userNickname');
+        
+        if (isNewUser && nickname) {
+            // Show special first-time community experience
+            showFirstCommunityVisit(nickname);
+        } else if (!nickname) {
+            // Prompt to create account for full features
+            showJoinCommunityPrompt();
+        } else {
+            // Normal community hub
+            showCommunityHub();
+        }
+    };
+    
+    const showFirstCommunityVisit = (nickname) => {
+        // Create a special welcome overlay
+        const welcomeHTML = `
+            <div class="community-first-visit">
+                <h2>Welcome to the Community, ${nickname}! 🎉</h2>
+                <p>You've got 10 points to start!</p>
+                
+                <div class="community-intro-cards">
+                    <div class="intro-card">
+                        <span class="card-emoji">🏆</span>
+                        <h3>Leaderboard</h3>
+                        <p>See top contributors</p>
+                    </div>
+                    <div class="intro-card">
+                        <span class="card-emoji">📈</span>
+                        <h3>Your Stats</h3>
+                        <p>Track your impact</p>
+                    </div>
+                    <div class="intro-card">
+                        <span class="card-emoji">🎖️</span>
+                        <h3>Badges</h3>
+                        <p>Unlock achievements</p>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="showFullCommunityHub()">
+                    Explore Community Hub
+                </button>
+            </div>
+        `;
+        // Display this
+    };
     
     const renderLeaderboardTab = () => {
         return `
