@@ -716,8 +716,8 @@ const App = {
                 const searchModule = modules.search || window.App?.getModule('search');
                 if (searchModule && searchModule.displayResults) {
                     searchModule.displayResults(data);
-                } else if (data.venues && data.venues.length > 0) {
-                    modules.helpers?.showSuccessToast(`Found ${data.venues.length} venues!`);
+                // } else if (data.venues && data.venues.length > 0) {
+                //     modules.helpers?.showSuccessToast(`Found ${data.venues.length} venues!`);
                 } else {
                     modules.helpers?.showErrorToast(`No venues found serving ${beerName}`);
                 }
