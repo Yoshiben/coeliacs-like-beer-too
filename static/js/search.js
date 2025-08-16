@@ -1345,6 +1345,12 @@ export const SearchModule = (function() {
     // ================================
     const showResultsOverlay = (title) => {
         console.log('📋 Showing results overlay:', title);
+
+        // Clean up any stuck loading states
+        const loadingEl = document.getElementById('resultsLoading');
+        if (loadingEl) {
+            loadingEl.style.display = 'none';  // Hide by default
+        }
     
         utils.hideLoadingToast();
         
@@ -1448,6 +1454,11 @@ export const SearchModule = (function() {
     };
     
     const displayResultsInOverlay = (venues, title) => {
+        // ALWAYS hide loading spinner first - this is the fix!
+        const loadingEl = document.getElementById('resultsLoading');
+        if (loadingEl) {
+            loadingEl.style.display = 'none';
+        }
         state.currentSearchVenues = venues;
         
         console.log('💾 Stored search results:', venues.length, 'venues');
