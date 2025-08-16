@@ -199,16 +199,19 @@ export const FormModule = (() => {
     const handleSubmissionSuccess = (result, reportData) => {
         utils.showToast('🎉 Beer report submitted successfully! Thanks for contributing!');
         
+        // Close the report modal
         modules.modalManager ? 
             modules.modalManager.close('reportModal') : 
             modules.modal.close('reportModal');
         
         resetReportForm();
         
-        const currentVenue = utils.getCurrentVenue();
-        if (currentVenue?.venue_id) {
-            const searchModule = window.App?.getModule('search');
-            searchModule?.showVenueDetails?.(currentVenue.venue_id);
+        // Get the venue details for the prompt
+        const venue = utils.getCurrentVenue() || utils.getSelectedVenue();
+        
+        // Show status prompt if we have venue info
+        if (venue && venue.venue_id) {
+            showGFStatusPromptAfterBeer(venue);
         } else {
             returnToHomeView();
         }
@@ -218,6 +221,114 @@ export const FormModule = (() => {
             status: result.status,
             brewery: reportData.brewery
         });
+    };
+    
+    // Add this new function after handleSubmissionSuccess:
+    const showGFStatusPromptAfterBeer = (venue) => {
+        // Create a custom modal for the status prompt
+        const promptModal = document.createElement('div');
+        promptModal.id = 'statusPromptModal';
+        promptModal.className = 'modal status-prompt-modal';
+        promptModal.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2 class="modal-title">One more thing! 🍺</h2>
+                    <p class="modal-subtitle">What's the GF beer availability at ${utils.escapeHtml(venue.venue_name || venue.name)}?</p>
+                </div>
+                <div class="modal-body">
+                    <p style="text-align: center; margin-bottom: 1.5rem; color: var(--text-secondary);">
+                        This helps others know what to expect when they visit!
+                    </p>
+                    <div class="status-options-compact">
+                        <button class="status-option-compact" data-status="always_tap_cask" data-venue-id="${venue.venue_id}">
+                            <span class="option-emoji">⭐</span>
+                            <span class="option-text">Always has GF on tap/cask</span>
+                        </button>
+                        <button class="status-option-compact" data-status="always_bottle_can" data-venue-id="${venue.venue_id}">
+                            <span class="option-emoji">✅</span>
+                            <span class="option-text">Always has GF bottles/cans</span>
+                        </button>
+                        <button class="status-option-compact" data-status="currently" data-venue-id="${venue.venue_id}">
+                            <span class="option-emoji">🔵</span>
+                            <span class="option-text">Currently has GF (not always)</span>
+                        </button>
+                    </div>
+                    <button class="skip-status-btn" data-action="skip-status-prompt">
+                        Skip for now
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(promptModal);
+        promptModal.style.display = 'flex';
+        
+        // Add event listeners to the status buttons
+        promptModal.querySelectorAll('.status-option-compact').forEach(btn => {
+            btn.addEventListener('click', async () => {
+                const status = btn.dataset.status;
+                const venueId = btn.dataset.venueId;
+                
+                // Show loading
+                utils.showLoadingToast('Updating status...');
+                
+                try {
+                    const response = await fetch('/api/update-gf-status', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            venue_id: parseInt(venueId),
+                            status: status,
+                            submitted_by: window.App.getState('userNickname') || localStorage.getItem('userNickname') || 'anonymous'
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        utils.hideLoadingToast();
+                        utils.showToast('✅ Perfect! Status updated. Thanks for helping the community!');
+                        
+                        // Update the current venue data
+                        const currentVenue = window.App.getState(STATE_KEYS.CURRENT_VENUE);
+                        if (currentVenue) {
+                            window.App.setState(STATE_KEYS.CURRENT_VENUE, {
+                                ...currentVenue,
+                                gf_status: status
+                            });
+                        }
+                        
+                        // If venue details are open, refresh them
+                        const searchModule = window.App?.getModule('search');
+                        if (currentVenue?.venue_id) {
+                            searchModule?.showVenueDetails?.(currentVenue.venue_id);
+                        }
+                    } else {
+                        throw new Error('Failed to update status');
+                    }
+                } catch (error) {
+                    console.error('Failed to update status:', error);
+                    utils.hideLoadingToast();
+                    utils.showToast('Failed to update status, but your beer report was saved!', 'error');
+                }
+                
+                // Remove the modal
+                promptModal.remove();
+            });
+        });
+        
+        // Skip button handler
+        const skipBtn = promptModal.querySelector('[data-action="skip-status-prompt"]');
+        if (skipBtn) {
+            skipBtn.addEventListener('click', () => {
+                promptModal.remove();
+                
+                // If venue details are open, refresh them
+                const currentVenue = utils.getCurrentVenue();
+                if (currentVenue?.venue_id) {
+                    const searchModule = window.App?.getModule('search');
+                    searchModule?.showVenueDetails?.(currentVenue.venue_id);
+                }
+            });
+        }
     };
     
     const returnToHomeView = () => {
