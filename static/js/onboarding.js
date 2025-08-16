@@ -462,7 +462,7 @@ export const OnboardingFlow = (() => {
         const modal = document.getElementById(`${id}Modal`);
         if (modal) {
             modal.classList.add('fade-out');
-            setTimeout(() => modal.remove(), 300);
+            setTimeout(() => modal.remove(), 300);  // <-- Change to remove() not just hide
         }
     };
     
