@@ -113,9 +113,9 @@ export const OnboardingFlow = (() => {
                 
                 <div class="founder-section">
                     <div class="founder-message">
-                        <p><strong>Hi! I'm the founder and fellow coeliac.</strong></p>
-                        <p>I built this after too many disappointing pub visits where staff didn't know what was gluten free.</p>
-                        <p>Now, with YOUR help, we're mapping every GF beer in the UK! 🗺️</p>
+                        <p><strong>Hi there! I'm Ben, the founder of Coeliacs Like Beer Too!, and fellow coeliac.</strong></p>
+                        <p>I decided to build this after one too many disappointing pub visits without gluten free options or where staff thought Corona was gluten free 😡.</p>
+                        <p>Now, with YOUR help, we're mapping every venue serving GF in the UK! 🗺️</p>
                     </div>
                 </div>
                 
@@ -125,11 +125,11 @@ export const OnboardingFlow = (() => {
                         <span class="stat-label">Venues</span>
                     </div>
                     <div class="stat-item featured">
-                        <span class="stat-number">2,400+</span>
+                        <span class="stat-number">32</span>
                         <span class="stat-label">With GF Beer</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-number">500+</span>
+                        <span class="stat-number">3+</span>
                         <span class="stat-label">Contributors</span>
                     </div>
                 </div>
@@ -319,7 +319,12 @@ export const OnboardingFlow = (() => {
         const result = await UserSession.createUser(state.nickname, state.avatarEmoji);
         
         if (result.success) {
-            closeModal('nickname');
+            // IMPORTANT: Remove the modal from DOM, not just close it
+            const nicknameModal = document.getElementById('nicknameModal');
+            if (nicknameModal) {
+                nicknameModal.remove(); // <-- THIS removes it completely
+            }
+            
             showCommunityBenefits(result.user);
         } else {
             alert(`Error: ${result.error}`);
@@ -420,7 +425,11 @@ export const OnboardingFlow = (() => {
     };
     
     const finishOnboarding = () => {
-        closeModal('benefits');
+        // Remove the benefits modal completely
+        const benefitsModal = document.getElementById('benefitsModal');
+        if (benefitsModal) {
+            benefitsModal.remove(); // <-- Remove from DOM
+        }
         
         // Trigger any post-onboarding actions
         window.dispatchEvent(new Event('onboardingComplete'));
