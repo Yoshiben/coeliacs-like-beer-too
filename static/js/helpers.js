@@ -1,6 +1,5 @@
 // ================================================================================
-// HELPERS.JS - Streamlined Version
-// Handles: UI utilities, storage, animations, overlays, responsive helpers
+// HELPERS.JS - Cleaned up with better toast management
 // ================================================================================
 
 import { Constants } from './constants.js';
@@ -78,7 +77,7 @@ export const HelpersModule = (function() {
     };
     
     // ================================
-    // TOAST SYSTEM
+    // TOAST SYSTEM - CLEANED UP
     // ================================
     const createToast = (id, message, type) => {
         const toast = document.createElement('div');
@@ -105,13 +104,17 @@ export const HelpersModule = (function() {
     };
     
     const showToast = (message, type = 'info', duration = config.toast.duration) => {
-        // Clean up any stuck toasts first
-        document.querySelectorAll('.toast').forEach(existingToast => {
-            existingToast.remove();
-        });
+        // Skip redundant success messages
+        if (type === 'success') {
+            const skipPhrases = ['Loading', 'Searching', 'Found', 'Complete', 'Ready'];
+            if (skipPhrases.some(phrase => message.includes(phrase))) {
+                console.log(`⏭️ Skipping redundant toast: ${message}`);
+                return null;
+            }
+        }
         
-        // Clear the active toasts set
-        state.activeToasts.clear();
+        // Clear any existing toasts of the same type
+        document.querySelectorAll(`.toast-${type}`).forEach(toast => toast.remove());
         
         const toastId = `toast-${Date.now()}`;
         const toast = createToast(toastId, message, type);
@@ -126,14 +129,6 @@ export const HelpersModule = (function() {
         if (duration > 0) {
             setTimeout(() => {
                 hideToast(toastId);
-                // Extra cleanup after animation
-                setTimeout(() => {
-                    const element = document.getElementById(toastId);
-                    if (element && element.parentNode) {
-                        element.remove();
-                    }
-                    state.activeToasts.delete(toastId);
-                }, config.toast.animationDuration);
             }, duration);
         }
         
@@ -148,7 +143,9 @@ export const HelpersModule = (function() {
         toast.classList.add('hide');
         
         setTimeout(() => {
-            toast.remove();
+            if (toast && toast.parentNode) {
+                toast.remove();
+            }
             state.activeToasts.delete(toastId);
         }, config.toast.animationDuration);
     };
@@ -161,34 +158,37 @@ export const HelpersModule = (function() {
         }
     };
     
-    const showLoadingToast = (message = 'Loading...', minDelay = 300) => {
-        // Don't show loading toast for instant operations on mobile
-        if (isMobile() && minDelay < 500) {
-            // Return a fake ID and hide function for compatibility
-            return {
-                id: 'fake-toast',
-                hide: () => {} 
+    // IMPROVED showLoadingToast - prevents duplicates and cleans up properly
+    const showLoadingToast = (message = 'Loading...', minDelay = 500) => {
+        // Clear any existing loading toast first
+        if (state.loadingToastId) {
+            hideToast(state.loadingToastId);
+            state.loadingToastId = null;
+        }
+        
+        // On mobile, don't show loading for quick operations
+        if (isMobile() && minDelay < 1000) {
+            return { 
+                hide: () => {
+                    // Make sure we clean up any that slipped through
+                    if (state.loadingToastId) {
+                        hideToast(state.loadingToastId);
+                        state.loadingToastId = null;
+                    }
+                } 
             };
         }
         
         let shown = false;
-        let toastId = null;
         
-        // Only show after delay (if operation takes time)
+        // Only show after delay
         const timeoutId = setTimeout(() => {
             shown = true;
-            if (state.loadingToastId) {
-                updateToastMessage(state.loadingToastId, message);
-                toastId = state.loadingToastId;
-            } else {
-                toastId = showToast(message, 'loading', 0);
-                state.loadingToastId = toastId;
-            }
+            state.loadingToastId = showToast(message, 'loading', 0);
         }, minDelay);
         
-        // Return object with hide function
+        // Return control object
         return {
-            id: toastId || 'pending',
             hide: () => {
                 clearTimeout(timeoutId);
                 if (shown && state.loadingToastId) {
@@ -199,42 +199,50 @@ export const HelpersModule = (function() {
         };
     };
     
-    // Add this new function to helpers.js
-    const smartToast = (message, type = 'info', options = {}) => {
-        const {
-            showOnMobile = true,
-            minDuration = 2000,
-            skipIfVisible = true
-        } = options;
-        
-        // Skip redundant toasts on mobile
-        if (isMobile()) {
-            // Don't show if not wanted on mobile
-            if (!showOnMobile) return null;
-            
-            // Skip if similar toast already showing
-            if (skipIfVisible && state.activeToasts.size > 0) return null;
-            
-            // Skip certain types of messages
-            const skipPhrases = ['Loading', 'Searching', 'Found', 'Complete'];
-            if (skipPhrases.some(phrase => message.includes(phrase))) {
-                return null;
-            }
-        }
-        
-        return showToast(message, type, minDuration);
-    };
-    
     const hideLoadingToast = () => {
         if (state.loadingToastId) {
             hideToast(state.loadingToastId);
             state.loadingToastId = null;
         }
+        // Also clean up any stuck loading toasts
+        document.querySelectorAll('.toast-loading').forEach(toast => toast.remove());
     };
     
-    // Shorthand methods
-    const showSuccessToast = (message) => showToast(message, 'success');
-    const showErrorToast = (message) => showToast(message, 'error');
+    // Smart toast helper - only shows important messages
+    const smartToast = (message, type = 'info') => {
+        // Always show errors
+        if (type === 'error' || message.includes('❌') || message.includes('⚠️')) {
+            return showToast(message, type);
+        }
+        
+        // Only show success for important actions
+        if (type === 'success') {
+            const importantPhrases = ['🎉', 'Level', 'Account', 'Saved', 'Updated', 'Added'];
+            if (importantPhrases.some(phrase => message.includes(phrase))) {
+                return showToast(message, type);
+            }
+        }
+        
+        // Skip everything else
+        console.log(`⏭️ Skipping toast: ${message}`);
+        return null;
+    };
+    
+    // Shorthand methods - now smarter
+    const showSuccessToast = (message) => smartToast(message, 'success');
+    const showErrorToast = (message) => showToast(message, 'error'); // Always show errors
+    
+    // Nuclear cleanup function
+    const clearAllToasts = () => {
+        // Remove all toast elements
+        document.querySelectorAll('.toast').forEach(toast => toast.remove());
+        
+        // Clear state
+        state.activeToasts.clear();
+        state.loadingToastId = null;
+        
+        console.log('🧹 All toasts cleared');
+    };
     
     // ================================
     // OVERLAY MANAGEMENT
@@ -245,6 +253,9 @@ export const HelpersModule = (function() {
             console.error(`Overlay not found: ${overlayId}`);
             return false;
         }
+        
+        // Clean up toasts when changing views
+        clearAllToasts();
         
         // Store scroll position
         if (options.preserveScroll) {
@@ -279,6 +290,9 @@ export const HelpersModule = (function() {
     const hideOverlay = (overlayId) => {
         const overlay = document.getElementById(overlayId);
         if (!overlay) return false;
+        
+        // Clean up toasts
+        clearAllToasts();
         
         // Update state
         const activeOverlays = window.App.getState(STATE_KEYS.ACTIVE_OVERLAYS) || new Set();
@@ -319,6 +333,7 @@ export const HelpersModule = (function() {
         console.log('🏠 Showing home view');
         
         hideAllOverlays();
+        clearAllToasts(); // Clean up when going home
         
         const elements = {
             hero: document.querySelector('.hero-section'),
@@ -345,6 +360,9 @@ export const HelpersModule = (function() {
                 overlay.classList.remove('active');
             }
         });
+        
+        // Clean up toasts
+        clearAllToasts();
         
         // Clean up any map instances
         const mapModule = window.App?.getModule('map');
@@ -554,8 +572,9 @@ export const HelpersModule = (function() {
         
         window.addEventListener('resize', handleResize);
         
-        // Handle back button
+        // Handle back button - clean up toasts
         window.addEventListener('popstate', (e) => {
+            clearAllToasts();
             if (e.state?.view) {
                 handleViewChange(e.state.view);
             }
@@ -583,12 +602,6 @@ export const HelpersModule = (function() {
             viewport.isTablet ? 'tablet' : 'desktop'
         );
     };
-
-    const clearAllToasts = () => {
-        document.querySelectorAll('.toast').forEach(toast => toast.remove());
-        state.activeToasts.clear();
-        state.loadingToastId = null;
-    };
     
     // ================================
     // INITIALIZATION
@@ -597,7 +610,7 @@ export const HelpersModule = (function() {
         console.log('🔧 Initializing Helpers Module');
         
         // Clean up any stuck toasts from previous session
-        document.querySelectorAll('.toast').forEach(toast => toast.remove());
+        clearAllToasts();
         
         setupEventListeners();
         initializeViewport();
@@ -613,10 +626,12 @@ export const HelpersModule = (function() {
         
         // Toast system
         showToast,
+        smartToast,
         showLoadingToast,
         hideLoadingToast,
         showSuccessToast,
         showErrorToast,
+        clearAllToasts,
         
         // Overlay management
         showOverlay,
