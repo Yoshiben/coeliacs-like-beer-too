@@ -158,43 +158,55 @@ export const HelpersModule = (function() {
         }
     };
     
-    // IMPROVED showLoadingToast - prevents duplicates and cleans up properly
     const showLoadingToast = (message = 'Loading...', minDelay = 500) => {
-        // Clear any existing loading toast first
+        // ALWAYS kill any existing loading toast first
         if (state.loadingToastId) {
-            hideToast(state.loadingToastId);
+            const existingToast = document.getElementById(state.loadingToastId);
+            if (existingToast) existingToast.remove();
             state.loadingToastId = null;
         }
         
-        // On mobile, don't show loading for quick operations
+        // Kill any rogue loading toasts too
+        document.querySelectorAll('.toast-loading').forEach(t => t.remove());
+        
+        // Don't show on mobile for quick operations
         if (isMobile() && minDelay < 1000) {
             return { 
                 hide: () => {
-                    // Make sure we clean up any that slipped through
-                    if (state.loadingToastId) {
-                        hideToast(state.loadingToastId);
-                        state.loadingToastId = null;
-                    }
+                    // Still cleanup just in case
+                    document.querySelectorAll('.toast-loading').forEach(t => t.remove());
                 } 
             };
         }
         
-        let shown = false;
+        let toastId = null;
+        let timeoutId = null;
         
         // Only show after delay
-        const timeoutId = setTimeout(() => {
-            shown = true;
-            state.loadingToastId = showToast(message, 'loading', 0);
+        timeoutId = setTimeout(() => {
+            toastId = showToast(message, 'loading', 0);
+            state.loadingToastId = toastId;
         }, minDelay);
         
-        // Return control object
+        // Return control object that ACTUALLY WORKS
         return {
             hide: () => {
-                clearTimeout(timeoutId);
-                if (shown && state.loadingToastId) {
-                    hideToast(state.loadingToastId);
+                // Clear the timeout if it hasn't fired yet
+                if (timeoutId) clearTimeout(timeoutId);
+                
+                // Remove the toast if it was created
+                if (toastId) {
+                    const toast = document.getElementById(toastId);
+                    if (toast) toast.remove();
+                }
+                
+                // Clear the state
+                if (state.loadingToastId === toastId) {
                     state.loadingToastId = null;
                 }
+                
+                // Nuclear cleanup of any loading toasts
+                document.querySelectorAll('.toast-loading').forEach(t => t.remove());
             }
         };
     };
