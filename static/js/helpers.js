@@ -200,12 +200,23 @@ export const HelpersModule = (function() {
     };
     
     const hideLoadingToast = () => {
+        // Kill the tracked one
         if (state.loadingToastId) {
             hideToast(state.loadingToastId);
             state.loadingToastId = null;
         }
-        // Also clean up any stuck loading toasts
-        document.querySelectorAll('.toast-loading').forEach(toast => toast.remove());
+        
+        // ALSO kill any rogue loading toasts
+        document.querySelectorAll('.toast-loading').forEach(toast => {
+            toast.remove();
+        });
+        
+        // Nuclear option - kill any toast with "Finding" in it
+        document.querySelectorAll('.toast').forEach(toast => {
+            if (toast.textContent.includes('Finding') || toast.textContent.includes('Loading')) {
+                toast.remove();
+            }
+        });
     };
     
     // Smart toast helper - only shows important messages
