@@ -580,19 +580,24 @@ export const SearchModule = (function() {
     // ================================
     // VENUE DETAILS
     // ================================
-    const showVenueDetails = async (venueId) => {
+    cconst showVenueDetails = async (venueId) => {
         console.log('🏠 Showing venue details:', venueId);
+        
+        let loadingToast = null;
         
         try {
             // Only show loading for slow connections
-            const loadingToast = utils.showLoadingToast('Loading venue details...', 1000);
+            loadingToast = utils.showLoadingToast('Loading venue details...', 1000);
             
             const results = await modules.api.searchVenues({ 
                 venueId: venueId
             });
             const venues = Array.isArray(results) ? results : results.venues;
             
-            loadingToast.hide();
+            // ALWAYS hide the loading toast
+            if (loadingToast && loadingToast.hide) {
+                loadingToast.hide();
+            }
             
             if (venues && venues.length > 0) {
                 const venue = venues[0];
@@ -607,7 +612,13 @@ export const SearchModule = (function() {
             
         } catch (error) {
             console.error('❌ Error loading venue:', error);
-            utils.hideLoadingToast();
+            
+            // ENSURE loading toast is hidden on error
+            if (loadingToast && loadingToast.hide) {
+                loadingToast.hide();
+            }
+            utils.hideLoadingToast(); // Belt and braces approach
+            
             utils.showToast('Error loading venue details.', 'error');
             return null;
         }
