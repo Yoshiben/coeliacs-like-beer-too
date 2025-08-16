@@ -325,7 +325,7 @@ export const FormModule = (() => {
             });
         });
         
-        // Skip button handler
+        // Skip button handler - THIS WAS MISSING!
         const skipBtn = promptModal.querySelector('[data-action="skip-status-prompt"]');
         if (skipBtn) {
             skipBtn.addEventListener('click', () => {
