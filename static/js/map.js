@@ -523,6 +523,11 @@ export const MapModule = (() => {
             content += `<div class="popup-address">${utils.escapeHtml(venue.address)}</div>`;
         }
         content += `<div class="popup-postcode">${utils.escapeHtml(venue.postcode)}</div>`;
+
+        // FIX: Check if postcode exists before using it
+        if (venue.postcode) {
+            content += `<div class="popup-postcode">${utils.escapeHtml(venue.postcode)}</div>`;
+        }
         
         if (venue.distance !== undefined) {
             content += `<div class="popup-distance">${venue.distance.toFixed(1)}km away</div>`;
