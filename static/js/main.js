@@ -705,43 +705,11 @@ const App = {
         'search-all-venues': (el, modules) => {
             console.log('Search all venues clicked!');
             
-            // Uncheck toggle
-            const toggle = document.getElementById('searchToggle');
-            if (toggle) toggle.checked = false;
-            
-            // Get the last search
-            const lastSearch = window.App.getState('lastSearch');
-            if (!lastSearch) return;
-            
-            let url;
-            const params = new URLSearchParams();
-            
-            if (lastSearch.type === 'name') {
-                params.append('query', lastSearch.query);
-                params.append('search_type', 'name');
-                params.append('gf_only', 'false');
-                url = `/search?${params}`;
-            } else if (lastSearch.type === 'area') {
-                params.append('query', lastSearch.query);
-                params.append('search_type', 'area');
-                params.append('gf_only', 'false');
-                url = `/search?${params}`;
-            } else if (lastSearch.type === 'beer') {
-                // Beer search uses different endpoint
-                url = `/api/search-by-beer?query=${encodeURIComponent(lastSearch.query)}&gf_only=false`;
+            // Just click the "All venues" option in the top nav toggle!
+            const allVenuesOption = document.querySelector('.toggle-option[data-value="all"]');
+            if (allVenuesOption) {
+                allVenuesOption.click();
             }
-            
-            if (!url) return;
-            
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    // Display the results
-                    const searchModule = modules.search || window.App?.getModule('search');
-                    if (searchModule && searchModule.displayResultsInOverlay) {
-                        searchModule.displayResultsInOverlay(data.venues, `All venues: "${lastSearch.query}"`);
-                    }
-                });
         },
         
         // In main.js actionHandlers - update show-full-map
