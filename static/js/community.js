@@ -103,7 +103,7 @@ export const CommunityModule = (() => {
         return {
             venue_id: 19684,
             name: 'Dukes',
-            description: 'Lovely community bar with 2 dedicated gluten free taps: '/n' Thornbridge - Lukas & Left Handed Giant - Sky Above. Check them out!',
+            description: 'Lovely community bar with 2 dedicated gluten free taps: Thornbridge - Lukas & Left Handed Giant - Sky Above. Check them out!',
             address: 'Halifax',
             gf_status: 'always_tap_cask',
         };
