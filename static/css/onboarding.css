@@ -1,0 +1,698 @@
+/* ================================================================================
+   ONBOARDING.CSS - Complete Onboarding Styles
+   ================================================================================ */
+
+/* Base Modal Styles */
+.onboarding-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: fadeIn 0.3s ease;
+}
+
+.onboarding-modal-content {
+    background: white;
+    border-radius: 20px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    animation: slideUp 0.4s ease;
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.1);
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.modal-close:hover {
+    background: rgba(0, 0, 0, 0.2);
+    transform: rotate(90deg);
+}
+
+/* Age Gate Styles */
+.age-gate-content {
+    padding: 3rem 2rem;
+    text-align: center;
+}
+
+.age-gate-logo {
+    margin-bottom: 2rem;
+}
+
+.logo-emoji {
+    font-size: 4rem;
+    display: block;
+    margin-bottom: 1rem;
+    animation: bounce 2s infinite;
+}
+
+.age-gate-logo h1 {
+    font-size: 1.8rem;
+    background: linear-gradient(135deg, var(--purple) 0%, var(--dark-purple) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+}
+
+.age-gate-message h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.age-gate-message p {
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.age-question {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 1.5rem 0 !important;
+}
+
+.age-gate-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin: 2rem 0;
+}
+
+.age-gate-buttons .btn {
+    min-width: 150px;
+}
+
+.age-gate-legal {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-light);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.age-gate-legal a {
+    color: var(--purple);
+    text-decoration: none;
+}
+
+/* Welcome Screen Styles */
+.welcome-content {
+    padding: 2rem;
+    position: relative;
+}
+
+.skip-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+}
+
+.skip-btn:hover {
+    color: var(--text-primary);
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 8px;
+}
+
+.welcome-hero {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.welcome-emoji {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 1rem;
+}
+
+.welcome-hero h1 {
+    font-size: 1.5rem;
+    line-height: 1.3;
+    background: linear-gradient(135deg, var(--purple) 0%, var(--dark-purple) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.founder-section {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(109, 40, 217, 0.05) 100%);
+    border-radius: 15px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.founder-message p {
+    margin-bottom: 0.75rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.founder-message p:first-child {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.stats-showcase {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-item {
+    text-align: center;
+    padding: 1rem;
+    border-radius: 12px;
+    background: var(--bg-secondary);
+}
+
+.stat-item.featured {
+    background: linear-gradient(135deg, var(--purple) 0%, var(--dark-purple) 100%);
+    color: white;
+}
+
+.stat-number {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    opacity: 0.8;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: var(--bg-secondary);
+    border-radius: 10px;
+}
+
+.feature-emoji {
+    font-size: 1.5rem;
+}
+
+.feature-text {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+/* Nickname Selection Styles */
+.nickname-content {
+    padding: 2rem;
+}
+
+.nickname-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.nickname-header h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.nickname-header p {
+    color: var(--text-secondary);
+}
+
+.input-group {
+    margin-bottom: 1.5rem;
+}
+
+#nicknameInput {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.1rem;
+    border: 2px solid var(--border-light);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+#nicknameInput:focus {
+    border-color: var(--purple);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.input-status {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    min-height: 20px;
+}
+
+.status-checking {
+    color: var(--text-secondary);
+}
+
+.status-success {
+    color: var(--green);
+    font-weight: 600;
+}
+
+.status-error {
+    color: var(--red);
+}
+
+.suggestions-section {
+    margin-bottom: 1.5rem;
+}
+
+.suggestions-section p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+}
+
+.suggestion-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.chip {
+    padding: 0.5rem 1rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-light);
+    border-radius: 20px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.chip:hover {
+    background: var(--purple);
+    color: white;
+    border-color: var(--purple);
+    transform: translateY(-2px);
+}
+
+.avatar-section {
+    margin-bottom: 1.5rem;
+}
+
+.avatar-section p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+}
+
+.avatar-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.5rem;
+}
+
+.avatar-option {
+    aspect-ratio: 1;
+    border: 2px solid var(--border-light);
+    border-radius: 12px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    background: white;
+    transition: all 0.3s ease;
+}
+
+.avatar-option:hover {
+    border-color: var(--purple);
+    transform: scale(1.1);
+}
+
+.avatar-option.active {
+    border-color: var(--purple);
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(109, 40, 217, 0.1) 100%);
+}
+
+.privacy-section {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+}
+
+.privacy-item {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.nickname-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+}
+
+/* Community Benefits Styles */
+.benefits-content {
+    padding: 2rem;
+}
+
+.success-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.avatar-display {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.success-header h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, var(--purple) 0%, var(--dark-purple) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.success-header p {
+    color: var(--text-secondary);
+}
+
+.welcome-bonus {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%);
+    border: 2px solid var(--gold);
+    border-radius: 12px;
+    margin-bottom: 2rem;
+}
+
+.bonus-icon {
+    font-size: 2rem;
+}
+
+.bonus-text strong {
+    display: block;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.bonus-text span {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.benefit {
+    padding: 1rem;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    text-align: center;
+}
+
+.benefit-icon {
+    display: block;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.benefit strong {
+    display: block;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.benefit small {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.first-badge {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(109, 40, 217, 0.05) 100%);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.first-badge p {
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+}
+
+.badge-showcase {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.badge-icon {
+    font-size: 2.5rem;
+}
+
+.badge-info strong {
+    display: block;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.badge-info small {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+/* Button Styles */
+.btn-large {
+    padding: 1rem 2rem !important;
+    font-size: 1.1rem !important;
+}
+
+.btn-hero {
+    width: 100%;
+    padding: 1.25rem !important;
+    font-size: 1.1rem !important;
+    font-weight: 600;
+    background: linear-gradient(135deg, var(--purple) 0%, var(--dark-purple) 100%);
+    border: none;
+    color: white;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-hero:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3);
+}
+
+.btn-hero:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.fade-out {
+    animation: fadeOut 0.3s ease forwards;
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+/* Welcome Back Toast */
+.welcome-back-toast {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    padding: 1rem 1.5rem;
+    transform: translateX(400px);
+    transition: transform 0.3s ease;
+    z-index: 10000;
+}
+
+.welcome-back-toast.show {
+    transform: translateX(0);
+}
+
+.welcome-back-toast.fade-out {
+    opacity: 0;
+    transform: translateX(400px);
+}
+
+.toast-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.toast-avatar {
+    font-size: 2rem;
+}
+
+.toast-text strong {
+    display: block;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+}
+
+.toast-text small {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+/* Points Notification */
+.points-notification {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+    background: linear-gradient(135deg, var(--purple) 0%, var(--dark-purple) 100%);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    font-weight: 600;
+    z-index: 10001;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.points-notification.show {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+}
+
+.points-animation {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.points-reason {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 640px) {
+    .onboarding-modal-content {
+        width: 95%;
+        max-height: 95vh;
+        border-radius: 15px;
+    }
+    
+    .age-gate-content,
+    .welcome-content,
+    .nickname-content,
+    .benefits-content {
+        padding: 1.5rem;
+    }
+    
+    .stats-showcase {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.5rem;
+    }
+    
+    .stat-item {
+        padding: 0.75rem 0.5rem;
+    }
+    
+    .stat-number {
+        font-size: 1.2rem;
+    }
+    
+    .features-grid,
+    .benefits-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .age-gate-buttons {
+        flex-direction: column;
+    }
+    
+    .age-gate-buttons .btn {
+        width: 100%;
+    }
+    
+    .privacy-section {
+        grid-template-columns: 1fr;
+    }
+    
+    .nickname-actions {
+        flex-direction: column;
+    }
+    
+    .nickname-actions .btn {
+        width: 100%;
+    }
+}
