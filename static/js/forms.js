@@ -242,7 +242,7 @@ export const FormModule = (() => {
         window.App.setState('statusPromptVenue', venue);
         
         // Open the modal using ModalManager
-        modules.modalManager?.open('beerDetailsPromptModal', {
+        modules.modalManager?.open('statusPromptAfterBeerModal', {
             onOpen: () => {
                 // Update the modal content dynamically
                 const modal = document.getElementById('beerDetailsPromptModal');
@@ -251,23 +251,31 @@ export const FormModule = (() => {
                 const modalBody = modal.querySelector('.modal-body');
                 if (modalBody) {
                     modalBody.innerHTML = `
-                        <div class="success-icon">🍺</div>
-                        <h3>One more thing!</h3>
-                        <p>What's the GF beer availability at ${utils.escapeHtml(venue.venue_name || venue.name)}?</p>
-                        <p style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 1.5rem;">This helps others know what to expect!</p>
-                        <div class="modal-actions status-modal-action">
-                            <button class="btn btn-primary" data-action="quick-update-status" data-status="always_tap_cask" data-venue-id="${venue.venue_id}">
-                                ⭐ Always Tap/Cask
-                            </button>
-                            <button class="btn btn-success" data-action="quick-update-status" data-status="always_bottle_can" data-venue-id="${venue.venue_id}">
-                                ✅ Always Bottles/Cans
-                            </button>
-                            <button class="btn btn-info" data-action="quick-update-status" data-status="currently" data-venue-id="${venue.venue_id}">
-                                🔵 Currently (not always)
-                            </button>
-                            <button class="btn btn-secondary" data-action="skip-status-update">
-                                Skip for now
-                            </button>
+                        <div class="modal-content" style="background: white; padding: 2rem; border-radius: 15px; max-width: 450px;">
+                            <div class="modal-header">
+                                <h2 class="modal-title">One more thing! 🍺</h2>
+                                <p class="modal-subtitle">What's the GF beer availability at ${utils.escapeHtml(venue.venue_name || venue.name)}?</p>
+                            </div>
+                            <div class="modal-body">
+                                <p style="text-align: center; margin-bottom: 1.5rem; color: var(--text-secondary);">
+                                    This helps others know what to expect when they visit!
+                                </p>
+                                <div class="status-options-compact">
+                                    <button class="status-option-compact" data-status="always_tap_cask" data-venue-id="${venue.venue_id}">
+                                        <span class="option-emoji">⭐</span>
+                                        <span class="option-text">Always has GF on tap/cask</span>
+                                    </button>
+                                    <button class="status-option-compact" data-status="always_bottle_can" data-venue-id="${venue.venue_id}">
+                                        <span class="option-emoji">✅</span>
+                                        <span class="option-text">Always has GF bottles/cans</span>
+                                    </button>
+                                    <button class="status-option-compact" data-status="currently" data-venue-id="${venue.venue_id}">
+                                        <span class="option-emoji">🔵</span>
+                                        <span class="option-text">Currently has GF (not always)</span>
+                                    </button>
+                                </div>
+                                <button class="skip-status-btn">Skip for now</button>
+                            </div>
                         </div>
                     `;
                 }
