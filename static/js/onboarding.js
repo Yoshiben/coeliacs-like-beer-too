@@ -324,10 +324,12 @@ export const OnboardingFlow = (() => {
         
         const nickname = `${prefixes[Math.floor(Math.random() * prefixes.length)]}${suffixes[Math.floor(Math.random() * suffixes.length)]}${random}`;
         
+        // THIS IS THE FIX - directly set value and trigger input event
         const nicknameInput = document.getElementById('nicknameInput');
         if (nicknameInput) {
             nicknameInput.value = nickname;
-            checkNickname(nickname); // Actually check the generated nickname
+            // Manually trigger the check
+            OnboardingFlow.checkNickname(nickname);
         }
     };
     
