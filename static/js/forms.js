@@ -236,96 +236,43 @@ export const FormModule = (() => {
     
     // Add this new function after handleSubmissionSuccess:
     const showGFStatusPromptAfterBeer = (venue) => {
-        console.log('🎯 showGFStatusPromptAfterBeer called with venue:', venue);
+        console.log('🎯 Showing status prompt for venue:', venue);
         
-        // Check if modal already exists
-        if (document.getElementById('statusPromptModal')) {
-            document.getElementById('statusPromptModal').remove();
-        }
+        // Store venue data for the action handlers
+        window.App.setState('statusPromptVenue', venue);
         
-        // Create modal
-        const promptModal = document.createElement('div');
-        promptModal.id = 'statusPromptModal';
-        promptModal.className = 'modal status-prompt-modal';
-        promptModal.style.cssText = 'display: flex !important; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 99999; background: rgba(0,0,0,0.5); align-items: center; justify-content: center;';
-        
-        promptModal.innerHTML = `
-            <div class="modal-content" style="background: white; padding: 2rem; border-radius: 15px; max-width: 450px;">
-                <div class="modal-header">
-                    <h2 class="modal-title">One more thing! 🍺</h2>
-                    <p class="modal-subtitle">What's the GF beer availability at ${utils.escapeHtml(venue.venue_name || venue.name)}?</p>
-                </div>
-                <div class="modal-body">
-                    <p style="text-align: center; margin-bottom: 1.5rem; color: var(--text-secondary);">
-                        This helps others know what to expect when they visit!
-                    </p>
-                    <div class="status-options-compact">
-                        <button class="status-option-compact" data-status="always_tap_cask" data-venue-id="${venue.venue_id}">
-                            <span class="option-emoji">⭐</span>
-                            <span class="option-text">Always has GF on tap/cask</span>
-                        </button>
-                        <button class="status-option-compact" data-status="always_bottle_can" data-venue-id="${venue.venue_id}">
-                            <span class="option-emoji">✅</span>
-                            <span class="option-text">Always has GF bottles/cans</span>
-                        </button>
-                        <button class="status-option-compact" data-status="currently" data-venue-id="${venue.venue_id}">
-                            <span class="option-emoji">🔵</span>
-                            <span class="option-text">Currently has GF (not always)</span>
-                        </button>
-                    </div>
-                    <button class="skip-status-btn">Skip for now</button>
-                </div>
-            </div>
-        `;
-        
-        document.body.appendChild(promptModal);
-        
-        // IMPORTANT: Add event listeners AFTER appending to DOM
-        setTimeout(() => {
-            // Status button handlers
-            promptModal.querySelectorAll('.status-option-compact').forEach(btn => {
-                btn.onclick = async function() {
-                    console.log('Status button clicked:', this.dataset.status);
-                    const status = this.dataset.status;
-                    const venueId = this.dataset.venueId;
-                    
-                    utils.showLoadingToast('Updating status...');
-                    
-                    try {
-                        const response = await fetch('/api/update-gf-status', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                venue_id: parseInt(venueId),
-                                status: status,
-                                submitted_by: window.App.getState('userNickname') || localStorage.getItem('userNickname') || 'anonymous'
-                            })
-                        });
-                        
-                        if (response.ok) {
-                            utils.hideLoadingToast();
-                            utils.showToast('✅ Perfect! Status updated. Thanks for helping the community!');
-                        }
-                    } catch (error) {
-                        console.error('Failed to update status:', error);
-                        utils.hideLoadingToast();
-                        utils.showToast('Failed to update status, but your beer report was saved!', 'error');
-                    }
-                    
-                    // Remove the modal
-                    promptModal.remove();
-                };
-            });
-            
-            // Skip button handler
-            const skipBtn = promptModal.querySelector('.skip-status-btn');
-            if (skipBtn) {
-                skipBtn.onclick = function() {
-                    console.log('Skip button clicked');
-                    promptModal.remove();
-                };
+        // Open the modal using ModalManager
+        modules.modalManager?.open('beerDetailsPromptModal', {
+            onOpen: () => {
+                // Update the modal content dynamically
+                const modal = document.getElementById('beerDetailsPromptModal');
+                if (!modal) return;
+                
+                const modalBody = modal.querySelector('.modal-body');
+                if (modalBody) {
+                    modalBody.innerHTML = `
+                        <div class="success-icon">🍺</div>
+                        <h3>One more thing!</h3>
+                        <p>What's the GF beer availability at ${utils.escapeHtml(venue.venue_name || venue.name)}?</p>
+                        <p style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 1.5rem;">This helps others know what to expect!</p>
+                        <div class="modal-actions status-modal-action">
+                            <button class="btn btn-primary" data-action="quick-update-status" data-status="always_tap_cask" data-venue-id="${venue.venue_id}">
+                                ⭐ Always Tap/Cask
+                            </button>
+                            <button class="btn btn-success" data-action="quick-update-status" data-status="always_bottle_can" data-venue-id="${venue.venue_id}">
+                                ✅ Always Bottles/Cans
+                            </button>
+                            <button class="btn btn-info" data-action="quick-update-status" data-status="currently" data-venue-id="${venue.venue_id}">
+                                🔵 Currently (not always)
+                            </button>
+                            <button class="btn btn-secondary" data-action="skip-status-update">
+                                Skip for now
+                            </button>
+                        </div>
+                    `;
+                }
             }
-        }, 100);
+        });
     };
     
     const returnToHomeView = () => {
