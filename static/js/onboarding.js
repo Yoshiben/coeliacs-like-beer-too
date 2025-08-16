@@ -284,6 +284,38 @@ export const OnboardingFlow = (() => {
             }
         }, 500);
     };
+
+    // Add this function after checkNickname:
+
+    const showSuggestions = (suggestions) => {
+        // Find or create suggestions container
+        let suggestionsContainer = document.getElementById('nicknameSuggestions');
+        
+        if (!suggestionsContainer) {
+            // Create it if it doesn't exist
+            const inputGroup = document.querySelector('.input-group');
+            suggestionsContainer = document.createElement('div');
+            suggestionsContainer.id = 'nicknameSuggestions';
+            suggestionsContainer.className = 'nickname-suggestions-box';
+            inputGroup.appendChild(suggestionsContainer);
+        }
+        
+        // Display the suggestions
+        suggestionsContainer.innerHTML = `
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0.5rem 0;">
+                That name is taken! Try one of these:
+            </p>
+            <div class="suggestion-chips">
+                ${suggestions.map(suggestion => 
+                    `<button class="chip" onclick="OnboardingFlow.useNickname('${suggestion}')">
+                        ${suggestion}
+                    </button>`
+                ).join('')}
+            </div>
+        `;
+        
+        suggestionsContainer.style.display = 'block';
+    };
     
     const generateRandom = () => {
         const prefixes = ['Beer', 'Hop', 'Malt', 'GF', 'Gluten', 'Free', 'Craft', 'Brew'];
@@ -322,11 +354,19 @@ export const OnboardingFlow = (() => {
         const result = await UserSession.createUser(state.nickname, state.avatarEmoji);
         
         if (result.success) {
-            // IMPORTANT: Remove the modal from DOM, not just close it
+            // Force remove the nickname modal RIGHT NOW
             const nicknameModal = document.getElementById('nicknameModal');
             if (nicknameModal) {
-                nicknameModal.remove(); // <-- THIS removes it completely
+                nicknameModal.style.display = 'none';
+                nicknameModal.remove();
             }
+            
+            // Also remove by class just in case
+            document.querySelectorAll('.onboarding-modal').forEach(m => {
+                if (m.querySelector('#nicknameInput')) {
+                    m.remove();
+                }
+            });
             
             showCommunityBenefits(result.user);
         } else {
@@ -428,11 +468,18 @@ export const OnboardingFlow = (() => {
     };
     
     const finishOnboarding = () => {
-        // Remove the benefits modal completely
-        const benefitsModal = document.getElementById('benefitsModal');
-        if (benefitsModal) {
-            benefitsModal.remove(); // <-- Remove from DOM
-        }
+        // Nuclear option - remove ALL onboarding modals
+        ['ageGateModal', 'welcomeModal', 'nicknameModal', 'benefitsModal'].forEach(id => {
+            const modal = document.getElementById(id);
+            if (modal) {
+                modal.remove();
+            }
+        });
+        
+        // Also try class-based removal
+        document.querySelectorAll('.onboarding-modal').forEach(modal => {
+            modal.remove();
+        });
         
         // Trigger any post-onboarding actions
         window.dispatchEvent(new Event('onboardingComplete'));
