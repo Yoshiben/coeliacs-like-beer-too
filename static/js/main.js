@@ -1470,10 +1470,8 @@ const App = {
         
         // Hide banner, show float button
         const banner = document.getElementById('cookieConsent');
-        const floatBtn = document.getElementById('cookieSettingsFloat');
         
         if (banner) banner.style.display = 'none';
-        if (floatBtn) floatBtn.style.display = 'block';
         
         helpers.showSuccessToast('✅ Cookie preferences saved!');
     },
@@ -1483,7 +1481,6 @@ const App = {
         const hasConsent = helpers?.Storage.get('cookieConsent');
         
         const banner = document.getElementById('cookieConsent');
-        const floatBtn = document.getElementById('cookieSettingsFloat');
         
         if (!hasConsent) {
             // No consent yet - show banner, hide float button
@@ -1491,14 +1488,12 @@ const App = {
                 banner.style.display = 'block';
                 console.log('🍪 Showing cookie banner - no consent found');
             }
-            if (floatBtn) floatBtn.style.display = 'none';
         } else {
             // Has consent - hide banner, show float button
             if (banner) {
                 banner.style.display = 'none';
                 console.log('🍪 Hiding cookie banner - consent already given');
             }
-            if (floatBtn) floatBtn.style.display = 'block';
         }
     },
     
