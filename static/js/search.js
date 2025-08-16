@@ -20,6 +20,31 @@ export const SearchModule = (function() {
         totalPages: 1,
         totalResults: 0
     };
+
+    // ADD THIS NEW FUNCTION HERE (it's a private function, not in the return object)
+    const setResultsViewState = (viewType, message = '') => {
+        const elements = {
+            loading: document.getElementById('resultsLoading'),
+            list: document.getElementById('resultsList'),
+            noResults: document.getElementById('noResultsFound')
+        };
+        
+        // Hide EVERYTHING first
+        if (elements.loading) elements.loading.style.display = 'none';
+        if (elements.list) elements.list.style.display = 'none';
+        if (elements.noResults) elements.noResults.style.display = 'none';
+        
+        // Show only what we need
+        if (viewType === 'loading' && elements.loading) {
+            elements.loading.style.display = 'flex';
+            const loadingText = elements.loading.querySelector('.loading-text');
+            if (loadingText) loadingText.textContent = message;
+        } else if (viewType === 'list' && elements.list) {
+            elements.list.style.display = 'block';
+        } else if (viewType === 'no-results' && elements.noResults) {
+            elements.noResults.style.display = 'flex';
+        }
+    };  // <-- Note: semicolon here because it's a standalone const declaration
     
     // ================================
     // MODULE GETTERS - Centralized
@@ -1400,18 +1425,7 @@ export const SearchModule = (function() {
     };
     
     const showResultsLoading = (message) => {
-        const elements = {
-            loading: document.getElementById('resultsLoading'),
-            list: document.getElementById('resultsList'),
-            noResults: document.getElementById('noResultsFound')
-        };
-        
-        if (elements.loading) elements.loading.style.display = 'flex';
-        if (elements.list) elements.list.style.display = 'none';
-        if (elements.noResults) elements.noResults.style.display = 'none';
-        
-        const loadingText = document.querySelector('.loading-text');
-        if (loadingText) loadingText.textContent = message;
+        setResultsViewState('loading', message);
     };
     
     const showNoResults = (message) => {
@@ -1453,23 +1467,18 @@ export const SearchModule = (function() {
         }
     };
     
-    const displayResultsInOverlay = (venues, title) => {
-        // ALWAYS hide loading spinner first - this is the fix!
-        const loadingEl = document.getElementById('resultsLoading');
-        if (loadingEl) {
-            loadingEl.style.display = 'none';
-        }
-        state.currentSearchVenues = venues;
+   const displayResultsInOverlay = (venues, title) => {
+        // Use the new helper to ensure everything is clean
+        setResultsViewState('list');
         
+        state.currentSearchVenues = venues;
         console.log('💾 Stored search results:', venues.length, 'venues');
-
+        
         const modalManager = modules.modalManager || window.App?.getModule('modalManager');
         const currentView = modalManager?.getInternalView?.('resultsOverlay') || 'list';
         console.log('📊 Preserving view state:', currentView);
         
         const elements = {
-            loading: document.getElementById('resultsLoading'),
-            noResults: document.getElementById('noResultsFound'),
             list: document.getElementById('resultsList'),
             listContainer: document.getElementById('resultsListContainer'),
             mapContainer: document.getElementById('resultsMapContainer'),
@@ -1477,9 +1486,7 @@ export const SearchModule = (function() {
             paginationContainer: document.getElementById('paginationContainer')
         };
         
-        if (elements.loading) elements.loading.style.display = 'none';
-        if (elements.noResults) elements.noResults.style.display = 'none';
-        
+        // Ensure proper view setup
         if (elements.listContainer) {
             elements.listContainer.style.display = 'block';
             elements.listContainer.style.flex = '1';
@@ -1493,6 +1500,7 @@ export const SearchModule = (function() {
             elements.btnText.textContent = 'Map';
         }
         
+        // Populate the results list
         if (elements.list) {
             elements.list.style.display = 'block';
             elements.list.innerHTML = '';
@@ -1503,6 +1511,7 @@ export const SearchModule = (function() {
             });
         }
         
+        // Update title
         const titleEl = document.getElementById('resultsTitle');
         if (titleEl) titleEl.textContent = title;
         
