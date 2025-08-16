@@ -158,11 +158,14 @@ export const HelpersModule = (function() {
         }
     };
     
+    // UPDATE THE showLoadingToast FUNCTION (around line 166):
+
     const showLoadingToast = (message = 'Loading...', minDelay = 500) => {
         // ALWAYS kill any existing loading toast first
         if (state.loadingToastId) {
             const existingToast = document.getElementById(state.loadingToastId);
             if (existingToast) existingToast.remove();
+            state.activeToasts.delete(state.loadingToastId);
             state.loadingToastId = null;
         }
         
@@ -173,7 +176,6 @@ export const HelpersModule = (function() {
         if (isMobile() && minDelay < 1000) {
             return { 
                 hide: () => {
-                    // Still cleanup just in case
                     document.querySelectorAll('.toast-loading').forEach(t => t.remove());
                 } 
             };
@@ -181,32 +183,46 @@ export const HelpersModule = (function() {
         
         let toastId = null;
         let timeoutId = null;
+        let isShown = false;
         
         // Only show after delay
         timeoutId = setTimeout(() => {
             toastId = showToast(message, 'loading', 0);
             state.loadingToastId = toastId;
+            isShown = true;
         }, minDelay);
         
         // Return control object that ACTUALLY WORKS
         return {
             hide: () => {
                 // Clear the timeout if it hasn't fired yet
-                if (timeoutId) clearTimeout(timeoutId);
+                if (timeoutId) {
+                    clearTimeout(timeoutId);
+                    timeoutId = null;
+                }
                 
                 // Remove the toast if it was created
-                if (toastId) {
-                    const toast = document.getElementById(toastId);
-                    if (toast) toast.remove();
+                if (toastId && isShown) {
+                    hideToast(toastId);
                 }
                 
                 // Clear the state
-                if (state.loadingToastId === toastId) {
-                    state.loadingToastId = null;
-                }
+                state.loadingToastId = null;
                 
-                // Nuclear cleanup of any loading toasts
-                document.querySelectorAll('.toast-loading').forEach(t => t.remove());
+                // Nuclear cleanup of ANY loading toasts
+                setTimeout(() => {
+                    document.querySelectorAll('.toast-loading').forEach(t => t.remove());
+                    // Also clean up any toast with "Finding" in it
+                    document.querySelectorAll('.toast').forEach(toast => {
+                        if (toast.textContent && (
+                            toast.textContent.includes('Finding') || 
+                            toast.textContent.includes('Loading') ||
+                            toast.textContent.includes('Searching')
+                        )) {
+                            toast.remove();
+                        }
+                    });
+                }, 100);
             }
         };
     };
