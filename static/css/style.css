@@ -1752,6 +1752,7 @@ body.page-breweries .nav-back-btn { display: flex !important; }
    padding: var(--space-lg) var(--space-xl);
    transition: all var(--transition);
    z-index: var(--z-toast);
+   display: none;
 }
 
 .toast.show {
