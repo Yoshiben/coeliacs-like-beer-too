@@ -12,6 +12,7 @@ import json
 from datetime import datetime, timedelta
 import requests
 import math
+import random
 
 # Initialize Flask app
 app = Flask(__name__, 
@@ -748,18 +749,18 @@ def get_community_leaderboard():
 
 @app.route('/api/user/check-nickname')
 def check_nickname():
+    import random  # Add this import at the top of the function
     nickname = request.args.get('nickname', '').strip()
     
     if not nickname or len(nickname) < 3:
         return jsonify({'available': False, 'error': 'Too short'})
     
     # Check if it's a bad word or inappropriate
-    # Add your own list of banned words if needed
     banned_words = ['admin', 'administrator', 'root', 'system']
     if nickname.lower() in banned_words:
         return jsonify({'available': False, 'error': 'Reserved name'})
     
-    conn = get_db_connection()
+    conn = mysql.connector.connect(**db_config)  # FIXED: Use the same connection method
     cursor = conn.cursor()
     
     try:
@@ -794,7 +795,7 @@ def create_user():
     if not nickname or not uuid:
         return jsonify({'error': 'Missing required fields'}), 400
     
-    conn = get_db_connection()
+    conn = mysql.connector.connect(**db_config)  # FIXED
     cursor = conn.cursor(dictionary=True)
     
     try:
@@ -808,7 +809,7 @@ def create_user():
                 'user_id': existing['user_id'],
                 'nickname': existing['nickname'],
                 'message': 'Welcome back!',
-                'points': 0  # You'd fetch their actual points
+                'points': 0
             })
         
         # Create new user with 10 welcome points
@@ -840,14 +841,13 @@ def create_user():
 
 @app.route('/api/user/get/<uuid>')
 def get_user(uuid):
-    conn = get_db_connection()
+    conn = mysql.connector.connect(**db_config)  # FIXED
     cursor = conn.cursor(dictionary=True)
     
     try:
+        # Only select columns that actually exist in your users table
         cursor.execute("""
-            SELECT user_id, nickname, avatar_emoji, points, level,
-                   beers_reported, venues_added, statuses_updated,
-                   created_at, last_active
+            SELECT user_id, nickname, points
             FROM users 
             WHERE uuid = %s
         """, (uuid,))
@@ -857,25 +857,26 @@ def get_user(uuid):
         if not user:
             return jsonify({'error': 'User not found'}), 404
         
-        # Get badges (if you have a badges table)
-        cursor.execute("""
-            SELECT achievement_id 
-            FROM user_achievements 
-            WHERE user_id = %s
-        """, (user['user_id'],))
-        
-        badges = [row['achievement_id'] for row in cursor.fetchall()]
-        user['badges'] = badges
+        # Add default values for missing fields
+        user['avatar_emoji'] = '🍺'
+        user['level'] = 1
+        user['beers_reported'] = 0
+        user['venues_added'] = 0
+        user['statuses_updated'] = 0
+        user['badges'] = []
         
         return jsonify(user)
         
+    except Exception as e:
+        print(f"Error getting user: {e}")
+        return jsonify({'error': 'Database error'}), 500
     finally:
         cursor.close()
         conn.close()
 
 @app.route('/api/user/update-active/<uuid>', methods=['POST'])
 def update_last_active(uuid):
-    conn = get_db_connection()
+    conn = mysql.connector.connect(**db_config)  # FIXED
     cursor = conn.cursor()
     
     try:
@@ -1649,6 +1650,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
