@@ -744,6 +744,154 @@ def get_community_leaderboard():
             cursor.close()
             conn.close()
 
+# Add these to your app.py
+
+@app.route('/api/user/check-nickname')
+def check_nickname():
+    nickname = request.args.get('nickname', '').strip()
+    
+    if not nickname or len(nickname) < 3:
+        return jsonify({'available': False, 'error': 'Too short'})
+    
+    # Check if it's a bad word or inappropriate
+    # Add your own list of banned words if needed
+    banned_words = ['admin', 'administrator', 'root', 'system']
+    if nickname.lower() in banned_words:
+        return jsonify({'available': False, 'error': 'Reserved name'})
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute("SELECT COUNT(*) FROM users WHERE nickname = %s", (nickname,))
+        exists = cursor.fetchone()[0] > 0
+        
+        if exists:
+            # Generate suggestions
+            suggestions = []
+            for suffix in ['_UK', str(random.randint(1, 99)), '_GF', '2025']:
+                suggestions.append(f"{nickname}{suffix}")
+            
+            return jsonify({
+                'available': False, 
+                'message': 'Already taken',
+                'suggestions': suggestions
+            })
+        
+        return jsonify({'available': True})
+        
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route('/api/user/create', methods=['POST'])
+def create_user():
+    data = request.get_json()
+    nickname = data.get('nickname', '').strip()
+    uuid = data.get('uuid', '').strip()
+    avatar_emoji = data.get('avatar_emoji', '🍺')
+    
+    if not nickname or not uuid:
+        return jsonify({'error': 'Missing required fields'}), 400
+    
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        # Check if UUID already has account
+        cursor.execute("SELECT user_id, nickname FROM users WHERE uuid = %s", (uuid,))
+        existing = cursor.fetchone()
+        
+        if existing:
+            return jsonify({
+                'success': True,
+                'user_id': existing['user_id'],
+                'nickname': existing['nickname'],
+                'message': 'Welcome back!',
+                'points': 0  # You'd fetch their actual points
+            })
+        
+        # Create new user with 10 welcome points
+        cursor.execute("""
+            INSERT INTO users (uuid, nickname, avatar_emoji, points, created_at)
+            VALUES (%s, %s, %s, 10, NOW())
+        """, (uuid, nickname, avatar_emoji))
+        
+        user_id = cursor.lastrowid
+        conn.commit()
+        
+        return jsonify({
+            'success': True,
+            'user_id': user_id,
+            'nickname': nickname,
+            'points': 10,
+            'message': 'Account created!'
+        })
+        
+    except mysql.connector.IntegrityError:
+        return jsonify({'error': 'Nickname already taken'}), 409
+    except Exception as e:
+        conn.rollback()
+        print(f"Error creating user: {e}")
+        return jsonify({'error': 'Failed to create account'}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route('/api/user/get/<uuid>')
+def get_user(uuid):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        cursor.execute("""
+            SELECT user_id, nickname, avatar_emoji, points, level,
+                   beers_reported, venues_added, statuses_updated,
+                   created_at, last_active
+            FROM users 
+            WHERE uuid = %s
+        """, (uuid,))
+        
+        user = cursor.fetchone()
+        
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+        
+        # Get badges (if you have a badges table)
+        cursor.execute("""
+            SELECT achievement_id 
+            FROM user_achievements 
+            WHERE user_id = %s
+        """, (user['user_id'],))
+        
+        badges = [row['achievement_id'] for row in cursor.fetchall()]
+        user['badges'] = badges
+        
+        return jsonify(user)
+        
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route('/api/user/update-active/<uuid>', methods=['POST'])
+def update_last_active(uuid):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    try:
+        cursor.execute("""
+            UPDATE users 
+            SET last_active = NOW() 
+            WHERE uuid = %s
+        """, (uuid,))
+        
+        conn.commit()
+        return jsonify({'success': True})
+        
+    finally:
+        cursor.close()
+        conn.close()
+
 @app.route('/api/community/my-stats/<nickname>')
 def get_user_stats(nickname):
     """Get real stats for a specific user"""
@@ -1501,6 +1649,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
