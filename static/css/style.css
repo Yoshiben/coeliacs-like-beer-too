@@ -2904,3 +2904,105 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 }
 
 
+/* Map Popup Styling */
+.leaflet-popup-content-wrapper {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(109, 40, 217, 0.05) 100%);
+    border-radius: 15px !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2) !important;
+    border: 2px solid rgba(139, 92, 246, 0.2);
+    padding: 0 !important;
+}
+
+.leaflet-popup-content {
+    margin: 0 !important;
+    padding: 0 !important;
+    min-width: 250px;
+}
+
+.popup-content {
+    padding: 1rem;
+}
+
+.popup-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, var(--purple) 0%, var(--dark-purple) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.popup-address,
+.popup-postcode {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.25rem;
+}
+
+.popup-distance {
+    font-size: 0.9rem;
+    color: var(--purple);
+    font-weight: 600;
+    margin: 0.5rem 0;
+}
+
+.popup-gf-status {
+    padding: 0.5rem;
+    border-radius: 10px;
+    margin: 0.75rem 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+.popup-gf-status.always-gf {
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%);
+    color: var(--gold);
+    border: 1px solid var(--gold);
+}
+
+.popup-gf-status.current-gf {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%);
+    color: var(--green);
+    border: 1px solid var(--green);
+}
+
+.popup-gf-status.no-gf {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--red);
+    border: 1px solid var(--red);
+}
+
+.popup-gf-status.unknown {
+    background: rgba(156, 163, 175, 0.1);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-light);
+}
+
+.popup-button {
+    width: 100%;
+    padding: 0.75rem;
+    background: linear-gradient(135deg, var(--purple) 0%, var(--dark-purple) 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 0.75rem;
+}
+
+.popup-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
+
+/* Leaflet popup arrow styling */
+.leaflet-popup-tip {
+    background: white !important;
+    border: 2px solid rgba(139, 92, 246, 0.2);
+    border-top: none;
+    border-right: none;
+}
