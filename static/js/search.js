@@ -790,7 +790,7 @@ export const SearchModule = (function() {
         
         if (elements.title) elements.title.textContent = venue.venue_name;
         if (elements.address) elements.address.textContent = venue.address;
-        if (elements.location) elements.location.textContent = `${venue.postcode} • ${venue.local_authority}`;
+        if (elements.location) elements.location.textContent = `${venue.postcode} • ${venue.city}`;
         
         setupBeerDetails(venue, elements.beer);
         setupGFStatusDisplay(venue);
@@ -1770,7 +1770,7 @@ export const SearchModule = (function() {
         
         clone.querySelector('.result-address').textContent = venue.address;
         clone.querySelector('.result-postcode').textContent = venue.postcode;
-        clone.querySelector('.result-authority').textContent = venue.local_authority;
+        clone.querySelector('.result-authority').textContent = venue.city;
         
         const viewButton = clone.querySelector('[data-action="view-venue"]');
         viewButton.dataset.venueId = venue.venue_id;
