@@ -133,7 +133,7 @@
 }
 
 .toggle-switch input:checked + .toggle-slider {
-    background: var(--green);
+    background: var(--orange);
 }
 
 .toggle-switch input:checked + .toggle-slider::after {
@@ -164,7 +164,8 @@
 }
 
 .shop-btn {
-    background: linear-gradient(135deg, var(--green) 0%, var(--dark-green) 100%);
+/*     background: linear-gradient(135deg, var(--green) 0%, var(--dark-green) 100%); */
+    background: var(--orange-gradient);
 }
 
 .more-coming {
