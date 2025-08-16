@@ -335,6 +335,45 @@ const App = {
         
         // Check cookie consent
         App.checkCookieConsent();
+
+        // ADD THE ONBOARDING CODE HERE (after line 260):
+        // Initialize user session and onboarding
+        await OnboardingFlow.start();
+        
+        // Listen for onboarding completion
+        window.addEventListener('onboardingComplete', () => {
+            console.log('🎉 Onboarding complete!');
+        });
+        
+        // Check if user is authenticated for contributions
+        window.addEventListener('beforeContribution', async (event) => {
+            const status = UserSession.getStatus();
+            
+            if (status.status !== 'authenticated') {
+                event.preventDefault();
+                
+                if (confirm('Join the community to track your contributions! Choose a nickname?')) {
+                    OnboardingFlow.showNicknameSelection();
+                }
+            }
+        });
+        
+        // Award points for contributions
+        window.addEventListener('contributionMade', async (event) => {
+            const { type, data } = event.detail;
+            
+            const points = {
+                'beer_report': 15,
+                'status_update': 5,
+                'venue_add': 20,
+                'photo_upload': 10
+            };
+            
+            if (UserSession.isAuthenticated) {
+                await UserSession.awardPoints(points[type], data.message);
+            }
+        });
+        // END OF ONBOARDING CODE
         
         // Track session start
         const tracking = App.getModule('tracking');
