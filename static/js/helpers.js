@@ -583,6 +583,12 @@ export const HelpersModule = (function() {
             viewport.isTablet ? 'tablet' : 'desktop'
         );
     };
+
+    const clearAllToasts = () => {
+        document.querySelectorAll('.toast').forEach(toast => toast.remove());
+        state.activeToasts.clear();
+        state.loadingToastId = null;
+    };
     
     // ================================
     // INITIALIZATION
