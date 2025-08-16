@@ -557,6 +557,58 @@ const App = {
         'perform-beer-search': (el, modules) => {
             modules.search?.searchByBeer();
         },
+
+        // In your action handlers object in main.js, add:
+        'toggle-results-map': () => {
+            console.log('🗺️ Toggling results map');
+            
+            const mapModule = modules.map;
+            if (!mapModule) {
+                console.error('❌ Map module not available');
+                return;
+            }
+            
+            const listContainer = document.getElementById('resultsListContainer');
+            const mapContainer = document.getElementById('resultsMapContainer');
+            const btnText = document.getElementById('resultsMapBtnText');
+            
+            if (!listContainer || !mapContainer) {
+                console.error('❌ Results containers not found');
+                return;
+            }
+            
+            const isMapVisible = mapContainer.style.display !== 'none';
+            
+            if (isMapVisible) {
+                // Switch to list view
+                console.log('📋 Switching to list view');
+                listContainer.style.display = 'block';
+                mapContainer.style.display = 'none';
+                if (btnText) btnText.textContent = 'Map';
+                
+                // Clean up map
+                mapModule.cleanupResultsMap?.();
+            } else {
+                // Switch to map view
+                console.log('🗺️ Switching to map view');
+                listContainer.style.display = 'none';
+                mapContainer.style.display = 'block';
+                if (btnText) btnText.textContent = 'List';
+                
+                // Initialize map with search results
+                const searchModule = modules.search;
+                const venues = searchModule?.getCurrentResults?.() || [];
+                
+                if (venues.length > 0) {
+                    mapModule.initResultsMap?.(venues);
+                } else {
+                    console.warn('⚠️ No venues to display on map');
+                }
+            }
+            
+            // Track the action
+            modules.tracking?.trackEvent('toggle_results_map', 'UI', isMapVisible ? 'to_list' : 'to_map');
+        },
         
         // Navigation actions
         'close-results': (el, modules) => {
