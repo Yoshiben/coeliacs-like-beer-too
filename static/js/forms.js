@@ -237,21 +237,20 @@ export const FormModule = (() => {
     // Add this new function after handleSubmissionSuccess:
     const showGFStatusPromptAfterBeer = (venue) => {
         console.log('🎯 showGFStatusPromptAfterBeer called with venue:', venue);
-    
+        
         // Check if modal already exists
         if (document.getElementById('statusPromptModal')) {
-            console.log('⚠️ Modal already exists, removing it');
             document.getElementById('statusPromptModal').remove();
         }
-        // Create a custom modal for the status prompt
+        
+        // Create modal
         const promptModal = document.createElement('div');
         promptModal.id = 'statusPromptModal';
         promptModal.className = 'modal status-prompt-modal';
-
         promptModal.style.cssText = 'display: flex !important; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 99999; background: rgba(0,0,0,0.5); align-items: center; justify-content: center;';
         
         promptModal.innerHTML = `
-            <div class="modal-content">
+            <div class="modal-content" style="background: white; padding: 2rem; border-radius: 15px; max-width: 450px;">
                 <div class="modal-header">
                     <h2 class="modal-title">One more thing! 🍺</h2>
                     <p class="modal-subtitle">What's the GF beer availability at ${utils.escapeHtml(venue.venue_name || venue.name)}?</p>
@@ -274,85 +273,59 @@ export const FormModule = (() => {
                             <span class="option-text">Currently has GF (not always)</span>
                         </button>
                     </div>
-                    <button class="skip-status-btn" data-action="skip-status-prompt">
-                        Skip for now
-                    </button>
+                    <button class="skip-status-btn">Skip for now</button>
                 </div>
             </div>
         `;
         
-        console.log('📝 Adding modal to body');
         document.body.appendChild(promptModal);
         
-        console.log('✅ Modal should be visible now');
-        promptModal.style.display = 'flex';
-        
-        // Add event listeners to the status buttons
-        promptModal.querySelectorAll('.status-option-compact').forEach(btn => {
-            btn.addEventListener('click', async () => {
-                const status = btn.dataset.status;
-                const venueId = btn.dataset.venueId;
-                
-                // Show loading
-                utils.showLoadingToast('Updating status...');
-                
-                try {
-                    const response = await fetch('/api/update-gf-status', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            venue_id: parseInt(venueId),
-                            status: status,
-                            submitted_by: window.App.getState('userNickname') || localStorage.getItem('userNickname') || 'anonymous'
-                        })
-                    });
+        // IMPORTANT: Add event listeners AFTER appending to DOM
+        setTimeout(() => {
+            // Status button handlers
+            promptModal.querySelectorAll('.status-option-compact').forEach(btn => {
+                btn.onclick = async function() {
+                    console.log('Status button clicked:', this.dataset.status);
+                    const status = this.dataset.status;
+                    const venueId = this.dataset.venueId;
                     
-                    if (response.ok) {
+                    utils.showLoadingToast('Updating status...');
+                    
+                    try {
+                        const response = await fetch('/api/update-gf-status', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                venue_id: parseInt(venueId),
+                                status: status,
+                                submitted_by: window.App.getState('userNickname') || localStorage.getItem('userNickname') || 'anonymous'
+                            })
+                        });
+                        
+                        if (response.ok) {
+                            utils.hideLoadingToast();
+                            utils.showToast('✅ Perfect! Status updated. Thanks for helping the community!');
+                        }
+                    } catch (error) {
+                        console.error('Failed to update status:', error);
                         utils.hideLoadingToast();
-                        utils.showToast('✅ Perfect! Status updated. Thanks for helping the community!');
-                        
-                        // Update the current venue data
-                        const currentVenue = window.App.getState(STATE_KEYS.CURRENT_VENUE);
-                        if (currentVenue) {
-                            window.App.setState(STATE_KEYS.CURRENT_VENUE, {
-                                ...currentVenue,
-                                gf_status: status
-                            });
-                        }
-                        
-                        // If venue details are open, refresh them
-                        const searchModule = window.App?.getModule('search');
-                        if (currentVenue?.venue_id) {
-                            searchModule?.showVenueDetails?.(currentVenue.venue_id);
-                        }
-                    } else {
-                        throw new Error('Failed to update status');
+                        utils.showToast('Failed to update status, but your beer report was saved!', 'error');
                     }
-                } catch (error) {
-                    console.error('Failed to update status:', error);
-                    utils.hideLoadingToast();
-                    utils.showToast('Failed to update status, but your beer report was saved!', 'error');
-                }
-                
-                // Remove the modal
-                promptModal.remove();
+                    
+                    // Remove the modal
+                    promptModal.remove();
+                };
             });
-        });
-        
-        // Skip button handler - THIS WAS MISSING!
-        const skipBtn = promptModal.querySelector('[data-action="skip-status-prompt"]');
-        if (skipBtn) {
-            skipBtn.addEventListener('click', () => {
-                promptModal.remove();
-                
-                // If venue details are open, refresh them
-                const currentVenue = utils.getCurrentVenue();
-                if (currentVenue?.venue_id) {
-                    const searchModule = window.App?.getModule('search');
-                    searchModule?.showVenueDetails?.(currentVenue.venue_id);
-                }
-            });
-        }
+            
+            // Skip button handler
+            const skipBtn = promptModal.querySelector('.skip-status-btn');
+            if (skipBtn) {
+                skipBtn.onclick = function() {
+                    console.log('Skip button clicked');
+                    promptModal.remove();
+                };
+            }
+        }, 100);
     };
     
     const returnToHomeView = () => {
