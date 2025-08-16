@@ -109,13 +109,58 @@ export const UserSession = (() => {
                     statusesUpdated: userData.statuses_updated
                 };
                 
+                // Get user's welcome preference (default: daily)
+                const welcomeFrequency = localStorage.getItem('welcomeFrequency') || 'daily';
+                const lastWelcomeBack = localStorage.getItem('lastWelcomeBack');
+                const now = Date.now();
+                let shouldShowWelcome = false;
+                let welcomeType = 'normal';
+                
+                if (!lastWelcomeBack) {
+                    shouldShowWelcome = true;
+                    welcomeType = 'first';
+                } else {
+                    const hoursSince = (now - parseInt(lastWelcomeBack)) / (1000 * 60 * 60);
+                    const daysSince = hoursSince / 24;
+                    
+                    // Check frequency preference
+                    switch(welcomeFrequency) {
+                        case 'always':
+                            shouldShowWelcome = true;
+                            break;
+                        case 'daily':
+                            shouldShowWelcome = hoursSince > 12;
+                            break;
+                        case 'weekly':
+                            shouldShowWelcome = daysSince > 7;
+                            break;
+                        case 'never':
+                            shouldShowWelcome = false;
+                            break;
+                    }
+                    
+                    // Determine message type based on time away
+                    if (daysSince > 30) welcomeType = 'long_absence';
+                    else if (daysSince > 7) welcomeType = 'week_away';
+                    else if (hoursSince < 1) welcomeType = 'still_here';
+                    else welcomeType = 'normal';
+                }
+                
                 // Update last active
                 updateLastActive();
                 
+                // Store when we showed welcome
+                if (shouldShowWelcome) {
+                    localStorage.setItem('lastWelcomeBack', now.toString());
+                }
+                
                 return { 
                     status: 'returning-user',
-                    user: getUserData()
+                    user: getUserData(),
+                    showWelcome: shouldShowWelcome,
+                    welcomeType: welcomeType
                 };
+                
             } else if (response.status === 404) {
                 // New user
                 const hasSeenWelcome = localStorage.getItem('hasSeenWelcome');
