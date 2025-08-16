@@ -48,9 +48,18 @@ export const FormModule = (() => {
         setCurrentBrewery: (brewery) => window.App.setState(STATE_KEYS.CURRENT_BREWERY, brewery),
         
         showToast: (message, type = 'success') => {
-            const toastFn = type === 'success' ? window.showSuccessToast : window.showErrorToast;
-            if (toastFn) toastFn(message);
-            else console.log(type === 'success' ? '✅' : '❌', message);
+            // Only show error toasts and important success messages
+            if (type === 'error' || message.includes('❌') || message.includes('⚠️')) {
+                const toastFn = type === 'success' ? window.showSuccessToast : window.showErrorToast;
+                if (toastFn) toastFn(message);
+            }
+            // Skip success toasts unless they're important (contain 🎉 or similar)
+            else if (type === 'success' && (message.includes('🎉') || message.includes('Level'))) {
+                if (window.showSuccessToast) window.showSuccessToast(message);
+            }
+            else {
+                console.log(type === 'success' ? '✅' : '❌', message);
+            }
         },
         
         showLoadingToast: (message) => window.showLoadingToast?.(message),
