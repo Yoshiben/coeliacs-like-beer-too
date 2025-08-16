@@ -562,7 +562,8 @@ const App = {
         'toggle-results-map': () => {
             console.log('🗺️ Toggling results map');
             
-            const mapModule = modules.map;
+            // Use window.App.getModule instead of modules
+            const mapModule = window.App.getModule('map');
             if (!mapModule) {
                 console.error('❌ Map module not available');
                 return;
@@ -596,7 +597,7 @@ const App = {
                 if (btnText) btnText.textContent = 'List';
                 
                 // Initialize map with search results
-                const searchModule = modules.search;
+                const searchModule = window.App.getModule('search');
                 const venues = searchModule?.getCurrentResults?.() || [];
                 
                 if (venues.length > 0) {
@@ -607,7 +608,8 @@ const App = {
             }
             
             // Track the action
-            modules.tracking?.trackEvent('toggle_results_map', 'UI', isMapVisible ? 'to_list' : 'to_map');
+            const trackingModule = window.App.getModule('tracking');
+            trackingModule?.trackEvent('toggle_results_map', 'UI', isMapVisible ? 'to_list' : 'to_map');
         },
         
         // Navigation actions
