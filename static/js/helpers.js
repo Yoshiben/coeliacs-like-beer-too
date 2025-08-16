@@ -159,22 +159,19 @@ export const HelpersModule = (function() {
     };
 
     const showLoadingToast = (message = 'Loading...', minDelay = 500) => {
+        // Track this specific loading request
+        const requestId = Date.now();
+        
         // ALWAYS kill any existing loading toast first
         if (state.loadingToastId) {
             const existingToast = document.getElementById(state.loadingToastId);
-            if (existingToast) {
-                console.log('🧹 Removing existing loading toast:', state.loadingToastId);
-                existingToast.remove();
-            }
+            if (existingToast) existingToast.remove();
             state.activeToasts.delete(state.loadingToastId);
             state.loadingToastId = null;
         }
         
-        // Kill any rogue loading toasts too
-        document.querySelectorAll('.toast-loading').forEach(t => {
-            console.log('🧹 Removing rogue loading toast');
-            t.remove();
-        });
+        // Kill any rogue loading toasts
+        document.querySelectorAll('.toast-loading').forEach(t => t.remove());
         
         // Don't show on mobile for quick operations
         if (isMobile() && minDelay < 1000) {
@@ -188,10 +185,17 @@ export const HelpersModule = (function() {
         let toastId = null;
         let timeoutId = null;
         let isShown = false;
+        let isCancelled = false; // Track if hide was called before show
         
         // Only show after delay
         timeoutId = setTimeout(() => {
-            toastId = showToast(message, 'loading', 0); // duration 0 means manual control
+            // DON'T show if already cancelled!
+            if (isCancelled) {
+                console.log('⏭️ Skipping toast creation - already cancelled');
+                return;
+            }
+            
+            toastId = showToast(message, 'loading', 0);
             state.loadingToastId = toastId;
             isShown = true;
             console.log('📍 Loading toast created:', toastId, message);
@@ -200,7 +204,10 @@ export const HelpersModule = (function() {
         // Return control object
         return {
             hide: () => {
-                console.log('🔚 Loading toast hide called for:', toastId || 'pending');
+                console.log('🔚 Loading toast hide called - shown:', isShown, 'id:', toastId);
+                
+                // Mark as cancelled so it won't show later
+                isCancelled = true;
                 
                 // Clear the timeout if it hasn't fired yet
                 if (timeoutId) {
@@ -219,13 +226,17 @@ export const HelpersModule = (function() {
                 }
                 
                 // Clear the state
-                state.loadingToastId = null;
+                if (state.loadingToastId === toastId) {
+                    state.loadingToastId = null;
+                }
                 
                 // Nuclear cleanup - remove ALL loading toasts
-                document.querySelectorAll('.toast-loading').forEach(t => {
-                    console.log('🧹 Nuclear cleanup of loading toast');
-                    t.remove();
-                });
+                setTimeout(() => {
+                    document.querySelectorAll('.toast-loading').forEach(t => {
+                        console.log('🧹 Nuclear cleanup of loading toast');
+                        t.remove();
+                    });
+                }, 100);
             }
         };
     };
