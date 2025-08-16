@@ -571,6 +571,53 @@ const App = {
             }
         },
 
+        // Add these to your main.js action handlers:
+
+        'quick-update-status': async (el, modules) => {
+            const status = el.dataset.status;
+            const venueId = el.dataset.venueId;
+            
+            console.log('🎯 Updating status:', status, 'for venue:', venueId);
+            
+            modules.modalManager?.close('beerDetailsPromptModal');
+            modules.helpers?.showLoadingToast('Updating status...');
+            
+            try {
+                const response = await fetch('/api/update-gf-status', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        venue_id: parseInt(venueId),
+                        status: status,
+                        submitted_by: window.App.getState('userNickname') || localStorage.getItem('userNickname') || 'anonymous'
+                    })
+                });
+                
+                if (response.ok) {
+                    modules.helpers?.hideLoadingToast();
+                    modules.helpers?.showSuccessToast('✅ Perfect! Status updated. Thanks!');
+                    
+                    // Update current venue state
+                    const currentVenue = window.App.getState('currentVenue');
+                    if (currentVenue) {
+                        window.App.setState('currentVenue', {
+                            ...currentVenue,
+                            gf_status: status
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to update status:', error);
+                modules.helpers?.hideLoadingToast();
+                modules.helpers?.showErrorToast('Failed to update status');
+            }
+        },
+        
+        'skip-status-update': (el, modules) => {
+            console.log('⏭️ Skipping status update');
+            modules.modalManager?.close('beerDetailsPromptModal');
+        },
+
         
         'close-modal': (el, modules) => {
             const modal = el.closest('.modal, .search-modal, .report-modal');
