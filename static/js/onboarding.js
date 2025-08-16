@@ -292,8 +292,11 @@ export const OnboardingFlow = (() => {
         
         const nickname = `${prefixes[Math.floor(Math.random() * prefixes.length)]}${suffixes[Math.floor(Math.random() * suffixes.length)]}${random}`;
         
-        document.getElementById('nicknameInput').value = nickname;
-        checkNickname(nickname);
+        const nicknameInput = document.getElementById('nicknameInput');
+        if (nicknameInput) {
+            nicknameInput.value = nickname;
+            checkNickname(nickname); // Actually check the generated nickname
+        }
     };
     
     const useNickname = (nickname) => {
@@ -461,8 +464,7 @@ export const OnboardingFlow = (() => {
     const closeModal = (id) => {
         const modal = document.getElementById(`${id}Modal`);
         if (modal) {
-            modal.classList.add('fade-out');
-            setTimeout(() => modal.remove(), 300);  // <-- Change to remove() not just hide
+            modal.remove();  // Just remove it completely
         }
     };
     
