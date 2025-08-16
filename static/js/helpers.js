@@ -159,6 +159,14 @@ export const HelpersModule = (function() {
     };
 
     const showLoadingToast = (message = 'Loading...', minDelay = 500) => {
+        // DEBUG: WHO IS CALLING THIS?
+        if (message.includes('Finding GF beer')) {
+            console.error('🚨🚨🚨 FINDING GF BEER TOAST REQUESTED 🚨🚨🚨');
+            console.trace('STACK TRACE:');
+            
+            // Set a global flag so we can track this
+            window.PROBLEMATIC_TOAST_ACTIVE = true;
+        }
         // Track this specific loading request
         const requestId = Date.now();
         
