@@ -385,44 +385,60 @@ export const NavStateManager = (() => {
 
     const handleToggleChange = (mode) => {
         console.log(`🔀 Toggle changed to: ${mode}`);
-        
+       
         // Update the filter state
         window.App.setState('gfOnlyFilter', mode === 'gf');
+        
+        // CRITICAL: Update the actual search toggle checkbox BEFORE re-running search!
+        const searchToggle = document.getElementById('searchToggle');
+        if (searchToggle) {
+           searchToggle.checked = (mode === 'gf');
+           console.log(`✅ Updated searchToggle checkbox to: ${searchToggle.checked}`);
+        }
         
         // Get current context
         const currentContext = state.currentContext;
         
         // If we're on results page, re-run the search
         if (currentContext === 'results') {
-            const searchModule = window.App?.getModule('search');
-            const lastSearch = window.App?.getState('lastSearch');
-            
-            console.log('📱 Current context:', currentContext);
-            console.log('🔍 Last search:', lastSearch);
-            
-            if (lastSearch && searchModule) {
-                // Re-run based on search type
-                if ((lastSearch.type === 'nearby' || lastSearch.type === 'location') && lastSearch.radius) {
-                    console.log('🔄 Re-running nearby search with radius:', lastSearch.radius);
-                    searchModule.searchNearbyWithDistance(lastSearch.radius);
-                } else if (lastSearch.type === 'name' && lastSearch.query) {
-                    console.log('🔄 Re-running name search');
-                    // Need to set the input value first
-                    const nameInput = document.getElementById('nameInput');
-                    if (nameInput) nameInput.value = lastSearch.query;
-                    searchModule.searchByName();
-                } else if (lastSearch.type === 'area' && lastSearch.query) {
-                    console.log('🔄 Re-running area search');
-                    // Need to set the input value first
-                    const areaInput = document.getElementById('areaInput');
-                    if (areaInput) areaInput.value = lastSearch.query;
-                    searchModule.searchByArea();
-                }
-            }
+           const searchModule = window.App?.getModule('search');
+           const lastSearch = window.App?.getState('lastSearch');
+           
+           console.log('📱 Current context:', currentContext);
+           console.log('🔍 Last search:', lastSearch);
+           
+           if (lastSearch && searchModule) {
+               // Small delay to ensure DOM is fully updated
+               setTimeout(() => {
+                   // Re-run based on search type
+                   if ((lastSearch.type === 'nearby' || lastSearch.type === 'location') && lastSearch.radius) {
+                       console.log('🔄 Re-running nearby search with radius:', lastSearch.radius);
+                       searchModule.searchNearbyWithDistance(lastSearch.radius);
+                   } else if (lastSearch.type === 'name' && lastSearch.query) {
+                       console.log('🔄 Re-running name search');
+                       // Need to set the input value first
+                       const nameInput = document.getElementById('nameInput');
+                       if (nameInput) nameInput.value = lastSearch.query;
+                       searchModule.searchByName();
+                   } else if (lastSearch.type === 'area' && lastSearch.query) {
+                       console.log('🔄 Re-running area search');
+                       // Need to set the input value first
+                       const areaInput = document.getElementById('areaInput');
+                       if (areaInput) areaInput.value = lastSearch.query;
+                       searchModule.searchByArea();
+                   } else if (lastSearch.type === 'beer') {
+                       console.log('🔄 Re-running beer search');
+                       // Need to set the input value first
+                       const beerInput = document.getElementById('beerInput');
+                       if (beerInput) beerInput.value = lastSearch.query;
+                       searchModule.searchByBeer();
+                   }
+               }, 50); // 50ms delay to ensure DOM updates
+           }
         } else if (currentContext === 'map') {
-            // Update map display
-            const mapModule = window.App?.getModule('map');
-            mapModule?.updateMapDisplay?.(mode === 'gf');
+           // Update map display
+           const mapModule = window.App?.getModule('map');
+           mapModule?.updateMapDisplay?.(mode === 'gf');
         }
         
         // Track the change
