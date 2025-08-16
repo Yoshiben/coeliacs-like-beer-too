@@ -199,30 +199,31 @@ export const FormModule = (() => {
     const handleSubmissionSuccess = (result, reportData) => {
         utils.showToast('🎉 Beer report submitted successfully! Thanks for contributing!');
         
-        // Close the report modal
         modules.modalManager ? 
             modules.modalManager.close('reportModal') : 
             modules.modal.close('reportModal');
         
         resetReportForm();
         
-        // Get the venue details for the prompt
+        // DEBUG: Check what venue data we have
         const venue = utils.getCurrentVenue() || utils.getSelectedVenue();
+        console.log('🔍 DEBUG: Current venue:', venue);
+        console.log('🔍 DEBUG: Report data:', reportData);
         
         // Show status prompt if we have venue info
         if (venue && venue.venue_id) {
-            showGFStatusPromptAfterBeer(venue);  // THIS LINE IS KEY!
+            console.log('✅ Showing status prompt for venue:', venue);
+            showGFStatusPromptAfterBeer(venue);
+        } else if (reportData && reportData.venue_id) {
+            console.log('✅ Showing status prompt from report data:', reportData);
+            showGFStatusPromptAfterBeer({
+                venue_id: reportData.venue_id,
+                venue_name: reportData.venue_name || 'this venue',
+                name: reportData.venue_name || 'this venue'
+            });
         } else {
-            // Try to get venue from reportData if not in state
-            if (reportData.venue_id) {
-                showGFStatusPromptAfterBeer({
-                    venue_id: reportData.venue_id,
-                    venue_name: reportData.venue_name,
-                    name: reportData.venue_name
-                });
-            } else {
-                returnToHomeView();
-            }
+            console.log('❌ No venue data found, returning to home');
+            returnToHomeView();
         }
         
         modules.tracking?.trackFormSubmission('beer_report', {
