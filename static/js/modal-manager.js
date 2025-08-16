@@ -46,6 +46,11 @@ export const ModalManager = (() => {
         manualVenueEntryModal: { type: 'modal', group: 'form', exclusive: true },
         nicknameModal: { type: 'modal', group: 'user', exclusive: true },
         statusPromptAfterBeerModal: { type: 'modal', group: 'status', stackable: true, order: 4 },
+
+        ageGateModal: { type: 'modal', group: 'onboarding', exclusive: true, priority: true },
+        welcomeModal: { type: 'modal', group: 'onboarding', exclusive: true },
+        nicknameModal: { type: 'modal', group: 'onboarding', exclusive: true },  // This one exists but in wrong group
+        benefitsModal: { type: 'modal', group: 'onboarding', exclusive: true },
         
         // Status modals (can stack in specific order)
         gfStatusModal: { type: 'modal', group: 'status', stackable: true, order: 1, priority: true },
