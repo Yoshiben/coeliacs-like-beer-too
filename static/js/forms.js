@@ -235,10 +235,20 @@ export const FormModule = (() => {
     
     // Add this new function after handleSubmissionSuccess:
     const showGFStatusPromptAfterBeer = (venue) => {
+        console.log('🎯 showGFStatusPromptAfterBeer called with venue:', venue);
+    
+        // Check if modal already exists
+        if (document.getElementById('statusPromptModal')) {
+            console.log('⚠️ Modal already exists, removing it');
+            document.getElementById('statusPromptModal').remove();
+        }
         // Create a custom modal for the status prompt
         const promptModal = document.createElement('div');
         promptModal.id = 'statusPromptModal';
         promptModal.className = 'modal status-prompt-modal';
+
+        promptModal.style.cssText = 'display: flex !important; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 99999; background: rgba(0,0,0,0.5); align-items: center; justify-content: center;';
+        
         promptModal.innerHTML = `
             <div class="modal-content">
                 <div class="modal-header">
@@ -270,7 +280,10 @@ export const FormModule = (() => {
             </div>
         `;
         
+        console.log('📝 Adding modal to body');
         document.body.appendChild(promptModal);
+        
+        console.log('✅ Modal should be visible now');
         promptModal.style.display = 'flex';
         
         // Add event listeners to the status buttons
