@@ -211,9 +211,18 @@ export const FormModule = (() => {
         
         // Show status prompt if we have venue info
         if (venue && venue.venue_id) {
-            showGFStatusPromptAfterBeer(venue);
+            showGFStatusPromptAfterBeer(venue);  // THIS LINE IS KEY!
         } else {
-            returnToHomeView();
+            // Try to get venue from reportData if not in state
+            if (reportData.venue_id) {
+                showGFStatusPromptAfterBeer({
+                    venue_id: reportData.venue_id,
+                    venue_name: reportData.venue_name,
+                    name: reportData.venue_name
+                });
+            } else {
+                returnToHomeView();
+            }
         }
         
         modules.tracking?.trackFormSubmission('beer_report', {
