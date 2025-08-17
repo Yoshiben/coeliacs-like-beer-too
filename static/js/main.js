@@ -130,6 +130,10 @@ const App = {
                 throw new Error('Leaflet not loaded');
             }
             
+            // Initialize toast module first
+            ToastModule.init();
+            App.registerModule('toast', ToastModule);
+            
             // Initialize in phases
             await App.initPhase1(); // Core utilities
             await App.initPhase2(); // Data layer
@@ -156,10 +160,12 @@ const App = {
         App.registerModule('ui', HelpersModule);     // Legacy alias
         App.registerModule('utils', HelpersModule);  // Legacy alias
         
-        // Make critical functions globally available
-        window.showLoadingToast = HelpersModule.showLoadingToast;
-        window.hideLoadingToast = HelpersModule.hideLoadingToast;
-        window.showSuccessToast = HelpersModule.showSuccessToast;
+        // Make critical functions globally available (redirecting to toast module)
+        window.showLoadingToast = () => ToastModule.showLoadingToast();
+        window.hideLoadingToast = () => ToastModule.hideLoadingToast();
+        window.showSuccessToast = (msg) => ToastModule.success(msg);
+        window.showErrorToast = (msg) => ToastModule.error(msg);
+        window.showToast = (msg, type) => ToastModule.show(msg, type);
         window.animateNumber = HelpersModule.animateNumber;
         window.closeResults = HelpersModule.closeResults;
     },
@@ -516,7 +522,8 @@ const App = {
             tracking: App.getModule('tracking'),
             nav: App.getModule('nav'),
             breweries: App.getModule('breweries'), // ADD THIS LINE
-            community: App.getModule('community')  // AND THIS IF NEEDED
+            community: App.getModule('community'),  // AND THIS IF NEEDED
+            toast: App.getModule('toast')  // ADD THIS
         };
 
         console.log('📦 Available modules:', Object.keys(modules).filter(key => modules[key] !== null));
@@ -569,7 +576,7 @@ const App = {
         'show-venue-on-map': (el, modules) => {
             const currentVenue = App.getState(STATE_KEYS.CURRENT_VENUE);
             if (!currentVenue || !currentVenue.latitude || !currentVenue.longitude) {
-                modules.helpers?.showToast('📍 Location not available for this venue', 'error');
+                modules.toast?.error('📍 Location not available for this venue');
                 return;
             }
             
@@ -655,7 +662,6 @@ const App = {
             console.log('🎯 Updating status:', status, 'for venue:', venueId);
             
             modules.modalManager?.close('beerDetailsPromptModal');
-            modules.helpers?.showLoadingToast('Updating status...');
             
             try {
                 const response = await fetch('/api/update-gf-status', {
@@ -669,8 +675,7 @@ const App = {
                 });
                 
                 if (response.ok) {
-                    modules.helpers?.hideLoadingToast();
-                    modules.helpers?.showSuccessToast('✅ Perfect! Status updated. Thanks!');
+                    modules.toast?.success('✅ Perfect! Status updated. Thanks!');
                     
                     // Update current venue state
                     const currentVenue = window.App.getState('currentVenue');
@@ -683,14 +688,19 @@ const App = {
                 }
             } catch (error) {
                 console.error('Failed to update status:', error);
-                modules.helpers?.hideLoadingToast();
-                modules.helpers?.showErrorToast('Failed to update status');
+                modules.toast?.error('Failed to update status');
             }
         },
         
         'skip-status-update': (el, modules) => {
             console.log('⏭️ Skipping status update');
             modules.modalManager?.close('beerDetailsPromptModal');
+        },
+
+        'skip-status-prompt': (el, modules) => {
+            console.log('⏭️ Skipping status prompt after beer report');
+            modules.modalManager?.close('statusPromptAfterBeerModal');
+            modules.toast?.info('No problem! Thanks for the beer report! 🍺');
         },
 
         
@@ -733,9 +743,6 @@ const App = {
                 searchInput.value = searchQuery;
             }
             
-            // Show we're searching
-            modules.helpers?.showLoadingToast(`Searching for ${beerName}...`);
-            
             // Use GET request like the normal search
             const params = new URLSearchParams({
                 q: searchQuery,
@@ -745,21 +752,16 @@ const App = {
             fetch(`/api/search?${params}`)
             .then(response => response.json())
             .then(data => {
-                modules.helpers?.hideLoadingToast();
-                
                 const searchModule = modules.search || window.App?.getModule('search');
                 if (searchModule && searchModule.displayResults) {
                     searchModule.displayResults(data);
-                // } else if (data.venues && data.venues.length > 0) {
-                //     modules.helpers?.showSuccessToast(`Found ${data.venues.length} venues!`);
                 } else {
-                    modules.helpers?.showErrorToast(`No venues found serving ${beerName}`);
+                    modules.toast?.error(`No venues found serving ${beerName}`);
                 }
             })
             .catch(error => {
                 console.error('Search error:', error);
-                modules.helpers?.hideLoadingToast();
-                modules.helpers?.showErrorToast('Search failed');
+                modules.toast?.error('Search failed');
             });
         },
 
@@ -890,7 +892,7 @@ const App = {
         
         'close-venue-added-modal': (el, modules) => {
             modules.modalManager?.close('venueAddedPromptModal');
-            modules.helpers?.showSuccessToast('Venue added successfully!');
+            modules.toast?.success('Venue added successfully!');
         },
         
         // In main.js actionHandlers - update show-full-map
@@ -988,7 +990,7 @@ const App = {
         },
         'skip-details': (el, modules) => {
             modules.modalManager?.close('beerDetailsPromptModal');
-            modules.helpers?.showSuccessToast?.('✅ Status updated successfully!');
+            modules.toast?.success('✅ Status updated successfully!');
         },
         'add-beer-details': (el, modules) => {
             modules.modalManager?.close('beerDetailsPromptModal');
@@ -1032,7 +1034,7 @@ const App = {
                 if (dropdown) dropdown.style.display = 'none';
                 
                 breweryInput.focus();
-                modules.helpers?.showToast('💡 Type the new brewery name and continue', 'info');
+                modules.toast?.info('💡 Type the new brewery name and continue');
             }
         },
         
@@ -1044,7 +1046,7 @@ const App = {
                 if (dropdown) dropdown.style.display = 'none';
                 
                 beerNameInput.focus();
-                modules.helpers?.showToast('💡 Type the new beer name and continue', 'info');
+                modules.toast?.info('💡 Type the new beer name and continue');
             }
         },
 
@@ -1060,7 +1062,7 @@ const App = {
                 beerStyleInput.focus();
             }
             
-            modules.helpers?.showToast('✅ Beer name accepted - continue with details', 'success');
+            modules.toast?.success('✅ Beer name accepted - continue with details');
         },
 
         'update-area-placeholder': (el, modules) => {
@@ -1151,7 +1153,7 @@ const App = {
                     communityHub.renderHub();
                 }
                 
-                modules.helpers?.showSuccessToast(`Nickname changed to ${newNickname}!`);
+                modules.toast?.success(`Nickname changed to ${newNickname}!`);
             }
         },
         
@@ -1390,7 +1392,7 @@ const App = {
                 window.App.setState('userNickname', nickname);
                 localStorage.setItem('userNickname', nickname);
                 modules.modalManager?.close('nicknameModal');
-                modules.helpers?.showToast(`👋 Welcome, ${nickname}!`);
+                modules.toast?.success(`👋 Welcome, ${nickname}!`);
                 
                 // Continue with whatever triggered the nickname prompt
                 const pendingAction = window.App.getState('pendingActionAfterNickname');
@@ -1439,13 +1441,13 @@ const App = {
             const postcode = document.getElementById('manualVenuePostcode')?.value.trim().toUpperCase();
             
             if (!name || !address || !city || !postcode) {
-                modules.helpers?.showToast('Please fill in all fields', 'error');
+                modules.toast?.error('Please fill in all fields');
                 return;
             }
             
             // Validate postcode
             if (!modules.helpers?.isValidPostcode(postcode)) {
-                modules.helpers?.showToast('Please enter a valid UK postcode', 'error');
+                modules.toast?.error('Please enter a valid UK postcode');
                 return;
             }
             
@@ -1459,7 +1461,6 @@ const App = {
             };
             
             modules.modalManager?.close('manualVenueEntryModal');
-            modules.helpers?.showLoadingToast('Adding venue to database...');
             
             // Use the existing submitNewVenue function
             modules.search?.PlacesSearchModule?.submitNewVenue(venueData);
@@ -1494,6 +1495,7 @@ const App = {
     handleCookieConsent: (analyticsAllowed) => {
         const helpers = App.getModule('helpers');
         const tracking = App.getModule('tracking');
+        const toast = App.getModule('toast');
         
         if (!helpers || !tracking) return;
         
@@ -1507,7 +1509,7 @@ const App = {
         
         if (banner) banner.style.display = 'none';
         
-        helpers.showSuccessToast('✅ Cookie preferences saved!');
+        toast?.success('✅ Cookie preferences saved!');
     },
     
     checkCookieConsent: () => {
@@ -1615,9 +1617,10 @@ const App = {
         const location = App.getState(STATE_KEYS.USER_LOCATION);
         const map = App.getState(STATE_KEYS.MAP_DATA.FULL_UK_MAP);
         const marker = App.getState(STATE_KEYS.MAP_DATA.USER_MARKER);
+        const toast = modules.toast;
         
         if (!location) {
-            modules.helpers?.showSuccessToast?.('📍 Location not available. Please enable location services.');
+            toast?.info('📍 Location not available. Please enable location services.');
             return;
         }
         
