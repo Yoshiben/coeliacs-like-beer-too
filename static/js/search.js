@@ -1,6 +1,5 @@
 // ================================================================================
-// SEARCH.JS - CLEANED VERSION
-// Removed redundant toasts, kept essential functionality intact
+// SEARCH.JS - CLEANED VERSION WITH NO LOADING TOASTS
 // ================================================================================
 
 import { Constants } from './constants.js';
@@ -21,7 +20,6 @@ export const SearchModule = (function() {
         totalResults: 0
     };
 
-    // ADD THIS NEW FUNCTION HERE (it's a private function, not in the return object)
     const setResultsViewState = (viewType, message = '') => {
         const elements = {
             loading: document.getElementById('resultsLoading'),
@@ -44,7 +42,7 @@ export const SearchModule = (function() {
         } else if (viewType === 'no-results' && elements.noResults) {
             elements.noResults.style.display = 'flex';
         }
-    };  // <-- Note: semicolon here because it's a standalone const declaration
+    };
     
     // ================================
     // MODULE GETTERS - Centralized
@@ -56,7 +54,8 @@ export const SearchModule = (function() {
         get modalManager() { return window.App?.getModule('modalManager'); },
         get tracking() { return window.App?.getModule('tracking'); },
         get ui() { return window.App?.getModule('ui'); },
-        get helpers() { return window.App?.getModule('helpers'); }
+        get helpers() { return window.App?.getModule('helpers'); },
+        get toast() { return window.App?.getModule('toast'); }
     };
     
     // ================================
@@ -79,44 +78,6 @@ export const SearchModule = (function() {
         
         setCurrentVenue(venue) {
             window.App.setState(STATE_KEYS.CURRENT_VENUE, venue);
-        },
-        
-        // Smart toast - only show when it adds value
-        showToast(message, type = 'success') {
-            // Only show error toasts and important notifications
-            if (type === 'error' || message.includes('❌') || message.includes('⚠️')) {
-                if (window.showSuccessToast && type === 'success') {
-                    window.showSuccessToast(message);
-                } else if (window.showErrorToast && type === 'error') {
-                    window.showErrorToast(message);
-                } else if (window.showToast) {
-                    window.showToast(message, type);
-                }
-            }
-            // Skip success messages that are obvious from UI
-        },
-        
-        // Only show loading for operations that take time
-        showLoadingToast(message, minDelay = 500) {
-            // Check if mobile
-            const isMobile = window.innerWidth <= 768;
-            
-            // On mobile, only show for longer operations
-            if (isMobile && minDelay < 1000) {
-                return { hide: () => {} }; // Return dummy object
-            }
-            
-            if (window.showLoadingToast) {
-                const id = window.showLoadingToast(message);
-                return { hide: () => window.hideLoadingToast?.() };
-            }
-            return { hide: () => {} };
-        },
-        
-        hideLoadingToast() {
-            if (window.hideLoadingToast) {
-                window.hideLoadingToast();
-            }
         }
     };
     
@@ -147,9 +108,6 @@ export const SearchModule = (function() {
         const gfOnly = window.App.getState('gfOnlyFilter') !== false;
         console.log(`🍺 Current filter: ${gfOnly ? 'GF Only' : 'All Venues'}`);
     
-        // Create a loader reference we can definitely clean up
-        let loader = null;
-    
         try {
             modules.modalManager?.close('distanceModal') || modules.modal?.close('distanceModal');
             
@@ -166,7 +124,7 @@ export const SearchModule = (function() {
                 } catch (locationError) {
                     console.error('❌ Location error:', locationError);
                     hideResultsAndShowHome();
-                    utils.showToast('📍 Location needed for nearby search. Try searching by area instead!', 'error');
+                    modules.toast?.error('📍 Location needed for nearby search. Try searching by area instead!');
                     
                     setTimeout(() => {
                         modules.modal?.open('areaModal');
@@ -177,7 +135,7 @@ export const SearchModule = (function() {
             
             // Only show accuracy warning for poor accuracy
             if (userLocation.accuracy > 1000) {
-                utils.showToast(`⚠️ Location accuracy: ±${Math.round(userLocation.accuracy)}m`, 'warning');
+                modules.toast?.warning(`⚠️ Location accuracy: ±${Math.round(userLocation.accuracy)}m`);
             }
             
             // Save search state
@@ -234,7 +192,7 @@ export const SearchModule = (function() {
     
             // Only show toast for edge cases
             if (data.pagination.total > 100) {
-                utils.showToast(`Wow! ${data.pagination.total} venues found!`, 'success');
+                modules.toast?.success(`Wow! ${data.pagination.total} venues found!`);
             }
             
             modules.tracking?.trackSearch(`nearby_${radiusKm}km`, 'location', data.pagination.total);
@@ -242,24 +200,6 @@ export const SearchModule = (function() {
         } catch (error) {
             console.error('❌ Error in nearby search:', error);
             showNoResults('Could not complete search. Please try again.');
-        } finally {
-            // ALWAYS clean up loading states
-            utils.hideLoadingToast();
-            
-            // Nuclear option - kill any stuck loading toasts
-            if (modules.helpers) {
-                modules.helpers.clearAllToasts();
-            }
-            
-            // Belt and braces - directly remove any loading toast elements
-            setTimeout(() => {
-                document.querySelectorAll('.toast-loading').forEach(t => t.remove());
-                document.querySelectorAll('.toast').forEach(toast => {
-                    if (toast.textContent && toast.textContent.includes('Finding GF beer')) {
-                        toast.remove();
-                    }
-                });
-            }, 100);
         }
     };
     
@@ -344,7 +284,7 @@ export const SearchModule = (function() {
         const query = document.getElementById('nameInput')?.value.trim();
         
         if (!query) {
-            utils.showToast('Please enter a venue name to search', 'error');
+            modules.toast?.error('Please enter a venue name to search');
             return;
         }
         
@@ -377,7 +317,7 @@ export const SearchModule = (function() {
         const searchType = document.getElementById('areaSearchType')?.value;
         
         if (!query) {
-            utils.showToast('Please enter a location to search', 'error');
+            modules.toast?.error('Please enter a location to search');
             return;
         }
         
@@ -422,7 +362,7 @@ export const SearchModule = (function() {
         const searchType = document.getElementById('beerSearchType')?.value;
         
         if (!query) {
-            utils.showToast('Please enter something to search for', 'error');
+            modules.toast?.error('Please enter something to search for');
             return;
         }
         
@@ -627,8 +567,6 @@ export const SearchModule = (function() {
     const showVenueDetails = async (venueId) => {
         console.log('🏠 Showing venue details:', venueId);
         
-        let loadingToast = null;
-        
         try {
             const results = await modules.api.searchVenues({ 
                 venueId: venueId
@@ -642,20 +580,13 @@ export const SearchModule = (function() {
                 displayVenueDetails(venue);
                 return venue;
             } else {
-                utils.showToast('Venue not found.', 'error');
+                modules.toast?.error('Venue not found.');
                 return null;
             }
             
         } catch (error) {
             console.error('❌ Error loading venue:', error);
-            
-            // ENSURE loading toast is hidden on error
-            if (loadingToast && loadingToast.hide) {
-                loadingToast.hide();
-            }
-            utils.hideLoadingToast(); // Belt and braces approach
-            
-            utils.showToast('Error loading venue details.', 'error');
+            modules.toast?.error('Error loading venue details.');
             return null;
         }
     };
@@ -1040,7 +971,7 @@ export const SearchModule = (function() {
                 );
             } catch (error) {
                 console.error('❌ Error loading page:', error);
-                utils.showToast('Error loading page. Please try again.', 'error');
+                modules.toast?.error('Error loading page. Please try again.');
             }
         } else if (searchState.type === 'name' || searchState.type === 'area' || searchState.type === 'beer') {
             await performTextSearch(
@@ -1050,7 +981,7 @@ export const SearchModule = (function() {
                 pageNum
             );
         } else {
-            utils.showToast('Unable to load page for this search type', 'error');
+            modules.toast?.error('Unable to load page for this search type');
         }
     };
     
@@ -1067,7 +998,7 @@ export const SearchModule = (function() {
     };
     
     // ================================
-    // LOCATION UTILITIES
+    // LOCATION UTILITIES  
     // ================================
     const requestLocationWithUI = () => {
         if (state.locationRequestInProgress) {
@@ -1252,17 +1183,13 @@ export const SearchModule = (function() {
             console.log('📍 User clicked allow location');
             cleanup();
             
-            const loadingToast = utils.showLoadingToast('📍 Getting your location...', 1000);
-            
             if (!navigator.geolocation) {
-                loadingToast.hide();
                 reject(new Error('Geolocation not supported'));
                 return;
             }
             
             navigator.geolocation.getCurrentPosition(
                 (position) => {
-                    loadingToast.hide();
                     const location = {
                         lat: position.coords.latitude,
                         lng: position.coords.longitude,
@@ -1271,7 +1198,6 @@ export const SearchModule = (function() {
                     resolve(location);
                 },
                 (error) => {
-                    loadingToast.hide();
                     let message = 'Could not get location. ';
                     
                     switch(error.code) {
@@ -1286,6 +1212,7 @@ export const SearchModule = (function() {
                             break;
                     }
                     
+                    modules.toast?.error(message);
                     reject(new Error(message));
                 },
                 {
@@ -1314,7 +1241,7 @@ export const SearchModule = (function() {
             const modal = document.getElementById('locationBlockedModal');
             if (!modal) {
                 console.error('Location blocked modal not found');
-                utils.showToast('📍 Location blocked. Enable in browser settings and refresh.', 'error');
+                modules.toast?.error('📍 Location blocked. Enable in browser settings and refresh.');
                 return;
             }
             
@@ -1385,10 +1312,8 @@ export const SearchModule = (function() {
         // Clean up any stuck loading states
         const loadingEl = document.getElementById('resultsLoading');
         if (loadingEl) {
-            loadingEl.style.display = 'none';  // Hide by default
+            loadingEl.style.display = 'none';
         }
-    
-        utils.hideLoadingToast();
         
         const elements = {
             list: document.getElementById('resultsListContainer'),
@@ -1684,7 +1609,7 @@ export const SearchModule = (function() {
     };
     
     // ================================
-    // PLACES SEARCH MODULE (kept intact as it's complex)
+    // PLACES SEARCH MODULE
     // ================================
     const PlacesSearchModule = {
         selectedPlace: null,
@@ -1716,7 +1641,7 @@ export const SearchModule = (function() {
                });
            } else {
                console.error('❌ ModalManager not available');
-               utils.showToast('Error: Modal system not available', 'error');
+               modules.toast?.error('Error: Modal system not available');
            }
        },
        
@@ -1743,388 +1668,383 @@ export const SearchModule = (function() {
            const resultsDiv = document.getElementById('placesResults');
            if (!resultsDiv) {
                console.error('❌ placesResults div not found');
-               return;
-           }
-           
-           if (!query || query.length < 3) {
-               resultsDiv.style.display = 'none';
-               console.log('ℹ️ Query too short, hiding results');
-               return;
-           }
-           
-           console.log('⏳ Starting search timeout for:', query);
-           resultsDiv.innerHTML = '<div style="padding: 20px; text-align: center; color: #666;">Searching...</div>';
-           resultsDiv.style.display = 'block';
-           
-           this.searchTimeout = setTimeout(() => {
-               console.log('🚀 Executing search for:', query);
-               this.searchGooglePlaces(query);
-           }, 300);
-       },
-       
-       async searchGooglePlaces(query) {
-           console.log('🌍 searchGooglePlaces called with:', query);
-           
-           try {
-               console.log('📡 Making API request to /api/search-places');
-               
-               const response = await fetch('/api/search-places', {
-                   method: 'POST',
-                   headers: { 'Content-Type': 'application/json' },
-                   body: JSON.stringify({ query: query })
-               });
-               
-               console.log('📡 API response status:', response.status);
-               
-               if (!response.ok) {
-                   const errorText = await response.text();
-                   console.error('❌ API Error Response:', response.status, errorText);
-                   throw new Error(`API Error: ${response.status} - ${errorText}`);
-               }
-               
-               const data = await response.json();
-               console.log('✅ API response data:', data);
-               
-               const places = data.results || [];
-               console.log(`📍 Found ${places.length} places:`, places);
-               
-               this.displayResults(places);
-               
-           } catch (error) {
-               console.error('❌ Google Places search error:', error);
-               this.showError(`Search failed: ${error.message}. Please try again.`);
-           }
-       },
-       
-       displayResults(places) {
-           const resultsDiv = document.getElementById('placesResults');
-           if (!resultsDiv) return;
-           
-           const selectedPreview = document.getElementById('selectedPlacePreview');
-           if (selectedPreview) {
-               selectedPreview.style.display = 'none';
-           }
-           
-           if (places.length === 0) {
-               resultsDiv.innerHTML = `
-                   <div class="no-places-found">
-                       <p>No venues found. Try a different search.</p>
-                       <small>Tip: Include the city name</small>
-                   </div>
-               `;
-               resultsDiv.style.display = 'block';
-               return;
-           }
-           
-           this.searchResults = places;
-           
-           resultsDiv.innerHTML = places.map((place, index) => {
-               const name = place.name || place.display_name?.split(',')[0] || 'Unknown Venue';
-               const address = place.formatted_address || this.formatAddress(place);
-               const type = this.getPlaceTypeFromGoogle(place);
-               
-               return `
-                   <div class="place-result" data-action="select-place" data-place-index="${index}">
-                       <div class="place-icon">${this.getPlaceIcon(type)}</div>
-                       <div class="place-info">
-                           <strong>${this.escapeHtml(name)}</strong>
-                           <small>${this.escapeHtml(address)}</small>
-                           <span class="place-type">${type}</span>
-                       </div>
-                   </div>
-               `;
-           }).join('');
-       
-           resultsDiv.innerHTML += `
-               <div style="padding: var(--space-lg); border-top: 1px solid var(--border-light); margin-top: var(--space-md);">
-                   <button class="btn btn-secondary" data-action="manual-venue-entry" style="width: 100%;">
-                       ✏️ Can't find it? Enter manually
-                   </button>
-               </div>
-           `;
-           
-           resultsDiv.style.display = 'block';
-       },
-       
-       getPlaceTypeFromGoogle(place) {
-           if (!place.types) return 'Venue';
-           
-           const types = place.types;
-           if (types.includes('bar')) return 'Bar';
-           if (types.includes('restaurant')) return 'Restaurant';
-           if (types.includes('cafe')) return 'Café';
-           if (types.includes('night_club')) return 'Club';
-           if (types.includes('meal_takeaway')) return 'Takeaway';
-           if (types.includes('lodging')) return 'Hotel';
-           
-           return 'Venue';
-       },
-       
-       selectPlace(placeOrIndex) {
-           console.log('🏠 Selecting place:', placeOrIndex);
-           const place = typeof placeOrIndex === 'number' 
-               ? this.searchResults[placeOrIndex]
-               : placeOrIndex;
-               
-           if (!place) {
-               console.error('❌ No place found to select');
-               return;
-           }
-           
-           console.log('✅ Place selected:', place);
-           
-           const placeName = place.name || 'Unknown Venue';
-           const placeAddress = place.formatted_address || 'Address not available';
-           const placeType = this.getPlaceTypeFromGoogle(place);
-           
-           const lat = place.geometry?.location?.lat;
-           const lng = place.geometry?.location?.lng;
-           
-           if (!lat || !lng) {
-               console.error('❌ No coordinates available for place:', place);
-               utils.showToast('This venue has no location data available', 'error');
-               return;
-           }
-           
-           this.selectedPlace = {
-               name: placeName,
-               address: placeAddress,
-               lat: lat,
-               lon: lng,
-               type: placeType,
-               place_id: place.place_id,
-               formatted_address: place.formatted_address,
-               types: place.types || [],
-               source: 'google_places'
-           };
-           
-           document.getElementById('selectedPlaceName').textContent = this.selectedPlace.name;
-           document.getElementById('selectedPlaceAddress').textContent = this.selectedPlace.address;
-           document.getElementById('selectedPlaceType').textContent = this.selectedPlace.type;
-           document.getElementById('selectedPlacePreview').style.display = 'block';
-           
-           this.hideResults();
-       },
-       
-       useSelectedPlace() {
-           if (!this.selectedPlace) {
-               console.error('❌ No selected place');
-               return;
-           }
-           
-           console.log('📝 Using selected place to add new venue');
-           
-           const place = this.selectedPlace;
-           
-           let postcode = '';
-           if (place.formatted_address) {
-               const postcodeMatch = place.formatted_address.match(/[A-Z]{1,2}[0-9R][0-9A-Z]?\s?[0-9][A-Z]{2}/i);
-               if (postcodeMatch) {
-                   postcode = postcodeMatch[0];
-               }
-           }
-           
-           let address = place.formatted_address || place.address || '';
-           if (postcode) {
-               address = address.replace(new RegExp(`,?\\s*${postcode.replace(/\s/g, '\\s*')}.*$`, 'i'), '').trim();
-               const nameRegex = new RegExp(`^${place.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')},?\\s*`, 'i');
-               address = address.replace(nameRegex, '').trim();
-           }
-           
-           const newVenueData = {
-               name: place.name,
-               address: address,
-               postcode: postcode,
-               latitude: place.lat,
-               longitude: place.lon,
-               place_id: place.place_id,
-               source: 'google_places'
-           };
-           
-           console.log('🏠 New venue data:', newVenueData);
-           
-           if (modules.modalManager) {
-               modules.modalManager.close('placesSearchModal');
-           } else {
-               document.getElementById('placesSearchModal').style.display = 'none';
-               document.body.style.overflow = '';
-           }
-           
-           const loadingToast = utils.showLoadingToast('Adding new venue to database...', 1000);
-           
-           this.submitNewVenue(newVenueData);
-       },
-       
-       async submitNewVenue(venueData) {
-           try {
-               let nickname = window.App.getState('userNickname');
-               if (!nickname) {
-                   nickname = localStorage.getItem('userNickname') || 'anonymous';
-               }
-               
-               const payload = {
-                   venue_name: venueData.name,
-                   address: venueData.address,
-                   postcode: venueData.postcode,
-                   latitude: venueData.latitude,
-                   longitude: venueData.longitude,
-                   submitted_by: nickname,
-                   types: venueData.types || [],
-                   place_id: venueData.place_id || null
-               };
-               
-               console.log('📡 Submitting venue data:', payload);
-               
-               const response = await fetch('/api/add-venue', {
-                   method: 'POST',
-                   headers: {
-                       'Content-Type': 'application/json'
-                   },
-                   body: JSON.stringify(payload)
-               });
-               
-               utils.hideLoadingToast();
-               
-               if (!response.ok) {
-                   const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-                   throw new Error(errorData.error || `Server error: ${response.status}`);
-               }
-               
-               const result = await response.json();
-               console.log('✅ Venue added:', result);
-               
-               window.newlyAddedVenue = {
-                   venue_id: result.venue_id,
-                   venue_name: venueData.name,
-                   name: venueData.name,
-                   address: venueData.address,
-                   postcode: venueData.postcode,
-                   latitude: venueData.latitude,
-                   longitude: venueData.longitude,
-                   venue_type: result.venue_type
-               };
-               
-               this.showVenueAddedPrompt(result);
-               
-           } catch (error) {
-               console.error('❌ Error adding venue:', error);
-               utils.hideLoadingToast();
-               utils.showToast(`❌ Failed to add venue: ${error.message}`, 'error');
-           }
-       },
+              return;
+          }
+          
+          if (!query || query.length < 3) {
+              resultsDiv.style.display = 'none';
+              console.log('ℹ️ Query too short, hiding results');
+              return;
+          }
+          
+          console.log('⏳ Starting search timeout for:', query);
+          resultsDiv.innerHTML = '<div style="padding: 20px; text-align: center; color: #666;">Searching...</div>';
+          resultsDiv.style.display = 'block';
+          
+          this.searchTimeout = setTimeout(() => {
+              console.log('🚀 Executing search for:', query);
+              this.searchGooglePlaces(query);
+          }, 300);
+      },
+      
+      async searchGooglePlaces(query) {
+          console.log('🌍 searchGooglePlaces called with:', query);
+          
+          try {
+              console.log('📡 Making API request to /api/search-places');
+              
+              const response = await fetch('/api/search-places', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ query: query })
+              });
+              
+              console.log('📡 API response status:', response.status);
+              
+              if (!response.ok) {
+                  const errorText = await response.text();
+                  console.error('❌ API Error Response:', response.status, errorText);
+                  throw new Error(`API Error: ${response.status} - ${errorText}`);
+              }
+              
+              const data = await response.json();
+              console.log('✅ API response data:', data);
+              
+              const places = data.results || [];
+              console.log(`📍 Found ${places.length} places:`, places);
+              
+              this.displayResults(places);
+              
+          } catch (error) {
+              console.error('❌ Google Places search error:', error);
+              this.showError(`Search failed: ${error.message}. Please try again.`);
+          }
+      },
+      
+      displayResults(places) {
+          const resultsDiv = document.getElementById('placesResults');
+          if (!resultsDiv) return;
+          
+          const selectedPreview = document.getElementById('selectedPlacePreview');
+          if (selectedPreview) {
+              selectedPreview.style.display = 'none';
+          }
+          
+          if (places.length === 0) {
+              resultsDiv.innerHTML = `
+                  <div class="no-places-found">
+                      <p>No venues found. Try a different search.</p>
+                      <small>Tip: Include the city name</small>
+                  </div>
+              `;
+              resultsDiv.style.display = 'block';
+              return;
+          }
+          
+          this.searchResults = places;
+          
+          resultsDiv.innerHTML = places.map((place, index) => {
+              const name = place.name || place.display_name?.split(',')[0] || 'Unknown Venue';
+              const address = place.formatted_address || this.formatAddress(place);
+              const type = this.getPlaceTypeFromGoogle(place);
+              
+              return `
+                  <div class="place-result" data-action="select-place" data-place-index="${index}">
+                      <div class="place-icon">${this.getPlaceIcon(type)}</div>
+                      <div class="place-info">
+                          <strong>${this.escapeHtml(name)}</strong>
+                          <small>${this.escapeHtml(address)}</small>
+                          <span class="place-type">${type}</span>
+                      </div>
+                  </div>
+              `;
+          }).join('');
+      
+          resultsDiv.innerHTML += `
+              <div style="padding: var(--space-lg); border-top: 1px solid var(--border-light); margin-top: var(--space-md);">
+                  <button class="btn btn-secondary" data-action="manual-venue-entry" style="width: 100%;">
+                      ✏️ Can't find it? Enter manually
+                  </button>
+              </div>
+          `;
+          
+          resultsDiv.style.display = 'block';
+      },
+      
+      getPlaceTypeFromGoogle(place) {
+          if (!place.types) return 'Venue';
+          
+          const types = place.types;
+          if (types.includes('bar')) return 'Bar';
+          if (types.includes('restaurant')) return 'Restaurant';
+          if (types.includes('cafe')) return 'Café';
+          if (types.includes('night_club')) return 'Club';
+          if (types.includes('meal_takeaway')) return 'Takeaway';
+          if (types.includes('lodging')) return 'Hotel';
+          
+          return 'Venue';
+      },
+      
+      selectPlace(placeOrIndex) {
+          console.log('🏠 Selecting place:', placeOrIndex);
+          const place = typeof placeOrIndex === 'number' 
+              ? this.searchResults[placeOrIndex]
+              : placeOrIndex;
+              
+          if (!place) {
+              console.error('❌ No place found to select');
+              return;
+          }
+          
+          console.log('✅ Place selected:', place);
+          
+          const placeName = place.name || 'Unknown Venue';
+          const placeAddress = place.formatted_address || 'Address not available';
+          const placeType = this.getPlaceTypeFromGoogle(place);
+          
+          const lat = place.geometry?.location?.lat;
+          const lng = place.geometry?.location?.lng;
+          
+          if (!lat || !lng) {
+              console.error('❌ No coordinates available for place:', place);
+              modules.toast?.error('This venue has no location data available');
+              return;
+          }
+          
+          this.selectedPlace = {
+              name: placeName,
+              address: placeAddress,
+              lat: lat,
+              lon: lng,
+              type: placeType,
+              place_id: place.place_id,
+              formatted_address: place.formatted_address,
+              types: place.types || [],
+              source: 'google_places'
+          };
+          
+          document.getElementById('selectedPlaceName').textContent = this.selectedPlace.name;
+          document.getElementById('selectedPlaceAddress').textContent = this.selectedPlace.address;
+          document.getElementById('selectedPlaceType').textContent = this.selectedPlace.type;
+          document.getElementById('selectedPlacePreview').style.display = 'block';
+          
+          this.hideResults();
+      },
+      
+      useSelectedPlace() {
+          if (!this.selectedPlace) {
+              console.error('❌ No selected place');
+              return;
+          }
+          
+          console.log('📝 Using selected place to add new venue');
+          
+          const place = this.selectedPlace;
+          
+          let postcode = '';
+          if (place.formatted_address) {
+              const postcodeMatch = place.formatted_address.match(/[A-Z]{1,2}[0-9R][0-9A-Z]?\s?[0-9][A-Z]{2}/i);
+              if (postcodeMatch) {
+                  postcode = postcodeMatch[0];
+              }
+          }
+          
+          let address = place.formatted_address || place.address || '';
+          if (postcode) {
+              address = address.replace(new RegExp(`,?\\s*${postcode.replace(/\s/g, '\\s*')}.*$`, 'i'), '').trim();
+              const nameRegex = new RegExp(`^${place.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')},?\\s*`, 'i');
+              address = address.replace(nameRegex, '').trim();
+          }
+          
+          const newVenueData = {
+              name: place.name,
+              address: address,
+              postcode: postcode,
+              latitude: place.lat,
+              longitude: place.lon,
+              place_id: place.place_id,
+              source: 'google_places'
+          };
+          
+          console.log('🏠 New venue data:', newVenueData);
+          
+          if (modules.modalManager) {
+              modules.modalManager.close('placesSearchModal');
+          } else {
+              document.getElementById('placesSearchModal').style.display = 'none';
+              document.body.style.overflow = '';
+          }
+          
+          this.submitNewVenue(newVenueData);
+      },
+      
+      async submitNewVenue(venueData) {
+          try {
+              let nickname = window.App.getState('userNickname');
+              if (!nickname) {
+                  nickname = localStorage.getItem('userNickname') || 'anonymous';
+              }
+              
+              const payload = {
+                  venue_name: venueData.name,
+                  address: venueData.address,
+                  postcode: venueData.postcode,
+                  latitude: venueData.latitude,
+                  longitude: venueData.longitude,
+                  submitted_by: nickname,
+                  types: venueData.types || [],
+                  place_id: venueData.place_id || null
+              };
+              
+              console.log('📡 Submitting venue data:', payload);
+              
+              const response = await fetch('/api/add-venue', {
+                  method: 'POST',
+                  headers: {
+                      'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify(payload)
+              });
+              
+              if (!response.ok) {
+                  const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+                  throw new Error(errorData.error || `Server error: ${response.status}`);
+              }
+              
+              const result = await response.json();
+              console.log('✅ Venue added:', result);
+              
+              window.newlyAddedVenue = {
+                  venue_id: result.venue_id,
+                  venue_name: venueData.name,
+                  name: venueData.name,
+                  address: venueData.address,
+                  postcode: venueData.postcode,
+                  latitude: venueData.latitude,
+                  longitude: venueData.longitude,
+                  venue_type: result.venue_type
+              };
+              
+              this.showVenueAddedPrompt(result);
+              
+          } catch (error) {
+              console.error('❌ Error adding venue:', error);
+              modules.toast?.error(`❌ Failed to add venue: ${error.message}`);
+          }
+      },
 
-       showVenueAddedPrompt(result) {
-           console.log('🎉 Showing venue added prompt for:', result);
-           
-           window.App.setState('lastAddedVenueId', result.venue_id);
-           window.App.setState('lastAddedVenueName', result.message.split(' added successfully!')[0]);
-           
-           const newVenue = {
-               venue_id: result.venue_id,
-               name: result.message.split(' added successfully!')[0],
-               venue_name: result.message.split(' added successfully!')[0]
-           };
-           window.App.setState('currentVenue', newVenue);
-           
-           const venueNameEl = document.getElementById('addedVenueName');
-           if (venueNameEl) {
-               venueNameEl.textContent = newVenue.name;
-           }
-           
-           if (modules.modalManager) {
-               modules.modalManager.close('placesSearchModal');
-           }
-           
-           utils.showToast(`🎉 ${result.message}`, 'success');
-           
-           setTimeout(() => {
-               if (modules.modalManager) {
-                   modules.modalManager.open('venueAddedPromptModal');
-               }
-           }, 500);
-       },
-       
-       formatAddress(place) {
-           if (place.formatted_address) {
-               return place.formatted_address;
-           }
-           return place.address || 'Address not available';
-       },
-       
-       getPlaceIcon(type) {
-           const icons = {
-               'Bar': '🍹',
-               'Restaurant': '🍽️',
-               'Café': '☕',
-               'Club': '🎵',
-               'Takeaway': '🥡',
-               'Hotel': '🏨',
-               'Venue': '🍺'
-           };
-           return icons[type] || '📍';
-       },
-       
-       hideResults() {
-           const resultsDiv = document.getElementById('placesResults');
-           if (resultsDiv) {
-               resultsDiv.style.display = 'none';
-           }
-       },
-       
-       escapeHtml(text) {
-           const div = document.createElement('div');
-           div.textContent = text;
-           return div.innerHTML;
-       },
-       
-       showError(message) {
-           const resultsDiv = document.getElementById('placesResults');
-           if (resultsDiv) {
-               resultsDiv.innerHTML = `<div class="search-error">${message}</div>`;
-               resultsDiv.style.display = 'block';
-           }
-       }
-   };
-   
-   // ================================
-   // INITIALIZATION
-   // ================================
-   document.addEventListener('DOMContentLoaded', () => {
-       PlacesSearchModule.init();
-   });
-   
-   // ================================
-   // PUBLIC API
-   // ================================
-   return {
-       // Location search
-       startLocationSearch,
-       searchNearbyWithDistance,
-       requestLocationWithUI,
-       
-       // Search methods
-       searchByName,
-       searchByArea,
-       searchByBeer,
-       
-       // Pagination
-       goToPage,
-       goToPreviousPage,
-       goToNextPage,
-       
-       // Venue details
-       showVenueDetails,
-       loadBeerList,
-       
-       // Navigation
-       goBackToResults,
-       
-       // Sub-modules
-       PlacesSearchModule,
-       
-       // State getters
-       getCurrentResults: () => state.currentSearchVenues,
-       getLastSearchState: () => state.lastSearchState,
-       getAllSearchResults
-   };
+      showVenueAddedPrompt(result) {
+          console.log('🎉 Showing venue added prompt for:', result);
+          
+          window.App.setState('lastAddedVenueId', result.venue_id);
+          window.App.setState('lastAddedVenueName', result.message.split(' added successfully!')[0]);
+          
+          const newVenue = {
+              venue_id: result.venue_id,
+              name: result.message.split(' added successfully!')[0],
+              venue_name: result.message.split(' added successfully!')[0]
+          };
+          window.App.setState('currentVenue', newVenue);
+          
+          const venueNameEl = document.getElementById('addedVenueName');
+          if (venueNameEl) {
+              venueNameEl.textContent = newVenue.name;
+          }
+          
+          if (modules.modalManager) {
+              modules.modalManager.close('placesSearchModal');
+          }
+          
+          modules.toast?.success(`🎉 ${result.message}`);
+          
+          setTimeout(() => {
+              if (modules.modalManager) {
+                  modules.modalManager.open('venueAddedPromptModal');
+              }
+          }, 500);
+      },
+      
+      formatAddress(place) {
+          if (place.formatted_address) {
+              return place.formatted_address;
+          }
+          return place.address || 'Address not available';
+      },
+      
+      getPlaceIcon(type) {
+          const icons = {
+              'Bar': '🍹',
+              'Restaurant': '🍽️',
+              'Café': '☕',
+              'Club': '🎵',
+              'Takeaway': '🥡',
+              'Hotel': '🏨',
+              'Venue': '🍺'
+          };
+          return icons[type] || '📍';
+      },
+      
+      hideResults() {
+          const resultsDiv = document.getElementById('placesResults');
+          if (resultsDiv) {
+              resultsDiv.style.display = 'none';
+          }
+      },
+      
+      escapeHtml(text) {
+          const div = document.createElement('div');
+          div.textContent = text;
+          return div.innerHTML;
+      },
+      
+      showError(message) {
+          const resultsDiv = document.getElementById('placesResults');
+          if (resultsDiv) {
+              resultsDiv.innerHTML = `<div class="search-error">${message}</div>`;
+              resultsDiv.style.display = 'block';
+          }
+      }
+  };
+  
+  // ================================
+  // INITIALIZATION
+  // ================================
+  document.addEventListener('DOMContentLoaded', () => {
+      PlacesSearchModule.init();
+  });
+  
+  // ================================
+  // PUBLIC API
+  // ================================
+  return {
+      // Location search
+      startLocationSearch,
+      searchNearbyWithDistance,
+      requestLocationWithUI,
+      
+      // Search methods
+      searchByName,
+      searchByArea,
+      searchByBeer,
+      
+      // Pagination
+      goToPage,
+      goToPreviousPage,
+      goToNextPage,
+      
+      // Venue details
+      showVenueDetails,
+      loadBeerList,
+      
+      // Navigation
+      goBackToResults,
+      
+      // Sub-modules
+      PlacesSearchModule,
+      
+      // State getters
+      getCurrentResults: () => state.currentSearchVenues,
+      getLastSearchState: () => state.lastSearchState,
+      getAllSearchResults
+  };
 })();
