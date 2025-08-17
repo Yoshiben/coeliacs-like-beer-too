@@ -2885,3 +2885,64 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 .skip-status-btn:hover {
     color: var(--text-primary);
 }
+
+
+/* Toast Container */
+.toast-container {
+    position: fixed;
+    z-index: var(--z-toast, 10000);
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+}
+
+/* Position variants */
+.toast-container[data-position="bottom-center"] {
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    align-items: center;
+}
+
+.toast-container[data-position="top-right"] {
+    top: var(--space-md);
+    right: var(--space-md);
+    align-items: flex-end;
+}
+
+/* Individual toasts */
+.toast {
+    pointer-events: auto;
+    min-width: 250px;
+    max-width: 500px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.toast.hide {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    color: inherit;
+    font-size: 1.5rem;
+    cursor: pointer;
+    opacity: 0.7;
+    padding: 0;
+    margin-left: var(--space-sm);
+}
+
+.toast-close:hover {
+    opacity: 1;
+}
