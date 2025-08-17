@@ -1319,8 +1319,142 @@
             console.log('📺 Viewport:', window.innerWidth + 'x' + window.innerHeight);
             console.log('🌐 Connection:', navigator.connection?.effectiveType || 'unknown');
         </script>
+        <script>
+            // PASTE THIS AT THE BOTTOM OF YOUR main.js or in a <script> tag before </body> in index.html
+
+            // Debug VH Gap Inspector
+            const debugVH = () => {
+                // Remove if exists
+                const existing = document.getElementById('vh-debug-panel');
+                if (existing) {
+                    existing.remove();
+                    return;
+                }
+                
+                // Create debug panel
+                const panel = document.createElement('div');
+                panel.id = 'vh-debug-panel';
+                panel.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: rgba(0, 0, 0, 0.95);
+                    color: #00ff00;
+                    padding: 20px;
+                    border-radius: 10px;
+                    font-family: monospace;
+                    font-size: 14px;
+                    z-index: 99999;
+                    min-width: 300px;
+                    box-shadow: 0 0 30px rgba(0, 255, 0, 0.5);
+                `;
+                
+                // Get measurements
+                const topNav = document.querySelector('.top-nav');
+                const bottomNav = document.querySelector('.bottom-nav');
+                const body = document.body;
+                const styles = window.getComputedStyle(body);
+                
+                const vh = window.innerHeight;
+                const vhCalc = vh * 0.08;
+                const topNavHeight = topNav ? topNav.offsetHeight : 0;
+                const bottomNavHeight = bottomNav ? bottomNav.offsetHeight : 0;
+                const paddingTop = parseFloat(styles.paddingTop);
+                const paddingBottom = parseFloat(styles.paddingBottom);
+                
+                // Calculate gaps
+                const topGap = Math.abs(paddingTop - topNavHeight);
+                const bottomGap = Math.abs(paddingBottom - bottomNavHeight);
+                
+                // Build HTML
+                panel.innerHTML = `
+                    <div style="color: #ffff00; font-size: 16px; margin-bottom: 15px; text-align: center;">
+                        🔍 VH GAP INSPECTOR
+                    </div>
+                    
+                    <div style="margin: 8px 0;">
+                        <span style="color: #00ffff;">Viewport Height:</span>
+                        <span style="color: #00ff00; float: right;">${vh}px</span>
+                    </div>
+                    
+                    <div style="margin: 8px 0;">
+                        <span style="color: #00ffff;">8vh calculates to:</span>
+                        <span style="color: #00ff00; float: right;">${vhCalc.toFixed(2)}px</span>
+                    </div>
+                    
+                    <hr style="border: 1px solid #333; margin: 10px 0;">
+                    
+                    <div style="margin: 8px 0;">
+                        <span style="color: #00ffff;">Top Nav Height:</span>
+                        <span style="color: #00ff00; float: right;">${topNavHeight}px</span>
+                    </div>
+                    
+                    <div style="margin: 8px 0;">
+                        <span style="color: #00ffff;">Body Padding Top:</span>
+                        <span style="color: #00ff00; float: right;">${paddingTop.toFixed(2)}px</span>
+                    </div>
+                    
+                    <div style="margin: 8px 0;">
+                        <span style="color: #ff6666;">TOP GAP:</span>
+                        <span style="color: ${topGap > 0.5 ? '#ff0000' : '#00ff00'}; float: right; font-weight: bold;">
+                            ${topGap.toFixed(2)}px ${topGap > 0.5 ? '⚠️' : '✅'}
+                        </span>
+                    </div>
+                    
+                    <hr style="border: 1px solid #333; margin: 10px 0;">
+                    
+                    <div style="margin: 8px 0;">
+                        <span style="color: #00ffff;">Bottom Nav Height:</span>
+                        <span style="color: #00ff00; float: right;">${bottomNavHeight}px</span>
+                    </div>
+                    
+                    <div style="margin: 8px 0;">
+                        <span style="color: #00ffff;">Body Padding Bottom:</span>
+                        <span style="color: #00ff00; float: right;">${paddingBottom.toFixed(2)}px</span>
+                    </div>
+                    
+                    <div style="margin: 8px 0;">
+                        <span style="color: #ff6666;">BOTTOM GAP:</span>
+                        <span style="color: ${bottomGap > 0.5 ? '#ff0000' : '#00ff00'}; float: right; font-weight: bold;">
+                            ${bottomGap.toFixed(2)}px ${bottomGap > 0.5 ? '⚠️' : '✅'}
+                        </span>
+                    </div>
+                    
+                    ${(topGap > 0.5 || bottomGap > 0.5) ? `
+                        <div style="background: rgba(255, 0, 0, 0.2); border: 1px solid #ff0000; padding: 10px; margin-top: 15px; border-radius: 5px;">
+                            <strong>⚠️ FIX NEEDED!</strong><br>
+                            The gaps exist because 8vh rounds differently for different elements.<br><br>
+                            <strong>Solution:</strong> Use CSS variables with fixed px values instead of vh units.
+                        </div>
+                    ` : `
+                        <div style="background: rgba(0, 255, 0, 0.1); border: 1px solid #00ff00; padding: 10px; margin-top: 15px; border-radius: 5px;">
+                            ✅ No gaps detected!
+                        </div>
+                    `}
+                    
+                    <button onclick="document.getElementById('vh-debug-panel').remove()" style="
+                        background: #00ff00;
+                        color: black;
+                        border: none;
+                        padding: 10px;
+                        margin-top: 15px;
+                        width: 100%;
+                        border-radius: 5px;
+                        font-weight: bold;
+                        cursor: pointer;
+                    ">CLOSE DEBUG</button>
+                `;
+                
+                document.body.appendChild(panel);
+            };
+            
+            // Run it
+            debugVH();
+        </script>
     </body>
 </html>
+
 
 
 
