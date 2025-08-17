@@ -894,6 +894,46 @@ const App = {
             modules.modalManager?.close('venueAddedPromptModal');
             modules.toast?.success('Venue added successfully!');
         },
+
+        'quick-status-update': async (el, modules) => {
+            const status = el.dataset.status;
+            const statusPromptVenue = window.App.getState('statusPromptVenue');
+            
+            if (!statusPromptVenue) {
+                console.error('No venue found for status update');
+                return;
+            }
+            
+            console.log('🎯 Quick status update:', status, 'for venue:', statusPromptVenue.venue_id);
+            
+            // Close the prompt modal
+            modules.modalManager?.close('statusPromptAfterBeerModal');
+            
+            try {
+                const response = await fetch('/api/update-gf-status', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        venue_id: statusPromptVenue.venue_id,
+                        status: status,
+                        submitted_by: window.App.getState('userNickname') || 'anonymous'
+                    })
+                });
+                
+                if (response.ok) {
+                    modules.toast?.success('✅ Perfect! Status updated. Double thanks!');
+                    
+                    // Award extra points
+                    const communityHub = modules.communityHub || window.App?.getModule('communityHub');
+                    if (communityHub?.isUserActive()) {
+                        communityHub.trackAction('STATUS_UPDATE', { venue: statusPromptVenue.venue_name });
+                    }
+                }
+            } catch (error) {
+                console.error('Failed to update status:', error);
+                modules.toast?.error('Failed to update status');
+            }
+        },
         
         // In main.js actionHandlers - update show-full-map
         'show-full-map': (el, modules) => {
