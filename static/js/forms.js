@@ -243,53 +243,29 @@ export const FormModule = (() => {
         });
     };
     
-    // Add this new function after handleSubmissionSuccess:
     const showGFStatusPromptAfterBeer = (venue) => {
         console.log('🎯 Showing status prompt for venue:', venue);
         
         // Store venue data for the action handlers
         window.App.setState('statusPromptVenue', venue);
         
-        // Open the modal using ModalManager
-        modules.modalManager?.open('statusPromptAfterBeerModal', {
-            onOpen: () => {
-                // Update the modal content dynamically
-                const modal = document.getElementById('beerDetailsPromptModal');
-                if (!modal) return;
-                
-                const modalBody = modal.querySelector('.modal-body');
-                if (modalBody) {
-                    modalBody.innerHTML = `
-                        <div class="modal-content" style="background: white; padding: 2rem; border-radius: 15px; max-width: 450px;">
-                            <div class="modal-header">
-                                <h2 class="modal-title">One more thing! 🍺</h2>
-                                <p class="modal-subtitle">What's the GF beer availability at ${utils.escapeHtml(venue.venue_name || venue.name)}?</p>
-                            </div>
-                            <div class="modal-body">
-                                <p style="text-align: center; margin-bottom: 1.5rem; color: var(--text-secondary);">
-                                    This helps others know what to expect when they visit!
-                                </p>
-                                <div class="status-options-compact">
-                                    <button class="status-option-compact" data-status="always_tap_cask" data-venue-id="${venue.venue_id}">
-                                        <span class="option-emoji">⭐</span>
-                                        <span class="option-text">Always has GF on tap/cask</span>
-                                    </button>
-                                    <button class="status-option-compact" data-status="always_bottle_can" data-venue-id="${venue.venue_id}">
-                                        <span class="option-emoji">✅</span>
-                                        <span class="option-text">Always has GF bottles/cans</span>
-                                    </button>
-                                    <button class="status-option-compact" data-status="currently" data-venue-id="${venue.venue_id}">
-                                        <span class="option-emoji">🔵</span>
-                                        <span class="option-text">Currently has GF (not always)</span>
-                                    </button>
-                                </div>
-                                <button class="skip-status-btn">Skip for now</button>
-                            </div>
-                        </div>
-                    `;
-                }
+        // Close venue details overlay first if it's open
+        const modalManager = modules.modalManager;
+        if (modalManager?.isOpen('venueDetailsOverlay')) {
+            modalManager.close('venueDetailsOverlay');
+        }
+        
+        // Small delay to ensure overlay is closed
+        setTimeout(() => {
+            // Set the venue name in the modal
+            const venueNameEl = document.getElementById('statusPromptVenueName');
+            if (venueNameEl && venue) {
+                venueNameEl.textContent = venue.venue_name || venue.name || 'this venue';
             }
-        });
+            
+            // Now open the correct status prompt modal
+            modalManager?.open('statusPromptAfterBeerModal');
+        }, 300);
     };
     
     const returnToHomeView = () => {
