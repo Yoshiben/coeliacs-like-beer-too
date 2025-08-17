@@ -462,25 +462,47 @@
                     </p>
                     
                     <p style="margin-bottom: 2rem;">
-                        <strong>Quick question:</strong> Is GF beer currently available at <span id="statusPromptVenueName" style="font-weight: bold;">this venue</span>?
+                        <strong>How reliably does <span id="statusPromptVenueName" style="font-weight: bold;">this venue</span> have GF beer?</strong>
                     </p>
                     
-                    <div class="status-quick-options" style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                        <button class="btn btn-success status-prompt-btn" data-action="quick-status-update" data-status="currently" style="flex: 1; min-width: 150px;">
-                            ✅ Yes, Available Now
+                    <div class="status-quick-options" style="display: flex; flex-direction: column; gap: 0.75rem; max-width: 400px; margin: 0 auto;">
+                        <button class="btn btn-success status-prompt-btn" data-action="quick-status-update" data-status="always_tap_cask" style="text-align: left; padding: 1rem;">
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <span style="font-size: 1.5rem;">⭐</span>
+                                <div>
+                                    <strong>Always has GF on tap/cask</strong>
+                                    <br><small style="opacity: 0.8;">The holy grail! Permanent GF tap/cask lines</small>
+                                </div>
+                            </div>
                         </button>
                         
-                        <button class="btn btn-secondary status-prompt-btn" data-action="quick-status-update" data-status="not_currently" style="flex: 1; min-width: 150px;">
-                            ❌ Not Right Now
+                        <button class="btn btn-primary status-prompt-btn" data-action="quick-status-update" data-status="always_bottle_can" style="text-align: left; padding: 1rem;">
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <span style="font-size: 1.5rem;">✅</span>
+                                <div>
+                                    <strong>Always has GF bottles/cans</strong>
+                                    <br><small style="opacity: 0.8;">Reliable bottled/canned options</small>
+                                </div>
+                            </div>
                         </button>
                         
-                        <button class="btn btn-outline" data-action="skip-status-prompt" style="flex: 1; min-width: 150px;">
-                            🤷 Not Sure / Skip
+                        <button class="btn btn-secondary status-prompt-btn" data-action="quick-status-update" data-status="currently" style="text-align: left; padding: 1rem;">
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <span style="font-size: 1.5rem;">🔵</span>
+                                <div>
+                                    <strong>Sometimes has GF beer</strong>
+                                    <br><small style="opacity: 0.8;">Not always available, but they have it today</small>
+                                </div>
+                            </div>
+                        </button>
+                        
+                        <button class="btn btn-outline" data-action="skip-status-prompt" style="padding: 0.75rem; margin-top: 0.5rem;">
+                            🤷 Not sure / Skip
                         </button>
                     </div>
                     
-                    <p style="margin-top: 2rem; font-size: 0.9rem; opacity: 0.7;">
-                        This helps other coeliacs know if they can get GF beer there today!
+                    <p style="margin-top: 1.5rem; font-size: 0.9rem; opacity: 0.7;">
+                        This helps others know what to expect when they visit!
                     </p>
                 </div>
             </div>
@@ -1319,6 +1341,7 @@
         
     </body>
 </html>
+
 
 
 
