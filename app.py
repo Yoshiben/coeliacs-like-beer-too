@@ -1096,7 +1096,7 @@ def submit_beer_update():
             WHERE LOWER(brewery_name) = LOWER(%s)
         """, (brewery_name,))
         
-        brewery_rows = cursor.fetchall()  # Use fetchall to consume all results
+        brewery_rows = cursor.fetchall()
         
         if brewery_rows:
             brewery_id = brewery_rows[0]['brewery_id']
@@ -1121,7 +1121,7 @@ def submit_beer_update():
             WHERE brewery_id = %s AND LOWER(beer_name) = LOWER(%s)
         """, (brewery_id, beer_name))
         
-        beer_rows = cursor.fetchall()  # Use fetchall to consume all results
+        beer_rows = cursor.fetchall()
         
         if beer_rows:
             beer_id = beer_rows[0]['beer_id']
@@ -1154,16 +1154,16 @@ def submit_beer_update():
             WHERE venue_id = %s AND beer_id = %s AND format = %s
         """, (venue_id, beer_id, format_type))
         
-        existing_reports = cursor.fetchall()  # Use fetchall to consume all results
+        existing_reports = cursor.fetchall()
         
         if existing_reports:
             existing_report = existing_reports[0]
-            # Update existing report
+            # Update existing report - FIXED: removed last_updated_by
             cursor.execute("""
                 UPDATE venue_beers 
                 SET last_seen = CURRENT_DATE, 
                     times_reported = %s,
-                    last_updated_by = %s
+                    added_by = %s
                 WHERE report_id = %s
             """, ((existing_report['times_reported'] or 0) + 1, submitted_by, existing_report['report_id']))
             report_id = existing_report['report_id']
@@ -1182,13 +1182,15 @@ def submit_beer_update():
         
         conn.commit()
         
+        # After successful beer report, show the status prompt
         return jsonify({
             'success': True,
             'message': '🎉 Beer report added successfully!',
             'report_id': report_id,
             'beer_id': beer_id,
             'brewery_id': brewery_id,
-            'status': 'approved'
+            'status': 'approved',
+            'show_status_prompt': True  # Add this flag
         })
         
     except Exception as e:
@@ -1650,6 +1652,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
