@@ -1,5 +1,5 @@
 // ================================================================================
-// HELPERS.JS - Streamlined Version
+// HELPERS.JS - Cleaned Version (Toast functionality moved to toast.js)
 // Handles: UI utilities, storage, animations, overlays, responsive helpers
 // ================================================================================
 
@@ -13,17 +13,11 @@ export const HelpersModule = (function() {
     // PRIVATE STATE
     // ================================
     const state = {
-        activeToasts: new Set(),
-        loadingToastId: null,
         resizeTimeout: null,
         scrollPositions: new Map()
     };
     
     const config = {
-        toast: {
-            duration: Constants.UI.TOAST_DURATION,
-            animationDuration: Constants.UI.ANIMATION_DURATION
-        },
         debounce: {
             resize: 250,
             scroll: 150
@@ -34,7 +28,8 @@ export const HelpersModule = (function() {
     // MODULE GETTERS
     // ================================
     const modules = {
-        get tracking() { return window.App?.getModule('tracking'); }
+        get tracking() { return window.App?.getModule('tracking'); },
+        get toast() { return window.App?.getModule('toast'); }
     };
     
     // ================================
@@ -163,11 +158,13 @@ export const HelpersModule = (function() {
         
         const elements = {
             hero: document.querySelector('.hero-section'),
-            search: document.querySelector('.search-section')
+            search: document.querySelector('.search-section'),
+            community: document.querySelector('.community-home')
         };
         
         if (elements.hero) elements.hero.style.display = 'block';
         if (elements.search) elements.search.style.display = 'flex';
+        if (elements.community) elements.community.style.display = 'block';
         
         window.App.setState(STATE_KEYS.CURRENT_VIEW, 'home');
         updateNavigationState();
@@ -426,204 +423,45 @@ export const HelpersModule = (function() {
     };
     
     // ================================
-    // TOAST SYSTEM - FIXED VERSION
+    // TOAST LEGACY SUPPORT
+    // These just redirect to the toast module for backwards compatibility
     // ================================
-    const createToast = (id, message, type) => {
-        const toast = document.createElement('div');
-        toast.id = id;
-        toast.className = `toast toast-${type}`;
-        
-        const icons = {
-            loading: '<div class="spinner"></div>',
-            success: '✅',
-            error: '❌',
-            info: 'ℹ️',
-            warning: '⚠️'
-        };
-        
-        const icon = icons[type] || '';
-        toast.innerHTML = `
-            <div class="toast-content">
-                ${icon ? `<span class="toast-icon">${icon}</span>` : ''}
-                <span class="toast-message">${escapeHtml(message)}</span>
-            </div>
-        `;
-        
-        return toast;
+    const showToast = (message, type, duration) => {
+        return modules.toast?.show(message, type, { duration });
     };
     
-    const showToast = (message, type = 'info', duration = config.toast.duration) => {
-        // Clear any existing toasts of the same type
-        document.querySelectorAll(`.toast-${type}`).forEach(toast => toast.remove());
-        
-        const toastId = `toast-${Date.now()}`;
-        const toast = createToast(toastId, message, type);
-        
-        document.body.appendChild(toast);
-        state.activeToasts.add(toastId);
-        
-        // Force reflow then animate in
-        toast.offsetHeight;
-        toast.classList.add('show');
-        
-        if (duration > 0) {
-            setTimeout(() => hideToast(toastId), duration);
-        }
-        
-        return toastId;
+    const showSuccessToast = (message) => {
+        return modules.toast?.success(message);
     };
     
-    const hideToast = (toastId) => {
-        const toast = document.getElementById(toastId);
-        if (!toast) return;
-        
-        toast.classList.remove('show');
-        toast.classList.add('hide');
-        
-        setTimeout(() => {
-            if (toast && toast.parentNode) {
-                toast.remove();
-            }
-            state.activeToasts.delete(toastId);
-        }, config.toast.animationDuration);
+    const showErrorToast = (message) => {
+        return modules.toast?.error(message);
     };
     
-    const showLoadingToast = (message = 'Loading...', minDelay = 500) => {
-        // ALWAYS clean up any existing loading toast
-        hideLoadingToast();
-        
-        // Track if we should cancel this toast
-        let isCancelled = false;
-        let toastId = null;
-        let timeoutId = null;
-        
-        // Don't show on mobile for quick operations
-        if (isMobile() && minDelay < 1000) {
-            return { 
-                hide: () => {
-                    isCancelled = true;
-                }
-            };
-        }
-        
-        // Only show after delay
-        timeoutId = setTimeout(() => {
-            if (!isCancelled) {
-                toastId = showToast(message, 'loading', 0);
-                state.loadingToastId = toastId;
-            }
-        }, minDelay);
-        
-        // Return control object
-        return {
-            hide: () => {
-                isCancelled = true;
-                
-                // Clear the timeout if it hasn't fired
-                if (timeoutId) {
-                    clearTimeout(timeoutId);
-                }
-                
-                // Remove the toast if it exists
-                if (toastId) {
-                    hideToast(toastId);
-                }
-                
-                // Clear state
-                state.loadingToastId = null;
-                
-                // Nuclear cleanup
-                setTimeout(() => {
-                    document.querySelectorAll('.toast-loading').forEach(t => t.remove());
-                }, 100);
-            }
-        };
+    const showLoadingToast = (message) => {
+        console.warn('⚠️ Loading toasts are deprecated. Use proper loading UI instead.');
+        return { hide: () => {} };
     };
     
     const hideLoadingToast = () => {
-        // Kill the tracked one
-        if (state.loadingToastId) {
-            const toast = document.getElementById(state.loadingToastId);
-            if (toast) toast.remove();
-            state.loadingToastId = null;
-        }
-        
-        // Nuclear option - kill ALL loading toasts
-        document.querySelectorAll('.toast-loading').forEach(toast => {
-            toast.remove();
-        });
-        
-        // Also kill any toast with these phrases
-        document.querySelectorAll('.toast').forEach(toast => {
-            const text = toast.textContent || '';
-            if (text.includes('Finding') || text.includes('Loading') || text.includes('Searching')) {
-                toast.remove();
-            }
-        });
-        
-        // Clear from active toasts set
-        state.activeToasts.forEach(id => {
-            const toast = document.getElementById(id);
-            if (toast && toast.classList.contains('toast-loading')) {
-                state.activeToasts.delete(id);
-            }
-        });
-    };
-
-    const updateToastMessage = (toastId, message) => {
-        const toast = document.getElementById(toastId);
-        if (toast) {
-            const messageEl = toast.querySelector('.toast-message');
-            if (messageEl) messageEl.textContent = message;
-        }
+        console.warn('⚠️ Loading toasts are deprecated.');
     };
     
-    // Shorthand methods
-    const showSuccessToast = (message) => showToast(message, 'success');
-    const showErrorToast = (message) => showToast(message, 'error');
-
-    // Add a nuclear cleanup function
     const clearAllToasts = () => {
-        // Remove ALL toasts
-        document.querySelectorAll('.toast, [class*="toast"]').forEach(toast => {
-            toast.remove();
-        });
-        
-        // Clear state
-        state.activeToasts.clear();
-        state.loadingToastId = null;
+        return modules.toast?.clear();
     };
-
-// ================================
-// INITIALIZATION - WITH CLEANUP
-// ================================
-const init = () => {
-    console.log('🔧 Initializing Helpers Module');
     
-    // Clean up any stuck toasts on init
-    clearAllToasts();
-    
-    setupEventListeners();
-    initializeViewport();
-    
-    // Periodic cleanup for stuck toasts (every 30 seconds)
-    setInterval(() => {
-        // Only clean up old loading toasts
-        document.querySelectorAll('.toast-loading').forEach(toast => {
-            const toastId = toast.id;
-            if (toastId) {
-                const timestamp = parseInt(toastId.split('-')[1]) || 0;
-                const age = Date.now() - timestamp;
-                if (age > 30000) { // Over 30 seconds old
-                    console.log('🧹 Cleaning stuck toast');
-                    toast.remove();
-                }
-            }
-        });
-    }, 30000);
-    
-    console.log('✅ Helpers Module initialized');
-};
+    // ================================
+    // INITIALIZATION
+    // ================================
+    const init = () => {
+        console.log('🔧 Initializing Helpers Module');
+        
+        setupEventListeners();
+        initializeViewport();
+        
+        console.log('✅ Helpers Module initialized');
+    };
     
     // ================================
     // PUBLIC API
@@ -631,15 +469,13 @@ const init = () => {
     return {
         init,
         
-        // Toast system
-        createToast,
+        // Toast legacy support (redirects to toast module)
         showToast,
-        hideToast,
+        showSuccessToast,
+        showErrorToast,
         showLoadingToast,
         hideLoadingToast,
         clearAllToasts,
-        showSuccessToast,
-        showErrorToast,
         
         // Overlay management
         showOverlay,
@@ -691,3 +527,6 @@ if (document.readyState === 'loading') {
 } else {
     HelpersModule.init();
 }
+
+// Make it globally available for legacy code
+window.HelpersModule = HelpersModule;
