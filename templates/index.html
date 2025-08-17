@@ -453,6 +453,44 @@
                 </div>
             </div>
         </div>
+
+        <!-- Status Prompt After Beer Report Modal -->
+        <div id="statusPromptAfterBeerModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>🎯 One More Thing!</h2>
+                    <button class="modal-close" data-action="close-modal">&times;</button>
+                </div>
+                
+                <div class="modal-body" style="text-align: center; padding: 2rem;">
+                    <p style="font-size: 1.1rem; margin-bottom: 1.5rem;">
+                        Thanks for adding that beer! 🍺
+                    </p>
+                    
+                    <p style="margin-bottom: 2rem;">
+                        <strong>Quick question:</strong> Is GF beer currently available at this venue?
+                    </p>
+                    
+                    <div class="status-quick-options" style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                        <button class="btn btn-success" data-action="quick-update-status" data-status="currently" style="flex: 1; min-width: 150px;">
+                            ✅ Yes, Available Now
+                        </button>
+                        
+                        <button class="btn btn-secondary" data-action="quick-update-status" data-status="not_currently" style="flex: 1; min-width: 150px;">
+                            ❌ Not Right Now
+                        </button>
+                        
+                        <button class="btn btn-outline" data-action="skip-status-prompt" style="flex: 1; min-width: 150px;">
+                            🤷 Not Sure / Skip
+                        </button>
+                    </div>
+                    
+                    <p style="margin-top: 2rem; font-size: 0.9rem; opacity: 0.7;">
+                        This helps other coeliacs know if they can get GF beer there today!
+                    </p>
+                </div>
+            </div>
+        </div>
     
         <div id="resultsOverlay" class="overlay results-overlay">
             <div class="results-container">
@@ -1283,6 +1321,7 @@
         </script>
     </body>
 </html>
+
 
 
 
