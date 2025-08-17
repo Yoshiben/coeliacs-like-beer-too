@@ -921,13 +921,25 @@ const App = {
                 });
                 
                 if (response.ok) {
-                    modules.toast?.success('✅ Perfect! Status updated. Double thanks!');
+                    modules.toast?.success('🎉 Beer added + status updated! You are a legend! 🍺⭐');
+                    
+                    // Update the venue in state
+                    if (statusPromptVenue) {
+                        window.App.setState('currentVenue', {
+                            ...statusPromptVenue,
+                            gf_status: status
+                        });
+                    }
                     
                     // Award extra points
                     const communityHub = modules.communityHub || window.App?.getModule('communityHub');
                     if (communityHub?.isUserActive()) {
                         communityHub.trackAction('STATUS_UPDATE', { venue: statusPromptVenue.venue_name });
                     }
+                    
+                    // DON'T show the beer details prompt - they just added a beer!
+                    // Just clear the state and we're done
+                    window.App.setState('statusPromptVenue', null);
                 }
             } catch (error) {
                 console.error('Failed to update status:', error);
