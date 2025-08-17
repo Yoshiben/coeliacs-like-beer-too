@@ -462,15 +462,15 @@
                     </p>
                     
                     <p style="margin-bottom: 2rem;">
-                        <strong>Quick question:</strong> Is GF beer currently available at this venue?
+                        <strong>Quick question:</strong> Is GF beer currently available at <span id="statusPromptVenueName" style="font-weight: bold;">this venue</span>?
                     </p>
                     
                     <div class="status-quick-options" style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                        <button class="btn btn-success" data-action="quick-update-status" data-status="currently" style="flex: 1; min-width: 150px;">
+                        <button class="btn btn-success status-prompt-btn" data-action="quick-status-update" data-status="currently" style="flex: 1; min-width: 150px;">
                             ✅ Yes, Available Now
                         </button>
                         
-                        <button class="btn btn-secondary" data-action="quick-update-status" data-status="not_currently" style="flex: 1; min-width: 150px;">
+                        <button class="btn btn-secondary status-prompt-btn" data-action="quick-status-update" data-status="not_currently" style="flex: 1; min-width: 150px;">
                             ❌ Not Right Now
                         </button>
                         
@@ -1319,6 +1319,7 @@
         
     </body>
 </html>
+
 
 
 
