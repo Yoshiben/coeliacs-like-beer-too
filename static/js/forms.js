@@ -691,9 +691,9 @@ export const FormModule = (() => {
             
             this.selectedStatus = null;
             
-            const venueNameEl = document.getElementById('statusVenueName');
-            if (venueNameEl) {
-                venueNameEl.textContent = this.currentVenue.name;
+            const venueNameEl = document.getElementById('statusPromptVenueName');
+            if (venueNameEl && venue) {
+                venueNameEl.textContent = venue.venue_name || 'this venue';
             }
             
             modules.modalManager ? 
