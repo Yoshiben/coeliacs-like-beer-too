@@ -2,6 +2,9 @@
    DESIGN SYSTEM - CSS VARIABLES
    ================================ */
 :root {
+
+   --nav-height: clamp(56px, 8vh, 81px);
+   
    /* Z-Index Scale */
    --z-base: 1;
    --z-overlay: 1000;
@@ -163,6 +166,8 @@ body {
    overflow: hidden;
    display: flex;
    flex-direction: column;
+   padding-top: var(--nav-height);
+   padding-bottom: var(--nav-height);
 }
 
 html {
@@ -179,7 +184,7 @@ html {
    position: fixed;
    top: 0;
    left: 0;
-   padding: 8vh 0;
+/*    padding: 8vh 0; */
    width: 100%;
    height: 100vh;  
    height: 100dvh;
@@ -368,8 +373,7 @@ html {
    top: 0;
    left: 0;
    right: 0;
-   height: 8vh;
-   height: 8dvh;
+   height: var(--nav-height);
    background: var(--primary-gradient);
    z-index: var(--z-navigation) !important;
    box-shadow: var(--shadow-sm);
@@ -454,8 +458,7 @@ body.page-breweries .nav-back-btn { display: flex !important; }
    z-index: var(--z-navigation);
    box-shadow: var(--shadow);
    backdrop-filter: blur(10px);
-   height: 8vh;
-   height: 8dvh;
+   height: var(--nav-height);
    width: 100%;
 }
 .nav-item {
@@ -622,8 +625,6 @@ body.page-breweries .nav-back-btn { display: flex !important; }
    overflow-y: auto;
    -webkit-overflow-scrolling: touch;
    background: var(--bg-home);
-   padding-bottom: 8vh;
-   padding-top: 8vh;
    position: relative;
    z-index: 1;
 }
