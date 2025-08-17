@@ -630,18 +630,10 @@ export const SearchModule = (function() {
         let loadingToast = null;
         
         try {
-            // Only show loading for slow connections
-            loadingToast = utils.showLoadingToast('Loading venue details...', 1000);
-            
             const results = await modules.api.searchVenues({ 
                 venueId: venueId
             });
             const venues = Array.isArray(results) ? results : results.venues;
-            
-            // ALWAYS hide the loading toast
-            if (loadingToast && loadingToast.hide) {
-                loadingToast.hide();
-            }
             
             if (venues && venues.length > 0) {
                 const venue = venues[0];
