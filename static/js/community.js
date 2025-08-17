@@ -489,7 +489,8 @@ export const CommunityModule = (() => {
             modules.modalManager.closeAll();
         }
         
-        modules.helpers?.showLoadingToast('Finding GF beer near you...');
+        // DON'T show a loading toast here - let the search module handle it
+        // The search module already shows its own loading states
         
         try {
             const searchModule = modules.search;
@@ -497,13 +498,13 @@ export const CommunityModule = (() => {
                 throw new Error('Search module not loaded');
             }
             
+            // Just call the search - it handles its own loading UI
             await searchModule.searchNearbyWithDistance(5);
             
             modules.tracking?.trackEvent('quick_nearby', 'Community', 'homepage');
             
         } catch (error) {
             console.error('❌ Quick nearby error:', error);
-            modules.helpers?.hideLoadingToast();
             modules.helpers?.showToast('Could not get location. Try searching by area instead.', 'error');
             
             if (modules.modalManager) {
