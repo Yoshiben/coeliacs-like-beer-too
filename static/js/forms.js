@@ -263,6 +263,12 @@ export const FormModule = (() => {
                 venueNameEl.textContent = venue.venue_name || venue.name || 'this venue';
             }
             
+            // IMPORTANT: Set venue ID on all status buttons
+            const statusButtons = document.querySelectorAll('.status-prompt-btn');
+            statusButtons.forEach(btn => {
+                btn.dataset.venueId = venue.venue_id;
+            });
+            
             // Now open the correct status prompt modal
             modalManager?.open('statusPromptAfterBeerModal');
         }, 300);
