@@ -194,6 +194,8 @@ html {
    z-index: var(--z-modal-backdrop);
    overflow: hidden;
    display: none;
+   padding-top: var(--nav-height);
+   padding-bottom: var(--nav-height);
 }
 
 .overlay.active {
