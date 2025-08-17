@@ -758,7 +758,11 @@ export const FormModule = (() => {
                 utils.showToast('✅ Status updated successfully!');
                 modules.tracking?.trackEvent('gf_status_updated', 'Form', this.selectedStatus);
                 
-                if (['always_tap_cask', 'always_bottle_can', 'currently'].includes(this.selectedStatus)) {
+                // CHECK: Did we come from the beer report flow?
+                const cameFromBeerReport = window.App.getState('statusPromptVenue') !== null;
+                
+                // Only show beer details prompt if NOT from beer report flow
+                if (!cameFromBeerReport && ['always_tap_cask', 'always_bottle_can', 'currently'].includes(this.selectedStatus)) {
                     setTimeout(() => {
                         modules.modalManager ? 
                             modules.modalManager.open('beerDetailsPromptModal') :
