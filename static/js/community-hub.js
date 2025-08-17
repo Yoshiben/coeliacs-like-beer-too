@@ -1,5 +1,5 @@
 // ================================================================================
-// COMMUNITY-HUB.JS - Community & Gamification System
+// COMMUNITY-HUB.JS - Community & Gamification System (FIXED)
 // Handles: Points, badges, leaderboards, impact tracking, shop integration
 // ================================================================================
 
@@ -40,6 +40,9 @@ export const CommunityHubModule = (() => {
         LOCAL_HERO: { id: 'local_hero', name: 'Local Hero', icon: '📍', points: 75 }
     };
     
+    // Level thresholds
+    const LEVEL_THRESHOLDS = [0, 50, 150, 300, 500, 800, 1200, 1700, 2500, 3500, 5000, 7500, 10000];
+    
     // ================================
     // MODULE GETTERS
     // ================================
@@ -47,7 +50,8 @@ export const CommunityHubModule = (() => {
         get api() { return window.App?.getModule('api'); },
         get modalManager() { return window.App?.getModule('modalManager'); },
         get helpers() { return window.App?.getModule('helpers'); },
-        get tracking() { return window.App?.getModule('tracking'); }
+        get tracking() { return window.App?.getModule('tracking'); },
+        get toast() { return window.App?.getModule('toast'); }
     };
     
     // ================================
@@ -64,9 +68,8 @@ export const CommunityHubModule = (() => {
     };
 
     // ================================
-    // MISSING FUNCTIONS TO ADD
+    // HELPER FUNCTIONS
     // ================================
-    
     const setupEventListeners = () => {
         // Just a placeholder for now - will add real listeners when needed
         console.log('✅ Community Hub event listeners setup');
@@ -78,7 +81,7 @@ export const CommunityHubModule = (() => {
     };
     
     const showLevelUpNotification = (level) => {
-        modules.helpers?.showSuccessToast(`🎉 Level ${level} reached!`);
+        modules.toast?.success(`🎉 Level ${level} reached!`);
     };
     
     const getLevelName = (level) => {
@@ -86,188 +89,28 @@ export const CommunityHubModule = (() => {
         return names[level - 1] || 'Unknown';
     };
     
-    const renderLevelProgress = () => {
-        if (!state.userProfile) return '';
+    const calculateProgress = () => {
+        if (!state.userProfile) return 0;
         
         const currentLevel = state.userProfile.level;
-        const thresholds = [0, 100, 250, 500, 1000, 2000, 5000, 10000];
-        const currentThreshold = thresholds[currentLevel - 1];
-        const nextThreshold = thresholds[currentLevel] || 10000;
+        const currentThreshold = LEVEL_THRESHOLDS[currentLevel - 1] || 0;
+        const nextThreshold = LEVEL_THRESHOLDS[currentLevel] || 10000;
+        
         const progress = ((state.userProfile.points - currentThreshold) / (nextThreshold - currentThreshold)) * 100;
+        return Math.min(Math.max(progress, 0), 100);
+    };
+    
+    const calculatePointsToNext = () => {
+        if (!state.userProfile) return 0;
         
-        return `
-            <div class="level-banner">
-                <div class="level-header">
-                    <div class="level-title">Level ${currentLevel}: ${getLevelName(currentLevel)}</div>
-                    <div class="level-badge">Next: ${getLevelName(currentLevel + 1)}</div>
-                </div>
-                <div class="level-progress">
-                    <div class="level-fill" style="width: ${progress}%"></div>
-                </div>
-                <div class="level-text">${nextThreshold - state.userProfile.points} points to next level</div>
-            </div>
-        `;
+        const nextThreshold = LEVEL_THRESHOLDS[state.userProfile.level] || 10000;
+        return Math.max(0, nextThreshold - state.userProfile.points);
     };
     
-    const renderOnboarding = (container) => {
-        container.innerHTML = `
-            <div style="padding: 2rem; text-align: center;">
-                <h2>👋 Welcome to the Community Hub!</h2>
-                <p>Set a nickname to start tracking your contributions</p>
-                <button class="btn btn-primary" data-action="save-nickname">Set Nickname</button>
-            </div>
-        `;
-    };
-    
-    const renderRecentAchievements = () => {
-        if (!state.userProfile || state.userProfile.achievements.length === 0) {
-            return '<p style="padding: 1rem; text-align: center; color: var(--text-secondary);">No achievements yet - keep contributing!</p>';
-        }
-        
-        return `
-            <div class="achievements-grid">
-                ${state.userProfile.achievements.map(id => {
-                    const achievement = ACHIEVEMENTS[id.toUpperCase()];
-                    return achievement ? `
-                        <div class="achievement-badge">
-                            <span>${achievement.icon}</span>
-                            <span>${achievement.name}</span>
-                        </div>
-                    ` : '';
-                }).join('')}
-            </div>
-        `;
-    };
-
-    // In community-hub.js or community.js
-    const openCommunityHub = () => {
-        const isNewUser = window.App.getState('isNewUser');
-        const nickname = window.App.getState('userNickname');
-        
-        if (isNewUser && nickname) {
-            // Show special first-time community experience
-            showFirstCommunityVisit(nickname);
-        } else if (!nickname) {
-            // Prompt to create account for full features
-            showJoinCommunityPrompt();
-        } else {
-            // Normal community hub
-            showCommunityHub();
-        }
-    };
-    
-    const showFirstCommunityVisit = (nickname) => {
-        // Create a special welcome overlay
-        const welcomeHTML = `
-            <div class="community-first-visit">
-                <h2>Welcome to the Community, ${nickname}! 🎉</h2>
-                <p>You've got 10 points to start!</p>
-                
-                <div class="community-intro-cards">
-                    <div class="intro-card">
-                        <span class="card-emoji">🏆</span>
-                        <h3>Leaderboard</h3>
-                        <p>See top contributors</p>
-                    </div>
-                    <div class="intro-card">
-                        <span class="card-emoji">📈</span>
-                        <h3>Your Stats</h3>
-                        <p>Track your impact</p>
-                    </div>
-                    <div class="intro-card">
-                        <span class="card-emoji">🎖️</span>
-                        <h3>Badges</h3>
-                        <p>Unlock achievements</p>
-                    </div>
-                </div>
-                
-                <button class="btn btn-primary" onclick="showFullCommunityHub()">
-                    Explore Community Hub
-                </button>
-            </div>
-        `;
-        // Display this
-    };
-    
-    const renderLeaderboardTab = () => {
-        return `
-            <div class="leaderboard-section">
-                <div class="leaderboard-header">
-                    <div class="leaderboard-title">🏆 Community Champions</div>
-                </div>
-                <div class="leaderboard-list">
-                    ${state.leaderboard.map((user, index) => `
-                        <div class="leader-row ${user.nickname === state.userProfile?.nickname ? 'you' : ''}">
-                            <div class="rank ${index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : ''}">${index + 1}</div>
-                            <div class="leader-info">
-                                <div class="leader-name">${user.nickname} ${user.nickname === state.userProfile?.nickname ? '(You)' : ''}</div>
-                                <div class="leader-stats">
-                                    ${user.beer_reports > 0 ? `🍺 ${user.beer_reports} beers` : ''}
-                                    ${user.status_updates > 0 ? `✅ ${user.status_updates} updates` : ''}
-                                    ${user.venues_touched > 0 ? `📍 ${user.venues_touched} venues` : ''}
-                                </div>
-                            </div>
-                            <div class="leader-points">${user.points} pts</div>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        `;
-    };
-    
-    const renderBreweriesTab = () => {
-        return `
-            <div class="breweries-section">
-                <div class="breweries-header">
-                    <div class="breweries-title">🤝 Partner Breweries</div>
-                    <div class="breweries-subtitle">Support the breweries that support our community</div>
-                </div>
-                <div class="brewery-cards">
-                    <div class="brewery-card">
-                        <div class="brewery-logo">🌾</div>
-                        <div class="brewery-name">Coming Soon!</div>
-                        <div class="brewery-meta">We're partnering with GF breweries</div>
-                    </div>
-                </div>
-            </div>
-        `;
-    };
-    
-    const renderChallengesTab = () => {
-        return `
-            <div class="challenges-section">
-                <h3>🎯 Weekly Challenges</h3>
-                <p style="padding: 1rem; text-align: center;">Coming soon!</p>
-            </div>
-        `;
-    };
-    
-    const switchTab = (tabName) => {
-        state.currentView = tabName;
-        
-        // Load leaderboard data when switching to that tab
-        if (tabName === 'leaderboard' && state.leaderboard.length === 0) {
-            loadLeaderboard();
-        }
-        
-        const contentEl = document.getElementById('hubTabContent');
-        if (contentEl) {
-            contentEl.innerHTML = renderTabContent();
-        }
-        
-        // Update active tab
-        document.querySelectorAll('[data-hub-tab]').forEach(tab => {
-            tab.classList.toggle('active', tab.dataset.hubTab === tabName);
-        });
-    };
-    
-    const getMockLeaderboard = () => {
-        return [
-            { nickname: 'GlutenFreeGuru', updates: 142, points: 1847 },
-            { nickname: 'CoeliacExplorer', updates: 98, points: 1523 },
-            { nickname: 'BeerMapper', updates: 87, points: 1290 },
-            { nickname: state.userProfile?.nickname || 'You', updates: 23, points: 452 }
-        ];
+    const getTotalUpdates = () => {
+        if (!state.userProfile) return 0;
+        const updates = state.userProfile.updates;
+        return updates.venues + updates.beers + updates.statuses;
     };
     
     // ================================
@@ -358,43 +201,12 @@ export const CommunityHubModule = (() => {
     };
     
     const calculateLevel = (points) => {
-        // More spread out levels
-        const thresholds = [
-            0,      // Level 1: 0
-            50,     // Level 2: 50
-            150,    // Level 3: 150
-            300,    // Level 4: 300
-            500,    // Level 5: 500
-            800,    // Level 6: 800
-            1200,   // Level 7: 1200
-            1700,   // Level 8: 1700
-            2500,   // Level 9: 2500
-            3500,   // Level 10: 3500
-            5000,   // Level 11: 5000
-            7500,   // Level 12: 7500
-            10000   // Level 13: 10000
-        ];
-        
-        for (let i = thresholds.length - 1; i >= 0; i--) {
-            if (points >= thresholds[i]) {
+        for (let i = LEVEL_THRESHOLDS.length - 1; i >= 0; i--) {
+            if (points >= LEVEL_THRESHOLDS[i]) {
                 return i + 1;
             }
         }
         return 1;
-    };
-    
-    // Also update calculatePointsToNext and calculateProgress to use the same thresholds
-    const LEVEL_THRESHOLDS = [0, 50, 150, 300, 500, 800, 1200, 1700, 2500, 3500, 5000, 7500, 10000];
-    
-    const calculateProgress = () => {
-        if (!state.userProfile) return 0;
-        
-        const currentLevel = state.userProfile.level;
-        const currentThreshold = LEVEL_THRESHOLDS[currentLevel - 1] || 0;
-        const nextThreshold = LEVEL_THRESHOLDS[currentLevel] || 10000;
-        
-        const progress = ((state.userProfile.points - currentThreshold) / (nextThreshold - currentThreshold)) * 100;
-        return Math.min(Math.max(progress, 0), 100);
     };
     
     // ================================
@@ -404,7 +216,7 @@ export const CommunityHubModule = (() => {
         if (!state.userProfile) return;
         
         const updates = state.userProfile.updates;
-        const venueCount = updates.venues || 0;  // Just use venues!
+        const venueCount = updates.venues || 0;
         
         // Check each achievement
         Object.values(ACHIEVEMENTS).forEach(achievement => {
@@ -451,7 +263,17 @@ export const CommunityHubModule = (() => {
     
     // ================================
     // UI RENDERING
-    // ================================    
+    // ================================
+    const renderOnboarding = (container) => {
+        container.innerHTML = `
+            <div style="padding: 2rem; text-align: center;">
+                <h2>👋 Welcome to the Community Hub!</h2>
+                <p>Set a nickname to start tracking your contributions</p>
+                <button class="btn btn-primary" data-action="save-nickname">Set Nickname</button>
+            </div>
+        `;
+    };
+    
     const renderHub = () => {
         const container = document.getElementById('communityHubContent');
         if (!container) return;
@@ -510,36 +332,7 @@ export const CommunityHubModule = (() => {
             tab.addEventListener('click', () => switchTab(tab.dataset.hubTab));
         });
     };
-
-    const renderBadgesTab = () => {
-        const allBadges = [
-            { id: 'first_steps', name: 'First Steps', icon: '👶', description: 'Update your first venue', earned: state.userProfile.achievements.includes('first_update') },
-            { id: 'regular', name: 'Regular', icon: '⭐', description: 'Update 10 venues', earned: state.userProfile.achievements.includes('ten_updates') },
-            { id: 'explorer', name: 'Explorer', icon: '🗺️', description: 'Update 25 venues', earned: state.userProfile.achievements.includes('fifty_updates') },
-            { id: 'legend', name: 'GF Legend', icon: '👑', description: 'Update 50 venues', earned: state.userProfile.achievements.includes('hundred_updates') },
-            { id: 'nightowl', name: 'Night Owl', icon: '🦉', description: 'Update after midnight', earned: false },
-            { id: 'early_bird', name: 'Early Bird', icon: '🐦', description: 'Update before 6am', earned: false },
-            { id: 'streak_week', name: 'Week Warrior', icon: '🔥', description: '7 day streak', earned: state.userProfile.achievements.includes('week_streak') },
-        ];
-        
-        return `
-            <div class="badges-section">
-                <h3>🏅 Your Badge Collection</h3>
-                <div class="badges-grid">
-                    ${allBadges.map(badge => `
-                        <div class="badge-card ${badge.earned ? 'earned' : 'locked'}">
-                            <div class="badge-icon">${badge.icon}</div>
-                            <div class="badge-name">${badge.name}</div>
-                            <div class="badge-description">${badge.description}</div>
-                            ${badge.earned ? '<div class="badge-status">✅ Earned</div>' : '<div class="badge-status">🔒 Locked</div>'}
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        `;
-    };
     
-    // Update renderTabContent to include badges
     const renderTabContent = () => {
         switch(state.currentView) {
             case 'impact':
@@ -554,87 +347,7 @@ export const CommunityHubModule = (() => {
                 return renderImpactTab();
         }
     };
-
-    const getTotalUpdates = () => {
-        if (!state.userProfile) return 0;
-        const updates = state.userProfile.updates;
-        return updates.venues + updates.beers + updates.statuses;
-    };
-
     
-    
-    const calculatePointsToNext = () => {
-        if (!state.userProfile) return 0;
-        
-        const thresholds = [0, 100, 250, 500, 1000, 2000, 5000, 10000];
-        const nextThreshold = thresholds[state.userProfile.level] || 10000;
-        
-        return Math.max(0, nextThreshold - state.userProfile.points);
-    };
-    
-    const loadUserStats = async () => {
-        if (!state.userProfile?.nickname) return;
-        
-        console.log('📊 Loading stats for:', state.userProfile.nickname);
-        
-        try {
-            const response = await fetch(`/api/community/my-stats/${encodeURIComponent(state.userProfile.nickname)}`);
-            const data = await response.json();
-            
-            console.log('📊 Raw stats response:', data);
-            
-            if (data.success) {
-                // Update the profile with real data - CHECK THESE PROPERTY NAMES!
-                state.userProfile.updates = {
-                    venues: data.stats.venues_updated || 0,
-                    beers: data.stats.beers_reported || 0,
-                    statuses: data.stats.status_updates || 0
-                };
-                state.userProfile.points = data.stats.points || 0;
-                
-                console.log('📊 Updated profile:', state.userProfile);
-                
-                // Recalculate level based on real points
-                state.userProfile.level = calculateLevel(data.stats.points);
-                
-                // Save and re-render
-                saveUserProfile();
-                
-                // Force re-render of everything
-                renderHub();
-                
-                console.log('✅ Stats loaded and rendered');
-            }
-        } catch (error) {
-            console.error('Failed to load user stats:', error);
-        }
-    };
-    
-    // Update the open function to load real stats
-    const open = () => {
-        console.log('🏆 Opening Community Hub');
-        
-        // Clean up any lingering toasts
-        document.querySelectorAll('.toast').forEach(toast => {
-            toast.remove();
-        });
-
-        // Also hide the loading toast if it's stuck
-        const loadingToast = document.getElementById('loadingToast');
-        if (loadingToast) {
-            loadingToast.style.display = 'none';
-        }
-        
-        modules.modalManager?.open('communityHubOverlay', {
-            onOpen: () => {
-                renderHub();
-                loadUserStats();  // Load real user stats!
-                loadLeaderboard();
-            }
-        });
-    };
-    
-    // Update renderImpactTab to show real numbers
     const renderImpactTab = () => {
         const updates = state.userProfile.updates;
         
@@ -673,11 +386,138 @@ export const CommunityHubModule = (() => {
                 </div>
             </div>
         `;
-};
+    };
+    
+    const renderLeaderboardTab = () => {
+        return `
+            <div class="leaderboard-section">
+                <div class="leaderboard-header">
+                    <div class="leaderboard-title">🏆 Community Champions</div>
+                </div>
+                <div class="leaderboard-list">
+                    ${state.leaderboard.map((user, index) => `
+                        <div class="leader-row ${user.nickname === state.userProfile?.nickname ? 'you' : ''}">
+                            <div class="rank ${index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : ''}">${index + 1}</div>
+                            <div class="leader-info">
+                                <div class="leader-name">${user.nickname} ${user.nickname === state.userProfile?.nickname ? '(You)' : ''}</div>
+                                <div class="leader-stats">
+                                    ${user.beer_reports > 0 ? `🍺 ${user.beer_reports} beers` : ''}
+                                    ${user.status_updates > 0 ? `✅ ${user.status_updates} updates` : ''}
+                                    ${user.venues_touched > 0 ? `📍 ${user.venues_touched} venues` : ''}
+                                </div>
+                            </div>
+                            <div class="leader-points">${user.points} pts</div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    };
+    
+    const renderBadgesTab = () => {
+        const allBadges = [
+            { id: 'first_steps', name: 'First Steps', icon: '👶', description: 'Update your first venue', earned: state.userProfile.achievements.includes('first_update') },
+            { id: 'regular', name: 'Regular', icon: '⭐', description: 'Update 10 venues', earned: state.userProfile.achievements.includes('ten_updates') },
+            { id: 'explorer', name: 'Explorer', icon: '🗺️', description: 'Update 25 venues', earned: state.userProfile.achievements.includes('fifty_updates') },
+            { id: 'legend', name: 'GF Legend', icon: '👑', description: 'Update 50 venues', earned: state.userProfile.achievements.includes('hundred_updates') },
+            { id: 'nightowl', name: 'Night Owl', icon: '🦉', description: 'Update after midnight', earned: false },
+            { id: 'early_bird', name: 'Early Bird', icon: '🐦', description: 'Update before 6am', earned: false },
+            { id: 'streak_week', name: 'Week Warrior', icon: '🔥', description: '7 day streak', earned: state.userProfile.achievements.includes('week_streak') },
+        ];
+        
+        return `
+            <div class="badges-section">
+                <h3>🏅 Your Badge Collection</h3>
+                <div class="badges-grid">
+                    ${allBadges.map(badge => `
+                        <div class="badge-card ${badge.earned ? 'earned' : 'locked'}">
+                            <div class="badge-icon">${badge.icon}</div>
+                            <div class="badge-name">${badge.name}</div>
+                            <div class="badge-description">${badge.description}</div>
+                            ${badge.earned ? '<div class="badge-status">✅ Earned</div>' : '<div class="badge-status">🔒 Locked</div>'}
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    };
+    
+    const renderChallengesTab = () => {
+        return `
+            <div class="challenges-section">
+                <h3>🎯 Weekly Challenges</h3>
+                <p style="padding: 1rem; text-align: center;">Coming soon!</p>
+            </div>
+        `;
+    };
+    
+    const switchTab = (tabName) => {
+        state.currentView = tabName;
+        
+        // Load leaderboard data when switching to that tab
+        if (tabName === 'leaderboard' && state.leaderboard.length === 0) {
+            loadLeaderboard();
+        }
+        
+        const contentEl = document.getElementById('hubTabContent');
+        if (contentEl) {
+            contentEl.innerHTML = renderTabContent();
+        }
+        
+        // Update active tab
+        document.querySelectorAll('[data-hub-tab]').forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.hubTab === tabName);
+        });
+    };
+    
+    const getMockLeaderboard = () => {
+        return [
+            { nickname: 'GlutenFreeGuru', updates: 142, points: 1847 },
+            { nickname: 'CoeliacExplorer', updates: 98, points: 1523 },
+            { nickname: 'BeerMapper', updates: 87, points: 1290 },
+            { nickname: state.userProfile?.nickname || 'You', updates: 23, points: 452 }
+        ];
+    };
     
     // ================================
-    // LEADERBOARD
+    // API CALLS
     // ================================
+    const loadUserStats = async () => {
+        if (!state.userProfile?.nickname) return;
+        
+        console.log('📊 Loading stats for:', state.userProfile.nickname);
+        
+        try {
+            const response = await fetch(`/api/community/my-stats/${encodeURIComponent(state.userProfile.nickname)}`);
+            const data = await response.json();
+            
+            console.log('📊 Raw stats response:', data);
+            
+            if (data.success) {
+                // Update the profile with real data
+                state.userProfile.updates = {
+                    venues: data.stats.venues_updated || 0,
+                    beers: data.stats.beers_reported || 0,
+                    statuses: data.stats.status_updates || 0
+                };
+                state.userProfile.points = data.stats.points || 0;
+                
+                console.log('📊 Updated profile:', state.userProfile);
+                
+                // Recalculate level based on real points
+                state.userProfile.level = calculateLevel(data.stats.points);
+                
+                // Save and re-render
+                saveUserProfile();
+                renderHub();
+                
+                console.log('✅ Stats loaded and rendered');
+            }
+        } catch (error) {
+            console.error('Failed to load user stats:', error);
+        }
+    };
+    
     const loadLeaderboard = async () => {
         console.log('📊 Loading leaderboard...');
         try {
@@ -691,7 +531,7 @@ export const CommunityHubModule = (() => {
                 state.leaderboard = data.leaderboard;
                 console.log('📊 Loaded real leaderboard:', state.leaderboard);
                 
-                // Re-render current tab (could be impact OR leaderboard)
+                // Re-render current tab
                 const contentEl = document.getElementById('hubTabContent');
                 if (contentEl) {
                     contentEl.innerHTML = renderTabContent();
@@ -710,22 +550,26 @@ export const CommunityHubModule = (() => {
     // NOTIFICATIONS
     // ================================
     const showAchievementNotification = (achievement) => {
-        const popup = document.createElement('div');
-        popup.className = 'achievement-popup';
-        popup.innerHTML = `
-            <div class="achievement-content">
-                <div class="achievement-icon">${achievement.icon}</div>
-                <div class="achievement-text">
-                    <div class="achievement-title">${achievement.name}!</div>
-                    <div class="achievement-desc">+${achievement.points} points</div>
-                </div>
-                <button class="close-achievement" onclick="this.parentElement.parentElement.remove()">×</button>
-            </div>
-        `;
+        // Use toast module for achievement notifications
+        modules.toast?.success(`${achievement.icon} ${achievement.name}! +${achievement.points} points`);
+    };
+    
+    // ================================
+    // MAIN OPEN FUNCTION
+    // ================================
+    const open = () => {
+        console.log('🏆 Opening Community Hub');
         
-        document.body.appendChild(popup);
+        // Clean up any lingering toasts using the toast module
+        modules.toast?.clear();
         
-        setTimeout(() => popup.remove(), 5000);
+        modules.modalManager?.open('communityHubOverlay', {
+            onOpen: () => {
+                renderHub();
+                loadUserStats();
+                loadLeaderboard();
+            }
+        });
     };
     
     // ================================
