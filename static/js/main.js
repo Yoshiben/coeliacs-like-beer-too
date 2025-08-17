@@ -558,58 +558,37 @@ const App = {
             modules.search?.searchByBeer();
         },
 
-        // In your action handlers object in main.js, add:
-        'toggle-results-map': () => {
-            console.log('🗺️ Toggling results map');
-            
-            // Use window.App.getModule instead of modules
-            const mapModule = window.App.getModule('map');
-            if (!mapModule) {
-                console.error('❌ Map module not available');
+         // Map actions
+        'toggle-results-map': (el, modules) => {
+            modules.map?.toggleSearchResultsFullMap?.();
+        },
+        'toggle-venue-map': (el, modules) => {
+            App.toggleVenueDetailMap(modules);
+        },
+        'show-venue-on-map': (el, modules) => {
+            const currentVenue = App.getState(STATE_KEYS.CURRENT_VENUE);
+            if (!currentVenue || !currentVenue.latitude || !currentVenue.longitude) {
+                modules.helpers?.showToast('📍 Location not available for this venue', 'error');
                 return;
             }
             
-            const listContainer = document.getElementById('resultsListContainer');
-            const mapContainer = document.getElementById('resultsMapContainer');
-            const btnText = document.getElementById('resultsMapBtnText');
+            // Show full map
+            App.showFullMap(modules);
             
-            if (!listContainer || !mapContainer) {
-                console.error('❌ Results containers not found');
-                return;
-            }
-            
-            const isMapVisible = mapContainer.style.display !== 'none';
-            
-            if (isMapVisible) {
-                // Switch to list view
-                console.log('📋 Switching to list view');
-                listContainer.style.display = 'block';
-                mapContainer.style.display = 'none';
-                if (btnText) btnText.textContent = 'Map';
-                
-                // Clean up map
-                mapModule.cleanupResultsMap?.();
-            } else {
-                // Switch to map view
-                console.log('🗺️ Switching to map view');
-                listContainer.style.display = 'none';
-                mapContainer.style.display = 'block';
-                if (btnText) btnText.textContent = 'List';
-                
-                // Initialize map with search results
-                const searchModule = window.App.getModule('search');
-                const venues = searchModule?.getCurrentResults?.() || [];
-                
-                if (venues.length > 0) {
-                    mapModule.initResultsMap?.(venues);
-                } else {
-                    console.warn('⚠️ No venues to display on map');
+            // After map loads, center on this venue
+            setTimeout(() => {
+                const map = App.getState(STATE_KEYS.MAP_DATA.FULL_UK_MAP);
+                if (map) {
+                    map.setView([parseFloat(currentVenue.latitude), parseFloat(currentVenue.longitude)], 16);
+                    
+                    // Find and open the venue's popup
+                    map.eachLayer(layer => {
+                        if (layer.options && layer.options.venueId === currentVenue.venue_id) {
+                            layer.openPopup();
+                        }
+                    });
                 }
-            }
-            
-            // Track the action
-            const trackingModule = window.App.getModule('tracking');
-            trackingModule?.trackEvent('toggle_results_map', 'UI', isMapVisible ? 'to_list' : 'to_map');
+            }, 500);
         },
         
         // Navigation actions
