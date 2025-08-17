@@ -906,8 +906,13 @@ const App = {
             
             console.log('🎯 Quick status update:', status, 'for venue:', statusPromptVenue.venue_id);
             
-            // Close the prompt modal
+            // Close ALL status modals to prevent any confirmations
             modules.modalManager?.close('statusPromptAfterBeerModal');
+            modules.modalManager?.closeGroup('status'); // Close entire status group
+            
+            // Block the confirmation modal from opening
+            modules.modalManager?.block('gfStatusConfirmModal');
+            modules.modalManager?.block('beerDetailsPromptModal');
             
             try {
                 const response = await fetch('/api/update-gf-status', {
@@ -937,13 +942,22 @@ const App = {
                         communityHub.trackAction('STATUS_UPDATE', { venue: statusPromptVenue.venue_name });
                     }
                     
-                    // DON'T show the beer details prompt - they just added a beer!
-                    // Just clear the state and we're done
+                    // Clear the state
                     window.App.setState('statusPromptVenue', null);
+                    
+                    // Unblock the modals after a delay
+                    setTimeout(() => {
+                        modules.modalManager?.unblock('gfStatusConfirmModal');
+                        modules.modalManager?.unblock('beerDetailsPromptModal');
+                    }, 1000);
                 }
             } catch (error) {
                 console.error('Failed to update status:', error);
                 modules.toast?.error('Failed to update status');
+                
+                // Unblock on error too
+                modules.modalManager?.unblock('gfStatusConfirmModal');
+                modules.modalManager?.unblock('beerDetailsPromptModal');
             }
         },
         
