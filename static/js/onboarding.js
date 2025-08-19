@@ -853,7 +853,6 @@ Thank you for joining our community!
         modal.className = 'onboarding-modal';
         modal.innerHTML = `
             <div class="onboarding-modal-content">
-                ${closeable ? '<button class="modal-close" onclick="OnboardingFlow.closeModal(\'' + id + '\')">&times;</button>' : ''}
                 ${content}
             </div>
         `;
