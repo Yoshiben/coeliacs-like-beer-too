@@ -244,18 +244,16 @@
 
 /* Nickname Selection Styles */
 .nickname-content {
-    padding: 2rem;
+    padding: var(--space-xl);
 }
 
 .nickname-header {
     text-align: center;
-    margin-bottom: 2rem;
 }
 
 .nickname-header h2 {
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
-    color: var(--text-primary);
+   color: var(--text-primary);
+   margin: 0;
 }
 
 .nickname-header p {
@@ -301,7 +299,7 @@
 }
 
 .suggestions-section {
-    margin-bottom: 1.5rem;
+   display: flex;
 }
 
 .suggestions-section p {
@@ -311,9 +309,10 @@
 }
 
 .suggestion-chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
+   display: flex;
+   flex-wrap: wrap;
+   gap: 0.5rem;
+   justify-content: space-around;
 }
 
 .chip {
@@ -334,7 +333,7 @@
 }
 
 .avatar-section {
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--space-sm);
 }
 
 .avatar-section p {
@@ -342,7 +341,6 @@
     color: var(--text-secondary);
     margin-bottom: 0.75rem;
 }
-
 .avatar-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -370,13 +368,14 @@
 }
 
 .privacy-section {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
-    padding: 1rem;
-    background: var(--bg-secondary);
-    border-radius: 12px;
+   display: grid;
+   grid-template-columns: repeat(2, 1fr);
+   gap: 0.5rem;
+   margin-bottom: var(--space-sm);
+   padding: 1rem;
+   background: var(--bg-secondary);
+   border-radius: var(--radius);
+}
 }
 
 .privacy-item {
@@ -650,7 +649,6 @@
     }
     
     .age-gate-content,
-    .nickname-content,
     .benefits-content {
         padding: 1.5rem;
     }
@@ -673,10 +671,6 @@
     
     .age-gate-buttons .btn {
         width: 100%;
-    }
-    
-    .privacy-section {
-        grid-template-columns: 1fr;
     }
     
     .nickname-actions {
