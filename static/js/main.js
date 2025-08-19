@@ -1700,6 +1700,156 @@ const App = {
             modules.tracking?.trackEvent('go_to_location', 'Map', 'button_click');
         }
     },
+
+    // Enhanced Location Handling for PWA
+    const LocationManager = {
+        
+        // Check if running as PWA for better permissions
+        isPWA() {
+            return window.matchMedia('(display-mode: standalone)').matches || 
+                   window.navigator.standalone ||
+                   document.referrer.includes('android-app://');
+        },
+        
+        // Enhanced permission check
+        async checkPermissions() {
+            if ('permissions' in navigator) {
+                try {
+                    const result = await navigator.permissions.query({name: 'geolocation'});
+                    console.log('📍 Location permission:', result.state);
+                    return result.state;
+                } catch (error) {
+                    console.log('⚠️ Permissions API not fully supported');
+                }
+            }
+            return 'unknown';
+        },
+        
+        // Request location with PWA optimizations
+        async requestLocation(options = {}) {
+            const defaultOptions = {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 300000  // 5 minutes cache
+            };
+            
+            const locationOptions = { ...defaultOptions, ...options };
+            
+            return new Promise((resolve, reject) => {
+                if (!navigator.geolocation) {
+                    reject(new Error('Geolocation not supported'));
+                    return;
+                }
+                
+                // Show different UI for PWA vs browser
+                if (this.isPWA()) {
+                    console.log('🚀 PWA mode: Enhanced location access');
+                    // PWA mode typically has more persistent permissions
+                } else {
+                    console.log('🌐 Browser mode: Standard location access');
+                    // Show install prompt if permission issues persist
+                    this.suggestPWAInstall();
+                }
+                
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        console.log('✅ Location obtained:', position.coords);
+                        resolve(position);
+                    },
+                    (error) => {
+                        console.error('❌ Location error:', error);
+                        
+                        // Handle different error types
+                        switch(error.code) {
+                            case error.PERMISSION_DENIED:
+                                if (!this.isPWA()) {
+                                    this.showPWALocationBenefit();
+                                }
+                                reject(new Error('Location access denied'));
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                reject(new Error('Location unavailable'));
+                                break;
+                            case error.TIMEOUT:
+                                reject(new Error('Location request timed out'));
+                                break;
+                            default:
+                                reject(new Error('Unknown location error'));
+                        }
+                    },
+                    locationOptions
+                );
+            });
+        },
+        
+        // Show PWA benefits for location
+        showPWALocationBenefit() {
+            // Only show if install prompt is available
+            if (window.deferredPrompt) {
+                const modal = document.createElement('div');
+                modal.className = 'pwa-location-modal';
+                modal.innerHTML = `
+                    <div class="modal-backdrop" onclick="this.parentElement.remove()">
+                        <div class="modal-content" onclick="event.stopPropagation()">
+                            <h3>📱 Better Location Access</h3>
+                            <p>Installing as an app gives you:</p>
+                            <ul>
+                                <li>✅ More reliable location permissions</li>
+                                <li>✅ Faster app loading</li>
+                                <li>✅ Works offline</li>
+                                <li>✅ No browser bars</li>
+                            </ul>
+                            <div class="modal-actions">
+                                <button onclick="this.closest('.pwa-location-modal').remove()" 
+                                        class="btn btn-secondary">Not Now</button>
+                                <button onclick="window.deferredPrompt?.prompt(); this.closest('.pwa-location-modal').remove()" 
+                                        class="btn btn-primary">Install App</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                document.body.appendChild(modal);
+            }
+        },
+        
+        // Suggest PWA for location issues
+        suggestPWAInstall() {
+            // Only suggest if we have install prompt and haven't dismissed
+            if (window.deferredPrompt && !sessionStorage.getItem('pwa-dismissed')) {
+                setTimeout(() => {
+                    const suggestion = document.createElement('div');
+                    suggestion.innerHTML = `
+                        <div style="
+                            position: fixed;
+                            bottom: calc(var(--nav-height) + 16px);
+                            left: 16px;
+                            right: 16px;
+                            background: #fbbf24;
+                            color: #92400e;
+                            padding: 12px;
+                            border-radius: 12px;
+                            z-index: 1500;
+                            font-size: 0.9rem;
+                            text-align: center;
+                        ">
+                            💡 <strong>Tip:</strong> Install as app for better location access
+                            <button onclick="window.deferredPrompt?.prompt(); this.parentElement.remove()" 
+                                    style="margin-left: 8px; background: #92400e; color: white; border: none; padding: 4px 8px; border-radius: 8px; font-size: 0.8rem;">
+                                Install
+                            </button>
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(suggestion);
+                    setTimeout(() => suggestion.remove(), 8000);
+                }, 2000);
+            }
+        }
+    };
+    
+    // Export for use in your existing code
+    window.LocationManager = LocationManager;
     
     // ================================
     // VENUE ACTIONS
