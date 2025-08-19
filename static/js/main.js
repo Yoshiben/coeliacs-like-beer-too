@@ -1927,6 +1927,166 @@ const LocationManager = {
             }, 2000);
         }
     }
+    // iOS-specific location help
+    showIOSLocationHelp() {
+        const modal = document.createElement('div');
+        modal.className = 'ios-location-modal';
+        modal.innerHTML = `
+            <div class="modal-backdrop" onclick="this.parentElement.remove()">
+                <div class="modal-content" onclick="event.stopPropagation()">
+                    <h3>📍 Enable Location on iPhone</h3>
+                    <p>To find venues near you:</p>
+                    
+                    <div class="ios-location-steps">
+                        <div class="location-step">
+                            <span class="step-icon">⚙️</span>
+                            <span>Open iPhone <strong>Settings</strong></span>
+                        </div>
+                        <div class="location-step">
+                            <span class="step-icon">🌐</span>
+                            <span>Tap <strong>Safari</strong></span>
+                        </div>
+                        <div class="location-step">
+                            <span class="step-icon">📍</span>
+                            <span>Tap <strong>Location</strong></span>
+                        </div>
+                        <div class="location-step">
+                            <span class="step-icon">✅</span>
+                            <span>Select <strong>"Ask Next Time"</strong></span>
+                        </div>
+                    </div>
+                    
+                    <div class="ios-tip">
+                        💡 <strong>Better option:</strong> Install as app for more reliable location access!
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button onclick="this.closest('.ios-location-modal').remove()" 
+                                class="btn btn-secondary">Use Postcode Instead</button>
+                        ${!window.isStandalone() ? 
+                            '<button onclick="showIOSInstallGuide(); this.closest(\'.ios-location-modal\').remove()" class="btn btn-primary">Install as App</button>' : 
+                            '<button onclick="this.closest(\'.ios-location-modal\').remove()" class="btn btn-primary">Try Again</button>'
+                        }
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Add iOS-specific modal styles
+        const style = document.createElement('style');
+        style.textContent = `
+            .ios-location-modal {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100vh;
+                background: rgba(0,0,0,0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+            }
+            
+            .ios-location-modal .modal-content {
+                background: white;
+                border-radius: 16px;
+                padding: 1.5rem;
+                max-width: 350px;
+                width: 90%;
+                text-align: center;
+            }
+            
+            .ios-location-steps {
+                text-align: left;
+                margin: 1rem 0;
+            }
+            
+            .location-step {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                padding: 8px 0;
+                border-bottom: 1px solid #f0f0f0;
+            }
+            
+            .location-step:last-child {
+                border-bottom: none;
+            }
+            
+            .step-icon {
+                font-size: 1.2rem;
+                width: 24px;
+                text-align: center;
+            }
+            
+            .ios-tip {
+                background: #e3f2fd;
+                border: 1px solid #bbdefb;
+                border-radius: 8px;
+                padding: 12px;
+                margin: 1rem 0;
+                font-size: 0.9rem;
+                text-align: left;
+            }
+            
+            .modal-actions {
+                display: flex;
+                gap: 8px;
+                margin-top: 1rem;
+            }
+            
+            .modal-actions .btn {
+                flex: 1;
+                padding: 10px;
+                border: none;
+                border-radius: 8px;
+                font-weight: 600;
+                cursor: pointer;
+            }
+            
+            .btn-secondary {
+                background: #f5f5f5;
+                color: #666;
+            }
+            
+            .btn-primary {
+                background: #667eea;
+                color: white;
+            }
+        `;
+        document.head.appendChild(style);
+        document.body.appendChild(modal);
+    },
+    
+    // Update the existing requestLocation method to detect iOS
+    async requestLocation(options = {}) {
+        // ... existing code ...
+        
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                console.log('✅ Location obtained:', position.coords);
+                resolve(position);
+            },
+            (error) => {
+                console.error('❌ Location error:', error);
+                
+                // Handle different error types with iOS-specific help
+                switch(error.code) {
+                    case error.PERMISSION_DENIED:
+                        if (window.isIOS && window.isIOS()) {
+                            this.showIOSLocationHelp();
+                        } else if (!this.isPWA()) {
+                            this.showPWALocationBenefit();
+                        }
+                        reject(new Error('Location access denied'));
+                        break;
+                    // ... rest of your error handling
+                }
+            },
+            locationOptions
+        );
+    }
 };
 
 // Export for use in your existing code
