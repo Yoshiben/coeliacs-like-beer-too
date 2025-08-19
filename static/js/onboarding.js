@@ -940,7 +940,7 @@ Thank you for joining our community!
         const modal = createModal('nickname', `
             <div class="nickname-content">
                 <div class="nickname-header">
-                    <h2>Choose Your Beer Name! 🍻</h2>
+                    <h2>Choose Your Nickname! 🍻</h2>
                     <p>This is how you'll be known in the community</p>
                 </div>
                 
