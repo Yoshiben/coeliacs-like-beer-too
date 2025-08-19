@@ -128,7 +128,9 @@
 
 /* Welcome Screen Styles */
 .welcome-content {
-    position: relative;
+   position: relative;
+   display: flex;
+   flex-direction: column;
 }
 
 .skip-btn {
