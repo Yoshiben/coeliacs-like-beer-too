@@ -1616,7 +1616,7 @@ def signin_user():
                 UPDATE users 
                 SET last_active = NOW() 
                 WHERE user_id = %s
-            """, (user['user_id']))
+            """, (user['user_id'],))
             conn.commit()
         
         # Return user data (without passcode hash)
@@ -1884,6 +1884,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
