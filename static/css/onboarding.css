@@ -990,3 +990,72 @@
     0%, 100% { opacity: 0; }
     20%, 80% { opacity: 1; }
 }
+
+
+/* Add to onboarding.css */
+
+.nickname-options-box {
+    background: #f8f9fa;
+    border: 2px solid #e9ecef;
+    border-radius: 12px;
+    padding: 1rem;
+    margin-top: 1rem;
+    animation: slideDown 0.3s ease;
+}
+
+.nickname-taken-prompt {
+    text-align: center;
+}
+
+.taken-message {
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+}
+
+.taken-message strong {
+    color: var(--color-primary);
+    font-size: 1.1rem;
+}
+
+.taken-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.taken-actions .btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+}
+
+.suggestions-alternative {
+    border-top: 1px solid #dee2e6;
+    padding-top: 1rem;
+    margin-top: 1rem;
+}
+
+.suggestions-alternative p {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Make the readonly nickname field look different */
+input[readonly] {
+    background: #f5f5f5 !important;
+    cursor: not-allowed !important;
+    color: #6c757d;
+}
