@@ -13,6 +13,9 @@ from datetime import datetime, timedelta
 import requests
 import math
 import random
+import hashlib
+import secrets
+import string
 
 # Initialize Flask app
 app = Flask(__name__, 
@@ -1495,6 +1498,235 @@ def search_places():
         logger.error(f'Places API error: {str(e)}')
         return jsonify({'error': 'Search failed - please try again'}), 500
 
+
+# ==================================================
+# ONBOARDING & USER SESSIONS
+# ==================================================
+
+
+def generate_passcode():
+    """Generate a memorable 6-character passcode"""
+    # Use a mix of letters and numbers for memorability
+    chars = string.ascii_uppercase + string.digits
+    # Avoid confusing characters
+    chars = chars.replace('O', '').replace('0', '').replace('I', '').replace('1', '')
+    return ''.join(secrets.choice(chars) for _ in range(6))
+
+def hash_passcode(passcode):
+    """Hash passcode for secure storage"""
+    return hashlib.sha256(passcode.encode()).hexdigest()
+
+@app.route('/api/user/create', methods=['POST'])
+def create_user():
+    data = request.get_json()
+    nickname = data.get('nickname', '').strip()
+    uuid = data.get('uuid', '').strip()
+    avatar_emoji = data.get('avatar_emoji', '🍺')
+    
+    if not nickname or not uuid:
+        return jsonify({'error': 'Missing required fields'}), 400
+    
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        # Check if UUID already has account
+        cursor.execute("SELECT user_id, nickname, passcode FROM users WHERE uuid = %s", (uuid,))
+        existing = cursor.fetchone()
+        
+        if existing:
+            # User exists but trying to create new account - needs passcode
+            return jsonify({
+                'success': False,
+                'error': 'account_exists',
+                'message': 'This device already has an account. Please sign in.',
+                'existing_nickname': existing['nickname']
+            }), 409
+        
+        # Check if nickname exists
+        cursor.execute("SELECT user_id FROM users WHERE nickname = %s", (nickname,))
+        if cursor.fetchone():
+            return jsonify({'error': 'Nickname already taken'}), 409
+        
+        # Generate passcode
+        passcode = generate_passcode()
+        hashed_passcode = hash_passcode(passcode)
+        
+        # Create new user with passcode
+        cursor.execute("""
+            INSERT INTO users (uuid, nickname, avatar_emoji, passcode, points, created_at)
+            VALUES (%s, %s, %s, %s, 10, NOW())
+        """, (uuid, nickname, avatar_emoji, hashed_passcode))
+        
+        user_id = cursor.lastrowid
+        conn.commit()
+        
+        return jsonify({
+            'success': True,
+            'user_id': user_id,
+            'nickname': nickname,
+            'passcode': passcode,  # Return plain passcode ONLY on creation
+            'points': 10,
+            'message': 'Account created! Save your passcode!'
+        })
+        
+    except Exception as e:
+        conn.rollback()
+        logger.error(f"Error creating user: {e}")
+        return jsonify({'error': 'Failed to create account'}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route('/api/user/signin', methods=['POST'])
+def signin_user():
+    """Sign in with nickname and passcode"""
+    data = request.get_json()
+    nickname = data.get('nickname', '').strip()
+    passcode = data.get('passcode', '').strip().upper()  # Normalize to uppercase
+    uuid = data.get('uuid', '').strip()  # Device UUID for linking
+    
+    if not nickname or not passcode:
+        return jsonify({'error': 'Nickname and passcode required'}), 400
+    
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        # Find user by nickname
+        cursor.execute("""
+            SELECT user_id, nickname, avatar_emoji, passcode, points, 
+                   beers_reported, venues_added, statuses_updated
+            FROM users 
+            WHERE nickname = %s
+        """, (nickname,))
+        
+        user = cursor.fetchone()
+        
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+        
+        # Verify passcode
+        if hash_passcode(passcode) != user['passcode']:
+            return jsonify({'error': 'Invalid passcode'}), 401
+        
+        # Link this device to the user if UUID provided
+        if uuid:
+            cursor.execute("""
+                UPDATE users 
+                SET uuid = %s, last_active = NOW() 
+                WHERE user_id = %s
+            """, (uuid, user['user_id']))
+            conn.commit()
+        
+        # Return user data (without passcode hash)
+        del user['passcode']
+        user['level'] = 1  # Calculate based on points if needed
+        user['badges'] = []  # Load from badges table if implemented
+        
+        return jsonify({
+            'success': True,
+            'user': user,
+            'message': 'Welcome back!'
+        })
+        
+    except Exception as e:
+        logger.error(f"Error signing in: {e}")
+        return jsonify({'error': 'Sign in failed'}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route('/api/user/reset-passcode', methods=['POST'])
+def reset_passcode():
+    """Generate new passcode for user (requires current passcode)"""
+    data = request.get_json()
+    nickname = data.get('nickname', '').strip()
+    current_passcode = data.get('current_passcode', '').strip().upper()
+    
+    if not nickname or not current_passcode:
+        return jsonify({'error': 'Nickname and current passcode required'}), 400
+    
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        # Verify current passcode
+        cursor.execute("""
+            SELECT user_id, passcode FROM users WHERE nickname = %s
+        """, (nickname,))
+        
+        user = cursor.fetchone()
+        if not user or hash_passcode(current_passcode) != user['passcode']:
+            return jsonify({'error': 'Invalid credentials'}), 401
+        
+        # Generate new passcode
+        new_passcode = generate_passcode()
+        hashed_passcode = hash_passcode(new_passcode)
+        
+        # Update passcode
+        cursor.execute("""
+            UPDATE users 
+            SET passcode = %s 
+            WHERE user_id = %s
+        """, (hashed_passcode, user['user_id']))
+        
+        conn.commit()
+        
+        return jsonify({
+            'success': True,
+            'new_passcode': new_passcode,
+            'message': 'Passcode reset successfully. Save your new passcode!'
+        })
+        
+    except Exception as e:
+        logger.error(f"Error resetting passcode: {e}")
+        conn.rollback()
+        return jsonify({'error': 'Failed to reset passcode'}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+@app.route('/api/user/check-device/<uuid>')
+def check_device(uuid):
+    """Check if this device has an existing user"""
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor(dictionary=True)
+    
+    try:
+        cursor.execute("""
+            SELECT nickname, avatar_emoji 
+            FROM users 
+            WHERE uuid = %s
+        """, (uuid,))
+        
+        user = cursor.fetchone()
+        
+        if user:
+            return jsonify({
+                'has_account': True,
+                'nickname': user['nickname'],
+                'avatar_emoji': user['avatar_emoji']
+            })
+        else:
+            return jsonify({
+                'has_account': False
+            })
+        
+    except Exception as e:
+        logger.error(f"Error checking device: {e}")
+        return jsonify({'error': 'Check failed'}), 500
+    finally:
+        cursor.close()
+        conn.close()
+
+
+
+
+
+
+
+
 # ================================================================================
 # ADMIN ROUTES
 # ================================================================================
@@ -1652,21 +1884,3 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
