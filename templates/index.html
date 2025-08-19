@@ -1360,44 +1360,266 @@
             console.log('🌐 Connection:', navigator.connection?.effectiveType || 'unknown');
         </script>
 
+        <script>
+            // PWA Service Worker Registration
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', async () => {
+                    try {
+                        const registration = await navigator.serviceWorker.register('/static/js/service-worker.js');
+                        console.log('✅ Service Worker registered:', registration.scope);
+                        
+                        // Check for updates
+                        registration.addEventListener('updatefound', () => {
+                            console.log('🔄 New version available');
+                            const newWorker = registration.installing;
+                            
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // Show update notification
+                                    showUpdateNotification();
+                                }
+                            });
+                        });
+                        
+                    } catch (error) {
+                        console.log('❌ Service Worker registration failed:', error);
+                    }
+                });
+            }
+            
+            // PWA Install Prompt
+            let deferredPrompt;
+            let installBtn;
+            
+            window.addEventListener('beforeinstallprompt', (e) => {
+                console.log('📱 PWA install prompt available');
+                
+                // Prevent the mini-infobar from appearing on mobile
+                e.preventDefault();
+                
+                // Save the event for later use
+                deferredPrompt = e;
+                
+                // Show custom install button
+                showInstallPrompt();
+            });
+            
+            // Show custom install prompt
+            function showInstallPrompt() {
+                // Create install banner
+                const installBanner = document.createElement('div');
+                installBanner.id = 'pwa-install-banner';
+                installBanner.innerHTML = `
+                    <div class="install-banner-content">
+                        <div class="install-icon">📱</div>
+                        <div class="install-text">
+                            <strong>Install GF Beer Finder</strong>
+                            <small>Get app-like experience & better location access</small>
+                        </div>
+                        <div class="install-actions">
+                            <button class="btn btn-primary btn-sm" id="pwa-install-btn">Install</button>
+                            <button class="btn btn-secondary btn-sm" id="pwa-dismiss-btn">×</button>
+                        </div>
+                    </div>
+                `;
+                
+                // Style the banner
+                installBanner.style.cssText = `
+                    position: fixed;
+                    top: var(--nav-height);
+                    left: 0;
+                    right: 0;
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    padding: 12px;
+                    z-index: 1500;
+                    animation: slideDown 0.3s ease;
+                    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+                `;
+                
+                // Add CSS for the banner content
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes slideDown {
+                        from { transform: translateY(-100%); }
+                        to { transform: translateY(0); }
+                    }
+                    .install-banner-content {
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+                        max-width: 100%;
+                    }
+                    .install-icon {
+                        font-size: 1.5rem;
+                    }
+                    .install-text {
+                        flex: 1;
+                        min-width: 0;
+                    }
+                    .install-text strong {
+                        display: block;
+                        font-size: 0.9rem;
+                        line-height: 1.2;
+                    }
+                    .install-text small {
+                        opacity: 0.9;
+                        font-size: 0.8rem;
+                    }
+                    .install-actions {
+                        display: flex;
+                        gap: 8px;
+                    }
+                    #pwa-install-btn, #pwa-dismiss-btn {
+                        padding: 6px 12px;
+                        border: none;
+                        border-radius: 16px;
+                        font-size: 0.8rem;
+                        cursor: pointer;
+                    }
+                    #pwa-install-btn {
+                        background: rgba(255,255,255,0.9);
+                        color: #667eea;
+                        font-weight: 600;
+                    }
+                    #pwa-dismiss-btn {
+                        background: rgba(255,255,255,0.2);
+                        color: white;
+                        width: 28px;
+                        padding: 6px;
+                    }
+                `;
+                document.head.appendChild(style);
+                
+                document.body.appendChild(installBanner);
+                
+                // Handle install button click
+                document.getElementById('pwa-install-btn').addEventListener('click', async () => {
+                    if (deferredPrompt) {
+                        deferredPrompt.prompt();
+                        const result = await deferredPrompt.userChoice;
+                        
+                        console.log('📱 Install prompt result:', result.outcome);
+                        
+                        if (result.outcome === 'accepted') {
+                            console.log('✅ User installed the PWA');
+                        }
+                        
+                        deferredPrompt = null;
+                    }
+                    
+                    installBanner.remove();
+                });
+                
+                // Handle dismiss button
+                document.getElementById('pwa-dismiss-btn').addEventListener('click', () => {
+                    installBanner.style.animation = 'slideDown 0.3s ease reverse';
+                    setTimeout(() => installBanner.remove(), 300);
+                    
+                    // Don't show again for this session
+                    sessionStorage.setItem('pwa-dismissed', 'true');
+                });
+                
+                // Auto-dismiss after 10 seconds
+                setTimeout(() => {
+                    if (document.contains(installBanner)) {
+                        installBanner.style.animation = 'slideDown 0.3s ease reverse';
+                        setTimeout(() => installBanner.remove(), 300);
+                    }
+                }, 10000);
+            }
+            
+            // Show update notification
+            function showUpdateNotification() {
+                const updateBanner = document.createElement('div');
+                updateBanner.innerHTML = `
+                    <div style="
+                        position: fixed;
+                        bottom: var(--nav-height);
+                        left: 16px;
+                        right: 16px;
+                        background: #667eea;
+                        color: white;
+                        padding: 12px;
+                        border-radius: 12px;
+                        z-index: 1500;
+                        text-align: center;
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                    ">
+                        <strong>🚀 New version available!</strong>
+                        <button onclick="window.location.reload()" style="
+                            margin-left: 12px;
+                            background: white;
+                            color: #667eea;
+                            border: none;
+                            padding: 4px 12px;
+                            border-radius: 16px;
+                            font-weight: 600;
+                            cursor: pointer;
+                        ">Update</button>
+                    </div>
+                `;
+                
+                document.body.appendChild(updateBanner);
+                
+                setTimeout(() => updateBanner.remove(), 5000);
+            }
+            
+            // Handle app install success
+            window.addEventListener('appinstalled', () => {
+                console.log('🎉 PWA was installed successfully');
+                
+                // Hide install prompt if still showing
+                const banner = document.getElementById('pwa-install-banner');
+                if (banner) banner.remove();
+                
+                // Show success message
+                const successToast = document.createElement('div');
+                successToast.innerHTML = `
+                    <div style="
+                        position: fixed;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background: #10b981;
+                        color: white;
+                        padding: 16px 24px;
+                        border-radius: 12px;
+                        z-index: 2000;
+                        text-align: center;
+                        box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+                    ">
+                        🎉 App installed! Better location access enabled.
+                    </div>
+                `;
+                
+                document.body.appendChild(successToast);
+                setTimeout(() => successToast.remove(), 3000);
+            });
+            
+            // Detect if running as PWA
+            function isPWA() {
+                return window.matchMedia('(display-mode: standalone)').matches || 
+                       window.navigator.standalone ||
+                       document.referrer.includes('android-app://');
+            }
+            
+            // Enhanced location permissions for PWA
+            if (isPWA()) {
+                console.log('🚀 Running as PWA - enhanced features available');
+                document.body.classList.add('pwa-mode');
+                
+                // Better location handling for PWA mode
+                if ('permissions' in navigator) {
+                    navigator.permissions.query({name: 'geolocation'}).then(result => {
+                        console.log('📍 Location permission status:', result.state);
+                    });
+                }
+            }
+        </script>
+
         
        
         
     </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
