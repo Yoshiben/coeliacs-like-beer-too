@@ -788,59 +788,59 @@ def check_nickname():
         cursor.close()
         conn.close()
 
-@app.route('/api/user/create', methods=['POST'])
-def create_user():
-    data = request.get_json()
-    nickname = data.get('nickname', '').strip()
-    uuid = data.get('uuid', '').strip()
-    avatar_emoji = data.get('avatar_emoji', '🍺')
+# @app.route('/api/user/create', methods=['POST'])
+# def create_user():
+#     data = request.get_json()
+#     nickname = data.get('nickname', '').strip()
+#     uuid = data.get('uuid', '').strip()
+#     avatar_emoji = data.get('avatar_emoji', '🍺')
     
-    if not nickname or not uuid:
-        return jsonify({'error': 'Missing required fields'}), 400
+#     if not nickname or not uuid:
+#         return jsonify({'error': 'Missing required fields'}), 400
     
-    conn = mysql.connector.connect(**db_config)  # FIXED
-    cursor = conn.cursor(dictionary=True)
+#     conn = mysql.connector.connect(**db_config)  # FIXED
+#     cursor = conn.cursor(dictionary=True)
     
-    try:
-        # Check if UUID already has account
-        cursor.execute("SELECT user_id, nickname FROM users WHERE uuid = %s", (uuid,))
-        existing = cursor.fetchone()
+#     try:
+#         # Check if UUID already has account
+#         cursor.execute("SELECT user_id, nickname FROM users WHERE uuid = %s", (uuid,))
+#         existing = cursor.fetchone()
         
-        if existing:
-            return jsonify({
-                'success': True,
-                'user_id': existing['user_id'],
-                'nickname': existing['nickname'],
-                'message': 'Welcome back!',
-                'points': 0
-            })
+#         if existing:
+#             return jsonify({
+#                 'success': True,
+#                 'user_id': existing['user_id'],
+#                 'nickname': existing['nickname'],
+#                 'message': 'Welcome back!',
+#                 'points': 0
+#             })
         
-        # Create new user with 10 welcome points
-        cursor.execute("""
-            INSERT INTO users (uuid, nickname, avatar_emoji, points, created_at)
-            VALUES (%s, %s, %s, 10, NOW())
-        """, (uuid, nickname, avatar_emoji))
+#         # Create new user with 10 welcome points
+#         cursor.execute("""
+#             INSERT INTO users (uuid, nickname, avatar_emoji, points, created_at)
+#             VALUES (%s, %s, %s, 10, NOW())
+#         """, (uuid, nickname, avatar_emoji))
         
-        user_id = cursor.lastrowid
-        conn.commit()
+#         user_id = cursor.lastrowid
+#         conn.commit()
         
-        return jsonify({
-            'success': True,
-            'user_id': user_id,
-            'nickname': nickname,
-            'points': 10,
-            'message': 'Account created!'
-        })
+#         return jsonify({
+#             'success': True,
+#             'user_id': user_id,
+#             'nickname': nickname,
+#             'points': 10,
+#             'message': 'Account created!'
+#         })
         
-    except mysql.connector.IntegrityError:
-        return jsonify({'error': 'Nickname already taken'}), 409
-    except Exception as e:
-        conn.rollback()
-        print(f"Error creating user: {e}")
-        return jsonify({'error': 'Failed to create account'}), 500
-    finally:
-        cursor.close()
-        conn.close()
+#     except mysql.connector.IntegrityError:
+#         return jsonify({'error': 'Nickname already taken'}), 409
+#     except Exception as e:
+#         conn.rollback()
+#         print(f"Error creating user: {e}")
+#         return jsonify({'error': 'Failed to create account'}), 500
+#     finally:
+#         cursor.close()
+#         conn.close()
 
 @app.route('/api/user/get/<uuid>')
 def get_user(uuid):
@@ -1884,3 +1884,4 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
