@@ -984,7 +984,8 @@ Thank you for joining our community!
         promptSignIn,
         showSignInWithNickname,
         backToNickname,
-        clearNicknameOptions
+        clearNicknameOptions,
+        showNicknameSelection 
     };
 })();
 
