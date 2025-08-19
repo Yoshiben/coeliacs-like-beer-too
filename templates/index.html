@@ -1397,11 +1397,24 @@
                 // Save the event for later use
                 deferredPrompt = e;
                 
-                // Show custom install button
-                showInstallPrompt();
+                // Show custom install button (only for non-iOS)
+                if (!isIOS()) {
+                    showInstallPrompt();
+                }
             });
             
-            // Show custom install prompt
+            // iOS Detection Functions
+            function isIOS() {
+                return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            }
+            
+            function isStandalone() {
+                return window.navigator.standalone || 
+                       window.matchMedia('(display-mode: standalone)').matches;
+            }
+            
+            // Show custom install prompt (Android/Desktop)
             function showInstallPrompt() {
                 // Create install banner
                 const installBanner = document.createElement('div');
@@ -1526,6 +1539,236 @@
                 }, 10000);
             }
             
+            // iOS Install Guide
+            function showIOSInstallGuide() {
+                // Don't show if already installed or dismissed recently
+                if (isStandalone() || sessionStorage.getItem('ios-guide-dismissed')) {
+                    return;
+                }
+                
+                const guide = document.createElement('div');
+                guide.id = 'ios-install-guide';
+                guide.innerHTML = `
+                    <div class="ios-guide-content">
+                        <div class="ios-guide-header">
+                            <div class="ios-guide-icon">📱</div>
+                            <div class="ios-guide-text">
+                                <strong>Install GF Beer Finder</strong>
+                                <small>Get app-like experience & better location access</small>
+                            </div>
+                            <button class="ios-guide-close" onclick="dismissIOSGuide()">×</button>
+                        </div>
+                        
+                        <div class="ios-guide-steps">
+                            <div class="ios-step">
+                                <span class="step-number">1</span>
+                                <span class="step-icon">📤</span>
+                                <span class="step-text">Tap the Share button below</span>
+                            </div>
+                            <div class="ios-step">
+                                <span class="step-number">2</span>
+                                <span class="step-icon">➕</span>
+                                <span class="step-text">Select "Add to Home Screen"</span>
+                            </div>
+                            <div class="ios-step">
+                                <span class="step-number">3</span>
+                                <span class="step-icon">🍺</span>
+                                <span class="step-text">Enjoy app-like experience!</span>
+                            </div>
+                        </div>
+                        
+                        <div class="ios-guide-benefits">
+                            <div class="benefit">⚡ Faster loading</div>
+                            <div class="benefit">📍 Better location access</div>
+                            <div class="benefit">🔄 Works offline</div>
+                        </div>
+                    </div>
+                `;
+                
+                // Add styles for iOS guide
+                const style = document.createElement('style');
+                style.textContent = `
+                    #ios-install-guide {
+                        position: fixed;
+                        top: var(--nav-height);
+                        left: 0;
+                        right: 0;
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        color: white;
+                        z-index: 1600;
+                        animation: slideDown 0.4s ease;
+                        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+                    }
+                    
+                    .ios-guide-content {
+                        padding: 12px 16px;
+                    }
+                    
+                    .ios-guide-header {
+                        display: flex;
+                        align-items: center;
+                        gap: 12px;
+                        margin-bottom: 12px;
+                    }
+                    
+                    .ios-guide-icon {
+                        font-size: 1.5rem;
+                    }
+                    
+                    .ios-guide-text {
+                        flex: 1;
+                        min-width: 0;
+                    }
+                    
+                    .ios-guide-text strong {
+                        display: block;
+                        font-size: 0.95rem;
+                        line-height: 1.2;
+                        margin-bottom: 2px;
+                    }
+                    
+                    .ios-guide-text small {
+                        opacity: 0.9;
+                        font-size: 0.8rem;
+                        line-height: 1.2;
+                    }
+                    
+                    .ios-guide-close {
+                        background: rgba(255,255,255,0.2);
+                        border: none;
+                        color: white;
+                        width: 28px;
+                        height: 28px;
+                        border-radius: 50%;
+                        font-size: 1.1rem;
+                        cursor: pointer;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+                    
+                    .ios-guide-steps {
+                        display: flex;
+                        gap: 8px;
+                        margin-bottom: 12px;
+                        overflow-x: auto;
+                        padding: 4px 0;
+                    }
+                    
+                    .ios-step {
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        gap: 4px;
+                        min-width: 80px;
+                        text-align: center;
+                        position: relative;
+                    }
+                    
+                    .step-number {
+                        position: absolute;
+                        top: -8px;
+                        right: -8px;
+                        background: #fbbf24;
+                        color: #92400e;
+                        width: 20px;
+                        height: 20px;
+                        border-radius: 50%;
+                        font-size: 0.7rem;
+                        font-weight: bold;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+                    
+                    .step-icon {
+                        font-size: 1.2rem;
+                        margin-bottom: 2px;
+                    }
+                    
+                    .step-text {
+                        font-size: 0.75rem;
+                        line-height: 1.2;
+                        opacity: 0.95;
+                    }
+                    
+                    .ios-guide-benefits {
+                        display: flex;
+                        gap: 12px;
+                        justify-content: center;
+                        flex-wrap: wrap;
+                    }
+                    
+                    .benefit {
+                        background: rgba(255,255,255,0.15);
+                        padding: 4px 8px;
+                        border-radius: 12px;
+                        font-size: 0.75rem;
+                        white-space: nowrap;
+                    }
+                    
+                    /* Responsive adjustments */
+                    @media (max-width: 380px) {
+                        .ios-guide-content {
+                            padding: 10px 12px;
+                        }
+                        
+                        .ios-guide-steps {
+                            gap: 4px;
+                        }
+                        
+                        .ios-step {
+                            min-width: 70px;
+                        }
+                        
+                        .step-text {
+                            font-size: 0.7rem;
+                        }
+                        
+                        .ios-guide-benefits {
+                            gap: 8px;
+                        }
+                        
+                        .benefit {
+                            font-size: 0.7rem;
+                            padding: 3px 6px;
+                        }
+                    }
+                `;
+                document.head.appendChild(style);
+                
+                document.body.appendChild(guide);
+                
+                // Auto-dismiss after 15 seconds
+                setTimeout(() => {
+                    if (document.contains(guide)) {
+                        dismissIOSGuide();
+                    }
+                }, 15000);
+            }
+            
+            // Dismiss iOS guide
+            function dismissIOSGuide() {
+                const guide = document.getElementById('ios-install-guide');
+                if (guide) {
+                    guide.style.animation = 'slideDown 0.3s ease reverse';
+                    setTimeout(() => guide.remove(), 300);
+                }
+                
+                // Don't show again for this session
+                sessionStorage.setItem('ios-guide-dismissed', 'true');
+            }
+            
+            // Check if we should show iOS guide
+            function checkIOSInstallGuide() {
+                if (isIOS() && !isStandalone()) {
+                    // Show after a short delay so user sees the main app first
+                    setTimeout(() => {
+                        showIOSInstallGuide();
+                    }, 3000);
+                }
+            }
+            
             // Show update notification
             function showUpdateNotification() {
                 const updateBanner = document.createElement('div');
@@ -1570,6 +1813,10 @@
                 const banner = document.getElementById('pwa-install-banner');
                 if (banner) banner.remove();
                 
+                // Hide iOS guide if still showing
+                const guide = document.getElementById('ios-install-guide');
+                if (guide) guide.remove();
+                
                 // Show success message
                 const successToast = document.createElement('div');
                 successToast.innerHTML = `
@@ -1613,11 +1860,18 @@
                     });
                 }
             }
+            
+            // Make functions globally available
+            window.dismissIOSGuide = dismissIOSGuide;
+            window.isIOS = isIOS;
+            window.isStandalone = isStandalone;
+            
+            // Initialize iOS guide check when page loads
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', checkIOSInstallGuide);
+            } else {
+                checkIOSInstallGuide();
+            }
         </script>
-
-        
-       
-        
     </body>
 </html>
-
