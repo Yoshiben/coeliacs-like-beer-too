@@ -1,6 +1,6 @@
 // ================================================================================
-// USER-SESSION.JS - Complete User Management System
-// Handles: UUID, nickname, points, achievements, session state
+// USER-SESSION.JS - Complete User Management with Passcode Authentication
+// Handles: UUID, nickname, passcode auth, points, achievements, multi-device sync
 // ================================================================================
 
 export const UserSession = (() => {
@@ -23,7 +23,8 @@ export const UserSession = (() => {
             statusesUpdated: 0
         },
         isNewUser: false,
-        initialized: false
+        initialized: false,
+        isAuthenticated: false
     };
     
     // ================================
@@ -44,8 +45,8 @@ export const UserSession = (() => {
             return { status: 'need-age-verification' };
         }
         
-        // Check for existing user
-        const userStatus = await checkExistingUser();
+        // Check for existing user on this device
+        const userStatus = await checkDeviceUser();
         
         state.initialized = true;
         
@@ -89,80 +90,52 @@ export const UserSession = (() => {
         return 'verified';
     };
     
-    const checkExistingUser = async () => {
+    const checkDeviceUser = async () => {
         try {
-            const response = await fetch(`/api/user/get/${state.uuid}`);
+            // First check if device UUID has an account
+            const response = await fetch(`/api/user/check-device/${state.uuid}`);
+            const deviceData = await response.json();
             
-            if (response.ok) {
-                const userData = await response.json();
+            if (deviceData.has_account) {
+                // This device has created an account before
+                // Check if we have stored auth
+                const storedAuth = localStorage.getItem('userAuth');
                 
-                // Populate state
-                state.userId = userData.user_id;
-                state.nickname = userData.nickname;
-                state.avatarEmoji = userData.avatar_emoji;
-                state.points = userData.points;
-                state.level = userData.level;
-                state.badges = userData.badges || [];
-                state.stats = {
-                    beersReported: userData.beers_reported,
-                    venuesAdded: userData.venues_added,
-                    statusesUpdated: userData.statuses_updated
-                };
-                
-                // Get user's welcome preference (default: daily)
-                const welcomeFrequency = localStorage.getItem('welcomeFrequency') || 'daily';
-                const lastWelcomeBack = localStorage.getItem('lastWelcomeBack');
-                const now = Date.now();
-                let shouldShowWelcome = false;
-                let welcomeType = 'normal';
-                
-                if (!lastWelcomeBack) {
-                    shouldShowWelcome = true;
-                    welcomeType = 'first';
-                } else {
-                    const hoursSince = (now - parseInt(lastWelcomeBack)) / (1000 * 60 * 60);
-                    const daysSince = hoursSince / 24;
+                if (storedAuth) {
+                    // Try to auto-authenticate
+                    const authData = JSON.parse(storedAuth);
                     
-                    // Check frequency preference
-                    switch(welcomeFrequency) {
-                        case 'always':
-                            shouldShowWelcome = true;
-                            break;
-                        case 'daily':
-                            shouldShowWelcome = hoursSince > 12;
-                            break;
-                        case 'weekly':
-                            shouldShowWelcome = daysSince > 7;
-                            break;
-                        case 'never':
-                            shouldShowWelcome = false;
-                            break;
+                    // Verify the stored auth is still valid
+                    const userResponse = await fetch(`/api/user/get/${state.uuid}`);
+                    
+                    if (userResponse.ok) {
+                        const userData = await userResponse.json();
+                        
+                        // Populate state
+                        state.userId = userData.user_id;
+                        state.nickname = userData.nickname;
+                        state.avatarEmoji = userData.avatar_emoji || '🍺';
+                        state.points = userData.points || 0;
+                        state.level = userData.level || 1;
+                        state.badges = userData.badges || [];
+                        state.isAuthenticated = true;
+                        
+                        updateLastActive();
+                        
+                        return { 
+                            status: 'returning-user',
+                            user: getUserData()
+                        };
                     }
-                    
-                    // Determine message type based on time away
-                    if (daysSince > 30) welcomeType = 'long_absence';
-                    else if (daysSince > 7) welcomeType = 'week_away';
-                    else if (hoursSince < 1) welcomeType = 'still_here';
-                    else welcomeType = 'normal';
                 }
                 
-                // Update last active
-                updateLastActive();
-                
-                // Store when we showed welcome
-                if (shouldShowWelcome) {
-                    localStorage.setItem('lastWelcomeBack', now.toString());
-                }
-                
+                // Device has account but no stored auth
                 return { 
-                    status: 'returning-user',
-                    user: getUserData(),
-                    showWelcome: shouldShowWelcome,
-                    welcomeType: welcomeType
+                    status: 'device-has-account',
+                    nickname: deviceData.nickname
                 };
-                
-            } else if (response.status === 404) {
-                // New user
+            } else {
+                // New user or signed in from different device
                 const hasSeenWelcome = localStorage.getItem('hasSeenWelcome');
                 
                 if (!hasSeenWelcome) {
@@ -194,20 +167,29 @@ export const UserSession = (() => {
                 })
             });
             
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.message || 'Failed to create user');
-            }
-            
             const userData = await response.json();
             
-            // Update state
+            if (!response.ok) {
+                // Handle different error types
+                if (response.status === 409 && userData.error === 'account_exists') {
+                    return {
+                        success: false,
+                        error: 'account_exists',
+                        existing_nickname: userData.existing_nickname
+                    };
+                }
+                
+                throw new Error(userData.error || 'Failed to create user');
+            }
+            
+            // Update state with new user data
             state.userId = userData.user_id;
             state.nickname = userData.nickname;
             state.avatarEmoji = avatarEmoji;
-            state.points = userData.points || 10; // Welcome bonus!
+            state.points = userData.points || 10;
             state.level = 1;
             state.badges = ['welcome'];
+            state.isAuthenticated = true;
             
             // Mark welcome as seen
             localStorage.setItem('hasSeenWelcome', 'true');
@@ -217,7 +199,10 @@ export const UserSession = (() => {
             
             return {
                 success: true,
-                user: getUserData()
+                user: getUserData(),
+                passcode: userData.passcode,  // Return passcode for display
+                nickname: userData.nickname,
+                points: userData.points
             };
             
         } catch (error) {
@@ -225,6 +210,62 @@ export const UserSession = (() => {
             return {
                 success: false,
                 error: error.message
+            };
+        }
+    };
+    
+    const signIn = async (nickname, passcode) => {
+        try {
+            const response = await fetch('/api/user/signin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    nickname: nickname,
+                    passcode: passcode,
+                    uuid: state.uuid  // Link this device to the account
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (!response.ok) {
+                return {
+                    success: false,
+                    error: result.error || 'Sign in failed'
+                };
+            }
+            
+            // Update state with user data
+            state.userId = result.user.user_id;
+            state.nickname = result.user.nickname;
+            state.avatarEmoji = result.user.avatar_emoji || '🍺';
+            state.points = result.user.points || 0;
+            state.level = result.user.level || 1;
+            state.badges = result.user.badges || [];
+            state.stats = {
+                beersReported: result.user.beers_reported || 0,
+                venuesAdded: result.user.venues_added || 0,
+                statusesUpdated: result.user.statuses_updated || 0
+            };
+            state.isAuthenticated = true;
+            
+            // Store nickname locally
+            localStorage.setItem('userNickname', nickname);
+            localStorage.setItem('hasSeenWelcome', 'true');
+            
+            updateGlobalState();
+            
+            return {
+                success: true,
+                user: getUserData(),
+                message: result.message
+            };
+            
+        } catch (error) {
+            console.error('Error signing in:', error);
+            return {
+                success: false,
+                error: 'Network error. Please try again.'
             };
         }
     };
@@ -253,7 +294,7 @@ export const UserSession = (() => {
     };
     
     const awardPoints = async (points, reason) => {
-        if (!state.userId) return;
+        if (!state.userId || !state.isAuthenticated) return;
         
         state.points += points;
         updateGlobalState();
@@ -304,6 +345,7 @@ export const UserSession = (() => {
         window.App?.setState('userPoints', state.points);
         window.App?.setState('userLevel', state.level);
         window.App?.setState('userBadges', state.badges);
+        window.App?.setState('isAuthenticated', state.isAuthenticated);
     };
     
     const getUserData = () => ({
@@ -315,12 +357,13 @@ export const UserSession = (() => {
         level: state.level,
         badges: state.badges,
         stats: state.stats,
-        isNewUser: state.isNewUser
+        isNewUser: state.isNewUser,
+        isAuthenticated: state.isAuthenticated
     });
     
     const getStatus = () => {
         if (!state.initialized) return { status: 'not-initialized' };
-        if (!state.nickname) return { status: 'anonymous' };
+        if (!state.isAuthenticated) return { status: 'anonymous' };
         return { status: 'authenticated', user: getUserData() };
     };
     
@@ -336,11 +379,54 @@ export const UserSession = (() => {
             venuesAdded: 0,
             statusesUpdated: 0
         };
+        state.isAuthenticated = false;
         
+        // Clear stored auth
         localStorage.removeItem('userNickname');
+        localStorage.removeItem('userAuth');
+        
         updateGlobalState();
         
         return { status: 'logged-out' };
+    };
+    
+    const changePasscode = async (currentPasscode) => {
+        if (!state.nickname || !state.isAuthenticated) {
+            return { success: false, error: 'Not authenticated' };
+        }
+        
+        try {
+            const response = await fetch('/api/user/reset-passcode', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    nickname: state.nickname,
+                    current_passcode: currentPasscode
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (!response.ok) {
+                return {
+                    success: false,
+                    error: result.error || 'Failed to reset passcode'
+                };
+            }
+            
+            return {
+                success: true,
+                new_passcode: result.new_passcode,
+                message: result.message
+            };
+            
+        } catch (error) {
+            console.error('Error resetting passcode:', error);
+            return {
+                success: false,
+                error: 'Network error. Please try again.'
+            };
+        }
     };
     
     // ================================
@@ -350,16 +436,18 @@ export const UserSession = (() => {
         init,
         verifyAge,
         createUser,
+        signIn,
         checkNicknameAvailability,
         awardPoints,
         getUserData,
         getStatus,
         logout,
+        changePasscode,
         
         // Quick getters
         get nickname() { return state.nickname; },
         get points() { return state.points; },
         get uuid() { return state.uuid; },
-        get isAuthenticated() { return !!state.nickname; }
+        get isAuthenticated() { return state.isAuthenticated; }
     };
 })();
