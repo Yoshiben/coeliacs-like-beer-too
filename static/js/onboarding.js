@@ -252,7 +252,11 @@ export const OnboardingFlow = (() => {
                     timestamp: Date.now()
                 }));
                 
-                closeModal('signIn');
+                // Close ALL possible modals
+                ['signIn', 'nickname', 'signInPrompt', 'welcome'].forEach(id => {
+                    closeModal(id);
+                });
+                
                 showWelcomeBack(result.user);
             } else {
                 if (errorDiv && errorText) {
