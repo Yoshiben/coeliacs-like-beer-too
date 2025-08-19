@@ -598,76 +598,6 @@ Thank you for joining our community!
         closeModal('welcome');
     };
     
-    const showNicknameSelection = () => {
-        closeModal('welcome');
-        
-        const modal = createModal('nickname', `
-            <div class="nickname-content">
-                <div class="nickname-header">
-                    <h2>Choose Your Beer Name! 🍻</h2>
-                    <p>This is how you'll be known in the community</p>
-                </div>
-                
-                <div class="nickname-form">
-                    <div class="input-group">
-                        <input type="text" 
-                               id="nicknameInput" 
-                               placeholder="e.g. HopHunter, GFBeerGuru, MaltMaster..."
-                               maxlength="30"
-                               oninput="OnboardingFlow.checkNickname(this.value)">
-                        <div class="input-status" id="nicknameStatus"></div>
-                    </div>
-                    
-                    <div class="suggestions-section">
-                        <p>Need inspiration? Try these:</p>
-                        <div class="suggestion-chips">
-                            <button class="chip" onclick="OnboardingFlow.generateRandom()">
-                                🎲 Random
-                            </button>
-                            <button class="chip" onclick="OnboardingFlow.useNickname('BeerExplorer')">
-                                BeerExplorer
-                            </button>
-                            <button class="chip" onclick="OnboardingFlow.useNickname('HopHunter')">
-                                HopHunter
-                            </button>
-                            <button class="chip" onclick="OnboardingFlow.useNickname('GFGuru')">
-                                GFGuru
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="avatar-section">
-                        <p>Choose your avatar:</p>
-                        <div class="avatar-grid">
-                            ${['🍺', '🍻', '⭐', '🎯', '🚀', '💪', '🏆', '🦄', '🎨', '🌟'].map(emoji => 
-                                `<button class="avatar-option ${emoji === '🍺' ? 'active' : ''}" 
-                                         onclick="OnboardingFlow.selectAvatar('${emoji}')">${emoji}</button>`
-                            ).join('')}
-                        </div>
-                    </div>
-                    
-                    <div class="privacy-section">
-                        <div class="privacy-item">✅ No email required</div>
-                        <div class="privacy-item">✅ No personal data</div>
-                        <div class="privacy-item">✅ Secure passcode access</div>
-                        <div class="privacy-item">✅ Sync across devices!</div>
-                    </div>
-                </div>
-                
-                <div class="nickname-actions">
-                    <button class="btn btn-secondary" onclick="OnboardingFlow.skipNickname()">
-                        Skip for now
-                    </button>
-                    <button class="btn btn-primary" id="saveNicknameBtn" onclick="OnboardingFlow.saveNickname()" disabled>
-                        Create Account!
-                    </button>
-                </div>
-            </div>
-        `);
-        
-        document.body.appendChild(modal);
-    };
-    
     const checkNickname = (value) => {
         clearTimeout(state.nicknameCheckTimeout);
         state.nickname = value;
@@ -705,11 +635,164 @@ Thank you for joining our community!
                 statusEl.innerHTML = '<span class="status-error">❌ Already taken</span>';
                 saveBtn.disabled = true;
                 
-                if (result.suggestions) {
-                    showSuggestions(result.suggestions);
-                }
+                // Show sign-in option for taken nicknames
+                showNicknameOptions(value, result.suggestions);
             }
         }, 500);
+    };
+    
+    const showNicknameOptions = (nickname, suggestions) => {
+        let optionsContainer = document.getElementById('nicknameOptions');
+        
+        if (!optionsContainer) {
+            const inputGroup = document.querySelector('.input-group');
+            optionsContainer = document.createElement('div');
+            optionsContainer.id = 'nicknameOptions';
+            optionsContainer.className = 'nickname-options-box';
+            inputGroup.appendChild(optionsContainer);
+        }
+        
+        optionsContainer.innerHTML = `
+            <div class="nickname-taken-prompt">
+                <p class="taken-message">
+                    <strong>${nickname}</strong> is already taken!
+                </p>
+                
+                <div class="taken-actions">
+                    <button class="btn btn-primary btn-sm" onclick="OnboardingFlow.promptSignIn('${nickname}')">
+                        🔑 This is me - Sign in
+                    </button>
+                    <button class="btn btn-outline btn-sm" onclick="OnboardingFlow.clearNicknameOptions()">
+                        ❌ Not me - Try another
+                    </button>
+                </div>
+                
+                ${suggestions && suggestions.length > 0 ? `
+                    <div class="suggestions-alternative">
+                        <p>Or try one of these:</p>
+                        <div class="suggestion-chips">
+                            ${suggestions.map(suggestion => 
+                                `<button class="chip" onclick="OnboardingFlow.useNickname('${suggestion}')">
+                                    ${suggestion}
+                                </button>`
+                            ).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+        
+        optionsContainer.style.display = 'block';
+    };
+    
+    // Add new function to handle sign-in prompt from nickname screen
+    const promptSignIn = (nickname) => {
+        // Store the nickname for sign-in
+        state.attemptedNickname = nickname;
+        
+        // Close nickname modal
+        closeModal('nickname');
+        
+        // Show sign-in modal with nickname pre-filled
+        showSignInWithNickname(nickname);
+    };
+    
+    // New sign-in modal with pre-filled nickname
+    const showSignInWithNickname = (nickname) => {
+        const modal = createModal('signIn', `
+            <div class="signin-content">
+                <div class="signin-header">
+                    <h2>🔑 Welcome back, ${nickname}!</h2>
+                    <p>Enter your passcode to sign in</p>
+                </div>
+                
+                <div class="signin-form">
+                    <div class="input-group">
+                        <label>Nickname</label>
+                        <input type="text" 
+                               id="signInNickname" 
+                               value="${nickname}"
+                               readonly
+                               style="background: #f5f5f5; cursor: not-allowed;">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Passcode</label>
+                        <input type="text" 
+                               id="signInPasscode" 
+                               placeholder="Enter your 6-character code"
+                               maxlength="6"
+                               style="text-transform: uppercase; letter-spacing: 0.2em; font-family: monospace;"
+                               autofocus>
+                        <small>Enter the passcode you received when creating your account</small>
+                    </div>
+                    
+                    <div id="signInError" class="error-message" style="display: none;">
+                        <span class="error-icon">⚠️</span>
+                        <span class="error-text"></span>
+                    </div>
+                </div>
+                
+                <div class="signin-actions">
+                    <button class="btn btn-secondary" onclick="OnboardingFlow.backToNickname()">
+                        ← Try Different Name
+                    </button>
+                    <button class="btn btn-primary" id="signInBtn" onclick="OnboardingFlow.performSignIn()">
+                        Sign In
+                    </button>
+                </div>
+                
+                <div class="signin-help">
+                    <p><strong>Lost your passcode?</strong></p>
+                    <small>Unfortunately, we can't recover it. You'll need to create a new account with a different nickname.</small>
+                </div>
+            </div>
+        `);
+        
+        document.body.appendChild(modal);
+        
+        // Auto-focus passcode field
+        setTimeout(() => {
+            document.getElementById('signInPasscode')?.focus();
+        }, 100);
+    };
+    
+    // Add function to go back to nickname selection
+    const backToNickname = () => {
+        closeModal('signIn');
+        showNicknameSelection();
+        
+        // Re-populate the attempted nickname if it exists
+        if (state.attemptedNickname) {
+            setTimeout(() => {
+                const input = document.getElementById('nicknameInput');
+                if (input) {
+                    input.value = '';
+                    input.focus();
+                }
+            }, 100);
+        }
+    };
+    
+    // Add function to clear the options box
+    const clearNicknameOptions = () => {
+        const optionsContainer = document.getElementById('nicknameOptions');
+        if (optionsContainer) {
+            optionsContainer.style.display = 'none';
+        }
+        
+        // Clear the input
+        const input = document.getElementById('nicknameInput');
+        if (input) {
+            input.value = '';
+            input.focus();
+        }
+        
+        // Clear status
+        const statusEl = document.getElementById('nicknameStatus');
+        if (statusEl) {
+            statusEl.innerHTML = '';
+        }
     };
 
     const showSuggestions = (suggestions) => {
@@ -897,7 +980,11 @@ Thank you for joining our community!
         sharePasscode,
         confirmPasscodeSaved,
         finishOnboarding,
-        closeModal
+        closeModal,
+        promptSignIn,
+        showSignInWithNickname,
+        backToNickname,
+        clearNicknameOptions
     };
 })();
 
