@@ -1926,7 +1926,7 @@ const LocationManager = {
                 setTimeout(() => suggestion.remove(), 8000);
             }, 2000);
         }
-    }
+    },
     // iOS-specific location help
     showIOSLocationHelp() {
         const modal = document.createElement('div');
