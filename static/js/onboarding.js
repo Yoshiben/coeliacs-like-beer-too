@@ -760,7 +760,7 @@ Thank you for joining our community!
     // Add function to go back to nickname selection
     const backToNickname = () => {
         closeModal('signIn');
-        showNicknameSelection();
+        OnboardingFlow.showNicknameSelection();  // ✅ This works!
         
         // Re-populate the attempted nickname if it exists
         if (state.attemptedNickname) {
