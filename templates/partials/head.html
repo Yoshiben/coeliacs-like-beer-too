@@ -1,0 +1,64 @@
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coeliacs Like Beer Too! {{ cache_buster }}</title>
+
+<!-- Main Stylesheets -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v={{ cache_buster }}">
+
+<!-- Component Stylesheets -->
+<link rel="stylesheet" href="/static/css/breweries.css?v={{ cache_buster }}">
+<link rel="stylesheet" href="/static/css/community-hub.css?v={{ cache_buster }}">
+<link rel="stylesheet" href="/static/css/forms.css?v={{ cache_buster }}">
+<link rel="stylesheet" href="/static/css/map.css?v={{ cache_buster }}">
+<link rel="stylesheet" href="/static/css/modals.css?v={{ cache_buster }}">
+<link rel="stylesheet" href="/static/css/notifications.css?v={{ cache_buster }}">
+<link rel="stylesheet" href="/static/css/onboarding.css?v={{ cache_buster }}">
+<link rel="stylesheet" href="/static/css/toast.css?v={{ cache_buster }}">
+<link rel="stylesheet" href="/static/css/pwa.css?v={{ cache_buster }}">
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" 
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" 
+      crossorigin="" />
+
+<!-- Leaflet MarkerCluster CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+
+<!-- PWA Manifest -->
+<link rel="manifest" href="/static/manifest.json">
+
+<!-- Theme Colors -->
+<meta name="theme-color" content="#764BEA">
+<meta name="msapplication-TileColor" content="#764BEA">
+<meta name="msapplication-navbutton-color" content="#764BEA">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+<!-- Favicons & PWA Icons -->
+<link rel="icon" type="image/png" href="/static/images/favicon-96x96.png" sizes="96x96" />
+<link rel="icon" type="image/svg+xml" href="/static/images/favicon.svg" />
+<link rel="shortcut icon" href="/static/images/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-title" content="CLB" />
+
+<!-- Enhanced Meta for PWA -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="GF Beer Finder">
+
+<!-- Google Analytics with GDPR compliance -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-WSHR39KSXS"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    
+    // Set default consent to denied (GDPR compliant)
+    gtag('consent', 'default', {
+        'analytics_storage': 'denied'
+    });
+    
+    gtag('js', new Date());
+    gtag('config', 'G-WSHR39KSXS', {
+        'anonymize_ip': true,
+        'cookie_flags': 'SameSite=None;Secure'
+    });
+</script>
