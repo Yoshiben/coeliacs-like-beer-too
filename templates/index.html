@@ -8,10 +8,12 @@
         <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v={{ cache_buster }}">
         
         <link rel="stylesheet" href="/static/css/breweries.css?v={{ cache_buster }}">
-        <link rel="stylesheet" href="/static/css/community-hub.css?v={{ cache_buster }}">        
+        <link rel="stylesheet" href="/static/css/community-hub.css?v={{ cache_buster }}">
+        <link rel="stylesheet" href="/static/css/forms.css?v={{ cache_buster }}">
         <link rel="stylesheet" href="/static/css/map.css?v={{ cache_buster }}">
+        <link rel="stylesheet" href="/static/css/modals.css?v={{ cache_buster }}">
         <link rel="stylesheet" href="/static/css/onboarding.css?v={{ cache_buster }}">
-        <link rel="stylesheet" href="/static/css/toast.css">
+        <link rel="stylesheet" href="/static/css/toast.css?v={{ cache_buster }}">
         
         <!-- Leaflet CSS -->
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
@@ -64,15 +66,13 @@
             <div class="nav-content">
                 <!-- Left Section -->
                 <div class="nav-left">
-                    <!-- Logo (always visible) -->
                     <div class="logo-container">
                         <img src="/static/images/logo-white.svg" alt="Coeliacs Like Beer Too" class="nav-logo">
                     </div>
-                </div> <!-- ← THIS WAS MISSING! -->
+                </div>
                 
                 <!-- Right Section -->
                 <div class="nav-right">
-                    <!-- GF/All Toggle (results & map only) -->
                     <div class="nav-toggle">
                         <div class="toggle-container" id="mainToggleContainer">
                             <div class="toggle-track">
@@ -83,9 +83,11 @@
                         </div>
                     </div>
                     
-                    <!-- Future: Notifications, settings etc -->
                     <div class="nav-actions">
-                        <button class="btn nav-notification-btn">🔔</button>
+                        <button class="nav-notification-btn" data-action="show-notifications-preview">
+                            <span class="notification-icon">🔔</span>
+                            <span class="notification-badge-soon">Soon</span>
+                        </button>
                     </div>
                     
                     <!-- Back Button (hidden on home) -->
@@ -581,6 +583,61 @@
                         <button class="btn btn-secondary" id="nextPageBtn" data-action="next-page">
                             Next →
                         </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal" id="notificationsPreviewModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">🔔 Notifications Coming Soon!</h3>
+                    <button class="modal-close" data-action="close-modal">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="notifications-preview">
+                        <div class="preview-intro">
+                            <p>We're building a smart notification system to keep you updated on:</p>
+                        </div>
+                        
+                        <div class="notification-types">
+                            <div class="notification-type">
+                                <div class="type-icon">🍺</div>
+                                <div class="type-content">
+                                    <h4>New GF Beers Near You</h4>
+                                    <p>Get alerts when fresh gluten-free options are spotted within your chosen radius</p>
+                                </div>
+                            </div>
+                            
+                            <div class="notification-type">
+                                <div class="type-icon">✅</div>
+                                <div class="type-content">
+                                    <h4>Report Updates</h4>
+                                    <p>Know when your beer discoveries are verified by other community members</p>
+                                </div>
+                            </div>
+                            
+                            <div class="notification-type">
+                                <div class="type-icon">🔥</div>
+                                <div class="type-content">
+                                    <h4>Trending in Your Area</h4>
+                                    <p>See which GF beers are popular and highly-rated in your city this week</p>
+                                </div>
+                            </div>
+                            
+                            <div class="notification-type">
+                                <div class="type-icon">📍</div>
+                                <div class="type-content">
+                                    <h4>Location-Based Alerts</h4>
+                                    <p>Discover when you're near pubs with confirmed gluten-free options</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="preview-cta">
+                            <p><strong>Want to be notified when this launches?</strong></p>
+                            <p>Keep using the app - we'll announce it right here when it's ready! 🎉</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1876,4 +1933,5 @@
         </script>
     </body>
 </html>
+
 
