@@ -1393,14 +1393,26 @@ const App = {
             }
         },
         'about-us': (el, modules) => {
-            if (modules.modalManager) {
-                modules.modalManager.open('aboutOverlay');
+            // Close the more menu first
+            const moreMenu = document.getElementById('moreMenu');
+            if (moreMenu) {
+                moreMenu.classList.remove('active');
             }
+            
+            // Then open the about overlay
+            modules.modalManager.open('aboutOverlay');
+            modules.tracking?.trackEvent('about_us_view', 'Navigation', 'more_menu');
         },
         'about-gf': (el, modules) => {
-            if (modules.modalManager) {
-                modules.modalManager.open('gfInfoOverlay');
+            // Close the more menu first
+            const moreMenu = document.getElementById('moreMenu');
+            if (moreMenu) {
+                moreMenu.classList.remove('active');
             }
+            
+            // Then open the GF info overlay
+            modules.modalManager.open('gfInfoOverlay');
+            modules.tracking?.trackEvent('gf_info_view', 'Navigation', 'more_menu');
         },
         'close-about': (el, modules) => {
             if (modules.modalManager) {
