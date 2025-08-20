@@ -153,7 +153,8 @@
 }
 
 .welcome-hero {
-    text-align: center;
+   text-align: center;
+   padding-bottom: var(--space-sm);
 }
 
 .welcome-emoji {
@@ -173,7 +174,7 @@
 .founder-section {
    background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(109, 40, 217, 0.05) 100%);
    border-radius: var(--radius);
-   padding: var(--space-md);
+   padding: var(--space-xs);
    margin: var(--space-md);
 }
 
@@ -189,8 +190,9 @@
 }
 
 .stats-showcase {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+   display: grid;
+   grid-template-columns: repeat(3, 1fr);
+   margin: var(--space-sm);
 }
 
 .stat-item {
@@ -221,7 +223,7 @@
 .features-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
+    gap: var(--space-xs);
 }
 
 .feature-item {
@@ -244,11 +246,11 @@
 
 /* Nickname Selection Styles */
 .nickname-content {
-    padding: var(--space-xl);
+    padding: var(--space-sm);
 }
 
 .nickname-header {
-    text-align: center;
+   text-align: center;
 }
 
 .nickname-header h2 {
@@ -257,12 +259,13 @@
 }
 
 .nickname-header p {
-    color: var(--text-secondary);
+   color: var(--text-secondary);
+   margin: var(--space-md);
 }
 
-.input-group {
+/* .input-group {
     margin-bottom: 1.5rem;
-}
+} */
 
 #nicknameInput {
     width: 100%;
@@ -280,9 +283,9 @@
 }
 
 .input-status {
-    margin-top: 0.5rem;
-    font-size: 0.85rem;
-    min-height: 20px;
+   margin: var(--space-sm);
+   font-size: 0.85rem;
+   min-height: 20px;
 }
 
 .status-checking {
@@ -384,9 +387,10 @@
 }
 
 .nickname-actions {
-    display: flex;
-    gap: 1rem;
-    justify-content: space-between;
+   display: flex;
+   gap: 1rem;
+   justify-content: space-between;
+   padding-bottom: var(--space-sm);
 }
 
 /* Community Benefits Styles */
