@@ -942,7 +942,8 @@ Thank you for joining our community!
                 <button class="skip-btn" onclick="OnboardingFlow.skipNickname()">Skip →</button>
                 
                 <div class="nickname-header">
-                    <h2>Choose Your Nickname! 🍻</h2>
+                    <span class="welcome-emoji">🍻</span>
+                    <h2>Choose Your Nickname!</h2>
                     <p>This is how you'll be known in the community</p>
                 </div>
                 
