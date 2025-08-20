@@ -20,6 +20,15 @@ export const SearchModule = (function() {
         totalResults: 0
     };
 
+    const getCurrentCountry = () => {
+        return window.App?.getModule('countries')?.getCountry() || 'GB';
+    };
+    
+    const getCountryFlag = () => {
+        const country = getCurrentCountry();
+        return window.App?.getModule('countries')?.getCountryFlag(country) || '🇬🇧';
+    };
+
     const setResultsViewState = (viewType, message = '') => {
         const elements = {
             loading: document.getElementById('resultsLoading'),
@@ -103,16 +112,22 @@ export const SearchModule = (function() {
     };
     
     const searchNearbyWithDistance = async (radiusKm) => {
-        console.log(`🎯 Searching within ${radiusKm}km...`);
+        const country = getCurrentCountry();
+        const countryFlag = window.App?.getModule('countries')?.getCountryFlag(country) || '';
+        console.log(`Searching within ${radiusKm}km...`);
     
         const gfOnly = window.App.getState('gfOnlyFilter') !== false;
-        console.log(`🍺 Current filter: ${gfOnly ? 'GF Only' : 'All Venues'}`);
+        console.log(`Current filter: ${gfOnly ? 'GF Only' : 'All Venues'}`);
     
         try {
             modules.modalManager?.close('distanceModal') || modules.modal?.close('distanceModal');
+    
+            const searchTitle = country !== 'GB' ? 
+                `Within ${radiusKm}km ${countryFlag}` : 
+                `Within ${radiusKm}km`;
             
-            showResultsOverlay(`Venues within ${radiusKm}km`);
-            showResultsLoading('📍 Getting your location...');
+            showResultsOverlay(searchTitle);
+            showResultsLoading('Getting your location...');
             
             // Get user location
             let userLocation = utils.getUserLocation();
@@ -122,9 +137,9 @@ export const SearchModule = (function() {
                     utils.setUserLocation(userLocation);
                     modules.map?.setUserLocation(userLocation);
                 } catch (locationError) {
-                    console.error('❌ Location error:', locationError);
+                    console.error('Location error:', locationError);
                     hideResultsAndShowHome();
-                    modules.toast?.error('📍 Location needed for nearby search. Try searching by area instead!');
+                    modules.toast?.error('Location needed for nearby search. Try searching by area instead!');
                     
                     setTimeout(() => {
                         modules.modal?.open('areaModal');
@@ -135,7 +150,7 @@ export const SearchModule = (function() {
             
             // Only show accuracy warning for poor accuracy
             if (userLocation.accuracy > 1000) {
-                modules.toast?.warning(`⚠️ Location accuracy: ±${Math.round(userLocation.accuracy)}m`);
+                modules.toast?.warning(`Location accuracy: ±${Math.round(userLocation.accuracy)}m`);
             }
             
             // Save search state
@@ -143,6 +158,7 @@ export const SearchModule = (function() {
                 type: 'nearby',
                 radius: radiusKm,
                 userLocation: userLocation,
+                country: country,  // ADD THIS
                 timestamp: Date.now()
             };
             
@@ -151,12 +167,13 @@ export const SearchModule = (function() {
                     
             showResultsLoading('Searching for venues...');
             
-            // Use the paginated nearby endpoint
+            // Use the paginated nearby endpoint with country
             const searchParams = {
                 lat: userLocation.lat,
                 lng: userLocation.lng,
                 radius: radiusKm,
                 gf_only: gfOnly,
+                country: country,  // ADD THIS
                 page: 1
             };
     
@@ -182,7 +199,7 @@ export const SearchModule = (function() {
             // Display results
             displayResultsInOverlay(
                 data.venues, 
-                `${data.pagination.total} venues within ${radiusKm}km${accuracyText}`
+                `${data.pagination.total} venues within ${radiusKm}km${accuracyText}${country !== 'GB' ? ` ${countryFlag}` : ''}`
             );
             updatePaginationUI(
                 data.pagination.page, 
@@ -198,28 +215,32 @@ export const SearchModule = (function() {
             modules.tracking?.trackSearch(`nearby_${radiusKm}km`, 'location', data.pagination.total);
             
         } catch (error) {
-            console.error('❌ Error in nearby search:', error);
+            console.error('Error in nearby search:', error);
             showNoResults('Could not complete search. Please try again.');
         }
     };
+
     
     // ================================
     // TEXT SEARCHES - Consolidated
     // ================================
     const performTextSearch = async (type, query, searchConfig, page = 1) => {
         try {
+            const country = getCurrentCountry();
+            
             // Try to get user location for distance sorting
             let userLocation = utils.getUserLocation();
             if (!userLocation) {
                 userLocation = await tryGetUserLocation();
             }
             
-            // Perform search with page
+            // Perform search with page and country
             const searchParams = {
                 query: query,
                 searchType: searchConfig.searchType || 'all', 
                 page: page,
                 gfOnly: window.App.getState('gfOnlyFilter') !== false,
+                country: country,  // ADD THIS
                 user_lat: userLocation?.lat,
                 user_lng: userLocation?.lng
             };
@@ -258,6 +279,7 @@ export const SearchModule = (function() {
                 type: type,
                 query: query,
                 searchConfig: searchConfig,
+                country: country,  // ADD THIS
                 timestamp: Date.now()
             };
             
@@ -272,124 +294,29 @@ export const SearchModule = (function() {
             modules.tracking?.trackSearch(query, type, state.totalResults);
             
         } catch (error) {
-            console.error(`❌ Error in ${type} search:`, error);
+            console.error(`Error in ${type} search:`, error);
             showNoResults(searchConfig.errorMessage);
         }
     };
     
-    // ================================
-    // SEARCH METHODS
-    // ================================
-    const searchByName = async () => {
-        const query = document.getElementById('nameInput')?.value.trim();
-        
-        if (!query) {
-            modules.toast?.error('Please enter a venue name to search');
-            return;
-        }
-        
-        console.log('🏠 Searching for venue name:', query);
-        
-        modules.modalManager?.close('nameModal') || modules.modal?.close('nameModal');
-        
-        showResultsOverlay(`Venue name: "${query}"`);
-        showResultsLoading('Searching for venues...');
-        
-        window.App.setState(STATE_KEYS.LAST_SEARCH.TYPE, 'name');
-        window.App.setState(STATE_KEYS.LAST_SEARCH.QUERY, query);
-        window.App.setState(STATE_KEYS.LAST_SEARCH.TIMESTAMP, Date.now());
-        
-        await performTextSearch('name', query, {
-            searchType: 'name',
-            noResultsMessage: `No venues found matching "${query}"`,
-            stateQuery: query,
-            titleWithLocation: (count) => `${count} venues matching "${query}" (nearest first)`,
-            titleWithoutLocation: (count) => `${count} venues matching "${query}"`,
-            successMessage: `venues matching "${query}"`,
-            errorMessage: `Error searching for "${query}". Please try again.`
-        });
-        
-        modules.tracking?.trackEvent('search_by_name', 'Search', query);
-    };
-    
-    const searchByArea = async () => {
-        const query = document.getElementById('areaInput')?.value.trim();
-        const searchType = document.getElementById('areaSearchType')?.value;
-        
-        if (!query) {
-            modules.toast?.error('Please enter a location to search');
-            return;
-        }
-        
-        console.log(`🗺️ Searching by ${searchType}:`, query);
-        
-        modules.modalManager?.close('areaModal') || modules.modal?.close('areaModal');
-        
-        const searchTypeText = searchType === 'postcode' ? 'postcode' : 'area';
-        showResultsOverlay(`${searchTypeText}: "${query}"`);
-        showResultsLoading('Finding venues in this area...');
-        
-        window.App.setState(STATE_KEYS.LAST_SEARCH.TYPE, 'area');
-        window.App.setState(STATE_KEYS.LAST_SEARCH.QUERY, query);
-        window.App.setState(STATE_KEYS.LAST_SEARCH.TIMESTAMP, Date.now());
-        
-        state.lastSearchState = {
-            type: 'area',
-            query: query,
-            searchType: searchType,
-            timestamp: Date.now()
-        };
-        
-        if (searchType === 'postcode') {
-            await performPostcodeSearch(query);
-        } else {
-            await performTextSearch('area', query, {
-                searchType: 'area',
-                noResultsMessage: `No venues found in "${query}"`,
-                stateQuery: `${query} (city)`,
-                titleWithLocation: (count) => `${count} venues in ${query} (nearest first)`,
-                titleWithoutLocation: (count) => `${count} venues in ${query}`,
-                successMessage: `venues in ${query}`,
-                errorMessage: `Error searching for "${query}"`
-            }, 1);
-        }
-        
-        modules.tracking?.trackEvent('search_by_area', 'Search', `${searchType}:${query}`);
-    };
-    
-    const searchByBeer = async () => {
-        const query = document.getElementById('beerInput')?.value.trim();
-        const searchType = document.getElementById('beerSearchType')?.value;
-        
-        if (!query) {
-            modules.toast?.error('Please enter something to search for');
-            return;
-        }
-        
-        console.log(`🍺 Searching by ${searchType}:`, query);
-        
-        modules.modalManager?.close('beerModal') || modules.modal?.close('beerModal');
-        
-        const searchTypeText = searchType === 'brewery' ? 'brewery' : 
-                             searchType === 'beer' ? 'beer' : 'style';
-        showResultsOverlay(`${searchTypeText}: "${query}"`);
-        showResultsLoading('Finding venues with this beer...');
-        
-        window.App.setState(STATE_KEYS.LAST_SEARCH.TYPE, 'beer');
-        window.App.setState(STATE_KEYS.LAST_SEARCH.QUERY, query);
-        window.App.setState(STATE_KEYS.LAST_SEARCH.TIMESTAMP, Date.now());
-        
-        await performBeerSearch(query, searchType, 1);
-        
-        modules.tracking?.trackEvent('search_by_beer', 'Search', `${searchType}:${query}`);
-    };
-    
+    // Updated performPostcodeSearch
     const performPostcodeSearch = async (postcode) => {
         try {
+            const country = getCurrentCountry();
             const cleanPostcode = postcode.trim().toUpperCase();
-            const postcodePattern = /^[A-Z]{1,2}[0-9]?[0-9A-Z]?(\s?[0-9]?[A-Z]{0,2})?$/;
             
-            if (!postcodePattern.test(cleanPostcode)) {
+            // Different postcode patterns for different countries
+            const postcodePatterns = {
+                'GB': /^[A-Z]{1,2}[0-9]?[0-9A-Z]?(\s?[0-9]?[A-Z]{0,2})?$/,
+                'IE': /^[A-Z][0-9]{2}\s?[A-Z0-9]{4}$/,  // Irish Eircode
+                'US': /^[0-9]{5}(-[0-9]{4})?$/,  // US ZIP code
+                'CA': /^[A-Z][0-9][A-Z]\s?[0-9][A-Z][0-9]$/,  // Canadian postal code
+                'default': /.+/  // Accept anything for other countries
+            };
+            
+            const pattern = postcodePatterns[country] || postcodePatterns.default;
+            
+            if (!pattern.test(cleanPostcode)) {
                 await performTextSearch('area', postcode, {
                     searchType: 'area',
                     noResultsMessage: `No venues found in "${postcode}"`,
@@ -407,7 +334,8 @@ export const SearchModule = (function() {
                 query: cleanPostcode,
                 searchType: 'postcode',
                 page: 1,
-                gfOnly: window.App.getState('gfOnlyFilter') !== false
+                gfOnly: window.App.getState('gfOnlyFilter') !== false,
+                country: country  // ADD THIS
             };
             
             let userLocation = utils.getUserLocation();
@@ -425,29 +353,50 @@ export const SearchModule = (function() {
             let pagination = results.pagination;
             
             if (!venues || venues.length === 0) {
-                if (cleanPostcode.length >= 5 && cleanPostcode.includes(' ')) {
-                    console.log('📍 No direct matches, trying geocoding...');
+                // Try geocoding based on country
+                if (cleanPostcode.length >= 3) {
+                    console.log('No direct matches, trying geocoding...');
                     try {
-                        const location = await modules.api.geocodePostcode(cleanPostcode);
-                        console.log(`✅ Postcode geocoded to: ${location.lat}, ${location.lng}`);
+                        let location;
                         
-                        const nearbyVenues = await modules.api.findNearbyVenues(
-                            location.lat, 
-                            location.lng, 
-                            5,
-                            window.App.getState('gfOnlyFilter') !== false
-                        );
-                        
-                        if (nearbyVenues.length > 0) {
-                            venues = nearbyVenues;
-                            pagination = {
-                                page: 1,
-                                pages: 1,
-                                total: nearbyVenues.length
-                            };
+                        if (country === 'GB') {
+                            // Use UK-specific postcodes.io
+                            const response = await fetch(`https://api.postcodes.io/postcodes/${encodeURIComponent(cleanPostcode)}`);
+                            if (response.ok) {
+                                const data = await response.json();
+                                location = {
+                                    lat: data.result.latitude,
+                                    lng: data.result.longitude
+                                };
+                            }
                         } else {
-                            showNoResults(`No venues found near ${cleanPostcode}`);
-                            return;
+                            // Use Nominatim for other countries
+                            const countryName = window.App?.getModule('countries')?.getCountryName(country);
+                            location = await modules.api.geocodePostcode(`${cleanPostcode}, ${countryName}`);
+                        }
+                        
+                        if (location) {
+                            console.log(`Postcode geocoded to: ${location.lat}, ${location.lng}`);
+                            
+                            const nearbyVenues = await modules.api.findNearbyVenues(
+                                location.lat, 
+                                location.lng, 
+                                5,
+                                window.App.getState('gfOnlyFilter') !== false,
+                                country  // ADD THIS
+                            );
+                            
+                            if (nearbyVenues.length > 0) {
+                                venues = nearbyVenues;
+                                pagination = {
+                                    page: 1,
+                                    pages: 1,
+                                    total: nearbyVenues.length
+                                };
+                            } else {
+                                showNoResults(`No venues found near ${cleanPostcode}`);
+                                return;
+                            }
                         }
                     } catch (geocodeError) {
                         console.error('Geocoding failed:', geocodeError);
@@ -483,6 +432,7 @@ export const SearchModule = (function() {
                 type: 'area',
                 query: cleanPostcode,
                 searchType: 'postcode',
+                country: country,  // ADD THIS
                 searchConfig: {
                     searchType: 'postcode',
                     noResultsMessage: `No venues found for "${cleanPostcode}"`,
@@ -500,14 +450,182 @@ export const SearchModule = (function() {
             modules.tracking?.trackSearch(cleanPostcode, 'postcode', state.totalResults);
             
         } catch (error) {
-            console.error('❌ Error searching by postcode:', error);
+            console.error('Error searching by postcode:', error);
             showNoResults(`Error searching for "${postcode}"`);
         }
     };
     
+    // ================================
+    // SEARCH METHODS
+    // ================================
+    const searchByName = async () => {
+        const query = document.getElementById('nameInput')?.value.trim();
+        
+        if (!query) {
+            modules.toast?.error('Please enter a venue name to search');
+            return;
+        }
+
+        const country = getCurrentCountry();  // ADD THIS
+        const countryFlag = getCountryFlag(); // ADD THIS
+        
+        console.log('🏠 Searching for venue name:', query);
+        
+        modules.modalManager?.close('nameModal') || modules.modal?.close('nameModal');
+
+        // Update title to show country if not UK
+        const searchTitle = country !== 'GB' ? 
+            `name: "${query}" ${countryFlag}` : 
+            `name: "${query}"`;
+        
+        showResultsOverlay(`Venue name: "${query}"`);
+        showResultsLoading('Searching for venues...');
+        
+        window.App.setState(STATE_KEYS.LAST_SEARCH.TYPE, 'name');
+        window.App.setState(STATE_KEYS.LAST_SEARCH.QUERY, query);
+        window.App.setState(STATE_KEYS.LAST_SEARCH.TIMESTAMP, Date.now());
+
+        state.lastSearchState = {
+            type: 'name',
+            query: query,
+            country: country,  // ADD THIS
+            timestamp: Date.now()
+        };
+        
+        await performTextSearch('name', query, {
+            searchType: 'name',
+            country: country,  // ADD THIS
+            noResultsMessage: `No venues found matching "${query}"${country !== 'GB' ? ` in ${countryFlag}` : ''}`,
+            stateQuery: query,
+            titleWithLocation: (count) => `${count} venues matching "${query}"${country !== 'GB' ? ` ${countryFlag}` : ''} (nearest first)`,
+            titleWithoutLocation: (count) => `${count} venues matching "${query}"${country !== 'GB' ? ` ${countryFlag}` : ''}`,
+            successMessage: `venues matching "${query}"`,
+            errorMessage: `Error searching for "${query}"`
+        }, 1);
+        
+        modules.tracking?.trackEvent('search_by_name', 'Search', query);
+    };
+    
+    const searchByArea = async () => {
+        const query = document.getElementById('areaInput')?.value.trim();
+        const searchType = document.getElementById('areaSearchType')?.value;
+        const country = getCurrentCountry();  // ADD THIS
+        const countryFlag = getCountryFlag(); // ADD THIS
+        
+        if (!query) {
+            modules.toast?.error('Please enter a location to search');
+            return;
+        }
+        
+        console.log(`🗺️ Searching by ${searchType}:`, query);
+        
+        modules.modalManager?.close('areaModal') || modules.modal?.close('areaModal');
+        
+        const searchTypeText = searchType === 'postcode' ? 'postcode' : 'area';
+        const searchTitle = country !== 'GB' ? 
+            `${searchTypeText}: "${query}" ${countryFlag}` : 
+            `${searchTypeText}: "${query}"`;
+        
+        showResultsOverlay(`${searchTypeText}: "${query}"`);
+        showResultsLoading('Finding venues in this area...');
+        
+        window.App.setState(STATE_KEYS.LAST_SEARCH.TYPE, 'area');
+        window.App.setState(STATE_KEYS.LAST_SEARCH.QUERY, query);
+        window.App.setState(STATE_KEYS.LAST_SEARCH.TIMESTAMP, Date.now());
+        
+        state.lastSearchState = {
+            type: 'area',
+            query: query,
+            searchType: searchType,
+            country: country,  // ADD THIS
+            timestamp: Date.now()
+        };
+        
+        if (searchType === 'postcode') {
+            await performPostcodeSearch(query, country);  // Pass country
+        } else {
+            await performTextSearch('area', query, {
+                searchType: 'area',
+                country: country,  // ADD THIS
+                noResultsMessage: `No venues found in "${query}"${country !== 'GB' ? ` (${countryFlag})` : ''}`,
+                stateQuery: `${query} (city)`,
+                titleWithLocation: (count) => `${count} venues in ${query}${country !== 'GB' ? ` ${countryFlag}` : ''} (nearest first)`,
+                titleWithoutLocation: (count) => `${count} venues in ${query}${country !== 'GB' ? ` ${countryFlag}` : ''}`,
+                successMessage: `venues in ${query}`,
+                errorMessage: `Error searching for "${query}"`
+            }, 1);
+        }
+        
+        modules.tracking?.trackEvent('search_by_area', 'Search', `${searchType}:${query}:${country}`);
+    };
+    
+    // Update searchByBeer
+    const searchByBeer = async () => {
+        const query = document.getElementById('beerInput')?.value.trim();
+        const searchType = document.getElementById('beerSearchType')?.value;
+        const country = getCurrentCountry();  // ADD THIS
+        const countryFlag = getCountryFlag(); // ADD THIS
+        
+        if (!query) {
+            modules.toast?.error('Please enter a beer, brewery, or style');
+            return;
+        }
+        
+        console.log(`🍺 Searching by ${searchType}: ${query} in ${countryFlag}`);
+        
+        modules.modalManager?.close('beerModal') || modules.modal?.close('beerModal');
+        
+        const searchTitle = country !== 'GB' ? 
+            `${searchType}: "${query}" ${countryFlag}` : 
+            `${searchType}: "${query}"`;
+        
+        showResultsOverlay(searchTitle);
+        showResultsLoading('Finding venues with this beer...');
+        
+        window.App.setState(STATE_KEYS.LAST_SEARCH.TYPE, 'beer');
+        window.App.setState(STATE_KEYS.LAST_SEARCH.QUERY, query);
+        window.App.setState(STATE_KEYS.LAST_SEARCH.COUNTRY, country);  // ADD THIS
+        window.App.setState(STATE_KEYS.LAST_SEARCH.TIMESTAMP, Date.now());
+        
+        state.lastSearchState = {
+            type: 'beer',
+            query: query,
+            searchType: searchType,
+            country: country,  // ADD THIS
+            timestamp: Date.now()
+        };
+        
+        try {
+            const params = new URLSearchParams({
+                query: query,
+                beer_type: searchType,
+                page: 1,
+                gf_only: filterGF.isActive().toString(),
+                country: country  // ADD THIS
+            });
+            
+            if (userLat && userLng) {
+                params.set('user_lat', userLat.toString());
+                params.set('user_lng', userLng.toString());
+            }
+            
+            const response = await fetch(`/api/search-by-beer?${params}`);
+            const data = await response.json();
+            
+            displayResults(data);
+            
+        } catch (error) {
+            console.error('Beer search error:', error);
+            showNoResults(`Error searching for "${query}"`);
+        }
+        
+        modules.tracking?.trackEvent('search_by_beer', 'Search', `${searchType}:${query}:${country}`);
+    };
+    
     const performBeerSearch = async (query, searchType, page = 1) => {
         try {
-            console.log(`🍺 Performing beer search: "${query}" (${searchType}) - page ${page}`);
+            const country = getCurrentCountry();
+            console.log(`Performing beer search: "${query}" (${searchType}) - page ${page}`);
             
             let userLocation = utils.getUserLocation();
             if (!userLocation) {
@@ -518,7 +636,8 @@ export const SearchModule = (function() {
                 query: query,
                 beer_type: searchType,
                 page: page.toString(),
-                gf_only: (window.App.getState('gfOnlyFilter') !== false).toString()
+                gf_only: (window.App.getState('gfOnlyFilter') !== false).toString(),
+                country: country  // ADD THIS
             })}`);
             
             if (!response.ok) throw new Error('Search failed');
@@ -543,6 +662,7 @@ export const SearchModule = (function() {
                 type: 'beer',
                 query: query,
                 searchType: searchType,
+                country: country,  // ADD THIS
                 timestamp: Date.now()
             };
             
@@ -556,7 +676,7 @@ export const SearchModule = (function() {
             modules.tracking?.trackSearch(query, `beer_${searchType}`, state.totalResults);
             
         } catch (error) {
-            console.error('❌ Error in beer search:', error);
+            console.error('Error in beer search:', error);
             showNoResults(`Error searching for "${query}". Please try again.`);
         }
     };
