@@ -1,0 +1,69 @@
+<!-- Templates -->
+<template id="venue-result-template">
+    <div class="result-item">
+        <div class="result-header">
+            <div class="result-main-info">
+                <h3 class="result-title"></h3>
+                <div class="result-distance"></div>
+            </div>
+            <div class="gf-indicator"></div>
+        </div>
+        <div class="result-location">
+            <div class="result-address"></div>
+            <div class="result-postcode"></div>
+            <div class="result-authority"></div>
+        </div>
+        <div class="result-actions">
+            <button class="btn btn-primary" data-action="view-venue">📍 View Details</button>
+        </div>
+    </div>
+</template>
+
+<template id="map-legend-template">
+    <div class="map-legend">
+        <div class="legend-title">🍺 GF Beer Status</div>
+        <div class="legend-item">
+            <div class="legend-marker always-tap-cask"></div>
+            <span class="legend-text">Always Tap/Cask</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-marker always-bottle-can"></div>
+            <span class="legend-text">Always Bottles/Cans</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-marker currently"></div>
+            <span class="legend-text">Currently Available</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-marker unknown"></div>
+            <span class="legend-text">Unknown Status</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-marker not-currently"></div>
+            <span class="legend-text">Not Currently</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-marker user-location"></div>
+            <span class="legend-text">Your Location</span>
+        </div>
+    </div>
+</template>
+
+<template id="map-error-template">
+    <div class="map-error-container">
+        <div class="map-error-icon">📍</div>
+        <div class="map-error-title">Location coordinates not available</div>
+        <div class="map-error-text">Help us by reporting the exact location!</div>
+    </div>
+</template>
+
+<template id="popup-content-template">
+    <div class="popup-content">
+        <div class="popup-title" data-field="name"></div>
+        <div class="popup-address" data-field="address"></div>
+        <div class="popup-postcode" data-field="postcode"></div>
+        <div class="popup-distance" data-field="distance"></div>
+        <div class="popup-gf-status" data-field="gf-status"></div>
+        <button class="popup-button" data-action="view-details">View Details</button>
+    </div>
+</template>
