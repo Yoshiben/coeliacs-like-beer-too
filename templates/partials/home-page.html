@@ -1,0 +1,140 @@
+<!-- Community Homepage -->
+<div class="home-page">
+    
+    <!-- Quick Stats Bar -->
+    <div class="stats-bar">
+        <div class="stat-pill">
+            <span class="stat-number-small" id="totalVenues">&nbsp;</span>
+            <span class="stat-label-small">Venues currently<br>in database</br></span>
+        </div>
+        <div class="stat-pill highlighted">
+            <span class="stat-number-small" id="gfVenues">&nbsp;</span>
+            <span class="stat-label-small">Known to serve<br>gf beer</br></span>
+        </div>
+        <div class="stat-pill">
+            <span class="stat-number-small" id="monthlyFinds">&nbsp;</span>
+            <span class="stat-label-small">New findings<br>this month</br></span>
+        </div>
+    </div>
+    
+    <!-- Near Me Quick Access -->
+    <div class="hero-section">
+        <div class="near-me-section">
+            <button class="card near-me-button" data-action="quick-nearby">
+                <div class="near-me-icon">📍</div>
+                <div class="near-me-content">
+                    <h3>Find GF Beer</h3>
+                    <p>Quick 5km search around<br>you</br></p>
+                </div>
+            </button>
+        </div>
+        <div class="buy-beer-section">
+            <button class="card buy-beer-button" data-action="buy-gf-beer">
+                <div class="buy-beer-icon">🛒</div>
+                <div class="buy-beer-content">
+                    <h3>Buy GF Beer</h3>
+                    <p>Shop premium selections<br>online</br></p>
+                </div>
+            </button>
+        </div>
+    </div>
+    
+    <!-- Community Feed -->
+    <div class="community-feed">
+        <!-- Venue of the Month -->
+        <div class="card featured-card">
+            <div class="featured-badge">🏆 Venue of the Month</div>
+            <div class="featured-content">
+                <h2>The Botanist Sheffield</h2>
+                <p>6 dedicated GF taps including Bellfield, Jump Ship & Brass Castle!</p>
+                <div class="featured-stats">
+                    <span>📍 Sheffield City Centre</span>
+                    <span>🍺 Always GF Available</span>
+                </div>
+                <button class="btn btn-featured" data-action="view-venue" data-venue-id="12345">
+                    View Details
+                </button>
+            </div>
+        </div>
+        
+        <!-- Recent Finds Section -->
+        <div class="recent-finds-section" id="recentFinds">
+            <h2 class="recent-finds-title">
+                <span class="recent-finds-icon">🆕</span>
+                Latest Community Discoveries
+            </h2>
+            
+            <div class="recent-finds-container">
+                <!-- Loading State -->
+                <div class="recent-finds-loading" id="recentFindsLoading">
+                    Loading latest discoveries...
+                </div>
+                
+                <!-- Error State -->
+                <div class="recent-finds-error" id="recentFindsError" style="display: none;">
+                    Unable to load recent finds. Please try again later.
+                </div>
+                
+                <!-- Empty State -->
+                <div class="recent-finds-empty" id="recentFindsEmpty" style="display: none;">
+                    No recent finds yet. Be the first to share a discovery!
+                </div>
+                
+                <!-- Dynamic Content List -->
+                <ul class="recent-finds-list" id="recentFindsList" style="display: none;">
+                    <!-- Dynamic content will be inserted here by JavaScript -->
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Trending This Week -->
+        <div class="section-header">
+            <h2>📈 Trending This Week</h2>
+        </div>
+        
+        <div class="card trending-list">
+            <div class="trending-item">
+                <span class="trending-rank">1</span>
+                <div class="trending-content">
+                    <strong>Brass Castle - Haze</strong>
+                    <small>Reported 18 times</small>
+                </div>
+                <span class="trending-badge">🔥</span>
+            </div>
+            <div class="trending-item">
+                <span class="trending-rank">2</span>
+                <div class="trending-content">
+                    <strong>Bellfield - Lawless</strong>
+                    <small>Reported 15 times</small>
+                </div>
+            </div>
+            <div class="trending-item">
+                <span class="trending-rank">3</span>
+                <div class="trending-content">
+                    <strong>Vagabond - American Pale Ale</strong>
+                    <small>Reported 12 times</small>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <button class="action-card" data-action="browse-breweries">
+                <span class="action-icon">🏭</span>
+                <span class="action-label">Browse Breweries</span>
+            </button>
+            <button class="action-card" data-action="new-to-gf">
+                <span class="action-icon">🎓</span>
+                <span class="action-label">New to GF?</span>
+            </button>
+            <button class="action-card" data-action="add-find">
+                <span class="action-icon">➕</span>
+                <span class="action-label">Add a Find</span>
+            </button>
+            <button class="action-card" data-action="saved-venues">
+                <span class="action-icon">❤️</span>
+                <span class="action-label">Saved Venues</span>
+            </button>
+        </div>
+    </div>
+</div>
