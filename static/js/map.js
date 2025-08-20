@@ -528,6 +528,12 @@ export const MapModule = (() => {
         if (venue.distance !== undefined && venue.distance !== null) {
             content += `<div class="popup-distance">📍 ${venue.distance.toFixed(1)}km away</div>`;
         }
+
+        if (venue.country && venue.country !== 'GB') {
+            const countriesModule = window.App?.getModule('countries');
+            const countryFlag = countriesModule?.getCountryFlag(venue.country) || '🌍';
+            content += `<div class="popup-country">${countryFlag} ${venue.country}</div>`;
+        }
         
         // FIX: Update the status messages to match your actual status values
         const statusMessages = {
@@ -594,10 +600,18 @@ export const MapModule = (() => {
         }
         
         // Create map
-        const fullUKMap = createMap('fullMap', {
-            center: userLocation ? [userLocation.lat, userLocation.lng] : config.defaultCenter,
-            zoom: userLocation ? 12 : config.defaultZoom
-        });
+        const countriesModule = window.App?.getModule('countries');
+            const currentCountry = countriesModule?.getCountry() || 'GB';
+            const countryData = countriesModule?.getCountryData(currentCountry);
+            
+            // Use country-specific center and zoom
+            const defaultCenter = countryData?.center || config.defaultCenter;
+            const defaultZoom = countryData?.zoom || config.defaultZoom;
+            
+            const fullUKMap = createMap('fullMap', {
+                center: userLocation ? [userLocation.lat, userLocation.lng] : cconfig.defaultCenter,
+                zoom: userLocation ? 12 : config.defaultZoom
+            });
         
         if (!fullUKMap) {
             console.error('Failed to create full UK map');
