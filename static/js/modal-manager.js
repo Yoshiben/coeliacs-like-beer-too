@@ -52,6 +52,7 @@ export const ModalManager = (() => {
         nicknameModal: { type: 'modal', group: 'onboarding', exclusive: true },  // This one exists but in wrong group
         benefitsModal: { type: 'modal', group: 'onboarding', exclusive: true },
         
+        
         // Status modals (can stack in specific order)
         gfStatusModal: { type: 'modal', group: 'status', stackable: true, order: 1, priority: true },
         gfStatusConfirmModal: { type: 'modal', group: 'status', stackable: true, order: 2 },
@@ -65,6 +66,7 @@ export const ModalManager = (() => {
         // System modals
         locationPermissionModal: { type: 'modal', group: 'system', priority: true },
         locationBlockedModal: { type: 'modal', group: 'system', priority: true },
+        notificationsPreviewModal: { type: 'modal', group: 'system', exclusive: true },
         cookieConsent: { type: 'banner', group: 'system', priority: true },
         cookieSettings: { type: 'modal', group: 'system', exclusive: true }
     };
