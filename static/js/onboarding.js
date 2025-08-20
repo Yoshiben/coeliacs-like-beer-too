@@ -310,8 +310,8 @@ export const OnboardingFlow = (() => {
                 
                 <div class="founder-section">
                     <div class="founder-message">
-                        <p><strong>Hi there! I'm Ben, the founder of Coeliacs Like Beer Too!, and fellow coeliac.</strong></p>
-                        <p>I decided to build this after one too many disappointing pub visits without gluten free options or where staff thought Corona was gluten free 😡.</p>
+                        <p><strong>Hi there! I'm Ben, the founder of Coeliacs Like Beer Too, and fellow coeliac.</strong></p>
+                        <p>I decided to build this web-app after one too many disappointing pub visits with no gf beer, or someone told me Corona was gluten free 😡.</p>
                         <p>Now, with YOUR help, we're mapping every venue serving GF in the UK! 🗺️</p>
                     </div>
                 </div>
@@ -322,7 +322,7 @@ export const OnboardingFlow = (() => {
                         <span class="stat-label">Venues</span>
                     </div>
                     <div class="stat-item featured">
-                        <span class="stat-number">100+</span>
+                        <span class="stat-number">50+</span>
                         <span class="stat-label">With GF Beer</span>
                     </div>
                     <div class="stat-item">
@@ -939,6 +939,8 @@ Thank you for joining our community!
         
         const modal = createModal('nickname', `
             <div class="nickname-content">
+                <button class="skip-btn" onclick="OnboardingFlow.skipNickname()">Skip →</button>
+                
                 <div class="nickname-header">
                     <h2>Choose Your Nickname! 🍻</h2>
                     <p>This is how you'll be known in the community</p>
@@ -991,9 +993,6 @@ Thank you for joining our community!
                 </div>
                 
                 <div class="nickname-actions">
-                    <button class="btn btn-secondary" onclick="OnboardingFlow.skipNickname()">
-                        Skip for now
-                    </button>
                     <button class="btn btn-primary" id="saveNicknameBtn" onclick="OnboardingFlow.saveNickname()" disabled>
                         Create Account!
                     </button>
