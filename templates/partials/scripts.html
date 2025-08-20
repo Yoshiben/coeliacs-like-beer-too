@@ -1,0 +1,26 @@
+<!-- Leaflet -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" 
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" 
+        crossorigin=""></script>
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
+<!-- Core App Scripts -->
+<script type="module" src="/static/js/main.js?v={{ cache_buster }}"></script>
+<script src="/static/js/recent-finds.js?v={{ cache_buster }}"></script>
+
+<!-- Initialization & PWA -->
+<script src="/static/js/init.js?v={{ cache_buster }}"></script>
+<script src="/static/js/pwa.js?v={{ cache_buster }}"></script>
+
+<!-- Pass template variables to JavaScript -->
+<script>
+    // Configuration passed from backend
+    window.APP_CONFIG = {
+        cacheBuster: '{{ cache_buster }}',
+        environment: '{{ environment|default("production") }}',
+        apiUrl: '{{ api_url|default("/api") }}'
+    };
+    
+    // Log cache buster for debugging
+    console.log('🚀 CACHE BUSTER:', '{{ cache_buster }}');
+</script>
