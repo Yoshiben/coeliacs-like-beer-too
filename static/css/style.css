@@ -154,6 +154,16 @@
    box-sizing: border-box;
 }
 
+/* Navigation visibility based on page context */
+body.page-home .nav-notification-btn { display: flex !important; }
+body.page-results .nav-back-btn,
+body.page-results .nav-toggle { display: flex !important; }
+body.page-search .nav-back-btn { display: flex !important; }
+body.page-map .nav-back-btn,
+body.page-map .nav-toggle { display: block !important; }
+body.page-venue .nav-back-btn { display: flex !important; }
+body.page-breweries .nav-back-btn { display: flex !important; }
+
 body {
    background: var(--primary-gradient);
    margin: 0;
@@ -210,75 +220,6 @@ html {
    overflow: hidden;
    box-shadow: var(--shadow-card-home);
    border: 1px solid rgba(139, 92, 246, 0.07);
-}
-
-.btn {
-   border: none;
-   background: none;
-   border-radius: var(--radius-xl);
-   padding: var(--space-lg);
-   font-weight: 600;
-   cursor: pointer;
-   box-shadow: var(--shadow);
-   transition: all 0.25s ease;
-}
-
-.btn-primary {
-   background: var(--primary-gradient);
-   color: var(--text-white);
-   flex: 1;
-}
-
-.btn-primary:hover {
-   transform: translateY(-1px);
-   box-shadow: var(--shadow-lg);
-}
-
-.btn-secondary {
-   background: var(--light-purple);
-   color: var(--text-secondary);
-   backdrop-filter: blur(10px);
-   border: 2px solid var(--border-light);
-   flex: 1;
-}
-
-.btn-success {
-    background: var(--success-gradient);
-    color: var(--text-white);
-}
-
-.btn-sm {
-   padding: var(--space-sm) var(--space-3xl);
-   font-size: var(--text-sm);
-}
-
-/* ================================
-   FORMS
-   ================================ */
-.form-input,
-.form-select {
-   border: 2px solid var(--border-light);
-   border-radius: var(--radius-xl);
-   font-size: var(--text-md);
-   margin: var(--space-xl);
-   transition: border-color 0.25s ease;
-   overflow: hidden;
-   padding: var(--space-xl);
-   width: -webkit-fill-available;
-}
-
-.form-input:focus {
-   outline: none;
-   border-color: var(--border-purple);
-   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-.form-label {
-   font-weight: 600;
-   color: var(--text-secondary);
-   font-size: var(--text-sm);
-   padding: var(--space-md);
-   display: flex;
 }
 
 /* ================================
@@ -350,16 +291,6 @@ nav-notification-btn {
 .nav-notification-btn {
     display: none !important;
 }
-
-/* Navigation visibility based on page context */
-body.page-home .nav-notification-btn { display: flex !important; }
-body.page-results .nav-back-btn,
-body.page-results .nav-toggle { display: flex !important; }
-body.page-search .nav-back-btn { display: flex !important; }
-body.page-map .nav-back-btn,
-body.page-map .nav-toggle { display: block !important; }
-body.page-venue .nav-back-btn { display: flex !important; }
-body.page-breweries .nav-back-btn { display: flex !important; }
 
 
 .bottom-nav {
@@ -1581,52 +1512,6 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 .beer-name-container {
     position: relative;
 }
-
-.photo-upload-compact input[type="file"] {
-    display: none;
-}
-
-.photo-upload-compact {
-    display: flex;
-    align-items: center;
-    gap: var(--space-md);
-    padding: var(--space-lg);
-    border: 2px dashed var(--light-grey);
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    transition: all var(--transition);
-    background: var(--grey-white);
-}
-
-.photo-upload-compact:hover {
-    border-color: var(--light-blue);
-    background: var(--bg-section);
-}
-
-.photo-upload-compact.active {
-    border-color: var(--light-blue);
-    background: var(--bg-purple);
-}
-
-.photo-upload-icon {
-    font-size: var(--text-2xl);
-}
-
-.photo-upload-text strong {
-    display: block;
-    color: var(--text-primary);
-    font-weight: 600;
-}
-
-.photo-upload-text small {
-    color: var(--text-muted);
-    font-size: var(--text-sm);
-}
-
-
-
-
-
 
 .pagination-container {
     position: sticky;
