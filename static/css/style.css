@@ -466,7 +466,7 @@ nav-notification-btn {
 /* ================================
    COMMUNITY HOME
    ================================ */
-.community-home {
+.home-page {
    flex: 1;
    display: flex;
    flex-direction: column;
