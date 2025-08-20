@@ -1655,20 +1655,18 @@ const App = {
             }
         }
         
-        const mapOverlay = document.getElementById('fullMapOverlay');
-        if (mapOverlay) {
-            mapOverlay.classList.add('active');
-            mapOverlay.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-            
-            setTimeout(() => modules.map?.initFullUKMap?.(), 100);
-            
-            modules.tracking?.trackEvent('full_map_view', 'Navigation', 'nav_bar');
-
-            // ADD THIS: Update navigation context after overlay is shown
-            const navModule = modules.nav;
-            navModule?.showMapWithContext();
-        }
+        // USE MODAL MANAGER INSTEAD OF MANUAL DOM MANIPULATION
+        modules.modalManager.open('fullMapOverlay', {
+            onOpen: () => {
+                // Initialize map after overlay is properly opened
+                setTimeout(() => modules.map?.initFullUKMap?.(), 100);
+                
+                // Update navigation context
+                modules.nav?.showMapWithContext();
+            }
+        });
+        
+        modules.tracking?.trackEvent('full_map_view', 'Navigation', 'nav_bar');
     },
     
     closeFullMap: (modules) => {
