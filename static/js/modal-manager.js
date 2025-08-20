@@ -44,7 +44,6 @@ export const ModalManager = (() => {
         beerListModal: { type: 'modal', group: 'venue-sub', exclusive: true },
         breweryBeersModal: { type: 'modal', group: 'brewery', exclusive: true },
         manualVenueEntryModal: { type: 'modal', group: 'form', exclusive: true },
-        nicknameModal: { type: 'modal', group: 'user', exclusive: true },
         statusPromptAfterBeerModal: { type: 'modal', group: 'status', stackable: true, order: 4 },
 
         ageGateModal: { type: 'modal', group: 'onboarding', exclusive: true, priority: true },
