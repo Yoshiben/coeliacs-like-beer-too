@@ -1,0 +1,716 @@
+<!-- Search Modals -->
+<div id="nameModal" class="modal search-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">🏠 Search by Venue Name</h3>
+            <p class="modal-subtitle">Enter the name of the venue you're looking for</p>
+        </div>
+        <input type="text" class="form-input" placeholder="e.g. The Red Lion, Wetherspoons" id="nameInput">
+        <div class="modal-actions">
+            <button class="btn btn-secondary" data-action="close-modal">Cancel</button>
+            <button class="btn btn-primary" data-action="perform-name-search">Search</button>
+        </div>
+    </div>
+</div>
+
+<div id="areaModal" class="modal search-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">🗺️ Search by Area</h3>
+            <p class="modal-subtitle">Find venues in a specific location</p>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Search by:</label>
+            <select id="areaSearchType" class="form-select" data-action="update-area-placeholder">
+                <option value="city">🏙️ City/Region</option>
+                <option value="postcode">📮 Postcode</option>  
+            </select>
+        </div>
+        <input type="text" class="form-input" placeholder="Enter postcode..." id="areaInput">
+        <div class="modal-actions">
+            <button class="btn btn-secondary" data-action="close-modal">Cancel</button>
+            <button class="btn btn-primary" data-action="perform-area-search">Search</button>
+        </div>
+    </div>
+</div>
+
+<div id="beerModal" class="modal search-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">🍺 Search by Beer</h3>
+            <p class="modal-subtitle">Find venues serving specific gluten-free beers</p>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Search by:</label>
+            <select id="beerSearchType" class="form-select" data-action="update-beer-placeholder">
+                <option value="brewery">🏭 Brewery Name</option>
+                <option value="beer">🍺 Specific Beer</option>
+                <option value="style">🎨 Beer Style</option>
+            </select>
+        </div>
+        <div class="beer-search-container">
+            <input type="text" class="form-input" placeholder="Start typing brewery name..." id="beerInput">
+            <div id="beerSuggestions" class="suggestions beer-search-suggestions"></div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" data-action="close-modal">Cancel</button>
+            <button class="btn btn-primary" data-action="perform-beer-search">Search</button>
+        </div>
+    </div>
+</div>
+
+<!-- Distance Selection Modal -->
+<div id="distanceModal" class="modal search-modal">
+    <div class="modal-content distance-content">
+        <div class="modal-header">
+            <h3 class="modal-title">📍 How far will you travel?</h3>
+        </div>
+        <div class="modal-options distance-options">
+            <div class="distance-option" data-distance="1">
+                <div class="distance-number">1km</div>
+                <div class="distance-label">Walking distance</div>
+            </div>
+            <div class="distance-option" data-distance="3">
+                <div class="distance-number">3km</div>
+                <div class="distance-label">Short journey</div>
+            </div>
+            <div class="distance-option popular" data-distance="5">
+                <div class="distance-number">5km</div>
+                <div class="distance-label">Most popular</div>
+            </div>
+            <div class="distance-option" data-distance="10">
+                <div class="distance-number">10km</div>
+                <div class="distance-label">Longer trip</div>
+            </div>
+            <div class="distance-option" data-distance="20">
+                <div class="distance-number">20km</div>
+                <div class="distance-label">Day out</div>
+            </div>
+        </div>
+        <div class="modal-actions distance-actions">
+            <button class="btn btn-secondary" data-action="close-modal">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<!-- Brewery Beers Modal -->
+<div id="breweryBeersModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">🍺 <span id="breweryName"></span> Beers</h3>
+            <button class="modal-close" data-action="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="breweryBeersLoading" class="loading-state">
+                <div class="loading-spinner"></div>
+                <div class="loading-text">Loading beers...</div>
+            </div>
+            <div id="breweryBeersList" class="brewery-beers-list"></div>
+            <div id="breweryBeersEmpty" class="empty-state" style="display: none;">
+                <p>No beers found for this brewery</p>
+            </div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-primary" data-action="search-venues-with-brewery">
+                🔍 Find Venues Serving These Beers
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Status Prompt After Beer Report Modal -->
+<div id="statusPromptAfterBeerModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>🎯 One More Thing!</h2>
+            <button class="modal-close" data-action="close-modal">&times;</button>
+        </div>
+        
+        <div class="modal-body" style="text-align: center; padding: 2rem;">
+            <p style="font-size: 1.1rem; margin-bottom: 1.5rem;">
+                Thanks for adding that beer! 🍺
+            </p>
+            
+            <p style="margin-bottom: 2rem;">
+                <strong>How reliably does <span id="statusPromptVenueName" style="font-weight: bold;">this venue</span> have GF beer?</strong>
+            </p>
+            
+            <div class="status-quick-options" style="display: flex; flex-direction: column; gap: 0.75rem; max-width: 400px; margin: 0 auto;">
+                <button class="btn btn-success status-prompt-btn" data-action="quick-status-update" data-status="always_tap_cask" style="text-align: left; padding: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span style="font-size: 1.5rem;">⭐</span>
+                        <div>
+                            <strong>Always has GF on tap/cask</strong>
+                            <br><small style="opacity: 0.8;">The holy grail! Permanent GF tap/cask lines</small>
+                        </div>
+                    </div>
+                </button>
+                
+                <button class="btn btn-primary status-prompt-btn" data-action="quick-status-update" data-status="always_bottle_can" style="text-align: left; padding: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span style="font-size: 1.5rem;">✅</span>
+                        <div>
+                            <strong>Always has GF bottles/cans</strong>
+                            <br><small style="opacity: 0.8;">Reliable bottled/canned options</small>
+                        </div>
+                    </div>
+                </button>
+                
+                <button class="btn btn-secondary status-prompt-btn" data-action="quick-status-update" data-status="currently" style="text-align: left; padding: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span style="font-size: 1.5rem;">🔵</span>
+                        <div>
+                            <strong>Sometimes has GF beer</strong>
+                            <br><small style="opacity: 0.8;">Not always available, but they have it today</small>
+                        </div>
+                    </div>
+                </button>
+                
+                <button class="btn btn-outline" data-action="skip-status-prompt" style="padding: 0.75rem; margin-top: 0.5rem;">
+                    🤷 Not sure / Skip
+                </button>
+            </div>
+            
+            <p style="margin-top: 1.5rem; font-size: 0.9rem; opacity: 0.7;">
+                This helps others know what to expect when they visit!
+            </p>
+        </div>
+    </div>
+</div>
+
+<!-- Notifications Preview Modal -->
+<div class="modal" id="notificationsPreviewModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">🔔 Notifications Coming Soon!</h3>
+            <button class="modal-close" data-action="close-modal">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="notifications-preview">
+                <div class="preview-intro">
+                    <p>We're building a smart notification system to keep you updated on:</p>
+                </div>
+                
+                <div class="notification-types">
+                    <div class="notification-type">
+                        <div class="type-icon">🍺</div>
+                        <div class="type-content">
+                            <h4>New GF Beers Near You</h4>
+                            <p>Get alerts when fresh gluten-free options are spotted within your chosen radius</p>
+                        </div>
+                    </div>
+                    
+                    <div class="notification-type">
+                        <div class="type-icon">✅</div>
+                        <div class="type-content">
+                            <h4>Report Updates</h4>
+                            <p>Know when your beer discoveries are verified by other community members</p>
+                        </div>
+                    </div>
+                    
+                    <div class="notification-type">
+                        <div class="type-icon">🔥</div>
+                        <div class="type-content">
+                            <h4>Trending in Your Area</h4>
+                            <p>See which GF beers are popular and highly-rated in your city this week</p>
+                        </div>
+                    </div>
+                    
+                    <div class="notification-type">
+                        <div class="type-icon">📍</div>
+                        <div class="type-content">
+                            <h4>Location-Based Alerts</h4>
+                            <p>Discover when you're near pubs with confirmed gluten-free options</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="preview-cta">
+                    <p><strong>Want to be notified when this launches?</strong></p>
+                    <p>Keep using the app - we'll announce it right here when it's ready! 🎉</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Report Modal -->
+<div id="reportModal" class="modal report-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Report GF Beer Find</h2>
+            <p class="modal-subtitle" id="reportModalSubtitle"></p>
+            <button class="modal-close" data-action="close-modal" aria-label="Close report modal">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+            <form id="reportForm" class="modal-form" data-action="submit-report">
+                <div class="form-group" id="venueSearchGroup">
+                    <label class="form-label">Find Your Venue *</label>
+                    <input type="text" id="reportVenueSearch" class="form-input" placeholder="Start typing venue name..." autocomplete="off">
+                    <div id="venueSuggestions" class="suggestions"></div>
+                </div>
+                
+                <div id="selectedVenueInfo" class="selected-venue-info">
+                    <div class="selected-venue-card">
+                        <strong id="selectedVenueName"></strong>
+                        <div id="selectedVenueAddress"></div>
+                        <button type="button" class="btn btn-secondary btn-sm" data-action="clear-selected-venue">Choose Different Venue</button>
+                    </div>
+                </div>
+                
+                <div id="newVenueFields" class="new-venue-fields">
+                    <h4>📍 Add New Venue</h4>
+                    <div class="form-group">
+                        <label class="form-label">Venue Name *</label>
+                        <input type="text" id="reportVenueName" class="form-input" placeholder="The Red Lion">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Address *</label>
+                        <input type="text" id="reportAddress" class="form-input" placeholder="123 High Street">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Postcode *</label>
+                        <input type="text" id="reportPostcode" class="form-input" placeholder="SW1A 1AA">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Beer Format *</label>
+                    <select id="reportFormat" name="reportFormat" class="form-select" required>
+                        <option value="">Select format...</option>
+                        <option value="bottle">🍺 Bottle</option>
+                        <option value="tap">🚰 Tap</option>
+                        <option value="cask">🛢️ Cask</option>
+                        <option value="can">🥫 Can</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Brewery</label>
+                    <div class="brewery-dropdown-container">
+                        <input type="text" id="reportBrewery" name="reportBrewery" class="form-input" placeholder="Start typing brewery name..." autocomplete="off">
+                        <div id="breweryDropdown" class="suggestions brewery-suggestions"></div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Beer Name</label>
+                    <div class="beer-name-container">
+                        <input type="text" id="reportBeerName" name="reportBeerName" class="form-input" placeholder="Start typing beer name..." autocomplete="off">
+                        <div id="beerNameDropdown" class="suggestions beer-suggestions"></div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Beer Style</label>
+                    <div class="beer-style-container">
+                        <input type="text" id="reportBeerStyle" name="reportBeerStyle" class="form-input" placeholder="IPA, Lager, Stout..." autocomplete="off">
+                        <div id="beerStyleDropdown" class="suggestions style-suggestions"></div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">ABV (Alcohol %)</label>
+                    <input type="number" id="reportBeerABV" name="reportBeerABV" class="form-input" placeholder="4.5" step="0.1" min="0" max="20">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Photo (Optional)</label>
+                    <label for="reportPhoto" class="photo-upload-compact">
+                        <div class="photo-upload-icon">📷</div>
+                        <div class="photo-upload-text">
+                            <strong>Add a photo</strong><br>
+                            <small>Beer menu, bottle, or tap</small>
+                        </div>
+                        <input type="file" id="reportPhoto" name="reportPhoto" accept="image/*">
+                    </label>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Submit Report</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Places Search Modal -->
+<div id="placesSearchModal" class="modal places-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">🔍 Find Your Venue</h2>
+            <button class="modal-close" data-action="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p class="search-prompt">Search for bars, venues, or restaurants:</p>
+            <div class="places-search-container">
+                <input type="text" id="placesSearchInput" class="form-input" placeholder="e.g. Lawn Club Sheffield" autocomplete="off">
+                <div id="placesResults" class="places-results"></div>
+            </div>
+            <div class="search-powered-by"><small>Powered by Google Places</small></div>
+            <div id="selectedPlacePreview" class="selected-place-preview" style="display: none;">
+                <h4>Selected Venue:</h4>
+                <div class="place-details">
+                    <strong id="selectedPlaceName"></strong>
+                    <div id="selectedPlaceAddress"></div>
+                    <div id="selectedPlaceType"></div>
+                </div>
+                <button class="btn btn-primary" data-action="use-selected-place">✅ Use This Venue</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Venue Added Prompt Modal -->
+<div id="venueAddedPromptModal" class="modal prompt-modal">
+    <div class="modal-content">
+        <div class="modal-body">
+            <div class="success-icon"> </div>
+            <h3>Venue Added Successfully!</h3>
+            <p><strong id="addedVenueName"></strong> has been added to our database.</p>
+            <p>What would you like to do next?</p>
+            <div class="modal-actions status-modal-action">
+                <button class="btn btn-primary" data-action="update-gf-status-new-venue">📊 Update GF Beer Status</button>
+                <button class="btn btn-success" data-action="report-gf-beer-new-venue">🍺 Report GF Beer Available</button>
+                <button class="btn btn-secondary" data-action="close-venue-added-modal">✅ Done For Now</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Status Modals -->
+<div id="gfStatusModal" class="modal status-modal">
+    <div class="modal-content status-modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Update GF Beer Status</h2>
+            <p class="modal-subtitle" id="statusModalSubtitle"></p>
+            <button class="modal-close" data-action="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-options status-options">
+                <button class="status-option always-tap-cask" data-status="always_tap_cask">
+                    <div class="option-icon">⭐</div>
+                    <div class="option-content">
+                        <h4>Always Has Tap/Cask</h4>
+                        <p>Dedicated GF tap or cask - the holy grail!</p>
+                    </div>
+                </button>
+                <button class="status-option always-bottle-can" data-status="always_bottle_can">
+                    <div class="option-icon">✅</div>
+                    <div class="option-content">
+                        <h4>Always Has Bottles/Cans</h4>
+                        <p>Reliable GF bottles or cans in the fridge</p>
+                    </div>
+                </button>
+                <button class="status-option currently" data-status="currently">
+                    <div class="option-icon">🔵</div>
+                    <div class="option-content">
+                        <h4>Currently Available</h4>
+                        <p>GF beer in stock right now</p>
+                    </div>
+                </button>
+                <button class="status-option not-currently" data-status="not_currently">
+                    <div class="option-icon">❌</div>
+                    <div class="option-content">
+                        <h4>Not Available</h4>
+                        <p>No GF options at the moment</p>
+                    </div>
+                </button>
+                <button class="status-option unknown" data-status="unknown">
+                    <div class="option-icon">❓</div>
+                    <div class="option-content">
+                        <h4>Not Sure</h4>
+                        <p>Status unknown</p>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="gfStatusConfirmModal" class="modal confirm-modal">
+    <div class="modal-content confirm-modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Confirm Status Change</h2>
+        </div>
+        <div class="modal-body">
+            <div class="confirm-message">
+                <p>You're about to update the GF beer status to:</p>
+                <div class="confirm-status" id="confirmStatus"></div>
+                <p class="confirm-warning">This will be visible to all users. Are you sure?</p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" data-action="cancel-status">Cancel</button>
+                <button class="btn btn-primary" data-action="confirm-status">Yes, Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="beerDetailsPromptModal" class="modal prompt-modal">
+    <div class="modal-content prompt-modal-content">
+        <div class="modal-body">
+            <div class="success-icon">🎉</div>
+            <h3>Thanks for the update!</h3>
+            <p>Would you like to tell us which GF beers are available?</p>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" data-action="skip-details">Not Now</button>
+                <button class="btn btn-primary" data-action="add-beer-details">📝 Add Beer Details</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Beer List Modal -->
+<div id="beerListModal" class="modal beer-list-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">🍺 Current GF Beers</h3>
+            <p class="modal-subtitle" id="beerListVenueName"></p>
+            <button class="modal-close" data-action="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="beerListContent" class="beer-list-content">
+                <!-- Beer items will be populated here -->
+            </div>
+            <div class="beer-list-empty" id="beerListEmpty" style="display: none;">
+                <p>No GF beers reported yet</p>
+                <button class="btn btn-primary" data-action="report-beer">Add First Beer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Nickname Modal -->
+<div id="nicknameModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">👋 Choose Your Nickname</h3>
+            <p class="modal-subtitle">How should we credit your contributions?</p>
+        </div>
+        <div class="modal-body">
+            <input type="text" 
+                   id="nicknameInput" 
+                   class="form-input" 
+                   placeholder="e.g. BeerHunter, GFGuru..."
+                   maxlength="30">
+            <p style="text-align: center; color: var(--text-muted); font-size: var(--text-sm); margin-top: var(--space-md);">
+                This will be shown on your beer reports
+            </p>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" data-action="skip-nickname">Skip for Now</button>
+            <button class="btn btn-primary" data-action="save-nickname">Save Nickname</button>
+        </div>
+    </div>
+</div>
+
+<!-- Manual Venue Entry Modal -->
+<div id="manualVenueEntryModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">✏️ Add Venue Manually</h3>
+            <button class="modal-close" data-action="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form id="manualVenueForm">
+                <div class="form-group">
+                    <label class="form-label">Venue Name *</label>
+                    <input type="text" id="manualVenueName" class="form-input" 
+                           placeholder="e.g. The Jolly Roger" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Address *</label>
+                    <input type="text" id="manualVenueAddress" class="form-input" 
+                           placeholder="e.g. 123 High Street" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">City/Town *</label>
+                    <input type="text" id="manualVenueCity" class="form-input" 
+                           placeholder="e.g. Sheffield" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Postcode *</label>
+                    <input type="text" id="manualVenuePostcode" class="form-input" 
+                           placeholder="e.g. S1 2AB" required 
+                           pattern="[A-Za-z]{1,2}[0-9Rr][0-9A-Za-z]? ?[0-9][ABD-HJLNP-UW-Zabd-hjlnp-uw-z]{2}">
+                </div>
+                <p style="text-align: center; color: var(--text-muted); font-size: var(--text-sm);">
+                    We'll try to find coordinates later
+                </p>
+            </form>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" data-action="close-modal">Cancel</button>
+            <button class="btn btn-primary" data-action="submit-manual-venue">Add Venue</button>
+        </div>
+    </div>
+</div>
+
+<!-- Location Permission Modal -->
+<div id="locationPermissionModal" class="modal location-modal">
+    <div class="modal-content location-permission-card">
+        <div class="permission-icon">📍</div>
+        <h2 class="permission-title">Enable Location Services</h2>
+        <p class="permission-text">
+            To find venues near you, we need access to your location. 
+            Your location data stays on your device and is never stored.
+        </p>
+        <div class="permission-benefits">
+            <div class="benefit-item">
+                <span class="benefit-icon">🎯</span>
+                <span>Find the closest venues with GF beer</span>
+            </div>
+            <div class="benefit-item">
+                <span class="benefit-icon">📏</span>
+                <span>See accurate distances</span>
+            </div>
+            <div class="benefit-item">
+                <span class="benefit-icon">🗺️</span>
+                <span>Get directions from your location</span>
+            </div>
+        </div>
+        <div class="permission-actions">
+            <button class="btn btn-secondary" data-action="deny-location">Not Now</button>
+            <button class="btn btn-primary" data-action="allow-location">Enable Location</button>
+        </div>
+        <p class="permission-note">
+            You can change this anytime in your browser settings
+        </p>
+    </div>
+</div>
+
+<!-- Location Blocked Modal -->
+<div id="locationBlockedModal" class="modal location-modal">
+    <div class="modal-content location-permission-card">
+        <div class="permission-icon blocked">🚫</div>
+        <h2 class="permission-title">Location Access Blocked</h2>
+        <p class="permission-text">
+            Your browser is currently blocking location access for this website. 
+            To find venues near you, you'll need to update your browser settings.
+            If you don't wish to share your location, please select "Search
+            by Area" below to continue.
+        </p>
+        
+        <div class="permission-benefits blocked-instructions">
+            <h4>How to enable location:</h4>
+            
+            <div class="browser-instructions" id="browserInstructions">
+                <!-- Chrome -->
+                <div class="instruction-set" data-browser="chrome">
+                    <strong>Chrome:</strong>
+                    <ol>
+                        <li>Click the lock icon 🔒 in the address bar</li>
+                        <li>Find "Location" and change it to "Allow"</li>
+                        <li>Refresh the page and try again</li>
+                    </ol>
+                </div>
+                
+                <!-- Firefox -->
+                <div class="instruction-set" data-browser="firefox">
+                    <strong>Firefox:</strong>
+                    <ol>
+                        <li>Click the lock icon 🔒 in the address bar</li>
+                        <li>Click "Clear permissions and reload"</li>
+                        <li>When prompted, click "Allow location access"</li>
+                    </ol>
+                </div>
+                
+                <!-- Safari -->
+                <div class="instruction-set" data-browser="safari">
+                    <strong>Safari:</strong>
+                    <ol>
+                        <li>Go to Safari → Preferences → Websites</li>
+                        <li>Click "Location" in the sidebar</li>
+                        <li>Find coeliacslikebeer.co.uk and change to "Allow"</li>
+                    </ol>
+                </div>
+                
+                <!-- Edge -->
+                <div class="instruction-set" data-browser="edge">
+                    <strong>Edge:</strong>
+                    <ol>
+                        <li>Click the lock icon 🔒 in the address bar</li>
+                        <li>Click "Permissions for this site"</li>
+                        <li>Find "Location" and change to "Allow"</li>
+                    </ol>
+                </div>
+                
+                <!-- Generic -->
+                <div class="instruction-set" data-browser="generic">
+                    <strong>Most browsers:</strong>
+                    <ol>
+                        <li>Look for a lock icon 🔒 in your address bar</li>
+                        <li>Click it and find location settings</li>
+                        <li>Change location access to "Allow"</li>
+                        <li>Refresh the page and try again</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        
+        <div class="permission-actions">
+            <button class="btn btn-secondary" data-action="close-location-blocked">Search by Area</button>
+            <button class="btn btn-primary" data-action="reload-page">Try Again</button>
+        </div>
+        
+        <p class="permission-note">
+            Don't worry - your location data is never stored or shared
+        </p>
+    </div>
+</div>
+
+<!-- Cookie Settings Modal -->
+<div id="cookieSettings" class="modal cookie-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">🍪 Cookie Settings</h2>
+            <button class="modal-close" aria-label="Close cookie settings">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="cookie-settings-content">
+                <div class="cookie-category">
+                    <div class="cookie-category-header">
+                        <h3>Essential Cookies</h3>
+                        <label class="cookie-toggle">
+                            <input type="checkbox" checked disabled>
+                            <span class="toggle-slider essential"></span>
+                        </label>
+                    </div>
+                    <p>These cookies are necessary for the website to function and cannot be switched off. They are usually only set in response to actions made by you which amount to a request for services.</p>
+                    <div class="cookie-details">
+                        <strong>Examples:</strong> Session management, search preferences, location consent
+                    </div>
+                </div>
+                <div class="cookie-category">
+                    <div class="cookie-category-header">
+                        <h3>Analytics Cookies</h3>
+                        <label class="cookie-toggle">
+                            <input type="checkbox" id="analyticsConsent">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <p>These cookies help us understand how visitors interact with our website by collecting and reporting information anonymously. This helps us improve our service.</p>
+                    <div class="cookie-details">
+                        <strong>Provider:</strong> Google Analytics<br>
+                        <strong>Purpose:</strong> Usage statistics, popular features, performance monitoring
+                    </div>
+                </div>
+                <div class="cookie-info">
+                    <h4>📋 Your Rights</h4>
+                    <ul>
+                        <li>You can change your preferences at any time</li>
+                        <li>Withdrawing consent may limit website functionality</li>
+                        <li>Essential cookies cannot be disabled</li>
+                        <li>See our <a href="/cookies" target="_blank">Cookie Policy</a> for full details</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button data-action="save-cookie-preferences" class="btn btn-primary">Save Preferences</button>
+                <button data-action="accept-all-from-settings" class="btn btn-success">Accept All</button>
+            </div>
+        </div>
+    </div>
+</div>
