@@ -307,8 +307,8 @@ export const OnboardingFlow = (() => {
                 <div class="founder-section">
                     <div class="founder-message">
                         <p><strong>Hi there! I'm Ben, the founder of Coeliacs Like Beer Too, and fellow coeliac.</strong></p>
-                        <p>I decided to build this web-app after one too many disappointing pub visits with no gf beer, or someone told me Corona was gluten free 😡.</p>
-                        <p>Now, with YOUR help, we're mapping every venue serving GF in the UK! 🗺️</p>
+                        <p>I decided to build this web-app after one too many disappointing pub visits with no gf beer, or being told that Corona was gluten free 😡.</p>
+                        <p>Now, with YOUR help, we're mapping every venue serving GF in the UK (and possibly, eventually, the world!) 🌍</p>
                     </div>
                 </div>
                 
