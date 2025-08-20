@@ -37,29 +37,25 @@ export const OnboardingFlow = (() => {
                 break;
                 
             case 'returning-user':
-                // Check if this device has the user's passcode stored
-                const hasStoredAuth = localStorage.getItem('userAuth');
-                if (hasStoredAuth) {
-                    showWelcomeBack(userStatus.user);
-                } else {
-                    // Device not linked - show sign in
-                    showSignInPrompt();
-                }
+                // User is authenticated - just show welcome back
+                showWelcomeBack(userStatus.user);
                 break;
                 
             case 'device-has-account':
-                // This device created an account but may need to sign in again
+                // This is the ONLY time we need sign-in prompt
+                // (Device created account before but auth was cleared)
                 showSignInPrompt();
                 break;
                 
             case 'anonymous':
-                console.log('Anonymous user');
-                break;
-                
-            default:
-                console.log('Ready to use app');
-        }
-    };
+                // User skipped before - they're good to go
+            console.log('Anonymous user');
+            break;
+            
+        default:
+            console.log('Ready to use app');
+    }
+};
     
     // ================================
     // AGE GATE (unchanged)
