@@ -8,19 +8,21 @@
    ================================ */
 
 .overlay {
-   position: fixed;
-   top: 0;
-   left: 0;
-   width: 100%;
-   height: 100vh;  
-   height: 100dvh;
-   z-index: var(--z-overlay);
-   overflow: hidden;
-   display: none;
-   padding-top: var(--nav-height);
-   /*     padding-bottom: var(--nav-height); */
-   padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom));
-   background: var(--primary-gradient);
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh; /* Dynamic viewport height for mobile */
+    z-index: var(--z-overlay);
+    overflow: hidden;
+    display: none;
+    
+    /* Account for nav bars AND safe areas */
+    padding-top: calc(var(--nav-height) + env(safe-area-inset-top));
+    padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom));
+    
+    background: var(--primary-gradient);
 }
 
 .overlay.active {
