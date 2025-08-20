@@ -1544,3 +1544,240 @@ nav-notification-btn {
         font-size: 16px !important;
     }
 }
+
+/* ================================================================================
+   ADD THESE UPDATES TO YOUR style.css
+   Safe area support for iPhone home indicators
+   ================================================================================ */
+
+/* ================================
+   UPDATE YOUR BODY STYLES
+   ================================ */
+body {
+    background: var(--primary-gradient);
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-primary);
+    line-height: 1.6;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    
+    /* Updated padding to account for safe areas */
+    padding-top: calc(var(--nav-height) + env(safe-area-inset-top));
+    padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom));
+}
+
+/* ================================
+   UPDATE YOUR TOP NAV
+   ================================ */
+.top-nav {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    
+    /* Account for notch/status bar on phones */
+    padding-top: env(safe-area-inset-top);
+    height: calc(var(--nav-height) + env(safe-area-inset-top));
+    
+    background: var(--primary-gradient);
+    z-index: var(--z-navigation) !important;
+    box-shadow: var(--shadow-sm);
+    backdrop-filter: blur(10px);
+}
+
+.nav-content {
+    height: var(--nav-height); /* Keep content at original height */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--space-md);
+    
+    /* Add safe area padding for landscape mode (notch on side) */
+    padding-left: calc(var(--space-md) + env(safe-area-inset-left));
+    padding-right: calc(var(--space-md) + env(safe-area-inset-right));
+}
+
+/* ================================
+   UPDATE YOUR BOTTOM NAV
+   ================================ */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--primary-gradient);
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: var(--z-navigation);
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(10px);
+    
+    /* Updated height and padding for home indicator */
+    height: calc(var(--nav-height) + env(safe-area-inset-bottom));
+    padding-bottom: env(safe-area-inset-bottom);
+    
+    /* Safe areas for landscape */
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    
+    width: 100%;
+}
+
+/* ================================
+   UPDATE COOKIE CONSENT
+   ================================ */
+.cookie-consent {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(45, 55, 72, 0.98);
+    color: var(--text-white);
+    padding: var(--space-xl);
+    z-index: var(--z-cookie);
+    backdrop-filter: blur(10px);
+    border-top: 3px solid #667eea;
+    animation: slideInUp 0.3s ease-out;
+    
+    /* Updated padding to go above bottom nav + home indicator */
+    padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom) + var(--space-xl));
+}
+
+/* ================================
+   UPDATE COMMUNITY HOME
+   ================================ */
+.community-home,
+.home-page {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    background: var(--bg-home);
+    position: relative;
+    z-index: 1;
+    
+    /* Add safe area padding for content */
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ================================
+   UPDATE SEARCH CONTAINER
+   ================================ */
+.search-container {
+    height: 100%;
+    flex: 1;
+    background: var(--white);
+    position: relative;
+    align-content: space-evenly;
+    
+    /* Ensure search options don't go under home indicator */
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ================================
+   UPDATE RESULTS CONTAINER
+   ================================ */
+.results-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    background: var(--primary-gradient);
+    min-height: 0;
+    
+    /* Safe area support */
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* ================================
+   UPDATE VENUE DETAILS
+   ================================ */
+.venue-action-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: var(--space-xl);
+    background: var(--bg-white);
+    border-top: 1px solid var(--divider-color);
+    margin-top: auto;
+    
+    /* Push buttons above home indicator */
+    padding-bottom: calc(var(--space-xl) + env(safe-area-inset-bottom));
+}
+
+/* ================================
+   TOASTS AND FLOATING ELEMENTS
+   ================================ */
+.toast {
+    /* If toasts appear at bottom, account for home indicator */
+    bottom: calc(var(--nav-height) + env(safe-area-inset-bottom) + var(--space-lg));
+}
+
+/* Any floating action buttons */
+.fab,
+.floating-action-button {
+    bottom: calc(var(--nav-height) + env(safe-area-inset-bottom) + var(--space-xl));
+}
+
+/* ================================
+   MORE MENU (above bottom nav)
+   ================================ */
+.more-menu {
+    position: absolute;
+    bottom: 100%;
+    right: 0;
+    background: var(--bg-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    min-width: 200px;
+    display: none;
+    
+    /* Adjust margin to account for nav height with safe area */
+    margin-bottom: calc(var(--space-sm) + env(safe-area-inset-bottom));
+}
+
+/* ================================
+   PAGINATION (sticky at bottom)
+   ================================ */
+.pagination-container {
+    position: sticky;
+    bottom: 0;
+    background: var(--bg-white);
+    border-top: 1px solid var(--border-light);
+    padding: var(--space-md);
+    z-index: var(--z-overlay);
+    box-shadow: var(--shadow);
+    
+    /* Push pagination above home indicator */
+    padding-bottom: calc(var(--space-md) + env(safe-area-inset-bottom));
+}
+
+/* ================================
+   LANDSCAPE MODE ADJUSTMENTS
+   ================================ */
+@media (orientation: landscape) {
+    /* In landscape, safe areas are on the sides */
+    .overlay,
+    .modal {
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+    }
+    
+    /* Adjust containers for landscape notches */
+    .results-container,
+    .venue-details-container,
+    .search-container {
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+    }
+}
