@@ -254,13 +254,16 @@
 }
 
 .nickname-header h2 {
-   color: var(--text-primary);
    margin: 0;
+   background: var(--primary-gradient);
+   -webkit-background-clip: text;
+   -webkit-text-fill-color: transparent;
+   background-clip: text;
 }
 
 .nickname-header p {
-   color: var(--text-secondary);
-   margin: var(--space-md);
+   color: var(--text-primary);
+   margin: var(--space-sm);
 }
 
 /* .input-group {
