@@ -301,6 +301,7 @@ def search():
     gf_only = request.args.get('gf_only', 'false').lower() == 'true'
     page = request.args.get('page', 1, type=int)
     venue_id = request.args.get('venue_id', type=int)
+    country = request.args.get('country', 'GB')
     
     # Get user location for distance ordering
     user_lat = request.args.get('user_lat', type=float)
@@ -327,6 +328,7 @@ def search():
                     v.city,
                     v.latitude,
                     v.longitude,
+                    v.country,
                     COALESCE(s.status, 'unknown') as gf_status,
                     GROUP_CONCAT(
                         DISTINCT CONCAT(vb.format, ' - ', 
@@ -515,6 +517,7 @@ def search_by_beer():
     search_type = request.args.get('beer_type', 'all')  # brewery/beer/style
     page = request.args.get('page', 1, type=int)
     gf_only = request.args.get('gf_only', 'false').lower() == 'true'
+    country = request.args.get('country', 'GB')
     
     if not query or len(query) < 2:
         return jsonify({'error': 'Query too short'}), 400
@@ -548,6 +551,7 @@ def search_by_beer():
                 v.city,
                 v.latitude,
                 v.longitude,
+                v.country,
                 COALESCE(s.status, 'unknown') as gf_status,
                 GROUP_CONCAT(
                     DISTINCT CONCAT(vb.format, ' - ', 
@@ -1383,9 +1387,9 @@ def add_venue():
             INSERT INTO venues (
                 venue_name, street, city, postcode, 
                 address, latitude, longitude, 
-                venue_type, created_by
+                venue_type, country, created_by
             ) VALUES (
-                %s, %s, %s, %s, %s, %s, %s, %s, %s
+                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
             )
         """, (
             data['venue_name'],
@@ -1395,7 +1399,8 @@ def add_venue():
             data['address'],
             data.get('latitude'),
             data.get('longitude'),
-            venue_type,  # Use the determined enum value
+            venue_type,
+            country,
             submitted_by
         ))
         
@@ -1884,6 +1889,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
