@@ -982,3 +982,274 @@
 .places-results::-webkit-scrollbar-thumb:hover {
     background: var(--border-purple);
 }
+
+/* ================================================================================
+   MODALS.CSS - Updated with Safe Area Support
+   Handles proper spacing for devices with home indicators (iPhone X+)
+   ================================================================================ */
+
+/* ================================
+   BASE MODAL STYLES
+   ================================ */
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--modal-backdrop);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: var(--z-modal-backdrop);
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    
+    /* Use dynamic viewport height for better mobile experience */
+    height: 100vh;
+    height: 100dvh;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    border-radius: var(--radius-xl);
+    width: 90%;
+    max-width: 500px;
+    
+    /* Updated max-height with safe areas and dynamic viewport */
+    max-height: 85vh;
+    max-height: 85dvh;
+    
+    /* Account for safe areas in the calculation */
+    max-height: calc(90vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    max-height: calc(90dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    
+    overflow-y: auto;
+    position: relative;
+    box-shadow: var(--shadow-xl);
+    animation: modalSlideIn 0.3s ease-out;
+    
+    /* Ensure content doesn't go under home indicator */
+    margin-bottom: env(safe-area-inset-bottom);
+}
+
+/* ================================
+   MODAL HEADER & BODY
+   ================================ */
+
+.modal-header {
+    padding: var(--space-xl);
+    border-bottom: 1px solid var(--modal-line);
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 10;
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+}
+
+.modal-body {
+    padding: var(--space-xl);
+    
+    /* Add padding at bottom for devices with home indicator */
+    padding-bottom: calc(var(--space-xl) + env(safe-area-inset-bottom));
+}
+
+.modal-actions {
+    padding: var(--space-lg) var(--space-xl);
+    border-top: 1px solid var(--modal-line);
+    display: flex;
+    gap: var(--space-md);
+    background: white;
+    position: sticky;
+    bottom: 0;
+    border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+    
+    /* Ensure buttons don't get too close to home indicator */
+    padding-bottom: calc(var(--space-lg) + env(safe-area-inset-bottom));
+}
+
+/* ================================
+   SEARCH MODALS
+   ================================ */
+
+.search-modal .modal-content {
+    /* Slightly smaller max height for search modals */
+    max-height: 70vh;
+    max-height: 70dvh;
+    max-height: calc(70dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+}
+
+.distance-content {
+    /* Distance modal specific sizing */
+    max-height: 60vh;
+    max-height: 60dvh;
+    max-height: calc(60dvh - env(safe-area-inset-bottom));
+}
+
+/* ================================
+   FORM MODALS
+   ================================ */
+
+.report-modal .modal-content {
+    /* Report modal needs more height */
+    max-height: 90vh;
+    max-height: 90dvh;
+    max-height: calc(95vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    max-height: calc(95dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+}
+
+.report-modal .modal-body {
+    /* Extra padding for long forms */
+    padding-bottom: calc(var(--space-2xl) + env(safe-area-inset-bottom));
+}
+
+/* ================================
+   STATUS MODALS
+   ================================ */
+
+.status-modal-content {
+    /* Status modals can be taller */
+    max-height: 80vh;
+    max-height: 80dvh;
+    max-height: calc(85vh - env(safe-area-inset-bottom));
+    max-height: calc(85dvh - env(safe-area-inset-bottom));
+}
+
+/* ================================
+   PROMPT MODALS
+   ================================ */
+
+.prompt-modal .modal-content {
+    /* Prompt modals are usually smaller */
+    max-height: 50vh;
+    max-height: 50dvh;
+}
+
+/* ================================
+   LOCATION MODALS
+   ================================ */
+
+.location-permission-card {
+    width: 90%;
+    max-width: 400px;
+    max-height: 70vh;
+    max-height: 70dvh;
+    max-height: calc(75vh - env(safe-area-inset-bottom));
+    max-height: calc(75dvh - env(safe-area-inset-bottom));
+}
+
+/* ================================
+   COOKIE MODAL
+   ================================ */
+
+.cookie-modal .modal-content {
+    max-height: 85vh;
+    max-height: 85dvh;
+    max-height: calc(90vh - env(safe-area-inset-bottom));
+    max-height: calc(90dvh - env(safe-area-inset-bottom));
+}
+
+/* ================================
+   PLACES MODAL
+   ================================ */
+
+.places-modal .modal-content {
+    max-height: 75vh;
+    max-height: 75dvh;
+    max-height: calc(80vh - env(safe-area-inset-bottom));
+    max-height: calc(80dvh - env(safe-area-inset-bottom));
+}
+
+/* ================================
+   FULLSCREEN-ISH MODALS
+   ================================ */
+
+/* Some modals might want to be nearly fullscreen */
+.modal.fullscreen .modal-content {
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    max-width: none;
+    max-height: none;
+    border-radius: 0;
+    margin: 0;
+    
+    /* Account for safe areas on all sides */
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+}
+
+/* ================================
+   MODAL ANIMATIONS
+   ================================ */
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ================================
+   RESPONSIVE ADJUSTMENTS
+   ================================ */
+
+/* Small phones in landscape */
+@media (max-height: 500px) {
+    .modal-content {
+        max-height: 90vh;
+        max-height: 90dvh;
+        max-height: calc(95vh - env(safe-area-inset-bottom));
+        max-height: calc(95dvh - env(safe-area-inset-bottom));
+    }
+    
+    .modal-header {
+        padding: var(--space-md) var(--space-lg);
+    }
+    
+    .modal-body {
+        padding: var(--space-md) var(--space-lg);
+        padding-bottom: calc(var(--space-md) + env(safe-area-inset-bottom));
+    }
+}
+
+/* Tablets and larger screens (safe areas usually not needed but doesn't hurt) */
+@media (min-width: 768px) {
+    .modal-content {
+        max-height: 80vh;
+        max-height: 80dvh;
+        /* Still account for safe areas just in case (iPad Pro with home indicator?) */
+        max-height: calc(85vh - env(safe-area-inset-bottom));
+        max-height: calc(85dvh - env(safe-area-inset-bottom));
+    }
+}
+
+/* ================================
+   SPECIAL MODAL STATES
+   ================================ */
+
+/* When keyboard is open on mobile */
+.modal.keyboard-open .modal-content {
+    max-height: 50vh;
+    max-height: 50dvh;
+    transition: max-height 0.3s ease;
+}
+
+/* Scrollable modal content */
+.modal-body.scrollable {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    
+    /* Add some scroll padding for better UX */
+    scroll-padding-bottom: calc(20px + env(safe-area-inset-bottom));
+}
