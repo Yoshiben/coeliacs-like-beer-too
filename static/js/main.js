@@ -1006,6 +1006,9 @@ const App = {
         'close-full-map': (el, modules) => {
             App.closeFullMap(modules);
         },
+        'show-notifications-preview': (el, modules) => {
+            modules.modalManager?.open('notificationsPreviewModal');
+        },
         'go-to-my-location': (el, modules) => {
             App.goToUserLocation(modules);
         },
