@@ -47,7 +47,7 @@ export const APIModule = (function() {
     // SEARCH APIS
     // ================================
     const searchVenues = async (params) => {
-        const { query, searchType = 'all', page = 1, venueId = null, gfOnly = false, user_lat, user_lng } = params;
+        const { query, searchType = 'all', page = 1, venueId = null, gfOnly = false, country = 'GB', user_lat, user_lng } = params;
         
         let url;
         
@@ -79,7 +79,8 @@ export const APIModule = (function() {
             lat: lat.toString(),
             lng: lng.toString(),
             radius: radius.toString(),
-            gf_only: gfOnly.toString()
+            gf_only: gfOnly.toString(),
+            country: country  // ADD THIS
         });
         
         const venues = await apiCall(`${Constants.API.NEARBY}?${params}`);
