@@ -1215,6 +1215,8 @@ def submit_beer_update():
             cursor.close()
             conn.close()
 
+# In /api/update-gf-status endpoint, modify to:
+
 @app.route('/api/update-gf-status', methods=['POST'])
 def update_gf_status():
     """Update GF status using new schema"""
@@ -1240,25 +1242,22 @@ def update_gf_status():
         current_row = cursor.fetchone()
         old_status = current_row['status'] if current_row else 'unknown'
         
-        # Insert into status_updates table for audit trail
+        # FIX 1: Check if status is actually changing
+        if old_status == new_status:
+            conn.close()
+            logger.info(f"Status unchanged for venue {venue_id}: {new_status} (skipped duplicate)")
+            return jsonify({
+                'success': True,
+                'message': f'Status already set to {new_status}',
+                'status': new_status,
+                'duplicate': True  # Flag for frontend if needed
+            })
+        
+        # Insert into status_updates table for audit trail (only if changed)
         cursor.execute("""
             INSERT INTO status_updates (venue_id, old_status, new_status, updated_by)
             VALUES (%s, %s, %s, %s)
         """, (venue_id, old_status, new_status, submitted_by))
-        
-        # Update the GF status
-        cursor.execute("""
-            UPDATE gf_status 
-            SET status = %s, updated_at = NOW(), updated_by = %s
-            WHERE venue_id = %s
-        """, (new_status, submitted_by, venue_id))
-        
-        # If no rows updated, insert new record
-        if cursor.rowcount == 0:
-            cursor.execute("""
-                INSERT INTO gf_status (venue_id, status, updated_at, updated_by)
-                VALUES (%s, %s, NOW(), %s)
-            """, (venue_id, new_status, submitted_by))
         
         conn.commit()
         
@@ -1267,7 +1266,8 @@ def update_gf_status():
         return jsonify({
             'success': True,
             'message': f'Status updated to {new_status}',
-            'status': new_status
+            'status': new_status,
+            'changed': True  # Indicates an actual change occurred
         })
         
     except Exception as e:
@@ -1889,6 +1889,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
