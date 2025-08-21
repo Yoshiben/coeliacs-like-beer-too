@@ -232,7 +232,7 @@ def nearby():
                 v.city,
                 v.latitude,
                 v.longitude,
-                COALESCE(s.status, 'unknown') as gf_status,
+                ANY_VALUE(COALESCE(s.status, 'unknown')) as gf_status,
                 (6371 * acos(cos(radians(%s)) * cos(radians(v.latitude)) * 
                     cos(radians(v.longitude) - radians(%s)) + sin(radians(%s)) * 
                     sin(radians(v.latitude)))) AS distance,
@@ -329,7 +329,7 @@ def search():
                     v.latitude,
                     v.longitude,
                     v.country,
-                    COALESCE(s.status, 'unknown') as gf_status,
+                    ANY_VALUE(COALESCE(s.status, 'unknown')) as gf_status,
                     GROUP_CONCAT(
                         DISTINCT CONCAT(vb.format, ' - ', 
                         COALESCE(br.brewery_name, 'Unknown'), ' ', 
@@ -418,7 +418,7 @@ def search():
                 v.city,
                 v.latitude,
                 v.longitude,
-                COALESCE(s.status, 'unknown') as gf_status,
+                ANY_VALUE(COALESCE(s.status, 'unknown')) as gf_status,
                 GROUP_CONCAT(
                     DISTINCT CONCAT(vb.format, ' - ', 
                     COALESCE(br.brewery_name, 'Unknown'), ' ', 
@@ -552,7 +552,7 @@ def search_by_beer():
                 v.latitude,
                 v.longitude,
                 v.country,
-                COALESCE(s.status, 'unknown') as gf_status,
+                ANY_VALUE(COALESCE(s.status, 'unknown')) as gf_status,
                 GROUP_CONCAT(
                     DISTINCT CONCAT(vb.format, ' - ', 
                     COALESCE(br.brewery_name, 'Unknown'), ' ', 
