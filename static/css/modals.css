@@ -869,11 +869,7 @@
    RESPONSIVE DESIGN
    ================================ */
 
-@media (max-width: 768px) {
-   .modal-body {
-        padding: var(--space-md);
-    }
-    
+@media (max-width: 768px) {    
     .modal-actions {
         padding: var(--space-md);
         gap: var(--space-sm);
@@ -1011,9 +1007,6 @@
    ================================ */
 
 .modal-body {
-    padding: var(--space-xl);
-    
-    /* Add padding at bottom for devices with home indicator */
     padding-bottom: calc(var(--space-xl) + env(safe-area-inset-bottom));
 }
 
