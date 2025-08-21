@@ -434,10 +434,9 @@ html {
 }
 
 .nav-logo {
-   height: 5vh;
-   height: 5dvh;
+   height: 4vh;
+   height: 4dvh;
    width: auto;
-   max-width: 280px;
 }
 
 .nav-actions {
