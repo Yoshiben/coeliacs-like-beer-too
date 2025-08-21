@@ -979,21 +979,6 @@ body {
     margin-bottom: calc(var(--space-sm) + env(safe-area-inset-bottom));
 }
 
-/* ================================
-   PAGINATION (sticky at bottom)
-   ================================ */
-.pagination-container {
-    position: sticky;
-    bottom: 0;
-    background: var(--bg-white);
-    border-top: 1px solid var(--border-light);
-    padding: var(--space-md);
-    z-index: var(--z-overlay);
-    box-shadow: var(--shadow);
-    
-    /* Push pagination above home indicator */
-    padding-bottom: calc(var(--space-md) + env(safe-area-inset-bottom));
-}
 
 /* ================================
    LANDSCAPE MODE ADJUSTMENTS
