@@ -697,10 +697,75 @@ const App = {
             modules.modalManager?.close('beerDetailsPromptModal');
         },
 
-        'skip-status-prompt': (el, modules) => {
+        // Update the 'skip-status-prompt' action handler in main.js:
+
+        'skip-status-prompt': async (el, modules) => {
             console.log('⏭️ Skipping status prompt after beer report');
+            
+            // FIX 2: Auto-update to 'currently' if not already 'always_*'
+            const statusPromptVenue = window.App.getState('statusPromptVenue');
+            
+            if (statusPromptVenue) {
+                const currentStatus = statusPromptVenue.gf_status || 'unknown';
+                
+                // Only auto-update if NOT already 'always_tap_cask' or 'always_bottle_can'
+                if (currentStatus !== 'always_tap_cask' && currentStatus !== 'always_bottle_can') {
+                    console.log('🔄 Auto-updating status to "currently" (from:', currentStatus, ')');
+                    
+                    try {
+                        const response = await fetch('/api/update-gf-status', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                venue_id: statusPromptVenue.venue_id,
+                                status: 'currently',
+                                submitted_by: window.App.getState('userNickname') || 
+                                              localStorage.getItem('userNickname') || 
+                                              'anonymous'
+                            })
+                        });
+                        
+                        const result = await response.json();
+                        
+                        if (response.ok) {
+                            // Check if it was a duplicate (status unchanged)
+                            if (result.duplicate) {
+                                modules.toast?.info('Thanks for the beer report! 🍺');
+                            } else {
+                                modules.toast?.success('Thanks! Beer added & status set to "Currently has GF" 🍺✅');
+                            }
+                            
+                            // Update venue state if changed
+                            if (!result.duplicate && statusPromptVenue) {
+                                window.App.setState('currentVenue', {
+                                    ...statusPromptVenue,
+                                    gf_status: 'currently'
+                                });
+                            }
+                        } else {
+                            // Silent fail - still thank them for the beer report
+                            modules.toast?.success('Thanks for the beer report! 🍺');
+                        }
+                    } catch (error) {
+                        console.error('Failed to auto-update status:', error);
+                        // Silent fail - still thank them for the beer report
+                        modules.toast?.success('Thanks for the beer report! 🍺');
+                    }
+                } else {
+                    // Already has 'always_*' status, just thank them
+                    console.log('ℹ️ Venue already has "always" status:', currentStatus);
+                    modules.toast?.success('Thanks for the beer report! 🍺');
+                }
+                
+                // Clear the state
+                window.App.setState('statusPromptVenue', null);
+            } else {
+                // No venue data, just thank them
+                modules.toast?.info('Thanks for the beer report! 🍺');
+            }
+            
+            // Close the modal
             modules.modalManager?.close('statusPromptAfterBeerModal');
-            modules.toast?.info('No problem! Thanks for the beer report! 🍺');
         },
 
         
