@@ -223,24 +223,25 @@ export const FormModule = (() => {
         resetReportForm();
         
         const venue = utils.getCurrentVenue() || utils.getSelectedVenue();
-        const submittedBy = reportData.submitted_by; // Get who submitted the beer report
+        const submittedBy = reportData.submitted_by;
+        const userId = reportData.user_id; // Get the user_id from report data
         
         console.log('🔍 DEBUG: Current venue:', venue);
         console.log('🔍 DEBUG: Report data:', reportData);
-        console.log('👤 DEBUG: Submitted by:', submittedBy);
+        console.log('👤 DEBUG: Submitted by:', submittedBy, 'User ID:', userId);
         
         // Add a delay to ensure modal is fully closed
         setTimeout(() => {
             if (venue && venue.venue_id) {
                 console.log('✅ Showing status prompt for venue:', venue);
-                showGFStatusPromptAfterBeer(venue, reportData.submittedBy, reportData.user_id); // Pass submitter
+                showGFStatusPromptAfterBeer(venue, submittedBy, userId); // Pass all 3 parameters
             } else if (reportData && reportData.venue_id) {
                 console.log('✅ Showing status prompt from report data:', reportData);
                 showGFStatusPromptAfterBeer({
                     venue_id: reportData.venue_id,
                     venue_name: reportData.venue_name || 'this venue',
                     name: reportData.venue_name || 'this venue'
-                }, submittedBy); // Pass submitter
+                }, submittedBy, userId); // Pass all 3 parameters
             } else {
                 console.log('❌ No venue data found, returning to home');
                 returnToHomeView();
@@ -254,14 +255,14 @@ export const FormModule = (() => {
         });
     };
     
-    const showGFStatusPromptAfterBeer = (venue, submittedBy) => {
+    const showGFStatusPromptAfterBeer = (venue, submittedBy, userId) => {
         console.log('🎯 Showing status prompt for venue:', venue);
-        console.log('👤 Submitted by:', submittedBy);
+        console.log('👤 Submitted by:', submittedBy, 'User ID:', userId);
         
-        // Store venue data AND submitter for the action handlers
+        // Store venue data for the action handlers
         window.App.setState('statusPromptVenue', venue);
-        window.App.setState('statusPromptSubmittedBy', submittedBy); // Store the submitter
-        window.App.setState('statusPromptUserId', userId); // ADD THIS
+        window.App.setState('statusPromptSubmittedBy', submittedBy);
+        window.App.setState('statusPromptUserId', userId);
         
         // Close venue details overlay first if it's open
         const modalManager = modules.modalManager;
