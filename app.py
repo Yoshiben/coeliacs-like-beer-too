@@ -110,6 +110,49 @@ def get_user_id(nickname):
             cursor.close()
             conn.close()
 
+def update_user_stats(user_id, stat_type, points_to_add=0):
+    """Helper function to update user statistics"""
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor()
+        
+        # Map stat types to columns
+        stat_columns = {
+            'beer_report': 'beers_reported',
+            'status_update': 'statuses_updated',
+            'venue_add': 'venues_added',
+            'photo_upload': 'photos_uploaded',
+            'helpful_vote': 'helpful_votes'
+        }
+        
+        if stat_type not in stat_columns:
+            return False
+        
+        column = stat_columns[stat_type]
+        
+        # Update the specific stat, points, and last_active
+        cursor.execute(f"""
+            UPDATE users 
+            SET {column} = {column} + 1,
+                points = points + %s,
+                last_active = NOW()
+            WHERE user_id = %s
+        """, (points_to_add, user_id))
+        
+        conn.commit()
+        logger.info(f"Updated stats for user {user_id}: +1 {column}, +{points_to_add} points")
+        return True
+        
+    except Exception as e:
+        logger.error(f"Error updating user stats: {str(e)}")
+        if 'conn' in locals():
+            conn.rollback()
+        return False
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
+
 @app.route('/api/stats')
 def get_stats():
     """Get site statistics with new schema"""
