@@ -261,6 +261,7 @@ export const FormModule = (() => {
         // Store venue data AND submitter for the action handlers
         window.App.setState('statusPromptVenue', venue);
         window.App.setState('statusPromptSubmittedBy', submittedBy); // Store the submitter
+        window.App.setState('statusPromptUserId', userId); // ADD THIS
         
         // Close venue details overlay first if it's open
         const modalManager = modules.modalManager;
