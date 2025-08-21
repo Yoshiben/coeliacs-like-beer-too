@@ -455,7 +455,6 @@ def search():
                     v.city,
                     v.latitude,
                     v.longitude,
-                    v.country,
                     ANY_VALUE(COALESCE(s.status, 'unknown')) as gf_status,
                     GROUP_CONCAT(
                         DISTINCT CONCAT(vb.format, ' - ', 
@@ -1450,9 +1449,9 @@ def add_venue():
             INSERT INTO venues (
                 venue_name, street, city, postcode, 
                 address, latitude, longitude, 
-                venue_type, country, created_by
+                venue_type, created_by
             ) VALUES (
-                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
+                %s, %s, %s, %s, %s, %s, %s, %s, %s
             )
         """, (
             data['venue_name'],
@@ -1463,7 +1462,6 @@ def add_venue():
             data.get('latitude'),
             data.get('longitude'),
             venue_type,
-            country,
             submitted_by
         ))
         
@@ -1951,6 +1949,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
