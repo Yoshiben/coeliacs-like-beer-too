@@ -669,6 +669,6 @@
     background-clip: text;
 }
 
-photo-upload-compact {
+.photo-upload-compact {
    display:none;
 }
