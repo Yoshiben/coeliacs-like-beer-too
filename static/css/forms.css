@@ -4,7 +4,7 @@
 
 /* Base Form Elements */
 .form-input,
-.form-select
+.form-select,
 .form-group {
    border: 2px solid var(--border-light);
    border-radius: var(--radius-xl);
