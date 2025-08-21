@@ -176,8 +176,7 @@ def get_recent_finds():
                 b.beer_name,
                 br.brewery_name,
                 vb.format,
-                vb.added_by,
-                vb.times_reported
+                vb.added_by
             FROM venue_beers vb
             JOIN venues v ON vb.venue_id = v.venue_id
             LEFT JOIN beers b ON vb.beer_id = b.beer_id
@@ -224,8 +223,7 @@ def get_recent_finds():
                 'format': find['format'],
                 'location': location,
                 'time_ago': time_ago,
-                'added_at': find['added_at'].isoformat(),
-                'times_reported': find['times_reported'] or 1
+                'added_at': find['added_at'].isoformat()
             }
             
             formatted_finds.append(formatted_find)
@@ -792,7 +790,7 @@ def submit_beer_update():
         
         # STEP 3: Check if this beer is already reported for this venue
         cursor.execute("""
-            SELECT report_id, times_reported FROM venue_beers 
+            SELECT report_id FROM venue_beers 
             WHERE venue_id = %s AND beer_id = %s AND format = %s
         """, (venue_id, beer_id, format_type))
         
@@ -803,18 +801,17 @@ def submit_beer_update():
             # Update existing report - ONLY user_id
             cursor.execute("""
                 UPDATE venue_beers 
-                SET last_seen = CURRENT_DATE, 
-                    times_reported = %s,
+                SET last_seen = CURRENT_DATE,
                     user_id = %s
                 WHERE report_id = %s
-            """, ((existing_report['times_reported'] or 0) + 1, user_id, existing_report['report_id']))
+            """, ((user_id, existing_report['report_id']))
             report_id = existing_report['report_id']
             logger.info(f"Updated existing report {report_id} by user {user_id}")
         else:
             # Insert new report - ONLY user_id
             cursor.execute("""
                 INSERT INTO venue_beers (
-                    venue_id, beer_id, format, user_id, times_reported, last_seen
+                    venue_id, beer_id, format, user_id, last_seen
                 ) VALUES (
                     %s, %s, %s, %s, 1, CURRENT_DATE
                 )
@@ -1904,6 +1901,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
