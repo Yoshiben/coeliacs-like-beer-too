@@ -31,8 +31,6 @@
 
 /* Modal Content Container */
 .modal-content {
-   max-height: 82vh;
-   max-height: 82dvh;
    max-width: 96vw;
    max-width: 96dvw;
    padding: 0;
@@ -57,8 +55,8 @@
    max-height: 85dvh;
    
    /* Account for safe areas in the calculation */
-   max-height: calc(90vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-   max-height: calc(90dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+   max-height: calc(80vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+   max-height: calc(80dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
    
    overflow-y: auto;
    position: relative;
@@ -888,11 +886,6 @@
     .modal-content {
         max-width: 98vw;
         max-height: 95vh;
-        border-radius: var(--radius-lg);
-    }
-    
-    .modal-header {
-        padding: var(--space-md);
     }
     
     .modal-body {
