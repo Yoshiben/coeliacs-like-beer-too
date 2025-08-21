@@ -704,6 +704,7 @@ const App = {
             
             // FIX 2: Auto-update to 'currently' if not already 'always_*'
             const statusPromptVenue = window.App.getState('statusPromptVenue');
+            const statusPromptSubmittedBy = window.App.getState('statusPromptSubmittedBy'); // Get stored submitter
             
             if (statusPromptVenue) {
                 const currentStatus = statusPromptVenue.gf_status || 'unknown';
@@ -711,6 +712,7 @@ const App = {
                 // Only auto-update if NOT already 'always_tap_cask' or 'always_bottle_can'
                 if (currentStatus !== 'always_tap_cask' && currentStatus !== 'always_bottle_can') {
                     console.log('🔄 Auto-updating status to "currently" (from:', currentStatus, ')');
+                    console.log('👤 Using submitter:', statusPromptSubmittedBy);
                     
                     try {
                         const response = await fetch('/api/update-gf-status', {
@@ -719,9 +721,11 @@ const App = {
                             body: JSON.stringify({
                                 venue_id: statusPromptVenue.venue_id,
                                 status: 'currently',
-                                submitted_by: window.App.getState('userNickname') || 
-                                              localStorage.getItem('userNickname') || 
-                                              'anonymous'
+                                // Use the persisted submitter from beer report
+                                submitted_by: statusPromptSubmittedBy || 
+                                            window.App.getState('userNickname') || 
+                                            localStorage.getItem('userNickname') || 
+                                            'anonymous'
                             })
                         });
                         
@@ -759,6 +763,7 @@ const App = {
                 
                 // Clear the state
                 window.App.setState('statusPromptVenue', null);
+                window.App.setState('statusPromptSubmittedBy', null);
             } else {
                 // No venue data, just thank them
                 modules.toast?.info('Thanks for the beer report! 🍺');
@@ -963,6 +968,7 @@ const App = {
         'quick-status-update': async (el, modules) => {
             const status = el.dataset.status;
             const statusPromptVenue = window.App.getState('statusPromptVenue');
+            const statusPromptSubmittedBy = window.App.getState('statusPromptSubmittedBy'); // Get stored submitter
             
             if (!statusPromptVenue) {
                 console.error('No venue found for status update');
@@ -970,10 +976,11 @@ const App = {
             }
             
             console.log('🎯 Quick status update:', status, 'for venue:', statusPromptVenue.venue_id);
+            console.log('👤 Submitted by:', statusPromptSubmittedBy);
             
             // Close ALL status modals to prevent any confirmations
             modules.modalManager?.close('statusPromptAfterBeerModal');
-            modules.modalManager?.closeGroup('status'); // Close entire status group
+            modules.modalManager?.closeGroup('status');
             
             // Block the confirmation modal from opening
             modules.modalManager?.block('gfStatusConfirmModal');
@@ -986,15 +993,26 @@ const App = {
                     body: JSON.stringify({
                         venue_id: statusPromptVenue.venue_id,
                         status: status,
-                        submitted_by: window.App.getState('userNickname') || 'anonymous'
+                        // Use the persisted submitter from beer report, fallback to current nickname
+                        submitted_by: statusPromptSubmittedBy || 
+                                    window.App.getState('userNickname') || 
+                                    localStorage.getItem('userNickname') || 
+                                    'anonymous'
                     })
                 });
                 
+                const result = await response.json();
+                
                 if (response.ok) {
-                    modules.toast?.success('🎉 Beer added + status updated! You are a legend! 🍺⭐');
+                    // Check if it was a duplicate
+                    if (result.duplicate) {
+                        modules.toast?.info('🍺 Beer added! Status already set to ' + status);
+                    } else {
+                        modules.toast?.success('🎉 Beer added + status updated! You are a legend! 🍺⭐');
+                    }
                     
-                    // Update the venue in state
-                    if (statusPromptVenue) {
+                    // Update the venue in state if changed
+                    if (!result.duplicate && statusPromptVenue) {
                         window.App.setState('currentVenue', {
                             ...statusPromptVenue,
                             gf_status: status
@@ -1009,6 +1027,7 @@ const App = {
                     
                     // Clear the state
                     window.App.setState('statusPromptVenue', null);
+                    window.App.setState('statusPromptSubmittedBy', null);
                     
                     // Unblock the modals after a delay
                     setTimeout(() => {
