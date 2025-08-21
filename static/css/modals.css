@@ -176,12 +176,6 @@
    margin: 0 var(--space-lg) var(--space-md);
 }
 
-/* Status Modal */
-.status-modal .modal-content {
-   max-width: 500px;
-   width: 90vw;
-}
-
 /* Distance Modal */
 .distance-modal .modal-content {
    max-width: 400px;
@@ -876,12 +870,7 @@
    ================================ */
 
 @media (max-width: 768px) {
-    .modal-content {
-        max-width: 98vw;
-        max-height: 95vh;
-    }
-    
-    .modal-body {
+   .modal-body {
         padding: var(--space-md);
     }
     
@@ -1067,18 +1056,6 @@
 .report-modal .modal-body {
     /* Extra padding for long forms */
     padding-bottom: calc(var(--space-2xl) + env(safe-area-inset-bottom));
-}
-
-/* ================================
-   STATUS MODALS
-   ================================ */
-
-.status-modal-content {
-    /* Status modals can be taller */
-    max-height: 80vh;
-    max-height: 80dvh;
-    max-height: calc(85vh - env(safe-area-inset-bottom));
-    max-height: calc(85dvh - env(safe-area-inset-bottom));
 }
 
 /* ================================
