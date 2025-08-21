@@ -176,7 +176,9 @@ def get_recent_finds():
                 b.beer_name,
                 br.brewery_name,
                 vb.format,
-                vb.added_by
+                vb.last_seen,
+                u.nickname as added_by,
+                u.avatar_emoji
             FROM venue_beers vb
             JOIN venues v ON vb.venue_id = v.venue_id
             LEFT JOIN beers b ON vb.beer_id = b.beer_id
@@ -192,15 +194,21 @@ def get_recent_finds():
         # Format the response
         formatted_finds = []
         for find in recent_finds:
-            # Calculate time ago
-            time_diff = datetime.now() - find['added_at']
+            # Calculate time ago using last_seen instead of added_at
+            time_diff = datetime.now().date() - find['last_seen']
             
-            if time_diff.total_seconds() < 3600:  # Less than 1 hour
-                time_ago = f"{int(time_diff.total_seconds() / 60)} minutes ago"
-            elif time_diff.total_seconds() < 86400:  # Less than 1 day
-                time_ago = f"{int(time_diff.total_seconds() / 3600)} hours ago"
-            else:
+            if time_diff.days == 0:
+                time_ago = "Today"
+            elif time_diff.days == 1:
+                time_ago = "Yesterday"
+            elif time_diff.days < 7:
                 time_ago = f"{time_diff.days} days ago"
+            elif time_diff.days < 30:
+                weeks = time_diff.days // 7
+                time_ago = f"{weeks} week{'s' if weeks > 1 else ''} ago"
+            else:
+                months = time_diff.days // 30
+                time_ago = f"{months} month{'s' if months > 1 else ''} ago"
             
             # Format beer info
             beer_description = "Unknown beer"
@@ -216,14 +224,15 @@ def get_recent_finds():
             
             formatted_find = {
                 'id': find['report_id'],
-                'user_name': find['added_by'] if find['added_by'] != 'anonymous' else 'Anonymous User',
+                'user_name': find['added_by'] if find['added_by'] else 'Anonymous User',
+                'avatar_emoji': find['avatar_emoji'] if find['avatar_emoji'] else '🍺',
                 'venue_id': find['venue_id'],
                 'venue_name': find['venue_name'],
                 'beer_description': beer_description,
                 'format': find['format'],
                 'location': location,
                 'time_ago': time_ago,
-                'added_at': find['added_at'].isoformat()
+                'added_at': find['last_seen'].isoformat() if find['last_seen'] else None
             }
             
             formatted_finds.append(formatted_find)
@@ -1004,7 +1013,7 @@ def get_community_leaderboard():
             LEFT JOIN users u ON vb.user_id = u.user_id
             WHERE 1=1
             AND vb.user_id IS NOT NULL
-            GROUP BY added_by
+            GROUP BY nicname
         """)
         beer_contributors = {row['nickname']: row for row in cursor.fetchall()}
         
@@ -1018,7 +1027,7 @@ def get_community_leaderboard():
             LEFT JOIN users u ON s.user_id = u.user_id
             WHERE 1=1
             AND s.user_id IS NOT NULL
-            GROUP BY updated_by
+            GROUP BY nickname
         """)
         status_contributors = {row['nickname']: row for row in cursor.fetchall()}
         
