@@ -144,8 +144,7 @@ export const FormModule = (() => {
             state.isSubmitting = false;
         }
     };
-    
-    // REPLACE the collectReportData function in forms.js (around line 65) with debugging
+
 
     const collectReportData = (formData) => {
         const elements = utils.getFormElements();
@@ -177,8 +176,16 @@ export const FormModule = (() => {
             reportData.venue_id = null;
         }
     
-        // Add nickname for attribution
-        reportData.submitted_by = window.App.getState('userNickname') || localStorage.getItem('userNickname') || 'anonymous';
+        // ADD USER_ID HERE! 👇
+        // Get user_id from localStorage or state
+        reportData.user_id = parseInt(localStorage.getItem('user_id')) || 
+                             window.App.getState('userId') || 
+                             null;
+        
+        // Keep nickname for display purposes
+        reportData.submitted_by = window.App.getState('userNickname') || 
+                                  localStorage.getItem('userNickname') || 
+                                  'anonymous';
     
         if (reportData.beer_abv) {
             reportData.beer_abv = parseFloat(reportData.beer_abv) || null;
@@ -186,6 +193,7 @@ export const FormModule = (() => {
         
         // DEBUG: Log the data being sent
         console.log('🔍 DEBUG: Report data being sent:', reportData);
+        console.log('📤 User ID:', reportData.user_id, 'Nickname:', reportData.submitted_by);
         
         return reportData;
     };
