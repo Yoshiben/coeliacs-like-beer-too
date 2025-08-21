@@ -612,3 +612,57 @@
 .form-group.error select {
     border-color: #ef4444 !important;
 }
+
+.field-error {
+    display: none;
+    color: #ef4444;
+    font-size: 0.75rem;
+    margin-top: 4px;
+    font-weight: 500;
+    animation: slideDown 0.2s ease;
+}
+
+.field-error.show {
+    display: block;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-group.error input,
+.form-group.error select {
+    border-color: #ef4444 !important;
+    background-color: #fef2f2;
+}
+
+.form-group.error label {
+    color: #ef4444;
+}
+
+/* Add subtle shake animation for errors */
+.form-group.error input,
+.form-group.error select {
+    animation: shake 0.3s ease;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+/* Style the error text to match your purple theme */
+.field-error {
+    background: linear-gradient(90deg, #ef4444, #dc2626);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
