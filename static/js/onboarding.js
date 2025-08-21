@@ -264,6 +264,27 @@ export const OnboardingFlow = (() => {
                     timestamp: Date.now()
                 }));
                 
+                // Fetch and set real user stats from database
+                try {
+                    const statsResponse = await fetch(`/api/get-user-id/${nickname}`);
+                    if (statsResponse.ok) {
+                        const userData = await statsResponse.json();
+                        
+                        // Store user_id in localStorage for future API calls
+                        localStorage.setItem('user_id', userData.user_id);
+                        localStorage.setItem('userNickname', nickname);
+                        
+                        // Update app state with real values
+                        window.App.setState('userId', userData.user_id);
+                        window.App.setState('userPoints', userData.points || 0);
+                        window.App.setState('userLevel', userData.level || 1);
+                        
+                        console.log('Loaded user stats:', userData);
+                    }
+                } catch (statsError) {
+                    console.error('Failed to load user stats:', statsError);
+                }
+                
                 // Close ALL possible modals
                 ['signIn', 'nickname', 'signInPrompt', 'welcome'].forEach(id => {
                     closeModal(id);
