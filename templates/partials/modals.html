@@ -274,32 +274,31 @@
                         <input type="text" id="reportPostcode" class="form-input" placeholder="SW1A 1AA">
                     </div>
                 </div>
-                
+                <!-- Beer format field -->
                 <div class="form-group">
-                    <label class="form-label">Beer Format *</label>
-                    <select id="reportFormat" name="reportFormat" class="form-select" required>
+                    <label>Beer Format *</label>
+                    <select id="reportFormat" name="reportFormat">
                         <option value="">Select format...</option>
-                        <option value="bottle">🍺 Bottle</option>
-                        <option value="tap">🚰 Tap</option>
-                        <option value="cask">🛢️ Cask</option>
-                        <option value="can">🥫 Can</option>
+                        <option value="tap">Tap</option>
+                        <option value="cask">Cask</option>
+                        <option value="bottle">Bottle</option>
+                        <option value="can">Can</option>
                     </select>
+                    <span class="field-error" id="formatError"></span>
                 </div>
                 
+                <!-- Brewery field -->
                 <div class="form-group">
-                    <label class="form-label">Brewery</label>
-                    <div class="brewery-dropdown-container">
-                        <input type="text" id="reportBrewery" name="reportBrewery" class="form-input" placeholder="Start typing brewery name..." autocomplete="off">
-                        <div id="breweryDropdown" class="suggestions brewery-suggestions"></div>
-                    </div>
+                    <label>Brewery Name *</label>
+                    <input type="text" id="reportBrewery" placeholder="Start typing...">
+                    <span class="field-error" id="breweryError"></span>
                 </div>
                 
+                <!-- Beer Name field -->
                 <div class="form-group">
-                    <label class="form-label">Beer Name</label>
-                    <div class="beer-name-container">
-                        <input type="text" id="reportBeerName" name="reportBeerName" class="form-input" placeholder="Start typing beer name..." autocomplete="off">
-                        <div id="beerNameDropdown" class="suggestions beer-suggestions"></div>
-                    </div>
+                    <label>Beer Name</label>
+                    <input type="text" id="reportBeerName" placeholder="Start typing...">
+                    <span class="field-error" id="beerNameError"></span>
                 </div>
                 
                 <div class="form-group">
