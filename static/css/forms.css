@@ -4,7 +4,8 @@
 
 /* Base Form Elements */
 .form-input,
-.form-select {
+.form-select
+.form-group {
    border: 2px solid var(--border-light);
    border-radius: var(--radius-xl);
    font-size: var(--text-md);
@@ -19,7 +20,8 @@
 }
 
 .form-input:focus,
-.form-select:focus {
+.form-select:focus,
+.form-group:focus {
    outline: none;
    border-color: var(--border-purple);
    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
