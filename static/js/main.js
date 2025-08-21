@@ -645,8 +645,8 @@ const App = {
                     modules.modalManager?.open('searchOverlay');
                     modules.nav?.setPageContext('search');
                 }, 100);
-
-            } else if (currentContext === 'venue-details' || currentContext === 'venue') {  // Add this case
+                
+            } else if (currentContext === 'venue-details' || currentContext === 'venue') {
                 // From venue details -> back to search results
                 modules.modalManager?.close('venueDetailsOverlay');
                 setTimeout(() => {
@@ -663,8 +663,11 @@ const App = {
                 }, 100);
                 
             } else if (currentContext === 'search') {
-                // From search overlay -> back to home
+                // From search -> check where we came from
+                const searchReturnContext = window.App.getState('searchReturnContext');
                 modules.modalManager?.close('searchOverlay');
+                
+                // Always go home since you opened search from home via "Find GF Beer"
                 modules.nav?.goToHome();
                 
             } else {
