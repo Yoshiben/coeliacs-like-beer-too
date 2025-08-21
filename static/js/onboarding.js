@@ -24,8 +24,24 @@ export const OnboardingFlow = (() => {
     const start = async () => {
         console.log('🚀 Starting onboarding flow...');
         
-        const userStatus = await UserSession.init();
-        console.log('User status:', userStatus);
+        const existingNickname = localStorage.getItem('userNickname');
+            if (existingNickname) {
+                console.log('✅ Existing user found:', existingNickname);
+                
+                // Just check age verification for existing users
+                const ageVerified = localStorage.getItem('ageVerified');
+                if (!ageVerified) {
+                    showAgeGate();
+                    return;
+                }
+                
+                // User exists and age verified - we're done!
+                return { status: 'existing-user', nickname: existingNickname };
+            }
+            
+            // Rest of your existing code continues unchanged...
+            const userStatus = await UserSession.init();
+            console.log('User status:', userStatus);
         
         switch (userStatus.status) {
             case 'need-age-verification':
