@@ -655,13 +655,21 @@ const App = {
                 }, 100);
                 
             } else if (currentContext === 'results') {
-                // From results -> back to search overlay (always)
-                modules.modalManager?.close('resultsOverlay');
-                setTimeout(() => {
-                    modules.modalManager?.open('searchOverlay');
-                    modules.nav?.setPageContext('search');
-                }, 100);
+                // Check if we came from auto-search (Find GF Beer button)
+                const lastSearchType = window.App.getState('lastSearch.type');
                 
+                modules.modalManager?.close('resultsOverlay');
+                
+                if (lastSearchType === 'nearby' || lastSearchType === 'location') {
+                    // Auto-search from home - go back to home
+                    modules.nav?.goToHome();
+                } else {
+                    // Manual search - go back to search overlay
+                    setTimeout(() => {
+                        modules.modalManager?.open('searchOverlay');
+                        modules.nav?.setPageContext('search');
+                    }, 100);
+                }
             } else if (currentContext === 'search') {
                 // From search -> check where we came from
                 const searchReturnContext = window.App.getState('searchReturnContext');
