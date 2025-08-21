@@ -804,7 +804,7 @@ def submit_beer_update():
                 SET last_seen = CURRENT_DATE,
                     user_id = %s
                 WHERE report_id = %s
-            """, ((user_id, existing_report['report_id']))
+            """, (user_id, existing_report['report_id']))
             report_id = existing_report['report_id']
             logger.info(f"Updated existing report {report_id} by user {user_id}")
         else:
@@ -1901,6 +1901,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
