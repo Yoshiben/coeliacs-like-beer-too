@@ -1013,7 +1013,7 @@ def get_community_leaderboard():
             LEFT JOIN users u ON vb.user_id = u.user_id
             WHERE 1=1
             AND vb.user_id IS NOT NULL
-            GROUP BY nicname
+            GROUP BY nickname
         """)
         beer_contributors = {row['nickname']: row for row in cursor.fetchall()}
         
@@ -1910,6 +1910,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
