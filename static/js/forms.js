@@ -233,7 +233,7 @@ export const FormModule = (() => {
         setTimeout(() => {
             if (venue && venue.venue_id) {
                 console.log('✅ Showing status prompt for venue:', venue);
-                showGFStatusPromptAfterBeer(venue, submittedBy); // Pass submitter
+                showGFStatusPromptAfterBeer(venue, reportData.submittedBy, reportData.user_id); // Pass submitter
             } else if (reportData && reportData.venue_id) {
                 console.log('✅ Showing status prompt from report data:', reportData);
                 showGFStatusPromptAfterBeer({
