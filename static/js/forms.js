@@ -120,7 +120,6 @@ export const FormModule = (() => {
         const validation = validateReportForm(reportData);
         
         if (!validation.isValid) {
-            utils.showToast(`❌ Please fill in: ${validation.errors.join(', ')}`, 'error');
             state.isSubmitting = false;
             return;
         }
