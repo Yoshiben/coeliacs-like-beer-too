@@ -596,3 +596,19 @@
        transform: rotate(360deg);
    }
 }
+
+.field-error {
+    display: none;
+    color: #ef4444;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.field-error.show {
+    display: block;
+}
+
+.form-group.error input,
+.form-group.error select {
+    border-color: #ef4444 !important;
+}
