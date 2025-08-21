@@ -749,6 +749,7 @@ export const FormModule = (() => {
                     body: JSON.stringify({
                         venue_id: parseInt(venueToUpdate.venue_id),
                         status: this.selectedStatus,
+                        user_id: parseInt(localStorage.getItem('user_id')),  // ADD THIS LINE
                         submitted_by: window.App.getState('userNickname') || localStorage.getItem('userNickname') || 'anonymous'
                     })
                 });
