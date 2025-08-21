@@ -751,6 +751,10 @@ export const FormModule = (() => {
             utils.showLoadingToast('Updating status...');
             
             try {
+
+                const userId = parseInt(localStorage.getItem('user_id'));
+                console.log('Sending user_id:', userId); // Debug log
+                
                 const response = await fetch('/api/update-gf-status', {
                     method: 'POST',
                     headers: { 
