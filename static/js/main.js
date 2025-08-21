@@ -722,17 +722,18 @@ const App = {
         'skip-status-prompt': async (el, modules) => {
             console.log('⏭️ Skipping status prompt after beer report');
             
-            // FIX 2: Auto-update to 'currently' if not already 'always_*'
             const statusPromptVenue = window.App.getState('statusPromptVenue');
-            const statusPromptSubmittedBy = window.App.getState('statusPromptSubmittedBy'); // Get stored submitter
+            const statusPromptSubmittedBy = window.App.getState('statusPromptSubmittedBy');
             
             if (statusPromptVenue) {
                 const currentStatus = statusPromptVenue.gf_status || 'unknown';
                 
-                // Only auto-update if NOT already 'always_tap_cask' or 'always_bottle_can'
                 if (currentStatus !== 'always_tap_cask' && currentStatus !== 'always_bottle_can') {
                     console.log('🔄 Auto-updating status to "currently" (from:', currentStatus, ')');
-                    console.log('👤 Using submitter:', statusPromptSubmittedBy);
+                    
+                    // Get user_id from localStorage
+                    const userId = parseInt(localStorage.getItem('user_id'));
+                    console.log('👤 Using user_id:', userId);
                     
                     try {
                         const response = await fetch('/api/update-gf-status', {
@@ -741,7 +742,7 @@ const App = {
                             body: JSON.stringify({
                                 venue_id: statusPromptVenue.venue_id,
                                 status: 'currently',
-                                // Use the persisted submitter from beer report
+                                user_id: userId,
                                 submitted_by: statusPromptSubmittedBy || 
                                             window.App.getState('userNickname') || 
                                             localStorage.getItem('userNickname') || 
@@ -752,14 +753,12 @@ const App = {
                         const result = await response.json();
                         
                         if (response.ok) {
-                            // Check if it was a duplicate (status unchanged)
                             if (result.duplicate) {
                                 modules.toast?.info('Thanks for the beer report! 🍺');
                             } else {
                                 modules.toast?.success('Thanks! Beer added & status set to "Currently has GF" 🍺✅');
                             }
                             
-                            // Update venue state if changed
                             if (!result.duplicate && statusPromptVenue) {
                                 window.App.setState('currentVenue', {
                                     ...statusPromptVenue,
@@ -767,29 +766,23 @@ const App = {
                                 });
                             }
                         } else {
-                            // Silent fail - still thank them for the beer report
                             modules.toast?.success('Thanks for the beer report! 🍺');
                         }
                     } catch (error) {
                         console.error('Failed to auto-update status:', error);
-                        // Silent fail - still thank them for the beer report
                         modules.toast?.success('Thanks for the beer report! 🍺');
                     }
                 } else {
-                    // Already has 'always_*' status, just thank them
                     console.log('ℹ️ Venue already has "always" status:', currentStatus);
                     modules.toast?.success('Thanks for the beer report! 🍺');
                 }
                 
-                // Clear the state
                 window.App.setState('statusPromptVenue', null);
                 window.App.setState('statusPromptSubmittedBy', null);
             } else {
-                // No venue data, just thank them
                 modules.toast?.info('Thanks for the beer report! 🍺');
             }
             
-            // Close the modal
             modules.modalManager?.close('statusPromptAfterBeerModal');
         },
 
@@ -988,7 +981,7 @@ const App = {
         'quick-status-update': async (el, modules) => {
             const status = el.dataset.status;
             const statusPromptVenue = window.App.getState('statusPromptVenue');
-            const statusPromptSubmittedBy = window.App.getState('statusPromptSubmittedBy'); // Get stored submitter
+            const statusPromptSubmittedBy = window.App.getState('statusPromptSubmittedBy');
             
             if (!statusPromptVenue) {
                 console.error('No venue found for status update');
@@ -998,11 +991,12 @@ const App = {
             console.log('🎯 Quick status update:', status, 'for venue:', statusPromptVenue.venue_id);
             console.log('👤 Submitted by:', statusPromptSubmittedBy);
             
-            // Close ALL status modals to prevent any confirmations
+            // Get user_id from localStorage since it's not being passed through state
+            const userId = parseInt(localStorage.getItem('user_id'));
+            console.log('🆔 User ID from localStorage:', userId);
+            
             modules.modalManager?.close('statusPromptAfterBeerModal');
             modules.modalManager?.closeGroup('status');
-            
-            // Block the confirmation modal from opening
             modules.modalManager?.block('gfStatusConfirmModal');
             modules.modalManager?.block('beerDetailsPromptModal');
             
@@ -1013,7 +1007,7 @@ const App = {
                     body: JSON.stringify({
                         venue_id: statusPromptVenue.venue_id,
                         status: status,
-                        // Use the persisted submitter from beer report, fallback to current nickname
+                        user_id: userId,
                         submitted_by: statusPromptSubmittedBy || 
                                     window.App.getState('userNickname') || 
                                     localStorage.getItem('userNickname') || 
@@ -1024,14 +1018,12 @@ const App = {
                 const result = await response.json();
                 
                 if (response.ok) {
-                    // Check if it was a duplicate
                     if (result.duplicate) {
                         modules.toast?.info('🍺 Beer added! Status already set to ' + status);
                     } else {
                         modules.toast?.success('🎉 Beer added + status updated! You are a legend! 🍺⭐');
                     }
                     
-                    // Update the venue in state if changed
                     if (!result.duplicate && statusPromptVenue) {
                         window.App.setState('currentVenue', {
                             ...statusPromptVenue,
@@ -1039,17 +1031,14 @@ const App = {
                         });
                     }
                     
-                    // Award extra points
                     const communityHub = modules.communityHub || window.App?.getModule('communityHub');
                     if (communityHub?.isUserActive()) {
                         communityHub.trackAction('STATUS_UPDATE', { venue: statusPromptVenue.venue_name });
                     }
                     
-                    // Clear the state
                     window.App.setState('statusPromptVenue', null);
                     window.App.setState('statusPromptSubmittedBy', null);
                     
-                    // Unblock the modals after a delay
                     setTimeout(() => {
                         modules.modalManager?.unblock('gfStatusConfirmModal');
                         modules.modalManager?.unblock('beerDetailsPromptModal');
@@ -1059,7 +1048,6 @@ const App = {
                 console.error('Failed to update status:', error);
                 modules.toast?.error('Failed to update status');
                 
-                // Unblock on error too
                 modules.modalManager?.unblock('gfStatusConfirmModal');
                 modules.modalManager?.unblock('beerDetailsPromptModal');
             }
