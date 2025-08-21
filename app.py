@@ -819,12 +819,9 @@ def submit_beer_update():
         else:
             # Insert new report - ONLY user_id
             cursor.execute("""
-                INSERT INTO venue_beers (
-                    venue_id, beer_id, format, user_id, last_seen
-                ) VALUES (
-                    %s, %s, %s, %s, 1, CURRENT_DATE
-                )
-            """, (venue_id, beer_id, format_type, user_id))
+                INSERT INTO venue_beers (venue_id, beer_id, user_id, format, last_seen)
+                VALUES (%s, %s, %s, %s, CURRENT_DATE)
+            """, (venue_id, beer_id, user_id, format_type))
             report_id = cursor.lastrowid
             logger.info(f"Added new venue_beer report {report_id} by user {user_id}")
         
@@ -1910,6 +1907,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
