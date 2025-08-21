@@ -271,8 +271,8 @@
 }
 
 .rank.silver { 
-    background: linear-gradient(135deg, var(--level-silver), var(--grey)); 
-    color: white; 
+   background: silver
+   color: white; 
 }
 
 .rank.bronze { 
