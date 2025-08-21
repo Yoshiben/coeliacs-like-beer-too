@@ -1156,6 +1156,9 @@ const App = {
         'add-beer-details': (el, modules) => {
             modules.modalManager?.close('beerDetailsPromptModal');
             
+            // Set flag to prevent circular prompt
+            window.App.setState('cameFromBeerDetailsPrompt', true);
+            
             // Get the current venue from state
             const currentVenue = window.App.getState('currentVenue');
             
