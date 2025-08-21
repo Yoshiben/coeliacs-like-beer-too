@@ -342,9 +342,29 @@ const App = {
         
         // Check cookie consent
         App.checkCookieConsent();
-
-        // ADD THE ONBOARDING CODE HERE (after line 260):
-        // Initialize user session and onboarding
+    
+        // ADD THIS HERE! 👇
+        // Load user_id for existing nickname
+        async function loadUserId() {
+            const nickname = localStorage.getItem('userNickname');
+            if (nickname && !localStorage.getItem('user_id')) {
+                try {
+                    const response = await fetch(`/api/get-user-id/${nickname}`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        localStorage.setItem('user_id', data.user_id);
+                        window.App.setState('userId', data.user_id);
+                        console.log(`✅ Found user_id ${data.user_id} for ${nickname}`);
+                    }
+                } catch (error) {
+                    console.error('Failed to get user_id:', error);
+                }
+            }
+        }
+        
+        await loadUserId(); // Call it here
+        
+        // Initialize user session and onboarding (continues with existing code...)
         await OnboardingFlow.start();
         
         // Listen for onboarding completion
