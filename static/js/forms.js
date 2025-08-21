@@ -120,6 +120,7 @@ export const FormModule = (() => {
         const validation = validateReportForm(reportData);
         
         if (!validation.isValid) {
+            utils.showToast(`❌ Please fill in: ${validation.errors.join(', ')}`, 'error');
             state.isSubmitting = false;
             return;
         }
@@ -198,48 +199,18 @@ export const FormModule = (() => {
     };
     
     const validateReportForm = (data) => {
-        // Clear all previous errors
-        document.querySelectorAll('.field-error').forEach(el => {
-            el.classList.remove('show');
-            el.textContent = '';
-        });
-        document.querySelectorAll('.form-group').forEach(el => {
-            el.classList.remove('error');
-        });
+        const required = [
+            ['beer_format', 'Beer Format'],
+            ['brewery_name', 'Brewery Name']
+        ];
         
-        let isValid = true;
+        const errors = required.filter(([key]) => !data[key]).map(([, label]) => label);
         
-        // Check format
-        if (!data.beer_format) {
-            showFieldError('formatError', 'Please select a format');
-            isValid = false;
-        }
-        
-        // Check brewery
-        if (!data.brewery_name) {
-            showFieldError('breweryError', 'Please enter brewery name');
-            isValid = false;
-        }
-        
-        // Check venue
         if (!data.venue_id && !data.venue_name) {
-            showFieldError('venueError', 'Please select or enter a venue');
-            isValid = false;
+            errors.push('Venue Name');
         }
         
-        return { isValid, errors: [] }; // Return empty errors array since we're showing inline
-    };
-    
-    const showFieldError = (errorId, message) => {
-        const errorEl = document.getElementById(errorId);
-        if (errorEl) {
-            errorEl.textContent = message;
-            errorEl.classList.add('show');
-            const formGroup = errorEl.closest('.form-group');
-            if (formGroup) {
-                formGroup.classList.add('error');
-            }
-        }
+        return { isValid: errors.length === 0, errors };
     };
 
     const handleSubmissionSuccess = (result, reportData) => {
