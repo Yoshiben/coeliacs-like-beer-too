@@ -1467,14 +1467,6 @@ def add_venue():
         
         venue_id = cursor.lastrowid
         
-        # Add initial GF status as unknown
-        cursor.execute("""
-            INSERT INTO gf_status (venue_id, status, updated_at, updated_by)
-            VALUES (%s, 'unknown', NOW(), %s)
-        """, (venue_id, submitted_by))
-        
-        conn.commit()
-        
         # Log the addition
         logger.info(f"New venue added: {data['venue_name']} (ID: {venue_id}) as {venue_type} by {submitted_by}")
         
@@ -1949,6 +1941,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
