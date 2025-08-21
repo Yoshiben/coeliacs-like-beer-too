@@ -75,9 +75,52 @@ def index():
     version = str(int(time.time()))
     return render_template('index.html', cache_buster=version)
 
-# ====================================================================
-# RECENT FINDS API ENDPOINT
-# ====================================================================
+@app.route('/api/stats')
+def get_stats():
+    """Get site statistics with new schema"""
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor()
+        
+        # Total venues
+        cursor.execute("SELECT COUNT(*) as total FROM venues")
+        total_venues = cursor.fetchone()[0]
+        
+        # Venues with GF options
+        cursor.execute("""
+            SELECT COUNT(DISTINCT venue_id) as gf_total 
+            FROM gf_status 
+            WHERE status IN ('always_tap_cask','always_bottle_can', 'currently')
+        """)
+        gf_venues = cursor.fetchone()[0]
+
+        # Venues with GF options this month
+        cursor.execute("""
+            SELECT COUNT(DISTINCT venue_id) as gf_total_this_month
+            FROM gf_status 
+            WHERE status IN ('always_tap_cask','always_bottle_can', 'currently')
+            AND YEAR(updated_at) = YEAR(CURRENT_DATE())
+            AND MONTH(updated_at) = MONTH(CURRENT_DATE())
+        """)
+        gf_venues_this_month = cursor.fetchone()[0]
+        
+        return jsonify({
+            'total_venues': total_venues,
+            'gf_venues': gf_venues,
+            'gf_venues_this_month': gf_venues_this_month
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in stats: {str(e)}")
+        return jsonify({
+            'total_venues': 67031,
+            'gf_venues': 100,
+            'gf_venues_this_month': 10 
+        })
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
 
 @app.route('/api/recent-finds')
 def get_recent_finds():
@@ -177,7 +220,6 @@ def get_recent_finds():
             cursor.close()
             conn.close()
 
-# In app.py, REPLACE the entire /nearby route with:
 @app.route('/nearby')
 def nearby():
     """Find nearby venues with pagination support"""
@@ -617,6 +659,10 @@ def search_by_beer():
         if 'conn' in locals() and conn.is_connected():
             cursor.close()
             conn.close()
+
+# ====================================================================
+# RECENT FINDS API ENDPOINT
+# ====================================================================
                     
 @app.route('/autocomplete')
 def autocomplete():
@@ -955,52 +1001,6 @@ def get_user_stats(nickname):
 # API ROUTES
 # ================================================================================
 
-@app.route('/api/stats')
-def get_stats():
-    """Get site statistics with new schema"""
-    try:
-        conn = mysql.connector.connect(**db_config)
-        cursor = conn.cursor()
-        
-        # Total venues
-        cursor.execute("SELECT COUNT(*) as total FROM venues")
-        total_venues = cursor.fetchone()[0]
-        
-        # Venues with GF options
-        cursor.execute("""
-            SELECT COUNT(DISTINCT venue_id) as gf_total 
-            FROM gf_status 
-            WHERE status IN ('always_tap_cask','always_bottle_can', 'currently')
-        """)
-        gf_venues = cursor.fetchone()[0]
-
-        # Venues with GF options this month
-        cursor.execute("""
-            SELECT COUNT(DISTINCT venue_id) as gf_total_this_month
-            FROM gf_status 
-            WHERE status IN ('always_tap_cask','always_bottle_can', 'currently')
-            AND YEAR(updated_at) = YEAR(CURRENT_DATE())
-            AND MONTH(updated_at) = MONTH(CURRENT_DATE())
-        """)
-        gf_venues_this_month = cursor.fetchone()[0]
-        
-        return jsonify({
-            'total_venues': total_venues,
-            'gf_venues': gf_venues,
-            'gf_venues_this_month': gf_venues_this_month
-        })
-        
-    except Exception as e:
-        logger.error(f"Error in stats: {str(e)}")
-        return jsonify({
-            'total_venues': 67031,
-            'gf_venues': 100,
-            'gf_venues_this_month': 10 
-        })
-    finally:
-        if 'conn' in locals() and conn.is_connected():
-            cursor.close()
-            conn.close()
 
 @app.route('/api/breweries', methods=['GET'])
 def get_breweries():
@@ -1889,6 +1889,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
