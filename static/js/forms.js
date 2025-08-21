@@ -222,9 +222,20 @@ export const FormModule = (() => {
         
         resetReportForm();
         
+        // CHECK: Did we come from the beer details prompt after status update?
+        const cameFromStatusFlow = window.App.getState('cameFromBeerDetailsPrompt');
+        
+        if (cameFromStatusFlow) {
+            // Clear the flag
+            window.App.setState('cameFromBeerDetailsPrompt', false);
+            // Don't show status prompt - we already have the status!
+            return;
+        }
+        
+        // Normal flow - show status prompt
         const venue = utils.getCurrentVenue() || utils.getSelectedVenue();
         const submittedBy = reportData.submitted_by;
-        const userId = reportData.user_id; // Get the user_id from report data
+        const userId = reportData.user_id;
         
         console.log('🔍 DEBUG: Current venue:', venue);
         console.log('🔍 DEBUG: Report data:', reportData);
