@@ -75,6 +75,41 @@ def index():
     version = str(int(time.time()))
     return render_template('index.html', cache_buster=version)
 
+# Add this ONE simple endpoint to app.py:
+@app.route('/api/get-user-id/<nickname>', methods=['GET'])
+def get_user_id(nickname):
+    """Simply get user_id from nickname"""
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        cursor.execute("""
+            SELECT user_id, nickname, points, level 
+            FROM users 
+            WHERE nickname = %s AND is_active = 1
+        """, (nickname,))
+        
+        user = cursor.fetchone()
+        
+        if user:
+            return jsonify({
+                'success': True,
+                'user_id': user['user_id'],
+                'nickname': user['nickname'],
+                'points': user['points'],
+                'level': user['level']
+            })
+        else:
+            return jsonify({'success': False, 'error': 'User not found'}), 404
+            
+    except Exception as e:
+        logger.error(f"Error getting user ID: {str(e)}")
+        return jsonify({'error': 'Failed to get user'}), 500
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
+
 @app.route('/api/stats')
 def get_stats():
     """Get site statistics with new schema"""
@@ -965,13 +1000,13 @@ def get_community_leaderboard():
         # Get contributions from venue_beers
         cursor.execute("""
             SELECT 
-                added_by as nickname,
+                nickname,
                 COUNT(*) as beer_contributions,
                 COUNT(DISTINCT venue_id) as venues_with_beers
-            FROM venue_beers
-            WHERE added_by IS NOT NULL 
-            AND added_by != 'anonymous'
-            AND added_by != ''
+            FROM venue_beers vb
+            LEFT JOIN users u ON vb.user_id = u.user_id
+            WHERE 1=1
+            AND vb.user_id IS NOT NULL
             GROUP BY added_by
         """)
         beer_contributors = {row['nickname']: row for row in cursor.fetchall()}
@@ -979,13 +1014,13 @@ def get_community_leaderboard():
         # Get status updates
         cursor.execute("""
             SELECT 
-                updated_by as nickname,
+                nickname,
                 COUNT(*) as status_updates,
                 COUNT(DISTINCT venue_id) as venues_updated
-            FROM status_updates
-            WHERE updated_by IS NOT NULL 
-            AND updated_by != 'anonymous'
-            AND updated_by != ''
+            FROM status_updates s
+            LEFT JOIN users u ON s.user_id = u.user_id
+            WHERE 1=1
+            AND s.user_id IS NOT NULL
             GROUP BY updated_by
         """)
         status_contributors = {row['nickname']: row for row in cursor.fetchall()}
@@ -1074,60 +1109,6 @@ def check_nickname():
         cursor.close()
         conn.close()
 
-# @app.route('/api/user/create', methods=['POST'])
-# def create_user():
-#     data = request.get_json()
-#     nickname = data.get('nickname', '').strip()
-#     uuid = data.get('uuid', '').strip()
-#     avatar_emoji = data.get('avatar_emoji', '🍺')
-    
-#     if not nickname or not uuid:
-#         return jsonify({'error': 'Missing required fields'}), 400
-    
-#     conn = mysql.connector.connect(**db_config)  # FIXED
-#     cursor = conn.cursor(dictionary=True)
-    
-#     try:
-#         # Check if UUID already has account
-#         cursor.execute("SELECT user_id, nickname FROM users WHERE uuid = %s", (uuid,))
-#         existing = cursor.fetchone()
-        
-#         if existing:
-#             return jsonify({
-#                 'success': True,
-#                 'user_id': existing['user_id'],
-#                 'nickname': existing['nickname'],
-#                 'message': 'Welcome back!',
-#                 'points': 0
-#             })
-        
-#         # Create new user with 10 welcome points
-#         cursor.execute("""
-#             INSERT INTO users (uuid, nickname, avatar_emoji, points, created_at)
-#             VALUES (%s, %s, %s, 10, NOW())
-#         """, (uuid, nickname, avatar_emoji))
-        
-#         user_id = cursor.lastrowid
-#         conn.commit()
-        
-#         return jsonify({
-#             'success': True,
-#             'user_id': user_id,
-#             'nickname': nickname,
-#             'points': 10,
-#             'message': 'Account created!'
-#         })
-        
-#     except mysql.connector.IntegrityError:
-#         return jsonify({'error': 'Nickname already taken'}), 409
-#     except Exception as e:
-#         conn.rollback()
-#         print(f"Error creating user: {e}")
-#         return jsonify({'error': 'Failed to create account'}), 500
-#     finally:
-#         cursor.close()
-#         conn.close()
-
 @app.route('/api/user/get/<uuid>')
 def get_user(uuid):
     conn = mysql.connector.connect(**db_config)  # FIXED
@@ -1192,16 +1173,18 @@ def get_user_stats(nickname):
         # Get beer contributions
         cursor.execute("""
             SELECT COUNT(*) as count, COUNT(DISTINCT venue_id) as venues
-            FROM venue_beers
-            WHERE added_by = %s
+            FROM venue_beers vb
+            LEFT JOIN users u ON vb.user_id = u.user_id
+            WHERE nickname = %s
         """, (nickname,))
         beer_stats = cursor.fetchone()
         
         # Get status updates
         cursor.execute("""
             SELECT COUNT(*) as count, COUNT(DISTINCT venue_id) as venues
-            FROM status_updates
-            WHERE updated_by = %s
+            FROM status_updates s
+            LEFT JOIN users u ON s.user_id = u.user_id
+            WHERE nickname = %s
         """, (nickname,))
         status_stats = cursor.fetchone()
         
@@ -1921,6 +1904,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
