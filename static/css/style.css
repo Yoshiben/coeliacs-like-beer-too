@@ -197,7 +197,7 @@ html {
    ================================ */
 .card {
    background: var(--bg-card-home);
-   border-radius: var(--radius-xl);
+   border-radius: var(--radius-pill);
    overflow: hidden;
    box-shadow: var(--shadow-card-home);
    border: 1px solid rgba(139, 92, 246, 0.07);
