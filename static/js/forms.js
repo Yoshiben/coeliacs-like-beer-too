@@ -700,8 +700,8 @@ export const FormModule = (() => {
             this.selectedStatus = null;
             
             const venueNameEl = document.getElementById('statusPromptVenueName');
-            if (venueNameEl && venue) {
-                venueNameEl.textContent = venue.venue_name || 'this venue';
+            if (venueNameEl && this.currentVenue) {
+                venueNameEl.textContent = this.currentVenue.venue_name || this.currentVenue.name || 'this venue';
             }
             
             modules.modalManager ? 
