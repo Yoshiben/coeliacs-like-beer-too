@@ -738,13 +738,15 @@
 }
 
 .info-card {
-    background: var(--bg-white);
-    border-radius: var(--radius-xl);
-    max-width: 800px;
-    width: 100%;
-    max-height: 90vh;
-    overflow-y: auto;
-    box-shadow: var(--shadow-xl);
+   background: var(--bg-white);
+   border-radius: var(--radius-xl);
+   max-width: 800px;
+   width: 100%;
+   max-height: 90vh;
+   overflow-y: auto;
+   box-shadow: var(--shadow-xl);
+   max-height: calc(80vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+   max-height: calc(80dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
 }
 
 .info-header {
