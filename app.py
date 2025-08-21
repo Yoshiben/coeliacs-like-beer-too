@@ -84,9 +84,11 @@ def get_user_id(nickname):
         cursor = conn.cursor(dictionary=True)
         
         cursor.execute("""
-            SELECT user_id, nickname, points, level 
+            SELECT us.user_id, u.nickname, us.points, us.level 
             FROM user_stats us
-            WHERE nickname = %s AND is_active = 1
+            LEFT JOIN users u
+            ON us.user_id = u.user_id
+            WHERE u.nickname = %s AND u.is_active = 1
         """, (nickname,))
         
         user = cursor.fetchone()
@@ -1897,6 +1899,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
