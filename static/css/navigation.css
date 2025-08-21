@@ -40,6 +40,9 @@
    height: 4vh;
    height: 4dvh;
    width: auto;
+   position: absolute;
+   left: 0;
+   margin: var(--space-sm);
 }
 
 .nav-actions {
@@ -56,9 +59,12 @@ nav-notification-btn {
 .nav-back-btn {
    background: rgba(255, 255, 255, 0.2);
    color: var(--white);
-   padding: var(--space-sm) var(--space-lg);
    font-size: var(--text-xs);
    transition: all var(--transition);
+   border-radius: var(--radius-pill);
+   padding: var(--space-xs) var(--space-xl);
+   margin: var(--space-xs) 0;
+   min-height: 38px;
 }
 
 .nav-toggle,
