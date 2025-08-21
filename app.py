@@ -85,7 +85,7 @@ def get_user_id(nickname):
         
         cursor.execute("""
             SELECT user_id, nickname, points, level 
-            FROM users 
+            FROM user_stats 
             WHERE nickname = %s AND is_active = 1
         """, (nickname,))
         
@@ -1163,8 +1163,10 @@ def get_user(uuid):
     try:
         # Only select columns that actually exist in your users table
         cursor.execute("""
-            SELECT user_id, nickname, points
-            FROM users 
+            SELECT us.user_id, nickname, points
+            FROM users_stats us
+            LEFT JOIN users u
+            ON us.user_id = u.user_id
             WHERE uuid = %s
         """, (uuid,))
         
@@ -1661,8 +1663,7 @@ def signin_user():
     try:
         # Find user by nickname
         cursor.execute("""
-            SELECT user_id, nickname, avatar_emoji, passcode, points, 
-                   beers_reported, venues_added, statuses_updated
+            SELECT user_id, nickname, avatar_emoji, passcode
             FROM users 
             WHERE nickname = %s
         """, (nickname,))
@@ -1950,6 +1951,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
