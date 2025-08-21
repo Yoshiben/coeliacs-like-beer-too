@@ -141,14 +141,14 @@ def get_recent_finds():
                 b.beer_name,
                 br.brewery_name,
                 vb.format,
-                vb.added_at,
                 vb.added_by,
                 vb.times_reported
             FROM venue_beers vb
             JOIN venues v ON vb.venue_id = v.venue_id
             LEFT JOIN beers b ON vb.beer_id = b.beer_id
             LEFT JOIN breweries br ON b.brewery_id = br.brewery_id
-            ORDER BY vb.added_at DESC
+            LEFT JOIN users u ON vb.user_id = u.user_id
+            ORDER BY vb.last_seen DESC
             LIMIT 2
         """
         
@@ -1921,6 +1921,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
