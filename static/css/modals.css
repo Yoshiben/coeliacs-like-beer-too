@@ -47,26 +47,26 @@
    min-height: 0;
    width: -webkit-fill-available;
    height: -webkit-fill-available;
-       background: white;
-    border-radius: var(--radius-xl);
-    width: 90%;
-    max-width: 500px;
-    
-    /* Updated max-height with safe areas and dynamic viewport */
-    max-height: 85vh;
-    max-height: 85dvh;
-    
-    /* Account for safe areas in the calculation */
-    max-height: calc(90vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-    max-height: calc(90dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-    
-    overflow-y: auto;
-    position: relative;
-    box-shadow: var(--shadow-xl);
-    animation: modalSlideIn 0.3s ease-out;
-    
-    /* Ensure content doesn't go under home indicator */
-    margin-bottom: env(safe-area-inset-bottom);
+    background: white;
+   border-radius: var(--radius-xl);
+   width: 90%;
+   max-width: 500px;
+   
+   /* Updated max-height with safe areas and dynamic viewport */
+   max-height: 85vh;
+   max-height: 85dvh;
+   
+   /* Account for safe areas in the calculation */
+   max-height: calc(90vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+   max-height: calc(90dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+   
+   overflow-y: auto;
+   position: relative;
+   box-shadow: var(--shadow-xl);
+   animation: modalSlideIn 0.3s ease-out;
+   
+   /* Ensure content doesn't go under home indicator */
+   margin-bottom: env(safe-area-inset-bottom);
 }
 
 /* Modal Header */
