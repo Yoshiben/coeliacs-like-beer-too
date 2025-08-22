@@ -1342,6 +1342,7 @@ def get_all_venues_for_map():
             cursor.close()
             conn.close()
 
+@app.route('/api/add-venue', methods=['POST'])
 def add_venue():
     """Add a new venue to the database"""
     conn = None  # Initialize conn outside try block
