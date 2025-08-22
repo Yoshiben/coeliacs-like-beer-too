@@ -363,6 +363,27 @@ const App = {
         }
         
         await loadUserId(); // Call it here
+
+        // REQUEST LOCATION ONCE PER SESSION (PWA AND WEB)
+        if (!sessionStorage.getItem('locationRequested')) {
+            console.log('📍 Requesting location once for this session');
+            
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        sessionStorage.setItem('locationRequested', 'true');
+                        sessionStorage.setItem('lastLat', position.coords.latitude);
+                        sessionStorage.setItem('lastLng', position.coords.longitude);
+                        console.log('📍 Location cached for session');
+                    },
+                    (error) => {
+                        sessionStorage.setItem('locationRequested', 'true');
+                        console.log('📍 Location denied for session');
+                    },
+                    { enableHighAccuracy: false, timeout: 5000 }
+                );
+            }
+        }
         
         // Initialize user session and onboarding (continues with existing code...)
         await OnboardingFlow.start();
