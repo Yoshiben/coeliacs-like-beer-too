@@ -1315,6 +1315,20 @@ export const SearchModule = (function() {
                         lng: position.coords.longitude,
                         accuracy: position.coords.accuracy
                     };
+                    
+                    // ADD THIS BLOCK - Save to localStorage for persistence
+                    try {
+                        localStorage.setItem('lastKnownLocation', JSON.stringify({
+                            lat: location.lat,
+                            lng: location.lng,
+                            accuracy: location.accuracy,
+                            timestamp: Date.now()
+                        }));
+                        console.log('💾 Location saved to localStorage for future sessions');
+                    } catch (e) {
+                        console.error('Failed to cache location:', e);
+                    }
+                    
                     resolve(location);
                 },
                 (error) => {
@@ -1404,23 +1418,45 @@ export const SearchModule = (function() {
     };
     
     const tryGetUserLocation = async () => {
-        const cachedLocation = utils.getUserLocation();
+        // Check app state first
+        let cachedLocation = utils.getUserLocation();
         const locationTimestamp = window.App.getState(STATE_KEYS.LOCATION_TIMESTAMP);
         
+        // Use cached if recent (5 minutes)
         if (cachedLocation && locationTimestamp && Date.now() - locationTimestamp < 300000) {
-            console.log('📍 Using cached location');
+            console.log('📍 Using recently cached location');
             return cachedLocation;
         }
         
+        // Check localStorage for persistent cache
         try {
-            const location = await getUserLocation();
-            utils.setUserLocation(location);
-            modules.map?.setUserLocation(location);
-            return location;
-        } catch (error) {
-            console.log('📍 Could not get location:', error.message);
-            return null;
+            const stored = localStorage.getItem('lastKnownLocation');
+            if (stored) {
+                const data = JSON.parse(stored);
+                // Use if less than 24 hours old
+                if (data.timestamp && (Date.now() - data.timestamp < 86400000)) {
+                    cachedLocation = {
+                        lat: data.lat,
+                        lng: data.lng,
+                        accuracy: data.accuracy || 100
+                    };
+                    
+                    // Update app state
+                    utils.setUserLocation(cachedLocation);
+                    modules.map?.setUserLocation(cachedLocation);
+                    
+                    console.log('📍 Using localStorage cached location');
+                    return cachedLocation;
+                }
+            }
+        } catch (e) {
+            console.error('Failed to read cached location:', e);
         }
+        
+        // Only request fresh location if user explicitly searching by location
+        // Otherwise return null to avoid prompting
+        console.log('📍 No recent cached location available');
+        return null;
     };
     
     // ================================
