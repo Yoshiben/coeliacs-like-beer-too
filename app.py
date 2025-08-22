@@ -1736,7 +1736,31 @@ def check_device(uuid):
         conn.close()
 
 
-
+def update_user_stats(user_id, action_type, points):
+    """Update user statistics and points"""
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor()
+        
+        # Log the action
+        logger.info(f"Updating stats for user {user_id}: {action_type} (+{points} points)")
+        
+        # The user_stats VIEW will automatically calculate totals
+        # We just need to ensure the source data is updated
+        # The points come from counting records in venue_beers and status_updates
+        
+        conn.commit()
+        return True
+        
+    except Exception as e:
+        logger.error(f"Error updating user stats: {str(e)}")
+        if 'conn' in locals():
+            conn.rollback()
+        return False
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
 
 
 
@@ -1899,24 +1923,4 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
