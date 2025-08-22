@@ -363,136 +363,176 @@ const App = {
         
         await loadUserId();
     
-        // ENHANCED LOCATION HANDLING
+        // ENHANCED LOCATION PERSISTENCE
         const LocationPersistence = {
-            // Check if running as PWA
+            isIOS() {
+                return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            },
+    
             isPWA() {
                 return window.matchMedia('(display-mode: standalone)').matches || 
                        window.navigator.standalone ||
                        document.referrer.includes('android-app://');
             },
     
-            // Check if iOS
-            isIOS() {
-                return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-                       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-            },
-    
-            // Get cached location from localStorage (persists across sessions)
             getCachedLocation() {
-                const cached = localStorage.getItem('lastKnownLocation');
-                if (cached) {
-                    try {
+                try {
+                    const cached = localStorage.getItem('lastKnownLocation');
+                    if (cached) {
                         const data = JSON.parse(cached);
-                        // Check if location is less than 24 hours old
+                        // 24-hour expiry
                         if (data.timestamp && (Date.now() - data.timestamp < 86400000)) {
-                            console.log('📍 Using cached location from localStorage');
-                            return { lat: data.lat, lng: data.lng };
+                            return { 
+                                lat: data.lat, 
+                                lng: data.lng,
+                                accuracy: data.accuracy || 100
+                            };
                         }
-                    } catch (e) {
-                        console.error('Failed to parse cached location:', e);
                     }
+                } catch (e) {
+                    console.error('Failed to parse cached location:', e);
                 }
                 return null;
             },
     
-            // Save location to localStorage
-            saveLocation(lat, lng) {
+            saveLocation(lat, lng, accuracy = 100) {
                 try {
                     localStorage.setItem('lastKnownLocation', JSON.stringify({
                         lat: lat,
                         lng: lng,
+                        accuracy: accuracy,
                         timestamp: Date.now()
                     }));
-                    console.log('💾 Location saved to localStorage');
+                    
+                    // Also save to session storage for quick access
+                    sessionStorage.setItem('lastLat', lat);
+                    sessionStorage.setItem('lastLng', lng);
+                    sessionStorage.setItem('locationRequested', 'true');
+                    
+                    console.log('💾 Location persisted to storage');
                 } catch (e) {
                     console.error('Failed to save location:', e);
                 }
             },
     
-            // Request location with iOS-specific handling
-            async requestLocation() {
-                // For iOS web (not PWA), check cached location first
+            async initializeLocation() {
+                // Check if we already have location in app state
+                let currentLocation = window.App.getState('userLocation');
+                if (currentLocation) {
+                    console.log('📍 Location already in app state');
+                    return currentLocation;
+                }
+    
+                // For iOS Safari (not PWA), prefer cached location
                 if (this.isIOS() && !this.isPWA()) {
                     const cached = this.getCachedLocation();
                     if (cached) {
-                        // Set in session storage for quick access
-                        sessionStorage.setItem('lastLat', cached.lat);
-                        sessionStorage.setItem('lastLng', cached.lng);
-                        sessionStorage.setItem('locationRequested', 'true');
-                        
-                        // Also set in App state
                         window.App.setState('userLocation', cached);
+                        window.App.setState('locationTimestamp', Date.now());
+                        window.App.setState('locationAccuracy', cached.accuracy);
                         
                         console.log('📍 iOS Web: Using cached location to avoid permission prompt');
                         
-                        // Try to update in background (will prompt but user can dismiss)
-                        this.updateLocationInBackground();
+                        // Try silent update in background
+                        this.attemptSilentLocationUpdate();
                         
                         return cached;
                     }
                 }
     
-                // Normal location request
-                if (!sessionStorage.getItem('locationRequested') && navigator.geolocation) {
-                    return new Promise((resolve) => {
-                        navigator.geolocation.getCurrentPosition(
-                            (position) => {
-                                const location = {
-                                    lat: position.coords.latitude,
-                                    lng: position.coords.longitude
-                                };
-                                
-                                // Save to all storage types
-                                sessionStorage.setItem('locationRequested', 'true');
-                                sessionStorage.setItem('lastLat', location.lat);
-                                sessionStorage.setItem('lastLng', location.lng);
-                                this.saveLocation(location.lat, location.lng);
-                                
-                                // Set in App state
-                                window.App.setState('userLocation', location);
-                                
-                                console.log('📍 Fresh location obtained and cached');
-                                resolve(location);
-                            },
-                            (error) => {
-                                sessionStorage.setItem('locationRequested', 'true');
-                                console.log('📍 Location denied/failed:', error.message);
-                                
-                                // Try to use cached location as fallback
-                                const cached = this.getCachedLocation();
-                                if (cached) {
-                                    console.log('📍 Using cached location as fallback');
-                                    window.App.setState('userLocation', cached);
-                                }
-                                
-                                resolve(null);
-                            },
-                            { 
-                                enableHighAccuracy: false, 
-                                timeout: 5000,
-                                maximumAge: 300000 // 5 minutes
-                            }
-                        );
-                    });
+                // Check session storage (current session)
+                const sessionLat = sessionStorage.getItem('lastLat');
+                const sessionLng = sessionStorage.getItem('lastLng');
+                if (sessionLat && sessionLng) {
+                    const location = {
+                        lat: parseFloat(sessionLat),
+                        lng: parseFloat(sessionLng),
+                        accuracy: 100
+                    };
+                    window.App.setState('userLocation', location);
+                    console.log('📍 Using session storage location');
+                    return location;
                 }
-                
+    
+                // Check localStorage (persistent)
+                const cached = this.getCachedLocation();
+                if (cached) {
+                    window.App.setState('userLocation', cached);
+                    console.log('📍 Using cached location from localStorage');
+                    
+                    // Attempt background update
+                    this.attemptSilentLocationUpdate();
+                    
+                    return cached;
+                }
+    
+                // Only request if we don't have any cached location
+                if (!sessionStorage.getItem('locationRequested')) {
+                    console.log('📍 No cached location, attempting one-time request');
+                    return await this.requestFreshLocation();
+                }
+    
                 return null;
             },
     
-            // Background location update (non-blocking)
-            updateLocationInBackground() {
+            async requestFreshLocation() {
+                if (!navigator.geolocation) return null;
+    
+                return new Promise((resolve) => {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const location = {
+                                lat: position.coords.latitude,
+                                lng: position.coords.longitude,
+                                accuracy: position.coords.accuracy
+                            };
+                            
+                            // Save everywhere
+                            this.saveLocation(location.lat, location.lng, location.accuracy);
+                            window.App.setState('userLocation', location);
+                            window.App.setState('locationTimestamp', Date.now());
+                            window.App.setState('locationAccuracy', location.accuracy);
+                            
+                            console.log('✅ Fresh location obtained and cached');
+                            resolve(location);
+                        },
+                        (error) => {
+                            console.log('📍 Location request failed:', error.message);
+                            sessionStorage.setItem('locationRequested', 'true');
+                            
+                            // Still check for cached location as fallback
+                            const cached = this.getCachedLocation();
+                            if (cached) {
+                                window.App.setState('userLocation', cached);
+                                console.log('📍 Using cached location as fallback');
+                            }
+                            
+                            resolve(null);
+                        },
+                        { 
+                            enableHighAccuracy: false, 
+                            timeout: 5000,
+                            maximumAge: 300000 // 5 minutes
+                        }
+                    );
+                });
+            },
+    
+            attemptSilentLocationUpdate() {
+                // Non-blocking background update
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(
                         (position) => {
                             this.saveLocation(
                                 position.coords.latitude,
-                                position.coords.longitude
+                                position.coords.longitude,
+                                position.coords.accuracy
                             );
                             console.log('📍 Background location update successful');
                         },
                         () => {
-                            console.log('📍 Background location update failed (expected on iOS)');
+                            console.log('📍 Background update failed (expected on iOS)');
                         },
                         { 
                             enableHighAccuracy: false, 
@@ -505,24 +545,20 @@ const App = {
         };
     
         // Initialize location
-        await LocationPersistence.requestLocation();
+        await LocationPersistence.initializeLocation();
     
-        // For iOS, show PWA prompt if not installed
+        // Show iOS PWA hint if appropriate
         if (LocationPersistence.isIOS() && !LocationPersistence.isPWA()) {
-            // Check if we should show the iOS PWA hint
             const lastPromptTime = localStorage.getItem('lastIOSPWAPrompt');
             const daysSincePrompt = lastPromptTime ? 
                 (Date.now() - parseInt(lastPromptTime)) / 86400000 : Infinity;
             
-            if (daysSincePrompt > 7) { // Show once per week max
+            if (daysSincePrompt > 7 && !sessionStorage.getItem('ios-guide-dismissed')) {
                 setTimeout(() => {
-                    if (window.pwaHandler && !sessionStorage.getItem('ios-guide-dismissed')) {
-                        console.log('📱 Showing iOS PWA install guide for better location access');
-                        // Your existing showIOSInstallGuide will handle this
+                    if (window.pwaHandler) {
+                        console.log('📱 iOS user might benefit from PWA installation');
                     }
-                }, 5000); // Show after 5 seconds
-                
-                localStorage.setItem('lastIOSPWAPrompt', Date.now().toString());
+                }, 10000); // Show after 10 seconds if needed
             }
         }
     
