@@ -1078,6 +1078,12 @@
 .permission-title {
    display: flex;
    justify-content: center;
+   margin: var(--space-sm);
+}
+
+.benefit-itewm {
+   display: grid;
+   grid-template-columns: 1fr 1fr;
 }
 
 /* ================================
