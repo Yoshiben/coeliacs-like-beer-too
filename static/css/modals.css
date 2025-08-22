@@ -1066,12 +1066,18 @@
    ================================ */
 
 .location-permission-card {
-    width: 90%;
-    max-width: 400px;
-    max-height: 70vh;
-    max-height: 70dvh;
-    max-height: calc(75vh - env(safe-area-inset-bottom));
-    max-height: calc(75dvh - env(safe-area-inset-bottom));
+   padding: var(--space-lg);
+}
+
+.permssion-icon {
+   font-size: var(--text-3xl);
+   display: flex;
+   justify-content: center;
+}
+
+.permission-title {
+   display: flex;
+   justify-content: center;
 }
 
 /* ================================
