@@ -1342,9 +1342,9 @@ def get_all_venues_for_map():
             cursor.close()
             conn.close()
 
-@app.route('/api/add-venue', methods=['POST'])
 def add_venue():
     """Add a new venue to the database"""
+    conn = None  # Initialize conn outside try block
     try:
         data = request.get_json()
         
@@ -1426,8 +1426,16 @@ def add_venue():
         
         venue_id = cursor.lastrowid
         
+        # CRITICAL: Commit the transaction HERE before returning!
+        conn.commit()
+        
         # Log the addition
-        logger.info(f"New venue added: {data['venue_name']} (ID: {venue_id}) as {venue_type} by {submitted_by}")
+        logger.info(f"New venue added and committed: {data['venue_name']} (ID: {venue_id}) as {venue_type} by {submitted_by}")
+        
+        # Close connection before returning
+        cursor.close()
+        conn.close()
+        conn = None  # Set to None so finally block doesn't try to close again
         
         return jsonify({
             'success': True,
@@ -1438,7 +1446,7 @@ def add_venue():
         
     except mysql.connector.IntegrityError as e:
         logger.error(f"Database integrity error: {str(e)}")
-        if 'conn' in locals():
+        if conn:
             conn.rollback()
         return jsonify({
             'success': False,
@@ -1447,7 +1455,7 @@ def add_venue():
         
     except mysql.connector.Error as e:
         logger.error(f"MySQL error in add_venue: {str(e)}")
-        if 'conn' in locals():
+        if conn:
             conn.rollback()
         return jsonify({
             'success': False,
@@ -1459,7 +1467,7 @@ def add_venue():
         logger.error(f"Error type: {type(e)}")
         import traceback
         logger.error(f"Traceback: {traceback.format_exc()}")
-        if 'conn' in locals():
+        if conn:
             conn.rollback()
         return jsonify({
             'success': False,
@@ -1467,7 +1475,7 @@ def add_venue():
         }), 500
         
     finally:
-        if 'conn' in locals() and conn.is_connected():
+        if conn and conn.is_connected():
             cursor.close()
             conn.close()
 
@@ -1923,4 +1931,5 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
