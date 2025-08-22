@@ -549,34 +549,49 @@
 </div>
 
 <!-- Location Permission Modal -->
+<!-- Location Permission Modal -->
 <div id="locationPermissionModal" class="modal location-modal">
     <div class="modal-content location-permission-card">
         <div class="permission-icon">📍</div>
         <h2 class="permission-title">Enable Location Services</h2>
         <p class="permission-text">
-            To find venues near you, we need access to your location. 
-            Your location data stays on your device and is never stored.
+            To find GF beer venues near you, we need your location permission.
+            <strong>Your location is never stored on our servers</strong> - it stays on your device.
         </p>
+        
+        <div class="ios-notice" style="background: #fef3c7; border: 1px solid #fbbf24; padding: 12px; border-radius: 8px; margin: 1rem 0;">
+            <strong>📱 iPhone/iPad Users:</strong><br>
+            You'll need to allow location access each session for privacy. 
+            For fewer prompts, add this app to your home screen.
+        </div>
+        
         <div class="permission-benefits">
             <div class="benefit-item">
                 <span class="benefit-icon">🎯</span>
-                <span>Find the closest venues with GF beer</span>
+                <span>Find the closest venues with GF beer instantly</span>
             </div>
             <div class="benefit-item">
                 <span class="benefit-icon">📏</span>
-                <span>See accurate distances</span>
+                <span>See accurate walking/driving distances</span>
             </div>
             <div class="benefit-item">
                 <span class="benefit-icon">🗺️</span>
-                <span>Get directions from your location</span>
+                <span>Get turn-by-turn directions from where you are</span>
+            </div>
+            <div class="benefit-item">
+                <span class="benefit-icon">🔒</span>
+                <span>Your privacy is protected - we never track or store your location</span>
             </div>
         </div>
+        
         <div class="permission-actions">
-            <button class="btn btn-secondary" data-action="deny-location">Not Now</button>
+            <button class="btn btn-secondary" data-action="deny-location">Use Postcode Instead</button>
             <button class="btn btn-primary" data-action="allow-location">Enable Location</button>
         </div>
-        <p class="permission-note">
-            You can change this anytime in your browser settings
+        
+        <p class="permission-note" style="font-size: 0.85rem; opacity: 0.8;">
+            Safari users: Go to Settings → Privacy → Location Services → Safari
+            to manage permissions permanently
         </p>
     </div>
 </div>
