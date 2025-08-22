@@ -1069,7 +1069,7 @@
    padding: var(--space-lg);
 }
 
-.permssion-icon {
+.permission-icon {
    font-size: var(--text-3xl);
    display: flex;
    justify-content: center;
