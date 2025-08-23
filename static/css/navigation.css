@@ -305,3 +305,43 @@ nav-notification-btn {
     justify-self: end;
     gap: 0.5rem;
 }
+
+/* Make the toggle smaller */
+.nav-center {
+    max-width: 180px;
+}
+
+.nav-toggle {
+    transform: scale(0.85);
+    transform-origin: center;
+}
+
+.toggle-container {
+    height: 32px !important;
+    min-width: 140px !important;
+    max-width: 140px !important;
+}
+
+.toggle-track {
+    height: 100%;
+    position: relative;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    padding: 2px;
+}
+
+.toggle-option {
+    padding: 4px 8px !important;
+    font-size: 12px !important;
+    font-weight: 500;
+    line-height: 1.4;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toggle-thumb {
+    height: 28px !important;
+    border-radius: 14px;
+}
