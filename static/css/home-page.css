@@ -87,7 +87,7 @@
 .buy-beer-icon {
     font-size: var(--text-2xl);
     width: 60px;
-   padding-top: var(--space-xs);
+   padding: var(--space-xs);
 }
 
 /* Content styling - make them consistent */
