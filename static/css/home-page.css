@@ -87,6 +87,7 @@
 .buy-beer-icon {
     font-size: var(--text-2xl);
     width: 60px;
+   padding-top: var(--space-xs);
 }
 
 /* Content styling - make them consistent */
@@ -97,6 +98,7 @@
     flex-direction: column;
     justify-content: center;
     text-align: left;
+   padding-bottom: var(--space-xs);
 }
 
 .near-me-content h3,
