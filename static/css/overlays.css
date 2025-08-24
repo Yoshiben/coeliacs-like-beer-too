@@ -693,34 +693,6 @@
 }
 
 /* ================================
-   BREWERIES OVERLAY
-   ================================ */
-
-.breweries-overlay {
-    /* Inherits from .overlay */
-}
-
-.breweries-container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    background: var(--bg-white);
-}
-
-.breweries-content {
-    flex: 1;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    padding: var(--space-lg);
-}
-
-.breweries-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: var(--space-lg);
-}
-
-/* ================================
    INFO OVERLAYS (About & GF Info)
    ================================ */
 
