@@ -153,7 +153,16 @@ export const CommunityModule = (() => {
         ];
     };
 
-    const loadTrending = async () => {
+    const updateTrending = () => {
+        const container = document.querySelector('.trending-list');
+        if (!container || !state.trendingItems.length) return;
+        
+        // Update the section header based on time period
+        const header = document.querySelector('.section-header h2');
+        if (header && state.trendingTimePeriod) {
+            header.textContent = state.trendingTimePeriod === 'all_time' ? 
+                '🏆 Top Beers All Time' : '📈 Trending This Week';
+        }
         try {
             const response = await fetch('/api/community/trending');
             const data = await response.json();
