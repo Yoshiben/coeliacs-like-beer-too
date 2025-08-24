@@ -183,7 +183,7 @@
     font-weight: 700;
 }
 
-.results-map-toggle
+.results-map-toggle,
 .add-venue-btn {
     background: rgba(255, 255, 255, 0.2);
     color: var(--white);
