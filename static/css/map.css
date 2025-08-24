@@ -228,17 +228,6 @@
     flex: 1;
 }
 
-.results-map-toggle {
-    background: rgba(255, 255, 255, 0.2);
-    color: var(--white);
-    padding: var(--space-sm) var(--space-xl);
-    border-radius: var(--radius-pill);
-    border: none;
-    cursor: pointer;
-    transition: all var(--transition);
-    font-weight: 600;
-}
-
 .results-map-toggle:hover {
     background: rgba(255, 255, 255, 0.3);
     transform: translateY(-1px);
