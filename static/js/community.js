@@ -152,32 +152,6 @@ export const CommunityModule = (() => {
             }
         ];
     };
-
-    const updateTrending = () => {
-        const container = document.querySelector('.trending-list');
-        if (!container || !state.trendingItems.length) return;
-        
-        // Update the section header based on time period
-        const header = document.querySelector('.section-header h2');
-        if (header && state.trendingTimePeriod) {
-            header.textContent = state.trendingTimePeriod === 'all_time' ? 
-                '🏆 Top Beers All Time' : '📈 Trending This Week';
-        }
-        try {
-            const response = await fetch('/api/community/trending');
-            const data = await response.json();
-            
-            if (data.success) {
-                return data.trending;
-            } else {
-                console.error('Failed to load trending data');
-                return getMockTrendingData(); // Fallback to mock
-            }
-        } catch (error) {
-            console.error('Error loading trending:', error);
-            return getMockTrendingData(); // Fallback to mock
-        }
-    };
     
     const getMockTrendingData  = async () => {
         
