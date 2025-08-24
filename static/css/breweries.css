@@ -236,6 +236,7 @@
     gap: clamp(0.75rem, 2vw, 1rem);
     max-width: 1200px;
     margin: 0 auto;
+    padding-top: var(--space-lg);
 }
 
 .brewery-card {
