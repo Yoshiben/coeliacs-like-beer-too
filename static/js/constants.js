@@ -48,7 +48,8 @@ export const Constants = {
             TYPE: 'lastSearch.type',
             QUERY: 'lastSearch.query',
             RADIUS: 'lastSearch.radius',
-            TIMESTAMP: 'lastSearch.timestamp'
+            TIMESTAMP: 'lastSearch.timestamp',
+            COUNTRY: 'lastSearch.country'  // Add this if missing
         },
         SEARCH_RESULTS: 'searchResults',
         
