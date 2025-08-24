@@ -183,7 +183,8 @@
     font-weight: 700;
 }
 
-.results-map-toggle {
+.results-map-toggle,
+.add-venue-button {
     background: rgba(255, 255, 255, 0.2);
     color: var(--white);
     border: 2px solid rgba(255, 255, 255, 0.3);
