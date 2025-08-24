@@ -885,10 +885,6 @@
         font-size: var(--text-3xl);
         min-width: 50px;
     }
-    
-    .distance-option {
-        padding: var(--space-md);
-    }
 }
 
 @media (min-width: 1025px) {
