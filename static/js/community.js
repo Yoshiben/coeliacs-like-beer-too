@@ -152,11 +152,25 @@ export const CommunityModule = (() => {
             }
         ];
     };
-    
+
     const loadTrending = async () => {
-        // READY FOR REAL DATA:
-        // const response = await fetch(config.endpoints.trending);
-        // return await response.json();
+        try {
+            const response = await fetch('/api/community/trending');
+            const data = await response.json();
+            
+            if (data.success) {
+                return data.trending;
+            } else {
+                console.error('Failed to load trending data');
+                return getMockTrendingData(); // Fallback to mock
+            }
+        } catch (error) {
+            console.error('Error loading trending:', error);
+            return getMockTrendingData(); // Fallback to mock
+        }
+    };
+    
+    const getMockTrendingData  = async () => {
         
         return [
             {
