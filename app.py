@@ -75,7 +75,6 @@ def index():
     version = str(int(time.time()))
     return render_template('index.html', cache_buster=version)
 
-# Add this ONE simple endpoint to app.py:
 @app.route('/api/get-user-id/<nickname>', methods=['GET'])
 def get_user_id(nickname):
     """Simply get user_id from nickname"""
@@ -259,6 +258,61 @@ def get_recent_finds():
             'error': 'An error occurred'
         }), 500
         
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+@app.route('/api/community/trending')
+def get_trending_beers():
+    """Get trending beers from the last 7 days"""
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        # Get beers reported in the last 7 days, grouped and counted
+        cursor.execute("""
+            SELECT 
+                CONCAT(br.brewery_name, ' - ', b.beer_name) as beer_name,
+                br.brewery_name,
+                b.beer_name as name_only,
+                COUNT(*) as report_count,
+                COUNT(DISTINCT vb.venue_id) as venue_count
+            FROM venue_beers vb
+            JOIN beers b ON vb.beer_id = b.beer_id
+            JOIN breweries br ON b.brewery_id = br.brewery_id
+            WHERE vb.last_seen >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
+            GROUP BY b.beer_id, br.brewery_id
+            ORDER BY report_count DESC
+            LIMIT 5
+        """)
+        
+        trending = cursor.fetchall()
+        
+        # Format for frontend
+        formatted_trending = []
+        for idx, item in enumerate(trending, 1):
+            formatted_trending.append({
+                'rank': idx,
+                'beer_name': item['beer_name'],
+                'brewery': item['brewery_name'],
+                'report_count': item['report_count'],
+                'venue_count': item['venue_count'],
+                'hot': idx == 1,  # Mark #1 as hot
+                'trend': 'up' if item['report_count'] > 10 else 'stable'
+            })
+        
+        return jsonify({
+            'success': True,
+            'trending': formatted_trending
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting trending beers: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
     finally:
         if 'conn' in locals() and conn.is_connected():
             cursor.close()
@@ -1932,5 +1986,6 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
