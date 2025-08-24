@@ -600,19 +600,20 @@ export const SearchModule = (function() {
                 query: query,
                 beer_type: searchType,
                 page: 1,
-                gf_only: filterGF.isActive().toString(),
+                gf_only: (window.App.getState('gfOnlyFilter') !== false).toString(),
                 country: country  // ADD THIS
             });
             
-            if (userLat && userLng) {
-                params.set('user_lat', userLat.toString());
-                params.set('user_lng', userLng.toString());
-            }
+            const userLocation = utils.getUserLocation();
+                if (userLocation) {
+                    params.set('user_lat', userLocation.lat.toString());
+                    params.set('user_lng', userLocation.lng.toString());
+                }
             
             const response = await fetch(`/api/search-by-beer?${params}`);
             const data = await response.json();
             
-            displayResults(data);
+            displayResultsInOverlay(data.venues, searchTitle)
             
         } catch (error) {
             console.error('Beer search error:', error);
