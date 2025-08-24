@@ -185,14 +185,15 @@
 
 .results-map-toggle,
 .add-venue-btn {
-    background: rgba(255, 255, 255, 0.2);
-    color: var(--white);
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    padding: var(--space-sm) var(--space-lg);
-    border-radius: var(--radius-pill);
-    font-weight: 600;
-    cursor: pointer;
-    transition: all var(--transition);
+   background: rgba(255, 255, 255, 0.2);
+   color: var(--white);
+   border: 2px solid rgba(255, 255, 255, 0.3);
+   padding: var(--space-sm) var(--space-lg);
+   border-radius: var(--radius-pill);
+   font-weight: 600;
+   cursor: pointer;
+   transition: all var(--transition);
+   flex: none;
 }
 
 .results-map-toggle:hover {
