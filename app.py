@@ -265,12 +265,12 @@ def get_recent_finds():
 
 @app.route('/api/community/trending')
 def get_trending_beers():
-    """Get trending beers from the last 7 days"""
+    """Get trending beers from the last 7 days, fallback to all-time if none"""
     try:
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor(dictionary=True)
         
-        # Get beers reported in the last 7 days, grouped and counted
+        # First try: beers reported in the last 7 days
         cursor.execute("""
             SELECT 
                 CONCAT(br.brewery_name, ' - ', b.beer_name) as beer_name,
@@ -288,6 +288,27 @@ def get_trending_beers():
         """)
         
         trending = cursor.fetchall()
+        time_period = 'this_week'
+        
+        # If no results this week, get all-time top 5
+        if not trending or len(trending) == 0:
+            cursor.execute("""
+                SELECT 
+                    CONCAT(br.brewery_name, ' - ', b.beer_name) as beer_name,
+                    br.brewery_name,
+                    b.beer_name as name_only,
+                    COUNT(*) as report_count,
+                    COUNT(DISTINCT vb.venue_id) as venue_count
+                FROM venue_beers vb
+                JOIN beers b ON vb.beer_id = b.beer_id
+                JOIN breweries br ON b.brewery_id = br.brewery_id
+                GROUP BY b.beer_id, br.brewery_id
+                ORDER BY report_count DESC
+                LIMIT 5
+            """)
+            
+            trending = cursor.fetchall()
+            time_period = 'all_time'
         
         # Format for frontend
         formatted_trending = []
@@ -298,13 +319,14 @@ def get_trending_beers():
                 'brewery': item['brewery_name'],
                 'report_count': item['report_count'],
                 'venue_count': item['venue_count'],
-                'hot': idx == 1,  # Mark #1 as hot
+                'hot': idx == 1 and time_period == 'this_week',  # Only hot if #1 this week
                 'trend': 'up' if item['report_count'] > 10 else 'stable'
             })
         
         return jsonify({
             'success': True,
-            'trending': formatted_trending
+            'trending': formatted_trending,
+            'time_period': time_period  # So frontend knows if it's weekly or all-time
         })
         
     except Exception as e:
@@ -1986,6 +2008,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
