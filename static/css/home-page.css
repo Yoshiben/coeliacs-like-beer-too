@@ -38,7 +38,7 @@
    padding: 0 var(--space-lg) var(--space-xs);
 }
 .stat-pill.highlighted {
-    background: var(--primary-gradient);
+    background: var(--orange-gradient);
     color: var(--white);
 }
 .stat-number-small {
@@ -74,10 +74,11 @@
    cursor: pointer;
    transition: all 0.3s ease;
    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.08);
-   background: linear-gradient(135deg, 
+/*    background: linear-gradient(135deg, 
      rgba(255, 255, 255, 1) 0%, 
      rgba(248, 249, 250, 0.8) 100%
-   );
+   ); */
+   background: ver(--primary-gradient);
    height: 100%;
    width: 100%;
 }
@@ -105,7 +106,7 @@
 .buy-beer-content h3 {
    margin: var(--space-xs) 0 var(--space-xs) 0;
    font-size: var(--text-sm);
-   font-weight: 700;
+/*    font-weight: 700; */
    line-height: 1.2;
 }
 
