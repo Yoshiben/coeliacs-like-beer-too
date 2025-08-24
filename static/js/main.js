@@ -6,7 +6,7 @@
 import { Constants } from './constants.js';
 import { OnboardingFlow } from './onboarding.js';
 import { UserSession } from './user-session.js';
-import { ToastModule } from './toast.js';  // ADD THIS IMPORT
+import { ToastModule } from './toast.js'; 
 const STATE_KEYS = Constants.STATE_KEYS;
 
 // ================================
@@ -1527,6 +1527,19 @@ const App = {
                 }
                 
                 modules.toast?.success(`Nickname changed to ${newNickname}!`);
+            }
+        },
+
+        'update-beer-placeholder': (el, modules) => {
+            const searchType = el.value;
+            const input = document.getElementById('beerInput');
+            if (input) {
+                const placeholders = {
+                    'brewery': 'Enter brewery name',
+                    'beer': 'Enter beer name', 
+                    'style': 'Enter beer style'
+                };
+                input.placeholder = placeholders[searchType] || 'Enter search term';
             }
         },
         
