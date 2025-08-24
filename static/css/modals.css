@@ -1203,3 +1203,97 @@
 }
    
 
+/* Animate the beer cards */
+.beer-list-item {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.beer-list-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Add a subtle animation to the format icon */
+.beer-format {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(102, 126, 234, 0.1);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 14px;
+    animation: subtle-bounce 2s infinite;
+}
+
+@keyframes subtle-bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-2px); }
+}
+
+/* Style the delete button better */
+.btn-delete-beer {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff6b6b, #ff8787);
+    border: none;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-delete-beer:hover {
+    transform: rotate(90deg) scale(1.1);
+    background: linear-gradient(135deg, #ff5252, #ff6b6b);
+}
+
+/* Add beer style tags with colors */
+.beer-style {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* Empty state - make it more engaging */
+#beerListEmpty {
+    text-align: center;
+    padding: 40px 20px;
+    color: #666;
+}
+
+#beerListEmpty::before {
+    content: "🍺";
+    font-size: 48px;
+    display: block;
+    margin-bottom: 16px;
+    opacity: 0.5;
+    animation: rotate 4s linear infinite;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Add alternating colors for beer items */
+.beer-list-item:nth-child(odd) {
+    background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+}
+
+.beer-list-item:nth-child(even) {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+}
