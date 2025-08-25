@@ -1507,7 +1507,13 @@ const App = {
         },
 
         'switch-to-leaderboard': (el, modules) => {
-            switchTab('leaderboard');
+            // Just click the leaderboard tab - simplest solution!
+            const leaderboardTab = document.querySelector('[data-hub-tab="leaderboard"]');
+            if (leaderboardTab) {
+                leaderboardTab.click();
+            } else {
+                console.error('Leaderboard tab not found');
+            }
         },
 
         // Add to action handlers in main.js:
