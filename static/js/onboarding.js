@@ -980,7 +980,9 @@ Thank you for joining our community!
         showSignInWithNickname,
         backToNickname,
         clearNicknameOptions,
-        showNicknameSelection 
+        showNicknameSelection,
+        confirmPasscodeSavedAndReturnToCommunity,
+        showPasscodeDisplayForCommunity
     };
 })();
 
