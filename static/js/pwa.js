@@ -146,24 +146,23 @@ class PWAHandler {
     
     checkIOSInstallGuide() {
         if (this.isIOS() && !this.isStandalone()) {
-            // Check if onboarding is complete
-            const hasAgeConsent = localStorage.getItem('ageConsent') === 'true';
-            const hasSeenWelcome = localStorage.getItem('hasSeenWelcome') === 'true';
-            const hasNickname = localStorage.getItem('userNickname');
+            // Check if user has already completed onboarding (returning visitor)
+            const hasCompletedOnboarding = localStorage.getItem('ageConsent') === 'true' || 
+                                           localStorage.getItem('hasSeenWelcome') === 'true' || 
+                                           localStorage.getItem('userNickname');
             
-            // Only show if all onboarding steps are complete
-            if (hasAgeConsent && hasSeenWelcome && hasNickname) {
-                // Show after a short delay so user sees the main app first
+            if (hasCompletedOnboarding) {
+                // Returning visitor - show after 3 seconds
                 setTimeout(() => {
                     this.showIOSInstallGuide();
                 }, 3000);
             } else {
-                // Listen for onboarding completion
+                // New visitor - wait for onboarding to complete (or be skipped)
                 window.addEventListener('onboardingComplete', () => {
                     setTimeout(() => {
                         this.showIOSInstallGuide();
                     }, 3000);
-                }, { once: true });  // Only listen once
+                }, { once: true });
             }
         }
     }
