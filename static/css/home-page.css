@@ -323,7 +323,7 @@
 .action-label {
     font-size: var(--text-sm);
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--white);
 }
 
 .venue-badge-soon {
