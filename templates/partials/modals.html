@@ -1,31 +1,51 @@
 <!-- iOS Install Guide Modal -->
 <div id="ios-install-guide" class="modal" style="display: none;">
-    <div class="modal-content ios-guide-content">
-        <div class="modal-header ios-guide-header">
+    <div class="modal-content">
+        <button class="modal-close" data-action="close-ios-guide">×</button>
+        
+        <div class="modal-header">
             <div class="ios-guide-icon">📱</div>
-            <div class="ios-guide-text">
-                <strong>Install GF Beer Finder</strong>
-                <small>Get app-like experience & better location access</small>
-            </div>
-            <button class="ios-guide-close" data-action="close-ios-guide">×</button>
+            <h2>Install GF Beer Finder</h2>
+            <p>Get app-like experience & better location access</p>
         </div>
         
         <div class="ios-guide-steps">
             <div class="ios-step">
                 <span class="step-number">1</span>
-                <span class="step-icon">📤</span>
-                <span class="step-text">Tap the Share button below</span>
+                <div class="step-content">
+                    <div class="share-icon-visual">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                            <polyline points="16 6 12 2 8 6"/>
+                            <line x1="12" y1="2" x2="12" y2="15"/>
+                        </svg>
+                    </div>
+                    <span class="step-text">Tap the Share button below</span>
+                </div>
             </div>
+            
             <div class="ios-step">
                 <span class="step-number">2</span>
-                <span class="step-icon">➕</span>
-                <span class="step-text">Select "Add to Home Screen"</span>
+                <div class="step-content">
+                    <div class="step-icon">➕</div>
+                    <span class="step-text">Select "Add to Home Screen"</span>
+                </div>
             </div>
+            
             <div class="ios-step">
                 <span class="step-number">3</span>
-                <span class="step-icon">🍺</span>
-                <span class="step-text">Enjoy app-like experience!</span>
+                <div class="step-content">
+                    <div class="step-icon">🍺</div>
+                    <span class="step-text">Enjoy app-like experience!</span>
+                </div>
             </div>
+        </div>
+        
+        <div class="ios-guide-arrow">
+            <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                <path d="M20 5 L20 30 M10 20 L20 30 L30 20" stroke="#667eea" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="arrow-text">Down here!</span>
         </div>
         
         <div class="ios-guide-benefits">
