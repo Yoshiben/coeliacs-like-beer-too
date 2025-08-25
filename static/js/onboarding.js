@@ -52,17 +52,15 @@ export const OnboardingFlow = (() => {
                 break;
                 
             case 'returning-user':
-                // User is authenticated - just show welcome back
                 showWelcomeBack(userStatus.user);
                 break;
                 
             case 'device-has-account':
-                // Instead of showSignInPrompt, go straight to sign in
+                // Go straight to sign in with pre-filled nickname
                 showSignInWithNickname(userStatus.existingNickname || '');
                 break;
                 
             case 'anonymous':
-                // User skipped before - they're good to go
                 console.log('Anonymous user');
                 break;
                 
@@ -72,7 +70,7 @@ export const OnboardingFlow = (() => {
     };
     
     // ================================
-    // AGE GATE (unchanged)
+    // AGE GATE
     // ================================
     
     const showAgeGate = () => {
@@ -121,16 +119,10 @@ export const OnboardingFlow = (() => {
     };
     
     // ================================
-    // WELCOME SCREEN (mostly unchanged)
+    // WELCOME SCREEN
     // ================================
     
     const showWelcome = () => {
-        // Close any existing modals first
-        ['signInPrompt', 'signIn'].forEach(id => {
-            const modal = document.getElementById(`${id}Modal`);
-            if (modal) modal.remove();
-        });
-        
         const modal = createModal('welcome', `
             <div class="welcome-content">
                 <button class="skip-btn" onclick="OnboardingFlow.skipWelcome()">Skip →</button>
@@ -191,745 +183,15 @@ export const OnboardingFlow = (() => {
         document.body.appendChild(modal);
     };
     
-    const saveNickname = async () => {
-        const saveBtn = document.getElementById('saveNicknameBtn');
-        saveBtn.disabled = true;
-        saveBtn.textContent = 'Creating account...';
-        
-        const result = await UserSession.createUser(state.nickname, state.avatarEmoji);
-        
-        if (result.success) {
-            // Store the passcode in state
-            state.passcode = result.passcode;
-            
-            // Store auth locally
-            localStorage.setItem('userAuth', JSON.stringify({
-                nickname: state.nickname,
-                timestamp: Date.now()
-            }));
-            
-            // Remove nickname modal
-            closeModal('nickname');
-            
-            // CHECK: Should we return to community hub?
-            const shouldReturnToCommunity = window.App?.getState('returnToCommunityAfterNickname');
-            
-            if (shouldReturnToCommunity) {
-                // Clear the flag
-                window.App?.setState('returnToCommunityAfterNickname', false);
-                
-                // Show passcode but then go to community instead of benefits
-                showPasscodeDisplayForCommunity(result);
-            } else {
-                // Normal flow - show passcode then benefits
-                showPasscodeDisplay(result);
-            }
-        } else if (result.error === 'account_exists') {
-            // This device already has an account - removed showSignInPrompt
-            alert(`This device already has an account: ${result.existing_nickname}. Please sign in with your passcode.`);
-            closeModal('nickname');
-            // Show sign in with the nickname pre-filled
-            showSignInWithNickname(result.existing_nickname);
-        } else {
-            alert(`Error: ${result.error}`);
-            saveBtn.disabled = false;
-            saveBtn.textContent = 'Create Account!';
-        }
-    };
-
-    const showPasscodeDisplayForCommunity = (result) => {
-        // Same as showPasscodeDisplay but with different continue button
-        const modal = createModal('passcodeDisplay', `
-            <div class="passcode-display-content">
-                <div class="passcode-header">
-                    <div class="success-icon">🎉</div>
-                    <h2>Account Created!</h2>
-                    <p>Welcome, ${result.nickname}!</p>
-                </div>
-                
-                <div class="passcode-section">
-                    <h3>🔐 Your Secret Passcode</h3>
-                    <div class="passcode-display">
-                        <code id="passcodeValue">${result.passcode}</code>
-                        <button class="btn btn-sm btn-outline" onclick="OnboardingFlow.copyPasscode()">
-                            📋 Copy
-                        </button>
-                    </div>
-                    
-                    <div class="passcode-warning">
-                        <p><strong>⚠️ IMPORTANT: Save this passcode!</strong></p>
-                        <p>You'll need it to sign in on other devices or if you clear your browser data.</p>
-                        <p style="color: var(--color-error);">We cannot recover lost passcodes!</p>
-                    </div>
-                    
-                    <div class="passcode-actions">
-                        <button class="btn btn-outline" onclick="OnboardingFlow.downloadPasscode('${result.nickname}', '${result.passcode}')">
-                            💾 Download as Text File
-                        </button>
-                        <button class="btn btn-outline" onclick="OnboardingFlow.sharePasscode('${result.nickname}', '${result.passcode}')">
-                            📤 Share to Myself
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="passcode-confirm">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="passcodeConfirmCheck">
-                        <span>I've saved my passcode somewhere safe</span>
-                    </label>
-                </div>
-                
-                <button class="btn btn-primary btn-hero" id="continueFromPasscode" onclick="OnboardingFlow.confirmPasscodeSavedAndReturnToCommunity()" disabled>
-                    Continue to Community Hub →
-                </button>
-            </div>
-        `, false);
-        
-        document.body.appendChild(modal);
-        
-        // Enable continue button when checkbox is checked
-        document.getElementById('passcodeConfirmCheck')?.addEventListener('change', (e) => {
-            const continueBtn = document.getElementById('continueFromPasscode');
-            if (continueBtn) {
-                continueBtn.disabled = !e.target.checked;
-            }
-        });
-    };
-    
-    // 5. ADD function to return to community after passcode:
-    
-    const confirmPasscodeSavedAndReturnToCommunity = () => {
-        // Close passcode modal
-        closeModal('passcodeDisplay');
-        
-        // Store the new user data
-        localStorage.setItem('userNickname', state.nickname);
-        window.App?.setState('userNickname', state.nickname);
-        
-        // Reopen community hub
-        setTimeout(() => {
-            const communityHub = window.App?.getModule('communityHub');
-            if (communityHub) {
-                communityHub.open();
-            }
-        }, 500);
-    };
-    
-    // ================================
-    // PASSCODE DISPLAY (NEW)
-    // ================================
-    
-    const showPasscodeDisplay = (result) => {
-        const modal = createModal('passcodeDisplay', `
-            <div class="passcode-display-content">
-                <div class="passcode-header">
-                    <div class="success-icon">🎉</div>
-                    <h2>Account Created!</h2>
-                    <p>Welcome, ${result.nickname}!</p>
-                </div>
-                
-                <div class="passcode-section">
-                    <h3>🔐 Your Secret Passcode</h3>
-                    <div class="passcode-display">
-                        <code id="passcodeValue">${result.passcode}</code>
-                        <button class="btn btn-sm btn-outline" onclick="OnboardingFlow.copyPasscode()">
-                            📋 Copy
-                        </button>
-                    </div>
-                    
-                    <div class="passcode-warning">
-                        <p><strong>⚠️ IMPORTANT: Save this passcode!</strong></p>
-                        <p>You'll need it to sign in on other devices or if you clear your browser data.</p>
-                        <p style="color: var(--color-error);">We cannot recover lost passcodes!</p>
-                    </div>
-                    
-                    <div class="passcode-actions">
-                        <button class="btn btn-outline" onclick="OnboardingFlow.downloadPasscode('${result.nickname}', '${result.passcode}')">
-                            💾 Download as Text File
-                        </button>
-                        <button class="btn btn-outline" onclick="OnboardingFlow.sharePasscode('${result.nickname}', '${result.passcode}')">
-                            📤 Share to Myself
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="passcode-confirm">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="passcodeConfirmCheck">
-                        <span>I've saved my passcode somewhere safe</span>
-                    </label>
-                </div>
-                
-                <button class="btn btn-primary btn-hero" id="continueFromPasscode" onclick="OnboardingFlow.confirmPasscodeSaved()" disabled>
-                    Continue to Community Benefits →
-                </button>
-            </div>
-        `, false); // Can't close without confirming
-        
-        document.body.appendChild(modal);
-        
-        // Enable continue button when checkbox is checked
-        document.getElementById('passcodeConfirmCheck')?.addEventListener('change', (e) => {
-            const continueBtn = document.getElementById('continueFromPasscode');
-            if (continueBtn) {
-                continueBtn.disabled = !e.target.checked;
-            }
-        });
-    };
-
-    const showPasscodeDisplayForCommunity = (result) => {
-        // Same as showPasscodeDisplay but with different continue button
-        const modal = createModal('passcodeDisplay', `
-            <div class="passcode-display-content">
-                <div class="passcode-header">
-                    <div class="success-icon">🎉</div>
-                    <h2>Account Created!</h2>
-                    <p>Welcome, ${result.nickname}!</p>
-                </div>
-                
-                <div class="passcode-section">
-                    <h3>🔐 Your Secret Passcode</h3>
-                    <div class="passcode-display">
-                        <code id="passcodeValue">${result.passcode}</code>
-                        <button class="btn btn-sm btn-outline" onclick="OnboardingFlow.copyPasscode()">
-                            📋 Copy
-                        </button>
-                    </div>
-                    
-                    <div class="passcode-warning">
-                        <p><strong>⚠️ IMPORTANT: Save this passcode!</strong></p>
-                        <p>You'll need it to sign in on other devices or if you clear your browser data.</p>
-                        <p style="color: var(--color-error);">We cannot recover lost passcodes!</p>
-                    </div>
-                    
-                    <div class="passcode-actions">
-                        <button class="btn btn-outline" onclick="OnboardingFlow.downloadPasscode('${result.nickname}', '${result.passcode}')">
-                            💾 Download as Text File
-                        </button>
-                        <button class="btn btn-outline" onclick="OnboardingFlow.sharePasscode('${result.nickname}', '${result.passcode}')">
-                            📤 Share to Myself
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="passcode-confirm">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="passcodeConfirmCheck">
-                        <span>I've saved my passcode somewhere safe</span>
-                    </label>
-                </div>
-                
-                <button class="btn btn-primary btn-hero" id="continueFromPasscode" onclick="OnboardingFlow.confirmPasscodeSavedAndReturnToCommunity()" disabled>
-                    Continue to Community Hub →
-                </button>
-            </div>
-        `, false);
-        
-        document.body.appendChild(modal);
-        
-        // Enable continue button when checkbox is checked
-        document.getElementById('passcodeConfirmCheck')?.addEventListener('change', (e) => {
-            const continueBtn = document.getElementById('continueFromPasscode');
-            if (continueBtn) {
-                continueBtn.disabled = !e.target.checked;
-            }
-        });
-    };
-    
-    // 5. ADD function to return to community after passcode:
-    
-    const confirmPasscodeSavedAndReturnToCommunity = () => {
-        // Close passcode modal
-        closeModal('passcodeDisplay');
-        
-        // Store the new user data
-        localStorage.setItem('userNickname', state.nickname);
-        window.App?.setState('userNickname', state.nickname);
-        
-        // Reopen community hub
-        setTimeout(() => {
-            const communityHub = window.App?.getModule('communityHub');
-            if (communityHub) {
-                communityHub.open();
-            }
-        }, 500);
-    };
-    
-    const copyPasscode = () => {
-        const passcodeEl = document.getElementById('passcodeValue');
-        if (passcodeEl) {
-            navigator.clipboard.writeText(passcodeEl.textContent)
-                .then(() => {
-                    // Show toast or feedback
-                    const btn = event.target;
-                    const originalText = btn.textContent;
-                    btn.textContent = '✅ Copied!';
-                    setTimeout(() => {
-                        btn.textContent = originalText;
-                    }, 2000);
-                })
-                .catch(err => {
-                    console.error('Failed to copy:', err);
-                    alert('Failed to copy. Please select and copy manually.');
-                });
-        }
-    };
-    
-    const downloadPasscode = (nickname, passcode) => {
-        const content = `Coeliacs Like Beer Too! - Account Details
-========================================
-
-Nickname: ${nickname}
-Passcode: ${passcode}
-
-IMPORTANT: Keep this file safe!
-You'll need this passcode to sign in on other devices.
-
-Website: https://coeliacslikebeer.co.uk
-
-Thank you for joining our community!
-`;
-        
-        const blob = new Blob([content], { type: 'text/plain' });
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `CLB_Account_${nickname}.txt`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-    };
-    
-    const sharePasscode = (nickname, passcode) => {
-        const text = `My Coeliacs Like Beer Too! Account:\n\nNickname: ${nickname}\nPasscode: ${passcode}\n\nSave this for signing in on other devices!`;
-        
-        if (navigator.share) {
-            navigator.share({
-                title: 'CLB Account Details',
-                text: text
-            }).catch(err => console.log('Share cancelled:', err));
-        } else {
-            // Fallback - copy to clipboard
-            navigator.clipboard.writeText(text)
-                .then(() => alert('Account details copied to clipboard!'))
-                .catch(() => alert('Please copy your passcode manually'));
-        }
-    };
-    
-    const confirmPasscodeSaved = () => {
-        const user = {
-            nickname: state.nickname,
-            avatarEmoji: state.avatarEmoji,
-            points: 10
-        };
-        
-        closeModal('passcodeDisplay');
-        showCommunityBenefits(user);
-    };
-    
-    // ================================
-    // WELCOME BACK TOAST (updated)
-    // ================================
-    
-    const showWelcomeBack = (user) => {
-        // Check frequency preference
-        const welcomeFrequency = localStorage.getItem('welcomeFrequency') || 'session';
-        const lastWelcome = localStorage.getItem('lastWelcomeShown');
-        const now = Date.now();
-        
-        let shouldShow = false;
-        
-        if (!lastWelcome) {
-            shouldShow = true;
-        } else {
-            const hoursSince = (now - parseInt(lastWelcome)) / (1000 * 60 * 60);
-            
-            switch(welcomeFrequency) {
-                case 'always':
-                    shouldShow = false; // Never show
-                    break;
-                case 'session':
-                    // Show once per session (default)
-                    shouldShow = !sessionStorage.getItem('welcomeShown');
-                    break;
-                case 'daily':
-                    shouldShow = hoursSince > 24;
-                    break;
-                case 'weekly':
-                    shouldShow = hoursSince > 168;
-                    break;
-            }
-        }
-        
-        if (shouldShow) {
-            const toast = document.createElement('div');
-            toast.className = 'welcome-back-toast';
-            toast.innerHTML = `
-                <div class="toast-content">
-                    <span class="toast-avatar">${user.avatarEmoji}</span>
-                    <div class="toast-text">
-                        <strong>Welcome back, ${user.nickname}!</strong>
-                        <small>${user.points || 0} points • Level ${user.level || 1}</small>
-                    </div>
-                </div>
-            `;
-            
-            document.body.appendChild(toast);
-            
-            setTimeout(() => toast.classList.add('show'), 100);
-            setTimeout(() => {
-                toast.classList.add('fade-out');
-                setTimeout(() => toast.remove(), 500);
-            }, 3000);
-            
-            // Mark as shown
-            localStorage.setItem('lastWelcomeShown', now.toString());
-            sessionStorage.setItem('welcomeShown', 'true');
-        }
-    };
-    
-    // ================================
-    // REST OF THE CODE (mostly unchanged)
-    // ================================
-    
     const skipWelcome = () => {
         localStorage.setItem('hasSeenWelcome', 'true');
         closeModal('welcome');
     };
     
-    const checkNickname = (value) => {
-        clearTimeout(state.nicknameCheckTimeout);
-        state.nickname = value;
-        
-        const statusEl = document.getElementById('nicknameStatus');
-        const saveBtn = document.getElementById('saveNicknameBtn');
-        
-        if (value.length < 3) {
-            statusEl.innerHTML = '<span class="status-error">Too short (min 3 chars)</span>';
-            saveBtn.disabled = true;
-            return;
-        }
-        
-        if (value.length > 30) {
-            statusEl.innerHTML = '<span class="status-error">Too long (max 30 chars)</span>';
-            saveBtn.disabled = true;
-            return;
-        }
-        
-        if (!/^[a-zA-Z0-9_-]+$/.test(value)) {
-            statusEl.innerHTML = '<span class="status-error">Only letters, numbers, _ and -</span>';
-            saveBtn.disabled = true;
-            return;
-        }
-        
-        statusEl.innerHTML = '<span class="status-checking">Checking...</span>';
-        
-        state.nicknameCheckTimeout = setTimeout(async () => {
-            const result = await UserSession.checkNicknameAvailability(value);
-            
-            if (result.available) {
-                statusEl.innerHTML = '<span class="status-success">✅ Available!</span>';
-                saveBtn.disabled = false;
-            } else {
-                statusEl.innerHTML = '<span class="status-error">❌ Already taken</span>';
-                saveBtn.disabled = true;
-                
-                // Show sign-in option for taken nicknames
-                showNicknameOptions(value, result.suggestions);
-            }
-        }, 500);
-    };
+    // ================================
+    // NICKNAME SELECTION
+    // ================================
     
-    const showNicknameOptions = (nickname, suggestions) => {
-        let optionsContainer = document.getElementById('nicknameOptions');
-        
-        if (!optionsContainer) {
-            const inputGroup = document.querySelector('.input-group');
-            optionsContainer = document.createElement('div');
-            optionsContainer.id = 'nicknameOptions';
-            optionsContainer.className = 'nickname-options-box';
-            inputGroup.appendChild(optionsContainer);
-        }
-        
-        optionsContainer.innerHTML = `
-            <div class="nickname-taken-prompt">
-                <p class="taken-message">
-                    <strong>${nickname}</strong> is already taken!
-                </p>
-                
-                <div class="taken-actions">
-                    <button class="btn btn-primary btn-sm" onclick="OnboardingFlow.promptSignIn('${nickname}')">
-                        🔑 This is me - Sign in
-                    </button>
-                    <button class="btn btn-outline btn-sm" onclick="OnboardingFlow.clearNicknameOptions()">
-                        ❌ Not me - Try another
-                    </button>
-                </div>
-                
-                ${suggestions && suggestions.length > 0 ? `
-                    <div class="suggestions-alternative">
-                        <p>Or try one of these:</p>
-                        <div class="suggestion-chips">
-                            ${suggestions.map(suggestion => 
-                                `<button class="chip" onclick="OnboardingFlow.useNickname('${suggestion}')">
-                                    ${suggestion}
-                                </button>`
-                            ).join('')}
-                        </div>
-                    </div>
-                ` : ''}
-            </div>
-        `;
-        
-        optionsContainer.style.display = 'block';
-    };
-    
-    // Add new function to handle sign-in prompt from nickname screen
-    const promptSignIn = (nickname) => {
-        // Store the nickname for sign-in
-        state.attemptedNickname = nickname;
-        
-        // Close nickname modal
-        closeModal('nickname');
-        
-        // Show sign-in modal with nickname pre-filled
-        showSignInWithNickname(nickname);
-    };
-    
-    // New sign-in modal with pre-filled nickname
-    const showSignInWithNickname = (nickname) => {
-        const modal = createModal('signIn', `
-            <div class="signin-content">
-                <div class="signin-header">
-                    <h2>🔑 Welcome back, ${nickname}!</h2>
-                    <p>Enter your passcode to sign in</p>
-                </div>
-                
-                <div class="signin-form">
-                    <div class="input-group">
-                        <label>Nickname</label>
-                        <input type="text" 
-                               id="signInNickname" 
-                               value="${nickname}"
-                               readonly
-                               style="background: #f5f5f5; cursor: not-allowed;">
-                    </div>
-                    
-                    <div class="input-group">
-                        <label>Passcode</label>
-                        <input type="text" 
-                               id="signInPasscode" 
-                               placeholder="Enter your 6-character code"
-                               maxlength="6"
-                               style="text-transform: uppercase; letter-spacing: 0.2em; font-family: monospace;"
-                               autofocus>
-                        <small>Enter the passcode you received when creating your account</small>
-                    </div>
-                    
-                    <div id="signInError" class="error-message" style="display: none;">
-                        <span class="error-icon">⚠️</span>
-                        <span class="error-text"></span>
-                    </div>
-                </div>
-                
-                <div class="signin-actions">
-                    <button class="btn btn-secondary" onclick="OnboardingFlow.backToNickname()">
-                        ← Try Different Name
-                    </button>
-                    <button class="btn btn-primary" id="signInBtn" onclick="OnboardingFlow.performSignIn()">
-                        Sign In
-                    </button>
-                </div>
-                
-                <div class="signin-help">
-                    <p><strong>Lost your passcode?</strong></p>
-                    <small>Unfortunately, we can't recover it. You'll need to create a new account with a different nickname.</small>
-                </div>
-            </div>
-        `);
-        
-        document.body.appendChild(modal);
-        
-        // Auto-focus passcode field
-        setTimeout(() => {
-            document.getElementById('signInPasscode')?.focus();
-        }, 100);
-    };
-    
-    // Add function to go back to nickname selection
-    const backToNickname = () => {
-        closeModal('signIn');
-        OnboardingFlow.showNicknameSelection();  // ✅ This works!
-        
-        // Re-populate the attempted nickname if it exists
-        if (state.attemptedNickname) {
-            setTimeout(() => {
-                const input = document.getElementById('nicknameInput');
-                if (input) {
-                    input.value = '';
-                    input.focus();
-                }
-            }, 100);
-        }
-    };
-    
-    // Add function to clear the options box
-    const clearNicknameOptions = () => {
-        const optionsContainer = document.getElementById('nicknameOptions');
-        if (optionsContainer) {
-            optionsContainer.style.display = 'none';
-        }
-        
-        // Clear the input
-        const input = document.getElementById('nicknameInput');
-        if (input) {
-            input.value = '';
-            input.focus();
-        }
-        
-        // Clear status
-        const statusEl = document.getElementById('nicknameStatus');
-        if (statusEl) {
-            statusEl.innerHTML = '';
-        }
-    };
-
-    const showSuggestions = (suggestions) => {
-        let suggestionsContainer = document.getElementById('nicknameSuggestions');
-        
-        if (!suggestionsContainer) {
-            const inputGroup = document.querySelector('.input-group');
-            suggestionsContainer = document.createElement('div');
-            suggestionsContainer.id = 'nicknameSuggestions';
-            suggestionsContainer.className = 'nickname-suggestions-box';
-            inputGroup.appendChild(suggestionsContainer);
-        }
-        
-        suggestionsContainer.innerHTML = `
-            <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0.5rem 0;">
-                That name is taken! Try one of these:
-            </p>
-            <div class="suggestion-chips">
-                ${suggestions.map(suggestion => 
-                    `<button class="chip" onclick="OnboardingFlow.useNickname('${suggestion}')">
-                        ${suggestion}
-                    </button>`
-                ).join('')}
-            </div>
-        `;
-        
-        suggestionsContainer.style.display = 'block';
-    };
-    
-    const generateRandom = () => {
-        const prefixes = ['Beer', 'Hop', 'Malt', 'GF', 'Gluten', 'Free', 'Craft', 'Brew'];
-        const suffixes = ['Hunter', 'Explorer', 'Master', 'Guru', 'Seeker', 'Finder', 'Champion'];
-        const random = Math.floor(Math.random() * 99);
-        
-        const nickname = `${prefixes[Math.floor(Math.random() * prefixes.length)]}${suffixes[Math.floor(Math.random() * suffixes.length)]}${random}`;
-        
-        const nicknameInput = document.getElementById('nicknameInput');
-        if (nicknameInput) {
-            nicknameInput.value = nickname;
-            OnboardingFlow.checkNickname(nickname);
-        }
-    };
-    
-    const useNickname = (nickname) => {
-        document.getElementById('nicknameInput').value = nickname;
-        checkNickname(nickname);
-    };
-    
-    const selectAvatar = (emoji) => {
-        state.avatarEmoji = emoji;
-        
-        document.querySelectorAll('.avatar-option').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        
-        event.target.classList.add('active');
-    };
-    
-    const skipNickname = () => {
-        localStorage.setItem('hasSeenWelcome', 'true');
-        closeModal('nickname');
-    };
-    
-    const showCommunityBenefits = (user) => {
-        const modal = createModal('benefits', `
-            <div class="benefits-content">
-                <div class="success-header">
-                    <div class="avatar-display">${user.avatarEmoji}</div>
-                    <h2>Welcome, ${user.nickname}! 🎉</h2>
-                    <p>You're now part of the GF beer revolution!</p>
-                </div>
-                
-                <div class="welcome-bonus">
-                    <div class="bonus-icon">🎁</div>
-                    <div class="bonus-text">
-                        <strong>Welcome Bonus!</strong>
-                        <span>+10 points to get you started</span>
-                    </div>
-                </div>
-                
-                <div class="benefits-grid">
-                    <div class="benefit">
-                        <span class="benefit-icon">🏆</span>
-                        <strong>Earn Points</strong>
-                        <small>Get points for every contribution</small>
-                    </div>
-                    <div class="benefit">
-                        <span class="benefit-icon">🎖️</span>
-                        <strong>Unlock Badges</strong>
-                        <small>Show off your achievements</small>
-                    </div>
-                    <div class="benefit">
-                        <span class="benefit-icon">📊</span>
-                        <strong>Track Impact</strong>
-                        <small>See how many you've helped</small>
-                    </div>
-                    <div class="benefit">
-                        <span class="benefit-icon">📱</span>
-                        <strong>Sync Devices</strong>
-                        <small>Access your account anywhere!</small>
-                    </div>
-                </div>
-                
-                <div class="first-badge">
-                    <p>You've earned your first badge!</p>
-                    <div class="badge-showcase">
-                        <span class="badge-icon">👋</span>
-                        <div class="badge-info">
-                            <strong>Welcome to the Club</strong>
-                            <small>Joined the GF beer community</small>
-                        </div>
-                    </div>
-                </div>
-                
-                <button class="btn btn-primary btn-hero" onclick="OnboardingFlow.finishOnboarding()">
-                    Start Finding GF Beer! 🍺
-                </button>
-            </div>
-        `);
-        
-        document.body.appendChild(modal);
-    };
-    
-    const finishOnboarding = () => {
-        // Remove ALL onboarding modals
-        ['ageGate', 'welcome', 'nickname', 'benefits', 'passcodeDisplay', 'signIn', 'signInPrompt'].forEach(id => {
-            const modal = document.getElementById(`${id}Modal`);
-            if (modal) modal.remove();
-        });
-        
-        document.querySelectorAll('.onboarding-modal').forEach(modal => {
-            modal.remove();
-        });
-        
-        window.dispatchEvent(new Event('onboardingComplete'));
-    };
-
     const showNicknameSelection = () => {
         closeModal('welcome');
         
@@ -1000,6 +262,695 @@ Thank you for joining our community!
         document.body.appendChild(modal);
     };
     
+    const checkNickname = (value) => {
+        clearTimeout(state.nicknameCheckTimeout);
+        state.nickname = value;
+        
+        const statusEl = document.getElementById('nicknameStatus');
+        const saveBtn = document.getElementById('saveNicknameBtn');
+        
+        if (value.length < 3) {
+            statusEl.innerHTML = '<span class="status-error">Too short (min 3 chars)</span>';
+            saveBtn.disabled = true;
+            return;
+        }
+        
+        if (value.length > 30) {
+            statusEl.innerHTML = '<span class="status-error">Too long (max 30 chars)</span>';
+            saveBtn.disabled = true;
+            return;
+        }
+        
+        if (!/^[a-zA-Z0-9_-]+$/.test(value)) {
+            statusEl.innerHTML = '<span class="status-error">Only letters, numbers, _ and -</span>';
+            saveBtn.disabled = true;
+            return;
+        }
+        
+        statusEl.innerHTML = '<span class="status-checking">Checking...</span>';
+        
+        state.nicknameCheckTimeout = setTimeout(async () => {
+            const result = await UserSession.checkNicknameAvailability(value);
+            
+            if (result.available) {
+                statusEl.innerHTML = '<span class="status-success">✅ Available!</span>';
+                saveBtn.disabled = false;
+            } else {
+                statusEl.innerHTML = '<span class="status-error">❌ Already taken</span>';
+                saveBtn.disabled = true;
+                showNicknameOptions(value, result.suggestions);
+            }
+        }, 500);
+    };
+    
+    const showNicknameOptions = (nickname, suggestions) => {
+        let optionsContainer = document.getElementById('nicknameOptions');
+        
+        if (!optionsContainer) {
+            const inputGroup = document.querySelector('.input-group');
+            optionsContainer = document.createElement('div');
+            optionsContainer.id = 'nicknameOptions';
+            optionsContainer.className = 'nickname-options-box';
+            inputGroup.appendChild(optionsContainer);
+        }
+        
+        optionsContainer.innerHTML = `
+            <div class="nickname-taken-prompt">
+                <p class="taken-message">
+                    <strong>${nickname}</strong> is already taken!
+                </p>
+                
+                <div class="taken-actions">
+                    <button class="btn btn-primary btn-sm" onclick="OnboardingFlow.promptSignIn('${nickname}')">
+                        🔑 This is me - Sign in
+                    </button>
+                    <button class="btn btn-outline btn-sm" onclick="OnboardingFlow.clearNicknameOptions()">
+                        ❌ Not me - Try another
+                    </button>
+                </div>
+                
+                ${suggestions && suggestions.length > 0 ? `
+                    <div class="suggestions-alternative">
+                        <p>Or try one of these:</p>
+                        <div class="suggestion-chips">
+                            ${suggestions.map(suggestion => 
+                                `<button class="chip" onclick="OnboardingFlow.useNickname('${suggestion}')">
+                                    ${suggestion}
+                                </button>`
+                            ).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+        
+        optionsContainer.style.display = 'block';
+    };
+    
+    const clearNicknameOptions = () => {
+        const optionsContainer = document.getElementById('nicknameOptions');
+        if (optionsContainer) {
+            optionsContainer.style.display = 'none';
+        }
+        
+        const input = document.getElementById('nicknameInput');
+        if (input) {
+            input.value = '';
+            input.focus();
+        }
+        
+        const statusEl = document.getElementById('nicknameStatus');
+        if (statusEl) {
+            statusEl.innerHTML = '';
+        }
+    };
+    
+    const generateRandom = () => {
+        const prefixes = ['Beer', 'Hop', 'Malt', 'GF', 'Gluten', 'Free', 'Craft', 'Brew'];
+        const suffixes = ['Hunter', 'Explorer', 'Master', 'Guru', 'Seeker', 'Finder', 'Champion'];
+        const random = Math.floor(Math.random() * 99);
+        
+        const nickname = `${prefixes[Math.floor(Math.random() * prefixes.length)]}${suffixes[Math.floor(Math.random() * suffixes.length)]}${random}`;
+        
+        const nicknameInput = document.getElementById('nicknameInput');
+        if (nicknameInput) {
+            nicknameInput.value = nickname;
+            OnboardingFlow.checkNickname(nickname);
+        }
+    };
+    
+    const useNickname = (nickname) => {
+        document.getElementById('nicknameInput').value = nickname;
+        checkNickname(nickname);
+    };
+    
+    const selectAvatar = (emoji) => {
+        state.avatarEmoji = emoji;
+        
+        document.querySelectorAll('.avatar-option').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        event.target.classList.add('active');
+    };
+    
+    const skipNickname = () => {
+        localStorage.setItem('hasSeenWelcome', 'true');
+        closeModal('nickname');
+    };
+    
+    const saveNickname = async () => {
+        const saveBtn = document.getElementById('saveNicknameBtn');
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Creating account...';
+        
+        const result = await UserSession.createUser(state.nickname, state.avatarEmoji);
+        
+        if (result.success) {
+            state.passcode = result.passcode;
+            
+            localStorage.setItem('userAuth', JSON.stringify({
+                nickname: state.nickname,
+                timestamp: Date.now()
+            }));
+            
+            closeModal('nickname');
+            
+            // Check if we should return to community hub
+            const shouldReturnToCommunity = window.App?.getState('returnToCommunityAfterNickname');
+            
+            if (shouldReturnToCommunity) {
+                window.App?.setState('returnToCommunityAfterNickname', false);
+                showPasscodeDisplayForCommunity(result);
+            } else {
+                showPasscodeDisplay(result);
+            }
+        } else if (result.error === 'account_exists') {
+            alert(`This device already has an account: ${result.existing_nickname}. Please sign in with your passcode.`);
+            closeModal('nickname');
+            showSignInWithNickname(result.existing_nickname);
+        } else {
+            alert(`Error: ${result.error}`);
+            saveBtn.disabled = false;
+            saveBtn.textContent = 'Create Account!';
+        }
+    };
+    
+    // ================================
+    // SIGN IN
+    // ================================
+    
+    const promptSignIn = (nickname) => {
+        state.attemptedNickname = nickname;
+        closeModal('nickname');
+        showSignInWithNickname(nickname);
+    };
+    
+    const showSignInWithNickname = (nickname) => {
+        const modal = createModal('signIn', `
+            <div class="signin-content">
+                <div class="signin-header">
+                    <h2>🔑 Welcome back${nickname ? `, ${nickname}` : ''}!</h2>
+                    <p>Enter your passcode to sign in</p>
+                </div>
+                
+                <div class="signin-form">
+                    <div class="input-group">
+                        <label>Nickname</label>
+                        <input type="text" 
+                               id="signInNickname" 
+                               value="${nickname}"
+                               ${nickname ? 'readonly style="background: #f5f5f5; cursor: not-allowed;"' : ''}
+                               placeholder="Your nickname..."
+                               maxlength="30">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Passcode</label>
+                        <input type="text" 
+                               id="signInPasscode" 
+                               placeholder="Enter your 6-character code"
+                               maxlength="6"
+                               style="text-transform: uppercase; letter-spacing: 0.2em; font-family: monospace;"
+                               autofocus>
+                        <small>Enter the passcode you received when creating your account</small>
+                    </div>
+                    
+                    <div id="signInError" class="error-message" style="display: none;">
+                        <span class="error-icon">⚠️</span>
+                        <span class="error-text"></span>
+                    </div>
+                </div>
+                
+                <div class="signin-actions">
+                    <button class="btn btn-secondary" onclick="OnboardingFlow.backToNickname()">
+                        ← Try Different Name
+                    </button>
+                    <button class="btn btn-primary" id="signInBtn" onclick="OnboardingFlow.performSignIn()">
+                        Sign In
+                    </button>
+                </div>
+                
+                <div class="signin-help">
+                    <p><strong>Lost your passcode?</strong></p>
+                    <small>Unfortunately, we can't recover it. You'll need to create a new account with a different nickname.</small>
+                </div>
+            </div>
+        `);
+        
+        document.body.appendChild(modal);
+        
+        setTimeout(() => {
+            document.getElementById('signInPasscode')?.focus();
+        }, 100);
+    };
+    
+    const backToNickname = () => {
+        closeModal('signIn');
+        showNicknameSelection();
+        
+        if (state.attemptedNickname) {
+            setTimeout(() => {
+                const input = document.getElementById('nicknameInput');
+                if (input) {
+                    input.value = '';
+                    input.focus();
+                }
+            }, 100);
+        }
+    };
+    
+    const performSignIn = async () => {
+        const nickname = document.getElementById('signInNickname')?.value.trim();
+        const passcode = document.getElementById('signInPasscode')?.value.trim().toUpperCase();
+        const signInBtn = document.getElementById('signInBtn');
+        const errorDiv = document.getElementById('signInError');
+        const errorText = errorDiv?.querySelector('.error-text');
+        
+        if (!nickname || !passcode) {
+            if (errorDiv && errorText) {
+                errorText.textContent = 'Please enter both nickname and passcode';
+                errorDiv.style.display = 'block';
+            }
+            return;
+        }
+        
+        if (passcode.length !== 6) {
+            if (errorDiv && errorText) {
+                errorText.textContent = 'Passcode must be 6 characters';
+                errorDiv.style.display = 'block';
+            }
+            return;
+        }
+        
+        if (signInBtn) {
+            signInBtn.disabled = true;
+            signInBtn.textContent = 'Signing in...';
+        }
+        
+        try {
+            const result = await UserSession.signIn(nickname, passcode);
+            
+            if (result.success) {
+                localStorage.setItem('userAuth', JSON.stringify({
+                    nickname: nickname,
+                    timestamp: Date.now()
+                }));
+                
+                try {
+                    const statsResponse = await fetch(`/api/get-user-id/${nickname}`);
+                    if (statsResponse.ok) {
+                        const userData = await statsResponse.json();
+                        
+                        localStorage.setItem('user_id', userData.user_id);
+                        localStorage.setItem('userNickname', nickname);
+                        
+                        window.App.setState('userId', userData.user_id);
+                        window.App.setState('userPoints', userData.points || 0);
+                        window.App.setState('userLevel', userData.level || 1);
+                        
+                        console.log('Loaded user stats:', userData);
+                    }
+                } catch (statsError) {
+                    console.error('Failed to load user stats:', statsError);
+                }
+                
+                ['signIn', 'nickname', 'welcome'].forEach(id => {
+                    closeModal(id);
+                });
+                
+                showWelcomeBack(result.user);
+            } else {
+                if (errorDiv && errorText) {
+                    errorText.textContent = result.error || 'Sign in failed';
+                    errorDiv.style.display = 'block';
+                }
+                
+                if (signInBtn) {
+                    signInBtn.disabled = false;
+                    signInBtn.textContent = 'Sign In';
+                }
+            }
+        } catch (error) {
+            console.error('Sign in error:', error);
+            if (errorDiv && errorText) {
+                errorText.textContent = 'Sign in failed. Please try again.';
+                errorDiv.style.display = 'block';
+            }
+            
+            if (signInBtn) {
+                signInBtn.disabled = false;
+                signInBtn.textContent = 'Sign In';
+            }
+        }
+    };
+    
+    // ================================
+    // PASSCODE DISPLAY
+    // ================================
+    
+    const showPasscodeDisplay = (result) => {
+        const modal = createModal('passcodeDisplay', `
+            <div class="passcode-display-content">
+                <div class="passcode-header">
+                    <div class="success-icon">🎉</div>
+                    <h2>Account Created!</h2>
+                    <p>Welcome, ${result.nickname}!</p>
+                </div>
+                
+                <div class="passcode-section">
+                    <h3>🔐 Your Secret Passcode</h3>
+                    <div class="passcode-display">
+                        <code id="passcodeValue">${result.passcode}</code>
+                        <button class="btn btn-sm btn-outline" onclick="OnboardingFlow.copyPasscode()">
+                            📋 Copy
+                        </button>
+                    </div>
+                    
+                    <div class="passcode-warning">
+                        <p><strong>⚠️ IMPORTANT: Save this passcode!</strong></p>
+                        <p>You'll need it to sign in on other devices or if you clear your browser data.</p>
+                        <p style="color: var(--color-error);">We cannot recover lost passcodes!</p>
+                    </div>
+                    
+                    <div class="passcode-actions">
+                        <button class="btn btn-outline" onclick="OnboardingFlow.downloadPasscode('${result.nickname}', '${result.passcode}')">
+                            💾 Download as Text File
+                        </button>
+                        <button class="btn btn-outline" onclick="OnboardingFlow.sharePasscode('${result.nickname}', '${result.passcode}')">
+                            📤 Share to Myself
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="passcode-confirm">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="passcodeConfirmCheck">
+                        <span>I've saved my passcode somewhere safe</span>
+                    </label>
+                </div>
+                
+                <button class="btn btn-primary btn-hero" id="continueFromPasscode" onclick="OnboardingFlow.confirmPasscodeSaved()" disabled>
+                    Continue to Community Benefits →
+                </button>
+            </div>
+        `, false);
+        
+        document.body.appendChild(modal);
+        
+        document.getElementById('passcodeConfirmCheck')?.addEventListener('change', (e) => {
+            const continueBtn = document.getElementById('continueFromPasscode');
+            if (continueBtn) {
+                continueBtn.disabled = !e.target.checked;
+            }
+        });
+    };
+    
+    const showPasscodeDisplayForCommunity = (result) => {
+        const modal = createModal('passcodeDisplay', `
+            <div class="passcode-display-content">
+                <div class="passcode-header">
+                    <div class="success-icon">🎉</div>
+                    <h2>Account Created!</h2>
+                    <p>Welcome, ${result.nickname}!</p>
+                </div>
+                
+                <div class="passcode-section">
+                    <h3>🔐 Your Secret Passcode</h3>
+                    <div class="passcode-display">
+                        <code id="passcodeValue">${result.passcode}</code>
+                        <button class="btn btn-sm btn-outline" onclick="OnboardingFlow.copyPasscode()">
+                            📋 Copy
+                        </button>
+                    </div>
+                    
+                    <div class="passcode-warning">
+                        <p><strong>⚠️ IMPORTANT: Save this passcode!</strong></p>
+                        <p>You'll need it to sign in on other devices or if you clear your browser data.</p>
+                        <p style="color: var(--color-error);">We cannot recover lost passcodes!</p>
+                    </div>
+                    
+                    <div class="passcode-actions">
+                        <button class="btn btn-outline" onclick="OnboardingFlow.downloadPasscode('${result.nickname}', '${result.passcode}')">
+                            💾 Download as Text File
+                        </button>
+                        <button class="btn btn-outline" onclick="OnboardingFlow.sharePasscode('${result.nickname}', '${result.passcode}')">
+                            📤 Share to Myself
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="passcode-confirm">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="passcodeConfirmCheck">
+                        <span>I've saved my passcode somewhere safe</span>
+                    </label>
+                </div>
+                
+                <button class="btn btn-primary btn-hero" id="continueFromPasscode" onclick="OnboardingFlow.confirmPasscodeSavedAndReturnToCommunity()" disabled>
+                    Continue to Community Hub →
+                </button>
+            </div>
+        `, false);
+        
+        document.body.appendChild(modal);
+        
+        document.getElementById('passcodeConfirmCheck')?.addEventListener('change', (e) => {
+            const continueBtn = document.getElementById('continueFromPasscode');
+            if (continueBtn) {
+                continueBtn.disabled = !e.target.checked;
+            }
+        });
+    };
+    
+    const copyPasscode = () => {
+        const passcodeEl = document.getElementById('passcodeValue');
+        if (passcodeEl) {
+            navigator.clipboard.writeText(passcodeEl.textContent)
+                .then(() => {
+                    const btn = event.target;
+                    const originalText = btn.textContent;
+                    btn.textContent = '✅ Copied!';
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                    }, 2000);
+                })
+                .catch(err => {
+                    console.error('Failed to copy:', err);
+                    alert('Failed to copy. Please select and copy manually.');
+                });
+        }
+    };
+    
+    const downloadPasscode = (nickname, passcode) => {
+        const content = `Coeliacs Like Beer Too! - Account Details
+========================================
+
+Nickname: ${nickname}
+Passcode: ${passcode}
+
+IMPORTANT: Keep this file safe!
+You'll need this passcode to sign in on other devices.
+
+Website: https://coeliacslikebeer.co.uk
+
+Thank you for joining our community!
+`;
+        
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `CLB_Account_${nickname}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+    };
+    
+    const sharePasscode = (nickname, passcode) => {
+        const text = `My Coeliacs Like Beer Too! Account:\n\nNickname: ${nickname}\nPasscode: ${passcode}\n\nSave this for signing in on other devices!`;
+        
+        if (navigator.share) {
+            navigator.share({
+                title: 'CLB Account Details',
+                text: text
+            }).catch(err => console.log('Share cancelled:', err));
+        } else {
+            navigator.clipboard.writeText(text)
+                .then(() => alert('Account details copied to clipboard!'))
+                .catch(() => alert('Please copy your passcode manually'));
+        }
+    };
+    
+    const confirmPasscodeSaved = () => {
+        const user = {
+            nickname: state.nickname,
+            avatarEmoji: state.avatarEmoji,
+            points: 10
+        };
+        
+        closeModal('passcodeDisplay');
+        showCommunityBenefits(user);
+    };
+    
+    const confirmPasscodeSavedAndReturnToCommunity = () => {
+        closeModal('passcodeDisplay');
+        
+        localStorage.setItem('userNickname', state.nickname);
+        window.App?.setState('userNickname', state.nickname);
+        
+        setTimeout(() => {
+            const communityHub = window.App?.getModule('communityHub');
+            if (communityHub) {
+                communityHub.open();
+            }
+        }, 500);
+    };
+    
+    // ================================
+    // COMMUNITY BENEFITS
+    // ================================
+    
+    const showCommunityBenefits = (user) => {
+        const modal = createModal('benefits', `
+            <div class="benefits-content">
+                <div class="success-header">
+                    <div class="avatar-display">${user.avatarEmoji}</div>
+                    <h2>Welcome, ${user.nickname}! 🎉</h2>
+                    <p>You're now part of the GF beer revolution!</p>
+                </div>
+                
+                <div class="welcome-bonus">
+                    <div class="bonus-icon">🎁</div>
+                    <div class="bonus-text">
+                        <strong>Welcome Bonus!</strong>
+                        <span>+10 points to get you started</span>
+                    </div>
+                </div>
+                
+                <div class="benefits-grid">
+                    <div class="benefit">
+                        <span class="benefit-icon">🏆</span>
+                        <strong>Earn Points</strong>
+                        <small>Get points for every contribution</small>
+                    </div>
+                    <div class="benefit">
+                        <span class="benefit-icon">🎖️</span>
+                        <strong>Unlock Badges</strong>
+                        <small>Show off your achievements</small>
+                    </div>
+                    <div class="benefit">
+                        <span class="benefit-icon">📊</span>
+                        <strong>Track Impact</strong>
+                        <small>See how many you've helped</small>
+                    </div>
+                    <div class="benefit">
+                        <span class="benefit-icon">📱</span>
+                        <strong>Sync Devices</strong>
+                        <small>Access your account anywhere!</small>
+                    </div>
+                </div>
+                
+                <div class="first-badge">
+                    <p>You've earned your first badge!</p>
+                    <div class="badge-showcase">
+                        <span class="badge-icon">👋</span>
+                        <div class="badge-info">
+                            <strong>Welcome to the Club</strong>
+                            <small>Joined the GF beer community</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary btn-hero" onclick="OnboardingFlow.finishOnboarding()">
+                    Start Finding GF Beer! 🍺
+                </button>
+            </div>
+        `);
+        
+        document.body.appendChild(modal);
+    };
+    
+    // ================================
+    // WELCOME BACK TOAST
+    // ================================
+    
+    const showWelcomeBack = (user) => {
+        const welcomeFrequency = localStorage.getItem('welcomeFrequency') || 'session';
+        const lastWelcome = localStorage.getItem('lastWelcomeShown');
+        const now = Date.now();
+        
+        let shouldShow = false;
+        
+        if (!lastWelcome) {
+            shouldShow = true;
+        } else {
+            const hoursSince = (now - parseInt(lastWelcome)) / (1000 * 60 * 60);
+            
+            switch(welcomeFrequency) {
+                case 'always':
+                    shouldShow = false;
+                    break;
+                case 'session':
+                    shouldShow = !sessionStorage.getItem('welcomeShown');
+                    break;
+                case 'daily':
+                    shouldShow = hoursSince > 24;
+                    break;
+                case 'weekly':
+                    shouldShow = hoursSince > 168;
+                    break;
+            }
+        }
+        
+        if (shouldShow) {
+            const toast = document.createElement('div');
+            toast.className = 'welcome-back-toast';
+            toast.innerHTML = `
+                <div class="toast-content">
+                    <span class="toast-avatar">${user.avatarEmoji}</span>
+                    <div class="toast-text">
+                        <strong>Welcome back, ${user.nickname}!</strong>
+                        <small>${user.points || 0} points • Level ${user.level || 1}</small>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.classList.add('show'), 100);
+            setTimeout(() => {
+                toast.classList.add('fade-out');
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
+            
+            localStorage.setItem('lastWelcomeShown', now.toString());
+            sessionStorage.setItem('welcomeShown', 'true');
+        }
+    };
+    
+    // ================================
+    // FINISH
+    // ================================
+    
+    const finishOnboarding = () => {
+        ['ageGate', 'welcome', 'nickname', 'benefits', 'passcodeDisplay', 'signIn'].forEach(id => {
+            const modal = document.getElementById(`${id}Modal`);
+            if (modal) modal.remove();
+        });
+        
+        document.querySelectorAll('.onboarding-modal').forEach(modal => {
+            modal.remove();
+        });
+        
+        window.dispatchEvent(new Event('onboardingComplete'));
+    };
+    
+    // ================================
+    // UTILITIES
+    // ================================
+    
     const createModal = (id, content, closeable = true) => {
         const modal = document.createElement('div');
         modal.id = `${id}Modal`;
@@ -1033,9 +984,7 @@ Thank you for joining our community!
         confirmAge,
         underAge,
         showWelcome,
-        showSignIn,
-        performSignIn,
-        skipSignIn,
+        skipWelcome,
         showNicknameSelection,
         checkNickname,
         generateRandom,
@@ -1043,18 +992,19 @@ Thank you for joining our community!
         selectAvatar,
         saveNickname,
         skipNickname,
-        skipWelcome,
+        promptSignIn,
+        showSignInWithNickname,
+        backToNickname,
+        performSignIn,
+        clearNicknameOptions,
         copyPasscode,
         downloadPasscode,
         sharePasscode,
         confirmPasscodeSaved,
+        confirmPasscodeSavedAndReturnToCommunity,
+        showPasscodeDisplayForCommunity,
         finishOnboarding,
-        closeModal,
-        promptSignIn,
-        showSignInWithNickname,
-        backToNickname,
-        clearNicknameOptions,
-        showNicknameSelection 
+        closeModal
     };
 })();
 
