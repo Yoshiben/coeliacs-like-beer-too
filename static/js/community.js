@@ -597,15 +597,12 @@ export const CommunityModule = (() => {
             'new-to-gf': () => {
                 modules.modalManager?.open('gfInfoOverlay');
             },
-            'add-find': () => {
-                modules.modal?.openReportModal();
+            'review-beers': () => {
+                modules.helpers?.showToast('Ber reviews coming soon! 🚀', 'info');
             },
             'saved-venues': () => {
                 modules.helpers?.showToast('Saved venues coming soon! 🚀', 'info');
             },
-            'find-stockists': () => {
-                modules.helpers?.showToast('Stockist finder coming soon! 🚀', 'info');
-            }
         };
         
         const handler = actions[action];
