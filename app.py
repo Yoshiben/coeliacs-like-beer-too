@@ -469,6 +469,13 @@ def search():
     user_lat = request.args.get('user_lat', type=float)
     user_lng = request.args.get('user_lng', type=float)
     
+    if not query and not venue_id:
+        # Check if this looks like a page refresh (accept header contains text/html)
+        if 'text/html' in request.headers.get('Accept', ''):
+            return redirect('/')
+        # For AJAX calls, return empty results
+        return jsonify({'error': 'Query is required for search'}), 400
+    
     if query and (len(query) < 1 or len(query) > 100):
         return jsonify({'error': 'Invalid query length'}), 400
     
@@ -2008,6 +2015,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
