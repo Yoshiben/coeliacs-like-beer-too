@@ -598,11 +598,11 @@ export const CommunityModule = (() => {
                 modules.modalManager?.open('gfInfoOverlay');
             },
             'review-beers': () => {
-                modules.helpers?.showToast('Ber reviews coming soon! 🚀', 'info');
+                modules.helpers?.showToast('Beer reviews coming soon! 🚀', 'info');
             },
             'saved-venues': () => {
                 modules.helpers?.showToast('Saved venues coming soon! 🚀', 'info');
-            },
+            }
         };
         
         const handler = actions[action];
