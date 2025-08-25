@@ -882,6 +882,12 @@ const App = {
             }
         },
 
+        'close-ios-guide': (el, modules) => {
+            if (window.pwaHandler) {
+                window.pwaHandler.dismissIOSGuide();
+            }
+        },
+
         // Add these to your main.js action handlers:
 
         'quick-update-status': async (el, modules) => {
