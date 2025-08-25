@@ -1974,18 +1974,21 @@ const App = {
     
     checkCookieConsent: () => {
         const helpers = App.getModule('helpers');
-        const hasConsent = helpers?.Storage.get('cookieConsent');
+        
+        // Check BOTH the old and new storage keys
+        const hasConsent = helpers?.Storage.get('cookieConsent') || 
+                          localStorage.getItem('cookiesAccepted') === 'true';
         
         const banner = document.getElementById('cookieConsent');
         
         if (!hasConsent) {
-            // No consent yet - show banner, hide float button
+            // No consent yet - show banner
             if (banner) {
                 banner.style.display = 'block';
                 console.log('🍪 Showing cookie banner - no consent found');
             }
         } else {
-            // Has consent - hide banner, show float button
+            // Has consent - hide banner
             if (banner) {
                 banner.style.display = 'none';
                 console.log('🍪 Hiding cookie banner - consent already given');
