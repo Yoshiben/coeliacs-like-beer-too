@@ -52,7 +52,6 @@
    opacity: 0.8;
 }
 
-/* Replace your inline style with this: */
 .hero-section {
    display: grid;
    grid-template-columns: 1fr 1fr;
@@ -62,7 +61,6 @@
    border-radius: var(--radius-pill);
 }
 
-/* Make both buttons identical in size and styling */
 .near-me-button,
 .buy-beer-button {
    display: flex;
@@ -74,17 +72,12 @@
    cursor: pointer;
    transition: all 0.3s ease;
    box-shadow: 0 2px 8px rgba(139, 92, 246, 0.08);
-/*    background: linear-gradient(135deg, 
-     rgba(255, 255, 255, 1) 0%, 
-     rgba(248, 249, 250, 0.8) 100%
-   ); */
    background: var(--primary-gradient);
    height: 100%;
    width: 100%;
    color: var(--white);
 }
 
-/* Icon styling - make them consistent */
 .near-me-icon,
 .buy-beer-icon {
     font-size: var(--text-2xl);
@@ -92,7 +85,6 @@
    padding: var(--space-xs);
 }
 
-/* Content styling - make them consistent */
 .near-me-content,
 .buy-beer-content {
     flex: 1;
@@ -107,7 +99,6 @@
 .buy-beer-content h3 {
    margin: var(--space-xs) 0 var(--space-xs) 0;
    font-size: var(--text-sm);
-/*    font-weight: 700; */
    line-height: 1.2;
 }
 
@@ -118,55 +109,6 @@
    font-size: var(--space-sm);
    line-height: 1.3;
 }
-
-/* Different hover colors for each button */
-.near-me-button {
-    border-color: rgba(16, 185, 129, 0.2);
-}
-
-.near-me-button:hover {
-    transform: translateY(-2px);
-    border-color: rgba(16, 185, 129, 0.4);
-    background: linear-gradient(135deg, 
-        rgba(16, 185, 129, 0.05) 0%, 
-        rgba(255, 255, 255, 1) 100%
-    );
-    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.15);
-}
-
-.buy-beer-button {
-    border-color: rgba(245, 158, 11, 0.2);
-    position: relative;
-}
-
-.buy-beer-button:hover {
-    transform: translateY(-2px);
-    border-color: rgba(245, 158, 11, 0.4);
-    background: linear-gradient(135deg, 
-        rgba(245, 158, 11, 0.05) 0%, 
-        rgba(255, 255, 255, 1) 100%
-    );
-    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.15);
-}
-
-@keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 .community-feed {
     padding: 0 var(--space-lg) var(--space-xl);
