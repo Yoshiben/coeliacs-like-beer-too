@@ -1314,19 +1314,25 @@ const App = {
             App.goToUserLocation(modules);
         },
 
-        'open-nickname-modal': (el, modules) => {
+        'open-onboarding-nickname': (el, modules) => {
             console.log('🔓 Opening nickname modal from community hub');
             
             // Close community hub first
             modules.modalManager?.close('communityHubOverlay');
             
-            // Small delay then open nickname modal
+            // Small delay then use the PROPER onboarding flow
             setTimeout(() => {
-                // Open the nickname modal
-                modules.modalManager?.open('nicknameModal');
-                
-                // Set a flag so we know to reopen community hub after
-                window.App.setState('returnToCommunityAfterNickname', true);
+                // Use the OnboardingFlow's nickname selection
+                if (window.OnboardingFlow && window.OnboardingFlow.showNicknameSelection) {
+                    // Set a flag so we know to reopen community hub after
+                    window.App.setState('returnToCommunityAfterNickname', true);
+                    
+                    // Open the proper nickname modal with all its validation
+                    window.OnboardingFlow.showNicknameSelection();
+                } else {
+                    console.error('OnboardingFlow not available');
+                    modules.toast?.error('Could not open nickname selection');
+                }
             }, 100);
         },
         
