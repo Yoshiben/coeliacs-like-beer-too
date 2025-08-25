@@ -293,7 +293,6 @@ export const CommunityHubModule = (() => {
                     <!-- User info in top right -->
                     <div class="level-user-info">
                         <span class="username">${state.userProfile.nickname}</span>
-                        <button class="change-nickname-btn" data-action="change-nickname">✏️</button>
                     </div>
                     
                     <div class="level-header">
