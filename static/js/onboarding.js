@@ -186,6 +186,15 @@ export const OnboardingFlow = (() => {
     const skipWelcome = () => {
         localStorage.setItem('hasSeenWelcome', 'true');
         closeModal('welcome');
+        // Trigger onboarding complete event when skipping
+        window.dispatchEvent(new Event('onboardingComplete'));
+    };
+    
+    const skipNickname = () => {
+        localStorage.setItem('hasSeenWelcome', 'true');
+        closeModal('nickname');
+        // Trigger onboarding complete event when skipping
+        window.dispatchEvent(new Event('onboardingComplete'));
     };
     
     // ================================
@@ -392,11 +401,6 @@ export const OnboardingFlow = (() => {
         });
         
         event.target.classList.add('active');
-    };
-    
-    const skipNickname = () => {
-        localStorage.setItem('hasSeenWelcome', 'true');
-        closeModal('nickname');
     };
     
     const saveNickname = async () => {
