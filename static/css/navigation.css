@@ -6,8 +6,10 @@
    position: fixed;
    top: 0;
    left: 0;
-   right: 0;
-   height: var(--nav-height);
+   right: 0;  
+   /* Account for notch/status bar on phones */
+   padding-top: env(safe-area-inset-top);
+   height: calc(var(--nav-height) + env(safe-area-inset-top));   
    background: var(--primary-gradient);
    z-index: var(--z-navigation) !important;
    box-shadow: var(--shadow-sm);
@@ -15,11 +17,18 @@
 }
 
 .nav-content {
-   height: 100%;
-   display: flex;
    align-items: center;
    justify-content: space-between;
-   padding: 0 var(--space-md);
+
+   display: grid;
+   grid-template-columns: 1fr 1fr 1fr;  /* Three equal-ish columns */
+   width: 100%;
+
+   height: var(--nav-height); /* Keep content at original height */
+   
+   /* Add safe area padding for landscape mode (notch on side) */
+   padding-left: calc(var(--space-md) + env(safe-area-inset-left));
+   padding-right: calc(var(--space-md) + env(safe-area-inset-right));
 }
 
 .nav-left,
@@ -180,7 +189,7 @@ nav-notification-btn {
 }
 
 #cookieConsent {
-    display: none; /* Hidden by default, JS will show if needed */
+    display: none;
 }
 
 .cookie-text h4 {
@@ -197,38 +206,6 @@ nav-notification-btn {
     opacity: 0.9;
 }
 
-
-/* ================================
-   UPDATE YOUR TOP NAV
-   ================================ */
-.top-nav {
-    display: block;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    
-    /* Account for notch/status bar on phones */
-    padding-top: env(safe-area-inset-top);
-    height: calc(var(--nav-height) + env(safe-area-inset-top));
-    
-    background: var(--primary-gradient);
-    z-index: var(--z-navigation) !important;
-    box-shadow: var(--shadow-sm);
-    backdrop-filter: blur(10px);
-}
-
-.nav-content {
-    height: var(--nav-height); /* Keep content at original height */
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 var(--space-md);
-    
-    /* Add safe area padding for landscape mode (notch on side) */
-    padding-left: calc(var(--space-md) + env(safe-area-inset-left));
-    padding-right: calc(var(--space-md) + env(safe-area-inset-right));
-}
 
 /* ================================
    UPDATE YOUR BOTTOM NAV
@@ -276,14 +253,6 @@ nav-notification-btn {
     
     /* Updated padding to go above bottom nav + home indicator */
     padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom) + var(--space-xl));
-}
-
-.nav-content {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;  /* Three equal-ish columns */
-    align-items: center;
-    width: 100%;
-    padding: 0 1rem;
 }
 
 /* Logo stays left */
