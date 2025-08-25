@@ -604,6 +604,7 @@ export const CommunityHubModule = (() => {
         open,
         close,
         addPoints,
+        switchTab,
         trackAction: (action, metadata) => {
             // Called when user performs actions
             if (!state.userProfile) return;
