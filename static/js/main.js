@@ -943,9 +943,10 @@ const App = {
             // Close the cookie settings modal
             modules.modalManager?.close('cookieSettings');
             
-            // Initialize any analytics/marketing scripts if needed
-            if (modules.tracking) {
-                modules.tracking.initializeAnalytics();
+            // Update any cookie-dependent features
+            if (preferences.analytics && modules.tracking) {
+                console.log('📊 Analytics cookies accepted');
+                // The tracking module should already be checking for permissions
             }
             
             console.log('✅ Cookie preferences saved:', preferences);
