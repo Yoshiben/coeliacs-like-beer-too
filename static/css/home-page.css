@@ -326,9 +326,9 @@
     color: var(--white);
 }
 
-.venue-badge-soon {
+.venue-badge-soon,
+.review-badge-soon {
    position: absolute;
-   right: 1vh;
    background: var(--orange);
    color: var(--white);
    font-size: 0.6rem;
@@ -340,6 +340,14 @@
    letter-spacing: 0.5px;
    animation: gentlePulse 3s ease-in-out infinite;
    box-shadow: var(--shadow-sm);
+}
+
+.review-badge-soon {
+   left: 1vh;
+}
+
+.venue-badge-soon {
+   right: 1vh;
 }
 
 .gf-indicator {
