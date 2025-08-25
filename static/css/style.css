@@ -56,6 +56,7 @@
    --text-purple: rgba(118, 75, 162,1);
    
    /* Text Sizing */
+   --text-xxs: 0.6rem;
    --text-xs: 0.75rem;
    --text-sm: 0.875rem;
    --text-md: 1rem;
