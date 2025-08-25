@@ -136,15 +136,16 @@
 
 /* Section Tabs */
 .section-tabs {
-    display: flex;
-    gap: 0.5rem;
-    margin: 1rem;
-    background: white;
-    padding: 0.5rem;
-    border-radius: 15px;
-    box-shadow: var(--shadow-sm);
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
+   display: grid;
+   grid-template-columns: 1fr 1fr;
+   gap: var(--space-sm);
+   margin: var(--space-sm);
+   background: white;
+   padding: var(--space-xs);
+   border-radius: var(--radius-xl);
+   box-shadow: var(--shadow-sm);
+   overflow-x: auto;
+   -webkit-overflow-scrolling: touch;
 }
 
 .tab {
@@ -214,7 +215,6 @@
     background: white;
     border-radius: 20px;
     padding: clamp(1rem, 3vw, 1.5rem);
-    margin: 1rem;
     box-shadow: var(--shadow-sm);
 }
 
@@ -447,13 +447,12 @@
 
 /* Badges Section */
 .badges-section {
-    padding: 1rem;
+    padding: 0 var(--space-lg);
 }
 
 .badges-section h3 {
     font-size: 1.3rem;
     font-weight: 700;
-    margin-bottom: 1.5rem;
     text-align: center;
 }
 
@@ -491,8 +490,7 @@
 }
 
 .badge-icon {
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
+   font-size: var(--text-xl);
 }
 
 .badge-name {
@@ -554,10 +552,6 @@
     
     .badge-card {
         padding: 0.75rem;
-    }
-    
-    .badge-icon {
-        font-size: 2rem;
     }
     
     .badge-name {
