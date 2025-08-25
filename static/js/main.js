@@ -1584,19 +1584,14 @@ const App = {
             community?.handleQuickAction('new-to-gf');
         },
         
-        'add-find': (el, modules) => {
+        'review-beers': (el, modules) => {
             const community = modules.community || window.App?.getModule('community');
-            community?.handleQuickAction('add-find');
+            community?.handleQuickAction('review-beers');
         },
-        
+
         'saved-venues': (el, modules) => {
             const community = modules.community || window.App?.getModule('community');
             community?.handleQuickAction('saved-venues');
-        },
-        
-        'find-stockists': (el, modules) => {
-            const community = modules.community || window.App?.getModule('community');
-            community?.handleQuickAction('find-stockists');
         },
 
         'open-community-hub': (el, modules) => {
