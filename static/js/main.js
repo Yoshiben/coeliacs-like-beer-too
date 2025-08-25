@@ -1313,6 +1313,22 @@ const App = {
         'go-to-my-location': (el, modules) => {
             App.goToUserLocation(modules);
         },
+
+        'open-nickname-modal': (el, modules) => {
+            console.log('🔓 Opening nickname modal from community hub');
+            
+            // Close community hub first
+            modules.modalManager?.close('communityHubOverlay');
+            
+            // Small delay then open nickname modal
+            setTimeout(() => {
+                // Open the nickname modal
+                modules.modalManager?.open('nicknameModal');
+                
+                // Set a flag so we know to reopen community hub after
+                window.App.setState('returnToCommunityAfterNickname', true);
+            }, 100);
+        },
         
         // Form actions
         'report-beer': (el, modules) => {
@@ -1792,6 +1808,19 @@ const App = {
                 localStorage.setItem('userNickname', nickname);
                 modules.modalManager?.close('nicknameModal');
                 modules.toast?.success(`👋 Welcome, ${nickname}!`);
+                
+                // Check if we should return to community hub
+                if (window.App.getState('returnToCommunityAfterNickname')) {
+                    window.App.setState('returnToCommunityAfterNickname', false);
+                    
+                    // Reopen community hub after a brief delay
+                    setTimeout(() => {
+                        const communityHub = window.App?.getModule('communityHub');
+                        if (communityHub) {
+                            communityHub.open();
+                        }
+                    }, 500);
+                }
                 
                 // Continue with whatever triggered the nickname prompt
                 const pendingAction = window.App.getState('pendingActionAfterNickname');
