@@ -146,10 +146,25 @@ class PWAHandler {
     
     checkIOSInstallGuide() {
         if (this.isIOS() && !this.isStandalone()) {
-            // Show after a short delay so user sees the main app first
-            setTimeout(() => {
-                this.showIOSInstallGuide();
-            }, 3000);
+            // Check if onboarding is complete
+            const hasAgeConsent = localStorage.getItem('ageConsent') === 'true';
+            const hasSeenWelcome = localStorage.getItem('hasSeenWelcome') === 'true';
+            const hasNickname = localStorage.getItem('userNickname');
+            
+            // Only show if all onboarding steps are complete
+            if (hasAgeConsent && hasSeenWelcome && hasNickname) {
+                // Show after a short delay so user sees the main app first
+                setTimeout(() => {
+                    this.showIOSInstallGuide();
+                }, 3000);
+            } else {
+                // Listen for onboarding completion
+                window.addEventListener('onboardingComplete', () => {
+                    setTimeout(() => {
+                        this.showIOSInstallGuide();
+                    }, 3000);
+                }, { once: true });  // Only listen once
+            }
         }
     }
     
@@ -159,65 +174,21 @@ class PWAHandler {
             return;
         }
         
-        const guide = document.createElement('div');
-        guide.id = 'ios-install-guide';
-        guide.innerHTML = `
-            <div class="ios-guide-content">
-                <div class="ios-guide-header">
-                    <div class="ios-guide-icon">📱</div>
-                    <div class="ios-guide-text">
-                        <strong>Install GF Beer Finder</strong>
-                        <small>Get app-like experience & better location access</small>
-                    </div>
-                    <button class="ios-guide-close" id="ios-guide-close">×</button>
-                </div>
-                
-                <div class="ios-guide-steps">
-                    <div class="ios-step">
-                        <span class="step-number">1</span>
-                        <span class="step-icon">📤</span>
-                        <span class="step-text">Tap the Share button below</span>
-                    </div>
-                    <div class="ios-step">
-                        <span class="step-number">2</span>
-                        <span class="step-icon">➕</span>
-                        <span class="step-text">Select "Add to Home Screen"</span>
-                    </div>
-                    <div class="ios-step">
-                        <span class="step-number">3</span>
-                        <span class="step-icon">🍺</span>
-                        <span class="step-text">Enjoy app-like experience!</span>
-                    </div>
-                </div>
-                
-                <div class="ios-guide-benefits">
-                    <div class="benefit">⚡ Faster loading</div>
-                    <div class="benefit">📍 Better location access</div>
-                    <div class="benefit">🔄 Works offline</div>
-                </div>
-            </div>
-        `;
-        
-        document.body.appendChild(guide);
-        
-        // Handle close button
-        document.getElementById('ios-guide-close').addEventListener('click', () => {
-            this.dismissIOSGuide();
-        });
-        
-        // Auto-dismiss after 15 seconds
-        setTimeout(() => {
-            if (document.contains(guide)) {
-                this.dismissIOSGuide();
-            }
-        }, 15000);
+        const guide = document.getElementById('ios-install-guide');
+        if (guide) {
+            guide.style.display = 'flex';
+            guide.classList.add('active');
+        }
     }
     
     dismissIOSGuide() {
         const guide = document.getElementById('ios-install-guide');
         if (guide) {
             guide.classList.add('removing');
-            setTimeout(() => guide.remove(), 300);
+            setTimeout(() => {
+                guide.style.display = 'none';
+                guide.classList.remove('active', 'removing');
+            }, 300);
         }
         
         // Don't show again for this session
