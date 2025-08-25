@@ -817,17 +817,6 @@ html {
    .buy-beer-content {
       text-align: center;
    }
-
-   .near-me-content h3,
-   .buy-beer-content h3 {
-      font-size: var(--text-lg);
-      color: var(--text-primary);
-   }
-
-   .near-me-content p,
-   .buy-beer-content p {
-      display: none;
-   }
 }
 
 @supports (-webkit-touch-callout: none) {
