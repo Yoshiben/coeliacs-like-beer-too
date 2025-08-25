@@ -253,6 +253,15 @@ export const ModalManager = (() => {
     };
     
     const openModal = (modalId, config, options) => {
+        // Special handling for cookie settings - always close cookie consent first
+        if (modalId === 'cookieSettings' || modalId === 'cookieSettingsFloat') {
+            const cookieConsent = document.getElementById('cookieConsent');
+            if (cookieConsent) {
+                cookieConsent.classList.remove('show');
+                cookieConsent.style.display = 'none';
+            }
+        }
+        
         // Check if we can open over current state
         if (state.activeOverlays.length > 0 && !state.config.allowModalOverOverlay && !config.priority) {
             console.warn(`🚫 Cannot open modal over overlay`);
