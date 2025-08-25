@@ -78,27 +78,8 @@
    iOS INSTALL GUIDE
    ================================ */
 
-#ios-install-guide {
-    position: fixed;
-    top: var(--nav-height);
-    left: 0;
-    right: 0;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    z-index: 1600;
-    animation: slideDown 0.4s ease;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-
-.ios-guide-content {
-    padding: 12px 16px;
-}
-
 .ios-guide-header {
     display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 12px;
 }
 
 .ios-guide-icon {
@@ -110,12 +91,6 @@
     min-width: 0;
 }
 
-.ios-guide-text strong {
-    display: block;
-    font-size: 0.95rem;
-    line-height: 1.2;
-    margin-bottom: 2px;
-}
 
 .ios-guide-text small {
     opacity: 0.9;
@@ -297,11 +272,7 @@ body.pwa-mode {
    RESPONSIVE ADJUSTMENTS
    ================================ */
 
-@media (max-width: 380px) {
-    .ios-guide-content {
-        padding: 10px 12px;
-    }
-    
+@media (max-width: 380px) {    
     .ios-guide-steps {
         gap: 4px;
     }
@@ -327,35 +298,11 @@ body.pwa-mode {
 
 /* iOS Install Guide Modal */
 #ios-install-guide {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
     background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
     z-index: 10000;
     animation: fadeIn 0.3s ease;
 }
 
-.ios-guide-content {
-    background: white;
-    border-radius: 20px;
-    padding: 1.5rem;
-    max-width: 380px;
-    width: 90%;
-    margin: 0 auto;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-}
-
-.ios-guide-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    position: relative;
-}
 
 .ios-guide-icon {
     font-size: 2.5rem;
@@ -367,15 +314,15 @@ body.pwa-mode {
 }
 
 .ios-guide-text strong {
-    display: block;
-    font-size: 1.2rem;
-    color: #333;
-    margin-bottom: 0.25rem;
+   display: block;
+   font-size: var(--text-xl);
+   color: var(--white);
+   margin-bottom: var(--space-md);
 }
 
 .ios-guide-text small {
-    color: #666;
-    font-size: 0.9rem;
+   color: var(--white);
+   font-size: var(--text-sm);
 }
 
 .ios-guide-close {
@@ -470,10 +417,6 @@ body.pwa-mode {
 
 /* Responsive adjustments */
 @media (max-width: 400px) {
-    .ios-guide-content {
-        padding: 1rem;
-    }
-    
     .ios-guide-icon {
         font-size: 2rem;
     }
@@ -485,5 +428,212 @@ body.pwa-mode {
     .benefit {
         font-size: 0.8rem;
         padding: 0.4rem 0.6rem;
+    }
+}
+
+/* iOS Install Guide Modal - Better Styling */
+#ios-install-guide {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    backdrop-filter: blur(10px);
+}
+
+#ios-install-guide .modal-content {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 24px;
+    padding: 0;
+    max-width: 380px;
+    width: 90%;
+    margin: 0 auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    position: relative;
+    color: white;
+}
+
+#ios-install-guide .modal-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1;
+    transition: all 0.3s ease;
+}
+
+#ios-install-guide .modal-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+#ios-install-guide .modal-header {
+    padding: 2rem 2rem 1rem;
+    text-align: center;
+}
+
+.ios-guide-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+#ios-install-guide h2 {
+    color: white;
+    font-size: 1.8rem;
+    margin: 0 0 0.5rem 0;
+    font-weight: 700;
+}
+
+#ios-install-guide .modal-header p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1rem;
+    margin: 0;
+}
+
+.ios-guide-steps {
+    background: white;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.ios-step {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.ios-step:hover {
+    background: #e3f2fd;
+    transform: translateX(5px);
+}
+
+.step-number {
+    background: #fbbf24;
+    color: #92400e;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.step-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+}
+
+.share-icon-visual {
+    width: 32px;
+    height: 32px;
+    background: #667eea;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.step-icon {
+    font-size: 1.5rem;
+    width: 32px;
+    text-align: center;
+}
+
+.step-text {
+    color: #333;
+    font-weight: 500;
+}
+
+.ios-guide-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+    animation: bounce 2s infinite;
+}
+
+.arrow-text {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(10px); }
+}
+
+.ios-guide-benefits {
+    display: flex;
+    gap: 0.5rem;
+    padding: 1.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.ios-guide-benefits .benefit {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Animation for modal appearance */
+#ios-install-guide.active {
+    animation: slideUp 0.4s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 400px) {
+    #ios-install-guide .modal-content {
+        width: 95%;
+    }
+    
+    #ios-install-guide h2 {
+        font-size: 1.5rem;
+    }
+    
+    .ios-guide-icon {
+        font-size: 2.5rem;
     }
 }
