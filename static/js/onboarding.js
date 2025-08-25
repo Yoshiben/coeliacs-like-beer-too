@@ -191,10 +191,6 @@ export const OnboardingFlow = (() => {
         document.body.appendChild(modal);
     };
     
-    // ================================
-    // NICKNAME SELECTION (updated with passcode handling)
-    // ================================
-    
     const saveNickname = async () => {
         const saveBtn = document.getElementById('saveNicknameBtn');
         saveBtn.disabled = true;
@@ -239,6 +235,84 @@ export const OnboardingFlow = (() => {
             saveBtn.disabled = false;
             saveBtn.textContent = 'Create Account!';
         }
+    };
+
+    const showPasscodeDisplayForCommunity = (result) => {
+        // Same as showPasscodeDisplay but with different continue button
+        const modal = createModal('passcodeDisplay', `
+            <div class="passcode-display-content">
+                <div class="passcode-header">
+                    <div class="success-icon">🎉</div>
+                    <h2>Account Created!</h2>
+                    <p>Welcome, ${result.nickname}!</p>
+                </div>
+                
+                <div class="passcode-section">
+                    <h3>🔐 Your Secret Passcode</h3>
+                    <div class="passcode-display">
+                        <code id="passcodeValue">${result.passcode}</code>
+                        <button class="btn btn-sm btn-outline" onclick="OnboardingFlow.copyPasscode()">
+                            📋 Copy
+                        </button>
+                    </div>
+                    
+                    <div class="passcode-warning">
+                        <p><strong>⚠️ IMPORTANT: Save this passcode!</strong></p>
+                        <p>You'll need it to sign in on other devices or if you clear your browser data.</p>
+                        <p style="color: var(--color-error);">We cannot recover lost passcodes!</p>
+                    </div>
+                    
+                    <div class="passcode-actions">
+                        <button class="btn btn-outline" onclick="OnboardingFlow.downloadPasscode('${result.nickname}', '${result.passcode}')">
+                            💾 Download as Text File
+                        </button>
+                        <button class="btn btn-outline" onclick="OnboardingFlow.sharePasscode('${result.nickname}', '${result.passcode}')">
+                            📤 Share to Myself
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="passcode-confirm">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="passcodeConfirmCheck">
+                        <span>I've saved my passcode somewhere safe</span>
+                    </label>
+                </div>
+                
+                <button class="btn btn-primary btn-hero" id="continueFromPasscode" onclick="OnboardingFlow.confirmPasscodeSavedAndReturnToCommunity()" disabled>
+                    Continue to Community Hub →
+                </button>
+            </div>
+        `, false);
+        
+        document.body.appendChild(modal);
+        
+        // Enable continue button when checkbox is checked
+        document.getElementById('passcodeConfirmCheck')?.addEventListener('change', (e) => {
+            const continueBtn = document.getElementById('continueFromPasscode');
+            if (continueBtn) {
+                continueBtn.disabled = !e.target.checked;
+            }
+        });
+    };
+    
+    // 5. ADD function to return to community after passcode:
+    
+    const confirmPasscodeSavedAndReturnToCommunity = () => {
+        // Close passcode modal
+        closeModal('passcodeDisplay');
+        
+        // Store the new user data
+        localStorage.setItem('userNickname', state.nickname);
+        window.App?.setState('userNickname', state.nickname);
+        
+        // Reopen community hub
+        setTimeout(() => {
+            const communityHub = window.App?.getModule('communityHub');
+            if (communityHub) {
+                communityHub.open();
+            }
+        }, 500);
     };
     
     // ================================
@@ -980,9 +1054,7 @@ Thank you for joining our community!
         showSignInWithNickname,
         backToNickname,
         clearNicknameOptions,
-        showNicknameSelection,
-        confirmPasscodeSavedAndReturnToCommunity,
-        showPasscodeDisplayForCommunity
+        showNicknameSelection 
     };
 })();
 
