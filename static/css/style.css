@@ -994,19 +994,19 @@ body {
 /* Add this temporarily to test if the CSS is working */
 
 /* Make it REALLY obvious when page-community is active */
-body.page-community {
+/* body.page-community {
     border: 5px solid red !important;
-}
+} */
 
 /* Force show the back button with bright color */
-body.page-community .nav-back-btn { 
+/* body.page-community .nav-back-btn { 
     display: flex !important;
     background: red !important;
     color: white !important;
-}
+} */
 
 /* Also try without body prefix in case there's specificity issues */
-.page-community .nav-back-btn {
+/* .page-community .nav-back-btn {
     display: flex !important;
     background: blue !important;
-}
+} */
