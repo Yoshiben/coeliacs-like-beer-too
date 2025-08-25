@@ -37,14 +37,14 @@ export const ModalModule = (() => {
             
             // Show subtitle with venue name
             if (modalSubtitle) {
-                modalSubtitle.textContent = `at ${venueData.name}`;
+                modalSubtitle.textContent = `at ${venueData.venue_name}`;
                 modalSubtitle.style.display = 'block';
             }
             
             // Store venue data globally for form submission
             window.App.setState('selectedVenueForReport', {
                 venue_id: venueData.venue_id || venueData.id,
-                name: venueData.name,
+                name: venueData.venue_name,
                 address: venueData.address,
                 postcode: venueData.postcode
             });
