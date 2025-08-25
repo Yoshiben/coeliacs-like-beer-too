@@ -563,13 +563,37 @@ export const CommunityHubModule = (() => {
         // Clean up any lingering toasts using the toast module
         modules.toast?.clear();
         
+        // SET THE PAGE CONTEXT TO COMMUNITY
+        const navModule = window.App?.getModule('nav');
+        if (navModule) {
+            navModule.setPageContext('community');
+        }
+        
         modules.modalManager?.open('communityHubOverlay', {
             onOpen: () => {
                 renderHub();
                 loadUserStats();
                 loadLeaderboard();
+            },
+            onClose: () => {
+                // Reset to home context when closing
+                if (navModule) {
+                    navModule.setPageContext('home');
+                }
             }
         });
+    };
+
+    const close = () => {
+        console.log('🏆 Closing Community Hub');
+        
+        // Reset to home context
+        const navModule = window.App?.getModule('nav');
+        if (navModule) {
+            navModule.setPageContext('home');
+        }
+        
+        modules.modalManager?.close('communityHubOverlay');
     };
     
     // ================================
@@ -578,6 +602,7 @@ export const CommunityHubModule = (() => {
     return {
         init,
         open,
+        close,
         addPoints,
         trackAction: (action, metadata) => {
             // Called when user performs actions
