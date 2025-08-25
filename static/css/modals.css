@@ -196,11 +196,6 @@
    width: 95vw;
 }
 
-/* Cookie Settings Modal */
-.cookie-modal .modal-content {
-   max-width: 500px;
-   width: 90vw;
-}
 
 /* About/Info Modals */
 .info-modal .modal-content {
@@ -1082,16 +1077,6 @@
    grid-template-columns: 1fr 1fr;
 }
 
-/* ================================
-   COOKIE MODAL
-   ================================ */
-
-.cookie-modal .modal-content {
-    max-height: 85vh;
-    max-height: 85dvh;
-    max-height: calc(90vh - env(safe-area-inset-bottom));
-    max-height: calc(90dvh - env(safe-area-inset-bottom));
-}
 
 /* ================================
    PLACES MODAL
