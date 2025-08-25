@@ -25,23 +25,22 @@ export const OnboardingFlow = (() => {
         console.log('🚀 Starting onboarding flow...');
         
         const existingNickname = localStorage.getItem('userNickname');
-            if (existingNickname) {
-                console.log('✅ Existing user found:', existingNickname);
-                
-                // Just check age verification for existing users
-                const ageVerified = localStorage.getItem('ageVerified');
-                if (!ageVerified) {
-                    showAgeGate();
-                    return;
-                }
-                
-                // User exists and age verified - we're done!
-                return { status: 'existing-user', nickname: existingNickname };
+        if (existingNickname) {
+            console.log('✅ Existing user found:', existingNickname);
+            
+            // Just check age verification for existing users
+            const ageVerified = localStorage.getItem('ageVerified');
+            if (!ageVerified) {
+                showAgeGate();
+                return;
             }
             
-            // Rest of your existing code continues unchanged...
-            const userStatus = await UserSession.init();
-            console.log('User status:', userStatus);
+            // User exists and age verified - we're done!
+            return { status: 'existing-user', nickname: existingNickname };
+        }
+        
+        const userStatus = await UserSession.init();
+        console.log('User status:', userStatus);
         
         switch (userStatus.status) {
             case 'need-age-verification':
@@ -58,20 +57,19 @@ export const OnboardingFlow = (() => {
                 break;
                 
             case 'device-has-account':
-                // This is the ONLY time we need sign-in prompt
-                // (Device created account before but auth was cleared)
-                showSignInPrompt();
+                // Instead of showSignInPrompt, go straight to sign in
+                showSignInWithNickname(userStatus.existingNickname || '');
                 break;
                 
             case 'anonymous':
                 // User skipped before - they're good to go
-            console.log('Anonymous user');
-            break;
-            
-        default:
-            console.log('Ready to use app');
-    }
-};
+                console.log('Anonymous user');
+                break;
+                
+            default:
+                console.log('Ready to use app');
+        }
+    };
     
     // ================================
     // AGE GATE (unchanged)
@@ -120,205 +118,6 @@ export const OnboardingFlow = (() => {
     
     const underAge = () => {
         window.location.href = 'https://www.google.com/search?q=best+non-alcoholic+drinks';
-    };
-    
-    // ================================
-    // SIGN IN PROMPT (NEW)
-    // ================================
-    
-    const showSignInPrompt = () => {
-        const modal = createModal('signInPrompt', `
-            <div class="signin-prompt-content">
-                <div class="signin-header">
-                    <span class="signin-emoji">🔐</span>
-                    <h2>Welcome Back!</h2>
-                    <p>Sign in to access your account or create a new one</p>
-                </div>
-                
-                <div class="signin-options">
-                    <button class="btn btn-primary btn-large" onclick="OnboardingFlow.showSignIn()">
-                        🔑 I have an account
-                    </button>
-                    <button class="btn btn-success btn-large" onclick="OnboardingFlow.showWelcome()">
-                        ✨ Create new account
-                    </button>
-                    <button class="btn btn-outline" onclick="OnboardingFlow.skipSignIn()">
-                        Skip for now →
-                    </button>
-                </div>
-                
-                <div class="signin-benefits">
-                    <p>With an account you can:</p>
-                    <ul>
-                        <li>✅ Track your contributions</li>
-                        <li>🏆 Earn points and badges</li>
-                        <li>📱 Sync across devices</li>
-                        <li>💾 Save your favorite venues</li>
-                    </ul>
-                </div>
-            </div>
-        `);
-        
-        document.body.appendChild(modal);
-    };
-    
-    // ================================
-    // SIGN IN MODAL (NEW)
-    // ================================
-    
-    const showSignIn = () => {
-        closeModal('signInPrompt');
-        
-        const modal = createModal('signIn', `
-            <div class="signin-content">
-                <div class="signin-header">
-                    <h2>🔑 Sign In</h2>
-                    <p>Enter your nickname and passcode</p>
-                </div>
-                
-                <div class="signin-form">
-                    <div class="input-group">
-                        <label>Nickname</label>
-                        <input type="text" 
-                               id="signInNickname" 
-                               placeholder="Your nickname..."
-                               maxlength="30">
-                    </div>
-                    
-                    <div class="input-group">
-                        <label>Passcode</label>
-                        <input type="text" 
-                               id="signInPasscode" 
-                               placeholder="6-character code"
-                               maxlength="6"
-                               style="text-transform: uppercase; letter-spacing: 0.2em; font-family: monospace;">
-                        <small>Enter the 6-character passcode you received when creating your account</small>
-                    </div>
-                    
-                    <div id="signInError" class="error-message" style="display: none;">
-                        <span class="error-icon">⚠️</span>
-                        <span class="error-text"></span>
-                    </div>
-                </div>
-                
-                <div class="signin-actions">
-                    <button class="btn btn-secondary" onclick="OnboardingFlow.showSignInPrompt()">
-                        ← Back
-                    </button>
-                    <button class="btn btn-primary" id="signInBtn" onclick="OnboardingFlow.performSignIn()">
-                        Sign In
-                    </button>
-                </div>
-                
-                <div class="signin-help">
-                    <p>Lost your passcode?</p>
-                    <small>Unfortunately, without email we can't recover it. You'll need to create a new account.</small>
-                </div>
-            </div>
-        `);
-        
-        document.body.appendChild(modal);
-        
-        // Auto-focus nickname field
-        setTimeout(() => {
-            document.getElementById('signInNickname')?.focus();
-        }, 100);
-    };
-    
-    const performSignIn = async () => {
-        const nickname = document.getElementById('signInNickname')?.value.trim();
-        const passcode = document.getElementById('signInPasscode')?.value.trim().toUpperCase();
-        const signInBtn = document.getElementById('signInBtn');
-        const errorDiv = document.getElementById('signInError');
-        const errorText = errorDiv?.querySelector('.error-text');
-        
-        if (!nickname || !passcode) {
-            if (errorDiv && errorText) {
-                errorText.textContent = 'Please enter both nickname and passcode';
-                errorDiv.style.display = 'block';
-            }
-            return;
-        }
-        
-        if (passcode.length !== 6) {
-            if (errorDiv && errorText) {
-                errorText.textContent = 'Passcode must be 6 characters';
-                errorDiv.style.display = 'block';
-            }
-            return;
-        }
-        
-        // Show loading
-        if (signInBtn) {
-            signInBtn.disabled = true;
-            signInBtn.textContent = 'Signing in...';
-        }
-        
-        try {
-            const result = await UserSession.signIn(nickname, passcode);
-            
-            if (result.success) {
-                // Store auth locally for this device
-                localStorage.setItem('userAuth', JSON.stringify({
-                    nickname: nickname,
-                    timestamp: Date.now()
-                }));
-                
-                // Fetch and set real user stats from database
-                try {
-                    const statsResponse = await fetch(`/api/get-user-id/${nickname}`);
-                    if (statsResponse.ok) {
-                        const userData = await statsResponse.json();
-                        
-                        // Store user_id in localStorage for future API calls
-                        localStorage.setItem('user_id', userData.user_id);
-                        localStorage.setItem('userNickname', nickname);
-                        
-                        // Update app state with real values
-                        window.App.setState('userId', userData.user_id);
-                        window.App.setState('userPoints', userData.points || 0);
-                        window.App.setState('userLevel', userData.level || 1);
-                        
-                        console.log('Loaded user stats:', userData);
-                    }
-                } catch (statsError) {
-                    console.error('Failed to load user stats:', statsError);
-                }
-                
-                // Close ALL possible modals
-                ['signIn', 'nickname', 'signInPrompt', 'welcome'].forEach(id => {
-                    closeModal(id);
-                });
-                
-                showWelcomeBack(result.user);
-            } else {
-                if (errorDiv && errorText) {
-                    errorText.textContent = result.error || 'Sign in failed';
-                    errorDiv.style.display = 'block';
-                }
-                
-                if (signInBtn) {
-                    signInBtn.disabled = false;
-                    signInBtn.textContent = 'Sign In';
-                }
-            }
-        } catch (error) {
-            console.error('Sign in error:', error);
-            if (errorDiv && errorText) {
-                errorText.textContent = 'Sign in failed. Please try again.';
-                errorDiv.style.display = 'block';
-            }
-            
-            if (signInBtn) {
-                signInBtn.disabled = false;
-                signInBtn.textContent = 'Sign In';
-            }
-        }
-    };
-    
-    const skipSignIn = () => {
-        localStorage.setItem('hasSeenWelcome', 'true');
-        closeModal('signInPrompt');
     };
     
     // ================================
@@ -416,13 +215,25 @@ export const OnboardingFlow = (() => {
             // Remove nickname modal
             closeModal('nickname');
             
-            // Show passcode display
-            showPasscodeDisplay(result);
+            // CHECK: Should we return to community hub?
+            const shouldReturnToCommunity = window.App?.getState('returnToCommunityAfterNickname');
+            
+            if (shouldReturnToCommunity) {
+                // Clear the flag
+                window.App?.setState('returnToCommunityAfterNickname', false);
+                
+                // Show passcode but then go to community instead of benefits
+                showPasscodeDisplayForCommunity(result);
+            } else {
+                // Normal flow - show passcode then benefits
+                showPasscodeDisplay(result);
+            }
         } else if (result.error === 'account_exists') {
-            // This device already has an account
-            alert(`This device already has an account: ${result.existing_nickname}. Please sign in instead.`);
+            // This device already has an account - removed showSignInPrompt
+            alert(`This device already has an account: ${result.existing_nickname}. Please sign in with your passcode.`);
             closeModal('nickname');
-            showSignInPrompt();
+            // Show sign in with the nickname pre-filled
+            showSignInWithNickname(result.existing_nickname);
         } else {
             alert(`Error: ${result.error}`);
             saveBtn.disabled = false;
@@ -490,6 +301,84 @@ export const OnboardingFlow = (() => {
                 continueBtn.disabled = !e.target.checked;
             }
         });
+    };
+
+    const showPasscodeDisplayForCommunity = (result) => {
+        // Same as showPasscodeDisplay but with different continue button
+        const modal = createModal('passcodeDisplay', `
+            <div class="passcode-display-content">
+                <div class="passcode-header">
+                    <div class="success-icon">🎉</div>
+                    <h2>Account Created!</h2>
+                    <p>Welcome, ${result.nickname}!</p>
+                </div>
+                
+                <div class="passcode-section">
+                    <h3>🔐 Your Secret Passcode</h3>
+                    <div class="passcode-display">
+                        <code id="passcodeValue">${result.passcode}</code>
+                        <button class="btn btn-sm btn-outline" onclick="OnboardingFlow.copyPasscode()">
+                            📋 Copy
+                        </button>
+                    </div>
+                    
+                    <div class="passcode-warning">
+                        <p><strong>⚠️ IMPORTANT: Save this passcode!</strong></p>
+                        <p>You'll need it to sign in on other devices or if you clear your browser data.</p>
+                        <p style="color: var(--color-error);">We cannot recover lost passcodes!</p>
+                    </div>
+                    
+                    <div class="passcode-actions">
+                        <button class="btn btn-outline" onclick="OnboardingFlow.downloadPasscode('${result.nickname}', '${result.passcode}')">
+                            💾 Download as Text File
+                        </button>
+                        <button class="btn btn-outline" onclick="OnboardingFlow.sharePasscode('${result.nickname}', '${result.passcode}')">
+                            📤 Share to Myself
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="passcode-confirm">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="passcodeConfirmCheck">
+                        <span>I've saved my passcode somewhere safe</span>
+                    </label>
+                </div>
+                
+                <button class="btn btn-primary btn-hero" id="continueFromPasscode" onclick="OnboardingFlow.confirmPasscodeSavedAndReturnToCommunity()" disabled>
+                    Continue to Community Hub →
+                </button>
+            </div>
+        `, false);
+        
+        document.body.appendChild(modal);
+        
+        // Enable continue button when checkbox is checked
+        document.getElementById('passcodeConfirmCheck')?.addEventListener('change', (e) => {
+            const continueBtn = document.getElementById('continueFromPasscode');
+            if (continueBtn) {
+                continueBtn.disabled = !e.target.checked;
+            }
+        });
+    };
+    
+    // 5. ADD function to return to community after passcode:
+    
+    const confirmPasscodeSavedAndReturnToCommunity = () => {
+        // Close passcode modal
+        closeModal('passcodeDisplay');
+        
+        // Store the new user data
+        localStorage.setItem('userNickname', state.nickname);
+        window.App?.setState('userNickname', state.nickname);
+        
+        // Reopen community hub
+        setTimeout(() => {
+            const communityHub = window.App?.getModule('communityHub');
+            if (communityHub) {
+                communityHub.open();
+            }
+        }, 500);
     };
     
     const copyPasscode = () => {
@@ -1070,7 +959,6 @@ Thank you for joining our community!
         confirmAge,
         underAge,
         showWelcome,
-        showSignInPrompt,
         showSignIn,
         performSignIn,
         skipSignIn,
