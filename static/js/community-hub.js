@@ -269,7 +269,7 @@ export const CommunityHubModule = (() => {
             <div style="padding: 2rem; text-align: center;">
                 <h2>👋 Welcome to the Community Hub!</h2>
                 <p>Set a nickname to start tracking your contributions</p>
-                <button class="btn btn-primary" data-action="open-nickname-modal">Set Nickname</button>
+                <button class="btn btn-primary" data-action="open-onboarding-nickname">Set Nickname</button>
             </div>
         `;
     };
