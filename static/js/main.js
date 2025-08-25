@@ -926,6 +926,31 @@ const App = {
             modules.modalManager?.close('beerDetailsPromptModal');
         },
 
+        'accept-all-from-settings': (el, modules) => {
+            console.log('✅ Accepting all cookies from settings');
+            
+            // Set all cookie preferences to true
+            const preferences = {
+                necessary: true,
+                analytics: true,
+                marketing: true
+            };
+            
+            // Save preferences
+            localStorage.setItem('cookiePreferences', JSON.stringify(preferences));
+            localStorage.setItem('cookiesAccepted', 'true');
+            
+            // Close the cookie settings modal
+            modules.modalManager?.close('cookieSettings');
+            
+            // Initialize any analytics/marketing scripts if needed
+            if (modules.tracking) {
+                modules.tracking.initializeAnalytics();
+            }
+            
+            console.log('✅ Cookie preferences saved:', preferences);
+        },
+
         // Update the 'skip-status-prompt' action handler in main.js:
 
         'skip-status-prompt': async (el, modules) => {
