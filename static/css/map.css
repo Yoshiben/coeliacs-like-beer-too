@@ -207,3 +207,111 @@
 .marker-cluster div {
     background-color: var(--dark-grey) !important;
 }
+
+
+/* Add this to your map.css file */
+
+/* Map Loading Overlay */
+.map-loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fadeIn 0.3s ease;
+}
+
+.map-loading-content {
+    text-align: center;
+    padding: var(--space-xl);
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    margin: 0 auto var(--space-lg);
+    border: 4px solid rgba(139, 92, 246, 0.2);
+    border-top-color: var(--purple);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.loading-text {
+    font-size: var(--text-lg);
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--space-sm);
+}
+
+.loading-subtext {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Map Retry Control Styles */
+.map-retry-container {
+    background: white;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+    padding: var(--space-lg);
+    max-width: 250px;
+}
+
+.map-retry-content {
+    text-align: center;
+}
+
+.retry-icon {
+    font-size: 2rem;
+    margin-bottom: var(--space-sm);
+}
+
+.map-retry-content p {
+    margin: var(--space-sm) 0;
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+}
+
+.map-retry-content .btn {
+    width: 100%;
+    margin-top: var(--space-md);
+}
+
+/* Improve the map legend positioning on mobile */
+@media (max-width: 768px) {
+    .map-legend {
+        bottom: calc(var(--nav-height) + 8px);
+        max-width: 200px;
+        font-size: 0.75rem;
+    }
+    
+    .legend-item {
+        padding: 2px 0;
+        margin: 4px;
+    }
+}
+
+/* Better contrast for map markers */
+.leaflet-marker-icon.always-tap-cask-marker {
+    filter: drop-shadow(0 0 3px rgba(255, 215, 0, 0.8));
+}
+
+.leaflet-marker-icon.always-bottle-can-marker {
+    filter: drop-shadow(0 0 3px rgba(16, 185, 129, 0.6));
+}
