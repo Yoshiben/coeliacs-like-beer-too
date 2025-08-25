@@ -14,7 +14,7 @@
 
 .hero-nav {
     background: var(--primary-gradient);
-    color: var(--white);
+    color: var(--white)
     padding: var(--space-md);
     text-align: center;
 }
@@ -328,6 +328,23 @@
     font-size: var(--text-sm);
     font-weight: 600;
     color: var(--text-primary);
+}
+
+.venue-badge-soon {
+   position: absolute;
+   top: 186vh;
+   right: 1vh;
+   background: var(--orange);
+   color: var(--white);
+   font-size: 0.6rem;
+   font-weight: 700;
+   padding: 2px 4px;
+   border-radius: 8px;
+   border: 2px solid var(--white);
+   text-transform: uppercase;
+   letter-spacing: 0.5px;
+   animation: gentlePulse 3s ease-in-out infinite;
+   box-shadow: var(--shadow-sm);
 }
 
 .gf-indicator {
