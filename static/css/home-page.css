@@ -291,23 +291,19 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: var(--space-md);
-    margin-top: var(--space-2xl);
+    margin-top: var(--space-xl);
 }
 .action-card {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: var(--space-sm);
-    padding: var(--space-xl);
-    background: var(--white);
+    padding: var(--space-md);
+    background: var(--primary-gradient);
     border: 1px solid var(--border-light);
     border-radius: var(--radius-lg);
     cursor: pointer;
     transition: all var(--transition);
-    background: linear-gradient(135deg, 
-        rgba(255, 255, 255, 1) 0%, 
-        rgba(248, 249, 250, 0.6) 100%
-    );
     box-shadow: 0 2px 6px rgba(139, 92, 246, 0.06);
 }
 .action-card:hover {
@@ -332,7 +328,6 @@
 
 .venue-badge-soon {
    position: absolute;
-   top: 186vh;
    right: 1vh;
    background: var(--orange);
    color: var(--white);
