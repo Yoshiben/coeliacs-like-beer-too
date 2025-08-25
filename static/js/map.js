@@ -655,8 +655,14 @@ export const MapModule = (() => {
         return fullUKMap;
     };
     
+    // UPDATE loadAllVenuesOnMap function in map.js (around line 850)
+
     const loadAllVenuesOnMap = async () => {
         console.log('📍 Loading UK venues...');
+        
+        // Add loading overlay to the map
+        const mapElement = document.getElementById('fullMap');
+        let loadingOverlay = null;
         
         try {
             // Check cache first
@@ -667,10 +673,22 @@ export const MapModule = (() => {
                 return;
             }
             
-            // Show loading message
-            if (window.showLoadingToast) {
-                window.showLoadingToast('Loading venues across the UK...');
+            // Create loading overlay on the map itself
+            if (mapElement) {
+                loadingOverlay = document.createElement('div');
+                loadingOverlay.className = 'map-loading-overlay';
+                loadingOverlay.innerHTML = `
+                    <div class="map-loading-content">
+                        <div class="loading-spinner"></div>
+                        <div class="loading-text">Loading venues across the UK...</div>
+                        <div class="loading-subtext">This may take a few seconds</div>
+                    </div>
+                `;
+                mapElement.appendChild(loadingOverlay);
             }
+            
+            // Show toast as well for users who might not be looking at the map
+            const toastId = window.ToastModule?.info('Loading venue data...', { duration: 0 }); // duration: 0 means it won't auto-hide
             
             // Fetch data with better error handling
             const response = await fetch('/api/all-venues', {
@@ -711,26 +729,39 @@ export const MapModule = (() => {
             // Update display
             updateMapDisplay(true);
             
-            // Show success notification
+            // Calculate GF count for the success message
             const gfCount = allVenues.filter(p => 
                 p.gf_status === 'always_tap_cask' || 
                 p.gf_status === 'always_bottle_can' || 
                 p.gf_status === 'currently'
             ).length;
             
-            if (window.hideLoadingToast) {
-                window.hideLoadingToast();
+            // Remove loading overlay
+            if (loadingOverlay && loadingOverlay.parentNode) {
+                loadingOverlay.remove();
             }
             
-            if (window.showSuccessToast) {
-                window.showSuccessToast(`✅ Loaded ${allVenues.length} venues (${gfCount} with GF beer)`);
+            // Hide the loading toast
+            if (toastId && window.ToastModule) {
+                window.ToastModule.hide(toastId);
+            }
+            
+            // Show ONE success toast (not two!)
+            if (window.ToastModule) {
+                window.ToastModule.success(`✅ Loaded ${allVenues.length.toLocaleString()} venues (${gfCount.toLocaleString()} with GF beer)`);
             }
             
         } catch (error) {
             console.error('❌ Error loading venues:', error);
             
-            if (window.hideLoadingToast) {
-                window.hideLoadingToast();
+            // Remove loading overlay
+            if (loadingOverlay && loadingOverlay.parentNode) {
+                loadingOverlay.remove();
+            }
+            
+            // Hide the loading toast
+            if (toastId && window.ToastModule) {
+                window.ToastModule.hide(toastId);
             }
             
             // Show user-friendly error with retry option
@@ -738,10 +769,8 @@ export const MapModule = (() => {
                 'Server temporarily unavailable. Please try again.' : 
                 'Could not load venue data. Please check your connection.';
                 
-            if (window.showErrorToast) {
-                window.showErrorToast(errorMessage);
-            } else if (window.showSuccessToast) {
-                window.showSuccessToast(`❌ ${errorMessage}`);
+            if (window.ToastModule) {
+                window.ToastModule.error(errorMessage);
             }
             
             // Show retry button on map
