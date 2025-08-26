@@ -183,6 +183,10 @@
    box-sizing: border-box;
 }
 
+#ageGateModal { display: flex !important; }
+
+body.age-verified #ageGateModal { display: none !important; }
+
 /* Navigation visibility based on page context */
 body.page-home .nav-notification-btn { display: flex !important; }
 body.page-results .nav-back-btn,
