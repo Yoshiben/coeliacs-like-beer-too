@@ -880,7 +880,26 @@ Thank you for joining our community!
     // WELCOME BACK TOAST
     // ================================
     
-    const showWelcomeBack = (user) => {
+    const showWelcomeBack = async (user) => {
+        // First, load the actual user stats
+        try {
+            const nickname = user.nickname || localStorage.getItem('userNickname');
+            if (nickname) {
+                const response = await fetch(`/api/get-user-id/${nickname}`);
+                if (response.ok) {
+                    const userData = await response.json();
+                    user.points = userData.points || 0;
+                    user.level = userData.level || 1;
+                    
+                    // Update app state
+                    window.App?.setState('userPoints', user.points);
+                    window.App?.setState('userLevel', user.level);
+                }
+            }
+        } catch (error) {
+            console.error('Failed to load user stats for toast:', error);
+        }
+        
         const welcomeFrequency = localStorage.getItem('welcomeFrequency') || 'session';
         const lastWelcome = localStorage.getItem('lastWelcomeShown');
         const now = Date.now();
@@ -913,7 +932,7 @@ Thank you for joining our community!
             toast.className = 'welcome-back-toast';
             toast.innerHTML = `
                 <div class="toast-content">
-                    <span class="toast-avatar">${user.avatarEmoji}</span>
+                    <span class="toast-avatar">${user.avatarEmoji || '🍺'}</span>
                     <div class="toast-text">
                         <strong>Welcome back, ${user.nickname}!</strong>
                         <small>${user.points || 0} points • Level ${user.level || 1}</small>
