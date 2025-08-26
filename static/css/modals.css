@@ -37,7 +37,6 @@
    display: flex;
    flex-direction: column;
    overflow: hidden;
-   border-radius: var(--radius-xl);
    z-index: var(--z-modal-content);
    background: var(--bg-white);
    box-shadow: var(--shadow-xl);
@@ -45,10 +44,9 @@
    min-height: 0;
    width: -webkit-fill-available;
    height: -webkit-fill-available;
-    background: white;
+   background: white;
    border-radius: var(--radius-xl);
    width: 90%;
-   max-width: 500px;
    
    /* Updated max-height with safe areas and dynamic viewport */
    max-height: 85vh;
