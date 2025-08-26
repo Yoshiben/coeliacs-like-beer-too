@@ -5,26 +5,20 @@
 
    /* Your NEW primary gradient - the mesh effect */
     --primary-gradient: 
-        radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.9) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.9) 0%, transparent 50%),
-        radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.3) 0%, transparent 70%);
+         radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.9) 0%, transparent 50%),
+         radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.9) 0%, transparent 50%),
+         rgba(0, 0, 0, 0.85);
     
     /* Keep the old one as "simple" for when you need solid/clear gradient */
     --primary-gradient-simple: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    
-    /* Dark version for overlays */
-    --primary-gradient-dark: 
-        radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.9) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.9) 0%, transparent 50%),
-        rgba(0, 0, 0, 0.85);
-        
+          
     /* Light version for backgrounds */
     --primary-gradient-light: 
-        radial-gradient(circle at 30% 70%, rgba(102, 126, 234, 0.15) 0%, transparent 60%),
-        radial-gradient(circle at 70% 30%, rgba(118, 75, 162, 0.15) 0%, transparent 60%),
-        rgba(255, 255, 255, 0.95);
+         radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.9) 0%, transparent 50%),
+         radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.9) 0%, transparent 50%),
+         radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.3) 0%, transparent 70%);
 
-   --nav-height: clamp(56px, 8vh, 81px);  
+   --nav-height: clamp(50px, 8vh, 81px);  
    
    /* Z-Index Scale */
    --z-base: 1;
