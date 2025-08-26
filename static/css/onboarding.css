@@ -267,42 +267,39 @@
 
 
 
-
-
-
 /* =============================
    NICKNAME MODAL
    ============================= */
-
 .nickname-content {
-    padding: var(--space-sm);
+    padding: clamp(1rem, 2vw, 1.5rem);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.75rem, 2vh, 1rem);
 }
 
 .nickname-header {
-   text-align: center;
+    text-align: center;
 }
 
 .nickname-header h2 {
-   margin: 0;
-   background: var(--primary-gradient);
-   -webkit-background-clip: text;
-   -webkit-text-fill-color: transparent;
-   background-clip: text;
+    margin: 0;
+    font-size: clamp(1.3rem, 3.5vw, 1.8rem);
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .nickname-header p {
-   color: var(--text-primary);
-   margin: var(--space-sm);
+    color: var(--text-primary);
+    font-size: clamp(0.85rem, 2.5vw, 1rem);
+    margin: clamp(0.5rem, 1.5vh, 0.75rem) 0;
 }
-
-/* .input-group {
-    margin-bottom: 1.5rem;
-} */
 
 #nicknameInput {
     width: 100%;
-    padding: 1rem;
-    font-size: 1.1rem;
+    padding: clamp(0.75rem, 2vw, 1rem);
+    font-size: clamp(0.95rem, 2.5vw, 1.1rem);
     border: 2px solid var(--border-light);
     border-radius: 12px;
     transition: all 0.3s ease;
@@ -315,47 +312,36 @@
 }
 
 .input-status {
-   margin: var(--space-sm);
-   font-size: 0.85rem;
-   min-height: 20px;
-}
-
-.status-checking {
-    color: var(--text-secondary);
-}
-
-.status-success {
-    color: var(--green);
-    font-weight: 600;
-}
-
-.status-error {
-    color: var(--red);
+    margin: clamp(0.25rem, 1vh, 0.5rem) 0;
+    font-size: clamp(0.75rem, 2vw, 0.85rem);
+    min-height: 20px;
 }
 
 .suggestions-section {
-   display: flex;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.5rem, 1vh, 0.75rem);
 }
 
 .suggestions-section p {
-    font-size: 0.9rem;
+    font-size: clamp(0.8rem, 2vw, 0.9rem);
     color: var(--text-secondary);
-    margin-bottom: 0.75rem;
+    margin: 0;
 }
 
 .suggestion-chips {
-   display: flex;
-   flex-wrap: wrap;
-   gap: 0.5rem;
-   justify-content: space-around;
+    display: flex;
+    flex-wrap: wrap;
+    gap: clamp(0.4rem, 1vw, 0.6rem);
+    justify-content: center;
 }
 
 .chip {
-    padding: 0.5rem 1rem;
+    padding: clamp(0.4rem, 1.5vw, 0.5rem) clamp(0.8rem, 2vw, 1rem);
     background: var(--bg-secondary);
     border: 1px solid var(--border-light);
     border-radius: 20px;
-    font-size: 0.9rem;
+    font-size: clamp(0.8rem, 2vw, 0.9rem);
     cursor: pointer;
     transition: all 0.3s ease;
 }
@@ -368,28 +354,34 @@
 }
 
 .avatar-section {
-    margin-bottom: var(--space-sm);
+    margin-bottom: clamp(0.5rem, 1vh, 0.75rem);
 }
 
 .avatar-section p {
-    font-size: 0.9rem;
+    font-size: clamp(0.8rem, 2vw, 0.9rem);
     color: var(--text-secondary);
-    margin-bottom: 0.75rem;
+    margin-bottom: clamp(0.5rem, 1vh, 0.75rem);
 }
+
 .avatar-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 0.5rem;
+    gap: clamp(0.4rem, 1vw, 0.6rem);
+    max-width: 350px;  /* Prevent avatars from getting huge */
+    margin: 0 auto;
 }
 
 .avatar-option {
     aspect-ratio: 1;
     border: 2px solid var(--border-light);
     border-radius: 12px;
-    font-size: 1.5rem;
+    font-size: clamp(1.2rem, 3vw, 1.5rem);
     cursor: pointer;
     background: white;
     transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .avatar-option:hover {
@@ -403,27 +395,50 @@
 }
 
 .privacy-section {
-   display: grid;
-   grid-template-columns: repeat(2, 1fr);
-   gap: 0.5rem;
-   margin-bottom: var(--space-sm);
-   padding: 1rem;
-   background: var(--bg-secondary);
-   border-radius: var(--radius);
-}
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(0.4rem, 1vw, 0.5rem);
+    padding: clamp(0.75rem, 2vw, 1rem);
+    background: var(--bg-secondary);
+    border-radius: var(--radius);
 }
 
 .privacy-item {
-    font-size: 0.85rem;
+    font-size: clamp(0.75rem, 2vw, 0.85rem);
     color: var(--text-secondary);
 }
 
 .nickname-actions {
-   display: flex;
-   gap: 1rem;
-   justify-content: space-between;
-   padding-bottom: var(--space-sm);
+    display: flex;
+    gap: clamp(0.75rem, 2vw, 1rem);
+    justify-content: center;
+    padding: clamp(0.75rem, 2vh, 1rem) 0;
 }
+
+/* Ensure button in actions scales too */
+.nickname-actions .btn {
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    padding: clamp(0.6rem, 2vh, 0.8rem) clamp(1.2rem, 3vw, 1.8rem);
+}
+
+/* Small screen adjustment */
+@media (max-width: 360px) {
+    .privacy-section {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* Community Benefits Styles */
 .benefits-content {
@@ -574,6 +589,16 @@
     from { opacity: 1; }
     to { opacity: 0; }
 }
+
+
+
+
+
+
+
+
+
+
 
 /* Welcome Back Toast */
 .welcome-back-toast {
