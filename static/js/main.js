@@ -733,15 +733,15 @@ const App = {
         const modules = {
             search: App.getModule('search'),
             modal: App.getModule('modal'),
-            modalManager: App.getModule('modalManager'), // ADD THIS
+            modalManager: App.getModule('modalManager'),
             helpers: App.getModule('helpers'),
             map: App.getModule('map'),
             form: App.getModule('form'),
             tracking: App.getModule('tracking'),
             nav: App.getModule('nav'),
-            breweries: App.getModule('breweries'), // ADD THIS LINE
-            community: App.getModule('community'),  // AND THIS IF NEEDED
-            toast: App.getModule('toast')  // ADD THIS
+            breweries: App.getModule('breweries'),
+            community: App.getModule('community'), 
+            toast: App.getModule('toast')
         };
 
         console.log('📦 Available modules:', Object.keys(modules).filter(key => modules[key] !== null));
@@ -757,6 +757,19 @@ const App = {
     
     // Action handler map - split into logical groups
     actionHandlers: {
+        // Onboarding action handlers
+        'confirm-age': (el, modules) => {
+            OnboardingFlow.confirmAge();
+        },
+        
+        'under-age': (el, modules) => {
+            OnboardingFlow.underAge();
+        },
+
+
+
+
+        
         // Search actions
         'location-search': (el, modules) => {
             modules.nav?.setPageContext('search-modal'); // Set context to search-modal
