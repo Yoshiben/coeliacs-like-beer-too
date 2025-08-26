@@ -2,7 +2,10 @@
    ONBOARDING.CSS - Complete Onboarding Styles
    ================================================================================ */
 
-/* Base Modal Styles */
+/* ============================
+   AGE GATE MODAL
+   ============================ */
+
 .onboarding-modal {
     z-index: var(--z-onboarding);
     /* Dark gradient background - looks premium */
@@ -100,60 +103,69 @@
 
 
 
+/* =============================
+   WELCOME MODAL
+   ============================= */
+
 /* Welcome Screen Styles */
 .welcome-content {
-   position: relative;
-   display: flex;
-   flex-direction: column;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(var(--space-sm), 2vh, var(--space-lg));
 }
 
 .skip-btn {
     position: absolute;
-    top: 1rem;
-    right: 1rem;
+    top: clamp(var(--space-sm), 2vw, var(--space-lg));
+    right: clamp(var(--space-sm), 2vw, var(--space-lg));
     background: none;
     border: none;
     color: var(--text-secondary);
     cursor: pointer;
-    font-size: 0.9rem;
-    padding: 0.5rem 1rem;
-    transition: all 0.3s ease;
+    font-size: clamp(var(--text-sm), 2.5vw, var(--text-md));
+    padding: clamp(var(--space-xs), 1.5vw, var(--space-sm)) clamp(var(--space-sm), 2vw, var(--space-lg));
+    transition: all var(--transition);
 }
 
 .skip-btn:hover {
     color: var(--text-primary);
     background: rgba(0, 0, 0, 0.05);
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
 }
 
 .welcome-hero {
-   text-align: center;
-   padding-bottom: var(--space-sm);
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    padding: clamp(var(--space-sm), 2vh, var(--space-lg));
+    gap: clamp(var(--space-xs), 1vh, var(--space-md));
 }
 
 .welcome-emoji {
-    font-size: var(--text-4xl);
+    font-size: clamp(2rem, 8vh, 3.5rem);
 }
 
 .welcome-hero h1 {
-    font-size: 1.5rem;
+    font-size: clamp(1.2rem, 4vw, 1.8rem);
     line-height: 1.3;
     background: var(--primary-gradient);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-   margin: 0;
+    margin: 0;
 }
 
 .founder-section {
-   background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(109, 40, 217, 0.05) 100%);
-   border-radius: var(--radius);
-   padding: var(--space-xs);
-   margin: var(--space-md);
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(109, 40, 217, 0.05) 100%);
+    border-radius: var(--radius);
+    padding: clamp(var(--space-md), 3vw, var(--space-xl));
+    margin: clamp(var(--space-sm), 2vw, var(--space-lg));
 }
 
 .founder-message p {
-    margin-bottom: 0.75rem;
+    font-size: clamp(var(--text-sm), 2.5vw, var(--text-md));
+    margin-bottom: clamp(var(--space-xs), 1.5vh, var(--space-md));
     color: var(--text-secondary);
     line-height: 1.6;
 }
@@ -161,20 +173,21 @@
 .founder-message p:first-child {
     color: var(--text-primary);
     font-weight: 600;
+    font-size: clamp(var(--text-md), 3vw, var(--text-lg));
 }
 
 .stats-showcase {
-   display: grid;
-   grid-template-columns: repeat(3, 1fr);
-   margin: var(--space-sm);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(var(--space-xs), 1.5vw, var(--space-md));
+    margin: clamp(var(--space-sm), 2vw, var(--space-lg));
 }
 
 .stat-item {
-   text-align: center;
-   padding: 1rem;
-   border-radius: 12px;
-   background: var(--bg-secondary);
-   flex-direction: column;
+    text-align: center;
+    padding: clamp(var(--space-sm), 2vw, var(--space-lg));
+    border-radius: var(--radius);
+    background: var(--bg-secondary);
 }
 
 .stat-item.featured {
@@ -184,41 +197,86 @@
 
 .stat-number {
     display: block;
-    font-size: 1.5rem;
+    font-size: clamp(1rem, 3.5vw, 1.5rem);
     font-weight: 700;
-    margin-bottom: 0.25rem;
+    margin-bottom: clamp(var(--space-xxs), 0.5vh, var(--space-xs));
 }
 
 .stat-label {
-    font-size: 0.85rem;
+    font-size: clamp(var(--text-xs), 2vw, var(--text-sm));
     opacity: 0.8;
 }
 
 .features-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-xs);
+    gap: clamp(var(--space-xs), 1.5vw, var(--space-md));
+    margin: clamp(var(--space-sm), 2vw, var(--space-lg));
 }
 
 .feature-item {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem;
+    gap: clamp(var(--space-xs), 1.5vw, var(--space-md));
+    padding: clamp(var(--space-sm), 2vw, var(--space-md));
     background: var(--bg-secondary);
-    border-radius: 10px;
+    border-radius: var(--radius-sm);
 }
 
 .feature-emoji {
-    font-size: 1.5rem;
+    font-size: clamp(1.2rem, 4vw, 1.5rem);
+    flex-shrink: 0;
 }
 
 .feature-text {
-    font-size: 0.9rem;
+    font-size: clamp(var(--text-xs), 2.5vw, var(--text-sm));
     color: var(--text-secondary);
 }
 
-/* Nickname Selection Styles */
+.btn-hero {
+    font-size: clamp(var(--text-md), 3vw, var(--text-lg)) !important;
+    font-weight: 600;
+    padding: clamp(var(--space-md), 2.5vh, var(--space-xl)) clamp(var(--space-xl), 4vw, var(--space-3xl));
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all var(--transition-slow);
+    margin: clamp(var(--space-sm), 2vh, var(--space-lg));
+}
+
+.btn-hero:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3);
+}
+
+.btn-hero:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Responsive breakpoint for very small screens */
+@media (max-width: 360px) {
+    .stats-showcase {
+        grid-template-columns: 1fr;
+    }
+    
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+
+
+
+
+
+
+
+/* =============================
+   NICKNAME MODAL
+   ============================= */
+
 .nickname-content {
     padding: var(--space-sm);
 }
@@ -492,25 +550,7 @@
     font-size: 1.1rem !important;
 }
 
-.btn-hero {
-   font-size: 1.1rem !important;
-   font-weight: 600;
-   border: none;
-   border-radius: var(--radius);
-   cursor: pointer;
-   transition: all 0.3s ease;
-   margin: var(--space-md);
-}
 
-.btn-hero:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3);
-}
-
-.btn-hero:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
 
 /* Animations */
 @keyframes fadeIn {
