@@ -22,7 +22,7 @@
          radial-gradient(circle at 25% 75%, rgba(255, 152, 0, 1) 0%, transparent 45%),  /* Pure orange */    
          radial-gradient(circle at 75% 25%, rgba(255, 111, 0, 1) 0%, transparent 45%),  /* Deep orange */    
          radial-gradient(circle at 50% 50%, rgba(255, 140, 0, 0.5) 0%, transparent 70%), /* Third orange layer! */    
-         rgba(0, 0, 0, 0.6)
+         rgba(0, 0, 0, 0.6);
 
    --nav-height: clamp(50px, 8vh, 81px);  
    
