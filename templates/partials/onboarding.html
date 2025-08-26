@@ -1,20 +1,18 @@
 <!-- ============================================================================ -->
-<!-- ONBOARDING.HTML - All onboarding flow modals and components                 -->
-<!-- Includes: Age gate, Welcome, Nickname, Sign-in, Passcode, Benefits          -->
+<!-- ONBOARDING.HTML - Refactored with specific modal classes                    -->
+<!-- Each modal now has its own unique class for better control                  -->
 <!-- ============================================================================ -->
 
 <!-- Age Gate Modal -->
-<div id="ageGateModal" class="modal onboarding-modal" style="display: none;">
-    <div class="modal-content onboarding-modal-content">
+<div id="ageGateModal" class="modal-overlay age-gate-modal" style="display: none;">
+    <div class="modal-container age-gate-container">
         
-        <div class="modal-header onboarding-modal-header">
-            <div class="age-gate-logo">
-                <span class="logo-emoji">🍺</span>
-                <h1>Coeliacs Like Beer Too!</h1>
-            </div>
+        <div class="age-gate-header">
+            <span class="age-gate-emoji">🍺</span>
+            <h1 class="age-gate-title">Coeliacs Like Beer Too!</h1>
         </div>
         
-        <div class="age-gate-content">           
+        <div class="age-gate-body">           
             <div class="age-gate-message">
                 <h2>Hold up there, beer lover!</h2>
                 <p>This site contains content about alcoholic beverages.</p>
@@ -41,24 +39,22 @@
 </div>
 
 <!-- Welcome Modal -->
-<div id="welcomeModal" class="modal onboarding-modal" style="display: none;">
-    <div class="modal-content onboarding-modal-content">
-
-        <div class="modal-header onboarding-modal-header">
-            <div class="welcome-hero">
-                <span class="welcome-emoji">🎉</span>
-                <h1>Welcome to the UK's Biggest<br>GF Beer Community!</h1>
-                <button class="skip-btn" data-action="skip-welcome">Skip →</button>
-            </div>
+<div id="welcomeModal" class="modal-overlay welcome-modal" style="display: none;">
+    <div class="modal-container welcome-container">
+        
+        <button class="modal-skip-btn" data-action="skip-welcome">Skip →</button>
+        
+        <div class="welcome-header">
+            <span class="welcome-emoji">🎉</span>
+            <h1>Welcome to the UK's Biggest<br>GF Beer Community!</h1>
         </div>
         
-        <div class="welcome-content">
-             
+        <div class="welcome-body">
             <div class="founder-section">
                 <div class="founder-message">
-                    <p><strong>Hey there! Ben here - fellow coeliac and beer enthusiast.</strong></p>
+                    <p class="founder-greeting">Hey there! Ben here - fellow coeliac and beer enthusiast.</p>
                     <p>You know that feeling when the bartender suggests Corona as a "gluten-free option"? Yeah, me too 😩</p>
-                    <p>That's why I created this, with YOUR help, we're mapping every venue serving GF in the UK (and possibly, eventually, the world!) 🗺️🍺</p>
+                    <p>That's why I created this. With YOUR help, we're mapping every venue serving GF beer in the UK! 🗺️🍺</p>
                 </div>
             </div>
             
@@ -67,7 +63,7 @@
                     <span class="stat-number">67,000+</span>
                     <span class="stat-label">Venues</span>
                 </div>
-                <div class="stat-item featured">
+                <div class="stat-item stat-featured">
                     <span class="stat-number">50+</span>
                     <span class="stat-label">With GF Beer</span>
                 </div>
@@ -79,19 +75,19 @@
             
             <div class="features-grid">
                 <div class="feature-item">
-                    <span class="feature-emoji">📍</span>
+                    <span class="feature-icon">📍</span>
                     <span class="feature-text">Find GF beer near you</span>
                 </div>
                 <div class="feature-item">
-                    <span class="feature-emoji">🍺</span>
+                    <span class="feature-icon">🍺</span>
                     <span class="feature-text">Report your finds</span>
                 </div>
                 <div class="feature-item">
-                    <span class="feature-emoji">🏆</span>
+                    <span class="feature-icon">🏆</span>
                     <span class="feature-text">Earn points & badges</span>
                 </div>
                 <div class="feature-item">
-                    <span class="feature-emoji">💪</span>
+                    <span class="feature-icon">💪</span>
                     <span class="feature-text">Help the community</span>
                 </div>
             </div>
@@ -104,23 +100,23 @@
 </div>
 
 <!-- Nickname Selection Modal -->
-<div id="nicknameModal" class="modal onboarding-modal" style="display: none;">
-    <div class="modal-content onboarding-modal-content">
-
-        <div class="modal-header onboarding-modal-header">
-            <div class="welcome-hero">
-                <span class="welcome-emoji">🍻</span>
-                <h2>Choose Your Nickname!</h2>
-                <p>This is how you'll be known in the community</p>
-                <button class="skip-btn" data-action="skip-welcome">Skip →</button>
-            </div>
+<div id="nicknameModal" class="modal-overlay nickname-modal" style="display: none;">
+    <div class="modal-container nickname-container">
+        
+        <button class="modal-skip-btn" data-action="skip-nickname">Skip →</button>
+        
+        <div class="nickname-header">
+            <span class="nickname-emoji">🍻</span>
+            <h2>Choose Your Nickname!</h2>
+            <p>This is how you'll be known in the community</p>
         </div>
         
-        <div class="nickname-content">
+        <div class="nickname-body">
             <div class="nickname-form">
                 <div class="input-group">
                     <input type="text" 
                            id="nicknameInput" 
+                           class="nickname-input"
                            placeholder="e.g. HopHunter, GFBeerGuru, MaltMaster..."
                            maxlength="30"
                            data-action="check-nickname-input">
@@ -175,6 +171,210 @@
                     Create Account!
                 </button>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sign In Prompt Modal -->
+<div id="signInPromptModal" class="modal-overlay signin-prompt-modal" style="display: none;">
+    <div class="modal-container signin-prompt-container">
+        
+        <div class="signin-prompt-header">
+            <span class="signin-emoji">🔑</span>
+            <h2>Already have an account?</h2>
+            <p>Welcome back! Sign in to continue your beer journey</p>
+        </div>
+        
+        <div class="signin-prompt-body">
+            <div class="signin-options">
+                <button class="btn btn-primary btn-large" data-action="show-signin">
+                    🔓 Sign In with Passcode
+                </button>
+                <button class="btn btn-secondary btn-large" data-action="create-new-account">
+                    ✨ Create New Account
+                </button>
+            </div>
+            
+            <div class="signin-benefits">
+                <p>Why sign in?</p>
+                <ul>
+                    <li>📊 Keep your points and badges</li>
+                    <li>📱 Sync across all devices</li>
+                    <li>🏆 Track your contributions</li>
+                    <li>⭐ Unlock special features</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sign In Modal -->
+<div id="signInModal" class="modal-overlay signin-modal" style="display: none;">
+    <div class="modal-container signin-container">
+        
+        <button class="modal-close-btn" data-action="close-signin">×</button>
+        
+        <div class="signin-header">
+            <span class="signin-emoji">🔐</span>
+            <h2>Sign In</h2>
+            <p>Enter your details to continue</p>
+        </div>
+        
+        <div class="signin-body">
+            <form id="signInForm" class="signin-form">
+                <div class="input-group">
+                    <label for="signInNickname">Nickname</label>
+                    <input type="text" 
+                           id="signInNickname" 
+                           placeholder="Your nickname"
+                           required>
+                    <small>The nickname you chose when creating your account</small>
+                </div>
+                
+                <div class="input-group">
+                    <label for="signInPasscode">Passcode</label>
+                    <input type="text" 
+                           id="signInPasscode" 
+                           placeholder="Your 6-digit passcode"
+                           maxlength="6"
+                           pattern="[0-9]{6}"
+                           required>
+                    <small>The passcode you saved when creating your account</small>
+                </div>
+                
+                <div id="signInError" class="error-message" style="display: none;">
+                    <span class="error-icon">⚠️</span>
+                    <span class="error-text"></span>
+                </div>
+                
+                <div class="signin-actions">
+                    <button type="button" class="btn btn-secondary" data-action="back-to-prompt">
+                        Back
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        Sign In
+                    </button>
+                </div>
+            </form>
+            
+            <div class="signin-help">
+                <p>Forgot your passcode?</p>
+                <small>Unfortunately, we can't recover passcodes for security reasons. You'll need to create a new account.</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Passcode Display Modal -->
+<div id="passcodeModal" class="modal-overlay passcode-modal" style="display: none;">
+    <div class="modal-container passcode-container">
+        
+        <div class="passcode-header">
+            <span class="success-icon">✅</span>
+            <h2>Account Created!</h2>
+            <p>Save this passcode to access your account</p>
+        </div>
+        
+        <div class="passcode-body">
+            <div class="passcode-section">
+                <h3>Your Secure Passcode</h3>
+                <div class="passcode-display">
+                    <span id="passcodeValue">000000</span>
+                    <button class="btn btn-sm" data-action="copy-passcode">
+                        📋 Copy
+                    </button>
+                </div>
+                
+                <div class="passcode-warning">
+                    <p>⚠️ <strong>Important:</strong></p>
+                    <p>• This is the ONLY time you'll see this passcode</p>
+                    <p>• Save it somewhere safe (notes app, password manager)</p>
+                    <p>• You'll need it to sign in on other devices</p>
+                </div>
+                
+                <div class="passcode-actions">
+                    <button class="btn btn-secondary" data-action="download-passcode">
+                        💾 Save as Text File
+                    </button>
+                    <button class="btn btn-secondary" data-action="email-passcode">
+                        📧 Email to Myself
+                    </button>
+                </div>
+            </div>
+            
+            <div class="passcode-confirm">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="passcodeConfirmCheck">
+                    <span>I've saved my passcode somewhere safe</span>
+                </label>
+            </div>
+            
+            <button class="btn btn-primary btn-large" 
+                    id="continueFromPasscode" 
+                    data-action="continue-from-passcode" 
+                    disabled>
+                Continue to App →
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Community Benefits Modal -->
+<div id="benefitsModal" class="modal-overlay benefits-modal" style="display: none;">
+    <div class="modal-container benefits-container">
+        
+        <div class="benefits-header">
+            <div class="avatar-display" id="userAvatarDisplay">🍺</div>
+            <h2>Welcome, <span id="userNicknameDisplay">BeerLover</span>!</h2>
+            <p>You're now part of something special</p>
+        </div>
+        
+        <div class="benefits-body">
+            <div class="welcome-bonus">
+                <span class="bonus-icon">🎁</span>
+                <div class="bonus-text">
+                    <strong>Welcome Bonus!</strong>
+                    <span>You've earned 10 points for joining</span>
+                </div>
+            </div>
+            
+            <div class="benefits-grid">
+                <div class="benefit">
+                    <span class="benefit-icon">📍</span>
+                    <strong>Find GF Beer</strong>
+                    <small>Discover venues near you</small>
+                </div>
+                <div class="benefit">
+                    <span class="benefit-icon">🍺</span>
+                    <strong>Report Finds</strong>
+                    <small>15 points per beer</small>
+                </div>
+                <div class="benefit">
+                    <span class="benefit-icon">🏆</span>
+                    <strong>Earn Badges</strong>
+                    <small>Unlock achievements</small>
+                </div>
+                <div class="benefit">
+                    <span class="benefit-icon">📊</span>
+                    <strong>Track Progress</strong>
+                    <small>See your impact</small>
+                </div>
+            </div>
+            
+            <div class="first-badge">
+                <p>You've earned your first badge!</p>
+                <div class="badge-showcase">
+                    <span style="font-size: 3rem;">🌟</span>
+                    <div class="badge-info">
+                        <strong>Welcome Explorer</strong>
+                        <small>Joined the community</small>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary btn-large" data-action="start-exploring">
+                Start Exploring! 🗺️
+            </button>
         </div>
     </div>
 </div>
