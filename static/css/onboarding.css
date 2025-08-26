@@ -5,17 +5,11 @@
 /* Base Modal Styles */
 .onboarding-modal {
    z-index: var(--z-onboarding);
-   /*     animation: fadeIn 0.3s ease; */
 }
 
 .onboarding-modal-content {
    height: auto;
    justify-content: flex-start;
-   animation: slideUp 0.4s ease;   
-}
-
-.onboarding-modal-header {
-   padding: 0 0 var(--space-md);
    animation: slideUp 0.4s ease;   
 }
 
