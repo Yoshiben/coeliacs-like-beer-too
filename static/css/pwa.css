@@ -83,7 +83,7 @@
 }
 
 .ios-guide-icon {
-    font-size: 1.5rem;
+    font-size: var(--text-4xl);
 }
 
 .ios-guide-text {
@@ -295,11 +295,6 @@ body.pwa-mode {
     }
 }
 
-.ios-guide-icon {
-    font-size: 2.5rem;
-    margin-right: 1rem;
-}
-
 .ios-guide-text {
     flex: 1;
 }
@@ -408,10 +403,6 @@ body.pwa-mode {
 
 /* Responsive adjustments */
 @media (max-width: 400px) {
-    .ios-guide-icon {
-        font-size: 2rem;
-    }
-    
     .step-icon {
         display: none;
     }
@@ -458,13 +449,7 @@ body.pwa-mode {
 }
 
 #ios-install-guide .modal-header {
-    padding: 2rem 2rem 1rem;
-    text-align: center;
-}
-
-.ios-guide-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
+    padding: var(--space-md);
 }
 
 #ios-install-guide h2 {
@@ -595,16 +580,5 @@ body.pwa-mode {
     to {
         opacity: 1;
         transform: translateY(0);
-    }
-}
-
-/* Responsive adjustments */
-@media (max-width: 400px) {    
-    #ios-install-guide h2 {
-        font-size: 1.5rem;
-    }
-    
-    .ios-guide-icon {
-        font-size: 2.5rem;
     }
 }
