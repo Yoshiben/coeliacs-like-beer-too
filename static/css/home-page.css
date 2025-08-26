@@ -9,11 +9,7 @@
    -webkit-overflow-scrolling: touch;
    position: relative;
    z-index: 1;
-   background: 
-      radial-gradient(circle at 25% 75%, rgba(118, 75, 162, 0.2) 0%, transparent 40%),
-      radial-gradient(circle at 75% 25%, rgba(96, 96, 96, 0.6) 0%, transparent 50%),
-      radial-gradient(circle at 50% 20%, rgba(156, 163, 175, 0.4) 0%, transparent 60%),
-      rgba(209, 213, 219, 1);
+   background: var(--bg-home-page);
 }
 
 .hero-nav {
@@ -36,6 +32,10 @@
    background: var(--bg-card-home);
    gap: var(--space-md);
    padding: 0 var(--space-lg) var(--space-xs);
+   background: white;
+   box-shadow: var(--shadow-card-home);
+   border: 1px solid rgba(139, 92, 246, 0.07);
+   font-weight: 600;
 }
 .stat-pill.highlighted {
     background: var(--orange-gradient);
