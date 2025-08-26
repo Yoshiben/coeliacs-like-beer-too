@@ -1,0 +1,38 @@
+<!-- ============================================================================ -->
+<!-- ONBOARDING.HTML - All onboarding flow modals and components                 -->
+<!-- Includes: Age gate, Welcome, Nickname, Sign-in, Passcode, Benefits          -->
+<!-- ============================================================================ -->
+
+<!-- Age Gate Modal -->
+<div id="ageGateModal" class="onboarding-modal" style="display: none;">
+    <div class="onboarding-modal-content">
+        <div class="age-gate-content">
+            <div class="age-gate-logo">
+                <span class="logo-emoji">🍺</span>
+                <h1>Coeliacs Like Beer Too!</h1>
+            </div>
+            
+            <div class="age-gate-message">
+                <h2>Hold up there, beer lover!</h2>
+                <p>This site contains content about alcoholic beverages.</p>
+                <p class="age-question">Are you 18 or over?</p>
+            </div>
+            
+            <div class="age-gate-buttons">
+                <button class="btn btn-primary btn-large" data-action="confirm-age">
+                    ✅ Yes, I'm 18 or over
+                </button>
+                <button class="btn btn-secondary" data-action="under-age">
+                    ❌ Not yet
+                </button>
+            </div>
+            
+            <div class="age-gate-legal">
+                <p>By entering this site you agree to our 
+                   <a href="/terms" target="_blank">Terms</a> and 
+                   <a href="/privacy" target="_blank">Privacy Policy</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
