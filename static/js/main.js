@@ -766,6 +766,31 @@ const App = {
             OnboardingFlow.underAge();
         },
 
+        'skip-welcome': (el, modules) => {
+            OnboardingFlow.skipWelcome();
+        },
+        
+        'show-nickname-selection': (el, modules) => {
+            OnboardingFlow.showNicknameSelection();
+        },
+        
+        'skip-nickname': (el, modules) => {
+            OnboardingFlow.skipNickname();
+        },
+        
+        'generate-random-nickname': (el, modules) => {
+            OnboardingFlow.generateRandom();
+        },
+        
+        'use-nickname': (el, modules) => {
+            const nickname = el.dataset.nickname;
+            if (nickname) OnboardingFlow.useNickname(nickname);
+        },
+        
+        'save-nickname': (el, modules) => {
+            OnboardingFlow.saveNickname();
+        },
+
 
 
 
