@@ -9,7 +9,7 @@
 .onboarding-modal {
     z-index: var(--z-onboarding);
     /* Dark gradient background - looks premium */
-    background: var(--bg-onboarding);
+    background: var(--bg-overlay);
     backdrop-filter: blur(10px);
 }
 
