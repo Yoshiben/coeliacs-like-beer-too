@@ -18,11 +18,16 @@
          radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.9) 0%, transparent 50%),
          radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.3) 0%, transparent 70%);
 
-   --secondary-gradient:
-         radial-gradient(circle at 25% 75%, rgba(255, 152, 0, 1) 0%, transparent 45%),  /* Pure orange */    
-         radial-gradient(circle at 75% 25%, rgba(255, 111, 0, 1) 0%, transparent 45%),  /* Deep orange */    
-         radial-gradient(circle at 50% 50%, rgba(255, 140, 0, 0.5) 0%, transparent 70%), /* Third orange layer! */    
-         rgba(0, 0, 0, 0.6);
+   --bg-home-page:
+         radial-gradient(circle at 25% 75%, rgba(118, 75, 162, 0.2) 0%, transparent 40%),
+         radial-gradient(circle at 75% 25%, rgba(96, 96, 96, 0.6) 0%, transparent 50%),
+         radial-gradient(circle at 50% 20%, rgba(156, 163, 175, 0.4) 0%, transparent 60%),
+         rgba(209, 213, 219, 1);
+
+   --orange-gradient: 
+         radial-gradient(circle at 25% 75%, rgba(249, 115, 22, 0.9) 0%, transparent 50%),
+         radial-gradient(circle at 75% 25%, rgba(234, 88, 12, 0.9) 0%, transparent 50%),
+         rgba(0, 0, 0, 0.85);
 
    --nav-height: clamp(50px, 8vh, 81px);  
    
@@ -66,7 +71,7 @@
    --warning-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
    --info-gradient: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
    --purple-gradient: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-   --orange-gradient: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+   
    --currently-gradient: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
    
    /* Text Colors */
