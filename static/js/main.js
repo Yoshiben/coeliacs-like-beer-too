@@ -781,6 +781,24 @@ const App = {
         'generate-random-nickname': (el, modules) => {
             OnboardingFlow.generateRandom();
         },
+
+        'check-nickname-input': (el, modules) => {
+            const value = el.value;
+            if (window.OnboardingFlow && window.OnboardingFlow.checkNickname) {
+                window.OnboardingFlow.checkNickname(value);
+            }
+        },
+        
+        'select-avatar': (el, modules) => {
+            const emoji = el.dataset.emoji;
+            if (emoji && window.OnboardingFlow && window.OnboardingFlow.selectAvatar) {
+                // Pass the emoji and the element (for the event target)
+                const event = { target: el };
+                window.event = event; // Temporarily set for the selectAvatar function
+                window.OnboardingFlow.selectAvatar(emoji);
+                window.event = null; // Clean up
+            }
+        },
         
         'use-nickname': (el, modules) => {
             const nickname = el.dataset.nickname;
