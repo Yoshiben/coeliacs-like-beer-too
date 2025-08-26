@@ -40,7 +40,7 @@
     font-size: clamp(2rem, 8vh, 4rem);
     margin-bottom: clamp(0.25rem, 1vh, 1rem);
     animation: bounce 2s infinite;
-
+}
 
 @keyframes bounce {
     0%, 100% { transform: translateY(0); }
@@ -527,11 +527,6 @@
         opacity: 1;
         transform: translateY(0);
     }
-}
-
-@keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
 }
 
 .fade-out {
