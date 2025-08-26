@@ -211,10 +211,12 @@
 }
 
 .stat-item {
-    text-align: center;
-    padding: clamp(0.75rem, 2vw, 1rem);
-    border-radius: 12px;
-    background: #f8f9fa;
+   display: flex;
+   flex-direction: column;
+   text-align: center;
+   padding: clamp(0.75rem, 2vw, 1rem);
+   border-radius: 12px;
+   background: #f8f9fa;
 }
 
 .stat-featured {
