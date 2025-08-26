@@ -119,7 +119,7 @@
                            class="nickname-input"
                            placeholder="e.g. HopHunter, GFBeerGuru, MaltMaster..."
                            maxlength="30"
-                           data-action="check-nickname-input">
+                           oninput="OnboardingFlow.checkNickname(this.value)">
                     <div class="input-status" id="nicknameStatus"></div>
                     <div id="nicknameOptions" class="nickname-options-box" style="display: none;"></div>
                 </div>
