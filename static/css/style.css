@@ -96,6 +96,7 @@
    --radius-lg: 15px;
    --radius-xl: 20px;
    --radius-pill: 25px;
+   --radius-circle: 50%;
    
    /* Shadows */
    --shadow-xs: 0 2px 4px rgba(0, 0, 0, 0.2);
