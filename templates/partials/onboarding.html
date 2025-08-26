@@ -102,3 +102,79 @@
         </div>
     </div>
 </div>
+
+<!-- Nickname Selection Modal -->
+<div id="nicknameModal" class="modal onboarding-modal" style="display: none;">
+    <div class="modal-content onboarding-modal-content">
+
+        <div class="modal-header onboarding-modal-header">
+            <div class="welcome-hero">
+                <span class="welcome-emoji">🍻</span>
+                <h2>Choose Your Nickname!</h2>
+                <p>This is how you'll be known in the community</p>
+                <button class="skip-btn" data-action="skip-welcome">Skip →</button>
+            </div>
+        </div>
+        
+        <div class="nickname-content">
+            <div class="nickname-form">
+                <div class="input-group">
+                    <input type="text" 
+                           id="nicknameInput" 
+                           placeholder="e.g. HopHunter, GFBeerGuru, MaltMaster..."
+                           maxlength="30"
+                           data-action="check-nickname-input">
+                    <div class="input-status" id="nicknameStatus"></div>
+                    <div id="nicknameOptions" class="nickname-options-box" style="display: none;"></div>
+                </div>
+                
+                <div class="suggestions-section">
+                    <p>Need inspiration? Try these:</p>
+                    <div class="suggestion-chips">
+                        <button class="chip" data-action="generate-random-nickname">
+                            🎲 Random
+                        </button>
+                        <button class="chip" data-action="use-nickname" data-nickname="BeerExplorer">
+                            BeerExplorer
+                        </button>
+                        <button class="chip" data-action="use-nickname" data-nickname="HopHunter">
+                            HopHunter
+                        </button>
+                        <button class="chip" data-action="use-nickname" data-nickname="GFGuru">
+                            GFGuru
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="avatar-section">
+                    <p>Choose your avatar:</p>
+                    <div class="avatar-grid" id="avatarGrid">
+                        <button class="avatar-option active" data-action="select-avatar" data-emoji="🍺">🍺</button>
+                        <button class="avatar-option" data-action="select-avatar" data-emoji="🍻">🍻</button>
+                        <button class="avatar-option" data-action="select-avatar" data-emoji="⭐">⭐</button>
+                        <button class="avatar-option" data-action="select-avatar" data-emoji="🎯">🎯</button>
+                        <button class="avatar-option" data-action="select-avatar" data-emoji="🚀">🚀</button>
+                        <button class="avatar-option" data-action="select-avatar" data-emoji="💪">💪</button>
+                        <button class="avatar-option" data-action="select-avatar" data-emoji="🏆">🏆</button>
+                        <button class="avatar-option" data-action="select-avatar" data-emoji="🦄">🦄</button>
+                        <button class="avatar-option" data-action="select-avatar" data-emoji="🎨">🎨</button>
+                        <button class="avatar-option" data-action="select-avatar" data-emoji="🌟">🌟</button>
+                    </div>
+                </div>
+                
+                <div class="privacy-section">
+                    <div class="privacy-item">✅ No email required</div>
+                    <div class="privacy-item">✅ No personal data</div>
+                    <div class="privacy-item">✅ Secure passcode access</div>
+                    <div class="privacy-item">✅ Sync across devices!</div>
+                </div>
+            </div>
+            
+            <div class="nickname-actions">
+                <button class="btn btn-primary" id="saveNicknameBtn" data-action="save-nickname" disabled>
+                    Create Account!
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
