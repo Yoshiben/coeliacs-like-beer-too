@@ -1058,3 +1058,58 @@ input[readonly] {
     cursor: not-allowed !important;
     color: #6c757d;
 }
+
+/* Welcome Modal Container Fix */
+.onboarding-modal-content {
+    height: fit-content;
+    max-height: min(90vh, 750px);
+    width: min(90vw, 480px);  /* Max width to prevent stretching on large screens */
+    margin: auto;
+    overflow-y: auto;
+}
+
+/* Welcome Content Constraints */
+.welcome-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(0.75rem, 2vh, 1.25rem);  /* Reduced gap */
+    max-width: 100%;
+}
+
+/* Fix the stats grid */
+.stats-showcase {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(0.5rem, 1.5vw, 1rem);
+    margin: clamp(0.75rem, 2vw, 1.25rem);
+}
+
+/* Prevent stat items from getting huge */
+.stat-number {
+    font-size: clamp(1rem, 2.5vw, 1.25rem);  /* Reduced max size */
+}
+
+/* Fix features grid */
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(0.5rem, 1.5vw, 0.75rem);
+    margin: clamp(0.75rem, 2vw, 1.25rem);
+}
+
+/* Constrain founder section */
+.founder-section {
+    padding: clamp(1rem, 2vw, 1.25rem);  /* Reduced max padding */
+    margin: clamp(0.75rem, 2vw, 1rem);
+}
+
+/* Fix hero emoji */
+.welcome-emoji {
+    font-size: clamp(2rem, 6vw, 3rem);  /* Capped at 3rem */
+}
+
+/* Fix hero title */
+.welcome-hero h1 {
+    font-size: clamp(1.2rem, 3.5vw, 1.6rem);  /* Reduced max */
+}
