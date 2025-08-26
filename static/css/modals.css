@@ -39,7 +39,8 @@
    max-height: calc(clamp(400px, 85dvh, 800px) - env(safe-area-inset-top) - env(safe-area-inset-bottom));
    
    /* Dynamic padding that scales */
-   padding: clamp(var(--space-lg), 3vw, var(--space-3xl));
+/*    padding: clamp(var(--space-lg), 3vw, var(--space-3xl)); */
+   padding: 0;
    
    /* Clean up properties */
    display: flex;
