@@ -76,7 +76,6 @@
    color: var(--white);
    padding: var(--space-lg);
    flex-shrink: 0;
-   padding: var(--space-xl);
    border-bottom: 1px solid var(--modal-line);
    position: sticky;
    top: 0;
