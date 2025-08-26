@@ -1165,3 +1165,566 @@ input[readonly] {
 .avatar-option {
     font-size: clamp(1.2rem, 4vh, 1.8rem);  /* vh scaling */
 }
+
+
+
+
+
+
+
+
+
+
+
+/* // NEW VERSION // */
+
+/* ================================================================================
+   REFACTORED ONBOARDING.CSS - Each modal has its own class
+   Better organization, no conflicts, easier responsive design
+   ================================================================================ */
+
+/* ============================
+   SHARED BASE STYLES
+   ============================ */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    display: none;
+    z-index: var(--z-onboarding, 9999);
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    align-items: center;
+    justify-content: center;
+    
+    /* Dynamic padding that accounts for safe areas */
+    padding: clamp(1rem, 4vw, 2rem);
+    padding: max(clamp(1rem, 4vw, 2rem), env(safe-area-inset-top))
+            max(clamp(1rem, 4vw, 2rem), env(safe-area-inset-right))
+            max(clamp(1rem, 4vw, 2rem), env(safe-area-inset-bottom))
+            max(clamp(1rem, 4vw, 2rem), env(safe-area-inset-left));
+}
+
+.modal-overlay.active {
+    display: flex;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-container {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    width: 100%;
+    position: relative;
+    animation: slideUp 0.4s ease;
+    max-height: 90vh;
+    max-height: 90dvh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Shared button styles */
+.modal-skip-btn,
+.modal-close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.modal-close-btn {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    border-radius: 50%;
+}
+
+.modal-skip-btn:hover,
+.modal-close-btn:hover {
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ============================
+   AGE GATE MODAL
+   ============================ */
+.age-gate-container {
+    max-width: min(90vw, 450px);
+    max-height: min(85vh, 600px);
+}
+
+.age-gate-header {
+    background: var(--primary-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+    padding: clamp(1.5rem, 4vh, 2.5rem);
+    text-align: center;
+    color: white;
+}
+
+.age-gate-emoji {
+    display: block;
+    font-size: clamp(2.5rem, 8vw, 4rem);
+    margin-bottom: 0.5rem;
+    animation: bounce 2s infinite;
+}
+
+.age-gate-title {
+    font-size: clamp(1.5rem, 5vw, 2rem);
+    margin: 0;
+    color: white;
+}
+
+.age-gate-body {
+    padding: clamp(1.5rem, 4vw, 2rem);
+    text-align: center;
+}
+
+.age-gate-message h2 {
+    font-size: clamp(1.2rem, 4vw, 1.5rem);
+    color: var(--text-primary, #333);
+    margin: 0 0 1rem;
+}
+
+.age-gate-message p {
+    font-size: clamp(0.9rem, 3vw, 1rem);
+    color: var(--text-secondary, #666);
+    margin: 0.5rem 0;
+}
+
+.age-question {
+    font-size: clamp(1.1rem, 3.5vw, 1.25rem);
+    font-weight: 600;
+    color: var(--text-primary, #333);
+    margin: 1.5rem 0;
+}
+
+.age-gate-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 1.5rem 0;
+}
+
+.age-gate-buttons .btn {
+    min-width: 140px;
+    padding: 0.8rem 1.5rem;
+    font-size: clamp(0.9rem, 3vw, 1rem);
+}
+
+.age-gate-legal {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e0e0e0;
+    font-size: clamp(0.7rem, 2.5vw, 0.8rem);
+    color: #999;
+}
+
+/* ============================
+   WELCOME MODAL
+   ============================ */
+.welcome-container {
+    max-width: min(95vw, 500px);
+    max-height: min(90vh, 750px);
+}
+
+.welcome-header {
+    background: var(--primary-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+    padding: clamp(2rem, 5vh, 3rem) clamp(1.5rem, 4vw, 2rem);
+    text-align: center;
+    color: white;
+}
+
+.welcome-emoji {
+    display: block;
+    font-size: clamp(2.5rem, 7vw, 3.5rem);
+    margin-bottom: 1rem;
+}
+
+.welcome-header h1 {
+    font-size: clamp(1.3rem, 4vw, 1.8rem);
+    line-height: 1.3;
+    margin: 0;
+    color: white;
+}
+
+.welcome-body {
+    padding: clamp(1rem, 3vw, 1.5rem);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1rem, 3vh, 1.5rem);
+}
+
+.founder-section {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(109, 40, 217, 0.05) 100%);
+    border-radius: 12px;
+    padding: clamp(1rem, 3vw, 1.5rem);
+}
+
+.founder-greeting {
+    font-weight: 600;
+    color: var(--text-primary, #333);
+    font-size: clamp(1rem, 3vw, 1.1rem);
+}
+
+.founder-message p {
+    font-size: clamp(0.875rem, 2.5vw, 0.95rem);
+    color: var(--text-secondary, #666);
+    line-height: 1.6;
+    margin: 0.5rem 0;
+}
+
+.stats-showcase {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(0.5rem, 2vw, 1rem);
+}
+
+.stat-item {
+    text-align: center;
+    padding: clamp(0.75rem, 2vw, 1rem);
+    border-radius: 12px;
+    background: #f8f9fa;
+}
+
+.stat-featured {
+    background: var(--primary-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+    color: white;
+}
+
+.stat-number {
+    display: block;
+    font-size: clamp(1rem, 3vw, 1.25rem);
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    font-size: clamp(0.7rem, 2vw, 0.85rem);
+    opacity: 0.8;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(0.5rem, 2vw, 0.75rem);
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: clamp(0.6rem, 2vw, 0.8rem);
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.feature-icon {
+    font-size: clamp(1.2rem, 3.5vw, 1.5rem);
+    flex-shrink: 0;
+}
+
+.feature-text {
+    font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+    color: var(--text-secondary, #666);
+}
+
+.btn-hero {
+    width: 100%;
+    padding: clamp(0.8rem, 3vh, 1.2rem);
+    font-size: clamp(1rem, 3vw, 1.1rem);
+    font-weight: 600;
+    margin-top: 0.5rem;
+}
+
+/* ============================
+   NICKNAME MODAL
+   ============================ */
+.nickname-container {
+    max-width: min(95vw, 480px);
+    max-height: min(90vh, 700px);
+}
+
+.nickname-header {
+    background: var(--primary-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+    padding: clamp(1.5rem, 4vh, 2rem);
+    text-align: center;
+    color: white;
+}
+
+.nickname-emoji {
+    display: block;
+    font-size: clamp(2rem, 6vw, 3rem);
+    margin-bottom: 0.5rem;
+}
+
+.nickname-header h2 {
+    font-size: clamp(1.3rem, 4vw, 1.6rem);
+    margin: 0 0 0.5rem;
+    color: white;
+}
+
+.nickname-header p {
+    font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+    opacity: 0.95;
+    margin: 0;
+}
+
+.nickname-body {
+    padding: clamp(1rem, 3vw, 1.5rem);
+}
+
+.nickname-input {
+    width: 100%;
+    padding: clamp(0.7rem, 2vw, 1rem);
+    font-size: clamp(0.95rem, 3vw, 1.1rem);
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.nickname-input:focus {
+    border-color: var(--purple, #667eea);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.suggestions-section {
+    margin-top: 1.5rem;
+}
+
+.suggestions-section p {
+    font-size: clamp(0.85rem, 2.5vw, 0.9rem);
+    color: var(--text-secondary, #666);
+    margin-bottom: 0.75rem;
+}
+
+.suggestion-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.chip {
+    padding: clamp(0.4rem, 1.5vw, 0.5rem) clamp(0.7rem, 2vw, 1rem);
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.chip:hover {
+    background: var(--purple, #667eea);
+    color: white;
+    border-color: var(--purple, #667eea);
+    transform: translateY(-2px);
+}
+
+.avatar-section {
+    margin-top: 1.5rem;
+}
+
+.avatar-section p {
+    font-size: clamp(0.85rem, 2.5vw, 0.9rem);
+    color: var(--text-secondary, #666);
+    margin-bottom: 0.75rem;
+}
+
+.avatar-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: clamp(0.4rem, 1.5vw, 0.6rem);
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+.avatar-option {
+    aspect-ratio: 1;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    font-size: clamp(1.2rem, 3.5vw, 1.8rem);
+    cursor: pointer;
+    background: white;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar-option:hover {
+    border-color: var(--purple, #667eea);
+    transform: scale(1.1);
+}
+
+.avatar-option.active {
+    border-color: var(--purple, #667eea);
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(109, 40, 217, 0.1) 100%);
+}
+
+.privacy-section {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 12px;
+    margin-top: 1.5rem;
+}
+
+.privacy-item {
+    font-size: clamp(0.75rem, 2.5vw, 0.85rem);
+    color: var(--text-secondary, #666);
+}
+
+.nickname-actions {
+    display: flex;
+    justify-content: center;
+    padding: clamp(1rem, 3vh, 1.5rem) clamp(1rem, 3vw, 1.5rem);
+    background: #f8f9fa;
+    margin: 0 calc(-1 * clamp(1rem, 3vw, 1.5rem));
+    margin-top: 1.5rem;
+}
+
+/* ============================
+   ANIMATIONS
+   ============================ */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+/* ============================
+   RESPONSIVE BREAKPOINTS
+   ============================ */
+
+/* Small phones */
+@media (max-width: 360px) {
+    .stats-showcase {
+        grid-template-columns: 1fr;
+    }
+    
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .privacy-section {
+        grid-template-columns: 1fr;
+    }
+    
+    .age-gate-buttons,
+    .nickname-actions {
+        flex-direction: column;
+    }
+    
+    .age-gate-buttons .btn,
+    .nickname-actions .btn {
+        width: 100%;
+    }
+}
+
+/* Tablets */
+@media (min-width: 768px) {
+    .modal-container {
+        max-height: 85vh;
+    }
+    
+    .welcome-container {
+        max-width: 550px;
+    }
+    
+    .nickname-container {
+        max-width: 500px;
+    }
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+    .modal-overlay {
+        padding: 2rem;
+    }
+    
+    .modal-container {
+        max-height: 80vh;
+    }
+    
+    .age-gate-container {
+        max-width: 480px;
+    }
+    
+    .welcome-container {
+        max-width: 600px;
+    }
+}
+
+/* Landscape on mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+    .modal-container {
+        max-height: 95vh;
+        max-height: 95dvh;
+    }
+    
+    .age-gate-header,
+    .welcome-header,
+    .nickname-header {
+        padding: 1rem;
+    }
+    
+    .age-gate-emoji,
+    .welcome-emoji,
+    .nickname-emoji {
+        display: none;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
