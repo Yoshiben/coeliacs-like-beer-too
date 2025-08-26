@@ -114,6 +114,7 @@
    justify-content: center;
    font-size: var(--text-xl);
    transition: all var(--transition);
+   z-index: var(--z-status-modals);
 }
 
 .modal-close:hover {
