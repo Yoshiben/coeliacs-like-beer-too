@@ -124,72 +124,13 @@ export const OnboardingFlow = (() => {
     
     const showNicknameSelection = () => {
         closeModal('welcome');
-        
-        const modal = createModal('nickname', `
-            <div class="nickname-content">
-                <button class="skip-btn" onclick="OnboardingFlow.skipNickname()">Skip →</button>
-                
-                <div class="nickname-header">
-                    <span class="welcome-emoji">🍻</span>
-                    <h2>Choose Your Nickname!</h2>
-                    <p>This is how you'll be known in the community</p>
-                </div>
-                
-                <div class="nickname-form">
-                    <div class="input-group">
-                        <input type="text" 
-                               id="nicknameInput" 
-                               placeholder="e.g. HopHunter, GFBeerGuru, MaltMaster..."
-                               maxlength="30"
-                               oninput="OnboardingFlow.checkNickname(this.value)">
-                        <div class="input-status" id="nicknameStatus"></div>
-                    </div>
-                    
-                    <div class="suggestions-section">
-                        <p>Need inspiration? Try these:</p>
-                        <div class="suggestion-chips">
-                            <button class="chip" onclick="OnboardingFlow.generateRandom()">
-                                🎲 Random
-                            </button>
-                            <button class="chip" onclick="OnboardingFlow.useNickname('BeerExplorer')">
-                                BeerExplorer
-                            </button>
-                            <button class="chip" onclick="OnboardingFlow.useNickname('HopHunter')">
-                                HopHunter
-                            </button>
-                            <button class="chip" onclick="OnboardingFlow.useNickname('GFGuru')">
-                                GFGuru
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="avatar-section">
-                        <p>Choose your avatar:</p>
-                        <div class="avatar-grid">
-                            ${['🍺', '🍻', '⭐', '🎯', '🚀', '💪', '🏆', '🦄', '🎨', '🌟'].map(emoji => 
-                                `<button class="avatar-option ${emoji === '🍺' ? 'active' : ''}" 
-                                         onclick="OnboardingFlow.selectAvatar('${emoji}')">${emoji}</button>`
-                            ).join('')}
-                        </div>
-                    </div>
-                    
-                    <div class="privacy-section">
-                        <div class="privacy-item">✅ No email required</div>
-                        <div class="privacy-item">✅ No personal data</div>
-                        <div class="privacy-item">✅ Secure passcode access</div>
-                        <div class="privacy-item">✅ Sync across devices!</div>
-                    </div>
-                </div>
-                
-                <div class="nickname-actions">
-                    <button class="btn btn-primary" id="saveNicknameBtn" onclick="OnboardingFlow.saveNickname()" disabled>
-                        Create Account!
-                    </button>
-                </div>
-            </div>
-        `);
-        
-        document.body.appendChild(modal);
+        const modal = document.getElementById('nicknameModal');
+        if (modal) {
+            modal.style.display = 'flex';
+            modal.classList.add('active');
+            // Populate avatar grid
+            populateAvatarGrid();
+        }
     };
     
     const checkNickname = (value) => {
