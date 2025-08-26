@@ -101,21 +101,21 @@
 
 /* Modal Close Button */
 .modal-close {
+   display: flex;
    position: absolute;
-   right: var(--space-lg);
-   top: 50%;
+   right: 2vh;
+   top: 4vh;
    transform: translateY(-50%);
    background: rgba(255, 255, 255, 0.2);
    border-radius: 50%;
-   width: 36px;
-   height: 36px;
+   width: 4vh;
+   height: 4vh;
    border: none;
    color: var(--white);
-   cursor: pointer;
-   display: flex;
+   cursor: pointer;  
    align-items: center;
    justify-content: center;
-   font-size: var(--text-lg);
+   font-size: var(--text-xl);
    transition: all var(--transition);
 }
 
