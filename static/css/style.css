@@ -73,6 +73,7 @@
    --bg-orange: rgba(249, 115, 22, 0.1);
    --bg-glass: rgba(255, 255, 255, 0.1);
    --bg-section: rgba(248, 250, 252, 0.8);
+   --bg-modal: rgba(0, 0, 0, 0.7);
    --bg-overlay: rgba(0, 0, 0, 0.8);
    --bg-home: rgba(248, 249, 250, 1);
    --bg-card-home: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(248, 249, 250, 0.8) 100%);
