@@ -9,6 +9,7 @@
 }
 
 .onboarding-modal-content {
+   height: auto;
    justify-content: flex-start;
    animation: slideUp 0.4s ease;   
 }
@@ -28,7 +29,7 @@
 .age-gate-logo h1 {
    font-size: var(--text-3xl);
    color: white;
-   margin: 0;
+   margin: var(--space-md);
 }
 
 /* Age Gate Styles */
@@ -65,17 +66,23 @@
 }
 
 .age-gate-legal {
-    margin-top: 2rem;
-    padding-top: 2rem;
-    border-top: 1px solid var(--border-light);
-    font-size: 0.85rem;
-    color: var(--text-muted);
+   margin-top: var(--space-lg);
+   padding-top: var(--space-lg);
+   border-top: 1px solid var(--border-light);
+   font-size: var(--text-sm);
+   color: var(--text-muted);
 }
 
 .age-gate-legal a {
     color: var(--purple);
     text-decoration: none;
 }
+
+
+
+
+
+
 
 /* Welcome Screen Styles */
 .welcome-content {
@@ -598,9 +605,6 @@
 
 /* Mobile Responsiveness */
 @media (max-width: 640px) {
-    .onboarding-modal-content {
-        width: 95%;
-    }
     
     .benefits-content {
         padding: 1.5rem;
