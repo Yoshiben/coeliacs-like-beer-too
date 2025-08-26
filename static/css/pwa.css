@@ -295,15 +295,6 @@ body.pwa-mode {
     }
 }
 
-
-/* iOS Install Guide Modal */
-#ios-install-guide {
-    background: rgba(0, 0, 0, 0.7);
-    z-index: 10000;
-    animation: fadeIn 0.3s ease;
-}
-
-
 .ios-guide-icon {
     font-size: 2.5rem;
     margin-right: 1rem;
@@ -433,29 +424,13 @@ body.pwa-mode {
 
 /* iOS Install Guide Modal - Better Styling */
 #ios-install-guide {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: rgba(0, 0, 0, 0.7);
     z-index: 10000;
-    backdrop-filter: blur(10px);
+    animation: fadeIn 0.3s ease;
 }
 
 #ios-install-guide .modal-content {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 24px;
-    padding: 0;
-    max-width: 380px;
-    width: 90%;
-    margin: 0 auto;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-    position: relative;
-    color: white;
+    background: var(--primary-gradient);
 }
 
 #ios-install-guide .modal-close {
@@ -624,11 +599,7 @@ body.pwa-mode {
 }
 
 /* Responsive adjustments */
-@media (max-width: 400px) {
-    #ios-install-guide .modal-content {
-        width: 95%;
-    }
-    
+@media (max-width: 400px) {    
     #ios-install-guide h2 {
         font-size: 1.5rem;
     }
