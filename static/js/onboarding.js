@@ -96,64 +96,12 @@ export const OnboardingFlow = (() => {
     // ================================
     
     const showWelcome = () => {
-        const modal = createModal('welcome', `
-            <div class="welcome-content">
-                <button class="skip-btn" onclick="OnboardingFlow.skipWelcome()">Skip →</button>
-                
-                <div class="welcome-hero">
-                    <span class="welcome-emoji">🎉</span>
-                    <h1>Welcome to the UK's Biggest<br>GF Beer Community!</h1>
-                </div>
-                
-                <div class="founder-section">
-                    <div class="founder-message">
-                        <p><strong>Hi there! I'm Ben, the founder of Coeliacs Like Beer Too, and fellow coeliac.</strong></p>
-                        <p>I decided to build this web-app after one too many disappointing pub visits with no gf beer, or being told that Corona was gluten free 😡.</p>
-                        <p>Now, with YOUR help, we're mapping every venue serving GF in the UK (and possibly, eventually, the world!) 🌍</p>
-                    </div>
-                </div>
-                
-                <div class="stats-showcase">
-                    <div class="stat-item">
-                        <span class="stat-number">67,000+</span>
-                        <span class="stat-label">Venues</span>
-                    </div>
-                    <div class="stat-item featured">
-                        <span class="stat-number">50+</span>
-                        <span class="stat-label">With GF Beer</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-number">Growing</span>
-                        <span class="stat-label">Community</span>
-                    </div>
-                </div>
-                
-                <div class="features-grid">
-                    <div class="feature-item">
-                        <span class="feature-emoji">📍</span>
-                        <span class="feature-text">Find GF beer near you</span>
-                    </div>
-                    <div class="feature-item">
-                        <span class="feature-emoji">🍺</span>
-                        <span class="feature-text">Report your finds</span>
-                    </div>
-                    <div class="feature-item">
-                        <span class="feature-emoji">🏆</span>
-                        <span class="feature-text">Earn points & badges</span>
-                    </div>
-                    <div class="feature-item">
-                        <span class="feature-emoji">💪</span>
-                        <span class="feature-text">Help the community</span>
-                    </div>
-                </div>
-                
-                <button class="btn btn-primary btn-hero" onclick="OnboardingFlow.showNicknameSelection()">
-                    Join the Community! →
-                </button>
-            </div>
-        `);
-        
-        document.body.appendChild(modal);
+        closeModal('ageGate');
+        const modal = document.getElementById('welcomeModal');
+        if (modal) {
+            modal.style.display = 'flex';
+            modal.classList.add('active');
+        }
     };
     
     const skipWelcome = () => {
