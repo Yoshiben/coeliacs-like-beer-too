@@ -121,7 +121,7 @@
     right: clamp(var(--space-sm), 2vw, var(--space-lg));
     background: none;
     border: none;
-    color: var(--text-secondary);
+    color: white;
     cursor: pointer;
     font-size: clamp(var(--text-sm), 2.5vw, var(--text-md));
     padding: clamp(var(--space-xs), 1.5vw, var(--space-sm)) clamp(var(--space-sm), 2vw, var(--space-lg));
@@ -147,13 +147,10 @@
 }
 
 .welcome-hero h1 {
-    font-size: clamp(1.2rem, 4vw, 1.8rem);
-    line-height: 1.3;
-    background: var(--primary-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin: 0;
+   font-size: clamp(1.2rem, 4vw, 1.8rem);
+   line-height: 1.3;
+   color: white;
+   margin: 0;
 }
 
 .founder-section {
