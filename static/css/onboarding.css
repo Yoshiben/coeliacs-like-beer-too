@@ -1138,3 +1138,30 @@ input[readonly] {
 .welcome-hero h1 {
     font-size: clamp(1.2rem, 3.5vw, 1.6rem);  /* Reduced max */
 }
+
+
+/* Welcome Modal - matching age gate pattern */
+.welcome-hero h1 {
+    font-size: clamp(1.25rem, 5vh, 2rem);  /* Using vh like age gate */
+}
+
+.stat-number {
+    font-size: clamp(1rem, 4vh, 1.5rem);  /* vh instead of vw */
+}
+
+.founder-message p {
+    font-size: clamp(0.875rem, 2vh, 1rem);  /* vh for vertical scaling */
+}
+
+/* Nickname Modal - same pattern */
+.nickname-header h2 {
+    font-size: clamp(1.25rem, 5vh, 2rem);  /* vh like age gate */
+}
+
+#nicknameInput {
+    font-size: clamp(0.9rem, 2.5vh, 1.1rem);  /* vh for consistency */
+}
+
+.avatar-option {
+    font-size: clamp(1.2rem, 4vh, 1.8rem);  /* vh scaling */
+}
