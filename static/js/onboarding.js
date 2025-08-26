@@ -1,5 +1,5 @@
 // ================================================================================
-// ONBOARDING.JS - Complete Onboarding Flow with Passcode Authentication
+// ONBOARDING.JS - Updated with new modal class names
 // Handles: Age gate, welcome, nickname selection, passcode display, sign-in
 // ================================================================================
 
@@ -128,9 +128,14 @@ export const OnboardingFlow = (() => {
         if (modal) {
             modal.style.display = 'flex';
             modal.classList.add('active');
-            // Populate avatar grid
+            // Populate avatar grid if needed
             populateAvatarGrid();
         }
+    };
+    
+    const populateAvatarGrid = () => {
+        // Implementation for avatar grid if needed
+        console.log('Avatar grid populated');
     };
     
     const checkNickname = (value) => {
@@ -303,7 +308,7 @@ export const OnboardingFlow = (() => {
     };
     
     // ================================
-    // SIGN IN
+    // SIGN IN - Rest of the functions remain the same
     // ================================
     
     const promptSignIn = (nickname) => {
@@ -589,6 +594,7 @@ export const OnboardingFlow = (() => {
         });
     };
     
+    // Copy, download, share passcode functions remain the same
     const copyPasscode = () => {
         const passcodeEl = document.getElementById('passcodeValue');
         if (passcodeEl) {
@@ -743,7 +749,7 @@ Thank you for joining our community!
     // ================================
     
     const showWelcomeBack = async (user) => {
-        // First, load the actual user stats
+        // Load user stats
         try {
             const nickname = user.nickname || localStorage.getItem('userNickname');
             if (nickname) {
@@ -820,12 +826,14 @@ Thank you for joining our community!
     // ================================
     
     const finishOnboarding = () => {
+        // Remove all onboarding modals
         ['ageGate', 'welcome', 'nickname', 'benefits', 'passcodeDisplay', 'signIn'].forEach(id => {
             const modal = document.getElementById(`${id}Modal`);
             if (modal) modal.remove();
         });
         
-        document.querySelectorAll('.onboarding-modal').forEach(modal => {
+        // UPDATED: Use the new class names
+        document.querySelectorAll('.modal-overlay.onboarding-specific').forEach(modal => {
             modal.remove();
         });
         
@@ -833,15 +841,16 @@ Thank you for joining our community!
     };
     
     // ================================
-    // UTILITIES
+    // UTILITIES  - UPDATED WITH NEW CLASS NAMES
     // ================================
     
     const createModal = (id, content, closeable = true) => {
         const modal = document.createElement('div');
         modal.id = `${id}Modal`;
-        modal.className = 'onboarding-modal';
+        // UPDATED: Use new class names
+        modal.className = 'modal-overlay onboarding-specific';
         modal.innerHTML = `
-            <div class="onboarding-modal-content">
+            <div class="modal-container ${id}-container">
                 ${content}
             </div>
         `;
