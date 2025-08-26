@@ -74,38 +74,11 @@ export const OnboardingFlow = (() => {
     // ================================
     
     const showAgeGate = () => {
-        const modal = createModal('ageGate', `
-            <div class="age-gate-content">
-                <div class="age-gate-logo">
-                    <span class="logo-emoji">🍺</span>
-                    <h1>Coeliacs Like Beer Too!</h1>
-                </div>
-                
-                <div class="age-gate-message">
-                    <h2>Hold up there, beer lover!</h2>
-                    <p>This site contains content about alcoholic beverages.</p>
-                    <p class="age-question">Are you 18 or over?</p>
-                </div>
-                
-                <div class="age-gate-buttons">
-                    <button class="btn btn-primary btn-large" onclick="OnboardingFlow.confirmAge()">
-                        ✅ Yes, I'm 18 or over
-                    </button>
-                    <button class="btn btn-secondary" onclick="OnboardingFlow.underAge()">
-                        ❌ Not yet
-                    </button>
-                </div>
-                
-                <div class="age-gate-legal">
-                    <p>By entering this site you agree to our 
-                       <a href="/terms" target="_blank">Terms</a> and 
-                       <a href="/privacy" target="_blank">Privacy Policy</a>
-                    </p>
-                </div>
-            </div>
-        `, false);
-        
-        document.body.appendChild(modal);
+        const modal = document.getElementById('ageGateModal');
+        if (modal) {
+            modal.style.display = 'flex';
+            modal.classList.add('active');
+        }
     };
     
     const confirmAge = () => {
