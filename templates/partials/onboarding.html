@@ -1,6 +1,6 @@
 <!-- ============================================================================ -->
-<!-- ONBOARDING.HTML - Refactored with specific modal classes                    -->
-<!-- Each modal now has its own unique class for better control                  -->
+<!-- ONBOARDING.HTML - Fixed with consistent data-action attributes              -->
+<!-- No more onclick handlers - everything uses data-action                      -->
 <!-- ============================================================================ -->
 
 <!-- Age Gate Modal -->
@@ -119,7 +119,7 @@
                            class="nickname-input"
                            placeholder="e.g. HopHunter, GFBeerGuru, MaltMaster..."
                            maxlength="30"
-                           oninput="OnboardingFlow.checkNickname(this.value)">
+                           data-action="check-nickname-input">
                     <div class="input-status" id="nicknameStatus"></div>
                     <div id="nicknameOptions" class="nickname-options-box" style="display: none;"></div>
                 </div>
@@ -175,39 +175,6 @@
     </div>
 </div>
 
-<!-- Sign In Prompt Modal -->
-<div id="signInPromptModal" class="modal-overlay signin-prompt-modal" style="display: none;">
-    <div class="modal-container signin-prompt-container">
-        
-        <div class="signin-prompt-header">
-            <span class="signin-emoji">🔑</span>
-            <h2>Already have an account?</h2>
-            <p>Welcome back! Sign in to continue your beer journey</p>
-        </div>
-        
-        <div class="signin-prompt-body">
-            <div class="signin-options">
-                <button class="btn btn-primary btn-large" data-action="show-signin">
-                    🔓 Sign In with Passcode
-                </button>
-                <button class="btn btn-secondary btn-large" data-action="create-new-account">
-                    ✨ Create New Account
-                </button>
-            </div>
-            
-            <div class="signin-benefits">
-                <p>Why sign in?</p>
-                <ul>
-                    <li>📊 Keep your points and badges</li>
-                    <li>📱 Sync across all devices</li>
-                    <li>🏆 Track your contributions</li>
-                    <li>⭐ Unlock special features</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Sign In Modal -->
 <div id="signInModal" class="modal-overlay signin-modal" style="display: none;">
     <div class="modal-container signin-container">
@@ -221,7 +188,7 @@
         </div>
         
         <div class="signin-body">
-            <form id="signInForm" class="signin-form">
+            <div class="signin-form">
                 <div class="input-group">
                     <label for="signInNickname">Nickname</label>
                     <input type="text" 
@@ -235,9 +202,9 @@
                     <label for="signInPasscode">Passcode</label>
                     <input type="text" 
                            id="signInPasscode" 
-                           placeholder="Your 6-digit passcode"
+                           placeholder="Your 6-character passcode"
                            maxlength="6"
-                           pattern="[0-9]{6}"
+                           style="text-transform: uppercase; letter-spacing: 0.2em; font-family: monospace;"
                            required>
                     <small>The passcode you saved when creating your account</small>
                 </div>
@@ -248,18 +215,18 @@
                 </div>
                 
                 <div class="signin-actions">
-                    <button type="button" class="btn btn-secondary" data-action="back-to-prompt">
-                        Back
+                    <button type="button" class="btn btn-secondary" data-action="back-to-nickname">
+                        ← Back
                     </button>
-                    <button type="submit" class="btn btn-primary">
+                    <button type="button" class="btn btn-primary" data-action="perform-signin">
                         Sign In
                     </button>
                 </div>
-            </form>
+            </div>
             
             <div class="signin-help">
                 <p>Forgot your passcode?</p>
-                <small>Unfortunately, we can't recover passcodes for security reasons. You'll need to create a new account.</small>
+                <small>Unfortunately, we can't recover passcodes for security reasons. You'll need to create a new account with a different nickname.</small>
             </div>
         </div>
     </div>
@@ -304,7 +271,7 @@
             
             <div class="passcode-confirm">
                 <label class="checkbox-label">
-                    <input type="checkbox" id="passcodeConfirmCheck">
+                    <input type="checkbox" id="passcodeConfirmCheck" data-action="toggle-passcode-confirm">
                     <span>I've saved my passcode somewhere safe</span>
                 </label>
             </div>
