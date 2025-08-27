@@ -787,6 +787,33 @@ const App = {
                 OnboardingFlow.underAge();
             }
         },
+
+        // PWA actions
+        'show-install-guide': (el, modules) => {
+            if (window.OnboardingFlow) {
+                OnboardingFlow.showInstallGuide();
+            }
+        },
+        'skip-pwa-benefits': (el, modules) => {
+            if (window.OnboardingFlow) {
+                OnboardingFlow.skipPWABenefits();
+            }
+        },
+        'close-ios-guide': (el, modules) => {
+            if (window.OnboardingFlow) {
+                OnboardingFlow.closeIOSGuide();
+            }
+        },
+        'close-android-guide': (el, modules) => {
+            if (window.OnboardingFlow) {
+                OnboardingFlow.closeAndroidGuide();
+            }
+        },
+        'android-install-now': (el, modules) => {
+            if (window.OnboardingFlow) {
+                OnboardingFlow.installAndroid();
+            }
+        }
         
         // Welcome actions
         'skip-welcome': (el, modules) => {
