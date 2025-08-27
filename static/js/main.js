@@ -838,6 +838,8 @@ const App = {
         },
         
         'save-nickname': (el, modules) => {
+            console.log('🔍 OnboardingFlow exists?', !!window.OnboardingFlow);
+            console.log('🔍 saveNickname exists?', !!window.OnboardingFlow?.saveNickname);
             if (window.OnboardingFlow) {
                 OnboardingFlow.saveNickname();
             }
