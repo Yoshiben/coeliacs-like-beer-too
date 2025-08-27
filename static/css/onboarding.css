@@ -813,3 +813,727 @@
         color: #d1d5db;
     }
 }
+
+/* ============================
+   PASSCODE MODAL - BEAUTIFUL REDESIGN
+   ============================ */
+
+.passcode-container {
+    max-width: min(95vw, 440px);
+    max-height: min(90vh, 650px);
+}
+
+.passcode-header {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    padding: clamp(2rem, 5vh, 3rem);
+    text-align: center;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Animated background effect */
+.passcode-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: rotate 8s linear infinite;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.success-icon {
+    display: block;
+    font-size: clamp(3rem, 8vw, 4rem);
+    margin-bottom: 1rem;
+    animation: successPop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+    position: relative;
+    z-index: 1;
+}
+
+@keyframes successPop {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.passcode-header h2 {
+    font-size: clamp(1.5rem, 4vw, 1.8rem);
+    margin: 0 0 0.5rem;
+    color: white;
+    position: relative;
+    z-index: 1;
+}
+
+.passcode-header p {
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    opacity: 0.95;
+    margin: 0;
+    position: relative;
+    z-index: 1;
+}
+
+.passcode-body {
+    padding: clamp(1.5rem, 4vw, 2rem);
+}
+
+.passcode-section {
+    margin-bottom: 1.5rem;
+}
+
+.passcode-section h3 {
+    font-size: clamp(1rem, 3vw, 1.1rem);
+    color: #374151;
+    margin: 0 0 1rem;
+    text-align: center;
+    font-weight: 600;
+}
+
+.passcode-display {
+    background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+    border: 2px solid #d1d5db;
+    border-radius: 16px;
+    padding: clamp(1.2rem, 3vw, 1.5rem);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.passcode-display::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+}
+
+#passcodeValue {
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Courier New', monospace;
+    font-size: clamp(1.8rem, 5vw, 2.2rem);
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    color: #111827;
+    text-align: center;
+    flex: 1;
+    user-select: all;
+    cursor: text;
+}
+
+.passcode-display .btn-sm {
+    padding: 0.6rem 1rem;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+    font-weight: 600;
+    color: #4b5563;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.passcode-display .btn-sm:hover {
+    background: #10b981;
+    color: white;
+    border-color: #10b981;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.passcode-warning {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: 1px solid #fbbf24;
+    border-radius: 12px;
+    padding: clamp(1rem, 3vw, 1.25rem);
+    margin-bottom: 1.5rem;
+}
+
+.passcode-warning p {
+    margin: 0 0 0.5rem;
+    font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+    color: #92400e;
+    line-height: 1.5;
+}
+
+.passcode-warning p:first-child {
+    font-weight: 700;
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.passcode-warning p:last-child {
+    margin-bottom: 0;
+}
+
+.passcode-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.passcode-actions .btn-secondary {
+    flex: 1;
+    min-width: 140px;
+    padding: clamp(0.7rem, 2vw, 0.9rem);
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+    font-weight: 600;
+    color: #4b5563;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.passcode-actions .btn-secondary:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.passcode-confirm {
+    background: #f9fafb;
+    border-radius: 12px;
+    padding: clamp(1rem, 3vw, 1.25rem);
+    margin-bottom: 1.5rem;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    color: #374151;
+    font-weight: 500;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #d1d5db;
+    border-radius: 6px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.checkbox-label input[type="checkbox"]:checked {
+    background: #10b981;
+    border-color: #10b981;
+    position: relative;
+}
+
+.checkbox-label input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+#continueFromPasscode {
+    width: 100%;
+    padding: clamp(1rem, 3vw, 1.25rem);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: clamp(1rem, 3vw, 1.1rem);
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+#continueFromPasscode::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+#continueFromPasscode:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+#continueFromPasscode:not(:disabled):hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+#continueFromPasscode:disabled {
+    background: #d1d5db;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Success animation when checkbox is checked */
+.checkbox-label input[type="checkbox"]:checked ~ span {
+    color: #10b981;
+    font-weight: 600;
+}
+
+/* Mobile optimizations */
+@media (max-width: 400px) {
+    .passcode-actions {
+        flex-direction: column;
+    }
+    
+    .passcode-actions .btn-secondary {
+        width: 100%;
+    }
+    
+    #passcodeValue {
+        font-size: 1.5rem;
+        letter-spacing: 0.2em;
+    }
+    
+    .passcode-display {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .passcode-display .btn-sm {
+        width: 100%;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .passcode-modal .modal-container {
+        background: #1f2937;
+        color: #f9fafb;
+    }
+    
+    .passcode-section h3 {
+        color: #f3f4f6;
+    }
+    
+    .passcode-display {
+        background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+        border-color: #6b7280;
+    }
+    
+    #passcodeValue {
+        color: #f9fafb;
+    }
+    
+    .passcode-warning {
+        background: linear-gradient(135deg, #78350f 0%, #92400e 100%);
+        border-color: #b45309;
+    }
+    
+    .passcode-warning p {
+        color: #fef3c7;
+    }
+    
+    .passcode-confirm {
+        background: #374151;
+    }
+    
+    .checkbox-label {
+        color: #e5e7eb;
+    }
+}
+
+/* Add a celebration confetti effect */
+@keyframes confetti {
+    0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+.passcode-modal.celebrate::after {
+    content: '🎉';
+    position: absolute;
+    top: -50px;
+    left: 50%;
+    font-size: 2rem;
+    animation: confetti 3s ease-out;
+}
+
+/* ============================
+   BENEFITS/COMMUNITY WELCOME MODAL
+   ============================ */
+
+.benefits-container {
+    max-width: min(95vw, 460px);
+    max-height: min(90vh, 700px);
+}
+
+.benefits-header {
+    background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+    padding: clamp(2rem, 5vh, 2.5rem);
+    text-align: center;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Animated sparkles effect */
+.benefits-header::before,
+.benefits-header::after {
+    content: '✨';
+    position: absolute;
+    font-size: 1.5rem;
+    animation: sparkle 3s ease-in-out infinite;
+}
+
+.benefits-header::before {
+    top: 20%;
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.benefits-header::after {
+    top: 30%;
+    right: 10%;
+    animation-delay: 1.5s;
+}
+
+@keyframes sparkle {
+    0%, 100% { 
+        opacity: 0;
+        transform: scale(0.5) rotate(0deg);
+    }
+    50% { 
+        opacity: 1;
+        transform: scale(1) rotate(180deg);
+    }
+}
+
+.avatar-display {
+    display: inline-block;
+    width: clamp(60px, 15vw, 80px);
+    height: clamp(60px, 15vw, 80px);
+    background: white;
+    border-radius: 50%;
+    font-size: clamp(2rem, 6vw, 2.5rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    animation: avatarBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes avatarBounce {
+    0% { transform: scale(0) rotate(-180deg); }
+    50% { transform: scale(1.1) rotate(90deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+.benefits-header h2 {
+    font-size: clamp(1.4rem, 4vw, 1.7rem);
+    margin: 0 0 0.5rem;
+    color: white;
+}
+
+.benefits-header h2 span {
+    color: #fbbf24;
+    font-weight: 700;
+}
+
+.benefits-header p {
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    opacity: 0.95;
+    margin: 0;
+}
+
+.benefits-body {
+    padding: clamp(1.5rem, 4vw, 2rem);
+}
+
+.welcome-bonus {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: 2px solid #fbbf24;
+    border-radius: 16px;
+    padding: clamp(1rem, 3vw, 1.25rem);
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    overflow: hidden;
+    animation: slideInLeft 0.5s ease;
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.welcome-bonus::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(251, 191, 36, 0.1) 0%, transparent 70%);
+    animation: rotate 10s linear infinite;
+}
+
+.bonus-icon {
+    font-size: clamp(2rem, 6vw, 2.5rem);
+    animation: giftWiggle 2s ease-in-out infinite;
+}
+
+@keyframes giftWiggle {
+    0%, 100% { transform: rotate(-5deg); }
+    50% { transform: rotate(5deg); }
+}
+
+.bonus-text {
+    flex: 1;
+}
+
+.bonus-text strong {
+    display: block;
+    font-size: clamp(1rem, 3vw, 1.1rem);
+    color: #92400e;
+    margin-bottom: 0.25rem;
+}
+
+.bonus-text span {
+    font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+    color: #78350f;
+}
+
+.benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(0.75rem, 2vw, 1rem);
+    margin-bottom: 1.5rem;
+}
+
+.benefit {
+    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: clamp(1rem, 3vw, 1.25rem);
+    text-align: center;
+    transition: all 0.3s ease;
+    animation: fadeInUp 0.5s ease backwards;
+}
+
+.benefit:nth-child(1) { animation-delay: 0.1s; }
+.benefit:nth-child(2) { animation-delay: 0.2s; }
+.benefit:nth-child(3) { animation-delay: 0.3s; }
+.benefit:nth-child(4) { animation-delay: 0.4s; }
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.benefit:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    background: white;
+}
+
+.benefit-icon {
+    display: block;
+    font-size: clamp(2rem, 5vw, 2.5rem);
+    margin-bottom: 0.5rem;
+}
+
+.benefit strong {
+    display: block;
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    color: #111827;
+    margin-bottom: 0.25rem;
+}
+
+.benefit small {
+    display: block;
+    font-size: clamp(0.75rem, 2vw, 0.85rem);
+    color: #6b7280;
+}
+
+.first-badge {
+    background: linear-gradient(135deg, #ddd6fe 0%, #c4b5fd 100%);
+    border-radius: 16px;
+    padding: clamp(1.25rem, 3vw, 1.5rem);
+    text-align: center;
+    margin-bottom: 1.5rem;
+    border: 2px solid #a78bfa;
+    animation: badgeReveal 0.6s ease backwards;
+    animation-delay: 0.5s;
+}
+
+@keyframes badgeReveal {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.first-badge p {
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    color: #5b21b6;
+    margin: 0 0 1rem;
+    font-weight: 600;
+}
+
+.badge-showcase {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    background: white;
+    border-radius: 12px;
+    padding: clamp(0.75rem, 2vw, 1rem);
+}
+
+.badge-showcase > span {
+    animation: badgeBounce 1s ease infinite alternate;
+}
+
+@keyframes badgeBounce {
+    from { transform: translateY(0); }
+    to { transform: translateY(-5px); }
+}
+
+.badge-info {
+    text-align: left;
+}
+
+.badge-info strong {
+    display: block;
+    font-size: clamp(1rem, 3vw, 1.1rem);
+    color: #5b21b6;
+    margin-bottom: 0.25rem;
+}
+
+.badge-info small {
+    font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+    color: #7c3aed;
+}
+
+.benefits-body .btn-large {
+    width: 100%;
+    padding: clamp(1rem, 3vw, 1.25rem);
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: clamp(1rem, 3vw, 1.1rem);
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
+}
+
+.benefits-body .btn-large:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+}
+
+.benefits-body .btn-large::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.benefits-body .btn-large:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+/* Mobile adjustments */
+@media (max-width: 400px) {
+    .benefits-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .badge-showcase {
+        flex-direction: column;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .benefits-modal .modal-container {
+        background: #1f2937;
+    }
+    
+    .benefit {
+        background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+        border-color: #6b7280;
+    }
+    
+    .benefit:hover {
+        background: #4b5563;
+    }
+    
+    .benefit strong {
+        color: #f3f4f6;
+    }
+    
+    .benefit small {
+        color: #d1d5db;
+    }
+}
