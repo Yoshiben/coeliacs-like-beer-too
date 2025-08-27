@@ -908,8 +908,6 @@ const App = {
             if (window.OnboardingFlow) {
                 OnboardingFlow.finishOnboarding();
             }
-            // Could also trigger other actions like opening the search overlay
-            modules.modalManager?.open('searchOverlay');
         },
 
 
