@@ -867,6 +867,171 @@ Website: https://coeliacslikebeer.co.uk
         
         window.dispatchEvent(new Event('onboardingComplete'));
     };
+
+
+    // ============================
+    // COOKIE CONSENT FUNCTIONS
+    // ============================
+    
+    const acceptAllCookies = () => {
+        console.log('Accepting all cookies');
+        
+        // Set all toggles to checked
+        document.getElementById('analyticsCookies').checked = true;
+        document.getElementById('preferenceCookies').checked = true;
+        
+        // Save preferences
+        setCookiePreferences(true, true);
+        
+        // Hide modal and complete onboarding
+        hideModal('cookieModal');
+        onboardingComplete();
+    };
+    
+    const acceptSelectedCookies = () => {
+        console.log('Accepting selected cookies');
+        
+        // Get current toggle states
+        const analytics = document.getElementById('analyticsCookies').checked;
+        const preferences = document.getElementById('preferenceCookies').checked;
+        
+        // Save preferences
+        setCookiePreferences(analytics, preferences);
+        
+        // Hide modal and complete onboarding
+        hideModal('cookieModal');
+        onboardingComplete();
+    };
+    
+    const essentialOnlyCookies = () => {
+        console.log('Essential cookies only');
+        
+        // Uncheck all optional cookies
+        document.getElementById('analyticsCookies').checked = false;
+        document.getElementById('preferenceCookies').checked = false;
+        
+        // Save preferences
+        setCookiePreferences(false, false);
+        
+        // Hide modal and complete onboarding
+        hideModal('cookieModal');
+        onboardingComplete();
+    };
+    
+    // Post-Install methods
+    const postInstallGoToApp = () => {
+        hideModal('postInstallModal');
+        showGoodbyeMessage();
+    };
+    
+    const postInstallContinueBrowser = () => {
+        hideModal('postInstallModal');
+        showWelcome();
+    };
+    
+    // Show cookie modal after onboarding completes
+    const showCookieConsent = () => {
+        console.log('Showing cookie consent modal');
+        hideAllModals();
+        showModal('cookieModal');
+    };
+    
+    // Handle cookie preferences
+    const setCookiePreferences = (analytics, preferences) => {
+        const cookiePrefs = {
+            essential: true, // Always true
+            analytics: analytics,
+            preferences: preferences,
+            timestamp: Date.now()
+        };
+        
+        localStorage.setItem('cookieConsent', JSON.stringify(cookiePrefs));
+        localStorage.setItem('cookieConsentDate', new Date().toISOString());
+        
+        // Initialize analytics if accepted
+        if (analytics && window.gtag) {
+            window.gtag('consent', 'update', {
+                'analytics_storage': 'granted'
+            });
+        }
+        
+        console.log('Cookie preferences saved:', cookiePrefs);
+    };
+    
+    // Check if we need to show cookie consent
+    const needsCookieConsent = () => {
+        const consent = localStorage.getItem('cookieConsent');
+        if (!consent) return true;
+        
+        // Optional: Re-ask after a year
+        const consentDate = localStorage.getItem('cookieConsentDate');
+        if (consentDate) {
+            const daysSince = (Date.now() - new Date(consentDate).getTime()) / (1000 * 60 * 60 * 24);
+            if (daysSince > 365) return true;
+        }
+        
+        return false;
+    };
+    
+    // Update your onboarding completion to show cookies
+    const completeAccountSetup = () => {
+        console.log('Account setup complete, checking cookie consent');
+        
+        // Hide current modal
+        hideAllModals();
+        
+        // Check if we need cookie consent
+        if (needsCookieConsent()) {
+            setTimeout(() => {
+                showCookieConsent();
+            }, 500);
+        } else {
+            // Already have consent, finish
+            onboardingComplete();
+        }
+    };
+    
+    // Final onboarding completion
+    const onboardingComplete = () => {
+        console.log('✅ Onboarding fully complete!');
+        
+        // Mark onboarding as done
+        localStorage.setItem('onboardingComplete', 'true');
+        localStorage.setItem('onboardingCompleteDate', new Date().toISOString());
+        
+        // Remove any onboarding classes
+        document.body.classList.remove('onboarding-active');
+        
+        // Show success message
+        showSuccessToast('Welcome to Coeliacs Like Beer! 🍺');
+        
+        // Redirect to home or refresh
+        setTimeout(() => {
+            window.location.reload();
+        }, 1500);
+    };
+    
+    // Simple success toast
+    const showSuccessToast = (message) => {
+        const toast = document.createElement('div');
+        toast.className = 'success-toast';
+        toast.innerHTML = `
+            <div class="toast-content">
+                <span>✨</span>
+                <p>${message}</p>
+            </div>
+        `;
+        document.body.appendChild(toast);
+        
+        setTimeout(() => toast.classList.add('show'), 100);
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    };
+
+
     
     // ================================
     // FINISH
@@ -877,7 +1042,7 @@ Website: https://coeliacslikebeer.co.uk
         
         // Hide all onboarding modals
         ['ageGateModal', 'welcomeModal', 'nicknameModal', 'signInPromptModal', 
-         'signInModal', 'passcodeModal', 'benefitsModal'].forEach(modalId => {
+         'signInModal', 'passcodeModal', 'benefitsModal', 'cookieModal'].forEach(modalId => {
             hideModal(modalId);
         });
         
@@ -938,8 +1103,7 @@ Website: https://coeliacslikebeer.co.uk
         skipPWABenefits,
         closeIOSGuide,
         closeAndroidGuide,
-        installAndroid
-        
+        installAndroid        
     };
 })();
 
