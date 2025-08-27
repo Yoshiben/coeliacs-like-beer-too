@@ -973,3 +973,15 @@ html {
         padding-right: env(safe-area-inset-right);
     }
 }
+
+/* Fix modal container height issues on mid-size phones */
+@media (min-width: 375px) and (max-width: 430px) and (min-height: 700px) {
+    .modal-overlay {
+        padding: 1rem;
+    }
+    
+    .modal-container {
+        max-height: calc(100vh - 2rem);
+        max-height: calc(100dvh - 2rem);
+    }
+}
