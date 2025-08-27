@@ -188,37 +188,6 @@ export const OnboardingFlow = (() => {
         hideModal('android-install-guide');
         showWelcome(); // Continue to signup
     };
-    
-    const installAndroid = async () => {
-        if (window.pwaHandler?.deferredPrompt) {
-            try {
-                await window.pwaHandler.deferredPrompt.prompt();
-                const result = await window.pwaHandler.deferredPrompt.userChoice;
-                
-                if (result.outcome === 'accepted') {
-                    console.log('PWA installed');
-                    hideModal('android-install-guide');
-                    showWelcome();
-                } else {
-                    console.log('PWA install cancelled');
-                    // Still continue to welcome even if they cancel
-                    hideModal('android-install-guide');
-                    showWelcome();
-                }
-                
-                // Clear the prompt either way
-                window.pwaHandler.deferredPrompt = null;
-            } catch (error) {
-                console.error('Install error:', error);
-                hideModal('android-install-guide');
-                showWelcome();
-            }
-        } else {
-            // No prompt available, just continue
-            hideModal('android-install-guide');
-            showWelcome();
-        }
-    };
 
     
     // Show post-install modal
