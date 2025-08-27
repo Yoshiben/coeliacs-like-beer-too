@@ -207,10 +207,6 @@
    box-sizing: border-box;
 }
 
-/* #ageGateModal { display: flex !important; }
-
-body.age-verified #ageGateModal { display: none !important; } */
-
 /* Navigation visibility based on page context */
 body.page-home .nav-notification-btn { display: flex !important; }
 body.page-results .nav-back-btn,
@@ -249,6 +245,276 @@ html {
 .container {
    height: 100%;
 }
+
+
+
+/* ================================
+   MODAL SYSTEM
+   ================================ */
+
+/* Base Modal Structure */
+.modal {
+   position: fixed;
+   inset: 0;  /* Cleaner than top/left/right/bottom */
+   display: none;
+   z-index: var(--z-modal-backdrop);
+   backdrop-filter: var(--modal-blur);
+   background: var(--modal-backdrop);
+   align-items: center;
+   justify-content: center;
+   
+   /* Dynamic padding using your spacing variables */
+   padding: clamp(var(--space-lg), 4vw, var(--space-4xl));
+   
+   /* Safe areas on top of dynamic padding */
+   padding: max(clamp(var(--space-lg), 4vw, var(--space-4xl)), env(safe-area-inset-top))
+          max(clamp(var(--space-lg), 4vw, var(--space-4xl)), env(safe-area-inset-right))
+          max(clamp(var(--space-lg), 4vw, var(--space-4xl)), env(safe-area-inset-bottom))
+          max(clamp(var(--space-lg), 4vw, var(--space-4xl)), env(safe-area-inset-left));
+}
+
+.modal.active {
+   display: flex;
+}
+
+/* Modal Content Container */
+.modal-content {
+   /* Dynamic width that scales better */
+   width: min(90%, 500px);  /* Better than fixed 90% */
+   
+   /* Dynamic height using clamp */
+   max-height: clamp(400px, 85dvh, 800px);
+   
+   /* Account for safe areas more elegantly */
+   max-height: calc(clamp(400px, 85dvh, 800px) - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+   
+   /* Dynamic padding that scales */
+/*    padding: clamp(var(--space-lg), 3vw, var(--space-3xl)); */
+   padding: 0;
+   
+   /* Clean up properties */
+   display: flex;
+   flex-direction: column;
+   overflow: hidden;
+   position: relative;
+   z-index: var(--z-modal-content);
+   background: var(--bg-white);
+   border-radius: var(--radius-xl);
+   box-shadow: var(--shadow-xl);
+   animation: modalSlideIn var(--transition-slow);
+   height: auto;
+}
+
+.modal-header {
+   /* Dynamic padding */
+   padding: clamp(var(--space-md), 3vw, var(--space-2xl));
+   
+   /* Keep existing properties */
+   background: var(--primary-gradient);
+   color: var(--white);
+   text-align: center;
+   position: sticky;
+   top: 0;
+   z-index: 10;
+   flex-shrink: 0;
+   border-bottom: 1px solid var(--modal-line);
+   border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+}
+
+.modal-title {
+   color: var(--white);
+   margin: 0;
+   /* Dynamic font size using your text scale */
+   font-size: clamp(var(--text-lg), 4vw, var(--text-2xl));
+   font-weight: 700;
+}
+
+.modal-subtitle {
+   color: var(--white);
+   margin: var(--space-xs) 0 0;
+   /* Dynamic font size */
+   font-size: clamp(var(--text-sm), 2.5vw, var(--text-md));
+   opacity: 0.9;
+}
+
+/* Modal Close Button */
+.modal-close {
+   position: absolute;
+   /* Dynamic positioning that scales */
+   right: clamp(var(--space-md), 3vw, var(--space-2xl));
+   top: clamp(var(--space-md), 3vw, var(--space-2xl));
+   
+   /* Dynamic size using clamp */
+   width: clamp(32px, 5vw, 44px);
+   height: clamp(32px, 5vw, 44px);
+   
+   /* Clean styling */
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   background: rgba(255, 255, 255, 0.2);
+   backdrop-filter: blur(8px);
+   border: 2px solid rgba(255, 255, 255, 0.3);
+   border-radius: var(--radius-circle);
+   color: var(--white);
+   cursor: pointer;
+   
+   /* Dynamic font size */
+   font-size: clamp(var(--text-lg), 3vw, var(--text-2xl));
+   
+   /* Transitions */
+   transition: all var(--transition);
+   z-index: var(--z-status-modals);
+}
+
+.modal-close:hover {
+   background: rgba(255, 255, 255, 0.3);
+   transform: scale(1.1);
+}
+
+/* Modal Body */
+.modal-body {
+   flex: 1;
+   /* Dynamic padding that scales with viewport */
+   padding: clamp(var(--space-lg), 4vw, var(--space-3xl)) 
+          clamp(var(--space-md), 3vw, var(--space-2xl));
+   
+   /* Smooth scrolling */
+   overflow-y: auto;
+   -webkit-overflow-scrolling: touch;
+   overscroll-behavior: contain;
+   
+   /* Flexbox setup */
+   display: flex;
+   flex-direction: column;
+   min-height: 0;
+   
+   /* Optional: Dynamic gap between body elements */
+   gap: clamp(var(--space-md), 2vw, var(--space-xl));
+}
+
+/* Modal Actions/Footer */
+.modal-actions {
+   display: flex;
+   justify-content: center;
+   flex-wrap: wrap;  /* Allow wrapping on small screens */
+   
+   /* Dynamic gap and padding */
+   gap: clamp(var(--space-sm), 2vw, var(--space-lg));
+   padding: clamp(var(--space-md), 3vw, var(--space-xl));
+   
+   /* Styling */
+   flex-shrink: 0;
+   border-top: 1px solid var(--border-light);
+   background: var(--bg-section);
+   
+   /* Round bottom corners to match modal */
+   border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+   
+   /* Safe area for bottom (home indicator on iPhone) */
+   padding-bottom: max(clamp(var(--space-md), 3vw, var(--space-xl)), env(safe-area-inset-bottom));
+}
+
+/* Optional: Make action buttons responsive too */
+.modal-actions .btn {
+   /* Dynamic padding for buttons */
+   padding: clamp(var(--space-sm), 2vw, var(--space-md)) 
+          clamp(var(--space-lg), 3vw, var(--space-2xl));
+   
+   /* Dynamic font size */
+   font-size: clamp(var(--text-sm), 2.5vw, var(--text-md));
+   
+   /* Minimum width but allow growth */
+   min-width: clamp(100px, 30vw, 150px);
+   flex: 1 1 auto;
+   width: 100%;
+}
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    display: none;
+    z-index: var(--z-onboarding, 9999);
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    align-items: center;
+    justify-content: center;
+    
+    /* Dynamic padding that accounts for safe areas */
+    padding: clamp(1rem, 4vw, 2rem);
+    padding: max(clamp(1rem, 4vw, 2rem), env(safe-area-inset-top))
+            max(clamp(1rem, 4vw, 2rem), env(safe-area-inset-right))
+            max(clamp(1rem, 4vw, 2rem), env(safe-area-inset-bottom))
+            max(clamp(1rem, 4vw, 2rem), env(safe-area-inset-left));
+}
+
+.modal-overlay.active {
+    display: flex;
+    animation: fadeIn 0.3s ease;
+}
+
+.modal-container {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    width: 100%;
+    position: relative;
+    animation: slideUp 0.4s ease;
+    max-height: 90vh;
+    max-height: 90dvh;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Shared button styles */
+.modal-skip-btn,
+.modal-close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+}
+
+.modal-close-btn {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    border-radius: 50%;
+}
+
+.modal-skip-btn:hover,
+.modal-close-btn:hover {
+    background: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* ================================
    COMPONENTS
