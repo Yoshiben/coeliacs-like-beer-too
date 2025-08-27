@@ -386,10 +386,12 @@ export const OnboardingFlow = (() => {
             nicknameInput.style.cursor = 'not-allowed';
         }
         
-        // Update the header if nickname is known
-        const headerEl = modal.querySelector('.signin-header h2');
-        if (headerEl) {
-            headerEl.textContent = nickname ? `Welcome back, ${nickname}!` : 'Sign In';
+        // Update the nickname display in header
+        const nicknameDisplay = document.getElementById('signInNicknameDisplay');
+        if (nicknameDisplay && nickname) {
+            nicknameDisplay.textContent = nickname;
+        } else if (nicknameDisplay) {
+            nicknameDisplay.textContent = 'friend';
         }
         
         // Focus on passcode input
