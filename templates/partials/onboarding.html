@@ -201,135 +201,56 @@
         <div class="post-install-header">
             <span class="success-checkmark">✅</span>
             <h2>App Installed Successfully!</h2>
-            <p>Your app is ready to use</p>
+            <p>Time to open your new app</p>
         </div>
         
         <!-- Body -->
         <div class="post-install-body">
-            <!-- App Icon Display -->
-            <div class="app-icon-showcase">
-                <div class="app-icon-wrapper">
-                    <span class="app-icon">🍺</span>
-                    <span class="app-badge">NEW</span>
+            <!-- Simple Message -->
+            <div class="install-message">
+                <div class="app-icon-display">
+                    <span>🍺</span>
                 </div>
-            </div>
-            
-            <!-- Instructions -->
-            <div class="redirect-message">
-                <h3>Continue in the App</h3>
-                <p>To complete your account setup and access all features, please open the app we just installed.</p>
-            </div>
-            
-            <!-- Where to find it -->
-            <div class="find-app-guide">
-                <div class="find-app-item">
-                    <span class="find-icon">📱</span>
-                    <div class="find-text">
-                        <strong>On Android:</strong>
-                        <span>Check your home screen or app drawer</span>
+                
+                <h3>Open Your New App!</h3>
+                <p>Your Coeliacs Like Beer app is now on your home screen.</p>
+                
+                <div class="next-steps">
+                    <div class="step">
+                        <span class="step-emoji">👆</span>
+                        <span>Go to your home screen</span>
+                    </div>
+                    <div class="step">
+                        <span class="step-emoji">🔍</span>
+                        <span>Find the beer glass icon</span>
+                    </div>
+                    <div class="step">
+                        <span class="step-emoji">📱</span>
+                        <span>Tap to open & create your account</span>
                     </div>
                 </div>
-                <div class="find-app-item">
-                    <span class="find-icon">🏠</span>
-                    <div class="find-text">
-                        <strong>Can't find it?</strong>
-                        <span>Swipe up to see all apps</span>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Benefits reminder -->
-            <div class="app-benefits-reminder">
-                <p class="reminder-title">✨ In the app you'll get:</p>
-                <ul class="benefit-checklist">
-                    <li>Offline access to your saved venues</li>
-                    <li>Push notifications for new GF beers</li>
-                    <li>Faster loading & better performance</li>
-                    <li>One-tap access from your home screen</li>
-                </ul>
-            </div>
-            
-            <!-- Actions -->
-            <div class="post-install-actions">
-                <button class="btn btn-primary btn-large" onclick="openInstalledApp()">
-                    <span>Open App Now</span>
-                    <span class="btn-arrow">→</span>
-                </button>
-                <button class="btn btn-secondary" onclick="continueInBrowser()">
-                    Continue in Browser Instead
-                </button>
-            </div>
-            
-            <!-- Help text -->
-            <p class="help-text">
-                <small>💡 Tip: The app icon looks like a beer glass and is named "Coeliacs Like Beer"</small>
-            </p>
-        </div>
-    </div>
-</div>
-
-<!-- iOS Post-Install Modal (Different messaging) -->
-<div class="modal-overlay" id="iosPostInstallModal">
-    <div class="modal-container post-install-container ios-variant">
-        <!-- Success Header -->
-        <div class="post-install-header">
-            <span class="success-checkmark">✅</span>
-            <h2>Great! You've Added the App</h2>
-            <p>Find it on your home screen</p>
-        </div>
-        
-        <!-- Body -->
-        <div class="post-install-body">
-            <!-- Visual Guide -->
-            <div class="ios-home-visual">
-                <div class="ios-screen-mockup">
-                    <div class="ios-app-grid">
-                        <div class="ios-app-icon"></div>
-                        <div class="ios-app-icon"></div>
-                        <div class="ios-app-icon"></div>
-                        <div class="ios-app-icon highlighted">
-                            <span>🍺</span>
-                            <span class="app-name">CLB</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Instructions -->
-            <div class="redirect-message">
-                <h3>Open Your New App</h3>
-                <p>Go to your home screen and tap the new "Coeliacs Like Beer" icon to continue setting up your account.</p>
-            </div>
-            
-            <!-- Steps -->
-            <div class="ios-next-steps">
-                <div class="step-item">
-                    <span class="step-number">1</span>
-                    <span>Press the home button or swipe up</span>
-                </div>
-                <div class="step-item">
-                    <span class="step-number">2</span>
-                    <span>Find the new 🍺 app icon</span>
-                </div>
-                <div class="step-item">
-                    <span class="step-number">3</span>
-                    <span>Tap to open and continue</span>
+                
+                <div class="app-benefits-box">
+                    <p><strong>Why use the app?</strong></p>
+                    <p>✓ Works offline</p>
+                    <p>✓ Faster loading</p>
+                    <p>✓ Get notifications</p>
+                    <p>✓ One-tap access</p>
                 </div>
             </div>
             
             <!-- Actions -->
             <div class="post-install-actions">
-                <button class="btn btn-primary btn-large" onclick="closeModalAndEnd()">
-                    <span>Got it! I'll open the app</span>
+                <button class="btn btn-primary" id="understoodBtn">
+                    Got it! I'll open the app
                 </button>
-                <button class="btn btn-ghost" onclick="continueInBrowser()">
-                    <small>Continue in browser instead</small>
+                <button class="btn btn-ghost" id="continueBrowserBtn">
+                    Continue in browser instead
                 </button>
             </div>
         </div>
     </div>
 </div>
-
 <!-- Welcome Modal -->
 <div id="welcomeModal" class="modal-overlay welcome-modal" data-cover-nav="true" style="display: none;">
     <div class="modal-container welcome-container">
