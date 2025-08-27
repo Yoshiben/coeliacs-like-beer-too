@@ -318,24 +318,39 @@ export const OnboardingFlow = (() => {
         }
         
         try {
-            // For now, simulate account creation
-            const result = {
-                success: true,
-                nickname: state.nickname,
-                passcode: generatePasscode(),
-                user_id: Date.now()
-            };
+            // Get or create UUID for this device
+            let uuid = localStorage.getItem('userUUID');
+            if (!uuid) {
+                uuid = generateUUID();
+                localStorage.setItem('userUUID', uuid);
+            }
             
-            if (result.success) {
+            // Call the ACTUAL API to create user
+            const response = await fetch('/api/user/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    uuid: uuid,
+                    nickname: state.nickname,
+                    avatar_emoji: state.avatarEmoji
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok && result.success) {
                 state.passcode = result.passcode;
                 
+                // Store everything locally
                 localStorage.setItem('userNickname', state.nickname);
                 localStorage.setItem('userAvatar', state.avatarEmoji);
                 localStorage.setItem('user_id', result.user_id);
+                localStorage.setItem('userUUID', uuid);
                 
                 if (window.App) {
                     window.App.setState('userNickname', state.nickname);
                     window.App.setState('userId', result.user_id);
+                    window.App.setState('userUUID', uuid);
                 }
                 
                 hideModal('nicknameModal');
@@ -349,6 +364,14 @@ export const OnboardingFlow = (() => {
                 } else {
                     showPasscodeDisplay(result);
                 }
+            } else if (result.error === 'account_exists') {
+                // This device already has an account
+                alert(`This device already has an account: ${result.existing_nickname}. Please sign in with your passcode.`);
+                hideModal('nicknameModal');
+                showSignInWithNickname(result.existing_nickname);
+            } else {
+                // Other error
+                throw new Error(result.error || 'Failed to create account');
             }
         } catch (error) {
             console.error('❌ Error saving nickname:', error);
@@ -440,14 +463,35 @@ export const OnboardingFlow = (() => {
         }
         
         try {
-            // Simulate sign in for now
-            const result = { success: true, user: { nickname, avatarEmoji: '🍺' } };
+            // Get or use existing UUID
+            let uuid = localStorage.getItem('userUUID');
+            if (!uuid) {
+                uuid = generateUUID();
+                localStorage.setItem('userUUID', uuid);
+            }
             
-            if (result.success) {
+            // Call the ACTUAL sign-in API
+            const response = await fetch('/api/user/signin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    nickname: nickname,
+                    passcode: passcode,
+                    uuid: uuid
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok && result.success) {
+                // Store user data
                 localStorage.setItem('userNickname', nickname);
+                localStorage.setItem('user_id', result.user.user_id);
+                localStorage.setItem('userAvatar', result.user.avatar_emoji || '🍺');
                 
                 if (window.App) {
                     window.App.setState('userNickname', nickname);
+                    window.App.setState('userId', result.user.user_id);
                 }
                 
                 hideModal('signInModal');
@@ -670,6 +714,14 @@ Website: https://coeliacslikebeer.co.uk
             passcode += chars.charAt(Math.floor(Math.random() * chars.length));
         }
         return passcode;
+    };
+    
+    const generateUUID = () => {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+            const r = Math.random() * 16 | 0;
+            const v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
     };
     
     // ================================
