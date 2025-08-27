@@ -2311,3 +2311,45 @@
         font-size: 2rem;
     }
 }
+
+.goodbye-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem 3rem;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 10000;
+}
+
+.goodbye-message.show {
+    opacity: 1;
+}
+
+.goodbye-content {
+    text-align: center;
+}
+
+.goodbye-content span {
+    display: block;
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+    animation: wave 0.5s ease;
+}
+
+.goodbye-content p {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+@keyframes wave {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-15deg); }
+    75% { transform: rotate(15deg); }
+}
