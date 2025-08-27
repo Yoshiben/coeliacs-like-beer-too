@@ -2015,47 +2015,6 @@ const App = {
             }
         },
 
-        'save-nickname': (el, modules) => {
-            const nickname = document.getElementById('nicknameInput')?.value.trim();
-            if (nickname) {
-                window.App.setState('userNickname', nickname);
-                localStorage.setItem('userNickname', nickname);
-                modules.modalManager?.close('nicknameModal');
-                modules.toast?.success(`👋 Welcome, ${nickname}!`);
-                
-                // Check if we should return to community hub
-                if (window.App.getState('returnToCommunityAfterNickname')) {
-                    window.App.setState('returnToCommunityAfterNickname', false);
-                    
-                    // Reopen community hub after a brief delay
-                    setTimeout(() => {
-                        const communityHub = window.App?.getModule('communityHub');
-                        if (communityHub) {
-                            communityHub.open();
-                        }
-                    }, 500);
-                }
-                
-                // Continue with whatever triggered the nickname prompt
-                const pendingAction = window.App.getState('pendingActionAfterNickname');
-                if (pendingAction) {
-                    window.App.setState('pendingActionAfterNickname', null);
-                    pendingAction();
-                }
-            }
-        },
-        
-        'skip-nickname': (el, modules) => {
-            window.App.setState('userNickname', 'Anonymous');
-            modules.modalManager?.close('nicknameModal');
-            
-            const pendingAction = window.App.getState('pendingActionAfterNickname');
-            if (pendingAction) {
-                window.App.setState('pendingActionAfterNickname', null);
-                pendingAction();
-            }
-        },
-
         'prev-page': (el, modules) => {
             modules.search?.goToPreviousPage();
         },
