@@ -335,7 +335,7 @@ export const OnboardingFlow = (() => {
         console.log('⏭️ Skipping welcome');
         localStorage.setItem('hasSeenWelcome', 'true');
         hideModal('welcomeModal');
-        window.dispatchEvent(new Event('onboardingComplete'));
+        checkCookieConsent();
     };
     
     // ================================
@@ -352,7 +352,7 @@ export const OnboardingFlow = (() => {
         console.log('⏭️ Skipping nickname');
         localStorage.setItem('hasSeenWelcome', 'true');
         hideModal('nicknameModal');
-        window.dispatchEvent(new Event('onboardingComplete'));
+        checkCookieConsent();
     };
     
     const checkNickname = (value) => {
@@ -849,8 +849,9 @@ Website: https://coeliacslikebeer.co.uk
     };
     
     const startExploring = () => {
+        console.log('🚀 Starting exploration');
         hideModal('benefitsModal');
-        finishOnboarding();
+        checkCookieConsent();  // Check cookies instead of completing
     };
     
     // ================================
@@ -873,6 +874,20 @@ Website: https://coeliacslikebeer.co.uk
     // COOKIE CONSENT FUNCTIONS
     // ============================
     
+    const checkCookieConsent = () => {
+        console.log('🍪 Checking cookie consent...');
+        
+        if (needsCookieConsent()) {
+            console.log('🍪 Need cookie consent - showing modal');
+            setTimeout(() => {
+                showModal('cookieModal');
+            }, 300);
+        } else {
+            console.log('✅ Cookie consent already given');
+            completeOnboarding();
+        }
+    };
+    
     const acceptAllCookies = () => {
         console.log('Accepting all cookies');
         
@@ -885,7 +900,7 @@ Website: https://coeliacslikebeer.co.uk
         
         // Hide modal and complete onboarding
         hideModal('cookieModal');
-        onboardingComplete();
+        completeOnboarding ();
     };
     
     const acceptSelectedCookies = () => {
@@ -900,7 +915,7 @@ Website: https://coeliacslikebeer.co.uk
         
         // Hide modal and complete onboarding
         hideModal('cookieModal');
-        onboardingComplete();
+        completeOnboarding ();
     };
     
     const essentialOnlyCookies = () => {
@@ -915,7 +930,7 @@ Website: https://coeliacslikebeer.co.uk
         
         // Hide modal and complete onboarding
         hideModal('cookieModal');
-        onboardingComplete();
+        completeOnboarding ();
     };
     
     // Post-Install methods
@@ -992,20 +1007,23 @@ Website: https://coeliacslikebeer.co.uk
     };
     
     // Final onboarding completion
-    const onboardingComplete = () => {
-        console.log('✅ Onboarding fully complete!');
+    const completeOnboarding = () => {
+        console.log('🎉 Onboarding fully complete!');
         
-        // Mark onboarding as done
+        // Hide any remaining modals
+        hideAllModals();
+        
+        // Mark complete
         localStorage.setItem('onboardingComplete', 'true');
         localStorage.setItem('onboardingCompleteDate', new Date().toISOString());
         
-        // Remove any onboarding classes
-        document.body.classList.remove('onboarding-active');
+        // Emit completion event
+        if (window.App?.events) {
+            console.log('📢 Emitting onboarding:complete event');
+            window.App.events.emit('onboarding:complete');
+        }
         
-        // Show success message
-        showSuccessToast('Welcome to Coeliacs Like Beer! 🍺');
-        
-        // Redirect to home or refresh
+        // Reload after short delay
         setTimeout(() => {
             window.location.reload();
         }, 1500);
@@ -1133,7 +1151,9 @@ Website: https://coeliacslikebeer.co.uk
         skipPWABenefits,
         closeIOSGuide,
         closeAndroidGuide,
-        installAndroid        
+        installAndroid,
+        checkCookieConsent,
+        completeOnboarding
     };
 })();
 
