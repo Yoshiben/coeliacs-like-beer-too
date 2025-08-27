@@ -574,3 +574,100 @@
         </div>
     </div>
 </div>
+
+<div class="modal-overlay" data-cover-nav="true" id="cookieModal">
+    <div class="modal-container cookie-container">
+        <!-- Header -->
+        <div class="cookie-header">
+            <span class="cookie-emoji">🍪</span>
+            <h2>Cookie Settings</h2>
+            <p>We use cookies to improve your experience</p>
+        </div>
+        
+        <!-- Body -->
+        <div class="cookie-body">
+            <!-- Main Message -->
+            <div class="cookie-message">
+                <p>We use cookies to remember your preferences, keep you logged in, and understand how you use Coeliacs Like Beer.</p>
+            </div>
+            
+            <!-- Cookie Types -->
+            <div class="cookie-types">
+                <!-- Essential -->
+                <div class="cookie-type">
+                    <div class="cookie-type-header">
+                        <div class="cookie-info">
+                            <span class="cookie-icon">🔒</span>
+                            <div>
+                                <h4>Essential Cookies</h4>
+                                <p>Required for the app to work properly</p>
+                            </div>
+                        </div>
+                        <span class="cookie-badge always-on">Always On</span>
+                    </div>
+                    <div class="cookie-examples">
+                        <small>Login status, age verification, app settings</small>
+                    </div>
+                </div>
+                
+                <!-- Analytics -->
+                <div class="cookie-type">
+                    <div class="cookie-type-header">
+                        <div class="cookie-info">
+                            <span class="cookie-icon">📊</span>
+                            <div>
+                                <h4>Analytics Cookies</h4>
+                                <p>Help us improve the app</p>
+                            </div>
+                        </div>
+                        <label class="cookie-toggle">
+                            <input type="checkbox" id="analyticsCookies" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="cookie-examples">
+                        <small>Page views, feature usage, error tracking</small>
+                    </div>
+                </div>
+                
+                <!-- Preferences -->
+                <div class="cookie-type">
+                    <div class="cookie-type-header">
+                        <div class="cookie-info">
+                            <span class="cookie-icon">⚙️</span>
+                            <div>
+                                <h4>Preference Cookies</h4>
+                                <p>Remember your choices</p>
+                            </div>
+                        </div>
+                        <label class="cookie-toggle">
+                            <input type="checkbox" id="preferenceCookies" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="cookie-examples">
+                        <small>Search radius, map preferences, saved venues</small>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Privacy Link -->
+            <div class="cookie-privacy">
+                <p>Learn more in our <a href="/privacy" target="_blank">Privacy Policy</a></p>
+            </div>
+            
+            <!-- Actions -->
+            <div class="cookie-actions">
+                <button class="btn btn-primary" data-action="accept-all-cookies">
+                    Accept All Cookies
+                </button>
+                <button class="btn btn-secondary" data-action="accept-selected-cookies">
+                    Accept Selected
+                </button>
+                <button class="btn btn-ghost" data-action="essential-only-cookies">
+                    Essential Only
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
