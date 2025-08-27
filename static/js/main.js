@@ -758,30 +758,42 @@ const App = {
     // Action handler map - split into logical groups
     actionHandlers: {
         // Onboarding action handlers
-        'confirm-age': (el, modules) => {
-            OnboardingFlow.confirmAge();
+       'confirm-age': (el, modules) => {
+            if (window.OnboardingFlow) {
+                OnboardingFlow.confirmAge();
+            }
         },
         
         'under-age': (el, modules) => {
-            OnboardingFlow.underAge();
+            if (window.OnboardingFlow) {
+                OnboardingFlow.underAge();
+            }
         },
-
+        
         'skip-welcome': (el, modules) => {
-            OnboardingFlow.skipWelcome();
+            if (window.OnboardingFlow) {
+                OnboardingFlow.skipWelcome();
+            }
         },
         
         'show-nickname-selection': (el, modules) => {
-            OnboardingFlow.showNicknameSelection();
+            if (window.OnboardingFlow) {
+                OnboardingFlow.showNicknameSelection();
+            }
         },
         
         'skip-nickname': (el, modules) => {
-            OnboardingFlow.skipNickname();
+            if (window.OnboardingFlow) {
+                OnboardingFlow.skipNickname();
+            }
         },
         
         'generate-random-nickname': (el, modules) => {
-            OnboardingFlow.generateRandom();
+            if (window.OnboardingFlow) {
+                OnboardingFlow.generateRandom();
+            }
         },
-
+        
         'check-nickname-input': (el, modules) => {
             const value = el.value;
             if (window.OnboardingFlow && window.OnboardingFlow.checkNickname) {
@@ -791,22 +803,27 @@ const App = {
         
         'select-avatar': (el, modules) => {
             const emoji = el.dataset.emoji;
-            if (emoji && window.OnboardingFlow && window.OnboardingFlow.selectAvatar) {
-                // Pass the emoji and the element (for the event target)
-                const event = { target: el };
-                window.event = event; // Temporarily set for the selectAvatar function
+            if (emoji && window.OnboardingFlow) {
+                // Create a fake event object for the selectAvatar function
+                const fakeEvent = { target: el };
+                const originalEvent = window.event;
+                window.event = fakeEvent;
                 window.OnboardingFlow.selectAvatar(emoji);
-                window.event = null; // Clean up
+                window.event = originalEvent;
             }
         },
         
         'use-nickname': (el, modules) => {
             const nickname = el.dataset.nickname;
-            if (nickname) OnboardingFlow.useNickname(nickname);
+            if (nickname && window.OnboardingFlow) {
+                OnboardingFlow.useNickname(nickname);
+            }
         },
         
         'save-nickname': (el, modules) => {
-            OnboardingFlow.saveNickname();
+            if (window.OnboardingFlow) {
+                OnboardingFlow.saveNickname();
+            }
         },
 
 
