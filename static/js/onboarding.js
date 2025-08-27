@@ -197,10 +197,10 @@ export const OnboardingFlow = (() => {
                 </p>
                 
                 <div class="taken-actions">
-                    <button class="btn btn-primary btn-sm" onclick="OnboardingFlow.promptSignIn('${nickname}')">
+                    <button class="btn btn-primary btn-sm" id="signInButton">
                         🔑 This is me - Sign in
                     </button>
-                    <button class="btn btn-outline btn-sm" onclick="OnboardingFlow.clearNicknameOptions()">
+                    <button class="btn btn-outline btn-sm" id="tryAnotherButton">
                         ❌ Not me - Try another
                     </button>
                 </div>
@@ -210,7 +210,7 @@ export const OnboardingFlow = (() => {
                         <p>Or try one of these:</p>
                         <div class="suggestion-chips">
                             ${suggestions.map(suggestion => 
-                                `<button class="chip" onclick="OnboardingFlow.useNickname('${suggestion}')">
+                                `<button class="chip suggestion-btn" data-suggestion="${suggestion}">
                                     ${suggestion}
                                 </button>`
                             ).join('')}
@@ -221,6 +221,26 @@ export const OnboardingFlow = (() => {
         `;
         
         optionsContainer.style.display = 'block';
+        
+        // Add event listeners after creating the elements
+        document.getElementById('signInButton')?.addEventListener('click', () => {
+            console.log('Sign in button clicked for:', nickname);
+            promptSignIn(nickname);
+        });
+        
+        document.getElementById('tryAnotherButton')?.addEventListener('click', () => {
+            console.log('Try another button clicked');
+            clearNicknameOptions();
+        });
+        
+        // Add listeners for suggestion buttons
+        document.querySelectorAll('.suggestion-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const suggestion = e.target.dataset.suggestion;
+                console.log('Using suggestion:', suggestion);
+                useNickname(suggestion);
+            });
+        });
     };
     
     const clearNicknameOptions = () => {
