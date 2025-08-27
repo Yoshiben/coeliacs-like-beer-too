@@ -24,6 +24,16 @@ export const ModalManager = (() => {
     
     // Modal/Overlay Registry with types and rules
     const registry = {
+
+        // Onboarding modals group (complete set)
+        ageGateModal: { type: 'modal', group: 'onboarding', exclusive: true, priority: true },
+        welcomeModal: { type: 'modal', group: 'onboarding', exclusive: true },
+        nicknameModal: { type: 'modal', group: 'onboarding', exclusive: true },
+        signInModal: { type: 'modal', group: 'onboarding', exclusive: true },
+        passcodeModal: { type: 'modal', group: 'onboarding', exclusive: true },
+        benefitsModal: { type: 'modal', group: 'onboarding', exclusive: true },
+
+        
         // Search overlays (mutually exclusive)
         searchOverlay: { type: 'overlay', group: 'primary', exclusive: true },
         resultsOverlay: { type: 'overlay', group: 'primary', exclusive: true, hasInternalViews: true, defaultView: 'list' },
@@ -45,11 +55,6 @@ export const ModalManager = (() => {
         breweryBeersModal: { type: 'modal', group: 'brewery', exclusive: true },
         manualVenueEntryModal: { type: 'modal', group: 'form', exclusive: true },
         statusPromptAfterBeerModal: { type: 'modal', group: 'status', stackable: true, order: 4 },
-
-        ageGateModal: { type: 'modal', group: 'onboarding', exclusive: true, priority: true },
-        welcomeModal: { type: 'modal', group: 'onboarding', exclusive: true },
-        nicknameModal: { type: 'modal', group: 'onboarding', exclusive: true },  // This one exists but in wrong group
-        benefitsModal: { type: 'modal', group: 'onboarding', exclusive: true },
         
         
         // Status modals (can stack in specific order)
