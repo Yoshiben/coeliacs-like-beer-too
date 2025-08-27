@@ -182,51 +182,66 @@
         <button class="modal-close-btn" data-action="close-signin">×</button>
         
         <div class="signin-header">
-            <span class="signin-emoji">🔐</span>
-            <h2>Sign In</h2>
-            <p>Enter your details to continue</p>
+            <span class="signin-emoji">🔑</span>
+            <h2>Welcome back, <span id="signInNicknameDisplay">friend</span>!</h2>
+            <p>Great to see you again! Let's get you signed in.</p>
         </div>
         
         <div class="signin-body">
             <div class="signin-form">
                 <div class="input-group">
-                    <label for="signInNickname">Nickname</label>
+                    <label for="signInNickname">
+                        <span class="label-icon">👤</span> Nickname
+                    </label>
                     <input type="text" 
                            id="signInNickname" 
+                           class="signin-input"
                            placeholder="Your nickname"
                            required>
-                    <small>The nickname you chose when creating your account</small>
+                    <small class="input-hint">The nickname you chose when creating your account</small>
                 </div>
                 
                 <div class="input-group">
-                    <label for="signInPasscode">Passcode</label>
-                    <input type="text" 
-                           id="signInPasscode" 
-                           placeholder="Your 6-character passcode"
-                           maxlength="6"
-                           style="text-transform: uppercase; letter-spacing: 0.2em; font-family: monospace;"
-                           required>
-                    <small>The passcode you saved when creating your account</small>
+                    <label for="signInPasscode">
+                        <span class="label-icon">🔐</span> Passcode
+                    </label>
+                    <div class="passcode-input-wrapper">
+                        <input type="text" 
+                               id="signInPasscode" 
+                               class="signin-input passcode-input"
+                               placeholder="● ● ● ● ● ●"
+                               maxlength="6"
+                               autocomplete="off"
+                               autocorrect="off"
+                               autocapitalize="characters"
+                               spellcheck="false"
+                               required>
+                        <div class="passcode-format-hint">6 CHARACTERS</div>
+                    </div>
+                    <small class="input-hint">The passcode you saved when creating your account</small>
                 </div>
                 
-                <div id="signInError" class="error-message" style="display: none;">
+                <div id="signInError" class="signin-error-box" style="display: none;">
                     <span class="error-icon">⚠️</span>
                     <span class="error-text"></span>
                 </div>
-                
-                <div class="signin-actions">
-                    <button type="button" class="btn btn-secondary" data-action="back-to-nickname">
-                        ← Back
-                    </button>
-                    <button type="button" class="btn btn-primary" data-action="perform-signin">
-                        Sign In
-                    </button>
-                </div>
+            </div>
+            
+            <div class="signin-actions">
+                <button type="button" class="btn btn-secondary btn-large" data-action="back-to-nickname">
+                    <span class="btn-icon">←</span> Try Another Name
+                </button>
+                <button type="button" class="btn btn-primary btn-large btn-glow" data-action="perform-signin">
+                    <span class="btn-icon">🔓</span> Sign In
+                </button>
             </div>
             
             <div class="signin-help">
-                <p>Forgot your passcode?</p>
-                <small>Unfortunately, we can't recover passcodes for security reasons. You'll need to create a new account with a different nickname.</small>
+                <div class="help-icon">💡</div>
+                <div class="help-content">
+                    <p><strong>Lost your passcode?</strong></p>
+                    <small>Unfortunately, we can't recover passcodes for security reasons. You'll need to create a new account with a different nickname.</small>
+                </div>
             </div>
         </div>
     </div>
