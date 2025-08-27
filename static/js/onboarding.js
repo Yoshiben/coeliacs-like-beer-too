@@ -477,8 +477,6 @@ export const OnboardingFlow = (() => {
         if (nicknameInput && nickname) {
             nicknameInput.value = nickname;
             nicknameInput.readOnly = true;
-            nicknameInput.style.background = '#f5f5f5';
-            nicknameInput.style.cursor = 'not-allowed';
         }
         
         // Update the nickname display in header
@@ -810,7 +808,13 @@ Website: https://coeliacslikebeer.co.uk
         confirmPasscodeSavedAndReturnToCommunity,
         showPasscodeDisplayForCommunity,
         startExploring,
-        finishOnboarding
+        finishOnboarding,
+        showInstallGuide,
+        skipPWABenefits,
+        closeIOSGuide,
+        closeAndroidGuide,
+        installAndroid
+        
     };
 })();
 
