@@ -965,10 +965,9 @@ const App = {
             }
         },
         
-        // Benefits actions
         'start-exploring': (el, modules) => {
             if (window.OnboardingFlow) {
-                OnboardingFlow.finishOnboarding();
+                OnboardingFlow.finishOnboarding();  // This will now check for cookies
             }
         },
 
