@@ -75,7 +75,6 @@ export const OnboardingFlow = (() => {
                 console.log('✅ Ready to use app');
         }
     };
-    };
     
     // ================================
     // MODAL UTILITIES
