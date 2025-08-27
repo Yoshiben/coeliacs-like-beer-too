@@ -1153,7 +1153,10 @@ Website: https://coeliacslikebeer.co.uk
         closeAndroidGuide,
         installAndroid,
         checkCookieConsent,
-        completeOnboarding
+        completeOnboarding,
+        acceptAllCookies,
+        acceptSelectedCookies,
+        essentialOnlyCookies
     };
 })();
 
