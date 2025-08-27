@@ -780,14 +780,12 @@ const App = {
             if (window.OnboardingFlow) {
                 OnboardingFlow.confirmAge();
             }
-        },
-        
+        },        
         'under-age': (el, modules) => {
             if (window.OnboardingFlow) {
                 OnboardingFlow.underAge();
             }
         },
-
         // PWA actions
         'show-install-guide': (el, modules) => {
             if (window.OnboardingFlow) {
@@ -814,6 +812,23 @@ const App = {
                 OnboardingFlow.installAndroid();
             }
         },
+        'post-install-go-to-app': (el, modules) => {
+            hideModal('postInstallModal');
+            showGoodbyeMessage();
+        },        
+        'post-install-continue-browser': (el, modules) => {
+            hideModal('postInstallModal');
+            showWelcome();
+        },
+
+
+
+
+
+
+
+
+        
         
         // Welcome actions
         'skip-welcome': (el, modules) => {
