@@ -116,12 +116,85 @@ export const OnboardingFlow = (() => {
         localStorage.setItem('ageVerified', 'true');
         UserSession.verifyAge();
         hideModal('ageGateModal');
-        showWelcome();
+        
+        // Check if we should show PWA prompt
+        if (shouldShowPWAPrompt()) {
+            showPWABenefits(); // Show benefits first
+        } else {
+            showWelcome();
+        }
     };
     
     const underAge = () => {
         window.location.href = 'https://www.google.com/search?q=best+non-alcoholic+drinks';
     };
+
+
+    // ================================
+    // PWA PROMPT
+    // ================================
+
+    const shouldShowPWAPrompt = () => {
+        // Already installed?
+        const isStandalone = window.navigator.standalone || 
+                            window.matchMedia('(display-mode: standalone)').matches;
+        
+        // Already shown this session?
+        const alreadyShown = sessionStorage.getItem('pwa-prompt-shown');
+        
+        return !isStandalone && !alreadyShown;
+    };
+    
+    const showPWABenefits = () => {
+        sessionStorage.setItem('pwa-prompt-shown', 'true');
+        showModal('pwa-benefits-modal');
+    };
+    
+    const showInstallGuide = () => {
+        hideModal('pwa-benefits-modal');
+        
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                      (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        
+        if (isIOS) {
+            // Show iOS manual install guide
+            showModal('ios-install-guide');
+        } else if (window.pwaHandler?.deferredPrompt) {
+            // Show Android/Desktop with actual install button
+            showModal('android-install-guide');
+        } else {
+            // No install available, continue
+            showWelcome();
+        }
+    };
+    
+    const skipPWABenefits = () => {
+        hideModal('pwa-benefits-modal');
+        showWelcome();
+    };
+    
+    const closeIOSGuide = () => {
+        hideModal('ios-install-guide');
+        showWelcome(); // Continue to signup
+    };
+    
+    const closeAndroidGuide = () => {
+        hideModal('android-install-guide');
+        showWelcome(); // Continue to signup
+    };
+    
+    const installAndroid = async () => {
+        if (window.pwaHandler?.deferredPrompt) {
+            const result = await window.pwaHandler.deferredPrompt.prompt();
+            if (result.outcome === 'accepted') {
+                hideModal('android-install-guide');
+                showWelcome(); // They installed, continue
+            }
+        }
+    };
+
+
+    
     
     // ================================
     // WELCOME SCREEN
