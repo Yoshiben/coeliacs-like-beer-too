@@ -38,6 +38,158 @@
     </div>
 </div>
 
+<!-- PWA Install Prompt Modal -->
+<div id="pwaPromptModal" class="modal pwa-prompt-modal" data-cover-nav="true" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <span class="modal-icon">📱</span>
+            <h2 class="modal-title">Get the Full Experience!</h2>
+            <p class="modal-subtitle">Install as an app for better features</p>
+        </div>
+        
+        <div class="modal-body">
+            <div class="pwa-benefits-grid">
+                <div class="pwa-benefit">
+                    <span class="benefit-icon">📍</span>
+                    <div class="benefit-text">
+                        <strong>Better Location Access</strong>
+                        <small>Fewer permission prompts</small>
+                    </div>
+                </div>
+                <div class="pwa-benefit">
+                    <span class="benefit-icon">⚡</span>
+                    <div class="benefit-text">
+                        <strong>Faster Loading</strong>
+                        <small>Works offline too</small>
+                    </div>
+                </div>
+                <div class="pwa-benefit">
+                    <span class="benefit-icon">🏠</span>
+                    <div class="benefit-text">
+                        <strong>Home Screen Icon</strong>
+                        <small>One-tap access</small>
+                    </div>
+                </div>
+                <div class="pwa-benefit">
+                    <span class="benefit-icon">📲</span>
+                    <div class="benefit-text">
+                        <strong>App Experience</strong>
+                        <small>No browser bars</small>
+                    </div>
+                </div>
+            </div>
+            
+            <p class="pwa-note">
+                ✨ Your account works seamlessly across app and browser!
+            </p>
+        </div>
+        
+        <div class="modal-actions">
+            <button class="btn btn-secondary" data-action="skip-pwa">Maybe Later</button>
+            <button class="btn btn-primary" data-action="install-pwa">Show Me How!</button>
+        </div>
+    </div>
+</div>
+
+<!-- iOS Install Guide Modal -->
+<div id="ios-install-guide" class="modal" style="display: none;" data-cover-nav="true">
+    <div class="modal-content">
+        <button class="modal-close" data-action="close-ios-guide">×</button>
+        
+        <div class="modal-header">
+            <div class="ios-guide-icon">📱</div>
+            <h2>Install Coeliacs Like Beer 🍺</h2>
+            <p>Get app-like experience & better location access</p>
+        </div>
+        
+        <div class="ios-guide-steps">
+            <div class="ios-step">
+                <span class="step-number">1</span>
+                <div class="step-content">
+                    <div class="share-icon-visual">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                            <polyline points="16 6 12 2 8 6"/>
+                            <line x1="12" y1="2" x2="12" y2="15"/>
+                        </svg>
+                    </div>
+                    <span class="step-text">Tap the Share button below</span>
+                </div>
+            </div>
+            
+            <div class="ios-step">
+                <span class="step-number">2</span>
+                <div class="step-content">
+                    <span class="step-text">Select "Add to Home Screen"</span>
+                </div>
+            </div>
+            
+            <div class="ios-step">
+                <span class="step-number">3</span>
+                <div class="step-content">
+                    <span class="step-text">Enjoy app-like experience!</span>
+                </div>
+            </div>
+        </div>      
+        
+        <div class="ios-guide-benefits">
+            <div class="ios-benefit">⚡ Faster loading</div>
+            <div class="ios-benefit">📍 Better location access</div>
+            <div class="ios-benefit">🔄 Works offline</div>
+        </div>
+
+        <div class="ios-guide-arrow">
+            <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                <path d="M20 5 L20 30 M10 20 L20 30 L30 20" stroke="#667eea" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span class="arrow-text">Down here!</span>
+        </div>
+        
+    </div>
+</div>
+
+<!-- Android/Desktop Install Prompt Modal -->
+<div id="android-install-guide" class="modal" style="display: none;" data-cover-nav="true">
+    <div class="modal-content">
+        <button class="modal-close" data-action="close-android-guide">×</button>
+        
+        <div class="modal-header">
+            <div class="ios-guide-icon">📱</div>
+            <h2>Install Coeliacs Like Beer 🍺</h2>
+            <p>Get the app experience with one click!</p>
+        </div>
+        
+        <div class="android-guide-content">
+            <p class="install-ready-text">
+                Your browser is ready to install this app!
+            </p>
+            
+            <button class="btn btn-primary btn-large" id="android-install-now">
+                <span>📲</span> Install Now
+            </button>
+            
+            <div class="android-benefits">
+                <div class="benefit-row">
+                    <span>⚡</span> Instant access from home screen
+                </div>
+                <div class="benefit-row">
+                    <span>📍</span> Better location permissions
+                </div>
+                <div class="benefit-row">
+                    <span>🔄</span> Works offline
+                </div>
+                <div class="benefit-row">
+                    <span>📱</span> No browser bars
+                </div>
+            </div>
+            
+            <p class="install-note">
+                You can always uninstall from your phone settings
+            </p>
+        </div>
+    </div>
+</div>
+
 <!-- Welcome Modal -->
 <div id="welcomeModal" class="modal-overlay welcome-modal" data-cover-nav="true" style="display: none;">
     <div class="modal-container welcome-container">
