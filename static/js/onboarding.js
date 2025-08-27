@@ -889,6 +889,7 @@ Website: https://coeliacslikebeer.co.uk
     };
     
     const acceptAllCookies = () => {
+        console.log('✅ acceptAllCookies FUNCTION CALLED');
         console.log('Accepting all cookies');
         
         // Set all toggles to checked
