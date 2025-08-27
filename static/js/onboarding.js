@@ -1077,25 +1077,6 @@ Website: https://coeliacslikebeer.co.uk
             completeOnboarding();
         }
     };
-
-    // Add the cookie complete function:
-    const completeOnboarding = () => {
-        console.log('✅ Onboarding fully complete with cookies!');
-        
-        // Mark as complete
-        localStorage.setItem('onboardingComplete', 'true');
-        localStorage.setItem('onboardingCompleteDate', new Date().toISOString());
-        
-        // Trigger completion event
-        if (window.App?.events) {
-            window.App.events.emit('onboarding:complete');
-        }
-        
-        // Optional: Reload or redirect
-        setTimeout(() => {
-            window.location.reload();
-        }, 1500);
-    };
     
     // ================================
     // UTILITIES
