@@ -813,7 +813,7 @@ const App = {
             if (window.OnboardingFlow) {
                 OnboardingFlow.installAndroid();
             }
-        }
+        },
         
         // Welcome actions
         'skip-welcome': (el, modules) => {
