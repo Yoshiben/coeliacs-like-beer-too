@@ -27,3 +27,191 @@
         </div>
     </div>
 </div>
+
+<!-- Location Permission Modal -->
+<div id="locationPermissionModal" class="modal location-modal modal-fullscreen">
+    <div class="modal-content">
+        <div class="modal-header">
+            <button class="modal-close" data-action="deny-location">×</button>
+            <span class="modal-icon">📍</span>
+            <h2 class="modal-title">Enable Location Services</h2>
+            <p class="modal-subtitle">Find GF beer venues near you</p>
+        </div>
+        
+        <div class="modal-body">
+            <p class="permission-intro">
+                To find GF beer venues near you, we need your location permission.
+                <strong>Your location is never stored on our servers</strong> - it stays on your device.
+            </p>
+            
+            <div class="ios-notice">
+                <strong>📱 iPhone/iPad Users:</strong>
+                <span>You'll need to allow location access each session for privacy. 
+                For fewer prompts, add this app to your home screen.</span>
+            </div>
+            
+            <div class="permission-benefits">
+                <div class="benefit-item">
+                    <span class="benefit-icon">🎯</span>
+                    <span>Find the closest venues with GF beer instantly</span>
+                </div>
+                <div class="benefit-item">
+                    <span class="benefit-icon">📏</span>
+                    <span>See accurate walking/driving distances</span>
+                </div>
+                <div class="benefit-item">
+                    <span class="benefit-icon">🗺️</span>
+                    <span>Get turn-by-turn directions from where you are</span>
+                </div>
+                <div class="benefit-item">
+                    <span class="benefit-icon">🔒</span>
+                    <span>Your privacy is protected - we never track or store your location</span>
+                </div>
+            </div>
+            
+            <p class="permission-note">
+                Safari users: Go to Settings → Privacy → Location Services → Safari
+                to manage permissions permanently
+            </p>
+        </div>
+        
+        <div class="modal-actions">
+            <button class="btn btn-secondary" data-action="deny-location">Use Postcode Instead</button>
+            <button class="btn btn-primary" data-action="allow-location">Enable Location</button>
+        </div>
+    </div>
+</div>
+
+<!-- Location Blocked Modal -->
+<div id="locationBlockedModal" class="modal location-modal">
+    <div class="modal-content location-permission-card">
+        <div class="permission-icon blocked">🚫</div>
+        <h2 class="permission-title">Location Access Blocked</h2>
+        <p class="permission-text">
+            Your browser is currently blocking location access for this website. 
+            To find venues near you, you'll need to update your browser settings.
+            If you don't wish to share your location, please select "Search
+            by Area" below to continue.
+        </p>
+        
+        <div class="permission-benefits blocked-instructions">
+            <h4>How to enable location:</h4>
+            
+            <div class="browser-instructions" id="browserInstructions">
+                <!-- Chrome -->
+                <div class="instruction-set" data-browser="chrome">
+                    <strong>Chrome:</strong>
+                    <ol>
+                        <li>Click the lock icon 🔒 in the address bar</li>
+                        <li>Find "Location" and change it to "Allow"</li>
+                        <li>Refresh the page and try again</li>
+                    </ol>
+                </div>
+                
+                <!-- Firefox -->
+                <div class="instruction-set" data-browser="firefox">
+                    <strong>Firefox:</strong>
+                    <ol>
+                        <li>Click the lock icon 🔒 in the address bar</li>
+                        <li>Click "Clear permissions and reload"</li>
+                        <li>When prompted, click "Allow location access"</li>
+                    </ol>
+                </div>
+                
+                <!-- Safari -->
+                <div class="instruction-set" data-browser="safari">
+                    <strong>Safari:</strong>
+                    <ol>
+                        <li>Go to Safari → Preferences → Websites</li>
+                        <li>Click "Location" in the sidebar</li>
+                        <li>Find coeliacslikebeer.co.uk and change to "Allow"</li>
+                    </ol>
+                </div>
+                
+                <!-- Edge -->
+                <div class="instruction-set" data-browser="edge">
+                    <strong>Edge:</strong>
+                    <ol>
+                        <li>Click the lock icon 🔒 in the address bar</li>
+                        <li>Click "Permissions for this site"</li>
+                        <li>Find "Location" and change to "Allow"</li>
+                    </ol>
+                </div>
+                
+                <!-- Generic -->
+                <div class="instruction-set" data-browser="generic">
+                    <strong>Most browsers:</strong>
+                    <ol>
+                        <li>Look for a lock icon 🔒 in your address bar</li>
+                        <li>Click it and find location settings</li>
+                        <li>Change location access to "Allow"</li>
+                        <li>Refresh the page and try again</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+        
+        <div class="permission-actions">
+            <button class="btn btn-secondary" data-action="close-location-blocked">Search by Area</button>
+            <button class="btn btn-primary" data-action="reload-page">Try Again</button>
+        </div>
+        
+        <p class="permission-note">
+            Don't worry - your location data is never stored or shared
+        </p>
+    </div>
+</div>
+
+<!-- Cookie Settings Modal -->
+<div id="cookieSettings" class="modal cookie-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">🍪 Cookie Settings</h2>
+            <button class="modal-close" aria-label="Close cookie settings">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="cookie-settings-content">
+                <div class="cookie-category">
+                    <div class="cookie-category-header">
+                        <h3>Essential Cookies</h3>
+                        <label class="cookie-toggle">
+                            <input type="checkbox" checked disabled>
+                            <span class="toggle-slider essential"></span>
+                        </label>
+                    </div>
+                    <p>These cookies are necessary for the website to function and cannot be switched off. They are usually only set in response to actions made by you which amount to a request for services.</p>
+                    <div class="cookie-details">
+                        <strong>Examples:</strong> Session management, search preferences, location consent
+                    </div>
+                </div>
+                <div class="cookie-category">
+                    <div class="cookie-category-header">
+                        <h3>Analytics Cookies</h3>
+                        <label class="cookie-toggle">
+                            <input type="checkbox" id="analyticsConsent">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <p>These cookies help us understand how visitors interact with our website by collecting and reporting information anonymously. This helps us improve our service.</p>
+                    <div class="cookie-details">
+                        <strong>Provider:</strong> Google Analytics<br>
+                        <strong>Purpose:</strong> Usage statistics, popular features, performance monitoring
+                    </div>
+                </div>
+                <div class="cookie-info">
+                    <h4>📋 Your Rights</h4>
+                    <ul>
+                        <li>You can change your preferences at any time</li>
+                        <li>Withdrawing consent may limit website functionality</li>
+                        <li>Essential cookies cannot be disabled</li>
+                        <li>See our <a href="/cookies" target="_blank">Cookie Policy</a> for full details</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button data-action="save-cookie-preferences" class="btn btn-primary">Save Preferences</button>
+                <button data-action="accept-all-from-settings" class="btn btn-success">Accept All</button>
+            </div>
+        </div>
+    </div>
+</div>
