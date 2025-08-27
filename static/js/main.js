@@ -9,6 +9,9 @@ import { UserSession } from './user-session.js';
 import { ToastModule } from './toast.js'; 
 const STATE_KEYS = Constants.STATE_KEYS;
 
+console.log('OnboardingFlow loaded:', typeof OnboardingFlow);
+console.log('UserSession loaded:', typeof UserSession);
+
 // ================================
 // EVENT BUS
 // ================================
