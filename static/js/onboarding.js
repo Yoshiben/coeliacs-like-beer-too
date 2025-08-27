@@ -1038,15 +1038,45 @@ Website: https://coeliacslikebeer.co.uk
     // ================================
     
     const finishOnboarding = () => {
-        console.log('🎉 Finishing onboarding');
+        console.log('🎉 Finishing onboarding - checking for cookie consent');
         
-        // Hide all onboarding modals
-        ['ageGateModal', 'welcomeModal', 'nicknameModal', 'signInPromptModal', 
-         'signInModal', 'passcodeModal', 'benefitsModal', 'cookieModal'].forEach(modalId => {
-            hideModal(modalId);
-        });
+        // Hide all onboarding modals first
+        hideModal('ageGateModal');
+        hideModal('welcomeModal');
+        hideModal('nicknameModal');
+        hideModal('signInModal');
+        hideModal('passcodeModal');
+        hideModal('benefitsModal');
         
-        window.dispatchEvent(new Event('onboardingComplete'));
+        // Check if we need cookie consent
+        if (needsCookieConsent()) {
+            console.log('🍪 Showing cookie consent');
+            setTimeout(() => {
+                showModal('cookieModal');  // SHOW the cookie modal
+            }, 500);
+        } else {
+            console.log('✅ Cookie consent already given');
+            completeOnboarding();
+        }
+    };
+
+    // Add the cookie complete function:
+    const completeOnboarding = () => {
+        console.log('✅ Onboarding fully complete with cookies!');
+        
+        // Mark as complete
+        localStorage.setItem('onboardingComplete', 'true');
+        localStorage.setItem('onboardingCompleteDate', new Date().toISOString());
+        
+        // Trigger completion event
+        if (window.App?.events) {
+            window.App.events.emit('onboarding:complete');
+        }
+        
+        // Optional: Reload or redirect
+        setTimeout(() => {
+            window.location.reload();
+        }, 1500);
     };
     
     // ================================
