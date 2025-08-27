@@ -824,8 +824,12 @@ const App = {
             }
         },
         'accept-all-cookies': (el, modules) => {
+            console.log('🔥 ACTION HANDLER CALLED');
+            console.log('OnboardingFlow exists?', !!window.OnboardingFlow);
+            console.log('acceptAllCookies exists?', typeof window.OnboardingFlow?.acceptAllCookies);
+            
             if (window.OnboardingFlow) {
-                OnboardingFlow.acceptAllCookies();
+                window.OnboardingFlow.acceptAllCookies();
             }
         },
         
