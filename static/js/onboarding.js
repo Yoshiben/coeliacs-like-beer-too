@@ -225,12 +225,13 @@ export const OnboardingFlow = (() => {
         // Add event listeners after creating the elements
         document.getElementById('signInButton')?.addEventListener('click', () => {
             console.log('Sign in button clicked for:', nickname);
-            promptSignIn(nickname);
+            // Call the OnboardingFlow method properly
+            OnboardingFlow.promptSignIn(nickname);
         });
         
         document.getElementById('tryAnotherButton')?.addEventListener('click', () => {
             console.log('Try another button clicked');
-            clearNicknameOptions();
+            OnboardingFlow.clearNicknameOptions();
         });
         
         // Add listeners for suggestion buttons
@@ -238,7 +239,7 @@ export const OnboardingFlow = (() => {
             btn.addEventListener('click', (e) => {
                 const suggestion = e.target.dataset.suggestion;
                 console.log('Using suggestion:', suggestion);
-                useNickname(suggestion);
+                OnboardingFlow.useNickname(suggestion);
             });
         });
     };
@@ -332,8 +333,10 @@ export const OnboardingFlow = (() => {
     // ================================
     
     const promptSignIn = (nickname) => {
+        console.log('🔐 promptSignIn called with nickname:', nickname);
         state.attemptedNickname = nickname;
         closeModal('nickname');
+        console.log('📝 Calling showSignInWithNickname...');
         showSignInWithNickname(nickname);
     };
     
