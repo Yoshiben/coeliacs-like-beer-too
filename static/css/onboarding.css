@@ -2141,3 +2141,345 @@
         grid-template-columns: repeat(3, 1fr);
     }
 }
+
+
+<!-- ============================
+     CSS STYLES FOR POST-INSTALL MODALS
+     Add this to your onboarding.css file
+     ============================ -->
+
+<style>
+/* Post-Install Success Modal */
+.post-install-container {
+    max-width: min(95vw, 440px);
+    max-height: min(90vh, 750px);
+}
+
+.post-install-header {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    padding: clamp(1.5rem, 4vh, 2.5rem);
+    text-align: center;
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.post-install-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: rotate 10s linear infinite;
+}
+
+.success-checkmark {
+    display: inline-block;
+    font-size: clamp(3rem, 8vw, 4rem);
+    margin-bottom: 0.5rem;
+    animation: checkmarkPop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes checkmarkPop {
+    0% { transform: scale(0) rotate(-45deg); }
+    50% { transform: scale(1.2) rotate(10deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+.post-install-header h2 {
+    font-size: clamp(1.3rem, 4vw, 1.6rem);
+    margin: 0 0 0.5rem;
+    position: relative;
+    z-index: 1;
+}
+
+.post-install-header p {
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    opacity: 0.95;
+    margin: 0;
+}
+
+.post-install-body {
+    padding: clamp(1.5rem, 4vw, 2rem);
+}
+
+/* App Icon Showcase */
+.app-icon-showcase {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+.app-icon-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.app-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    font-size: 3rem;
+    box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+    animation: appIconBounce 2s ease-in-out infinite;
+}
+
+@keyframes appIconBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.app-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #ef4444;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 8px;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* Redirect Message */
+.redirect-message {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.redirect-message h3 {
+    font-size: clamp(1.1rem, 3vw, 1.3rem);
+    color: #111827;
+    margin: 0 0 0.5rem;
+}
+
+.redirect-message p {
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    color: #6b7280;
+    line-height: 1.5;
+}
+
+/* Find App Guide */
+.find-app-guide {
+    background: #f9fafb;
+    border-radius: 12px;
+    padding: clamp(1rem, 3vw, 1.25rem);
+    margin-bottom: 1.5rem;
+}
+
+.find-app-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 0;
+}
+
+.find-app-item:not(:last-child) {
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.find-icon {
+    font-size: 1.5rem;
+    width: 32px;
+    flex-shrink: 0;
+}
+
+.find-text strong {
+    display: block;
+    font-size: clamp(0.9rem, 2.5vw, 0.95rem);
+    color: #374151;
+    margin-bottom: 0.25rem;
+}
+
+.find-text span {
+    font-size: clamp(0.8rem, 2vw, 0.85rem);
+    color: #6b7280;
+}
+
+/* Benefits Reminder */
+.app-benefits-reminder {
+    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+    border: 1px solid #86efac;
+    border-radius: 12px;
+    padding: clamp(0.75rem, 2vw, 1rem);
+    margin-bottom: 1.5rem;
+}
+
+.reminder-title {
+    font-weight: 600;
+    color: #166534;
+    margin: 0 0 0.5rem;
+    font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+}
+
+.benefit-checklist {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.benefit-checklist li {
+    position: relative;
+    padding-left: 1.5rem;
+    margin-bottom: 0.4rem;
+    font-size: clamp(0.8rem, 2vw, 0.85rem);
+    color: #166534;
+}
+
+.benefit-checklist li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #10b981;
+    font-weight: 700;
+}
+
+/* Post Install Actions */
+.post-install-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.post-install-actions .btn-large {
+    width: 100%;
+    padding: clamp(0.9rem, 2.5vw, 1.1rem);
+    font-size: clamp(0.95rem, 2.5vw, 1.05rem);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn-arrow {
+    animation: arrowSlide 1.5s ease-in-out infinite;
+}
+
+@keyframes arrowSlide {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(5px); }
+}
+
+.help-text {
+    text-align: center;
+    margin-top: 1rem;
+    color: #6b7280;
+}
+
+/* iOS Variant Styles */
+.ios-variant .post-install-header {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.ios-home-visual {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+}
+
+.ios-screen-mockup {
+    background: #f3f4f6;
+    border-radius: 16px;
+    padding: 1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.ios-app-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 60px);
+    gap: 12px;
+}
+
+.ios-app-icon {
+    width: 60px;
+    height: 60px;
+    background: #e5e7eb;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.ios-app-icon.highlighted {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    animation: iconPulse 2s ease-in-out infinite;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.ios-app-icon.highlighted span:first-child {
+    font-size: 2rem;
+}
+
+.ios-app-icon.highlighted .app-name {
+    font-size: 0.6rem;
+    color: white;
+    margin-top: 2px;
+}
+
+@keyframes iconPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.ios-next-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.step-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    background: #f9fafb;
+    border-radius: 8px;
+}
+
+.step-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: #3b82f6;
+    color: white;
+    border-radius: 50%;
+    font-weight: 700;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+/* Responsive for iPhone 13 */
+@media (min-width: 389px) and (max-width: 395px) and (min-height: 840px) {
+    .post-install-container {
+        max-height: calc(100vh - 2rem);
+    }
+    
+    .post-install-header {
+        padding: 1.75rem 1.5rem;
+    }
+    
+    .success-checkmark {
+        font-size: 3rem;
+    }
+    
+    .app-icon {
+        width: 70px;
+        height: 70px;
+        font-size: 2.5rem;
+    }
+    
+    .post-install-body {
+        padding: 1.25rem;
+    }
+}
