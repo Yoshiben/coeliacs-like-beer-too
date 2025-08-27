@@ -341,6 +341,8 @@ export const OnboardingFlow = (() => {
     };
     
     const showSignInWithNickname = (nickname) => {
+        console.log('📝 Creating sign-in modal for:', nickname);
+        
         const modal = createModal('signIn', `
             <div class="signin-content">
                 <div class="signin-header">
@@ -394,8 +396,18 @@ export const OnboardingFlow = (() => {
         
         document.body.appendChild(modal);
         
+        // IMPORTANT: Actually show the modal!
+        modal.style.display = 'flex';
+        modal.classList.add('active');
+        
+        console.log('✅ Sign-in modal created and displayed');
+        
         setTimeout(() => {
-            document.getElementById('signInPasscode')?.focus();
+            const passcodeInput = document.getElementById('signInPasscode');
+            if (passcodeInput) {
+                passcodeInput.focus();
+                console.log('✅ Focus set on passcode input');
+            }
         }, 100);
     };
     
