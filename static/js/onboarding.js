@@ -5,6 +5,9 @@
 
 import { UserSession } from './user-session.js';
 
+// Make UserSession available to this module
+console.log('🔍 UserSession available:', typeof UserSession);
+
 export const OnboardingFlow = (() => {
     'use strict';
     
@@ -38,6 +41,7 @@ export const OnboardingFlow = (() => {
             return { status: 'existing-user', nickname: existingNickname };
         }
         
+        // Initialize UserSession first - this sets up the UUID
         const userStatus = await UserSession.init();
         console.log('User status:', userStatus);
         
@@ -63,12 +67,14 @@ export const OnboardingFlow = (() => {
                 break;
                 
             case 'anonymous':
-                console.log('👤 Anonymous user');
+                console.log('👤 Anonymous user - show welcome');
+                showWelcome();
                 break;
                 
             default:
                 console.log('✅ Ready to use app');
         }
+    };
     };
     
     // ================================
@@ -318,39 +324,23 @@ export const OnboardingFlow = (() => {
         }
         
         try {
-            // Get or create UUID for this device
-            let uuid = localStorage.getItem('userUUID');
-            if (!uuid) {
-                uuid = generateUUID();
-                localStorage.setItem('userUUID', uuid);
-            }
+            // Use UserSession to create the user
+            const result = await UserSession.createUser(state.nickname, state.avatarEmoji);
             
-            // Call the ACTUAL API to create user
-            const response = await fetch('/api/user/create', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    uuid: uuid,
-                    nickname: state.nickname,
-                    avatar_emoji: state.avatarEmoji
-                })
-            });
+            console.log('📝 User creation result:', result);
             
-            const result = await response.json();
-            
-            if (response.ok && result.success) {
+            if (result.success) {
                 state.passcode = result.passcode;
                 
                 // Store everything locally
                 localStorage.setItem('userNickname', state.nickname);
                 localStorage.setItem('userAvatar', state.avatarEmoji);
-                localStorage.setItem('user_id', result.user_id);
-                localStorage.setItem('userUUID', uuid);
+                localStorage.setItem('user_id', result.user?.userId || result.user_id);
+                localStorage.setItem('hasSeenWelcome', 'true');
                 
                 if (window.App) {
                     window.App.setState('userNickname', state.nickname);
-                    window.App.setState('userId', result.user_id);
-                    window.App.setState('userUUID', uuid);
+                    window.App.setState('userId', result.user?.userId || result.user_id);
                 }
                 
                 hideModal('nicknameModal');
@@ -369,13 +359,23 @@ export const OnboardingFlow = (() => {
                 alert(`This device already has an account: ${result.existing_nickname}. Please sign in with your passcode.`);
                 hideModal('nicknameModal');
                 showSignInWithNickname(result.existing_nickname);
+            } else if (result.error === 'Nickname already taken') {
+                // Nickname taken by someone else
+                const statusEl = document.getElementById('nicknameStatus');
+                if (statusEl) {
+                    statusEl.innerHTML = '<span style="color: #ef4444;">❌ Already taken - try another</span>';
+                }
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = 'Create Account!';
+                }
             } else {
                 // Other error
                 throw new Error(result.error || 'Failed to create account');
             }
         } catch (error) {
             console.error('❌ Error saving nickname:', error);
-            alert('Failed to create account. Please try again.');
+            alert(`Failed to create account: ${error.message}`);
             if (saveBtn) {
                 saveBtn.disabled = false;
                 saveBtn.textContent = 'Create Account!';
@@ -463,35 +463,21 @@ export const OnboardingFlow = (() => {
         }
         
         try {
-            // Get or use existing UUID
-            let uuid = localStorage.getItem('userUUID');
-            if (!uuid) {
-                uuid = generateUUID();
-                localStorage.setItem('userUUID', uuid);
-            }
+            // Use UserSession to sign in
+            const result = await UserSession.signIn(nickname, passcode);
             
-            // Call the ACTUAL sign-in API
-            const response = await fetch('/api/user/signin', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    nickname: nickname,
-                    passcode: passcode,
-                    uuid: uuid
-                })
-            });
+            console.log('🔐 Sign in result:', result);
             
-            const result = await response.json();
-            
-            if (response.ok && result.success) {
-                // Store user data
+            if (result.success) {
+                // Store user data locally
                 localStorage.setItem('userNickname', nickname);
-                localStorage.setItem('user_id', result.user.user_id);
-                localStorage.setItem('userAvatar', result.user.avatar_emoji || '🍺');
+                localStorage.setItem('user_id', result.user?.userId || result.user?.user_id);
+                localStorage.setItem('userAvatar', result.user?.avatarEmoji || '🍺');
+                localStorage.setItem('hasSeenWelcome', 'true');
                 
                 if (window.App) {
                     window.App.setState('userNickname', nickname);
-                    window.App.setState('userId', result.user.user_id);
+                    window.App.setState('userId', result.user?.userId || result.user?.user_id);
                 }
                 
                 hideModal('signInModal');
