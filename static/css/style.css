@@ -8,8 +8,44 @@
          radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.9) 0%, transparent 50%),
          radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.9) 0%, transparent 50%),
          rgba(0, 0, 0, 0.85);
-    
-    /* Keep the old one as "simple" for when you need solid/clear gradient */
+   
+   --purple-gradient: 
+         radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.9) 0%, transparent 50%),
+         radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.9) 0%, transparent 50%),
+         rgba(0, 0, 0, 0.85);
+
+   --orange-gradient: 
+         radial-gradient(circle at 25% 75%, rgba(249, 115, 22, 0.9) 0%, transparent 50%),
+         radial-gradient(circle at 75% 25%, rgba(234, 88, 12, 0.9) 0%, transparent 50%),
+         rgba(0, 0, 0, 0.85);
+
+   --green-gradient: 
+         radial-gradient(circle at 25% 75%, rgba(16, 185, 129, 0.9) 0%, transparent 50%),
+         radial-gradient(circle at 75% 25%, rgba(5, 150, 105, 0.9) 0%, transparent 50%),
+         rgba(0, 0, 0, 0.85);
+
+   --pink-gradient: 
+         radial-gradient(circle at 25% 75%, rgba(236, 72, 153, 0.9) 0%, transparent 50%),
+         radial-gradient(circle at 75% 25%, rgba(219, 39, 119, 0.9) 0%, transparent 50%),
+         rgba(0, 0, 0, 0.85);
+
+   --blue-gradient: 
+         radial-gradient(circle at 25% 75%, rgba(59, 130, 246, 0.9) 0%, transparent 50%),
+         radial-gradient(circle at 75% 25%, rgba(37, 99, 235, 0.9) 0%, transparent 50%),
+         rgba(0, 0, 0, 0.85);
+
+   
+
+   --bg-home-page:
+         radial-gradient(circle at 20% 80%, rgba(156, 163, 175, 0.3) 0%, transparent 50%),
+         radial-gradient(circle at 80% 20%, rgba(107, 114, 128, 0.3) 0%, transparent 50%),
+         rgba(249, 250, 251, 1);
+
+   
+
+   --nav-height: clamp(50px, 8vh, 81px);  
+
+       /* Keep the old one as "simple" for when you need solid/clear gradient */
     --primary-gradient-simple: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
           
     /* Light version for backgrounds */
@@ -17,18 +53,6 @@
          radial-gradient(circle at 20% 80%, rgba(102, 126, 234, 0.9) 0%, transparent 50%),
          radial-gradient(circle at 80% 20%, rgba(118, 75, 162, 0.9) 0%, transparent 50%),
          radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.3) 0%, transparent 70%);
-
-   --bg-home-page:
-         radial-gradient(circle at 20% 80%, rgba(156, 163, 175, 0.3) 0%, transparent 50%),
-         radial-gradient(circle at 80% 20%, rgba(107, 114, 128, 0.3) 0%, transparent 50%),
-         rgba(249, 250, 251, 1);
-
-   --orange-gradient: 
-         radial-gradient(circle at 25% 75%, rgba(249, 115, 22, 0.9) 0%, transparent 50%),
-         radial-gradient(circle at 75% 25%, rgba(234, 88, 12, 0.9) 0%, transparent 50%),
-         rgba(0, 0, 0, 0.85);
-
-   --nav-height: clamp(50px, 8vh, 81px);  
    
    /* Z-Index Scale */
    --z-base: 1;
@@ -922,20 +946,6 @@ body {
     z-index: 1;
     
     /* Add safe area padding for content */
-    padding-bottom: env(safe-area-inset-bottom);
-}
-
-/* ================================
-   UPDATE SEARCH CONTAINER
-   ================================ */
-.search-container {
-    height: 100%;
-    flex: 1;
-    background: var(--white);
-    position: relative;
-    align-content: space-evenly;
-    
-    /* Ensure search options don't go under home indicator */
     padding-bottom: env(safe-area-inset-bottom);
 }
 
