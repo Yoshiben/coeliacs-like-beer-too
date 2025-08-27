@@ -219,20 +219,21 @@ body.page-breweries .nav-back-btn { display: flex !important; }
 body.page-community .nav-back-btn { display: flex !important; }
 
 body {
-   background: var(--primary-gradient);
-   margin: 0;
-   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-   color: var(--text-primary);
-   line-height: 1.6;
-   position: fixed;
-   width: 100%;
-   height: 100%;
-   overflow: hidden;
-   display: flex;
-   flex-direction: column;
-   padding-top: var(--nav-height);
-   /*    padding-bottom: var(--nav-height); */
-   padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom));
+    background: var(--primary-gradient);
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-primary);
+    line-height: 1.6;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    
+    /* Updated padding to account for safe areas */
+    padding-top: calc(var(--nav-height) + env(safe-area-inset-top));
+    padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom));
 }
 
 html {
@@ -821,288 +822,6 @@ html {
     color: var(--text-white);
 }
 
-
-/* Brewery & Beer Dropdown Styling - Make them consistent */
-.brewery-dropdown-container,
-.beer-name-container {
-    position: relative;
-}
-
-
-.recent-finds-section {
-  background: var(--bg-recent-finds);
-  border: 1px solid var(--border-recent-finds);
-  border-radius: var(--border-recent-finds-radius);
-  padding: var(--recent-finds-padding);
-  margin: var(--space-xl) 0;
-  box-shadow: var(--shadow-recent-finds);
-  position: relative;
-  overflow: hidden;
-}
-
-.recent-finds-section::before {
-  content: '🍺';
-  position: absolute;
-  top: -10px;
-  right: -10px;
-  font-size: 4rem;
-  opacity: 0.03;
-  transform: rotate(-15deg);
-  pointer-events: none;
-}
-
-.recent-finds-title {
-  color: var(--text-primary);
-  font-size: var(--recent-finds-title-size);
-  font-weight: 700;
-  margin: 0 0 var(--recent-finds-gap) 0;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  position: relative;
-  z-index: 1;
-}
-
-.recent-finds-icon {
-  background: var(--purple-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  font-size: 1.2em;
-}
-
-.recent-finds-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--recent-finds-gap);
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  position: relative;
-  z-index: 1;
-}
-
-.recent-find-item {
-  background: var(--white);
-  border: 1px solid var(--border-recent-finds);
-  border-radius: calc(var(--border-recent-finds-radius) * 0.7);
-  padding: var(--recent-finds-padding);
-  transition: all var(--transition);
-  position: relative;
-  cursor: pointer;
-}
-
-.recent-find-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.15);
-  border-color: rgba(139, 92, 246, 0.2);
-}
-
-.recent-find-content {
-  display: grid;
-  gap: var(--space-sm);
-}
-
-.recent-find-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: var(--space-sm);
-}
-
-.recent-find-user {
-  color: var(--text-primary);
-  font-size: var(--recent-finds-text-size);
-  font-weight: 600;
-  margin: 0;
-}
-
-.recent-find-time {
-  color: var(--text-muted);
-  font-size: var(--recent-finds-time-size);
-  font-weight: 400;
-  opacity: 0.8;
-}
-
-.recent-find-beer {
-  color: var(--text-primary);
-  font-size: var(--recent-finds-text-size);
-  font-weight: 500;
-  margin: 0;
-  line-height: 1.4;
-}
-
-.recent-find-beer strong {
-  color: var(--border-purple);
-  font-weight: 700;
-}
-
-.recent-find-venue {
-  color: var(--text-secondary);
-  font-size: var(--recent-finds-text-size);
-  margin: 0;
-  font-weight: 500;
-}
-
-.recent-find-location {
-  color: var(--text-muted);
-  font-size: var(--recent-finds-location-size);
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  font-weight: 400;
-}
-
-.recent-find-actions {
-  display: flex;
-  gap: var(--space-sm);
-  margin-top: var(--space-md);
-  padding-top: var(--space-sm);
-  border-top: 1px solid var(--divider-color);
-}
-
-.recent-find-actions .btn {
-  padding: var(--space-xs) var(--space-md);
-  font-size: var(--recent-finds-location-size);
-  border-radius: var(--radius-pill);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition);
-  border: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-}
-
-.recent-find-actions .btn-outline {
-  background: rgba(139, 92, 246, 0.05);
-  color: var(--border-purple);
-  border: 1px solid rgba(139, 92, 246, 0.2);
-}
-
-.recent-find-actions .btn-outline:hover {
-  background: rgba(139, 92, 246, 0.1);
-  transform: translateY(-1px);
-}
-
-.recent-find-actions .btn-text {
-  background: transparent;
-  color: var(--text-muted);
-}
-
-.recent-find-actions .btn-text:hover {
-  color: var(--border-purple);
-}
-
-.recent-finds-loading {
-  text-align: center;
-  color: var(--text-muted);
-  font-style: italic;
-  padding: var(--space-xl);
-  font-size: var(--recent-finds-text-size);
-}
-
-.recent-finds-error {
-  text-align: center;
-  color: #dc3545;
-  font-size: var(--recent-finds-text-size);
-  padding: var(--space-xl);
-}
-
-.recent-finds-empty {
-  text-align: center;
-  color: var(--text-muted);
-  font-style: italic;
-  padding: var(--space-xl);
-  font-size: var(--recent-finds-text-size);
-}
-
-/* Animation for new items */
-.recent-find-item {
-  animation: slideInUp 0.4s ease-out;
-  animation-fill-mode: both;
-}
-
-.recent-find-item:nth-child(1) { animation-delay: 0.1s; }
-.recent-find-item:nth-child(2) { animation-delay: 0.2s; }
-
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Buy Beer Button - Add orange theming */
-.buy-beer-button {
-    border-color: var(--border-orange);
-}
-
-.buy-beer-button:hover {
-    transform: translateY(-2px);
-    border-color: var(--orange);
-    background: linear-gradient(135deg, 
-        var(--bg-orange) 0%, 
-        rgba(255, 255, 255, 1) 100%
-    );
-    box-shadow: 0 4px 16px var(--light-orange);
-}
-
-/* Recent Finds - Add orange accent option */
-.recent-finds-section {
-    /* Keep existing but add orange border option */
-    border: 1px solid var(--border-orange);
-}
-
-.recent-finds-title {
-    /* Add orange gradient to icon */
-    background: var(--orange-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-/* Action Cards - Add orange hover for "Add a Find" */
-.action-card[data-action="add-find"]:hover {
-    border-color: var(--border-orange);
-    background: linear-gradient(135deg, 
-        var(--bg-orange) 0%, 
-        rgba(255, 255, 255, 1) 100%
-    );
-    box-shadow: 0 4px 12px var(--light-orange);
-}
-
-/* Search Option - Beer (make it orange) */
-.search-option.beer {
-    background: linear-gradient(135deg, var(--bg-orange) 0%, rgba(249, 115, 22, 0.05) 100%);
-    border-color: var(--border-orange);
-}
-
-.search-option.beer:hover {
-    border-color: var(--orange);
-    background: linear-gradient(135deg, 
-        rgba(249, 115, 22, 0.15) 0%, 
-        rgba(255, 255, 255, 1) 100%
-    );
-    box-shadow: 0 4px 16px var(--light-orange);
-}
-
-
-/* Responsive grid for larger screens */
-@media (min-width: 768px) {
-  .recent-finds-list {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: var(--recent-finds-gap);
-  }
-}
-
-
 @media (min-width:1025px) {
    .nav-back-btn {
       position: absolute;
@@ -1151,31 +870,7 @@ html {
     }
 }
 
-/* ================================================================================
-   ADD THESE UPDATES TO YOUR style.css
-   Safe area support for iPhone home indicators
-   ================================================================================ */
 
-/* ================================
-   UPDATE YOUR BODY STYLES
-   ================================ */
-body {
-    background: var(--primary-gradient);
-    margin: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: var(--text-primary);
-    line-height: 1.6;
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    
-    /* Updated padding to account for safe areas */
-    padding-top: calc(var(--nav-height) + env(safe-area-inset-top));
-    padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom));
-}
 
 /* ================================
    UPDATE COMMUNITY HOME
@@ -1278,23 +973,3 @@ body {
         padding-right: env(safe-area-inset-right);
     }
 }
-
-/* Add this temporarily to test if the CSS is working */
-
-/* Make it REALLY obvious when page-community is active */
-/* body.page-community {
-    border: 5px solid red !important;
-} */
-
-/* Force show the back button with bright color */
-/* body.page-community .nav-back-btn { 
-    display: flex !important;
-    background: red !important;
-    color: white !important;
-} */
-
-/* Also try without body prefix in case there's specificity issues */
-/* .page-community .nav-back-btn {
-    display: flex !important;
-    background: blue !important;
-} */
