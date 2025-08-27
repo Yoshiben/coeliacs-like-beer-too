@@ -1586,3 +1586,81 @@
         padding: 1rem;
     }
 }
+
+
+/* Android Install Modal Styling */
+.android-install-modal .modal-body {
+    padding: 1.5rem;
+}
+
+.android-guide-content {
+    text-align: center;
+}
+
+.install-ready-text {
+    font-size: 1.1rem;
+    color: #4b5563;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+/* Big install button */
+.android-guide-content .btn-large {
+    width: 100%;
+    padding: 1.2rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+    background: var(--primary-gradient);
+    border: none;
+    border-radius: 16px;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 14px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
+}
+
+.android-guide-content .btn-large:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* Benefits list */
+.android-benefits {
+    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+    border-radius: 16px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+    text-align: left;
+}
+
+.benefit-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 0.95rem;
+    color: #374151;
+}
+
+.benefit-row:last-child {
+    border-bottom: none;
+}
+
+.benefit-row span:first-child {
+    font-size: 1.25rem;
+    width: 28px;
+    flex-shrink: 0;
+}
+
+.install-note {
+    font-size: 0.85rem;
+    color: #6b7280;
+    text-align: center;
+    line-height: 1.4;
+    opacity: 0.9;
+}
