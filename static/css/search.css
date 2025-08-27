@@ -1,0 +1,111 @@
+/* ================================
+   UPDATE SEARCH CONTAINER
+   ================================ */
+.search-container {
+    height: 100%;
+    flex: 1;
+    background: var(--bg-home);
+    position: relative;
+    align-content: space-evenly;
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+.search-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.search-header {
+    text-align: center;
+}
+
+.search-header-title {
+    font-size: var(--text-md);
+    color: var(--text-primary);
+    margin-bottom: 0; 
+}
+
+.search-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-lg);
+    min-height: 0;
+}
+
+.search-options {
+    flex: 1;
+    display: grid;
+    gap: var(--space-md);
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+}   
+
+.search-option {
+    border: 3px solid var(--border-light);
+    border-radius: var(--radius-xl);
+    padding: var(--space-md);
+    cursor: pointer;
+    transition: all var(--transition);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.search-option:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Search option colors */
+.search-option.location {
+    background: var(--green-gradient);
+    border-color: rgba(16, 185, 129, 0.2);
+}
+
+.search-option.name {
+    background: var(--blue-gradient);
+    border-color: rgba(59, 130, 246, 0.2);
+}
+
+.search-option.area {
+    background: var(--pink-gradient);
+    border-color: rgba(139, 92, 246, 0.2);
+}
+
+.search-option.beer {
+    background: var(--orange-gradient);
+    border-color: rgba(245, 158, 11, 0.2);
+}
+
+.search-option.beer:hover {
+    border-color: var(--orange);
+    background: linear-gradient(135deg, 
+        rgba(249, 115, 22, 0.15) 0%, 
+        rgba(255, 255, 255, 1) 100%
+    );
+    box-shadow: 0 4px 16px var(--light-orange);
+}
+
+.search-icon {
+    font-size: var(--text-2xl);
+    line-height: 1;
+}
+
+.search-title {
+    font-size: var(--text-md);
+    color: white;
+    margin-bottom: 0; 
+}
+
+.search-description {
+    font-size: var(--text-sm);
+    color: white;
+    text-align: center;
+    padding: 0 var(--space-xs);
+}
