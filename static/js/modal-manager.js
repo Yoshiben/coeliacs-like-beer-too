@@ -364,11 +364,15 @@ export const ModalManager = (() => {
     };
     
     const updateZIndexes = () => {
-        // Update z-indexes based on stack order
         state.modalStack.forEach((modalId, index) => {
             const modal = document.getElementById(modalId);
             if (modal) {
-                modal.style.zIndex = 1200 + (index * 10);
+                // Check if this modal should cover the nav
+                if (modal.dataset.coverNav === 'true') {
+                    modal.style.zIndex = 9999 + (index * 10);  // Above nav
+                } else {
+                    modal.style.zIndex = 1200 + (index * 10);   // Below nav (assuming nav is ~1000)
+                }
             }
         });
     };
