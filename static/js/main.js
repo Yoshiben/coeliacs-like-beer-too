@@ -697,16 +697,27 @@ const App = {
     },
     
     handleGlobalInput: (e) => {
-        // Delegate to appropriate handlers
+        // Handle input events for various inputs
         const inputHandlers = {
             'placesSearchInput': () => {
                 const search = App.getModule('search');
                 search?.PlacesSearchModule?.handleSearch(e.target.value);
+            },
+            'nicknameInput': () => {
+                // Handle nickname input changes
+                if (window.OnboardingFlow) {
+                    OnboardingFlow.checkNickname(e.target.value);
+                }
             }
         };
         
         const handler = inputHandlers[e.target.id];
         if (handler) handler();
+        
+        // Also check for data-action on input elements
+        if (e.target.dataset.action === 'check-nickname-input' && window.OnboardingFlow) {
+            OnboardingFlow.checkNickname(e.target.value);
+        }
     },
     
     handleGlobalChange: (e) => {
@@ -758,10 +769,14 @@ const App = {
         }
     },
     
-    // Action handler map - split into logical groups
     actionHandlers: {
-        // Onboarding action handlers
-       'confirm-age': (el, modules) => {
+        
+        // ================================
+        // ONBOARDING ACTION HANDLERS
+        // ================================
+        
+        // Age Gate actions
+        'confirm-age': (el, modules) => {
             if (window.OnboardingFlow) {
                 OnboardingFlow.confirmAge();
             }
@@ -773,6 +788,7 @@ const App = {
             }
         },
         
+        // Welcome actions
         'skip-welcome': (el, modules) => {
             if (window.OnboardingFlow) {
                 OnboardingFlow.skipWelcome();
@@ -785,6 +801,7 @@ const App = {
             }
         },
         
+        // Nickname actions
         'skip-nickname': (el, modules) => {
             if (window.OnboardingFlow) {
                 OnboardingFlow.skipNickname();
@@ -798,21 +815,18 @@ const App = {
         },
         
         'check-nickname-input': (el, modules) => {
+            // Note: This needs special handling for input events
+            // We'll handle this in the global input handler instead
             const value = el.value;
-            if (window.OnboardingFlow && window.OnboardingFlow.checkNickname) {
-                window.OnboardingFlow.checkNickname(value);
+            if (window.OnboardingFlow && value !== undefined) {
+                OnboardingFlow.checkNickname(value);
             }
         },
         
         'select-avatar': (el, modules) => {
             const emoji = el.dataset.emoji;
             if (emoji && window.OnboardingFlow) {
-                // Create a fake event object for the selectAvatar function
-                const fakeEvent = { target: el };
-                const originalEvent = window.event;
-                window.event = fakeEvent;
-                window.OnboardingFlow.selectAvatar(emoji);
-                window.event = originalEvent;
+                OnboardingFlow.selectAvatar(emoji);
             }
         },
         
@@ -828,8 +842,92 @@ const App = {
                 OnboardingFlow.saveNickname();
             }
         },
+        
+        // Sign In actions
+        'close-signin': (el, modules) => {
+            if (window.OnboardingFlow) {
+                OnboardingFlow.closeModal('signIn');
+            }
+        },
+        
+        'back-to-nickname': (el, modules) => {
+            if (window.OnboardingFlow) {
+                OnboardingFlow.backToNickname();
+            }
+        },
+        
+        'perform-signin': (el, modules) => {
+            if (window.OnboardingFlow) {
+                OnboardingFlow.performSignIn();
+            }
+        },
+        
+        // Passcode actions
+        'copy-passcode': (el, modules) => {
+            if (window.OnboardingFlow) {
+                OnboardingFlow.copyPasscode();
+            }
+        },
+        
+        'download-passcode': (el, modules) => {
+            if (window.OnboardingFlow) {
+                OnboardingFlow.downloadPasscode();
+            }
+        },
+        
+        'email-passcode': (el, modules) => {
+            if (window.OnboardingFlow) {
+                OnboardingFlow.emailPasscode();
+            }
+        },
+        
+        'toggle-passcode-confirm': (el, modules) => {
+            // Handle the checkbox toggle for passcode confirmation
+            const continueBtn = document.getElementById('continueFromPasscode');
+            if (continueBtn) {
+                continueBtn.disabled = !el.checked;
+            }
+        },
+        
+        'continue-from-passcode': (el, modules) => {
+            if (window.OnboardingFlow) {
+                // Check if we're returning to community hub or just finishing
+                const returnToCommunity = window.App?.getState('returnToCommunityAfterNickname');
+                if (returnToCommunity) {
+                    OnboardingFlow.confirmPasscodeSavedAndReturnToCommunity();
+                } else {
+                    OnboardingFlow.confirmPasscodeSaved();
+                }
+            }
+        },
+        
+        // Benefits actions
+        'start-exploring': (el, modules) => {
+            if (window.OnboardingFlow) {
+                OnboardingFlow.finishOnboarding();
+            }
+            // Could also trigger other actions like opening the search overlay
+            modules.modalManager?.open('searchOverlay');
+        },
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
 
 
         
