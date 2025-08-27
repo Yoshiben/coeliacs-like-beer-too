@@ -220,6 +220,135 @@ export const OnboardingFlow = (() => {
         }
     };
 
+    
+    // Show post-install modal
+    const showPostInstallModal = () => {
+        console.log('Showing post-install modal');
+        hideAllModals();
+        const modal = document.getElementById('postInstallModal');
+        if (modal) {
+            modal.classList.add('active');
+        }
+    };
+    
+    // Updated Android install with post-install modal
+    const installAndroid = async () => {
+        if (window.pwaHandler?.deferredPrompt) {
+            try {
+                await window.pwaHandler.deferredPrompt.prompt();
+                const result = await window.pwaHandler.deferredPrompt.userChoice;
+                
+                if (result.outcome === 'accepted') {
+                    console.log('PWA installed');
+                    hideModal('android-install-guide');
+                    
+                    // Show post-install modal instead of welcome
+                    setTimeout(() => {
+                        showPostInstallModal();
+                    }, 1500); // Give it a moment to install
+                    
+                } else {
+                    console.log('PWA install cancelled');
+                    // User cancelled, go straight to welcome
+                    hideModal('android-install-guide');
+                    showWelcome();
+                }
+                
+                // Clear the prompt either way
+                window.pwaHandler.deferredPrompt = null;
+            } catch (error) {
+                console.error('Install error:', error);
+                hideModal('android-install-guide');
+                showWelcome();
+            }
+        } else {
+            // No prompt available, just continue
+            hideModal('android-install-guide');
+            showWelcome();
+        }
+    };
+    
+    // Handle "Got it" button - user will open app
+    const handleUnderstoodBtn = () => {
+        console.log('User will open app');
+        
+        // Hide modal
+        hideModal('postInstallModal');
+        
+        // Mark that they installed
+        localStorage.setItem('appInstalled', 'true');
+        localStorage.setItem('appInstallTime', Date.now().toString());
+        
+        // End the flow here - they're going to the app
+        // Maybe show a goodbye message
+        showGoodbyeMessage();
+    };
+    
+    // Handle continue in browser
+    const handleContinueBrowser = () => {
+        console.log('User continuing in browser');
+        
+        // Mark their choice
+        localStorage.setItem('continuedInBrowser', 'true');
+        
+        // Hide post-install modal and continue to welcome
+        hideModal('postInstallModal');
+        showWelcome();
+    };
+    
+    // Simple goodbye message
+    const showGoodbyeMessage = () => {
+        const message = document.createElement('div');
+        message.className = 'goodbye-message';
+        message.innerHTML = `
+            <div class="goodbye-content">
+                <span>👋</span>
+                <p>See you in the app!</p>
+            </div>
+        `;
+        document.body.appendChild(message);
+        
+        // Fade in
+        setTimeout(() => message.classList.add('show'), 100);
+        
+        // Remove after 3 seconds
+        setTimeout(() => {
+            message.classList.remove('show');
+            setTimeout(() => message.remove(), 300);
+        }, 3000);
+    };
+    
+    // For iOS - show post-install after they complete the guide
+    const handleIOSInstallComplete = () => {
+        console.log('iOS install guide complete');
+        hideModal('ios-install-guide');
+        
+        // Show the same post-install modal
+        setTimeout(() => {
+            showPostInstallModal();
+        }, 500);
+    };
+    
+    // Initialize post-install handlers
+    const initPostInstallHandlers = () => {
+        // Understood button
+        const understoodBtn = document.getElementById('understoodBtn');
+        if (understoodBtn) {
+            understoodBtn.onclick = handleUnderstoodBtn;
+        }
+        
+        // Continue in browser button
+        const continueBrowserBtn = document.getElementById('continueBrowserBtn');
+        if (continueBrowserBtn) {
+            continueBrowserBtn.onclick = handleContinueBrowser;
+        }
+        
+        // Update iOS guide continue button
+        const iosContinueBtn = document.querySelector('#ios-install-guide .btn-primary');
+        if (iosContinueBtn) {
+            iosContinueBtn.onclick = handleIOSInstallComplete;
+        }
+    };
 
     
     
