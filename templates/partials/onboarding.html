@@ -39,15 +39,19 @@
 </div>
 
 <!-- PWA Install Prompt Modal -->
-<div id="pwaPromptModal" class="modal pwa-prompt-modal" data-cover-nav="true" style="display: none;">
+<div id="pwa-benefits-modal" class="modal pwa-benefits-modal" data-cover-nav="true" style="display: none;">
     <div class="modal-content">
         <div class="modal-header">
-            <span class="modal-icon">📱</span>
-            <h2 class="modal-title">Get the Full Experience!</h2>
-            <p class="modal-subtitle">Install as an app for better features</p>
+            <span class="modal-icon">✨</span>
+            <h2 class="modal-title">Get the Best Experience!</h2>
+            <p class="modal-subtitle">Install our app for better features</p>
         </div>
         
         <div class="modal-body">
+            <div class="pwa-intro">
+                <p>Take 10 seconds to install our app for a smoother experience</p>
+            </div>
+            
             <div class="pwa-benefits-grid">
                 <div class="pwa-benefit">
                     <span class="benefit-icon">📍</span>
@@ -80,13 +84,13 @@
             </div>
             
             <p class="pwa-note">
-                ✨ Your account works seamlessly across app and browser!
+                <strong>Same account everywhere!</strong> Sign up once, use anywhere.
             </p>
         </div>
         
         <div class="modal-actions">
-            <button class="btn btn-secondary" data-action="skip-pwa">Maybe Later</button>
-            <button class="btn btn-primary" data-action="install-pwa">Show Me How!</button>
+            <button class="btn btn-secondary" data-action="skip-pwa-benefits">Skip for Now</button>
+            <button class="btn btn-primary" data-action="show-install-guide">Show Me How!</button>
         </div>
     </div>
 </div>
