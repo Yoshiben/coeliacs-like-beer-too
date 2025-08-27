@@ -1784,12 +1784,6 @@ const App = {
         
         // Cookie actions
         // Update cookie consent:
-        'accept-all-cookies': (el, modules) => {
-            App.handleCookieConsent(true);
-        },
-        'accept-essential-cookies': (el, modules) => {
-            App.handleCookieConsent(false);
-        },
         'save-cookie-preferences': (el, modules) => {
             const analyticsConsent = document.getElementById('analyticsConsent')?.checked;
             App.handleCookieConsent(analyticsConsent);
