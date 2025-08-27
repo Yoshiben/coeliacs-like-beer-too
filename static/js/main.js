@@ -813,12 +813,32 @@ const App = {
             }
         },
         'post-install-go-to-app': (el, modules) => {
-            hideModal('postInstallModal');
-            showGoodbyeMessage();
-        },        
+            if (window.OnboardingFlow) {
+                OnboardingFlow.postInstallGoToApp();
+            }
+        },
+        
         'post-install-continue-browser': (el, modules) => {
-            hideModal('postInstallModal');
-            showWelcome();
+            if (window.OnboardingFlow) {
+                OnboardingFlow.postInstallContinueBrowser();
+            }
+        },
+        'accept-all-cookies': (el, modules) => {
+            if (window.OnboardingFlow) {
+                OnboardingFlow.acceptAllCookies();
+            }
+        },
+        
+        'accept-selected-cookies': (el, modules) => {
+            if (window.OnboardingFlow) {
+                OnboardingFlow.acceptSelectedCookies();
+            }
+        },
+        
+        'essential-only-cookies': (el, modules) => {
+            if (window.OnboardingFlow) {
+                OnboardingFlow.essentialOnlyCookies();
+            }
         },
 
 
