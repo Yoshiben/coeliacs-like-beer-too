@@ -1567,3 +1567,254 @@
         transform: scale(1) translateY(0);
     }
 }
+
+/* ================================
+   LOCATION PERMISSION MODAL - MATCHING YOUR HTML
+   ================================ */
+
+.location-modal .modal-content {
+    max-width: 480px;
+    width: 90vw;
+    padding: 0;
+    overflow: hidden;
+}
+
+/* Add the gradient header */
+.location-permission-card::before {
+    content: '';
+    display: block;
+    height: 120px;
+    background: var(--primary-gradient);
+    margin: -20px -20px 20px -20px;
+    position: relative;
+}
+
+.location-permission-card {
+    padding: 20px;
+    position: relative;
+}
+
+.permission-icon {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 4rem;
+    z-index: 10;
+    animation: bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+.permission-icon.blocked {
+    animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(-50%) rotate(0); }
+    25% { transform: translateX(-55%) rotate(-5deg); }
+    75% { transform: translateX(-45%) rotate(5deg); }
+}
+
+.permission-title {
+    margin-top: 80px;
+    font-size: clamp(1.3rem, 4vw, 1.6rem);
+    color: var(--text-primary);
+    text-align: center;
+    font-weight: 700;
+    margin-bottom: 1rem;
+}
+
+.permission-text {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    line-height: 1.5;
+    margin-bottom: 1.5rem;
+}
+
+.permission-text strong {
+    color: var(--purple);
+    font-weight: 600;
+}
+
+/* iOS Notice */
+.ios-notice {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: 1px solid #fbbf24;
+    padding: 1rem;
+    border-radius: 12px;
+    margin: 1.5rem 0;
+    font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+    line-height: 1.4;
+}
+
+.ios-notice strong {
+    color: #92400e;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+/* Benefits */
+.permission-benefits {
+    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+}
+
+.benefit-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+    color: var(--text-primary);
+    line-height: 1.4;
+}
+
+.benefit-item:last-child {
+    margin-bottom: 0;
+}
+
+.benefit-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    background: white;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Actions */
+.permission-actions {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.permission-actions .btn-primary {
+    background: var(--primary-gradient);
+    color: white;
+    padding: clamp(1rem, 3vw, 1.2rem);
+    border-radius: 12px;
+    font-size: clamp(1rem, 3vw, 1.1rem);
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);
+}
+
+.permission-actions .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.35);
+}
+
+.permission-actions .btn-secondary {
+    background: transparent;
+    color: var(--text-secondary);
+    padding: clamp(0.9rem, 2.5vw, 1rem);
+    border: 2px solid var(--border-light);
+    border-radius: 12px;
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.permission-actions .btn-secondary:hover {
+    background: var(--bg-section);
+    border-color: var(--border-purple);
+    color: var(--purple);
+}
+
+.permission-note {
+    text-align: center;
+    font-size: clamp(0.75rem, 2vw, 0.85rem);
+    color: var(--text-muted);
+    margin-top: 1.5rem;
+    opacity: 0.8;
+    line-height: 1.4;
+}
+
+/* Blocked Modal Variant */
+.location-modal .permission-icon.blocked {
+    color: #ef4444;
+}
+
+.blocked-instructions {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 1.5rem 0;
+}
+
+.blocked-instructions h4 {
+    color: #991b1b;
+    margin: 0 0 1rem;
+    font-size: 1rem;
+}
+
+.instruction-set {
+    display: none;
+    font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+}
+
+.instruction-set.active {
+    display: block;
+}
+
+.instruction-set strong {
+    color: #dc2626;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.instruction-set ol {
+    margin: 0.5rem 0 0 1.5rem;
+    padding: 0;
+    color: #7f1d1d;
+}
+
+.instruction-set li {
+    margin: 0.5rem 0;
+    line-height: 1.4;
+}
+
+/* Show all instructions by default, JS can hide based on browser */
+.browser-instructions .instruction-set {
+    display: block;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #fecaca;
+}
+
+.browser-instructions .instruction-set:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+/* Animation */
+@keyframes bounce-in {
+    0% { transform: translateX(-50%) scale(0); }
+    50% { transform: translateX(-50%) scale(1.1); }
+    100% { transform: translateX(-50%) scale(1); }
+}
+
+/* Responsive */
+@media (min-width: 480px) {
+    .permission-actions {
+        flex-direction: row;
+        justify-content: center;
+    }
+    
+    .permission-actions .btn {
+        flex: 1;
+        max-width: 200px;
+    }
+}
