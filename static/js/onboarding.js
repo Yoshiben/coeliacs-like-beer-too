@@ -155,15 +155,21 @@ export const OnboardingFlow = (() => {
         
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || 
                       (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+        // Add debug info
+        const debugInfo = {
+            isIOS: isIOS,
+            hasPrompt: !!window.pwaHandler?.deferredPrompt,
+            userAgent: navigator.userAgent.substring(0, 50)
+        };
         
         if (isIOS) {
-            // Show iOS manual install guide
             showModal('ios-install-guide');
         } else if (window.pwaHandler?.deferredPrompt) {
-            // Show Android/Desktop with actual install button
             showModal('android-install-guide');
         } else {
-            // No install available, continue
+            // Show a debug modal or alert for Android
+            alert(`Debug: No install prompt available\nUA: ${debugInfo.userAgent}`);
             showWelcome();
         }
     };
