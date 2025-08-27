@@ -32,6 +32,7 @@ export const ModalManager = (() => {
         signInModal: { type: 'modal', group: 'onboarding', exclusive: true },
         passcodeModal: { type: 'modal', group: 'onboarding', exclusive: true },
         benefitsModal: { type: 'modal', group: 'onboarding', exclusive: true },
+        cookieModal: { type: 'modal', group: 'onboarding', exclusive: true }, 
 
         
         // Search overlays (mutually exclusive)
