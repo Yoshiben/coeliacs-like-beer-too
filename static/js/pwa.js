@@ -1,6 +1,6 @@
 // ================================================================================
 // PWA-HANDLER.JS - Progressive Web App Installation & Management
-// Handles: Service Worker, Install Prompts, iOS Guide, Updates
+// Simplified version - install prompts now handled by onboarding flow
 // ================================================================================
 
 class PWAHandler {
@@ -13,8 +13,8 @@ class PWAHandler {
         console.log('🚀 Initializing PWA Handler...');
         this.registerServiceWorker();
         this.setupInstallPrompt();
-        this.checkIOSInstallGuide();
         this.handleAppInstalled();
+        this.detectPWAMode();
     }
 
     // ================================
@@ -56,82 +56,40 @@ class PWAHandler {
         window.addEventListener('beforeinstallprompt', (e) => {
             console.log('📱 PWA install prompt available');
             
-            // Prevent the mini-infobar from appearing on mobile
+            // Prevent the mini-infobar from appearing
             e.preventDefault();
             
-            // Save the event for later use
+            // Save the event so onboarding flow can use it
             this.deferredPrompt = e;
+            window.pwaHandler.deferredPrompt = e;
             
-            // Show custom install button (only for non-iOS)
-            if (!this.isIOS()) {
-                this.showInstallPrompt();
-            }
+            // Don't show any automatic prompts - onboarding handles this now
         });
-    }
-
-    showInstallPrompt() {
-        // Don't show if dismissed this session
-        if (sessionStorage.getItem('pwa-dismissed')) {
-            return;
-        }
-
-        // Create install banner
-        const installBanner = document.createElement('div');
-        installBanner.id = 'pwa-install-banner';
-        installBanner.innerHTML = `
-            <div class="install-banner-content">
-                <div class="install-icon">📱</div>
-                <div class="install-text">
-                    <strong>Install GF Beer Finder</strong>
-                    <small>Get app-like experience & better location access</small>
-                </div>
-                <div class="install-actions">
-                    <button class="btn btn-primary btn-sm" id="pwa-install-btn">Install</button>
-                    <button class="btn btn-secondary btn-sm" id="pwa-dismiss-btn">×</button>
-                </div>
-            </div>
-        `;
-        
-        document.body.appendChild(installBanner);
-        
-        // Handle install button click
-        document.getElementById('pwa-install-btn').addEventListener('click', async () => {
-            if (this.deferredPrompt) {
-                this.deferredPrompt.prompt();
-                const result = await this.deferredPrompt.userChoice;
-                
-                console.log('📱 Install prompt result:', result.outcome);
-                
-                if (result.outcome === 'accepted') {
-                    console.log('✅ User installed the PWA');
-                }
-                
-                this.deferredPrompt = null;
-            }
-            
-            installBanner.remove();
-        });
-        
-        // Handle dismiss button
-        document.getElementById('pwa-dismiss-btn').addEventListener('click', () => {
-            installBanner.classList.add('removing');
-            setTimeout(() => installBanner.remove(), 300);
-            
-            // Don't show again for this session
-            sessionStorage.setItem('pwa-dismissed', 'true');
-        });
-        
-        // Auto-dismiss after 10 seconds
-        setTimeout(() => {
-            if (document.contains(installBanner)) {
-                installBanner.classList.add('removing');
-                setTimeout(() => installBanner.remove(), 300);
-            }
-        }, 10000);
     }
 
     // ================================
-    // iOS SPECIFIC
+    // INSTALL METHODS (called by onboarding)
+    // ================================
+    
+    async promptInstall() {
+        if (this.deferredPrompt) {
+            this.deferredPrompt.prompt();
+            const result = await this.deferredPrompt.userChoice;
+            
+            console.log('📱 Install prompt result:', result.outcome);
+            
+            if (result.outcome === 'accepted') {
+                console.log('✅ User installed the PWA');
+            }
+            
+            this.deferredPrompt = null;
+            return result.outcome;
+        }
+        return 'dismissed';
+    }
+    
+    // ================================
+    // DEVICE DETECTION (used by onboarding)
     // ================================
     
     isIOS() {
@@ -139,59 +97,21 @@ class PWAHandler {
                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     }
     
+    isAndroid() {
+        return /Android/i.test(navigator.userAgent);
+    }
+    
+    isDesktop() {
+        return !this.isIOS() && !this.isAndroid();
+    }
+    
     isStandalone() {
         return window.navigator.standalone || 
                window.matchMedia('(display-mode: standalone)').matches;
     }
     
-    checkIOSInstallGuide() {
-        if (this.isIOS() && !this.isStandalone()) {
-            // Check if user has already completed onboarding (returning visitor)
-            const hasCompletedOnboarding = localStorage.getItem('ageConsent') === 'true' || 
-                                           localStorage.getItem('hasSeenWelcome') === 'true' || 
-                                           localStorage.getItem('userNickname');
-            
-            if (hasCompletedOnboarding) {
-                // Returning visitor - show after 3 seconds
-                setTimeout(() => {
-                    this.showIOSInstallGuide();
-                }, 3000);
-            } else {
-                // New visitor - wait for onboarding to complete (or be skipped)
-                window.addEventListener('onboardingComplete', () => {
-                    setTimeout(() => {
-                        this.showIOSInstallGuide();
-                    }, 3000);
-                }, { once: true });
-            }
-        }
-    }
-    
-    showIOSInstallGuide() {
-        // Don't show if already installed or dismissed recently
-        if (this.isStandalone() || sessionStorage.getItem('ios-guide-dismissed')) {
-            return;
-        }
-        
-        const guide = document.getElementById('ios-install-guide');
-        if (guide) {
-            guide.style.display = 'flex';
-            guide.classList.add('active');
-        }
-    }
-    
-    dismissIOSGuide() {
-        const guide = document.getElementById('ios-install-guide');
-        if (guide) {
-            guide.classList.add('removing');
-            setTimeout(() => {
-                guide.style.display = 'none';
-                guide.classList.remove('active', 'removing');
-            }, 300);
-        }
-        
-        // Don't show again for this session
-        sessionStorage.setItem('ios-guide-dismissed', 'true');
+    canInstall() {
+        return this.deferredPrompt !== null;
     }
 
     // ================================
@@ -223,23 +143,18 @@ class PWAHandler {
         window.addEventListener('appinstalled', () => {
             console.log('🎉 PWA was installed successfully');
             
-            // Hide install prompt if still showing
-            const banner = document.getElementById('pwa-install-banner');
-            if (banner) banner.remove();
-            
-            // Hide iOS guide if still showing
-            const guide = document.getElementById('ios-install-guide');
-            if (guide) guide.remove();
-            
             // Show success message
             this.showInstallSuccess();
+            
+            // Notify onboarding flow if it's listening
+            window.dispatchEvent(new Event('pwaInstalled'));
         });
     }
     
     showInstallSuccess() {
         const successToast = document.createElement('div');
         successToast.className = 'pwa-success-toast';
-        successToast.textContent = '🎉 App installed! Better location access enabled.';
+        successToast.textContent = '🎉 App installed successfully!';
         
         document.body.appendChild(successToast);
         setTimeout(() => successToast.remove(), 3000);
@@ -267,6 +182,17 @@ class PWAHandler {
                 });
             }
         }
+    }
+    
+    // ================================
+    // RETURNING USER CHECK (for old flow compatibility)
+    // ================================
+    
+    checkReturningUser() {
+        // This is now handled differently but kept for compatibility
+        // Returning users who already have the app won't see prompts
+        // New users get prompts during onboarding
+        return localStorage.getItem('userNickname') !== null;
     }
 }
 
