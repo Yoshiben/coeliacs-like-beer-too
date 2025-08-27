@@ -177,7 +177,7 @@
    /* Minimum width but allow growth */
    min-width: clamp(100px, 30vw, 150px);
    flex: 1 1 auto;
-   max-width: 300px;  /* Prevent buttons from getting too wide */
+   width: 100%;
 }
 
 /* ================================
