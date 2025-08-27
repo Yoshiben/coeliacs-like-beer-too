@@ -2354,6 +2354,12 @@
     75% { transform: rotate(15deg); }
 }
 
+/* ============================
+   COOKIE CONSENT MODAL STYLES
+   Add this to your onboarding.css file
+   ============================ */
+
+/* Cookie Consent Modal */
 .cookie-container {
     max-width: min(95vw, 480px);
     max-height: min(90vh, 700px);
@@ -2639,4 +2645,38 @@
         padding: 0.75rem;
         font-size: 0.85rem;
     }
+}
+
+/* Success Toast for completion */
+.success-toast {
+    position: fixed;
+    bottom: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    transition: bottom 0.3s ease;
+    z-index: 10000;
+}
+
+.success-toast.show {
+    bottom: 30px;
+}
+
+.success-toast .toast-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.success-toast .toast-content span {
+    font-size: 1.5rem;
+}
+
+.success-toast .toast-content p {
+    margin: 0;
+    font-weight: 600;
 }
