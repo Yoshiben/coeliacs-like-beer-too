@@ -1537,3 +1537,125 @@
         color: #d1d5db;
     }
 }
+
+
+/* SIGN IN MODAL - Fix header shrinking */
+.signin-modal .modal-content {
+    max-height: min(90vh, 650px);
+    display: flex;
+    flex-direction: column;
+}
+
+.signin-modal .modal-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 2rem 1.5rem;
+    flex-shrink: 0;  /* Prevent header from shrinking */
+    min-height: 140px; /* Maintain minimum height */
+}
+
+.signin-modal .modal-body {
+    flex: 1;
+    overflow-y: auto; /* Allow body to scroll */
+    min-height: 0;    /* Important for flex scrolling */
+    padding: 1.5rem;
+}
+
+.signin-modal .modal-actions {
+    flex-shrink: 0;  /* Keep actions at bottom */
+}
+
+/* PASSCODE MODAL - Same fixes */
+.passcode-modal .modal-content {
+    max-height: min(90vh, 650px);
+    display: flex;
+    flex-direction: column;
+}
+
+.passcode-modal .modal-header {
+    flex-shrink: 0;
+    min-height: 120px;
+}
+
+.passcode-modal .modal-body {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+/* BENEFITS MODAL - Make benefit cards smaller */
+.benefits-modal .modal-body {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+    padding: 1rem;
+}
+
+.benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;  /* Reduced from whatever it was */
+}
+
+.benefit {
+    padding: 1rem;  /* Reduced padding */
+    background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+    border-radius: 12px;
+}
+
+.benefit-icon {
+    font-size: 1.75rem;  /* Smaller icon */
+    margin-bottom: 0.5rem;
+}
+
+.benefit strong {
+    font-size: 0.9rem;  /* Smaller text */
+    margin-bottom: 0.25rem;
+}
+
+.benefit small {
+    font-size: 0.75rem;  /* Smaller description */
+}
+
+.first-badge {
+    padding: 1rem;  /* Reduce padding */
+    margin: 1rem 0;
+}
+
+.badge-showcase {
+    padding: 0.75rem;  /* Reduce padding */
+}
+
+/* Mobile height fixes */
+@media (max-height: 700px) {
+    .signin-modal .modal-header,
+    .passcode-modal .modal-header,
+    .benefits-modal .modal-header {
+        min-height: 100px;  /* Smaller minimum on short screens */
+        padding: 1.5rem 1rem;
+    }
+    
+    .modal-icon,
+    .success-icon {
+        font-size: 2.5rem;  /* Smaller icon */
+    }
+    
+    .benefits-grid {
+        gap: 0.5rem;
+    }
+    
+    .benefit {
+        padding: 0.75rem;
+    }
+}
+
+/* Very short screens (landscape phones) */
+@media (max-height: 500px) {
+    .benefits-grid {
+        grid-template-columns: repeat(4, 1fr);  /* Single row */
+    }
+    
+    .modal-header {
+        min-height: 80px;
+        padding: 1rem;
+    }
+}
