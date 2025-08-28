@@ -815,8 +815,9 @@ export const CascadeForm = (() => {
         reset,
         setVenue,
         getState: () => state,
-        selectBrewery,  // ADD THIS
-        selectBreweryBeer  // ADD THIS (note: the internal function is called selectBreweryBeer)
+        selectBrewery,
+        selectBreweryBeer,
+        handleSubmit  
     };
 })();
 
