@@ -1800,59 +1800,68 @@ export const SearchModule = (function() {
       },
       
       async submitNewVenue(venueData) {
-          try {
-              let nickname = window.App.getState('userNickname');
-              if (!nickname) {
-                  nickname = localStorage.getItem('userNickname') || 'anonymous';
-              }
-              
-              const payload = {
-                  venue_name: venueData.name,
-                  address: venueData.address,
-                  postcode: venueData.postcode,
-                  latitude: venueData.latitude,
-                  longitude: venueData.longitude,
-                  submitted_by: nickname,
-                  types: venueData.types || [],
-                  place_id: venueData.place_id || null
-              };
-              
-              console.log('📡 Submitting venue data:', payload);
-              
-              const response = await fetch('/api/add-venue', {
-                  method: 'POST',
-                  headers: {
-                      'Content-Type': 'application/json'
-                  },
-                  body: JSON.stringify(payload)
-              });
-              
-              if (!response.ok) {
-                  const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
-                  throw new Error(errorData.error || `Server error: ${response.status}`);
-              }
-              
-              const result = await response.json();
-              console.log('✅ Venue added:', result);
-              
-              window.newlyAddedVenue = {
-                  venue_id: result.venue_id,
-                  venue_name: venueData.name,
-                  name: venueData.name,
-                  address: venueData.address,
-                  postcode: venueData.postcode,
-                  latitude: venueData.latitude,
-                  longitude: venueData.longitude,
-                  venue_type: result.venue_type
-              };
-              
-              this.showVenueAddedPrompt(result);
-              
-          } catch (error) {
-              console.error('❌ Error adding venue:', error);
-              modules.toast?.error(`❌ Failed to add venue: ${error.message}`);
-          }
-      },
+        try {
+            // Get user_id from localStorage (same as status updates)
+            const userId = parseInt(localStorage.getItem('user_id'));
+            
+            if (!userId) {
+                modules.toast?.error('Please sign in to add venues');
+                // Trigger nickname modal if needed
+                return;
+            }
+            
+            const payload = {
+                venue_name: venueData.name,
+                address: venueData.address,
+                postcode: venueData.postcode,
+                latitude: venueData.latitude,
+                longitude: venueData.longitude,
+                user_id: userId,  // Send user_id instead of submitted_by
+                types: venueData.types || [],
+                place_id: venueData.place_id || null
+            };
+            
+            console.log('📡 Submitting venue data:', payload);
+            
+            const response = await fetch('/api/add-venue', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+                throw new Error(errorData.error || `Server error: ${response.status}`);
+            }
+            
+            const result = await response.json();
+            console.log('✅ Venue added:', result);
+            
+            // Show success with points if earned
+            if (result.points_earned) {
+                modules.toast?.success(`✅ ${result.message} +${result.points_earned} points!`);
+            }
+            
+            window.newlyAddedVenue = {
+                venue_id: result.venue_id,
+                venue_name: venueData.name,
+                name: venueData.name,
+                address: venueData.address,
+                postcode: venueData.postcode,
+                latitude: venueData.latitude,
+                longitude: venueData.longitude,
+                venue_type: result.venue_type
+            };
+            
+            this.showVenueAddedPrompt(result);
+            
+        } catch (error) {
+            console.error('❌ Error adding venue:', error);
+            modules.toast?.error(`❌ Failed to add venue: ${error.message}`);
+        }
+    },
 
       showVenueAddedPrompt(result) {
           console.log('🎉 Showing venue added prompt for:', result);
