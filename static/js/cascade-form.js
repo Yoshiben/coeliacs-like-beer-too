@@ -18,7 +18,8 @@ export const CascadeForm = (() => {
         isNewBrewery: false,
         isNewBeer: false,
         currentVenue: null,
-        initialized: false
+        initialized: false,
+        dropdownLoading: false  // Add this flag
     };
 
     // ================================
@@ -162,8 +163,16 @@ export const CascadeForm = (() => {
             
             breweryInput.addEventListener('focus', (e) => {
                 if (!breweryInput.value) {
-                    console.log('🔍 Focus: showing all breweries');
                     showAllBreweries();
+                }
+            });
+            
+            // Keep dropdown open when clicking on input
+            breweryInput.addEventListener('mousedown', (e) => {
+                if (!breweryInput.value) {
+                    e.preventDefault(); // Prevent default focus behavior
+                    showAllBreweries();
+                    breweryInput.focus(); // Manually focus after
                 }
             });
         }
@@ -299,21 +308,31 @@ export const CascadeForm = (() => {
     };
 
     const showAllBreweries = async () => {
+        // Prevent hiding while loading
+        state.dropdownLoading = true;
+        
         const dropdown = document.getElementById('breweryDropdown');
         if (dropdown) {
             dropdown.innerHTML = '<div class="dropdown-header">Loading breweries...</div>';
-            showDropdown('breweryDropdown');
+            dropdown.classList.add('show');
+            dropdown.style.display = 'block'; // Force display
         }
         
         try {
             const response = await fetch('/api/breweries');
             const breweries = await response.json();
-            displayBreweryDropdown(breweries.slice(0, 50), '');
+            
+            // Only proceed if dropdown still exists and should be shown
+            if (state.dropdownLoading && dropdown) {
+                displayBreweryDropdown(breweries.slice(0, 50), '');
+            }
         } catch (error) {
             console.error('Error loading breweries:', error);
-            if (dropdown) {
+            if (dropdown && state.dropdownLoading) {
                 dropdown.innerHTML = '<div class="dropdown-header">Failed to load breweries</div>';
             }
+        } finally {
+            state.dropdownLoading = false;
         }
     };
 
@@ -739,13 +758,20 @@ export const CascadeForm = (() => {
         const dropdown = document.getElementById(dropdownId);
         if (dropdown) {
             dropdown.classList.add('show');
+            dropdown.style.display = 'block'; // Force display with inline style
         }
     };
 
     const hideDropdown = (dropdownId) => {
+        // Don't hide if it's loading
+        if (dropdownId === 'breweryDropdown' && state.dropdownLoading) {
+            return;
+        }
+        
         const dropdown = document.getElementById(dropdownId);
         if (dropdown) {
             dropdown.classList.remove('show');
+            dropdown.style.display = 'none'; // Force hide with inline style
         }
     };
 
