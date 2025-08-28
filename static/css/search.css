@@ -63,22 +63,18 @@
 
 /* Search option colors */
 .search-option.location {
-    background: var(--green-gradient);
     border-color: rgba(16, 185, 129, 0.2);
 }
 
 .search-option.name {
-    background: var(--blue-gradient);
     border-color: rgba(59, 130, 246, 0.2);
 }
 
 .search-option.area {
-    background: var(--pink-gradient);
     border-color: rgba(139, 92, 246, 0.2);
 }
 
 .search-option.beer {
-    background: var(--orange-gradient);
     border-color: rgba(245, 158, 11, 0.2);
 }
 
