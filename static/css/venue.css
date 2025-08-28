@@ -19,7 +19,6 @@
 
 /* Fun header with floating beers */
 .beer-header {
-    background: var(--orange-gradient);
     position: relative;
     overflow: hidden;
     padding: clamp(1.25rem, 4vw, 2rem);
@@ -69,44 +68,6 @@
     z-index: 1;
 }
 
-/* Stats bar - MORE COLORFUL */
-/* .beer-stats-bar {
-    display: flex;
-    justify-content: space-around;
-    padding: clamp(0.75rem, 2.5vw, 1.25rem);
-    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-    border-radius: 12px;
-    margin: clamp(0.75rem, 2.5vw, 1rem);
-    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.15);
-}
-
-.stat-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: clamp(0.125rem, 1vw, 0.25rem);
-}
-
-.stat-icon {
-    font-size: clamp(1.25rem, 3.5vw, 1.75rem);
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
-}
-
-.stat-count {
-    font-size: clamp(1rem, 3vw, 1.5rem);
-    font-weight: 700;
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.stat-label {
-    font-size: clamp(0.7rem, 2vw, 0.85rem);
-    color: #92400e;
-    font-weight: 600;
-} */
-
 /* Beer list scrollable area */
 .beer-list-content {
     max-height: clamp(300px, 50vh, 500px);
@@ -117,7 +78,7 @@
 
 /* Beer cards - MORE PLAYFUL */
 .beer-card {
-    background: linear-gradient(135deg, #ffffff 0%, #fef3c7 100%);
+    background: var(--orange-gradient);
     border: 2px solid #fed7aa;
     border-radius: clamp(12px, 3vw, 16px);
     padding: clamp(0.875rem, 2.5vw, 1.25rem);
@@ -173,7 +134,7 @@
 .beer-name {
     font-size: clamp(0.95rem, 2.8vw, 1.2rem);
     font-weight: 700;
-    color: #451a03;
+    color: white;
     margin: 0 0 clamp(0.125rem, 1vw, 0.25rem);
 }
 
@@ -181,7 +142,7 @@
     display: inline-flex;
     align-items: center;
     gap: clamp(0.125rem, 1vw, 0.25rem);
-    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    background: white;
     padding: clamp(0.2rem, 1vw, 0.3rem) clamp(0.5rem, 2vw, 0.875rem);
     border-radius: 20px;
     font-size: clamp(0.75rem, 2.2vw, 0.9rem);
