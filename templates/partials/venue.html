@@ -17,95 +17,24 @@
             <div class="beer-stats-bar">
                 <div class="stat-item">
                     <span class="stat-icon">🚰</span>
-                    <span class="stat-count" id="tapCount">3</span>
+                    <span class="stat-count" id="tapCount">0</span>
                     <span class="stat-label">On Tap</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-icon">🍾</span>
-                    <span class="stat-count" id="bottleCount">2</span>
+                    <span class="stat-count" id="bottleCount">0</span>
                     <span class="stat-label">Bottles/Cans</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-icon">✅</span>
-                    <span class="stat-count" id="verifiedCount">5</span>
+                    <span class="stat-count" id="verifiedCount">0</span>
                     <span class="stat-label">Verified</span>
                 </div>
             </div>
             
+            <!-- Beer list content - populated by JavaScript -->
             <div id="beerListContent" class="beer-list-content">
-                <!-- Example beer item with new design -->
-                <div class="beer-card">
-                    <div class="beer-card-header">
-                        <div class="beer-icon-wrapper">
-                            <span class="beer-glass">🍺</span>
-                        </div>
-                        <div class="beer-main-info">
-                            <h4 class="beer-name">Handed Giant Sky Above</h4>
-                            <div class="brewery-tag">
-                                <span class="brewery-icon">🏭</span>
-                                <span class="brewery-name">Left Handed Giant</span>
-                            </div>
-                        </div>
-                        <div class="beer-actions">
-                            <button class="btn-more" data-action="beer-options">
-                                <span></span><span></span><span></span>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="beer-card-details">
-                        <div class="beer-badges">
-                            <span class="badge badge-tap">
-                                <span>🚰</span> On Tap
-                            </span>
-                            <span class="badge badge-style">Hazy Pale</span>
-                            <span class="badge badge-verified">
-                                <span>✓</span> Verified today
-                            </span>
-                        </div>
-                    </div>
-                    
-                    <!-- Dropdown menu (hidden by default) -->
-                    <div class="beer-dropdown-menu">
-                        <button data-action="verify-beer">✅ Verify still here</button>
-                        <button data-action="edit-beer">✏️ Edit details</button>
-                        <button data-action="report-issue">⚠️ Report issue</button>
-                        <button data-action="delete-beer" class="danger">🗑️ Remove</button>
-                    </div>
-                </div>
-                
-                <!-- Another example with bottle -->
-                <div class="beer-card">
-                    <div class="beer-card-header">
-                        <div class="beer-icon-wrapper bottle">
-                            <span class="beer-glass">🍾</span>
-                        </div>
-                        <div class="beer-main-info">
-                            <h4 class="beer-name">Lukas</h4>
-                            <div class="brewery-tag">
-                                <span class="brewery-icon">🏭</span>
-                                <span class="brewery-name">Thornbridge</span>
-                            </div>
-                        </div>
-                        <div class="beer-actions">
-                            <button class="btn-more" data-action="beer-options">
-                                <span></span><span></span><span></span>
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="beer-card-details">
-                        <div class="beer-badges">
-                            <span class="badge badge-bottle">
-                                <span>🍾</span> Bottle
-                            </span>
-                            <span class="badge badge-style">Lager</span>
-                            <span class="badge badge-unverified">
-                                <span>?</span> Needs verification
-                            </span>
-                        </div>
-                    </div>
-                </div>
+                <!-- Beer items will be populated here by showBeerList() -->
             </div>
             
             <!-- Empty state -->
