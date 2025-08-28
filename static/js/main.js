@@ -1653,26 +1653,22 @@ const App = {
             modules.form?.clearSelectedVenue?.();
         },
 
-
-        'select-status': (el, modules) => {
-            const status = el.dataset.status;
-            console.log('📊 Status selected:', status);
-            
-            const venueModule = modules.venue || window.App?.getModule('venue');
-            if (venueModule && venueModule.selectStatus) {
-                venueModule.selectStatus(status);
-            } else {
-                console.error('❌ VenueModule.selectStatus not found');
-            }
-        },
-
-        
-        
         // Status actions
         'change-gf-status': (el, modules) => {
             console.trace('🔍 DEBUG: Opening GF status modal from main.js action handler');
             modules.modalManager?.open('gfStatusModal');
         },
+
+
+        'select-status': (el, modules) => {
+            const status = el.dataset.status;
+            console.log('📊 Status selected:', status);
+            modules.venue?.selectStatus?.(status);
+        },
+
+        
+        
+        
         'confirm-status': (el, modules) => {
             modules.venue?.GFStatusFlow?.confirmStatusUpdate?.();
         },
