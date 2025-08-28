@@ -98,7 +98,7 @@ export const VenueModule = (function() {
                 if (navTitle) navTitle.textContent = venue.venue_name;
                 
                 // Populate all the venue information
-                populateVenueInfo(venue);
+                populateVenueDetails(venue);
                 setupVenueButtons(venue);
                 setupMapButton(venue);
                 
