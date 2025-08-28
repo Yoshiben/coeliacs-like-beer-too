@@ -1052,33 +1052,6 @@
     }
 }
 
-/* Dark mode support (if you have it) */
-@media (prefers-color-scheme: dark) {
-    .suggestions,
-    .brewery-dropdown {
-        background: #1f2937;
-        border-color: #374151;
-    }
-    
-    .suggestion-item {
-        background: #1f2937;
-        border-bottom-color: #374151;
-    }
-    
-    .suggestion-item:hover {
-        background: #374151;
-    }
-    
-    .suggestion-item strong {
-        color: #f9fafb;
-    }
-    
-    .suggestion-item small {
-        color: #9ca3af;
-    }
-}
-
-
 /* ================================
    CASCADE FORM VISIBILITY STATES
    Handle all show/hide in CSS
