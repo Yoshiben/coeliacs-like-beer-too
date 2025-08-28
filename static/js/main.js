@@ -215,7 +215,6 @@ const App = {
         const modules = await Promise.all([
             import('./map.js'),
             import('./search.js'),
-            import('./forms.js'),
             import('./community.js'),
             import('./nav.js'),
             import('./breweries.js'),
@@ -225,7 +224,6 @@ const App = {
         const [
             { MapModule },
             { SearchModule },
-            { FormModule },
             { CommunityModule },
             { NavStateManager },
             breweriesImport,
