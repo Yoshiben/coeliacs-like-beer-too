@@ -193,7 +193,7 @@ export const OnboardingFlow = (() => {
     // Show post-install modal
     const showPostInstallModal = () => {
         console.log('Showing post-install modal');
-        hideAllModals();
+        // hideAllModals();
         const modal = document.getElementById('postInstallModal');
         if (modal) {
             modal.classList.add('active');
@@ -948,7 +948,7 @@ Website: https://coeliacslikebeer.co.uk
     // Show cookie modal after onboarding completes
     const showCookieConsent = () => {
         console.log('Showing cookie consent modal');
-        hideAllModals();
+        // hideAllModals();
         showModal('cookieModal');
     };
     
@@ -994,7 +994,7 @@ Website: https://coeliacslikebeer.co.uk
         console.log('Account setup complete, checking cookie consent');
         
         // Hide current modal
-        hideAllModals();
+        // hideAllModals();
         
         // Check if we need cookie consent
         if (needsCookieConsent()) {
@@ -1012,7 +1012,7 @@ Website: https://coeliacslikebeer.co.uk
         console.log('🎉 Onboarding fully complete!');
         
         // Hide any remaining modals
-        hideAllModals();
+        // hideAllModals();
         
         // Mark complete
         localStorage.setItem('onboardingComplete', 'true');
