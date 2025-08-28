@@ -1653,6 +1653,19 @@ const App = {
             modules.form?.clearSelectedVenue?.();
         },
 
+
+        'select-status': (el, modules) => {
+            const status = el.dataset.status;
+            console.log('📊 Status selected:', status);
+            
+            const venueModule = modules.venue || window.App?.getModule('venue');
+            if (venueModule && venueModule.selectStatus) {
+                venueModule.selectStatus(status);
+            } else {
+                console.error('❌ VenueModule.selectStatus not found');
+            }
+        },
+
         
         
         // Status actions
