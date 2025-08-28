@@ -233,34 +233,27 @@ export const VenueModule = (function() {
     /**
      * Load and display the beer list for a venue
      */
-    const loadBeerList = (venue) => {
-        console.log('🍺 Loading beer list for:', venue.venue_name);
+    const loadBeerList = async (venue) => {
+        console.log('Loading beer list for:', venue.venue_name);
         
-        // Update modal header
+        // Update header
         const venueNameEl = document.getElementById('beerListVenueName');
         if (venueNameEl) {
-            venueNameEl.textContent = venue.venue_name || 'Unknown Venue';
+            venueNameEl.textContent = venue.venue_name;
         }
         
-        const contentEl = document.getElementById('beerListContent');
-        const emptyEl = document.getElementById('beerListEmpty');
-        
-        if (!contentEl || !emptyEl) {
-            console.error('❌ Beer list elements not found');
-            return;
-        }
-        
-        if (venue.beer_details) {
-            const beers = parseBeerDetails(venue.beer_details);
-            console.log('📊 Parsed beers:', beers);
+        try {
+            // Fetch structured beer data
+            const response = await fetch(`/api/venue/${venue.venue_id}/beers`);
+            const data = await response.json();
             
-            if (beers.length > 0) {
-                displayBeerList(beers);
+            if (data.beers && data.beers.length > 0) {
+                displayBeerList(data.beers);
             } else {
                 showEmptyBeerList();
             }
-        } else {
-            console.log('ℹ️ No beer details found');
+        } catch (error) {
+            console.error('Error loading beers:', error);
             showEmptyBeerList();
         }
     };
@@ -422,64 +415,7 @@ export const VenueModule = (function() {
             });
         });
     };
-    
-    /**
-     * Parse beer details string into structured data
-     */
-    const parseBeerDetails = (beerDetailsString) => {
-        const beers = [];
-        const beerStrings = beerDetailsString.split(', ');
-        
-        beerStrings.forEach((beerString, index) => {
-            // Extract format (tap, bottle, etc)
-            const formatMatch = beerString.match(/^(.*?)\s*-\s*/);
-            const format = formatMatch ? formatMatch[1] : 'Unknown';
-            
-            // Get everything after the format dash
-            const remainingString = formatMatch ? 
-                beerString.substring(formatMatch[0].length) : 
-                beerString;
-            
-            // Extract style if in parentheses at the end
-            const styleMatch = remainingString.match(/\((.*?)\)$/);
-            const style = styleMatch ? styleMatch[1] : null;
-            
-            // Get the beer and brewery part (remove style)
-            const nameBreweryPart = styleMatch ? 
-                remainingString.substring(0, remainingString.lastIndexOf('(')).trim() : 
-                remainingString.trim();
-            
-            // Split by last word (brewery is usually last word before style)
-            const words = nameBreweryPart.split(' ');
-            
-            // FIXED: Brewery is LAST word(s), beer name is FIRST part
-            // Check for multi-word breweries like "Left Handed Giant"
-            let brewery = words[words.length - 1]; // Start with last word
-            let name = words.slice(0, -1).join(' ');
-            
-            // Common multi-word brewery check
-            if (words.length >= 3) {
-                // Check if last 3 words might be brewery (Left Handed Giant)
-                const possibleBrewery = words.slice(-3).join(' ');
-                if (possibleBrewery === 'Left Handed Giant') {
-                    brewery = possibleBrewery;
-                    name = words.slice(0, -3).join(' ');
-                }
-                // Add other known multi-word breweries here
-            }
-            
-            beers.push({
-                id: `beer_${index}`,
-                format,
-                brewery: brewery || 'Unknown',
-                name: name || 'Unknown Beer',
-                style
-            });
-        });
-        
-        return beers;
-    };
-    
+
     // ================================
     // VENUE ACTIONS
     // ================================
@@ -655,7 +591,6 @@ export const VenueModule = (function() {
         deleteBeer,
         
         // Utilities
-        parseBeerDetails,
         getCurrentVenue: utils.getCurrentVenue,
         setCurrentVenue: utils.setCurrentVenue,
         
