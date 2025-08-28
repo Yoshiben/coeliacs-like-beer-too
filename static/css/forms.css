@@ -1165,3 +1165,29 @@
         transform: translateY(0);
     }
 }
+
+/* Force the modal to proper height */
+.report-modal .modal-content {
+    max-width: min(95vw, 500px);
+    height: min(90vh, 700px) !important;  /* Force the height */
+    min-height: 600px !important;  /* Minimum height so it's not tiny */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Make sure the form takes full height */
+.cascade-form {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+/* Content area should fill available space */
+.form-content-area {
+    flex: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+    min-height: 400px;  /* Ensure minimum height */
+}
