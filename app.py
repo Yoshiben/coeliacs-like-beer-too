@@ -1608,18 +1608,16 @@ def get_venue_beers(venue_id):
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor(dictionary=True)
         
-        # Fixed SQL query
         cursor.execute("""
             SELECT 
-                vb.beer_id,
-                br.brewery_name,
-                b.beer_name,            
+                vb.beer_id as id,
+                br.brewery_name as brewery,
+                b.beer_name as name,            
                 b.style,
                 vb.format,
-                vb.last_seen AS added_date,
-                u.nickname AS added_by
+                vb.last_seen as added_date,
+                u.nickname as added_by
             FROM venue_beers vb
-            LEFT JOIN venues v ON vb.venue_id = v.venue_id
             LEFT JOIN beers b ON vb.beer_id = b.beer_id
             LEFT JOIN breweries br ON b.brewery_id = br.brewery_id
             LEFT JOIN users u ON u.user_id = vb.user_id
@@ -1627,26 +1625,16 @@ def get_venue_beers(venue_id):
             ORDER BY vb.format, b.beer_name
         """, (venue_id,))
         
-        beers = []
-        rows = cursor.fetchall()
+        beers = cursor.fetchall()
         
-        # Check if rows is actually a list/tuple
-        if rows:
-            for row in rows:
-                beers.append({
-                    'id': row[0],
-                    'brewery': row[1],
-                    'name': row[2],
-                    'style': row[3],
-                    'format': row[4],
-                    'added_date': row[5].isoformat() if row[5] else None,
-                    'added_by': row[6]
-                })
+        # Process dates since JSON can't serialize datetime directly
+        for beer in beers:
+            if beer['added_date']:
+                beer['added_date'] = beer['added_date'].isoformat()
         
         cursor.close()
         conn.close()
         
-        # Always return a valid JSON response
         return jsonify({
             'venue_id': venue_id,
             'beers': beers,
@@ -1655,13 +1643,8 @@ def get_venue_beers(venue_id):
         
     except Exception as e:
         print(f"Error in get_venue_beers: {e}")
-        # Return empty list on error rather than 500
-        return jsonify({
-            'venue_id': venue_id,
-            'beers': [],
-            'count': 0,
-            'error': str(e)
-        })
+        return jsonify({'venue_id': venue_id, 'beers': [], 'count': 0}), 200
+                
 
 @app.route('/api/all-venues')
 def get_all_venues_for_map():
@@ -2077,6 +2060,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
