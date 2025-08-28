@@ -225,15 +225,7 @@ export const VenueModule = (function() {
         utils.setCurrentVenue(venue);
     };
     
-    const setupMapButtonHandler = (venue) => {
-        if (!venue.latitude || !venue.longitude) {
-            const mapBtn = document.querySelector('[data-action="toggle-venue-map"]');
-            if (mapBtn) {
-                mapBtn.disabled = true;
-                mapBtn.textContent = '🗺️ No Location';
-            }
-        }
-    };
+    
     
     const resetVenueDetailsView = () => {
         const venueContainer = document.getElementById('venueContainer');
@@ -565,16 +557,6 @@ export const VenueModule = (function() {
             console.error('Error deleting beer:', error);
             modules.toast?.error('Failed to remove beer');
         }
-    };
-    
-    /**
-     * Setup venue action buttons
-     */
-    const setupVenueButtons = (venue) => {
-        utils.setCurrentVenue(venue);
-        
-        // Additional button setup can go here
-        // For example, enabling/disabling buttons based on venue data
     };
     
     /**
