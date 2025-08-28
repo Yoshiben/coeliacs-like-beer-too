@@ -1981,14 +1981,15 @@ const App = {
         },
         'select-brewery': (el, modules) => {
             const brewery = el.dataset.brewery;
-            if (brewery && modules.form) {
-                modules.form.selectBrewery(brewery);
+            if (brewery && window.CascadeForm) {
+                window.CascadeForm.selectBrewery(brewery);
             }
         },
+        
         'select-beer': (el, modules) => {
             const beerData = el.dataset.beerData;
-            if (beerData && modules.form) {
-                modules.form.selectBeer(beerData);
+            if (beerData && window.CascadeForm) {
+                window.CascadeForm.selectBeer(JSON.parse(beerData));
             }
         },
         'retry-breweries': (el, modules) => {
