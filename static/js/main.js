@@ -1656,7 +1656,7 @@ const App = {
             modules.modalManager?.open('gfStatusModal');
         },
         'confirm-status': (el, modules) => {
-            modules.form?.GFStatusFlow?.confirmStatusUpdate?.();
+            modules.venue?.GFStatusFlow?.confirmStatusUpdate?.();
         },
         'cancel-status': (el, modules) => {
             modules.modalManager?.close('gfStatusConfirmModal');
