@@ -1607,8 +1607,8 @@ def get_brewery_beers(brewery_name):
 def get_venue_beers(venue_id):
     """Get structured beer data for a venue"""
     try:
-        conn = get_db_connection()
-        cursor = conn.cursor()
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
         
         # Fixed SQL query with proper column and variable references
         cursor.execute("""
@@ -2068,6 +2068,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
