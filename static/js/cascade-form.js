@@ -126,6 +126,7 @@ export const CascadeForm = (() => {
             const formatBtn = e.target.closest('.format-btn');
             if (formatBtn) {
                 e.preventDefault();
+                e.stopPropagation(); // Stop event from bubbling to other handlers
                 console.log('🔘 Format clicked:', formatBtn.dataset.format);
                 selectFormat(formatBtn.dataset.format);
                 return;
@@ -135,19 +136,22 @@ export const CascadeForm = (() => {
             const knowsBtn = e.target.closest('[data-knows-brewery]');
             if (knowsBtn) {
                 e.preventDefault();
+                e.stopPropagation();
                 console.log('🏭 Brewery knowledge:', knowsBtn.dataset.knowsBrewery);
                 handleBreweryKnowledge(knowsBtn.dataset.knowsBrewery === 'yes');
                 return;
             }
             
-            // Dropdown items
+            // Dropdown items - PRIORITY HANDLING
             const suggestionItem = e.target.closest('.suggestion-item');
-            if (suggestionItem) {
+            if (suggestionItem && suggestionItem.closest('#reportModal')) {  // Only if in our modal
                 e.preventDefault();
+                e.stopPropagation(); // Stop forms.js from handling it
+                console.log('🎯 Cascade handling suggestion click');
                 handleSuggestionClick(suggestionItem);
                 return;
             }
-        });
+        }, true); // Use capture phase to handle before other listeners
         
         // Brewery input with debounce
         const breweryInput = document.getElementById('reportBrewery');
@@ -585,9 +589,11 @@ export const CascadeForm = (() => {
     // ================================
     const handleSuggestionClick = (item) => {
         const action = item.dataset.action;
+        console.log('🎯 Handling suggestion click:', action);
         
         switch(action) {
             case 'select-brewery':
+                console.log('📍 Selecting brewery:', item.dataset.brewery);
                 selectBrewery(item.dataset.brewery);
                 break;
                 
