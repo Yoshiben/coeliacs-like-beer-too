@@ -23,14 +23,30 @@ const CascadeForm = {
     // ================================
     init() {
         console.log('🔧 Initializing Cascade Form...');
+        
+        // Check if modal exists before initializing
+        const modal = document.getElementById('reportModal');
+        if (!modal) {
+            console.log('⏳ Report modal not in DOM yet, deferring initialization');
+            return false;
+        }
+        
         this.attachEventListeners();
         this.setupClickOutside();
         this.reset();
         console.log('✅ Cascade Form initialized');
+        return true;
     },
 
     // Reset form to initial state
     reset() {
+        // Check if modal exists first
+        const modal = document.getElementById('reportModal');
+        if (!modal) {
+            console.log('📝 Report modal not found, skipping reset');
+            return;
+        }
+        
         // Reset state
         this.state.currentStep = 'format';
         this.state.selectedFormat = null;
@@ -46,7 +62,8 @@ const CascadeForm = {
         });
         
         // Show only format step
-        document.getElementById('step-format').classList.add('active');
+        const formatStep = document.getElementById('step-format');
+        if (formatStep) formatStep.classList.add('active');
         
         // Hide all dropdowns
         document.querySelectorAll('.suggestions').forEach(dropdown => {
@@ -626,6 +643,8 @@ const CascadeForm = {
         const activeIndex = steps.indexOf(activeStep);
         
         document.querySelectorAll('.progress-step').forEach((step, index) => {
+            if (!step) return;
+            
             step.classList.remove('active', 'completed');
             
             if (index < activeIndex) {
@@ -681,8 +700,19 @@ const CascadeForm = {
 // INITIALIZATION
 // ================================
 document.addEventListener('DOMContentLoaded', () => {
-    CascadeForm.init();
+    // Try to initialize
+    if (!CascadeForm.init()) {
+        // If modal doesn't exist yet, it will be initialized when opened
+        console.log('📝 Cascade form will initialize when modal is opened');
+    }
 });
 
 // Export for use by other modules
 window.CascadeForm = CascadeForm;
+
+// Also expose an initialization method for manual init
+window.initCascadeForm = () => {
+    if (!CascadeForm.state.initialized) {
+        CascadeForm.state.initialized = CascadeForm.init();
+    }
+};
