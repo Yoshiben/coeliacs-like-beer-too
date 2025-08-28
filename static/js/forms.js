@@ -950,7 +950,6 @@ export const FormModule = (() => {
     return {
         init,
         handleReportSubmission,
-        searchBreweries,
         searchBeerNames,
         selectBrewery,
         selectBeer,
