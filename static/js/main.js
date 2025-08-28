@@ -1985,6 +1985,13 @@ const App = {
                 window.CascadeForm.selectBrewery(brewery);
             }
         },
+
+        'select-brewery-beer': (el, modules) => {
+            const beerData = el.dataset.beer;
+            if (beerData && window.CascadeForm) {
+                window.CascadeForm.selectBreweryBeer(JSON.parse(beerData));
+            }
+        },
         
         'select-beer': (el, modules) => {
             const beerData = el.dataset.beerData;
