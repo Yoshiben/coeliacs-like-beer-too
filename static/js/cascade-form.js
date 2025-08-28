@@ -3,11 +3,13 @@
 // Handles the step-by-step beer reporting flow
 // ================================================================================
 
-const CascadeForm = {
+export const CascadeForm = (() => {
+    'use strict';
+    
     // ================================
     // STATE MANAGEMENT
     // ================================
-    state: {
+    const state = {
         currentStep: 'format',
         selectedFormat: null,
         knowsBrewery: null,
@@ -15,13 +17,14 @@ const CascadeForm = {
         selectedBeer: null,
         isNewBrewery: false,
         isNewBeer: false,
-        currentVenue: null
-    },
+        currentVenue: null,
+        initialized: false
+    };
 
     // ================================
     // INITIALIZATION
     // ================================
-    init() {
+    const init = () => {
         console.log('🔧 Initializing Cascade Form...');
         
         // Check if modal exists before initializing
@@ -31,15 +34,16 @@ const CascadeForm = {
             return false;
         }
         
-        this.attachEventListeners();
-        this.setupClickOutside();
-        this.reset();
+        attachEventListeners();
+        setupClickOutside();
+        reset();
         console.log('✅ Cascade Form initialized');
+        state.initialized = true;
         return true;
-    },
+    };
 
     // Reset form to initial state
-    reset() {
+    const reset = () => {
         // Check if modal exists first
         const modal = document.getElementById('reportModal');
         if (!modal) {
@@ -48,13 +52,13 @@ const CascadeForm = {
         }
         
         // Reset state
-        this.state.currentStep = 'format';
-        this.state.selectedFormat = null;
-        this.state.knowsBrewery = null;
-        this.state.selectedBrewery = null;
-        this.state.selectedBeer = null;
-        this.state.isNewBrewery = false;
-        this.state.isNewBeer = false;
+        state.currentStep = 'format';
+        state.selectedFormat = null;
+        state.knowsBrewery = null;
+        state.selectedBrewery = null;
+        state.selectedBeer = null;
+        state.isNewBrewery = false;
+        state.isNewBeer = false;
         
         // Reset UI - hide all steps
         document.querySelectorAll('.cascade-step').forEach(step => {
@@ -84,26 +88,28 @@ const CascadeForm = {
         });
         
         // Reset progress bar
-        this.updateProgress('format');
+        updateProgress('format');
         
         // Clear form inputs
         const form = document.getElementById('reportForm');
         if (form) form.reset();
-    },
+    };
 
     // Set venue context (called from main.js when opening modal)
-    setVenue(venue) {
-        this.state.currentVenue = venue;
+    const setVenue = (venue) => {
+        state.currentVenue = venue;
         if (venue) {
-            document.getElementById('venueId').value = venue.venue_id || venue.id;
-            document.getElementById('venueName').value = venue.venue_name || venue.name;
+            const venueIdInput = document.getElementById('venueId');
+            const venueNameInput = document.getElementById('venueName');
+            if (venueIdInput) venueIdInput.value = venue.venue_id || venue.id;
+            if (venueNameInput) venueNameInput.value = venue.venue_name || venue.name;
         }
-    },
+    };
 
     // ================================
     // EVENT LISTENERS
     // ================================
-    attachEventListeners() {
+    const attachEventListeners = () => {
         console.log('📎 Attaching event listeners...');
         
         // Use event delegation for all clicks within the modal
@@ -120,7 +126,7 @@ const CascadeForm = {
             if (formatBtn) {
                 e.preventDefault();
                 console.log('🔘 Format clicked:', formatBtn.dataset.format);
-                this.selectFormat(formatBtn.dataset.format);
+                selectFormat(formatBtn.dataset.format);
                 return;
             }
             
@@ -129,7 +135,7 @@ const CascadeForm = {
             if (knowsBtn) {
                 e.preventDefault();
                 console.log('🏭 Brewery knowledge:', knowsBtn.dataset.knowsBrewery);
-                this.handleBreweryKnowledge(knowsBtn.dataset.knowsBrewery === 'yes');
+                handleBreweryKnowledge(knowsBtn.dataset.knowsBrewery === 'yes');
                 return;
             }
             
@@ -137,7 +143,7 @@ const CascadeForm = {
             const suggestionItem = e.target.closest('.suggestion-item');
             if (suggestionItem) {
                 e.preventDefault();
-                this.handleSuggestionClick(suggestionItem);
+                handleSuggestionClick(suggestionItem);
                 return;
             }
         });
@@ -149,13 +155,13 @@ const CascadeForm = {
             breweryInput.addEventListener('input', (e) => {
                 clearTimeout(breweryTimeout);
                 breweryTimeout = setTimeout(() => {
-                    this.searchBreweries(e.target.value);
+                    searchBreweries(e.target.value);
                 }, 300);
             });
             
             breweryInput.addEventListener('focus', () => {
                 if (!breweryInput.value) {
-                    this.showAllBreweries();
+                    showAllBreweries();
                 }
             });
         }
@@ -167,7 +173,7 @@ const CascadeForm = {
             beerSearchInput.addEventListener('input', (e) => {
                 clearTimeout(beerSearchTimeout);
                 beerSearchTimeout = setTimeout(() => {
-                    this.searchBeersGlobally(e.target.value);
+                    searchBeersGlobally(e.target.value);
                 }, 300);
             });
         }
@@ -179,8 +185,8 @@ const CascadeForm = {
             beerNameInput.addEventListener('input', (e) => {
                 clearTimeout(beerNameTimeout);
                 beerNameTimeout = setTimeout(() => {
-                    if (this.state.selectedBrewery) {
-                        this.searchBreweryBeers(e.target.value);
+                    if (state.selectedBrewery) {
+                        searchBreweryBeers(e.target.value);
                     }
                 }, 300);
             });
@@ -190,14 +196,15 @@ const CascadeForm = {
         const form = document.getElementById('reportForm');
         if (form) {
             form.addEventListener('submit', (e) => {
-                this.handleSubmit(e);
+                handleSubmit(e);
             });
         }
-    },
+    };
 
     // Setup click outside to close dropdowns
-    setupClickOutside() {
+    const setupClickOutside = () => {
         document.addEventListener('click', (e) => {
+            // Check if clicked outside any dropdown
             const dropdowns = ['breweryDropdown', 'beerNameDropdown', 'beerSearchDropdown'];
             
             dropdowns.forEach(dropdownId => {
@@ -216,20 +223,20 @@ const CascadeForm = {
                 // If click is not on the input or dropdown, hide it
                 if (!e.target.closest(`#${dropdownId}`) && 
                     !e.target.closest(`#${inputId}`)) {
-                    this.hideDropdown(dropdownId);
+                    hideDropdown(dropdownId);
                 }
             });
         });
-    },
+    };
 
     // ================================
     // STEP 1: FORMAT SELECTION
     // ================================
-    selectFormat(format) {
+    const selectFormat = (format) => {
         console.log('📍 selectFormat called with:', format);
         
-        this.state.selectedFormat = format;
-        console.log('📍 State updated:', this.state.selectedFormat);
+        state.selectedFormat = format;
+        console.log('📍 State updated:', state.selectedFormat);
         
         // Update UI
         document.querySelectorAll('.format-btn').forEach(btn => {
@@ -248,60 +255,64 @@ const CascadeForm = {
         
         // Move to next step
         console.log('📍 About to show brewery-question step');
-        this.showStep('brewery-question');
-        this.updateProgress('brewery');
+        showStep('brewery-question');
+        updateProgress('brewery');
         console.log('📍 selectFormat complete');
-    },
+    };
 
     // ================================
     // STEP 2: BREWERY KNOWLEDGE
     // ================================
-    handleBreweryKnowledge(knowsBrewery) {
-        this.state.knowsBrewery = knowsBrewery;
+    const handleBreweryKnowledge = (knowsBrewery) => {
+        state.knowsBrewery = knowsBrewery;
         
         if (knowsBrewery) {
             // User knows brewery - show brewery selection
-            this.showStep('brewery-select');
-            document.getElementById('reportBrewery').focus();
+            showStep('brewery-select');
+            const breweryInput = document.getElementById('reportBrewery');
+            if (breweryInput) breweryInput.focus();
         } else {
             // User doesn't know brewery - show beer search
-            this.showStep('beer-search');
-            document.getElementById('beerSearchFirst').focus();
+            showStep('beer-search');
+            const beerSearchInput = document.getElementById('beerSearchFirst');
+            if (beerSearchInput) beerSearchInput.focus();
         }
-    },
+    };
 
     // ================================
     // BREWERY SEARCH & SELECTION
     // ================================
-    async searchBreweries(query) {
+    const searchBreweries = async (query) => {
         try {
             const response = await fetch(`/api/breweries?q=${encodeURIComponent(query)}`);
             const breweries = await response.json();
-            this.displayBreweryDropdown(breweries, query);
+            displayBreweryDropdown(breweries, query);
         } catch (error) {
             console.error('Error searching breweries:', error);
-            this.hideDropdown('breweryDropdown');
+            hideDropdown('breweryDropdown');
         }
-    },
+    };
 
-    async showAllBreweries() {
+    const showAllBreweries = async () => {
         const dropdown = document.getElementById('breweryDropdown');
         if (dropdown) {
             dropdown.innerHTML = '<div class="dropdown-header">Loading breweries...</div>';
-            this.showDropdown('breweryDropdown');
+            showDropdown('breweryDropdown');
         }
         
         try {
             const response = await fetch('/api/breweries');
             const breweries = await response.json();
-            this.displayBreweryDropdown(breweries.slice(0, 50), '');
+            displayBreweryDropdown(breweries.slice(0, 50), '');
         } catch (error) {
             console.error('Error loading breweries:', error);
-            dropdown.innerHTML = '<div class="dropdown-header">Failed to load breweries</div>';
+            if (dropdown) {
+                dropdown.innerHTML = '<div class="dropdown-header">Failed to load breweries</div>';
+            }
         }
-    },
+    };
 
-    displayBreweryDropdown(breweries, query) {
+    const displayBreweryDropdown = (breweries, query) => {
         const dropdown = document.getElementById('breweryDropdown');
         if (!dropdown) return;
         
@@ -310,15 +321,15 @@ const CascadeForm = {
         if (breweries.length === 0 && query) {
             html = `
                 <div class="dropdown-header">🔍 No matches found</div>
-                <div class="suggestion-item new-brewery" data-action="create-brewery" data-brewery="${this.escapeHtml(query)}">
-                    <strong>➕ Add "${this.escapeHtml(query)}" as new brewery</strong>
+                <div class="suggestion-item new-brewery" data-action="create-brewery" data-brewery="${escapeHtml(query)}">
+                    <strong>➕ Add "${escapeHtml(query)}" as new brewery</strong>
                     <small>This will be added to our database</small>
                 </div>
             `;
         } else {
             // Header
             if (query) {
-                html += `<div class="dropdown-header">🔍 ${breweries.length} matches for "${this.escapeHtml(query)}"</div>`;
+                html += `<div class="dropdown-header">🔍 ${breweries.length} matches for "${escapeHtml(query)}"</div>`;
             } else {
                 html += `<div class="dropdown-header">🍺 ${breweries.length} Breweries Available</div>`;
             }
@@ -326,8 +337,8 @@ const CascadeForm = {
             // Brewery list
             breweries.forEach(brewery => {
                 html += `
-                    <div class="suggestion-item" data-action="select-brewery" data-brewery="${this.escapeHtml(brewery)}">
-                        <strong>${this.escapeHtml(brewery)}</strong>
+                    <div class="suggestion-item" data-action="select-brewery" data-brewery="${escapeHtml(brewery)}">
+                        <strong>${escapeHtml(brewery)}</strong>
                     </div>
                 `;
             });
@@ -335,8 +346,8 @@ const CascadeForm = {
             // Add new option if searching
             if (query && !breweries.some(b => b.toLowerCase() === query.toLowerCase())) {
                 html += `
-                    <div class="suggestion-item new-brewery" data-action="create-brewery" data-brewery="${this.escapeHtml(query)}">
-                        <strong>➕ Add "${this.escapeHtml(query)}" as new brewery</strong>
+                    <div class="suggestion-item new-brewery" data-action="create-brewery" data-brewery="${escapeHtml(query)}">
+                        <strong>➕ Add "${escapeHtml(query)}" as new brewery</strong>
                         <small>Not in list? Add it!</small>
                     </div>
                 `;
@@ -344,58 +355,62 @@ const CascadeForm = {
         }
         
         dropdown.innerHTML = html;
-        this.showDropdown('breweryDropdown');
-    },
+        showDropdown('breweryDropdown');
+    };
 
-    selectBrewery(breweryName) {
-        this.state.selectedBrewery = breweryName;
-        this.state.isNewBrewery = false;
+    const selectBrewery = (breweryName) => {
+        state.selectedBrewery = breweryName;
+        state.isNewBrewery = false;
         
         // Fill input
-        document.getElementById('reportBrewery').value = breweryName;
-        this.hideDropdown('breweryDropdown');
+        const breweryInput = document.getElementById('reportBrewery');
+        if (breweryInput) breweryInput.value = breweryName;
+        hideDropdown('breweryDropdown');
         
         // Show beer details step
-        this.showStep('beer-details');
-        this.updateProgress('beer');
+        showStep('beer-details');
+        updateProgress('beer');
         
         // Show brewery confirmation
-        this.showBreweryConfirmed(breweryName);
+        showBreweryConfirmed(breweryName);
         
         // Focus beer name input
-        document.getElementById('reportBeerName').focus();
+        const beerNameInput = document.getElementById('reportBeerName');
+        if (beerNameInput) beerNameInput.focus();
         
         // Load this brewery's beers
-        this.loadBreweryBeers(breweryName);
-    },
+        loadBreweryBeers(breweryName);
+    };
 
-    createNewBrewery(breweryName) {
-        this.state.selectedBrewery = breweryName;
-        this.state.isNewBrewery = true;
+    const createNewBrewery = (breweryName) => {
+        state.selectedBrewery = breweryName;
+        state.isNewBrewery = true;
         
         // Fill input
-        document.getElementById('reportBrewery').value = breweryName;
-        this.hideDropdown('breweryDropdown');
+        const breweryInput = document.getElementById('reportBrewery');
+        if (breweryInput) breweryInput.value = breweryName;
+        hideDropdown('breweryDropdown');
         
         // Show beer details step
-        this.showStep('beer-details');
-        this.updateProgress('beer');
+        showStep('beer-details');
+        updateProgress('beer');
         
         // Show brewery confirmation with NEW indicator
-        this.showBreweryConfirmed(breweryName + ' (NEW)');
+        showBreweryConfirmed(breweryName + ' (NEW)');
         
         // Focus beer name input
-        document.getElementById('reportBeerName').focus();
+        const beerNameInput = document.getElementById('reportBeerName');
+        if (beerNameInput) beerNameInput.focus();
         
-        this.showToast(`🆕 "${breweryName}" will be added to our database!`);
-    },
+        showToast(`🆕 "${breweryName}" will be added to our database!`);
+    };
 
     // ================================
     // BEER SEARCH & SELECTION
     // ================================
-    async searchBeersGlobally(query) {
+    const searchBeersGlobally = async (query) => {
         if (query.length < 2) {
-            this.hideDropdown('beerSearchDropdown');
+            hideDropdown('beerSearchDropdown');
             return;
         }
         
@@ -404,6 +419,8 @@ const CascadeForm = {
             const beers = await response.json();
             
             const dropdown = document.getElementById('beerSearchDropdown');
+            if (!dropdown) return;
+            
             let html = '';
             
             if (beers.length > 0) {
@@ -411,173 +428,190 @@ const CascadeForm = {
                 beers.forEach(beer => {
                     html += `
                         <div class="suggestion-item beer-item" data-action="select-found-beer" data-beer='${JSON.stringify(beer)}'>
-                            <strong>${this.escapeHtml(beer.beer_name)}</strong>
-                            <small>🏭 ${this.escapeHtml(beer.brewery_name)} • ${this.escapeHtml(beer.style || 'Unknown style')}</small>
+                            <strong>${escapeHtml(beer.beer_name)}</strong>
+                            <small>🏭 ${escapeHtml(beer.brewery_name)} • ${escapeHtml(beer.style || 'Unknown style')}</small>
                         </div>
                     `;
                 });
             } else {
                 html = `
                     <div class="dropdown-header">No beers found</div>
-                    <div class="suggestion-item new-beer" data-action="create-new-beer" data-beer="${this.escapeHtml(query)}">
-                        <strong>➕ Add "${this.escapeHtml(query)}" as new beer</strong>
+                    <div class="suggestion-item new-beer" data-action="create-new-beer" data-beer="${escapeHtml(query)}">
+                        <strong>➕ Add "${escapeHtml(query)}" as new beer</strong>
                         <small>We'll help you add the brewery next</small>
                     </div>
                 `;
             }
             
             dropdown.innerHTML = html;
-            this.showDropdown('beerSearchDropdown');
+            showDropdown('beerSearchDropdown');
             
         } catch (error) {
             console.error('Error searching beers:', error);
         }
-    },
+    };
 
-    async searchBreweryBeers(query) {
-        if (!this.state.selectedBrewery) return;
+    const searchBreweryBeers = async (query) => {
+        if (!state.selectedBrewery) return;
         
         try {
-            const response = await fetch(`/api/brewery/${encodeURIComponent(this.state.selectedBrewery)}/beers?q=${encodeURIComponent(query)}`);
+            const response = await fetch(`/api/brewery/${encodeURIComponent(state.selectedBrewery)}/beers?q=${encodeURIComponent(query)}`);
             const beers = await response.json();
             
             const dropdown = document.getElementById('beerNameDropdown');
+            if (!dropdown) return;
+            
             let html = '';
             
             if (beers.length > 0) {
-                html = `<div class="dropdown-header">🍺 ${beers.length} ${this.state.selectedBrewery} beers</div>`;
+                html = `<div class="dropdown-header">🍺 ${beers.length} ${state.selectedBrewery} beers</div>`;
                 beers.forEach(beer => {
                     html += `
                         <div class="suggestion-item" data-action="select-brewery-beer" data-beer='${JSON.stringify(beer)}'>
-                            <strong>${this.escapeHtml(beer.beer_name)}</strong>
-                            <small>${this.escapeHtml(beer.style || 'Unknown')} • ${beer.abv || '?'}% ABV</small>
+                            <strong>${escapeHtml(beer.beer_name)}</strong>
+                            <small>${escapeHtml(beer.style || 'Unknown')} • ${beer.abv || '?'}% ABV</small>
                         </div>
                     `;
                 });
             } else if (query) {
                 html = `
-                    <div class="suggestion-item new-beer" data-action="add-brewery-beer" data-beer="${this.escapeHtml(query)}">
-                        <strong>➕ Add "${this.escapeHtml(query)}" to ${this.state.selectedBrewery}</strong>
+                    <div class="suggestion-item new-beer" data-action="add-brewery-beer" data-beer="${escapeHtml(query)}">
+                        <strong>➕ Add "${escapeHtml(query)}" to ${state.selectedBrewery}</strong>
                     </div>
                 `;
             }
             
             if (html) {
                 dropdown.innerHTML = html;
-                this.showDropdown('beerNameDropdown');
+                showDropdown('beerNameDropdown');
             } else {
-                this.hideDropdown('beerNameDropdown');
+                hideDropdown('beerNameDropdown');
             }
             
         } catch (error) {
             console.error('Error loading brewery beers:', error);
         }
-    },
+    };
 
-    async loadBreweryBeers(breweryName) {
+    const loadBreweryBeers = async (breweryName) => {
         try {
             const response = await fetch(`/api/brewery/${encodeURIComponent(breweryName)}/beers`);
             const beers = await response.json();
             
             if (beers.length > 0) {
-                this.showToast(`🍺 ${breweryName} has ${beers.length} beers in our database`);
+                showToast(`🍺 ${breweryName} has ${beers.length} beers in our database`);
             } else {
-                this.showToast(`🆕 You're adding the first ${breweryName} beer!`);
+                showToast(`🆕 You're adding the first ${breweryName} beer!`);
             }
         } catch (error) {
             console.error('Error loading brewery beers:', error);
         }
-    },
+    };
 
-    selectFoundBeer(beer) {
-        this.state.selectedBeer = beer;
-        this.state.selectedBrewery = beer.brewery_name;
+    const selectFoundBeer = (beer) => {
+        state.selectedBeer = beer;
+        state.selectedBrewery = beer.brewery_name;
         
-        this.hideDropdown('beerSearchDropdown');
+        hideDropdown('beerSearchDropdown');
         
         // Move to beer details with pre-filled data
-        this.showStep('beer-details');
-        this.updateProgress('beer');
+        showStep('beer-details');
+        updateProgress('beer');
         
         // Show brewery
-        this.showBreweryConfirmed(beer.brewery_name);
+        showBreweryConfirmed(beer.brewery_name);
         
         // Fill in beer details
-        document.getElementById('reportBeerName').value = beer.beer_name;
-        document.getElementById('reportBeerStyle').value = beer.style || '';
-        document.getElementById('reportBeerABV').value = beer.abv || '';
+        const beerNameInput = document.getElementById('reportBeerName');
+        const beerStyleInput = document.getElementById('reportBeerStyle');
+        const beerABVInput = document.getElementById('reportBeerABV');
+        
+        if (beerNameInput) beerNameInput.value = beer.beer_name;
+        if (beerStyleInput) beerStyleInput.value = beer.style || '';
+        if (beerABVInput) beerABVInput.value = beer.abv || '';
         
         // Show submit button
-        document.getElementById('formActions').classList.add('show');
+        const formActions = document.getElementById('formActions');
+        if (formActions) formActions.classList.add('show');
         
-        this.showToast(`✅ Found it! ${beer.beer_name} by ${beer.brewery_name}`);
-    },
+        showToast(`✅ Found it! ${beer.beer_name} by ${beer.brewery_name}`);
+    };
 
-    selectBreweryBeer(beer) {
+    const selectBreweryBeer = (beer) => {
         // Fill beer details
-        document.getElementById('reportBeerName').value = beer.beer_name;
-        document.getElementById('reportBeerStyle').value = beer.style || '';
-        document.getElementById('reportBeerABV').value = beer.abv || '';
+        const beerNameInput = document.getElementById('reportBeerName');
+        const beerStyleInput = document.getElementById('reportBeerStyle');
+        const beerABVInput = document.getElementById('reportBeerABV');
         
-        this.hideDropdown('beerNameDropdown');
+        if (beerNameInput) beerNameInput.value = beer.beer_name;
+        if (beerStyleInput) beerStyleInput.value = beer.style || '';
+        if (beerABVInput) beerABVInput.value = beer.abv || '';
+        
+        hideDropdown('beerNameDropdown');
         
         // Show submit button
-        document.getElementById('formActions').classList.add('show');
+        const formActions = document.getElementById('formActions');
+        if (formActions) formActions.classList.add('show');
         
-        this.showToast(`✅ Selected: ${beer.beer_name}`);
-    },
+        showToast(`✅ Selected: ${beer.beer_name}`);
+    };
 
     // ================================
     // DROPDOWN CLICK HANDLER
     // ================================
-    handleSuggestionClick(item) {
+    const handleSuggestionClick = (item) => {
         const action = item.dataset.action;
         
         switch(action) {
             case 'select-brewery':
-                this.selectBrewery(item.dataset.brewery);
+                selectBrewery(item.dataset.brewery);
                 break;
                 
             case 'create-brewery':
-                this.createNewBrewery(item.dataset.brewery);
+                createNewBrewery(item.dataset.brewery);
                 break;
                 
             case 'select-found-beer':
-                this.selectFoundBeer(JSON.parse(item.dataset.beer));
+                selectFoundBeer(JSON.parse(item.dataset.beer));
                 break;
                 
             case 'create-new-beer':
                 // User doesn't know brewery, creating new beer
                 const beerName = item.dataset.beer;
-                document.getElementById('beerSearchFirst').value = beerName;
-                this.hideDropdown('beerSearchDropdown');
+                const beerSearchInput = document.getElementById('beerSearchFirst');
+                if (beerSearchInput) beerSearchInput.value = beerName;
+                hideDropdown('beerSearchDropdown');
                 
                 // Move to brewery selection for this new beer
-                this.showStep('brewery-select');
-                this.updateProgress('brewery');
-                document.getElementById('reportBrewery').focus();
-                this.showToast('🏭 Now select or add the brewery for this beer');
+                showStep('brewery-select');
+                updateProgress('brewery');
+                const breweryInput = document.getElementById('reportBrewery');
+                if (breweryInput) breweryInput.focus();
+                showToast('🏭 Now select or add the brewery for this beer');
                 break;
                 
             case 'select-brewery-beer':
-                this.selectBreweryBeer(JSON.parse(item.dataset.beer));
+                selectBreweryBeer(JSON.parse(item.dataset.beer));
                 break;
                 
             case 'add-brewery-beer':
                 // Adding new beer to known brewery
-                document.getElementById('reportBeerName').value = item.dataset.beer;
-                this.hideDropdown('beerNameDropdown');
-                document.getElementById('reportBeerStyle').focus();
-                this.state.isNewBeer = true;
-                document.getElementById('formActions').classList.add('show');
+                const beerNameInput = document.getElementById('reportBeerName');
+                if (beerNameInput) beerNameInput.value = item.dataset.beer;
+                hideDropdown('beerNameDropdown');
+                const beerStyleInput = document.getElementById('reportBeerStyle');
+                if (beerStyleInput) beerStyleInput.focus();
+                state.isNewBeer = true;
+                const formActions = document.getElementById('formActions');
+                if (formActions) formActions.classList.add('show');
                 break;
         }
-    },
+    };
 
     // ================================
     // FORM SUBMISSION
     // ================================
-    async handleSubmit(e) {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         
         // Get user ID
@@ -585,18 +619,18 @@ const CascadeForm = {
                       window.App?.getState('userId');
         
         if (!userId) {
-            this.showToast('❌ Please log in first', 'error');
+            showToast('❌ Please log in first', 'error');
             return;
         }
         
         // Build submission data
         const formData = {
-            venue_id: this.state.currentVenue?.venue_id || this.state.currentVenue?.id,
-            format: this.state.selectedFormat,
-            brewery_name: this.state.selectedBrewery || document.getElementById('reportBrewery').value,
-            beer_name: document.getElementById('reportBeerName').value,
-            beer_style: document.getElementById('reportBeerStyle').value,
-            beer_abv: document.getElementById('reportBeerABV').value,
+            venue_id: state.currentVenue?.venue_id || state.currentVenue?.id,
+            format: state.selectedFormat,
+            brewery_name: state.selectedBrewery || document.getElementById('reportBrewery')?.value,
+            beer_name: document.getElementById('reportBeerName')?.value,
+            beer_style: document.getElementById('reportBeerStyle')?.value,
+            beer_abv: document.getElementById('reportBeerABV')?.value,
             user_id: userId,
             submitted_by: window.App?.getState('userNickname') || 
                          localStorage.getItem('userNickname') || 
@@ -615,37 +649,38 @@ const CascadeForm = {
             const result = await response.json();
             
             if (result.success) {
-                this.showToast('🎉 Beer reported successfully!');
+                showToast('🎉 Beer reported successfully!');
                 
                 // Close modal
                 if (window.App?.getModule('modalManager')) {
                     window.App.getModule('modalManager').close('reportModal');
                 } else {
-                    document.getElementById('reportModal').classList.remove('active');
+                    const modal = document.getElementById('reportModal');
+                    if (modal) modal.classList.remove('active');
                 }
                 
                 // Reset form
-                this.reset();
+                reset();
                 
                 // Show status prompt if needed
-                if (result.show_status_prompt && this.state.currentVenue) {
+                if (result.show_status_prompt && state.currentVenue) {
                     setTimeout(() => {
-                        window.App?.trigger?.('show-status-prompt', this.state.currentVenue);
+                        window.App?.trigger?.('show-status-prompt', state.currentVenue);
                     }, 300);
                 }
             } else {
-                this.showToast(result.error || '❌ Failed to submit', 'error');
+                showToast(result.error || '❌ Failed to submit', 'error');
             }
         } catch (error) {
             console.error('Submit error:', error);
-            this.showToast('❌ Failed to submit. Please try again.', 'error');
+            showToast('❌ Failed to submit. Please try again.', 'error');
         }
-    },
+    };
 
     // ================================
     // UI HELPERS
     // ================================
-    showStep(stepName) {
+    const showStep = (stepName) => {
         console.log('🔄 showStep called with:', stepName);
         
         // Hide all steps
@@ -673,9 +708,9 @@ const CascadeForm = {
                 console.log('🔄 Showed form actions');
             }
         }
-    },
+    };
 
-    updateProgress(activeStep) {
+    const updateProgress = (activeStep) => {
         const steps = ['format', 'brewery', 'beer'];
         const activeIndex = steps.indexOf(activeStep);
         
@@ -690,23 +725,23 @@ const CascadeForm = {
                 step.classList.add('active');
             }
         });
-    },
+    };
 
-    showDropdown(dropdownId) {
+    const showDropdown = (dropdownId) => {
         const dropdown = document.getElementById(dropdownId);
         if (dropdown) {
             dropdown.classList.add('show');
         }
-    },
+    };
 
-    hideDropdown(dropdownId) {
+    const hideDropdown = (dropdownId) => {
         const dropdown = document.getElementById(dropdownId);
         if (dropdown) {
             dropdown.classList.remove('show');
         }
-    },
+    };
 
-    showBreweryConfirmed(breweryName) {
+    const showBreweryConfirmed = (breweryName) => {
         const confirmed = document.getElementById('breweryConfirmed');
         const nameEl = document.getElementById('confirmedBreweryName');
         
@@ -714,9 +749,9 @@ const CascadeForm = {
             nameEl.textContent = breweryName;
             confirmed.classList.add('show');
         }
-    },
+    };
 
-    showToast(message, type = 'success') {
+    const showToast = (message, type = 'success') => {
         if (window.showSuccessToast && type === 'success') {
             window.showSuccessToast(message);
         } else if (window.showErrorToast && type === 'error') {
@@ -724,14 +759,24 @@ const CascadeForm = {
         } else {
             console.log(`${type === 'success' ? '✅' : '❌'} ${message}`);
         }
-    },
+    };
 
-    escapeHtml(text) {
+    const escapeHtml = (text) => {
         const div = document.createElement('div');
         div.textContent = text || '';
         return div.innerHTML;
-    }
-};
+    };
+
+    // ================================
+    // PUBLIC API
+    // ================================
+    return {
+        init,
+        reset,
+        setVenue,
+        getState: () => state
+    };
+})();
 
 // ================================
 // INITIALIZATION
@@ -749,7 +794,7 @@ window.CascadeForm = CascadeForm;
 
 // Also expose an initialization method for manual init
 window.initCascadeForm = () => {
-    if (!CascadeForm.state.initialized) {
-        CascadeForm.state.initialized = CascadeForm.init();
+    if (!CascadeForm.getState().initialized) {
+        CascadeForm.init();
     }
 };
