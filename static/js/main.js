@@ -228,6 +228,7 @@ const App = {
             { FormModule },
             { CommunityModule },
             { NavStateManager },
+            { VenueModule },
             breweriesImport
         ] = modules;
         
