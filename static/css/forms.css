@@ -1077,7 +1077,7 @@
 
 /* Hide all dropdowns by default */
 .suggestions {
-    display: none !important;
+    display: none;
     opacity: 0;
     transition: opacity 0.2s;
 }
