@@ -1617,7 +1617,7 @@ def get_venue_beers(venue_id):
                 br.brewery_name,
                 b.beer_name,            
                 b.style,
-                b.format,
+                vb.format,
                 vb.last_seen AS added_date,
                 u.nickname AS added_by
             FROM venue_beers vb
@@ -1626,7 +1626,7 @@ def get_venue_beers(venue_id):
             LEFT JOIN breweries br ON b.brewery_id = br.brewery_id
             LEFT JOIN users u ON u.user_id = vb.user_id
             WHERE vb.venue_id = %s
-            ORDER BY b.format, b.beer_name
+            ORDER BY vb.format, b.beer_name
         """, (venue_id,))
         
         beers = []
@@ -2068,6 +2068,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
