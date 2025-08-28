@@ -159,10 +159,13 @@ export const CascadeForm = (() => {
                 }, 300);
             });
             
-            breweryInput.addEventListener('focus', () => {
-                if (!breweryInput.value) {
-                    showAllBreweries();
-                }
+            breweryInput.addEventListener('focus', (e) => {
+                // Small delay to prevent immediate hide/show conflict
+                setTimeout(() => {
+                    if (!breweryInput.value) {
+                        showAllBreweries();
+                    }
+                }, 100);
             });
         }
         
@@ -204,6 +207,11 @@ export const CascadeForm = (() => {
     // Setup click outside to close dropdowns
     const setupClickOutside = () => {
         document.addEventListener('click', (e) => {
+            // Don't hide if clicking on the input itself
+            if (e.target.matches('#reportBrewery, #reportBeerName, #beerSearchFirst')) {
+                return;
+            }
+            
             // Check if clicked outside any dropdown
             const dropdowns = ['breweryDropdown', 'beerNameDropdown', 'beerSearchDropdown'];
             
@@ -218,11 +226,9 @@ export const CascadeForm = (() => {
                 };
                 
                 const inputId = inputMap[dropdownId];
-                const input = document.getElementById(inputId);
                 
-                // If click is not on the input or dropdown, hide it
-                if (!e.target.closest(`#${dropdownId}`) && 
-                    !e.target.closest(`#${inputId}`)) {
+                // If click is not on the dropdown itself, hide it
+                if (!e.target.closest(`#${dropdownId}`)) {
                     hideDropdown(dropdownId);
                 }
             });
