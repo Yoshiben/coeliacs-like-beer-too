@@ -1601,6 +1601,57 @@ def get_brewery_beers(brewery_name):
             cursor.close()
             conn.close()
 
+# In app.py, add this endpoint:
+
+@app.route('/api/venue/<int:venue_id>/beers', methods=['GET'])
+def get_venue_beers(venue_id):
+    """Get structured beer data for a venue"""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Get beers for this venue with proper structure
+        cursor.execute("""
+            SELECT 
+                vb.beer_id,
+                br.brewery_name,
+                b.beer_name,            
+                b.style,
+                b.format,
+                last_seen AS added_date,
+                nicname AS added_by
+            FROM venue_beers
+            LEFT JOIN venues v ON vb.venue_id = v.venue_id
+            LEFT JOIN beers b ON vb.beer_id = b.beer_id
+            LEFT JOIN breweries br ON b.brewery_id = br.brewery_id
+            LEFT JOIN users u ON u.ser_id = vb.user_id
+            WHERE venue_id = %s
+            ORDER BY beer_format, beer_name
+        """, (venue_id,))
+        
+        beers = []
+        for row in cur.fetchall():
+            beers.append({
+                'id': row[0],
+                'brewery': row[1],
+                'name': row[2],
+                'style': row[3],
+                'format': row[4],
+                'added_date': row[5].isoformat() if row[5] else None,
+                'added_by': row[6]
+            })
+        
+        cursor.close()
+        conn.close()
+        
+        return jsonify({
+            'venue_id': venue_id,
+            'beers': beers,
+            'count': len(beers)
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/all-venues')
 def get_all_venues_for_map():
@@ -2016,6 +2067,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
