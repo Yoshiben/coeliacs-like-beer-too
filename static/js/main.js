@@ -1462,14 +1462,19 @@ const App = {
         'quick-status-update': async (el, modules) => {
             const status = el.dataset.status;
             const statusPromptVenue = window.App.getState('statusPromptVenue');
-            const statusPromptSubmittedBy = window.App.getState('statusPromptSubmittedBy');
             
-            if (!statusPromptVenue) {
-                console.error('No venue found for status update');
+            // Get venue ID from multiple possible sources
+            const venueId = statusPromptVenue?.venue_id || 
+                            statusPromptVenue?.id || 
+                            el.dataset.venueId;
+            
+            if (!venueId) {
+                console.error('❌ No venue ID found in any source');
+                modules.toast?.error('Error: No venue selected');
                 return;
             }
             
-            console.log('🎯 Quick status update:', status, 'for venue:', statusPromptVenue.venue_id);
+            console.log('🎯 Quick status update:', status, 'for venue:', venueId);
             console.log('👤 Submitted by:', statusPromptSubmittedBy);
             
             // Get user_id from localStorage since it's not being passed through state
