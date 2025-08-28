@@ -276,9 +276,6 @@ export const VenueModule = (function() {
             b.format.toLowerCase() === 'bottle' || b.format.toLowerCase() === 'can'
         ).length;
         
-        // Update stats bar
-        updateBeerStats(tapCount, bottleCanCount, beers.length);
-        
         // Generate beer cards
         contentEl.innerHTML = beers.map((beer, index) => createBeerCard(beer, index)).join('');
         
@@ -290,22 +287,19 @@ export const VenueModule = (function() {
      * Create a single beer card HTML
      */
     const createBeerCard = (beer, index) => {
-        const isBottleCan = beer.format.toLowerCase() === 'bottle' || beer.format.toLowerCase() === 'can';
-        const isCask = beer.format.toLowerCase() === 'cask';
+        const isBottleCan = beer.format && (beer.format.toLowerCase() === 'bottle' || beer.format.toLowerCase() === 'can');
+        const isCask = beer.format && beer.format.toLowerCase() === 'cask';
         
         const formatIcon = isBottleCan ? '🍾' : '🍺';
         const formatClass = isBottleCan ? 'bottle' : '';
         const formatBadgeClass = isBottleCan ? 'badge-bottle' : 'badge-tap';
         
-        const formatLabel = {
+        const formatLabel = beer.format ? {
             'tap': 'On Tap',
             'cask': 'Cask',
             'bottle': 'Bottle',
             'can': 'Can'
-        }[beer.format.toLowerCase()] || beer.format;
-        
-        // For now, all beers need verification (you can add timestamp logic later)
-        const isVerified = false;
+        }[beer.format.toLowerCase()] || beer.format : 'Unknown';
         
         return `
             <div class="beer-card" data-beer-id="${beer.id}">
@@ -333,14 +327,6 @@ export const VenueModule = (function() {
                             <span>${isCask ? '🛢️' : (isBottleCan ? formatIcon : '🚰')}</span> ${formatLabel}
                         </span>
                         ${beer.style ? `<span class="badge badge-style">${beer.style}</span>` : ''}
-                        ${isVerified ? 
-                            `<span class="badge badge-verified">
-                                <span>✓</span> Verified today
-                            </span>` : 
-                            `<span class="badge badge-unverified">
-                                <span>?</span> Needs verification
-                            </span>`
-                        }
                     </div>
                 </div>
                 
@@ -364,15 +350,6 @@ export const VenueModule = (function() {
     };
     
     /**
-     * Update the beer statistics bar
-     */
-    const updateBeerStats = (tapCount, bottleCount, verifiedCount) => {
-        document.getElementById('tapCount').textContent = tapCount;
-        document.getElementById('bottleCount').textContent = bottleCount;
-        document.getElementById('verifiedCount').textContent = verifiedCount;
-    };
-    
-    /**
      * Show empty beer list state
      */
     const showEmptyBeerList = () => {
@@ -381,9 +358,6 @@ export const VenueModule = (function() {
         
         contentEl.style.display = 'none';
         emptyEl.style.display = 'block';
-        
-        // Reset stats to 0
-        updateBeerStats(0, 0, 0);
     };
     
     /**
