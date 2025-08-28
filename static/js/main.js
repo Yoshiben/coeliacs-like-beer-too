@@ -1751,7 +1751,6 @@ const App = {
                 modules.toast?.info('💡 Type the new brewery name and continue');
             }
         },
-        },
         
         'add-new-beer': (el, modules) => {
             const beerNameInput = document.getElementById('reportBeerName');
