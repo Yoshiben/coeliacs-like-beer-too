@@ -226,19 +226,31 @@ const CascadeForm = {
     // STEP 1: FORMAT SELECTION
     // ================================
     selectFormat(format) {
+        console.log('📍 selectFormat called with:', format);
+        
         this.state.selectedFormat = format;
+        console.log('📍 State updated:', this.state.selectedFormat);
         
         // Update UI
         document.querySelectorAll('.format-btn').forEach(btn => {
             btn.classList.toggle('selected', btn.dataset.format === format);
         });
+        console.log('📍 Updated button styles');
         
         // Set hidden input value
-        document.getElementById('reportFormat').value = format;
+        const hiddenInput = document.getElementById('reportFormat');
+        if (hiddenInput) {
+            hiddenInput.value = format;
+            console.log('📍 Set hidden input value:', format);
+        } else {
+            console.error('❌ Hidden input reportFormat not found!');
+        }
         
         // Move to next step
+        console.log('📍 About to show brewery-question step');
         this.showStep('brewery-question');
         this.updateProgress('brewery');
+        console.log('📍 selectFormat complete');
     },
 
     // ================================
@@ -634,8 +646,13 @@ const CascadeForm = {
     // UI HELPERS
     // ================================
     showStep(stepName) {
+        console.log('🔄 showStep called with:', stepName);
+        
         // Hide all steps
-        document.querySelectorAll('.cascade-step').forEach(step => {
+        const allSteps = document.querySelectorAll('.cascade-step');
+        console.log('🔄 Found', allSteps.length, 'cascade steps');
+        
+        allSteps.forEach(step => {
             step.classList.remove('active');
         });
         
@@ -643,11 +660,18 @@ const CascadeForm = {
         const targetStep = document.getElementById(`step-${stepName}`);
         if (targetStep) {
             targetStep.classList.add('active');
+            console.log('🔄 Activated step:', stepName);
+        } else {
+            console.error('❌ Step not found:', `step-${stepName}`);
         }
         
         // Show submit button when on beer details
         if (stepName === 'beer-details') {
-            document.getElementById('formActions').classList.add('show');
+            const formActions = document.getElementById('formActions');
+            if (formActions) {
+                formActions.classList.add('show');
+                console.log('🔄 Showed form actions');
+            }
         }
     },
 
