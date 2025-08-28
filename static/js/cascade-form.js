@@ -371,15 +371,13 @@ export const CascadeForm = (() => {
                 `;
             });
             
-            // Add new option if searching
-            if (query && !breweries.some(b => b.toLowerCase() === query.toLowerCase())) {
-                html += `
-                    <div class="suggestion-item new-brewery" data-action="create-brewery" data-brewery="${escapeHtml(query)}">
-                        <strong>➕ Add "${escapeHtml(query)}" as new brewery</strong>
-                        <small>Not in list? Add it!</small>
-                    </div>
-                `;
-            }
+            // FIXED: Add "Create New Brewery" option that prompts for input
+            html += `
+                <div class="suggestion-item new-brewery" data-action="prompt-new-brewery">
+                    <strong>➕ Create New Brewery</strong>
+                    <small>Not in list? Add a new one!</small>
+                </div>
+            `;
         }
         
         dropdown.innerHTML = html;
@@ -598,7 +596,20 @@ export const CascadeForm = (() => {
                 break;
                 
             case 'create-brewery':
+                // This is when there's already a name to create
                 createNewBrewery(item.dataset.brewery);
+                break;
+                
+            case 'prompt-new-brewery':
+                // NEW: This prompts user to type a new brewery name
+                const breweryInput = document.getElementById('reportBrewery');
+                if (breweryInput) {
+                    hideDropdown('breweryDropdown');
+                    breweryInput.value = '';
+                    breweryInput.placeholder = 'Type new brewery name...';
+                    breweryInput.focus();
+                    showToast('💡 Type the new brewery name');
+                }
                 break;
                 
             case 'select-found-beer':
