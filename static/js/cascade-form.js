@@ -602,7 +602,7 @@ export const CascadeForm = (() => {
                 
             case 'prompt-new-brewery':
                 // NEW: This prompts user to type a new brewery name
-                const breweryInput = document.getElementById('reportBrewery');
+                breweryInput = document.getElementById('reportBrewery');
                 if (breweryInput) {
                     hideDropdown('breweryDropdown');
                     breweryInput.value = '';
@@ -626,7 +626,7 @@ export const CascadeForm = (() => {
                 // Move to brewery selection for this new beer
                 showStep('brewery-select');
                 updateProgress('brewery');
-                const breweryInput = document.getElementById('reportBrewery');
+                breweryInput = document.getElementById('reportBrewery');
                 if (breweryInput) breweryInput.focus();
                 showToast('🏭 Now select or add the brewery for this beer');
                 break;
