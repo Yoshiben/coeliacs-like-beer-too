@@ -128,7 +128,7 @@ export const VenueModule = (function() {
         if (elements.location) elements.location.textContent = `${venue.postcode} • ${venue.city}`;
         
         // Beer details section
-        setupBeerSection(venue, elements.beer);
+        setupBeerDetails(venue, elements.beer);
         
         // GF Status display
         setupGFStatusDisplay(venue);
