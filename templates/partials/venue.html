@@ -340,3 +340,53 @@
     </div>
 </div>
 
+<!-- Venue Added Success Modal -->
+<div id="venueAddedPromptModal" class="modal venue-added-modal" data-cover-nav="true">
+    <div class="modal-content">
+        <div class="modal-header gradient-header">
+            <div class="header-decoration">
+                <span class="venue-emoji floating">🎉</span>
+                <span class="venue-emoji floating delay-1">✨</span>
+                <span class="venue-emoji floating delay-2">🍺</span>
+            </div>
+            <h2 class="modal-title">Venue Added Successfully!</h2>
+            <p class="modal-subtitle" id="addedVenueName"></p>
+            <button class="modal-close" data-action="close-venue-added-modal">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+            <div class="success-message">
+                <div class="success-icon-wrapper">
+                    <span class="success-checkmark">✅</span>
+                </div>
+                <p class="success-text">
+                    <strong id="addedVenueNameText">The venue</strong> has been added to our database!
+                </p>
+                <p class="success-points" id="venueAddedPoints">
+                    <span class="points-icon">⭐</span> +20 points earned!
+                </p>
+            </div>
+            
+            <div class="venue-actions-prompt">
+                <p class="prompt-text">What would you like to do next?</p>
+                
+                <div class="action-buttons">
+                    <button class="btn btn-primary btn-gradient" data-action="update-gf-status-new-venue">
+                        <span class="btn-icon">📊</span>
+                        <span>Update GF Beer Status</span>
+                    </button>
+                    
+                    <button class="btn btn-success" data-action="report-gf-beer-new-venue">
+                        <span class="btn-icon">🍺</span>
+                        <span>Report GF Beer Available</span>
+                    </button>
+                    
+                    <button class="btn btn-outline btn-subtle" data-action="close-venue-added-modal">
+                        <span class="btn-icon">✅</span>
+                        <span>Done For Now</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
