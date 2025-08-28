@@ -233,7 +233,6 @@ const App = {
         
         App.registerModule('map', MapModule);
         App.registerModule('search', SearchModule);
-        App.registerModule('form', FormModule);
         App.registerModule('community', CommunityModule);
         App.registerModule('venue', VenueModule);
 
@@ -318,7 +317,6 @@ const App = {
         }
         
         // Initialize forms
-        FormModule.init();
         NavStateManager.init();
     },
     
