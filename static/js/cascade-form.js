@@ -775,7 +775,7 @@ export const CascadeForm = (() => {
         const dropdown = document.getElementById(dropdownId);
         if (dropdown) {
             dropdown.classList.add('show');
-            dropdown.style.display = 'block'; // Force display with inline style
+            dropdown.style.display = ''; // Force display with inline style
         }
     };
 
