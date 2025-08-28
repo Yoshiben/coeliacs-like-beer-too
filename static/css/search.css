@@ -2,26 +2,22 @@
    UPDATE SEARCH CONTAINER
    ================================ */
 .search-container {
-    height: 100%;
-    flex: 1;
-    background: var(--bg-home);
-    position: relative;
-    align-content: space-evenly;
-    padding-bottom: env(safe-area-inset-bottom);
-}
-
-.search-card {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
+   height: auto;
+   display: flex;
+   flex: 1;
+   background: var(--bg-home-page);
+   position: relative;
+   align-content: space-evenly;
+   padding-bottom: env(safe-area-inset-bottom);
 }
 
 .search-header {
-    text-align: center;
+   text-align: center;
+   padding: var(--space-xl) var(--space-4xl) var(--space-3xl);
 }
 
 .search-header-title {
-    font-size: var(--text-md);
+    font-size: var(--text-3xl);
     color: var(--text-primary);
     margin-bottom: 0; 
 }
@@ -35,12 +31,13 @@
 }
 
 .search-options {
-    flex: 1;
-    display: grid;
-    gap: var(--space-md);
-    width: 100%;
-    height: 100%;
-    min-height: 0;
+   flex: 1;
+   display: grid;
+   grid-template-columns: repeat(2, 1fr);
+   gap: var(--space-md);
+   width: 100%;
+   height: 100%;
+   min-height: 0;
 }   
 
 .search-option {
@@ -55,6 +52,8 @@
     align-items: center;
     min-height: 0;
     overflow: hidden;
+   background: white;
+    color: var(--text-primary);
 }
 
 .search-option:hover {
@@ -93,19 +92,18 @@
 }
 
 .search-icon {
-    font-size: var(--text-2xl);
+    font-size: 4rem;
     line-height: 1;
 }
 
 .search-title {
     font-size: var(--text-md);
-    color: white;
     margin-bottom: 0; 
+   color: var(--text-primary);
 }
 
 .search-description {
     font-size: var(--text-sm);
-    color: white;
     text-align: center;
-    padding: 0 var(--space-xs);
+   color: var(--text-secondary);
 }
