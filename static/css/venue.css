@@ -437,3 +437,258 @@
 .beer-list-content::-webkit-scrollbar-thumb:hover {
     background: #d97706;
 }
+
+/* Cascade Form Styles */
+.cascade-form {
+    padding: 0;
+}
+
+.cascade-progress {
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem 1.5rem;
+    background: var(--bg-section);
+    border-bottom: 2px solid var(--border-light);
+    margin-bottom: 1.5rem;
+}
+
+.progress-step {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0.4;
+    transition: opacity 0.3s;
+}
+
+.progress-step.active {
+    opacity: 1;
+}
+
+.progress-step.completed {
+    opacity: 0.8;
+}
+
+.step-number {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--grey);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+.progress-step.active .step-number {
+    background: var(--purple);
+}
+
+.progress-step.completed .step-number {
+    background: var(--green);
+}
+
+.step-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+.progress-step.active .step-label {
+    color: var(--text-primary);
+}
+
+/* Format Grid */
+.format-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.format-btn {
+    padding: 1.25rem;
+    border: 2px solid var(--border-light);
+    border-radius: 12px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.format-btn:hover {
+    border-color: var(--purple);
+    background: var(--bg-purple);
+}
+
+.format-btn.selected {
+    border-color: var(--purple);
+    background: var(--bg-purple);
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.format-icon {
+    font-size: 2rem;
+}
+
+.format-name {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+/* Choice Buttons */
+.choice-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.choice-btn {
+    padding: 1rem;
+    border: 2px solid var(--border-light);
+    border-radius: 12px;
+    background: white;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.choice-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.yes-btn:hover {
+    border-color: var(--green);
+    background: rgba(16, 185, 129, 0.05);
+}
+
+.no-btn:hover {
+    border-color: var(--blue);
+    background: rgba(59, 130, 246, 0.05);
+}
+
+/* Cascade Steps */
+.cascade-step {
+    padding: 0 1.5rem;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeInUp 0.3s forwards;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Input Wrapper */
+.input-wrapper {
+    position: relative;
+}
+
+.brewery-confirmed {
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid var(--green);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.confirmed-icon {
+    font-size: 1.25rem;
+}
+
+/* Search Hint */
+.search-hint {
+    margin-top: 0.5rem;
+    padding: 0.75rem;
+    background: var(--bg-section);
+    border-radius: 8px;
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+/* Text Button */
+.text-btn {
+    background: none;
+    border: none;
+    color: var(--purple);
+    font-weight: 500;
+    cursor: pointer;
+    padding: 0.5rem 0;
+    transition: opacity 0.2s;
+}
+
+.text-btn:hover {
+    opacity: 0.8;
+}
+
+/* Optional Details */
+.optional-details {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-light);
+}
+
+.form-label.optional {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+}
+
+/* New Item Alert */
+.new-item-alert {
+    margin: 1rem 1.5rem;
+    padding: 0.75rem 1rem;
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid var(--orange);
+    border-radius: 8px;
+}
+
+.alert-content {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-primary);
+}
+
+.alert-icon {
+    font-size: 1.25rem;
+}
+
+/* Mobile responsive */
+@media (max-width: 480px) {
+    .format-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .choice-buttons {
+        grid-template-columns: 1fr;
+    }
+    
+    .cascade-progress {
+        padding: 0.75rem 1rem;
+    }
+    
+    .step-label {
+        display: none;
+    }
+}
