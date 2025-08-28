@@ -1953,10 +1953,6 @@ export const SearchModule = (function() {
       goToPreviousPage,
       goToNextPage,
       
-      // Venue details
-      showVenueDetails,
-      loadBeerList,
-      
       // Navigation
       goBackToResults,
       
