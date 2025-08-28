@@ -1739,12 +1739,21 @@ def get_all_venues_for_map():
 @app.route('/api/add-venue', methods=['POST'])
 def add_venue():
     """Add a new venue to the database"""
-    conn = None  # Initialize conn outside try block
+    conn = None
     try:
         data = request.get_json()
         
         # Log incoming data for debugging
         logger.info(f"Add venue request: {data}")
+        
+        # Get user_id instead of submitted_by
+        user_id = data.get('user_id')
+        
+        if not user_id:
+            return jsonify({
+                'success': False,
+                'error': 'User authentication required'
+            }), 401
         
         # Validate required fields
         required_fields = ['venue_name', 'address', 'postcode']
@@ -1757,7 +1766,13 @@ def add_venue():
             }), 400
         
         conn = mysql.connector.connect(**db_config)
-        cursor = conn.cursor()
+        cursor = conn.cursor(dictionary=True)
+        
+        # Verify user exists (same as status update)
+        cursor.execute("SELECT nickname FROM users WHERE user_id = %s AND is_active = 1", (user_id,))
+        user = cursor.fetchone()
+        if not user:
+            return jsonify({'error': 'Invalid user'}), 401
         
         # Check if venue already exists
         cursor.execute("""
@@ -1770,11 +1785,8 @@ def add_venue():
             return jsonify({
                 'success': False,
                 'error': 'A venue with this name and postcode already exists',
-                'venue_id': existing[0]
+                'venue_id': existing['venue_id']  # Note: dictionary cursor means existing['venue_id'] not existing[0]
             }), 409
-        
-        # Get the submitted_by value (nickname or 'anonymous')
-        submitted_by = data.get('submitted_by', 'anonymous')
         
         # Parse the address to extract components
         address_parts = data['address'].split(',')
@@ -1784,9 +1796,7 @@ def add_venue():
         # Determine venue_type from Google Places data or default to 'pub'
         venue_type = 'pub'  # Default fallback
         
-        # Try to map from source data if available
         if 'types' in data and data['types']:
-            # Map Google Places types to our ENUM values
             google_types = data['types']
             if 'bar' in google_types:
                 venue_type = 'bar'
@@ -1796,14 +1806,13 @@ def add_venue():
                 venue_type = 'hotel'
             elif 'night_club' in google_types:
                 venue_type = 'club'
-            # Keep 'pub' as default for everything else
         
-        # Insert new venue with correct ENUM value
+        # Insert new venue with user_id in added_by_user_id column
         cursor.execute("""
             INSERT INTO venues (
                 venue_name, street, city, postcode, 
                 address, latitude, longitude, 
-                venue_type, created_by
+                venue_type, added_by_user_id
             ) VALUES (
                 %s, %s, %s, %s, %s, %s, %s, %s, %s
             )
@@ -1816,27 +1825,30 @@ def add_venue():
             data.get('latitude'),
             data.get('longitude'),
             venue_type,
-            submitted_by
+            user_id  # Use user_id instead of submitted_by
         ))
         
         venue_id = cursor.lastrowid
-        
-        # CRITICAL: Commit the transaction HERE before returning!
         conn.commit()
         
-        # Log the addition
-        logger.info(f"New venue added and committed: {data['venue_name']} (ID: {venue_id}) as {venue_type} by {submitted_by}")
+        # Award points for adding venue (20 points)
+        points_earned = 20
+        update_user_stats(user_id, 'venue_add', points_earned)
         
-        # Close connection before returning
+        # Log the addition with user info
+        logger.info(f"New venue added: {data['venue_name']} (ID: {venue_id}) as {venue_type} by user {user_id} ({user['nickname']})")
+        
         cursor.close()
         conn.close()
-        conn = None  # Set to None so finally block doesn't try to close again
+        conn = None
         
         return jsonify({
             'success': True,
             'message': f'{data["venue_name"]} added successfully!',
             'venue_id': venue_id,
-            'venue_type': venue_type
+            'venue_type': venue_type,
+            'points_earned': points_earned,
+            'contributor': user['nickname']  # Can return nickname for display
         })
         
     except mysql.connector.IntegrityError as e:
@@ -1859,9 +1871,6 @@ def add_venue():
         
     except Exception as e:
         logger.error(f"Unexpected error in add_venue: {str(e)}")
-        logger.error(f"Error type: {type(e)}")
-        import traceback
-        logger.error(f"Traceback: {traceback.format_exc()}")
         if conn:
             conn.rollback()
         return jsonify({
@@ -2109,6 +2118,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
