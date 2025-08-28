@@ -16,6 +16,7 @@ const CascadeForm = {
     // Initialize
     init() {
         this.attachEventListeners();
+        this.setupClickOutside();
         this.reset();
         console.log('✅ Cascade form initialized');
     },
@@ -169,6 +170,12 @@ const CascadeForm = {
     // Show all breweries on focus
     async showAllBreweries() {
         const dropdown = document.getElementById('breweryDropdown');
+        const input = document.getElementById('reportBrewery');
+        
+        // Show loading state
+        dropdown.innerHTML = '<div class="suggestions loading"></div>';
+        dropdown.style.display = 'block';
+        input.classList.add('dropdown-open');
         
         try {
             const response = await fetch('/api/breweries');
@@ -177,38 +184,143 @@ const CascadeForm = {
             this.displayBreweryDropdown(breweries.slice(0, 50), '');
         } catch (error) {
             console.error('Error loading breweries:', error);
+            dropdown.innerHTML = '<div class="suggestions empty">Failed to load breweries</div>';
         }
+    },
+
+    setupClickOutside() {
+        document.addEventListener('click', (e) => {
+            // Check if clicked outside any dropdown
+            const dropdowns = ['breweryDropdown', 'beerNameDropdown', 'beerSearchDropdown'];
+            
+            dropdowns.forEach(dropdownId => {
+                const dropdown = document.getElementById(dropdownId);
+                if (!dropdown) return;
+                
+                const inputMap = {
+                    'breweryDropdown': 'reportBrewery',
+                    'beerNameDropdown': 'reportBeerName',
+                    'beerSearchDropdown': 'beerSearchFirst'
+                };
+                
+                const inputId = inputMap[dropdownId];
+                const input = document.getElementById(inputId);
+                
+                // If click is not on the input or dropdown, hide it
+                if (!e.target.closest(`#${dropdownId}`) && 
+                    !e.target.closest(`#${inputId}`)) {
+                    this.hideDropdown(dropdownId);
+                }
+            });
+        });
     },
     
     // Display brewery dropdown
     displayBreweryDropdown(breweries, query) {
         const dropdown = document.getElementById('breweryDropdown');
+        const input = document.getElementById('reportBrewery');
+        
+        if (!dropdown) return;
+        
+        // Add class to input for styling
+        input.classList.add('dropdown-open');
         
         if (breweries.length === 0 && query) {
             dropdown.innerHTML = `
-                <div class="suggestion-item new-brewery" data-action="create-brewery" data-brewery="${query}">
-                    <strong>➕ Add "${query}" as new brewery</strong>
+                <div class="dropdown-header">🔍 No matches found</div>
+                <div class="suggestion-item new-brewery" data-action="create-brewery" data-brewery="${this.escapeHtml(query)}">
+                    <strong>➕ Add "${this.escapeHtml(query)}" as new brewery</strong>
                     <small>This will be added to our database</small>
                 </div>
             `;
         } else {
-            dropdown.innerHTML = breweries.map(brewery => `
-                <div class="suggestion-item" data-action="select-brewery" data-brewery="${brewery}">
-                    <strong>${brewery}</strong>
-                </div>
-            `).join('');
+            // Build dropdown content
+            let html = '';
             
+            // Header
+            if (query) {
+                html += `<div class="dropdown-header">🔍 ${breweries.length} matches for "${this.escapeHtml(query)}"</div>`;
+            } else {
+                html += `<div class="dropdown-header">🍺 ${breweries.length} Breweries Available</div>`;
+            }
+            
+            // Brewery list
+            breweries.forEach(brewery => {
+                html += `
+                    <div class="suggestion-item" data-action="select-brewery" data-brewery="${this.escapeHtml(brewery)}">
+                        <strong>${this.escapeHtml(brewery)}</strong>
+                    </div>
+                `;
+            });
+            
+            // Add new option at the end if there's a query
             if (query && !breweries.some(b => b.toLowerCase() === query.toLowerCase())) {
-                dropdown.innerHTML += `
-                    <div class="suggestion-item new-brewery" data-action="create-brewery" data-brewery="${query}">
-                        <strong>➕ Add "${query}" as new brewery</strong>
+                html += `
+                    <div class="suggestion-item new-brewery" data-action="create-brewery" data-brewery="${this.escapeHtml(query)}">
+                        <strong>➕ Add "${this.escapeHtml(query)}" as new brewery</strong>
                         <small>Not in list? Add it!</small>
                     </div>
                 `;
             }
+            
+            dropdown.innerHTML = html;
         }
         
+        // Show dropdown with proper positioning
         dropdown.style.display = 'block';
+        dropdown.classList.add('active');
+        
+        // Ensure dropdown is visible in viewport
+        this.ensureDropdownVisible(dropdown);
+    },
+
+    // Hide dropdown properly
+    hideDropdown(dropdownId) {
+        const dropdown = document.getElementById(dropdownId);
+        if (dropdown) {
+            dropdown.style.display = 'none';
+            dropdown.classList.remove('active');
+            
+            // Remove class from associated input
+            const inputMap = {
+                'breweryDropdown': 'reportBrewery',
+                'beerNameDropdown': 'reportBeerName',
+                'beerSearchDropdown': 'beerSearchFirst'
+            };
+            
+            const inputId = inputMap[dropdownId];
+            if (inputId) {
+                const input = document.getElementById(inputId);
+                if (input) input.classList.remove('dropdown-open');
+            }
+        }
+    },
+
+    // Ensure dropdown is visible in viewport
+    ensureDropdownVisible(dropdown) {
+        if (!dropdown) return;
+        
+        const rect = dropdown.getBoundingClientRect();
+        const modal = dropdown.closest('.modal-content');
+        
+        if (modal) {
+            const modalRect = modal.getBoundingClientRect();
+            const dropdownBottom = rect.bottom;
+            const modalBottom = modalRect.bottom;
+            
+            // If dropdown extends beyond modal, adjust modal scroll
+            if (dropdownBottom > modalBottom) {
+                const scrollAmount = dropdownBottom - modalBottom + 20;
+                modal.scrollTop += scrollAmount;
+            }
+        }
+    },
+    
+    // Helper to escape HTML
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text || '';
+        return div.innerHTML;
     },
     
     // Search beers globally (when brewery unknown)
