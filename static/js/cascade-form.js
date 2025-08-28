@@ -817,7 +817,8 @@ export const CascadeForm = (() => {
         getState: () => state,
         selectBrewery,
         selectBreweryBeer,
-        handleSubmit  
+        handleSubmit,
+        selectFoundBeer
     };
 })();
 
