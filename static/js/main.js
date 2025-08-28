@@ -1999,12 +1999,13 @@ const App = {
             }
         },
         
-        'select-beer': (el, modules) => {
-            const beerData = el.dataset.beerData;
+        'select-found-beer': (el, modules) => {
+            const beerData = el.dataset.beer;
             if (beerData && window.CascadeForm) {
-                window.CascadeForm.selectBeer(JSON.parse(beerData));
+                window.CascadeForm.selectFoundBeer(JSON.parse(beerData));
             }
         },
+        
         'retry-breweries': (el, modules) => {
             modules.breweries?.loadBreweries();
         },
