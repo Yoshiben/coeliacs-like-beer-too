@@ -152,6 +152,8 @@ export const CascadeForm = (() => {
         const breweryInput = document.getElementById('reportBrewery');
         if (breweryInput) {
             let breweryTimeout;
+            let isShowingDropdown = false;
+            
             breweryInput.addEventListener('input', (e) => {
                 clearTimeout(breweryTimeout);
                 breweryTimeout = setTimeout(() => {
@@ -160,12 +162,18 @@ export const CascadeForm = (() => {
             });
             
             breweryInput.addEventListener('focus', (e) => {
-                // Small delay to prevent immediate hide/show conflict
-                setTimeout(() => {
-                    if (!breweryInput.value) {
-                        showAllBreweries();
-                    }
-                }, 100);
+                e.stopPropagation();  // Stop event bubbling
+                if (!breweryInput.value && !isShowingDropdown) {
+                    isShowingDropdown = true;
+                    showAllBreweries();
+                    // Reset flag after showing
+                    setTimeout(() => { isShowingDropdown = false; }, 500);
+                }
+            });
+            
+            // Prevent dropdown from closing when clicking input
+            breweryInput.addEventListener('click', (e) => {
+                e.stopPropagation();
             });
         }
         
@@ -204,31 +212,31 @@ export const CascadeForm = (() => {
         }
     };
 
-    // Setup click outside to close dropdowns
+    // Setup click outside to close dropdowns  
     const setupClickOutside = () => {
-        document.addEventListener('click', (e) => {
-            // Don't hide if clicking on the input itself
-            if (e.target.matches('#reportBrewery, #reportBeerName, #beerSearchFirst')) {
-                return;
-            }
-            
-            // Check if clicked outside any dropdown
+        // Use mousedown instead of click to prevent conflicts
+        document.addEventListener('mousedown', (e) => {
+            // Check each dropdown
             const dropdowns = ['breweryDropdown', 'beerNameDropdown', 'beerSearchDropdown'];
             
             dropdowns.forEach(dropdownId => {
                 const dropdown = document.getElementById(dropdownId);
-                if (!dropdown) return;
+                if (!dropdown || !dropdown.classList.contains('show')) return;
                 
                 const inputMap = {
                     'breweryDropdown': 'reportBrewery',
-                    'beerNameDropdown': 'reportBeerName',
+                    'beerNameDropdown': 'reportBeerName', 
                     'beerSearchDropdown': 'beerSearchFirst'
                 };
                 
                 const inputId = inputMap[dropdownId];
+                const input = document.getElementById(inputId);
                 
-                // If click is not on the dropdown itself, hide it
-                if (!e.target.closest(`#${dropdownId}`)) {
+                // Check if click is outside both input and dropdown
+                const clickedOnInput = input && input.contains(e.target);
+                const clickedOnDropdown = dropdown.contains(e.target);
+                
+                if (!clickedOnInput && !clickedOnDropdown) {
                     hideDropdown(dropdownId);
                 }
             });
