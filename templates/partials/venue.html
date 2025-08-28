@@ -1,0 +1,132 @@
+<!-- Beer List Modal -->
+<div id="beerListModal" class="modal beer-list-modal">
+    <div class="modal-content">
+        <div class="modal-header beer-header">
+            <div class="header-decoration">
+                <span class="beer-emoji floating">🍺</span>
+                <span class="beer-emoji floating delay-1">🍻</span>
+                <span class="beer-emoji floating delay-2">🍺</span>
+            </div>
+            <h3 class="modal-title">Current GF Beers</h3>
+            <p class="modal-subtitle" id="beerListVenueName"></p>
+            <button class="modal-close" data-action="close-modal">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+            <!-- Quick Stats Bar -->
+            <div class="beer-stats-bar">
+                <div class="stat-item">
+                    <span class="stat-icon">🚰</span>
+                    <span class="stat-count" id="tapCount">3</span>
+                    <span class="stat-label">On Tap</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">🍾</span>
+                    <span class="stat-count" id="bottleCount">2</span>
+                    <span class="stat-label">Bottles/Cans</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-icon">✅</span>
+                    <span class="stat-count" id="verifiedCount">5</span>
+                    <span class="stat-label">Verified</span>
+                </div>
+            </div>
+            
+            <div id="beerListContent" class="beer-list-content">
+                <!-- Example beer item with new design -->
+                <div class="beer-card">
+                    <div class="beer-card-header">
+                        <div class="beer-icon-wrapper">
+                            <span class="beer-glass">🍺</span>
+                        </div>
+                        <div class="beer-main-info">
+                            <h4 class="beer-name">Handed Giant Sky Above</h4>
+                            <div class="brewery-tag">
+                                <span class="brewery-icon">🏭</span>
+                                <span class="brewery-name">Left Handed Giant</span>
+                            </div>
+                        </div>
+                        <div class="beer-actions">
+                            <button class="btn-more" data-action="beer-options">
+                                <span></span><span></span><span></span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="beer-card-details">
+                        <div class="beer-badges">
+                            <span class="badge badge-tap">
+                                <span>🚰</span> On Tap
+                            </span>
+                            <span class="badge badge-style">Hazy Pale</span>
+                            <span class="badge badge-verified">
+                                <span>✓</span> Verified today
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <!-- Dropdown menu (hidden by default) -->
+                    <div class="beer-dropdown-menu">
+                        <button data-action="verify-beer">✅ Verify still here</button>
+                        <button data-action="edit-beer">✏️ Edit details</button>
+                        <button data-action="report-issue">⚠️ Report issue</button>
+                        <button data-action="delete-beer" class="danger">🗑️ Remove</button>
+                    </div>
+                </div>
+                
+                <!-- Another example with bottle -->
+                <div class="beer-card">
+                    <div class="beer-card-header">
+                        <div class="beer-icon-wrapper bottle">
+                            <span class="beer-glass">🍾</span>
+                        </div>
+                        <div class="beer-main-info">
+                            <h4 class="beer-name">Lukas</h4>
+                            <div class="brewery-tag">
+                                <span class="brewery-icon">🏭</span>
+                                <span class="brewery-name">Thornbridge</span>
+                            </div>
+                        </div>
+                        <div class="beer-actions">
+                            <button class="btn-more" data-action="beer-options">
+                                <span></span><span></span><span></span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="beer-card-details">
+                        <div class="beer-badges">
+                            <span class="badge badge-bottle">
+                                <span>🍾</span> Bottle
+                            </span>
+                            <span class="badge badge-style">Lager</span>
+                            <span class="badge badge-unverified">
+                                <span>?</span> Needs verification
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Empty state -->
+            <div class="beer-list-empty" id="beerListEmpty" style="display: none;">
+                <div class="empty-animation">
+                    <span class="empty-beer">🍺</span>
+                    <span class="empty-question">?</span>
+                </div>
+                <h4>No GF beers reported yet</h4>
+                <p>Be the first to add one!</p>
+                <button class="btn btn-primary" data-action="report-beer">
+                    <span>➕</span> Add First Beer
+                </button>
+            </div>
+        </div>
+        
+        <!-- Footer with quick add -->
+        <div class="modal-footer beer-footer">
+            <button class="btn btn-primary btn-full" data-action="quick-add-beer">
+                <span>➕</span> Add Another Beer
+            </button>
+        </div>
+    </div>
+</div>
