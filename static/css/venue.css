@@ -438,3 +438,10 @@
     background: #d97706;
 }
 
+.status-display {
+   display: flex;
+   flex-direction: column;
+}
+
+.status-icon {
+   font-size: 
