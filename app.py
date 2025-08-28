@@ -1601,16 +1601,14 @@ def get_brewery_beers(brewery_name):
             cursor.close()
             conn.close()
 
-# In app.py, add this endpoint:
-
 @app.route('/api/venue/<int:venue_id>/beers', methods=['GET'])
 def get_venue_beers(venue_id):
     """Get structured beer data for a venue"""
     try:
-        conn = mysql.connector.connect(**db_config)
-        cursor = conn.cursor(dictionary=True)
+        conn = get_db_connection()
+        cursor = conn.cursor()
         
-        # Fixed SQL query with proper column and variable references
+        # Fixed SQL query
         cursor.execute("""
             SELECT 
                 vb.beer_id,
@@ -1630,20 +1628,25 @@ def get_venue_beers(venue_id):
         """, (venue_id,))
         
         beers = []
-        for row in cursor.fetchall():
-            beers.append({
-                'id': row[0],
-                'brewery': row[1],
-                'name': row[2],
-                'style': row[3],
-                'format': row[4],
-                'added_date': row[5].isoformat() if row[5] else None,
-                'added_by': row[6]
-            })
+        rows = cursor.fetchall()
+        
+        # Check if rows is actually a list/tuple
+        if rows:
+            for row in rows:
+                beers.append({
+                    'id': row[0],
+                    'brewery': row[1],
+                    'name': row[2],
+                    'style': row[3],
+                    'format': row[4],
+                    'added_date': row[5].isoformat() if row[5] else None,
+                    'added_by': row[6]
+                })
         
         cursor.close()
         conn.close()
         
+        # Always return a valid JSON response
         return jsonify({
             'venue_id': venue_id,
             'beers': beers,
@@ -1651,8 +1654,14 @@ def get_venue_beers(venue_id):
         })
         
     except Exception as e:
-        print(f"Error in get_venue_beers: {e}")  # This will help debug
-        return jsonify({'error': str(e)}), 500
+        print(f"Error in get_venue_beers: {e}")
+        # Return empty list on error rather than 500
+        return jsonify({
+            'venue_id': venue_id,
+            'beers': [],
+            'count': 0,
+            'error': str(e)
+        })
 
 @app.route('/api/all-venues')
 def get_all_venues_for_map():
@@ -2068,6 +2077,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
