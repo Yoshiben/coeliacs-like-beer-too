@@ -1716,6 +1716,30 @@ const App = {
             }
         },
 
+        'create-brewery': (el, modules) => {
+            console.log('🏭 Creating new brewery');
+            
+            // Focus the brewery input field so user can type a new name
+            const breweryInput = document.getElementById('reportBrewery');
+            if (breweryInput) {
+                breweryInput.focus();
+                breweryInput.placeholder = 'Type new brewery name...';
+                
+                // Clear any existing value
+                breweryInput.value = '';
+                
+                // Hide the dropdown if it's showing
+                const dropdown = document.getElementById('breweryDropdown');
+                if (dropdown) {
+                    dropdown.style.display = 'none';
+                }
+                
+                // Show a helper message
+                modules.toast?.info('💡 Type the new brewery name and press Tab or click outside');
+            }
+        },
+        
+        // Also add this one if you don't have it:
         'add-new-brewery': (el, modules) => {
             const breweryInput = document.getElementById('reportBrewery');
             if (breweryInput) {
@@ -1726,6 +1750,7 @@ const App = {
                 breweryInput.focus();
                 modules.toast?.info('💡 Type the new brewery name and continue');
             }
+        },
         },
         
         'add-new-beer': (el, modules) => {
