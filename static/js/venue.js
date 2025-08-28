@@ -91,6 +91,17 @@ export const VenueModule = (function() {
             
             if (venues && venues.length > 0) {
                 const venue = venues[0];
+                
+                // ADD THIS DEBUG LOGGING HERE 👇
+                console.log('🔍 VENUE STRUCTURE:', {
+                    venue,
+                    keys: Object.keys(venue),
+                    id_field: venue.venue_id,
+                    alt_id: venue.id,
+                    has_venue_id: 'venue_id' in venue,
+                    has_id: 'id' in venue
+                });
+                
                 utils.setCurrentVenue(venue);
                 state.lastViewedVenueId = venueId;
                 
@@ -339,7 +350,11 @@ export const VenueModule = (function() {
     const confirmStatusUpdate = async () => {
         const venue = utils.getCurrentVenue();
         
-        if (!venue?.venue_id || !state.selectedStatus) {
+        // More robust venue ID extraction
+        const venueId = venue?.venue_id || venue?.id || window.App.getState('currentVenue')?.venue_id;
+        
+        if (!venueId || !state.selectedStatus) {
+            console.error('❌ Missing data:', { venueId, status: state.selectedStatus, venue });
             utils.showToast('❌ Error: Missing venue or status', 'error');
             return;
         }
@@ -362,6 +377,13 @@ export const VenueModule = (function() {
         try {
             const userId = parseInt(localStorage.getItem('user_id'));
             
+            // Log what we're sending
+            console.log('📤 Sending status update:', {
+                venue_id: parseInt(venueId),
+                status: state.selectedStatus,
+                user_id: userId
+            });
+            
             const response = await fetch('/api/update-gf-status', {
                 method: 'POST',
                 headers: { 
@@ -369,7 +391,7 @@ export const VenueModule = (function() {
                     'Accept': 'application/json'
                 },
                 body: JSON.stringify({
-                    venue_id: parseInt(venue.venue_id),
+                    venue_id: parseInt(venueId),  // Use the extracted venueId
                     status: state.selectedStatus,
                     user_id: userId,
                     submitted_by: window.App.getState('userNickname') || 
@@ -379,10 +401,14 @@ export const VenueModule = (function() {
             });
             
             if (!response.ok) {
-                throw new Error(`Server error: ${response.status}`);
+                const errorData = await response.json();
+                console.error('❌ Server error:', errorData);
+                throw new Error(`Server error: ${response.status} - ${errorData.error || 'Unknown'}`);
             }
             
-            await response.json();
+            const result = await response.json();
+            console.log('✅ Status update response:', result);
+            
             utils.hideLoadingToast();
             
             // Update the display immediately
