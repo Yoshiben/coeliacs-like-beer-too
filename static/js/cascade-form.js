@@ -371,17 +371,50 @@ export const CascadeForm = (() => {
                 `;
             });
             
-            // FIXED: Add "Create New Brewery" option that prompts for input
-            html += `
-                <div class="suggestion-item new-brewery" data-action="prompt-new-brewery">
-                    <strong>➕ Create New Brewery</strong>
-                    <small>Not in list? Add a new one!</small>
-                </div>
-            `;
+            // Add new brewery option if searching with a query
+            if (query && !breweries.some(b => b.toLowerCase() === query.toLowerCase())) {
+                html += `
+                    <div class="suggestion-item new-brewery" data-action="create-brewery" data-brewery="${escapeHtml(query)}">
+                        <strong>➕ Add "${escapeHtml(query)}" as new brewery</strong>
+                        <small>Not in list? Add it!</small>
+                    </div>
+                `;
+            }
         }
         
         dropdown.innerHTML = html;
         showDropdown('breweryDropdown');
+        
+        // CRITICAL: Attach click handlers AFTER adding HTML
+        dropdown.querySelectorAll('.suggestion-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const action = this.dataset.action;
+                const brewery = this.dataset.brewery;
+                
+                console.log('🎯 Clicked:', action, brewery);
+                
+                if (action === 'select-brewery') {
+                    selectBrewery(brewery);
+                } else if (action === 'create-brewery') {
+                    if (brewery) {
+                        createNewBrewery(brewery);
+                    } else {
+                        // No brewery name, prompt for input
+                        const input = document.getElementById('reportBrewery');
+                        if (input) {
+                            hideDropdown('breweryDropdown');
+                            input.value = '';
+                            input.placeholder = 'Type new brewery name...';
+                            input.focus();
+                            showToast('💡 Type the new brewery name');
+                        }
+                    }
+                }
+            });
+        });
     };
 
     const selectBrewery = (breweryName) => {
@@ -596,18 +629,25 @@ export const CascadeForm = (() => {
                 break;
                 
             case 'create-brewery':
-                // This is when there's already a name to create
+                console.log('🔴 CREATE BREWERY - item.dataset:', item.dataset);
+                console.log('🔴 Brewery value:', item.dataset.brewery);
+                
+                if (!item.dataset.brewery) {
+                    console.error('❌ No brewery name provided!');
+                    return;
+                }
+                
                 createNewBrewery(item.dataset.brewery);
                 break;
                 
             case 'prompt-new-brewery':
-                // NEW: This prompts user to type a new brewery name
-                breweryInput = document.getElementById('reportBrewery');
-                if (breweryInput) {
+                // Fixed: Don't redeclare breweryInput
+                const input = document.getElementById('reportBrewery');
+                if (input) {
                     hideDropdown('breweryDropdown');
-                    breweryInput.value = '';
-                    breweryInput.placeholder = 'Type new brewery name...';
-                    breweryInput.focus();
+                    input.value = '';
+                    input.placeholder = 'Type new brewery name...';
+                    input.focus();
                     showToast('💡 Type the new brewery name');
                 }
                 break;
@@ -626,7 +666,7 @@ export const CascadeForm = (() => {
                 // Move to brewery selection for this new beer
                 showStep('brewery-select');
                 updateProgress('brewery');
-                breweryInput = document.getElementById('reportBrewery');
+                const breweryInput = document.getElementById('reportBrewery');
                 if (breweryInput) breweryInput.focus();
                 showToast('🏭 Now select or add the brewery for this beer');
                 break;
@@ -648,7 +688,6 @@ export const CascadeForm = (() => {
                 break;
         }
     };
-
     // ================================
     // FORM SUBMISSION
     // ================================
@@ -775,7 +814,7 @@ export const CascadeForm = (() => {
         const dropdown = document.getElementById(dropdownId);
         if (dropdown) {
             dropdown.classList.add('show');
-            dropdown.style.display = ''; // Force display with inline style
+            dropdown.style.display = 'block'; // Force display with inline style
         }
     };
 
