@@ -1610,7 +1610,7 @@ def get_venue_beers(venue_id):
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # Get beers for this venue with proper structure
+        # Fixed SQL query with proper column and variable references
         cursor.execute("""
             SELECT 
                 vb.beer_id,
@@ -1618,19 +1618,19 @@ def get_venue_beers(venue_id):
                 b.beer_name,            
                 b.style,
                 b.format,
-                last_seen AS added_date,
-                nicname AS added_by
-            FROM venue_beers
+                vb.last_seen AS added_date,
+                u.nickname AS added_by
+            FROM venue_beers vb
             LEFT JOIN venues v ON vb.venue_id = v.venue_id
             LEFT JOIN beers b ON vb.beer_id = b.beer_id
             LEFT JOIN breweries br ON b.brewery_id = br.brewery_id
-            LEFT JOIN users u ON u.ser_id = vb.user_id
-            WHERE venue_id = %s
-            ORDER BY beer_format, beer_name
+            LEFT JOIN users u ON u.user_id = vb.user_id
+            WHERE vb.venue_id = %s
+            ORDER BY b.format, b.beer_name
         """, (venue_id,))
         
         beers = []
-        for row in cur.fetchall():
+        for row in cursor.fetchall():
             beers.append({
                 'id': row[0],
                 'brewery': row[1],
@@ -1651,6 +1651,7 @@ def get_venue_beers(venue_id):
         })
         
     except Exception as e:
+        print(f"Error in get_venue_beers: {e}")  # This will help debug
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/all-venues')
@@ -2067,6 +2068,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
