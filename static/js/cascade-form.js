@@ -814,7 +814,7 @@ export const CascadeForm = (() => {
         const dropdown = document.getElementById(dropdownId);
         if (dropdown) {
             dropdown.classList.add('show');
-            dropdown.style.removeProperty('display'); // Let CSS handle it
+            dropdown.style.display = 'block'; // This might be the issue
         }
     };
 
