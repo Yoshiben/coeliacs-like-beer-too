@@ -597,18 +597,41 @@
    }
 }
 
-/* Cascade Form Styles */
-.cascade-form {
-    padding: 0;
+/* ================================
+   CASCADE FORM - CLEANED UP CSS
+   ================================ */
+
+/* Modal Structure */
+.report-modal .modal-content {
+    max-width: min(95vw, 500px);
+    height: min(90vh, 700px);
+    min-height: 600px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
 }
 
+.cascade-form {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.form-content-area {
+    flex: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+    min-height: 400px;
+}
+
+/* Progress Bar */
 .cascade-progress {
     display: flex;
     justify-content: space-between;
     padding: 1rem 1.5rem;
     background: var(--bg-section);
     border-bottom: 2px solid var(--border-light);
-    margin-bottom: 1.5rem;
 }
 
 .progress-step {
@@ -619,13 +642,8 @@
     transition: opacity 0.3s;
 }
 
-.progress-step.active {
-    opacity: 1;
-}
-
-.progress-step.completed {
-    opacity: 0.8;
-}
+.progress-step.active { opacity: 1; }
+.progress-step.completed { opacity: 0.8; }
 
 .step-number {
     width: 24px;
@@ -640,25 +658,22 @@
     font-weight: bold;
 }
 
-.progress-step.active .step-number {
-    background: var(--purple);
+.progress-step.active .step-number { background: var(--purple); }
+.progress-step.completed .step-number { background: var(--green); }
+
+/* Steps */
+.cascade-step {
+    display: none;
+    padding: 0 1.5rem;
+    margin-bottom: 1.5rem;
 }
 
-.progress-step.completed .step-number {
-    background: var(--green);
+.cascade-step.active {
+    display: block;
+    animation: fadeInUp 0.3s forwards;
 }
 
-.step-label {
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--text-muted);
-}
-
-.progress-step.active .step-label {
-    color: var(--text-primary);
-}
-
-/* Format Grid */
+/* Format Buttons */
 .format-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -690,15 +705,6 @@
     box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
 }
 
-.format-icon {
-    font-size: 2rem;
-}
-
-.format-name {
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
 /* Choice Buttons */
 .choice-buttons {
     display: grid;
@@ -726,146 +732,9 @@
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-.yes-btn:hover {
-    border-color: var(--green);
-    background: rgba(16, 185, 129, 0.05);
-}
-
-.no-btn:hover {
-    border-color: var(--blue);
-    background: rgba(59, 130, 246, 0.05);
-}
-
-/* Cascade Steps */
-.cascade-step {
-    padding: 0 1.5rem;
-    margin-bottom: 1.5rem;
-    opacity: 0;
-    animation: fadeInUp 0.3s forwards;
-}
-
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Input Wrapper */
-.input-wrapper {
-    position: relative;
-}
-
-.brewery-confirmed {
-    background: rgba(16, 185, 129, 0.1);
-    border: 1px solid var(--green);
-    border-radius: 8px;
-    padding: 0.75rem 1rem;
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.confirmed-icon {
-    font-size: 1.25rem;
-}
-
-/* Search Hint */
-.search-hint {
-    margin-top: 0.5rem;
-    padding: 0.75rem;
-    background: var(--bg-section);
-    border-radius: 8px;
-    font-size: 0.875rem;
-    color: var(--text-muted);
-}
-
-/* Text Button */
-.text-btn {
-    background: none;
-    border: none;
-    color: var(--purple);
-    font-weight: 500;
-    cursor: pointer;
-    padding: 0.5rem 0;
-    transition: opacity 0.2s;
-}
-
-.text-btn:hover {
-    opacity: 0.8;
-}
-
-/* Optional Details */
-.optional-details {
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid var(--border-light);
-}
-
-.form-label.optional {
-    color: var(--text-muted);
-    font-size: 0.875rem;
-}
-
-/* New Item Alert */
-.new-item-alert {
-    margin: 1rem 1.5rem;
-    padding: 0.75rem 1rem;
-    background: rgba(245, 158, 11, 0.1);
-    border: 1px solid var(--orange);
-    border-radius: 8px;
-}
-
-.alert-content {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.875rem;
-    color: var(--text-primary);
-}
-
-.alert-icon {
-    font-size: 1.25rem;
-}
-
-/* Mobile responsive */
-@media (max-width: 480px) {
-    .format-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .choice-buttons {
-        grid-template-columns: 1fr;
-    }
-    
-    .cascade-progress {
-        padding: 0.75rem 1rem;
-    }
-    
-    .step-label {
-        display: none;
-    }
-}
-
-/* ================================
-   CASCADE FORM DROPDOWN STYLES
-   Add to your cascade-form.css or forms.css
-   ================================ */
-
-/* Dropdown container positioning */
-.input-wrapper {
-    position: relative;
-    width: 100%;
-}
-
-/* Main dropdown styles */
-.suggestions,
-.brewery-dropdown {
+/* Dropdowns - SIMPLIFIED */
+.suggestions {
+    /* Let JS control display */
     position: absolute;
     top: 100%;
     left: 0;
@@ -874,293 +743,81 @@
     overflow-y: auto;
     background: white;
     border: 2px solid #e5e7eb;
-    border-top: none;
     border-radius: 0 0 12px 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     z-index: 9999;
     margin-top: -2px;
-    animation: slideDown 0.2s ease;
 }
 
-/* Smooth animation */
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Dropdown header (e.g., "126 Breweries Available") */
 .dropdown-header {
     padding: 0.75rem 1rem;
     background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
     color: white;
     font-weight: 600;
     font-size: 0.875rem;
-    border-bottom: 1px solid #e5e7eb;
     position: sticky;
     top: 0;
-    z-index: 1;
 }
 
-/* Individual suggestion items */
 .suggestion-item {
     padding: 0.875rem 1rem;
     cursor: pointer;
-    transition: all 0.15s ease;
     border-bottom: 1px solid #f3f4f6;
     background: white;
-}
-
-.suggestion-item:last-child {
-    border-bottom: none;
-    border-radius: 0 0 10px 10px;
+    transition: background 0.15s;
 }
 
 .suggestion-item:hover {
-    background: linear-gradient(135deg, #f3f0ff 0%, #ede9fe 100%);
+    background: #f3f0ff;
     padding-left: 1.25rem;
 }
 
-.suggestion-item strong {
-    display: block;
-    color: #1f2937;
-    font-weight: 600;
-    margin-bottom: 0.125rem;
-}
-
-.suggestion-item small {
-    display: block;
-    color: #6b7280;
-    font-size: 0.75rem;
-    margin-top: 0.125rem;
-}
-
-/* New item (add brewery/beer) styling */
 .suggestion-item.new-brewery,
 .suggestion-item.new-beer {
     background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
     border-left: 3px solid #f59e0b;
 }
 
-.suggestion-item.new-brewery:hover,
-.suggestion-item.new-beer:hover {
-    background: linear-gradient(135deg, #fed7aa 0%, #fbbf24 100%);
-}
-
-/* Beer item with brewery info */
-.suggestion-item.beer-item {
-    padding: 1rem;
-}
-
-.suggestion-item.beer-item small {
-    color: #7c3aed;
-    font-weight: 500;
-}
-
-/* Scrollbar styling */
-.suggestions::-webkit-scrollbar,
-.brewery-dropdown::-webkit-scrollbar {
-    width: 6px;
-}
-
-.suggestions::-webkit-scrollbar-track,
-.brewery-dropdown::-webkit-scrollbar-track {
-    background: #f9fafb;
-    border-radius: 3px;
-}
-
-.suggestions::-webkit-scrollbar-thumb,
-.brewery-dropdown::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%);
-    border-radius: 3px;
-}
-
-.suggestions::-webkit-scrollbar-thumb:hover,
-.brewery-dropdown::-webkit-scrollbar-thumb:hover {
-    background: #7c3aed;
-}
-
-/* When dropdown is attached to focused input */
-.form-input:focus + .suggestions,
-.form-input:focus + .brewery-dropdown {
-    border-color: #7c3aed;
-    box-shadow: 0 4px 24px rgba(124, 58, 237, 0.2);
-}
-
-/* Empty state */
-.suggestions.empty {
-    padding: 2rem 1rem;
-    text-align: center;
-    color: #6b7280;
-    font-style: italic;
-}
-
-/* Loading state */
-.suggestions.loading {
-    padding: 2rem 1rem;
-    text-align: center;
-}
-
-.suggestions.loading::after {
-    content: '';
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 2px solid #e5e7eb;
-    border-top-color: #7c3aed;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-/* Modal-specific adjustments */
-.modal .suggestions,
-.modal .brewery-dropdown {
-    /* Ensure dropdown is above everything in modal */
-    z-index: 10001;
-}
-
-/* Fix input border radius when dropdown is open */
-.form-input.dropdown-open {
-    border-radius: 12px 12px 0 0;
-    border-color: #7c3aed;
-}
-
-/* Mobile responsive */
-@media (max-width: 480px) {
-    .suggestions,
-    .brewery-dropdown {
-        max-height: 200px;
-        font-size: 0.9rem;
-    }
-    
-    .suggestion-item {
-        padding: 0.75rem;
-    }
-    
-    .dropdown-header {
-        padding: 0.625rem 0.875rem;
-        font-size: 0.8rem;
-    }
-}
-
-/* ================================
-   CASCADE FORM VISIBILITY STATES
-   Handle all show/hide in CSS
-   ================================ */
-
-/* Default states - hide everything except first step */
-.cascade-step {
-    display: none;
-    opacity: 0;
-    animation: fadeInUp 0.3s forwards;
-}
-
-.cascade-step.active {
-    display: block;
-    opacity: 1;
-}
-
-/* Initial state - only format step visible */
-#step-format {
-    display: block;
-    opacity: 1;
-}
-
-/* Hide all dropdowns by default */
-.suggestions {
-    display: none;
-    opacity: 0;
-    transition: opacity 0.2s;
-}
-
-.suggestions.show {
-    display: block !important;
-    opacity: 1;
-}
-
-/* Hide brewery confirmed by default */
+/* Other Elements */
 .brewery-confirmed {
     display: none;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid var(--green);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .brewery-confirmed.show {
     display: flex;
 }
 
-/* Hide form actions initially */
 .form-actions {
     display: none;
+    padding: 1rem 1.5rem;
+    border-top: 2px solid var(--border-light);
 }
 
 .form-actions.show {
     display: block;
 }
 
-/* Progress step states */
-.progress-step {
-    opacity: 0.4;
-    transition: opacity 0.3s;
-}
-
-.progress-step.active {
-    opacity: 1;
-}
-
-.progress-step.completed {
-    opacity: 0.8;
-}
-
-.progress-step.completed .step-number {
-    background: var(--green, #10b981);
-}
-
-.progress-step.active .step-number {
-    background: var(--purple, #7c3aed);
-}
-
-/* Animation for step transitions */
+/* Animation */
 @keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    .format-grid,
+    .choice-buttons {
+        grid-template-columns: 1fr;
     }
-    to {
-        opacity: 1;
-        transform: translateY(0);
+    
+    .step-label {
+        display: none;
     }
-}
-
-/* Force the modal to proper height */
-.report-modal .modal-content {
-    max-width: min(95vw, 500px);
-    height: min(90vh, 700px) !important;  /* Force the height */
-    min-height: 600px !important;  /* Minimum height so it's not tiny */
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-/* Make sure the form takes full height */
-.cascade-form {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
-
-/* Content area should fill available space */
-.form-content-area {
-    flex: 1;
-    padding: 1.5rem;
-    overflow-y: auto;
-    min-height: 400px;  /* Ensure minimum height */
 }
