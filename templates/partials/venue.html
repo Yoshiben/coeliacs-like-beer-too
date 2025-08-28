@@ -41,55 +41,71 @@
     </div>
 </div>
 
-<!-- Status Prompt After Beer Report Modal -->
-<div id="statusPromptAfterBeerModal" class="modal" style="display: none;">
-    <div class="modal-content">
+<!-- Status Modals -->
+<div id="gfStatusModal" class="modal status-modal">
+    <div class="modal-content status-modal-content">
         <div class="modal-header">
-            <h2>🎯 One More Thing!</h2>
+            <h2 class="modal-title">Update GF Beer Status</h2>
+            <p class="modal-subtitle" id="statusModalSubtitle"></p>
             <button class="modal-close" data-action="close-modal">&times;</button>
         </div>
-        
         <div class="modal-body">
-            <p>Thanks for adding that beer! 🍺</p>
-            
-            <p><strong>How reliably does <span id="statusPromptVenueName">this venue</span> have GF beer?</strong></p>
-            
-            <div class="status-quick-options">
-                <button class="btn btn-success status-prompt-btn" data-action="quick-status-update" data-status="always_tap_cask">
-                    <div>
-                        <span>⭐</span>
-                        <div><strong>Always has GF on tap/cask</strong>
-                            <br><small>The holy grail! Permanent GF tap/cask lines</small>
-                        </div>
+            <div class="modal-options status-options">
+                <button class="status-option always-tap-cask" data-status="always_tap_cask">
+                    <div class="option-icon">⭐</div>
+                    <div class="option-content">
+                        <h4>Always Has Tap/Cask</h4>
+                        <p>Dedicated GF tap or cask - the holy grail!</p>
                     </div>
                 </button>
-                
-                <button class="btn btn-primary status-prompt-btn" data-action="quick-status-update" data-status="always_bottle_can">
-                    <div>
-                        <span>✅</span>
-                        <div>
-                            <strong>Always has GF bottles/cans</strong>
-                            <br><small>Reliable bottled/canned options</small>
-                        </div>
+                <button class="status-option always-bottle-can" data-status="always_bottle_can">
+                    <div class="option-icon">✅</div>
+                    <div class="option-content">
+                        <h4>Always Has Bottles/Cans</h4>
+                        <p>Reliable GF bottles or cans in the fridge</p>
                     </div>
                 </button>
-                
-                <button class="btn btn-secondary status-prompt-btn" data-action="quick-status-update" data-status="currently">
-                    <div>
-                        <span>🔵</span>
-                        <div>
-                            <strong>Sometimes has GF beer</strong>
-                            <br><small>Not always available, but they have it today</small>
-                        </div>
+                <button class="status-option currently" data-status="currently">
+                    <div class="option-icon">🔵</div>
+                    <div class="option-content">
+                        <h4>Currently Available</h4>
+                        <p>GF beer in stock right now</p>
                     </div>
                 </button>
-                
-                <button class="btn btn-outline" data-action="skip-status-prompt">
-                    🤷 Not sure / Skip
+                <button class="status-option not-currently" data-status="not_currently">
+                    <div class="option-icon">❌</div>
+                    <div class="option-content">
+                        <h4>Not Available</h4>
+                        <p>No GF options at the moment</p>
+                    </div>
+                </button>
+                <button class="status-option unknown" data-status="unknown">
+                    <div class="option-icon">❓</div>
+                    <div class="option-content">
+                        <h4>Not Sure</h4>
+                        <p>Status unknown</p>
+                    </div>
                 </button>
             </div>
-            
-            <p>This helps others know what to expect when they visit!</p>
+        </div>
+    </div>
+</div>
+
+<div id="gfStatusConfirmModal" class="modal confirm-modal">
+    <div class="modal-content confirm-modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Confirm Status Change</h2>
+        </div>
+        <div class="modal-body">
+            <div class="confirm-message">
+                <p>You're about to update the GF beer status to:</p>
+                <div class="confirm-status" id="confirmStatus"></div>
+                <p class="confirm-warning">This will be visible to all users. Are you sure?</p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" data-action="cancel-status">Cancel</button>
+                <button class="btn btn-primary" data-action="confirm-status">Yes, Update</button>
+            </div>
         </div>
     </div>
 </div>
@@ -232,6 +248,59 @@
                 </button>
             </div>
         </form>
+    </div>
+</div>
+
+<!-- Status Prompt After Beer Report Modal -->
+<div id="statusPromptAfterBeerModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>🎯 One More Thing!</h2>
+            <button class="modal-close" data-action="close-modal">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+            <p>Thanks for adding that beer! 🍺</p>
+            
+            <p><strong>How reliably does <span id="statusPromptVenueName">this venue</span> have GF beer?</strong></p>
+            
+            <div class="status-quick-options">
+                <button class="btn btn-success status-prompt-btn" data-action="quick-status-update" data-status="always_tap_cask">
+                    <div>
+                        <span>⭐</span>
+                        <div><strong>Always has GF on tap/cask</strong>
+                            <br><small>The holy grail! Permanent GF tap/cask lines</small>
+                        </div>
+                    </div>
+                </button>
+                
+                <button class="btn btn-primary status-prompt-btn" data-action="quick-status-update" data-status="always_bottle_can">
+                    <div>
+                        <span>✅</span>
+                        <div>
+                            <strong>Always has GF bottles/cans</strong>
+                            <br><small>Reliable bottled/canned options</small>
+                        </div>
+                    </div>
+                </button>
+                
+                <button class="btn btn-secondary status-prompt-btn" data-action="quick-status-update" data-status="currently">
+                    <div>
+                        <span>🔵</span>
+                        <div>
+                            <strong>Sometimes has GF beer</strong>
+                            <br><small>Not always available, but they have it today</small>
+                        </div>
+                    </div>
+                </button>
+                
+                <button class="btn btn-outline" data-action="skip-status-prompt">
+                    🤷 Not sure / Skip
+                </button>
+            </div>
+            
+            <p>This helps others know what to expect when they visit!</p>
+        </div>
     </div>
 </div>
 
