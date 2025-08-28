@@ -5,8 +5,9 @@
 
 import { Constants } from './constants.js';
 import { OnboardingFlow } from './onboarding.js';
-import { UserSession } from './user-session.js';
 import { ToastModule } from './toast.js'; 
+import { UserSession } from './user-session.js';
+import { VenueModule } from './venue.js'; 
 const STATE_KEYS = Constants.STATE_KEYS;
 
 console.log('OnboardingFlow loaded:', typeof OnboardingFlow);
@@ -160,8 +161,6 @@ const App = {
         
         const { HelpersModule } = await import('./helpers.js');
         App.registerModule('helpers', HelpersModule);
-        App.registerModule('ui', HelpersModule);     // Legacy alias
-        App.registerModule('utils', HelpersModule);  // Legacy alias
         
         // Make critical functions globally available (redirecting to toast module)
         window.showLoadingToast = () => ToastModule.showLoadingToast();
@@ -185,6 +184,7 @@ const App = {
         App.registerModule('api', APIModule);
         App.registerModule('tracking', TrackingModule);
         App.registerModule('filterGF', FilterStateManager);
+        
         
         // Initialize filter state manager
         FilterStateManager.init();
@@ -218,7 +218,8 @@ const App = {
             import('./forms.js'),
             import('./community.js'),
             import('./nav.js'),
-            import('./breweries.js')
+            import('./breweries.js'),
+            import('./venue.js')
         ]);
         
         const [
@@ -234,6 +235,7 @@ const App = {
         App.registerModule('search', SearchModule);
         App.registerModule('form', FormModule);
         App.registerModule('community', CommunityModule);
+        App.registerModule('venue', VenueModule);
 
         const { CommunityHubModule } = await import('./community-hub.js');
         App.registerModule('communityHub', CommunityHubModule);
@@ -1332,7 +1334,7 @@ const App = {
         // Venue actions
         'view-venue': (el, modules) => {
             const venueId = el.dataset.venueId || el.closest('[data-venue-id]')?.dataset.venueId;
-            if (venueId) modules.search?.showVenueDetails?.(venueId);
+            if (venueId) modules.venue?.showVenueDetails?.(venueId);
         },
         'view-venue-from-map': (el, modules) => {
             const venueId = el.dataset.venueId;
@@ -1345,7 +1347,7 @@ const App = {
                 }
                 
                 // Then show venue details
-                modules.search?.showVenueDetails?.(venueId);
+                modules.venue?.showVenueDetails?.(venueId);
             }
         },
         'find-venue-online': (el, modules) => {
@@ -2052,12 +2054,12 @@ const App = {
             
             // Set venue name
             const venueNameEl = document.getElementById('beerListVenueName');
-            if (venueNameEl) venueNameEl.textContent = currentVenue.name;
+            if (venueNameEl) venueNameEl.textContent = currentVenue.venue_name;
             
             // Load beer list - make sure we're calling the right module
-            const searchModule = modules.search || window.App?.getModule('search');
-            if (searchModule?.loadBeerList) {
-                searchModule.loadBeerList(currentVenue);
+            const venueModule = modules.venue || window.App?.getModule('venue');
+            if (venueModule?.loadBeerList) {
+                venueModule.loadBeerList(currentVenue);
             } else {
                 console.error('❌ loadBeerList function not found');
             }
