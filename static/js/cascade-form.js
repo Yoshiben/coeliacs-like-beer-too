@@ -142,12 +142,11 @@ export const CascadeForm = (() => {
                 return;
             }
             
-            // Dropdown items - PRIORITY HANDLING
-            const suggestionItem = e.target.closest('.suggestion-item');
-            if (suggestionItem && suggestionItem.closest('#reportModal')) {  // Only if in our modal
+           const suggestionItem = e.target.closest('.suggestion-item');
+            if (suggestionItem) {  // Remove the modal check - it's breaking things
                 e.preventDefault();
-                e.stopPropagation(); // Stop forms.js from handling it
-                console.log('🎯 Cascade handling suggestion click');
+                e.stopPropagation(); 
+                console.log('🎯 Clicked suggestion:', suggestionItem.dataset.action, suggestionItem.dataset.brewery);
                 handleSuggestionClick(suggestionItem);
                 return;
             }
