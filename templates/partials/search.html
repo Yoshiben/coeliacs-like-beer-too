@@ -1,0 +1,137 @@
+<!-- Search Options Overlay -->
+<div id="searchOverlay" class="overlay search-overlay">
+    <div class="search-container">
+        <div class="search-card">
+            <div class="search-header">
+                <h2 class="search-header-title">🔍 What are you searching for? 🍺</h2>
+            </div>
+            <div class="search-body">
+                <div class="search-options">
+                    
+                    <!-- Location Search -->
+                    <div class="search-option location" data-action="location-search">
+                        <span class="search-icon">📍</span>
+                        <h3 class="search-title">Near Me</h3>
+                        <p class="search-description">Control distance</p>
+                    </div>
+                    
+                    <!-- Name Search -->
+                    <div class="search-option name" data-action="search-name">
+                        <span class="search-icon">🏠</span>
+                        <h3 class="search-title">By Name</h3>
+                        <p class="search-description">Specific venue</p>
+                    </div>
+                    
+                    <!-- Area Search -->
+                    <div class="search-option area" data-action="search-area">
+                        <span class="search-icon">🗺️</span>
+                        <h3 class="search-title">By Area</h3>
+                        <p class="search-description">City or postcode</p>
+                    </div>
+                    
+                    <!-- Beer Search -->
+                    <div class="search-option beer" data-action="search-beer">
+                        <span class="search-icon">🍺</span>
+                        <h3 class="search-title">By Beer</h3>
+                        <p class="search-description">Find specific GF</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Search Modals -->
+<div id="nameModal" class="modal search-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">🏠 Search by Venue Name</h3>
+            <p class="modal-subtitle">Enter the name of the venue you're looking for</p>
+        </div>
+        <input type="text" class="form-input" placeholder="e.g. The Red Lion, Wetherspoons" id="nameInput">
+        <div class="modal-actions">
+            <button class="btn btn-secondary" data-action="close-modal">Cancel</button>
+            <button class="btn btn-primary" data-action="perform-name-search">Search</button>
+        </div>
+    </div>
+</div>
+
+<div id="areaModal" class="modal search-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">🗺️ Search by Area</h3>
+            <p class="modal-subtitle">Find venues in a specific location</p>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Search by:</label>
+            <select id="areaSearchType" class="form-select" data-action="update-area-placeholder">
+                <option value="city">🏙️ City/Region</option>
+                <option value="postcode">📮 Postcode</option>  
+            </select>
+        </div>
+        <input type="text" class="form-input" placeholder="Enter postcode..." id="areaInput">
+        <div class="modal-actions">
+            <button class="btn btn-secondary" data-action="close-modal">Cancel</button>
+            <button class="btn btn-primary" data-action="perform-area-search">Search</button>
+        </div>
+    </div>
+</div>
+
+<div id="beerModal" class="modal search-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">🍺 Search by Beer</h3>
+            <p class="modal-subtitle">Find venues serving specific gluten-free beers</p>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Search by:</label>
+            <select id="beerSearchType" class="form-select" data-action="update-beer-placeholder">
+                <option value="brewery">🏭 Brewery Name</option>
+                <option value="beer">🍺 Specific Beer</option>
+                <option value="style">🎨 Beer Style</option>
+            </select>
+        </div>
+        <div class="beer-search-container">
+            <input type="text" class="form-input" placeholder="Start typing brewery name..." id="beerInput">
+            <div id="beerSuggestions" class="suggestions beer-search-suggestions"></div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-secondary" data-action="close-modal">Cancel</button>
+            <button class="btn btn-primary" data-action="perform-beer-search">Search</button>
+        </div>
+    </div>
+</div>
+
+<!-- Distance Selection Modal -->
+<div id="distanceModal" class="modal search-modal">
+    <div class="modal-content distance-content">
+        <div class="modal-header">
+            <h3 class="modal-title">📍 How far will you travel?</h3>
+        </div>
+        <div class="modal-options distance-options">
+            <div class="distance-option" data-distance="1">
+                <div class="distance-number">1km</div>
+                <div class="distance-label">Walking distance</div>
+            </div>
+            <div class="distance-option" data-distance="3">
+                <div class="distance-number">3km</div>
+                <div class="distance-label">Short journey</div>
+            </div>
+            <div class="distance-option popular" data-distance="5">
+                <div class="distance-number">5km</div>
+                <div class="distance-label">Most popular</div>
+            </div>
+            <div class="distance-option" data-distance="10">
+                <div class="distance-number">10km</div>
+                <div class="distance-label">Longer trip</div>
+            </div>
+            <div class="distance-option" data-distance="20">
+                <div class="distance-number">20km</div>
+                <div class="distance-label">Day out</div>
+            </div>
+        </div>
+        <div class="modal-actions distance-actions">
+            <button class="btn btn-secondary" data-action="close-modal">Cancel</button>
+        </div>
+    </div>
+</div>
