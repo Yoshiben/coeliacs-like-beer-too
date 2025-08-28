@@ -405,4 +405,190 @@
 }
 
 .status-icon {
-   font-size: 
+   font-size: 2rem;
+}
+
+/* Venue Added Modal Styles */
+.venue-added-modal .modal-content {
+    max-width: 420px;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.venue-added-modal .gradient-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: clamp(1.5rem, 4vw, 2rem);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.venue-added-modal .modal-title {
+    font-size: clamp(1.25rem, 3vw, 1.5rem);
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.venue-added-modal .modal-subtitle {
+    font-size: clamp(0.9rem, 2vw, 1rem);
+    opacity: 0.95;
+    margin: 0;
+    font-weight: 500;
+}
+
+.venue-added-modal .modal-body {
+    padding: clamp(1.5rem, 4vw, 2rem);
+}
+
+/* Success Message Styling */
+.success-message {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.success-icon-wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+    border-radius: 50%;
+    margin-bottom: 1rem;
+    animation: pulse 2s infinite;
+}
+
+.success-checkmark {
+    font-size: 2rem;
+}
+
+.success-text {
+    font-size: clamp(1rem, 2.5vw, 1.1rem);
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.success-points {
+    font-size: clamp(0.9rem, 2vw, 1rem);
+    color: var(--primary);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.points-icon {
+    font-size: 1.2rem;
+    animation: sparkle 1s ease-in-out infinite;
+}
+
+/* Action Prompt Styling */
+.venue-actions-prompt {
+    background: var(--bg-secondary, #f8f9fa);
+    border-radius: 12px;
+    padding: clamp(1rem, 3vw, 1.5rem);
+}
+
+.prompt-text {
+    text-align: center;
+    font-size: clamp(0.9rem, 2vw, 1rem);
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+}
+
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.action-buttons .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: clamp(0.75rem, 2vw, 1rem);
+    font-size: clamp(0.9rem, 2vw, 1rem);
+    font-weight: 600;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.btn-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+}
+
+.btn-gradient:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+    border: none;
+}
+
+.btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(56, 239, 125, 0.4);
+}
+
+.btn-subtle {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--text-secondary);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.btn-subtle:hover {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+.btn-icon {
+    font-size: 1.2rem;
+}
+
+/* Floating animation for header emojis */
+.header-decoration {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.venue-emoji {
+    position: absolute;
+    font-size: 2rem;
+    opacity: 0.1;
+    animation: float 6s ease-in-out infinite;
+}
+
+.venue-emoji:nth-child(1) { left: 10%; top: 20%; }
+.venue-emoji:nth-child(2) { right: 15%; top: 60%; animation-delay: 2s; }
+.venue-emoji:nth-child(3) { left: 80%; bottom: 20%; animation-delay: 4s; }
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+@keyframes sparkle {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    50% { transform: scale(1.2) rotate(180deg); }
+}
