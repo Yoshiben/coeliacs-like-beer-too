@@ -41,16 +41,17 @@
     </div>
 </div>
 
-<!-- REPLACE YOUR CURRENT BEER REPORT MODAL WITH THIS -->
+<!-- CLEAN CASCADE BEER REPORT MODAL -->
 <div id="reportModal" class="modal report-modal">
     <div class="modal-content">
+        <!-- Fixed header -->
         <div class="modal-header">
             <h3>🍺 Report a Beer</h3>
             <button class="modal-close" data-action="close-modal">&times;</button>
         </div>
         
-        <form id="reportForm" class="modal-form cascade-form">
-            <!-- Progress indicator -->
+        <form id="reportForm" class="cascade-form">
+            <!-- Fixed progress bar -->
             <div class="cascade-progress">
                 <div class="progress-step active" data-step="format">
                     <span class="step-number">1</span>
@@ -66,104 +67,96 @@
                 </div>
             </div>
 
-            <!-- STEP 1: Format Selection (Always visible) -->
-            <div class="cascade-step active" id="step-format">
-                <label class="form-label">What format is it?</label>
-                <div class="format-grid">
-                    <button type="button" class="format-btn" data-format="tap">
-                        <span class="format-icon">🚰</span>
-                        <span class="format-name">Tap</span>
-                    </button>
-                    <button type="button" class="format-btn" data-format="cask">
-                        <span class="format-icon">🛢️</span>
-                        <span class="format-name">Cask</span>
-                    </button>
-                    <button type="button" class="format-btn" data-format="bottle">
-                        <span class="format-icon">🍾</span>
-                        <span class="format-name">Bottle</span>
-                    </button>
-                    <button type="button" class="format-btn" data-format="can">
-                        <span class="format-icon">🥫</span>
-                        <span class="format-name">Can</span>
-                    </button>
+            <!-- Scrollable content area -->
+            <div class="form-content-area">
+                <!-- STEP 1: Format Selection -->
+                <div class="cascade-step active" id="step-format">
+                    <label class="form-label">What format is it?</label>
+                    <div class="format-grid">
+                        <button type="button" class="format-btn" data-format="tap">
+                            <span class="format-icon">🚰</span>
+                            <span class="format-name">Tap</span>
+                        </button>
+                        <button type="button" class="format-btn" data-format="cask">
+                            <span class="format-icon">🛢️</span>
+                            <span class="format-name">Cask</span>
+                        </button>
+                        <button type="button" class="format-btn" data-format="bottle">
+                            <span class="format-icon">🍾</span>
+                            <span class="format-name">Bottle</span>
+                        </button>
+                        <button type="button" class="format-btn" data-format="can">
+                            <span class="format-icon">🥫</span>
+                            <span class="format-name">Can</span>
+                        </button>
+                    </div>
+                    <input type="hidden" id="reportFormat" name="reportFormat" required>
                 </div>
-                <input type="hidden" id="reportFormat" name="reportFormat" required>
-            </div>
 
-            <!-- STEP 2: Brewery Knowledge (Hidden initially) -->
-            <div class="cascade-step" id="step-brewery-question" style="display: none;">
-                <label class="form-label">Do you know the brewery?</label>
-                <div class="choice-buttons">
-                    <button type="button" class="choice-btn yes-btn" data-knows-brewery="yes">
-                        <span>✅</span> Yes, I know it
-                    </button>
-                    <button type="button" class="choice-btn no-btn" data-knows-brewery="no">
-                        <span>🔍</span> No, help me find it
-                    </button>
+                <!-- STEP 2: Brewery Question -->
+                <div class="cascade-step" id="step-brewery-question">
+                    <label class="form-label">Do you know the brewery?</label>
+                    <div class="choice-buttons">
+                        <button type="button" class="choice-btn yes-btn" data-knows-brewery="yes">
+                            <span>✅</span> Yes, I know it
+                        </button>
+                        <button type="button" class="choice-btn no-btn" data-knows-brewery="no">
+                            <span>🔍</span> No, help me find it
+                        </button>
+                    </div>
                 </div>
-            </div>
 
-            <!-- STEP 2A: Brewery Selection (If knows brewery) -->
-            <div class="cascade-step" id="step-brewery-select" style="display: none;">
-                <label class="form-label">Select or type the brewery</label>
-                <div class="input-wrapper">
+                <!-- STEP 2A: Brewery Selection -->
+                <div class="cascade-step" id="step-brewery-select">
+                    <label class="form-label">Select or type the brewery</label>
                     <input type="text" 
                            id="reportBrewery" 
                            name="reportBrewery" 
-                           class="form-input brewery-input"
+                           class="form-input"
                            placeholder="Start typing brewery name..."
                            autocomplete="off">
-                    <div id="breweryDropdown" class="suggestions brewery-dropdown" style="display: none;"></div>
+                    <!-- Dropdown appears inline here -->
+                    <div id="breweryDropdown" class="suggestions"></div>
                 </div>
-                <button type="button" class="text-btn" data-action="brewery-not-found">
-                    Can't find it? Add new brewery →
-                </button>
-            </div>
 
-            <!-- STEP 2B: Beer Search First (If doesn't know brewery) -->
-            <div class="cascade-step" id="step-beer-search" style="display: none;">
-                <label class="form-label">Search for the beer name</label>
-                <div class="input-wrapper">
+                <!-- STEP 2B: Beer Search First -->
+                <div class="cascade-step" id="step-beer-search">
+                    <label class="form-label">Search for the beer name</label>
                     <input type="text" 
                            id="beerSearchFirst" 
                            class="form-input"
-                           placeholder="Type beer name to search our database..."
+                           placeholder="Type beer name to search..."
                            autocomplete="off">
-                    <div id="beerSearchDropdown" class="suggestions" style="display: none;"></div>
-                </div>
-                <div class="search-hint">
-                    💡 We'll find the brewery for you if this beer exists in our database
-                </div>
-            </div>
-
-            <!-- STEP 3: Beer Details -->
-            <div class="cascade-step" id="step-beer-details" style="display: none;">
-                <div class="brewery-confirmed" id="breweryConfirmed" style="display: none;">
-                    <span class="confirmed-icon">✅</span>
-                    <span class="confirmed-text">
-                        Brewery: <strong id="confirmedBreweryName"></strong>
-                    </span>
+                    <div id="beerSearchDropdown" class="suggestions"></div>
+                    <div class="search-hint">
+                        💡 We'll find the brewery for you if this beer exists
+                    </div>
                 </div>
 
-                <label class="form-label">Beer name</label>
-                <input type="text" 
-                       id="reportBeerName" 
-                       name="reportBeerName" 
-                       class="form-input"
-                       placeholder="Enter beer name..."
-                       required>
-                <div id="beerNameDropdown" class="suggestions" style="display: none;"></div>
+                <!-- STEP 3: Beer Details -->
+                <div class="cascade-step" id="step-beer-details">
+                    <div class="brewery-confirmed" id="breweryConfirmed">
+                        <span class="confirmed-icon">✅</span>
+                        <span>Brewery: <strong id="confirmedBreweryName"></strong></span>
+                    </div>
 
-                <!-- Optional details -->
-                <div class="optional-details" id="optionalDetails" style="display: none;">
-                    <label class="form-label optional">Style (optional)</label>
+                    <label class="form-label">Beer name</label>
+                    <input type="text" 
+                           id="reportBeerName" 
+                           name="reportBeerName" 
+                           class="form-input"
+                           placeholder="Enter beer name..."
+                           required>
+                    <div id="beerNameDropdown" class="suggestions"></div>
+
+                    <label class="form-label">Style (optional)</label>
                     <input type="text" 
                            id="reportBeerStyle" 
                            name="reportBeerStyle" 
                            class="form-input"
                            placeholder="e.g. IPA, Stout, Lager...">
 
-                    <label class="form-label optional">ABV % (optional)</label>
+                    <label class="form-label">ABV % (optional)</label>
                     <input type="number" 
                            id="reportBeerABV" 
                            name="reportBeerABV" 
@@ -174,28 +167,16 @@
                            max="20">
                 </div>
 
-                <button type="button" class="text-btn toggle-details" data-action="toggle-optional">
-                    <span class="toggle-text">+ Add more details</span>
-                </button>
+                <!-- Hidden venue info -->
+                <input type="hidden" id="venueId" name="venue_id">
+                <input type="hidden" id="venueName" name="venue_name">
             </div>
 
-            <!-- Venue info (hidden, populated from context) -->
-            <input type="hidden" id="venueId" name="venue_id">
-            <input type="hidden" id="venueName" name="venue_name">
-
-            <!-- Submit button (hidden initially) -->
-            <div class="form-actions" id="formActions" style="display: none;">
-                <button type="submit" class="btn btn-primary btn-submit">
+            <!-- Fixed submit button at bottom -->
+            <div class="form-actions" id="formActions">
+                <button type="submit" class="btn btn-primary btn-block">
                     <span>🎉</span> Submit Report
                 </button>
-            </div>
-
-            <!-- New beer/brewery notification -->
-            <div class="new-item-alert" id="newItemAlert" style="display: none;">
-                <div class="alert-content">
-                    <span class="alert-icon">🆕</span>
-                    <span class="alert-text">This will be added to our database!</span>
-                </div>
             </div>
         </form>
     </div>
