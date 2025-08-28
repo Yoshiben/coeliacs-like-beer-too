@@ -1527,6 +1527,55 @@ def get_user_stats(nickname):
 # API ROUTES
 # ================================================================================
 
+@app.route('/api/beers/search', methods=['GET'])
+def search_beers_globally():
+    """Search all beers in database (for when user doesn't know brewery)"""
+    query = request.args.get('q', '').strip()
+    
+    if not query or len(query) < 2:
+        return jsonify([])
+    
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        # Search beers and include brewery info
+        cursor.execute("""
+            SELECT 
+                b.beer_id,
+                b.beer_name,
+                br.brewery_name,
+                b.style,
+                b.abv,
+                b.gluten_status
+            FROM beers b
+            LEFT JOIN breweries br ON b.brewery_id = br.brewery_id
+            WHERE b.beer_name LIKE %s
+            ORDER BY 
+                CASE 
+                    WHEN b.beer_name LIKE %s THEN 0
+                    WHEN b.beer_name LIKE %s THEN 1
+                    ELSE 2
+                END,
+                b.beer_name
+            LIMIT 20
+        """, (f'%{query}%', f'{query}%', f'%{query}%'))
+        
+        beers = cursor.fetchall()
+        
+        # Convert Decimal to float for JSON serialization
+        for beer in beers:
+            if beer['abv']:
+                beer['abv'] = float(beer['abv'])
+        
+        cursor.close()
+        conn.close()
+        
+        return jsonify(beers)
+        
+    except Exception as e:
+        logger.error(f"Error searching beers: {str(e)}")
+        return jsonify([]), 500
 
 @app.route('/api/breweries', methods=['GET'])
 def get_breweries():
@@ -2060,6 +2109,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
