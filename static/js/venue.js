@@ -226,22 +226,6 @@ export const VenueModule = (function() {
     };
     
     
-    
-    const resetVenueDetailsView = () => {
-        const venueContainer = document.getElementById('venueContainer');
-        const venueMapContainer = document.getElementById('venueMapContainer');
-        const mapBtnText = document.getElementById('venueMapBtnText');
-        
-        // Removes the split-screen class (if venue was showing half details, half map)
-        if (venueContainer) venueContainer.classList.remove('split-view');
-        
-        // Hides the map container completely
-        if (venueMapContainer) venueMapContainer.style.display = 'none';
-        
-        // Resets button text to "Show on Map" (not "Hide Map")
-        if (mapBtnText) mapBtnText.textContent = 'Show on Map';
-    };
-    
     // ================================
     // BEER LIST MANAGEMENT
     // ================================
@@ -583,8 +567,13 @@ export const VenueModule = (function() {
         const venueMapContainer = document.getElementById('venueMapContainer');
         const mapBtnText = document.getElementById('venueMapBtnText');
         
+        // Removes the split-screen class (if venue was showing half details, half map)
         if (venueContainer) venueContainer.classList.remove('split-view');
+        
+        // Hides the map container completely
         if (venueMapContainer) venueMapContainer.style.display = 'none';
+        
+        // Resets button text to "Show on Map" (not "Hide Map")
         if (mapBtnText) mapBtnText.textContent = 'Show on Map';
     };
     
