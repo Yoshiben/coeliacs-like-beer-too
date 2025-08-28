@@ -435,30 +435,44 @@ export const VenueModule = (function() {
             const formatMatch = beerString.match(/^(.*?)\s*-\s*/);
             const format = formatMatch ? formatMatch[1] : 'Unknown';
             
-            // Extract the rest after format
+            // Get everything after the format dash
             const remainingString = formatMatch ? 
                 beerString.substring(formatMatch[0].length) : 
                 beerString;
             
-            // Extract style if in parentheses
+            // Extract style if in parentheses at the end
             const styleMatch = remainingString.match(/\((.*?)\)$/);
             const style = styleMatch ? styleMatch[1] : null;
             
-            // Get name and brewery part
+            // Get the beer and brewery part (remove style)
             const nameBreweryPart = styleMatch ? 
                 remainingString.substring(0, remainingString.lastIndexOf('(')).trim() : 
                 remainingString.trim();
             
-            // Split brewery and name (assuming brewery comes first)
-            const parts = nameBreweryPart.split(' ');
-            const brewery = parts[0];
-            const name = parts.slice(1).join(' ');
+            // Split by last word (brewery is usually last word before style)
+            const words = nameBreweryPart.split(' ');
+            
+            // FIXED: Brewery is LAST word(s), beer name is FIRST part
+            // Check for multi-word breweries like "Left Handed Giant"
+            let brewery = words[words.length - 1]; // Start with last word
+            let name = words.slice(0, -1).join(' ');
+            
+            // Common multi-word brewery check
+            if (words.length >= 3) {
+                // Check if last 3 words might be brewery (Left Handed Giant)
+                const possibleBrewery = words.slice(-3).join(' ');
+                if (possibleBrewery === 'Left Handed Giant') {
+                    brewery = possibleBrewery;
+                    name = words.slice(0, -3).join(' ');
+                }
+                // Add other known multi-word breweries here
+            }
             
             beers.push({
                 id: `beer_${index}`,
                 format,
-                brewery,
-                name: name || nameBreweryPart,
+                brewery: brewery || 'Unknown',
+                name: name || 'Unknown Beer',
                 style
             });
         });
