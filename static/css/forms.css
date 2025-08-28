@@ -1077,3 +1077,91 @@
         color: #9ca3af;
     }
 }
+
+
+/* ================================
+   CASCADE FORM VISIBILITY STATES
+   Handle all show/hide in CSS
+   ================================ */
+
+/* Default states - hide everything except first step */
+.cascade-step {
+    display: none;
+    opacity: 0;
+    animation: fadeInUp 0.3s forwards;
+}
+
+.cascade-step.active {
+    display: block;
+    opacity: 1;
+}
+
+/* Initial state - only format step visible */
+#step-format {
+    display: block;
+    opacity: 1;
+}
+
+/* Hide all dropdowns by default */
+.suggestions {
+    display: none !important;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.suggestions.show {
+    display: block !important;
+    opacity: 1;
+}
+
+/* Hide brewery confirmed by default */
+.brewery-confirmed {
+    display: none;
+}
+
+.brewery-confirmed.show {
+    display: flex;
+}
+
+/* Hide form actions initially */
+.form-actions {
+    display: none;
+}
+
+.form-actions.show {
+    display: block;
+}
+
+/* Progress step states */
+.progress-step {
+    opacity: 0.4;
+    transition: opacity 0.3s;
+}
+
+.progress-step.active {
+    opacity: 1;
+}
+
+.progress-step.completed {
+    opacity: 0.8;
+}
+
+.progress-step.completed .step-number {
+    background: var(--green, #10b981);
+}
+
+.progress-step.active .step-number {
+    background: var(--purple, #7c3aed);
+}
+
+/* Animation for step transitions */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
