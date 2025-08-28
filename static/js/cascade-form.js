@@ -35,7 +35,7 @@ export const CascadeForm = (() => {
         }
         
         attachEventListeners();
-        setupClickOutside();
+        // setupClickOutside();  // COMMENTED OUT FOR NOW
         reset();
         console.log('✅ Cascade Form initialized');
         state.initialized = true;
@@ -152,7 +152,6 @@ export const CascadeForm = (() => {
         const breweryInput = document.getElementById('reportBrewery');
         if (breweryInput) {
             let breweryTimeout;
-            let isShowingDropdown = false;
             
             breweryInput.addEventListener('input', (e) => {
                 clearTimeout(breweryTimeout);
@@ -162,18 +161,10 @@ export const CascadeForm = (() => {
             });
             
             breweryInput.addEventListener('focus', (e) => {
-                e.stopPropagation();  // Stop event bubbling
-                if (!breweryInput.value && !isShowingDropdown) {
-                    isShowingDropdown = true;
+                if (!breweryInput.value) {
+                    console.log('🔍 Focus: showing all breweries');
                     showAllBreweries();
-                    // Reset flag after showing
-                    setTimeout(() => { isShowingDropdown = false; }, 500);
                 }
-            });
-            
-            // Prevent dropdown from closing when clicking input
-            breweryInput.addEventListener('click', (e) => {
-                e.stopPropagation();
             });
         }
         
