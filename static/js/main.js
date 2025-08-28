@@ -758,7 +758,8 @@ const App = {
             nav: App.getModule('nav'),
             breweries: App.getModule('breweries'),
             community: App.getModule('community'), 
-            toast: App.getModule('toast')
+            toast: App.getModule('toast'),
+            venue: App.getModule('venue')
         };
 
         console.log('📦 Available modules:', Object.keys(modules).filter(key => modules[key] !== null));
