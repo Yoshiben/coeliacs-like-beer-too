@@ -1631,12 +1631,6 @@ const App = {
                             window.CascadeForm.reset();
                         }
                         
-                        // Keep the old initialization for backward compatibility
-                        if (modules.modal?.initializeReportModal) {
-                            modules.modal.initializeReportModal(venueData);
-                        } else if (window.initializeReportModal) {
-                            window.initializeReportModal(venueData);
-                        }
                     }
                 });
             }
