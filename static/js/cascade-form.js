@@ -683,18 +683,21 @@ export const CascadeForm = (() => {
     const showStep = (stepName) => {
         console.log('🔄 showStep called with:', stepName);
         
-        // Hide all steps
+        // Hide ALL steps first
         const allSteps = document.querySelectorAll('.cascade-step');
         console.log('🔄 Found', allSteps.length, 'cascade steps');
         
         allSteps.forEach(step => {
+            console.log('  Hiding step:', step.id);
             step.classList.remove('active');
+            step.style.display = 'none';  // Force hide with inline style
         });
         
-        // Show target step
+        // Show ONLY the target step
         const targetStep = document.getElementById(`step-${stepName}`);
         if (targetStep) {
             targetStep.classList.add('active');
+            targetStep.style.display = 'block';  // Force show with inline style
             console.log('🔄 Activated step:', stepName);
         } else {
             console.error('❌ Step not found:', `step-${stepName}`);
