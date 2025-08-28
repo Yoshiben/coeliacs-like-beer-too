@@ -424,6 +424,44 @@ export const FormModule = (() => {
         document.getElementById('reportVenueSearch').focus();
     };
     
+    // ================================
+    // BREWERY & BEER AUTOCOMPLETE
+    // ================================
+    // REPLACE the searchBreweries function in forms.js (around line 150)
+
+    const searchBreweries = utils.debounce(async (query) => {
+        const dropdown = document.getElementById('breweryDropdown');
+        if (!dropdown) return;
+        
+        try {
+            const breweries = query.length < 1 ? 
+                await modules.api.getBreweries() : 
+                await modules.api.getBreweries(query);
+            
+            const headerText = query.length < 1 ? 
+                `🍺 ${breweries.length} Breweries Available` : 
+                `🔍 ${breweries.length} matches for "${query}"`;
+            
+            dropdown.className = 'suggestions brewery-suggestions';
+            dropdown.innerHTML = `
+                <div class="dropdown-header">${headerText}</div>
+                ${breweries.slice(0, query.length < 1 ? 100 : 50).map(brewery => 
+                    `<div class="suggestion-item" data-action="select-brewery" data-brewery="${brewery}">
+                        <strong>${utils.escapeHtml(brewery)}</strong>
+                    </div>`
+                ).join('')}
+                <div class="suggestion-item add-new-item" data-action="add-new-brewery">
+                    <strong>➕ Add "${utils.escapeHtml(query || 'New Brewery')}" as new brewery</strong>
+                    <small>Not in our database? Add it!</small>
+                </div>
+            `;
+            
+            showDropdown('breweryDropdown');
+        } catch (error) {
+            console.error('Error searching breweries:', error);
+            hideDropdown('breweryDropdown');
+        }
+    }, config.debounceDelay);
     
     const searchBeerNames = utils.debounce(async (query) => {
         const dropdown = document.getElementById('beerNameDropdown');
@@ -851,6 +889,7 @@ export const FormModule = (() => {
             'select-venue': () => selectVenue(action),
             'add-new-venue': () => showNewVenueFields(),
             'clear-selected-venue': () => clearSelectedVenue(),
+            'select-brewery': () => selectBrewery(action.dataset.brewery),
             'select-beer': () => selectBeer(action.dataset.beerData),
             'add-new-beer': () => {
                 document.getElementById('reportBeerName').value = '';
@@ -950,6 +989,7 @@ export const FormModule = (() => {
     return {
         init,
         handleReportSubmission,
+        searchBreweries,
         searchBeerNames,
         selectBrewery,
         selectBeer,
