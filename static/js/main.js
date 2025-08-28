@@ -228,8 +228,9 @@ const App = {
             { FormModule },
             { CommunityModule },
             { NavStateManager },
-            { VenueModule },
-            breweriesImport
+            breweriesImport,
+            { VenueModule }
+            
         ] = modules;
         
         App.registerModule('map', MapModule);
