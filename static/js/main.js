@@ -1616,13 +1616,22 @@ const App = {
         'report-beer': (el, modules) => {
             const venueData = window.App.getState('currentVenue');
             
-            // DON'T close overlays - we want venue details to stay open!
-            // modules.modalManager?.closeAllOverlays(); // <-- Remove this line
-            
             // Open report modal on top of venue details
             if (modules.modalManager) {
                 modules.modalManager.open('reportModal', {
                     onOpen: () => {
+                        // Initialize cascade form if needed
+                        if (window.initCascadeForm) {
+                            window.initCascadeForm();
+                        }
+                        
+                        // Set venue and reset cascade form
+                        if (window.CascadeForm) {
+                            window.CascadeForm.setVenue(venueData);
+                            window.CascadeForm.reset();
+                        }
+                        
+                        // Keep the old initialization for backward compatibility
                         if (modules.modal?.initializeReportModal) {
                             modules.modal.initializeReportModal(venueData);
                         } else if (window.initializeReportModal) {
