@@ -104,20 +104,42 @@ const CascadeForm = {
     // EVENT LISTENERS
     // ================================
     attachEventListeners() {
-        // Format buttons
-        document.querySelectorAll('.format-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                this.selectFormat(btn.dataset.format);
-            });
-        });
+        console.log('📎 Attaching event listeners...');
         
-        // Brewery knowledge buttons
-        document.querySelectorAll('[data-knows-brewery]').forEach(btn => {
-            btn.addEventListener('click', (e) => {
+        // Use event delegation for all clicks within the modal
+        const modal = document.getElementById('reportModal');
+        if (!modal) {
+            console.error('❌ Modal not found for event listeners');
+            return;
+        }
+        
+        // Single delegated click handler for all buttons
+        modal.addEventListener('click', (e) => {
+            // Format buttons
+            const formatBtn = e.target.closest('.format-btn');
+            if (formatBtn) {
                 e.preventDefault();
-                this.handleBreweryKnowledge(btn.dataset.knowsBrewery === 'yes');
-            });
+                console.log('🔘 Format clicked:', formatBtn.dataset.format);
+                this.selectFormat(formatBtn.dataset.format);
+                return;
+            }
+            
+            // Brewery knowledge buttons
+            const knowsBtn = e.target.closest('[data-knows-brewery]');
+            if (knowsBtn) {
+                e.preventDefault();
+                console.log('🏭 Brewery knowledge:', knowsBtn.dataset.knowsBrewery);
+                this.handleBreweryKnowledge(knowsBtn.dataset.knowsBrewery === 'yes');
+                return;
+            }
+            
+            // Dropdown items
+            const suggestionItem = e.target.closest('.suggestion-item');
+            if (suggestionItem) {
+                e.preventDefault();
+                this.handleSuggestionClick(suggestionItem);
+                return;
+            }
         });
         
         // Brewery input with debounce
@@ -171,15 +193,6 @@ const CascadeForm = {
                 this.handleSubmit(e);
             });
         }
-        
-        // Dropdown item clicks (delegated)
-        document.addEventListener('click', (e) => {
-            const item = e.target.closest('.suggestion-item');
-            if (item) {
-                e.preventDefault();
-                this.handleSuggestionClick(item);
-            }
-        });
     },
 
     // Setup click outside to close dropdowns
