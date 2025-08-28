@@ -1634,9 +1634,15 @@ const App = {
             modules.tracking?.trackEvent('report_beer_click', 'User Action', venueData?.name || 'unknown');
         },
 
-        'submit-report': (el, modules) => {
-            const form = document.getElementById('reportForm');
-            if (form) form.dispatchEvent(new Event('submit', { bubbles: true }));
+        'submit-beer-report': (el, modules) => {
+            console.log('🎉 Submit beer report clicked!');
+            
+            // Call CascadeForm's submit handler directly
+            if (window.CascadeForm) {
+                // Create a fake event object since handleSubmit expects one
+                const fakeEvent = { preventDefault: () => {} };
+                window.CascadeForm.handleSubmit(fakeEvent);
+            }
         },
         'clear-selected-venue': (el, modules) => {
             modules.form?.clearSelectedVenue?.();
