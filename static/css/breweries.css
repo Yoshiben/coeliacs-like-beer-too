@@ -102,11 +102,6 @@
     color: white;
 }
 
-
-.toggle-switch input {
-    display: none;
-}
-
 .toggle-slider {
     width: 50px;
     height: 26px;
