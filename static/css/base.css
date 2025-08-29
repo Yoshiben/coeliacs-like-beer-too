@@ -215,6 +215,7 @@ body.page-search .nav-back-btn { display: flex !important; }
 body.page-map .nav-back-btn,
 body.page-map .nav-toggle { display: block !important; }
 body.page-venue .nav-back-btn { display: flex !important; }
+body.page-contact .nav-back-btn { display: flex !important; }
 body.page-breweries .nav-back-btn { display: flex !important; }
 body.page-community .nav-back-btn { display: flex !important; }
 
