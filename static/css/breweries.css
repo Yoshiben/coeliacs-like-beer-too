@@ -1,11 +1,9 @@
 /* Breweries Showcase Styles */
 .breweries-hero {
     text-align: center;
-    padding: 2rem 1rem;
-    background: var(--primary-gradient);
+    background: var(--orange-gradient);
+    padding: clamp(1.5rem, 4vw, 2rem) clamp(1rem, 3vw, 1.5rem);
     color: white;
-    border-radius: 20px;
-    margin-bottom: 2rem;
 }
 
 .featured-section {
@@ -100,12 +98,10 @@
     gap: 1rem;
 }
 
-.toggle-switch {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    gap: 0.75rem;
+.brewery-filters .toggle-label {
+    color: white;
 }
+
 
 .toggle-switch input {
     display: none;
@@ -204,14 +200,6 @@
     outline: none;
     border-color: var(--border-purple);
     background: var(--bg-white);
-}
-
-.breweries-content {
-    flex: 1;
-    background: var(--bg-section);
-    padding: var(--space-lg);
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
 }
 
 .breweries-grid {
