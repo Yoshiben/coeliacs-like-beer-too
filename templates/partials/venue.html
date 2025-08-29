@@ -377,3 +377,34 @@
         </div>
     </div>
 </div>
+
+<!-- Beer Details Prompt Modal (after status update) -->
+<div id="beerDetailsPromptModal" class="modal beer-details-prompt-modal" data-cover-nav="true">
+    <div class="modal-content">
+        <div class="modal-header gradient-header">
+            <div class="header-decoration">
+                <span class="beer-emoji floating">🍺</span>
+                <span class="beer-emoji floating delay-1">✨</span>
+            </div>
+            <h2 class="modal-title">Thanks for the update!</h2>
+            <button class="modal-close" data-action="close-modal">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+            <div class="prompt-message">
+                <p class="prompt-text">Would you like to tell us which GF beers are available?</p>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-outline btn-subtle" data-action="skip-details">
+                    <span>Not Now</span>
+                </button>
+                
+                <button class="btn btn-primary btn-gradient" data-action="add-beer-details">
+                    <span class="btn-icon">🍺</span>
+                    <span>Add Beer Details</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
