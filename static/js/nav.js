@@ -86,7 +86,7 @@ export const NavStateManager = (() => {
             'search': '/search',
             'venue': '/venue',
             'map': '/map',
-            'contact': '/contact'
+            'contact': '/contact',
             'breweries': '/breweries'
         };
         return urlMap[context] || '/';
