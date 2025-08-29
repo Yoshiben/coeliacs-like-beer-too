@@ -1415,7 +1415,8 @@ const App = {
             });
             
             // Use venue module's openStatusModal instead
-            modules.venue?.openStatusModal();
+            console.trace('🔍 DEBUG: Opening GF status modal from main.js action handler');
+            modules.modalManager?.open('gfStatusModal');
         },
         
         'report-gf-beer-new-venue': (el, modules) => {
