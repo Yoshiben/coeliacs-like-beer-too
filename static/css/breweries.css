@@ -176,22 +176,6 @@
     margin-top: 2rem;
 }
 
-
-.breweries-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    height: 100dvh;
-    z-index: var(--z-overlay);
-    padding: 0;
-    display: none;
-    flex-direction: column;
-    overflow: hidden;
-    background: var(--bg-home);
-}
-
 .breweries-container {
     flex: 1;
     display: flex;
