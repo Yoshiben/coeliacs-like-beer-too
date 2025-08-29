@@ -259,7 +259,7 @@ html {
     height: 100vh;
     height: 100dvh; /* Dynamic viewport height for mobile */
     z-index: var(--z-overlay);
-    overflow: hidden;
+    overflow-y: auto;
     display: none;
     
     /* Account for nav bars AND safe areas */
