@@ -1594,7 +1594,9 @@
 }
 
 .android-guide-content {
-    text-align: center;
+   text-align: center;
+   padding: var(--space-md);
+   overflow: auto;
 }
 
 .install-ready-text {
@@ -1617,8 +1619,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.75rem;
-    margin-bottom: 2rem;
+    margin-bottom: var(--space-xl);
     box-shadow: 0 4px 14px rgba(102, 126, 234, 0.3);
     transition: all 0.3s ease;
 }
@@ -2149,8 +2150,8 @@
 }
 
 .post-install-header {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    padding: 2rem 1.5rem;
+    background: var(--green-gradient);
+    padding: var(--space-lg);
     text-align: center;
     color: white;
     position: relative;
