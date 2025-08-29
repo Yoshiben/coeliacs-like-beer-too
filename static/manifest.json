@@ -1,6 +1,6 @@
 {
   "name": "Coeliacs Like Beer Too - GF Beer Finder",
-  "short_name": "GF Beer Finder",
+  "short_name": "Coeliacs Like Beer",
   "description": "Find gluten-free beer venues across the UK. Discover breweries, pubs, and restaurants serving safe options for coeliacs.",
   "start_url": "/",
   "scope": "/",
@@ -68,7 +68,7 @@
       "url": "/?shortcut=report",
       "icons": [
         {
-          "src": "/static/images/icon-192.png", 
+          "src": "/static/images/android-chrome-192x192.png", 
           "sizes": "192x192"
         }
       ]
