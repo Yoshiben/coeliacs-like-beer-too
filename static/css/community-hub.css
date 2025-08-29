@@ -16,7 +16,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: var(--bg-home-page;
+    background: var(--bg-home-page);
     z-index: 1100;
     display: none;
     overflow-y: auto;
