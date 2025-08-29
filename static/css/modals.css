@@ -422,22 +422,6 @@
    DROPDOWN SUGGESTIONS
    ================================ */
 
-.suggestions {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: var(--bg-white);
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-lg);
-    z-index: var(--z-modal-content);
-    max-height: 400px;
-    overflow-y: auto;
-    display: none;
-    margin-top: var(--space-xs);
-}
-
 .dropdown-header {
     background: var(--primary-gradient);
     color: var(--text-white);
