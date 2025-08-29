@@ -826,3 +826,11 @@
     0%, 100% { transform: scale(1) rotate(0deg); }
     50% { transform: scale(1.2) rotate(180deg); }
 }
+
+.beer-confirmed {
+    display: none;
+}
+
+.beer-confirmed.show {
+    display: block;
+}
