@@ -815,13 +815,13 @@ const App = {
         },
         'post-install-go-to-app': (el, modules) => {
             if (window.OnboardingFlow) {
-                OnboardingFlow.postInstallGoToApp();
+                OnboardingFlow.handleUnderstoodBtn();
             }
         },
         
         'post-install-continue-browser': (el, modules) => {
             if (window.OnboardingFlow) {
-                OnboardingFlow.postInstallContinueBrowser();
+                OnboardingFlow.handleContinueBrowser();
             }
         },
         'accept-all-cookies': (el, modules) => {
