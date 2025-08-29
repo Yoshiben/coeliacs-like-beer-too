@@ -640,7 +640,7 @@
     
     /* Auto height but with constraints */
     height: auto;
-    min-height: min-content;
+   overflow: auto;
     
     /* Smooth animations */
     animation: modalSlideIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
