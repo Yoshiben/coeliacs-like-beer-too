@@ -1724,6 +1724,29 @@ const App = {
                 window.CascadeForm.createNewBrewery(breweryName);
             }
         },
+
+        'add-brewery-beer': (el, modules) => {
+            const beerName = el.dataset.beer;
+            if (beerName && window.CascadeForm) {
+                // Just set the beer name and show submit button
+                const beerNameInput = document.getElementById('reportBeerName');
+                if (beerNameInput) {
+                    beerNameInput.value = beerName;
+                }
+                
+                // Hide dropdown
+                const dropdown = document.getElementById('beerNameDropdown');
+                if (dropdown) {
+                    dropdown.style.display = 'none';
+                }
+                
+                // Show submit button
+                const formActions = document.getElementById('formActions');
+                if (formActions) {
+                    formActions.classList.add('show');
+                }
+            }
+        },
         
         // Also add this one if you don't have it:
         'add-new-brewery': (el, modules) => {
