@@ -734,19 +734,17 @@
 
 /* Dropdowns - SIMPLIFIED */
 .suggestions {
-    /* Let JS control display */
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    max-height: 240px;
-    overflow-y: auto;
-    background: white;
-    border: 2px solid #e5e7eb;
-    border-radius: 0 0 12px 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    z-index: 9999;
-    margin-top: -2px;
+   position: absolute;
+   left: 0;
+   right: 0;
+   max-height: 240px;
+   overflow-y: auto;
+   background: white;
+   border: 2px solid #e5e7eb;
+   border-radius: var(--radius-lg);
+   box-shadow: var(--shadow-lg);
+   z-index: 9999;
+   margin-top: -2px;
 }
 
 .dropdown-header {
@@ -825,14 +823,4 @@
 /* In your CSS file */
 #step-beer-details {
     position: relative; /* Make sure the parent is positioned */
-}
-
-#beerNameDropdown {
-    position: absolute;
-    top: 100%; /* Position right below the input */
-    left: 0;
-    right: 0;
-    max-height: 200px;
-    overflow-y: auto;
-    z-index: 1000;
 }
