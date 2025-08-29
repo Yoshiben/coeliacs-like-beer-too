@@ -28,6 +28,12 @@ export const OnboardingFlow = (() => {
     const start = async () => {
         console.log('🚀 Starting onboarding flow...');
         
+        // Check if onboarding already complete
+        if (localStorage.getItem('onboardingComplete') === 'true') {
+            console.log('✅ Onboarding already complete');
+            return { status: 'complete' };
+        }
+        
         const existingNickname = localStorage.getItem('userNickname');
         if (existingNickname) {
             console.log('✅ Existing user found:', existingNickname);
