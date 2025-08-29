@@ -1675,30 +1675,21 @@ const App = {
         },
         'add-beer-details': (el, modules) => {
             modules.modalManager?.close('beerDetailsPromptModal');
-            
-            // Set flag to prevent circular prompt
             window.App.setState('cameFromBeerDetailsPrompt', true);
             
-            // Get the current venue from state
             const currentVenue = window.App.getState('currentVenue');
             
-            // Open report modal with current venue data
-            if (modules.modalManager) {
-                modules.modalManager.open('reportModal', {
-                    onOpen: () => {
-                        // Initialize with current venue
-                        if (modules.modal?.initializeReportModal) {
-                            modules.modal.initializeReportModal(currentVenue);
-                        } else if (window.initializeReportModal) {
-                            window.initializeReportModal(currentVenue);
-                        }
+            modules.modalManager.open('reportModal', {
+                onOpen: () => {
+                    // Just set venue and reset, don't initialize
+                    if (window.CascadeForm) {
+                        window.CascadeForm.setVenue(currentVenue);
+                        window.CascadeForm.reset();
                     }
-                });
-            }
+                }
+            });
         },
-
-        
-        
+      
         'add-new-venue-from-results': (el, modules) => {
             // Close results overlay
             modules.modalManager?.close('resultsOverlay');
