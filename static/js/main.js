@@ -1717,25 +1717,11 @@ const App = {
         },
 
         'create-brewery': (el, modules) => {
-            console.log('🏭 Creating new brewery');
+            const breweryName = el.dataset.brewery;
             
-            // Focus the brewery input field so user can type a new name
-            const breweryInput = document.getElementById('reportBrewery');
-            if (breweryInput) {
-                breweryInput.focus();
-                breweryInput.placeholder = 'Type new brewery name...';
-                
-                // Clear any existing value
-                breweryInput.value = '';
-                
-                // Hide the dropdown if it's showing
-                const dropdown = document.getElementById('breweryDropdown');
-                if (dropdown) {
-                    dropdown.style.display = 'none';
-                }
-                
-                // Show a helper message
-                modules.toast?.info('💡 Type the new brewery name and press Tab or click outside');
+            if (breweryName && window.CascadeForm) {
+                // This is what should happen - just call createNewBrewery
+                window.CascadeForm.createNewBrewery(breweryName);
             }
         },
         
