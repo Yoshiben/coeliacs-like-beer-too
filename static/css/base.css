@@ -258,16 +258,14 @@ html {
     left: 0;
     width: 100%;
     height: 100vh;
-    height: 100dvh; /* Dynamic viewport height for mobile */
+    height: 100dvh;
     z-index: var(--z-overlay);
     overflow-y: auto;
     display: none;
-    
     /* Account for nav bars AND safe areas */
     padding-top: calc(var(--nav-height) + env(safe-area-inset-top));
-    padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom));
-    
-    background: var(--primary-gradient);
+    padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom));    
+    background: var(--bg-home-page);
 }
 
 .overlay.active {
