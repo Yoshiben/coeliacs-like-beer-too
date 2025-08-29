@@ -332,10 +332,10 @@ const App = {
         });
         
         // Ensure community home is visible
-        const communityHome = document.querySelector('.community-home');
-        if (communityHome) {
-            communityHome.style.display = 'block';
-        }
+        // const communityHome = document.querySelector('.community-home');
+        // if (communityHome) {
+        //     communityHome.style.display = 'block';
+        // }
         
         // Set up event delegation
         App.setupEventDelegation();
