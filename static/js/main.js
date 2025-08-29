@@ -977,6 +977,25 @@ const App = {
         },
 
 
+        'get-in-touch': (el, modules) => {
+            console.log('💬 Opening Get in Touch overlay');
+            modules.modalManager?.open('getInTouchOverlay');
+            modules.tracking?.trackEvent('get_in_touch_view', 'Navigation', 'community_section');
+        },
+        
+        'close-get-in-touch': (el, modules) => {
+            modules.modalManager?.close('getInTouchOverlay');
+        },
+        
+        'show-gf-guide': (el, modules) => {
+            // This would open your existing GF info overlay or create a new guide
+            modules.modalManager?.close('getInTouchOverlay');
+            setTimeout(() => {
+                modules.modalManager?.open('gfInfoOverlay');
+            }, 100);
+        },
+
+
 
 
 
