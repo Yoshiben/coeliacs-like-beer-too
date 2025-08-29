@@ -16,7 +16,7 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: var(--light-bg);
+    background: var(--bg-home-page;
     z-index: 1100;
     display: none;
     overflow-y: auto;
@@ -75,17 +75,6 @@
     opacity: 0.9;
 }
 
-/* Level Banner */
-.level-banner {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%); /* Better green! */
-    color: white;
-    padding: clamp(1rem, 3vw, 1.5rem);
-    border-radius: 20px;
-    margin: 1rem;
-    position: relative;
-    overflow: hidden;
-}
-
 /* Add the floating beer animation */
 .floating-beer {
     position: absolute;
@@ -137,7 +126,7 @@
 /* Section Tabs */
 .section-tabs {
    display: grid;
-   grid-template-columns: 1fr 1fr;
+   grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
    gap: var(--space-sm);
    margin: var(--space-sm);
    background: white;
@@ -160,7 +149,7 @@
    transition: var(--transition);
    color: var(--text-secondary);
    white-space: nowrap;
-   font-size: var(--text-xs);
+   font-size: var(--text-sm);
    
 }
 
@@ -389,13 +378,12 @@
 
 /* Updated level banner with integrated stats */
 .level-banner {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    background: var(--green-gradient);
     color: white;
     padding: clamp(1.5rem, 4vw, 2rem) clamp(1rem, 3vw, 1.5rem);
     margin: 0; /* No margin at top */
     position: relative;
     overflow: hidden;
-    border-radius: 0 0 20px 20px; /* Only round bottom corners */
 }
 
 .level-user-info {
