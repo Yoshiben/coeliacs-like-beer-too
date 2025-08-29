@@ -2752,3 +2752,13 @@
 .cookie-toggle input:checked + .toggle-slider:before {
     transform: translateX(22px); /* Use transform instead of left */
 }
+
+.cookie-toggle input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none; /* Add this */
+}
+
+.cookie-toggle {
+    cursor: pointer; /* Make the whole label clickable */
+}
