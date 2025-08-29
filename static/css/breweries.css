@@ -87,22 +87,22 @@
 
 /* Filter Toggle */
 .brewery-filters {
-    padding: 1rem;
-    background: white;
-    border-radius: 15px;
-    margin: 1rem 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
+    padding: var(--space-sm);
+    background: var(--green-gradient);
+    border-radius: var(--radius-pill);
+    margin: var(--space-sm);
+    width: 17vh;
+}
+
+.brewery-filters .toggle-switch {
+    gap: var(--space-xs);
 }
 
 .brewery-filters .toggle-label {
     color: white;
 }
 
-.toggle-slider {
+/* .toggle-slider {
     width: 50px;
     height: 26px;
     background: #ccc;
@@ -121,15 +121,15 @@
     top: 2px;
     left: 2px;
     transition: 0.3s;
-}
+} */
 
-.toggle-switch input:checked + .toggle-slider {
+/* .toggle-switch input:checked + .toggle-slider {
     background: var(--orange);
 }
 
 .toggle-switch input:checked + .toggle-slider::after {
     transform: translateX(24px);
-}
+} */
 
 .community-message {
     background: var(--light-bg);
