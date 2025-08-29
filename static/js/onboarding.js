@@ -351,6 +351,7 @@ export const OnboardingFlow = (() => {
     const skipNickname = () => {
         console.log('⏭️ Skipping nickname');
         localStorage.setItem('hasSeenWelcome', 'true');
+        localStorage.setItem('skippedNickname', 'true');
         hideModal('nicknameModal');
         checkCookieConsent();
     };
@@ -1011,7 +1012,8 @@ Website: https://coeliacslikebeer.co.uk
     const completeOnboarding = () => {
         console.log('🎉 Onboarding fully complete!');
         
-        // Hide any remaining modals
+        // Hide ALL modals including benefits
+        hideModal('benefitsModal'); // Add this
         hideAllModals();
         
         // Mark complete
