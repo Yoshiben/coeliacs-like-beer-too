@@ -13,7 +13,7 @@
 
 .search-header {
    text-align: center;
-   padding: var(--space-xl) var(--space-4xl) var(--space-3xl);
+   padding: var(--space-xl) var(--space-4xl);
 }
 
 .search-header-title {
@@ -88,8 +88,9 @@
 }
 
 .search-icon {
-    font-size: 4rem;
-    line-height: 1;
+   font-size: 4rem;
+   line-height: 1;
+   padding-top: (var--space-sm);
 }
 
 .search-title {
@@ -99,7 +100,9 @@
 }
 
 .search-description {
-    font-size: var(--text-sm);
-    text-align: center;
+   font-size: var(--text-sm);
+   text-align: center;
    color: var(--text-secondary);
+   margin: 0;
+   padding: var(--space-sm);
 }
