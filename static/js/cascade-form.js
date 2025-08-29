@@ -840,6 +840,17 @@ export const CascadeForm = (() => {
         }
     };
 
+    // In your searchBreweryBeers function, after a beer is selected:
+    const showBeerConfirmed = (beerName) => {
+        const confirmed = document.getElementById('beerConfirmed');
+        const nameEl = document.getElementById('confirmedBeerName');
+        
+        if (confirmed && nameEl) {
+            nameEl.textContent = beerName;
+            confirmed.classList.add('show');
+        }
+    };
+
     const showToast = (message, type = 'success') => {
         if (window.showSuccessToast && type === 'success') {
             window.showSuccessToast(message);
