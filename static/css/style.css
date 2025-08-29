@@ -23,6 +23,21 @@
           max(clamp(var(--space-lg), 4vw, var(--space-4xl)), env(safe-area-inset-left));
 }
 
+.modal-actions {
+    padding: var(--space-lg) var(--space-xl);
+    border-top: 1px solid var(--modal-line);
+    display: flex;
+    gap: var(--space-md);
+    background: white;
+    position: sticky;
+    bottom: 0;
+    border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+    
+    /* Ensure buttons don't get too close to home indicator */
+    padding-bottom: calc(var(--space-lg) + env(safe-area-inset-bottom));
+}
+
+
 .modal.active {
    display: flex;
 }
