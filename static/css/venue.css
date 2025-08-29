@@ -650,7 +650,6 @@
 }
 
 .venue-added-modal .gradient-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     padding: clamp(1.5rem, 4vw, 2rem);
     text-align: center;
@@ -753,19 +752,8 @@
     transition: all 0.3s ease;
 }
 
-.btn-gradient {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border: none;
-}
-
-.btn-gradient:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
-}
-
 .btn-success {
-    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    background: var(--green-gradient);
     color: white;
     border: none;
 }
