@@ -475,8 +475,7 @@
 .form-select:focus,
 .btn:focus,
 .checkbox-item:focus-within,
-.radio-item:focus-within,
-.toggle-switch:focus-within {
+.radio-item:focus-within {
    outline: 2px solid var(--purple);
    outline-offset: 2px;
 }
