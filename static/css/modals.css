@@ -649,27 +649,6 @@
    Handles proper spacing for devices with home indicators (iPhone X+)
    ================================================================================ */
 
-/* ================================
-   MODAL HEADER & BODY
-   ================================ */
-
-.modal-body {
-    padding-bottom: calc(var(--space-xl) + env(safe-area-inset-bottom));
-}
-
-.modal-actions {
-    padding: var(--space-lg) var(--space-xl);
-    border-top: 1px solid var(--modal-line);
-    display: flex;
-    gap: var(--space-md);
-    background: white;
-    position: sticky;
-    bottom: 0;
-    border-radius: 0 0 var(--radius-xl) var(--radius-xl);
-    
-    /* Ensure buttons don't get too close to home indicator */
-    padding-bottom: calc(var(--space-lg) + env(safe-area-inset-bottom));
-}
 
 /* ================================
    SEARCH MODALS
