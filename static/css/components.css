@@ -648,7 +648,7 @@
 
 .location-modal .modal-header {
     background: var(--primary-gradient);
-    padding: clamp(2rem, 5vh, 2.5rem) clamp(1.5rem, 4vw, 2rem);
+    padding: var(--space-md);
     text-align: center;
     position: relative;
     overflow: hidden;
