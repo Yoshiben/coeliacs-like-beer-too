@@ -1420,10 +1420,8 @@ const App = {
         },
         
         'report-gf-beer-new-venue': (el, modules) => {
-            // Close the prompt modal
             modules.modalManager?.close('venueAddedPromptModal');
             
-            // Get the venue ID from state
             const venueId = window.App.getState('lastAddedVenueId');
             const venueName = window.App.getState('lastAddedVenueName');
             
@@ -1432,20 +1430,21 @@ const App = {
                 return;
             }
             
-            // Set as current venue
-            window.App.setState('currentVenue', {
+            const venueData = {
                 venue_id: venueId,
-                name: venueName
-            });
+                venue_name: venueName
+            };
             
-            // Open the report modal
-            const modalModule = modules.modal || window.App?.getModule('modal');
-            if (modalModule && modalModule.openReportModal) {
-                modalModule.openReportModal({
-                    venue_id: venueId,
-                    name: venueName
-                });
-            }
+            window.App.setState('currentVenue', venueData);
+            
+            modules.modalManager.open('reportModal', {
+                onOpen: () => {
+                    if (window.CascadeForm) {
+                        window.CascadeForm.setVenue(venueData);  // THIS IS MISSING
+                        window.CascadeForm.reset();
+                    }
+                }
+            });
         },
         
         'close-venue-added-modal': (el, modules) => {
