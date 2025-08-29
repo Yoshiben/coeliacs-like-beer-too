@@ -1148,7 +1148,10 @@ Website: https://coeliacslikebeer.co.uk
         completeOnboarding,
         acceptAllCookies,
         acceptSelectedCookies,
-        essentialOnlyCookies
+        essentialOnlyCookies,
+        handleUnderstoodBtn,
+        handleContinueBrowser
+        
     };
 })();
 
