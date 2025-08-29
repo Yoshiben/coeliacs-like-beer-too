@@ -1400,29 +1400,22 @@ const App = {
             }
         },
 
-        // Add these action handlers to main.js
         'update-gf-status-new-venue': (el, modules) => {
-            // Close the prompt modal
             modules.modalManager?.close('venueAddedPromptModal');
             
-            // Get the venue ID from state or element
             const venueId = window.App.getState('lastAddedVenueId');
             if (!venueId) {
                 console.error('No venue ID found');
                 return;
             }
             
-            // Set as current venue for the status flow
             window.App.setState('currentVenue', {
                 venue_id: venueId,
-                name: window.App.getState('lastAddedVenueName')
+                venue_name: window.App.getState('lastAddedVenueName')
             });
             
-            // Open the GF status modal
-            const formModule = modules.form || window.App?.getModule('form');
-            if (formModule && formModule.GFStatusFlow) {
-                formModule.GFStatusFlow.openStatusModal();
-            }
+            // Use venue module's openStatusModal instead
+            modules.venue?.openStatusModal();
         },
         
         'report-gf-beer-new-venue': (el, modules) => {
