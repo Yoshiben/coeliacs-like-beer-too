@@ -2,7 +2,6 @@
 .breweries-hero {
     text-align: center;
     background: var(--orange-gradient);
-    padding: clamp(1.5rem, 4vw, 2rem) clamp(1rem, 3vw, 1.5rem);
     color: white;
 }
 
@@ -91,7 +90,7 @@
     background: var(--green-gradient);
     border-radius: var(--radius-pill);
     margin: var(--space-sm);
-    width: 17vh;
+    width: 135vw;
 }
 
 .brewery-filters .toggle-switch {
@@ -101,35 +100,6 @@
 .brewery-filters .toggle-label {
     color: white;
 }
-
-/* .toggle-slider {
-    width: 50px;
-    height: 26px;
-    background: #ccc;
-    border-radius: 26px;
-    position: relative;
-    transition: 0.3s;
-}
-
-.toggle-slider::after {
-    content: '';
-    position: absolute;
-    width: 22px;
-    height: 22px;
-    background: white;
-    border-radius: 50%;
-    top: 2px;
-    left: 2px;
-    transition: 0.3s;
-} */
-
-/* .toggle-switch input:checked + .toggle-slider {
-    background: var(--orange);
-}
-
-.toggle-switch input:checked + .toggle-slider::after {
-    transform: translateX(24px);
-} */
 
 .community-message {
     background: var(--light-bg);
@@ -146,7 +116,7 @@
     position: absolute;
     top: 1rem;
     right: 1rem;
-    background: var(--green);
+    background: var(--green-gradient);
     color: white;
     padding: 0.25rem 0.75rem;
     border-radius: 20px;
@@ -230,7 +200,7 @@
     background: var(--bg-purple);
 }
 
-.brewery-icon {
+.brewery-card .brewery-icon {
     font-size: clamp(2rem, 5vw, 2.5rem);
     margin-bottom: var(--space-xs);
     opacity: 0.8;
@@ -322,3 +292,16 @@
     background: var(--bg-section);
     border-radius: var(--radius-sm);
     color: var(--text-secondary);
+}
+
+.all-breweries-section {
+    padding: 0 var(--space-md);
+}
+
+.all-breweries-section .h2 {
+    display: flex;
+    margin-top: 0;
+    align-items: center;
+    justify-content: center;
+}
+
