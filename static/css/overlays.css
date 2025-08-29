@@ -322,21 +322,6 @@
 }
 
 /* ================================
-   COMMUNITY HUB OVERLAY
-   ================================ */
-
-#communityHubOverlay {
-    /* Inherits from .overlay */
-}
-
-#communityHubContent {
-    flex: 1;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    background: var(--white);
-}
-
-/* ================================
    INFO OVERLAYS (About & GF Info)
    ================================ */
 
