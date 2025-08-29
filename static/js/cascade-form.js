@@ -867,7 +867,8 @@ export const CascadeForm = (() => {
         selectBrewery,
         selectBreweryBeer,
         handleSubmit,
-        selectFoundBeer
+        selectFoundBeer,
+        createNewBrewery
     };
 })();
 
