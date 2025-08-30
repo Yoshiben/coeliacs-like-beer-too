@@ -201,6 +201,7 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
+/* FIXED CHECKBOX STYLES */
 .passcode-confirm {
     background: #374151;
     border-radius: 12px;
@@ -208,7 +209,6 @@
     margin-bottom: 1.5rem;
 }
 
-/* JUST A FUCKING NORMAL CHECKBOX */
 .passcode-confirm .checkbox-label {
     display: flex;
     align-items: center;
@@ -217,26 +217,64 @@
     font-size: 1rem;
     color: white;
     font-weight: 500;
+    user-select: none;
 }
 
+/* Remove all the conflicting styles and use a simple, reliable approach */
 .passcode-confirm input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
-    cursor: pointer;
+    /* Reset any inherited styles */
+    all: unset;
+    
+    /* Now add back what we need */
+    display: inline-block !important;
+    width: 20px !important;
+    height: 20px !important;
     flex-shrink: 0;
-    accent-color: #10b981;
+    
+    /* Visual appearance */
+    background: white;
+    border: 2px solid #10b981;
+    border-radius: 4px;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s ease;
+}
+
+/* Checked state - use a pseudo element for the checkmark */
+.passcode-confirm input[type="checkbox"]:checked {
+    background: #10b981;
+    border-color: #10b981;
+}
+
+.passcode-confirm input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* Hover state */
+.passcode-confirm input[type="checkbox"]:hover {
+    border-color: #059669;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* Focus state for accessibility */
+.passcode-confirm input[type="checkbox"]:focus {
+    outline: 2px solid #10b981;
+    outline-offset: 2px;
 }
 
 .passcode-confirm .checkbox-label span {
     color: white;
+    line-height: 1.4;
 }
 
-
-
-
-
-
-
+/* Continue button states */
 #continueFromPasscode {
     width: 100%;
     padding: clamp(1rem, 3vw, 1.25rem);
@@ -276,42 +314,19 @@
 }
 
 #continueFromPasscode:disabled {
-    background: #d1d5db;
+    background: #6b7280;
     cursor: not-allowed;
-    opacity: 0.6;
+    opacity: 0.7;
+    transform: none;
 }
 
-
-.passcode-confirm input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
-    cursor: pointer;
-    flex-shrink: 0;
-    -webkit-appearance: checkbox;
-    appearance: checkbox;
+/* Optional: Add a nice animation when the checkbox is clicked */
+@keyframes checkPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(0.95); }
+    100% { transform: scale(1); }
 }
 
-/* Force the checked state to be visible */
-.passcode-confirm input[type="checkbox"]:checked {
-    accent-color: #10b981;
-    background-color: #10b981;
-}
-
-.passcode-confirm input[type="checkbox"] {
-    all: revert;
-    width: 20px !important;
-    height: 20px !important;
-    cursor: pointer !important;
-}
-
-#passcodeConfirmCheck {
-    -webkit-appearance: checkbox !important;
-    appearance: checkbox !important;
-    width: 20px !important;
-    height: 20px !important;
-    opacity: 1 !important;
-    position: static !important;
-    display: inline-block !important;
-    visibility: visible !important;
-    margin: 0 !important;
+.passcode-confirm input[type="checkbox"]:active {
+    animation: checkPulse 0.2s ease;
 }
