@@ -956,6 +956,24 @@ const App = {
             if (continueBtn) {
                 continueBtn.disabled = !el.checked;
             }
+            
+            // Also handle the visual state of the custom checkbox
+            const customCheckbox = el.nextElementSibling;
+            if (customCheckbox && customCheckbox.classList.contains('checkbox-custom')) {
+                if (el.checked) {
+                    customCheckbox.style.background = '#10b981';
+                    customCheckbox.style.borderColor = '#10b981';
+                    customCheckbox.innerHTML = '✓';
+                    customCheckbox.style.color = 'white';
+                    customCheckbox.style.display = 'flex';
+                    customCheckbox.style.alignItems = 'center';
+                    customCheckbox.style.justifyContent = 'center';
+                } else {
+                    customCheckbox.style.background = 'transparent';
+                    customCheckbox.style.borderColor = 'white';
+                    customCheckbox.innerHTML = '';
+                }
+            }
         },
         
         'continue-from-passcode': (el, modules) => {
