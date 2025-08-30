@@ -48,8 +48,8 @@ export const ModalManager = (() => {
         aboutOverlay: { type: 'overlay', group: 'info', exclusive: true, zIndex: 1500 },
         gfInfoOverlay: { type: 'overlay', group: 'info', exclusive: true, zIndex: 1500 },
         getInTouchOverlay: { type: 'overlay', group: 'info', exclusive: true, zIndex: 1500 },
-        privacyOverlay: { type: 'overlay', group: 'info', exclusive: true, zIndex: 1500 },
-        termsOverlay: { type: 'overlay', group: 'info', exclusive: true, zIndex: 1500 },
+        privacyOverlay: { type: 'overlay', group: 'info', exclusive: true, zIndex: 3000 },
+        termsOverlay: { type: 'overlay', group: 'info', exclusive: true, zIndex: 3000 },
         
         // Search modals (mutually exclusive within group)
         nameModal: { type: 'modal', group: 'search-input', exclusive: true },
