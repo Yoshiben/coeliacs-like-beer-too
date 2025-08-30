@@ -84,7 +84,6 @@
    line-height: 1.4;
 }
 
-
 /* ================================
    SPECIALIZED INPUT TYPES
    ================================ */
@@ -239,108 +238,6 @@
 }
 
 /* ================================
-   CHECKBOXES & RADIOS
-   ================================ */
-
-.checkbox-group,
-.radio-group {
-   display: flex;
-   flex-direction: column;
-   gap: var(--space-md);
-}
-
-.checkbox-item,
-.radio-item {
-   display: flex;
-   align-items: center;
-   gap: var(--space-md);
-   padding: var(--space-lg);
-   border: 2px solid var(--border-light);
-   border-radius: var(--radius-lg);
-   cursor: pointer;
-   transition: all var(--transition);
-   background: var(--bg-white);
-}
-
-.checkbox-item:hover,
-.radio-item:hover {
-   border-color: var(--border-purple);
-   background: var(--bg-purple);
-}
-
-.checkbox-item.checked,
-.radio-item.checked {
-   border-color: var(--purple);
-   background: var(--bg-purple);
-}
-
-.checkbox-input,
-.radio-input {
-   position: absolute;
-   opacity: 0;
-   width: 0;
-   height: 0;
-}
-
-.checkbox-custom,
-.radio-custom {
-   width: 20px;
-   height: 20px;
-   border: 2px solid var(--border-light);
-   background: var(--bg-white);
-   transition: all var(--transition);
-   flex-shrink: 0;
-}
-
-.checkbox-custom {
-   border-radius: var(--radius-sm);
-}
-
-.radio-custom {
-   border-radius: 50%;
-}
-
-.checkbox-input:checked + .checkbox-custom {
-   background: var(--purple);
-   border-color: var(--purple);
-}
-
-.radio-input:checked + .radio-custom {
-   background: var(--purple);
-   border-color: var(--purple);
-}
-
-.checkbox-input:checked + .checkbox-custom::after {
-   content: '✓';
-   color: white;
-   font-size: 12px;
-   font-weight: bold;
-   display: flex;
-   align-items: center;
-   justify-content: center;
-   width: 100%;
-   height: 100%;
-}
-
-.radio-input:checked + .radio-custom::after {
-   content: '';
-   width: 8px;
-   height: 8px;
-   background: white;
-   border-radius: 50%;
-   display: block;
-   margin: 4px auto;
-}
-
-.checkbox-label,
-.radio-label {
-   font-weight: 500;
-   color: var(--text-primary);
-   cursor: pointer;
-   line-height: 1.4;
-}
-
-/* ================================
    TOGGLE SWITCHES
    ================================ */
 
@@ -366,19 +263,6 @@
    position: relative;
    transition: all var(--transition);
 }
-
-/* .toggle-slider::after {
-   content: '';
-   position: absolute;
-   top: 2px;
-   left: 2px;
-   width: 22px;
-   height: 22px;
-   background: white;
-   border-radius: 50%;
-   transition: all var(--transition);
-   box-shadow: var(--shadow-sm);
-} */
 
 .toggle-input:checked + .toggle-slider {
    background: var(--purple);
@@ -458,12 +342,6 @@
        margin: var(--space-md);
        padding: var(--space-lg);
    }
-   
-   .checkbox-item,
-   .radio-item {
-       padding: var(--space-md);
-       gap: var(--space-sm);
-   }
 }
 
 /* ================================
@@ -473,9 +351,7 @@
 /* Focus management */
 .form-input:focus,
 .form-select:focus,
-.btn:focus,
-.checkbox-item:focus-within,
-.radio-item:focus-within {
+.btn:focus {
    outline: 2px solid var(--purple);
    outline-offset: 2px;
 }
@@ -487,11 +363,6 @@
    .btn {
        border-width: 2px;
    }
-   
-   .checkbox-custom,
-   .radio-custom {
-       border-width: 2px;
-   }
 }
 
 /* Reduced motion support */
@@ -499,8 +370,6 @@
    .btn,
    .form-input,
    .form-select,
-   .checkbox-item,
-   .radio-item,
    .toggle-slider,
    .toggle-slider::after {
        transition: none;
@@ -822,37 +691,4 @@
 /* In your CSS file */
 #step-beer-details {
     position: relative; /* Make sure the parent is positioned */
-}
-
-/* PASSCODE CHECKBOX OVERRIDE - Add this AFTER forms.css in your HTML */
-
-/* Force the passcode modal to use a REAL checkbox, not the custom one */
-#passcodeModal .checkbox-label input[type="checkbox"],
-.passcode-confirm .checkbox-label input[type="checkbox"] {
-    /* FORCE VISIBILITY */
-    display: inline-block !important;
-    opacity: 1 !important;
-    position: static !important;
-    width: 20px !important;
-    height: 20px !important;
-    cursor: pointer !important;
-    flex-shrink: 0 !important;
-    accent-color: #10b981 !important;
-    margin: 0 !important;
-}
-
-/* HIDE the custom checkbox span completely in passcode modal */
-#passcodeModal .checkbox-custom,
-.passcode-confirm .checkbox-custom {
-    display: none !important;
-}
-
-/* Make sure the label looks right */
-#passcodeModal .checkbox-label,
-.passcode-confirm .checkbox-label {
-    display: flex !important;
-    align-items: center !important;
-    gap: 0.75rem !important;
-    cursor: pointer !important;
-    color: white !important;
 }
