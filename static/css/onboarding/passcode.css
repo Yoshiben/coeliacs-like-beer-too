@@ -5,8 +5,7 @@
 .passcode-container {
    max-width: min(95vw, 440px);
    max-height: min(90vh, 650px);
-   overflow: auto;
-  background: #1f2937;
+   background: #1f2937;
 }
 
 .passcode-header {
@@ -209,7 +208,7 @@
     margin-bottom: 1.5rem;
 }
 
-/* PASSCODE MODAL CHECKBOX - CLEAN SLATE */
+/* JUST A FUCKING NORMAL CHECKBOX */
 .passcode-confirm .checkbox-label {
     display: flex;
     align-items: center;
@@ -220,37 +219,63 @@
     font-weight: 500;
 }
 
-/* Hide the real checkbox */
 .passcode-confirm input[type="checkbox"] {
-    position: absolute;
-    opacity: 0;
-    width: 1px;
-    height: 1px;
-}
-
-/* Style the custom checkbox */
-.passcode-confirm .checkbox-custom {
-    display: inline-flex;
     width: 20px;
     height: 20px;
-    border: 2px solid white;
-    border-radius: 4px;
-    background: transparent;
+    cursor: pointer;
+    flex-shrink: 0;
+    accent-color: #10b981;
+}
+
+.passcode-confirm .checkbox-label span {
+    color: white;
+}
+
+
+
+
+
+
+
+.benefits-modal .benefits-body .btn-large {
+    width: 100%;
+    padding: clamp(1rem, 3vw, 1.25rem);
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: clamp(1rem, 3vw, 1.1rem);
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
-    flex-shrink: 0;
+    gap: 0.5rem;
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
 }
 
-/* When checked */
-.passcode-confirm input[type="checkbox"]:checked + .checkbox-custom {
-    background: #10b981;
-    border-color: #10b981;
+.benefits-modal .benefits-body .btn-large:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
 }
 
-.passcode-confirm input[type="checkbox"]:checked + .checkbox-custom::after {
-    content: '✓';
-    color: white;
-    font-size: 14px;
-    font-weight: bold;
+.benefits-modal .benefits-body .btn-large::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.benefits-modal .benefits-body .btn-large:hover::before {
+    width: 300px;
+    height: 300px;
 }
