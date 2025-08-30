@@ -1,46 +1,52 @@
 <div id="breweriesOverlay" class="overlay breweries-overlay">
-    <!-- Hero Section -->
-    <div class="breweries-hero">
-        <h1 id="breweriesTitle">🍺 GF Breweries</h1>
-        <p id="breweriesSubtitle">Discover all gluten-free breweries in our database</p>
-    </div>
-    
-    <!-- Filter Toggle -->
-    <div class="brewery-filters">
-        <div class="filter-toggle">
-            <label class="toggle-switch">
-                <input type="checkbox" id="purchasableToggle">
-                <span class="toggle-slider"></span>
-                <span class="toggle-label">Online shop</span>
-            </label>
+    <div class="overlay-container breweries-container">
+        <!-- Fixed Hero Header -->
+        <div class="breweries-header">
+            <h1 id="breweriesTitle">🍺 GF Breweries</h1>
+            <p id="breweriesSubtitle">Discover all gluten-free breweries in our database</p>
         </div>
-    </div>
-    <div>
-        <div class="community-message" id="affiliateMessage" style="display: none;">
-            <span class="message-icon">💙</span>
-            <span>These affiliate links help keep this site free for everyone!</span>
-        </div>
-    </div>
-    
-    <!-- Featured Partners -->
-    <div class="featured-section" id="featuredSection" style="display: none;">
-        <h2>🤝 Our Partner Breweries</h2>
-        <div class="featured-grid" id="featuredGrid">
-            <!-- Featured cards populated by JS -->
-        </div>
-        <div class="more-coming">
-            <h3>🚀 More Coming Soon!</h3>
-            <p>We're actively partnering with more GF breweries. Check back regularly!</p>
-        </div>
-    </div>
-    
-    <!-- All Breweries Section -->
-    <div class="all-breweries-section" id="allBreweriesSection">
-        <h2>📚 All Breweries in Database</h2>
-        <input type="text" id="brewerySearchInput" class="brewery-search-input" 
-               placeholder="Search breweries...">
-        <div id="breweriesGrid" class="breweries-grid">
-            <!-- Brewery cards populated by JS -->
+        
+        <!-- Scrollable Body -->
+        <div class="breweries-body">
+            <!-- Filter Toggle -->
+            <div class="brewery-filters">
+                <div class="filter-toggle">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="purchasableToggle">
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-label">Online shop</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div>
+                <div class="community-message" id="affiliateMessage" style="display: none;">
+                    <span class="message-icon">💙</span>
+                    <span>These affiliate links help keep this site free for everyone!</span>
+                </div>
+            </div>
+            
+            <!-- Featured Partners -->
+            <div class="featured-section" id="featuredSection" style="display: none;">
+                <h2>🤝 Our Partner Breweries</h2>
+                <div class="featured-grid" id="featuredGrid">
+                    <!-- Featured cards populated by JS -->
+                </div>
+                <div class="more-coming">
+                    <h3>🚀 More Coming Soon!</h3>
+                    <p>We're actively partnering with more GF breweries. Check back regularly!</p>
+                </div>
+            </div>
+            
+            <!-- All Breweries Section -->
+            <div class="all-breweries-section" id="allBreweriesSection">
+                <h2>📚 All Breweries in Database</h2>
+                <input type="text" id="brewerySearchInput" class="brewery-search-input" 
+                       placeholder="Search breweries...">
+                <div id="breweriesGrid" class="breweries-grid">
+                    <!-- Brewery cards populated by JS -->
+                </div>
+            </div>
         </div>
     </div>
 </div>
