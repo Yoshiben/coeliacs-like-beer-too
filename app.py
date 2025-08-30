@@ -1246,6 +1246,42 @@ def update_gf_status():
         if 'conn' in locals() and conn.is_connected():
             cursor.close()
             conn.close()
+
+@app.route('/api/venue/<int:venue_id>/status-confirmations')
+def get_status_confirmations(venue_id):
+    conn = mysql.connector.connect(**db_config)
+    cursor = conn.cursor(dictionary=True)
+    
+    # Get most recent confirmation and count of unique users in last 7 days
+    cursor.execute("""
+        SELECT 
+            COUNT(DISTINCT user_id) as confirmer_count,
+            MAX(confirmed_at) as last_confirmed,
+            TIMESTAMPDIFF(HOUR, MAX(confirmed_at), NOW()) as hours_ago
+        FROM status_confirmations 
+        WHERE venue_id = %s 
+        AND confirmed_at > DATE_SUB(NOW(), INTERVAL 7 DAY)
+    """, (venue_id,))
+    
+    result = cursor.fetchone()
+    
+    # Format the response
+    if result and result['confirmer_count'] > 0:
+        if result['hours_ago'] < 24:
+            time_text = f"{result['hours_ago']} hours ago"
+        else:
+            days = result['hours_ago'] // 24
+            time_text = f"{days} day{'s' if days > 1 else ''} ago"
+            
+        return jsonify({
+            'text': f"Last confirmed: {time_text} by {result['confirmer_count']} user{'s' if result['confirmer_count'] > 1 else ''}",
+            'has_confirmations': True
+        })
+    else:
+        return jsonify({
+            'text': "Not yet confirmed",
+            'has_confirmations': False
+        })
                     
 @app.route('/autocomplete')
 def autocomplete():
@@ -2124,6 +2160,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
