@@ -205,8 +205,8 @@
 }
 
 .nickname-header {
-    background: var(--primary-gradient);
-    padding: var(--space-md);
+    background: var(--primary-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+    padding: clamp(1.5rem, 4vh, 2rem);
     text-align: center;
     color: white;
 }
@@ -587,7 +587,7 @@
 
 .passcode-header {
     background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    padding: var(--space-md);
+    padding: clamp(2rem, 5vh, 3rem);
     text-align: center;
     color: white;
     position: relative;
@@ -782,7 +782,7 @@
 }
 
 /* PASSCODE MODAL SPECIFIC CHECKBOX STYLES */
-.passcode-modal .checkbox-label,
+#passcodeModal .checkbox-label,
 .passcode-confirm .checkbox-label {
     display: flex;
     align-items: center;
@@ -794,20 +794,25 @@
 }
 
 /* Just use the native checkbox for passcode modal */
-.passcode-modal input[type="checkbox"],
-.passcode-confirm input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
-    cursor: pointer;
-    flex-shrink: 0;
-    accent-color: #10b981;
-    margin: 0;
+#passcodeModal input[type="checkbox"],
+.passcode-confirm input[type="checkbox"],
+#passcodeConfirmCheck {
+    display: inline-block !important;
+    opacity: 1 !important;
+    position: static !important;
+    width: 20px !important;
+    height: 20px !important;
+    cursor: pointer !important;
+    flex-shrink: 0 !important;
+    accent-color: #10b981 !important;
+    margin: 0 !important;
+    visibility: visible !important;
 }
 
 /* Hide the custom checkbox span in passcode modal */
-.passcode-modal .checkbox-custom,
+#passcodeModal .checkbox-custom,
 .passcode-confirm .checkbox-custom {
-    display: none;
+    display: none !important;
 }
 
 #continueFromPasscode {
@@ -858,36 +863,36 @@
    BENEFITS/COMMUNITY WELCOME MODAL
    ============================ */
 
-.benefits-modal .benefits-container {
-   background: var(--bg-home-page);
-   max-width: min(95vw, 460px);
-   max-height: min(90vh, 700px);
+.benefits-container {
+    max-width: min(95vw, 460px);
+    max-height: min(90vh, 700px);
 }
 
-.benefits-modal .benefits-header {
-   background: var(--primary-gradient);
-   padding: var(--space-md);
-   text-align: center;
-   color: white;
-   position: relative;
+.benefits-header {
+    background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+    padding: clamp(2rem, 5vh, 2.5rem);
+    text-align: center;
+    color: white;
+    position: relative;
+    overflow: hidden;
 }
 
 /* Animated sparkles effect */
-.benefits-modal .benefits-header::before,
-.benefits-modal .benefits-header::after {
+.benefits-header::before,
+.benefits-header::after {
     content: '✨';
     position: absolute;
     font-size: 1.5rem;
     animation: sparkle 3s ease-in-out infinite;
 }
 
-.benefits-modal .benefits-header::before {
+.benefits-header::before {
     top: 20%;
     left: 10%;
     animation-delay: 0s;
 }
 
-.benefits-modal .benefits-header::after {
+.benefits-header::after {
     top: 30%;
     right: 10%;
     animation-delay: 1.5s;
@@ -925,28 +930,28 @@
     100% { transform: scale(1) rotate(0deg); }
 }
 
-.benefits-modal .benefits-header h2 {
+.benefits-header h2 {
     font-size: clamp(1.4rem, 4vw, 1.7rem);
     margin: 0 0 0.5rem;
     color: white;
 }
 
-.benefits-modal .benefits-header h2 span {
+.benefits-header h2 span {
     color: #fbbf24;
     font-weight: 700;
 }
 
-.benefits-modal .benefits-header p {
+.benefits-header p {
     font-size: clamp(0.9rem, 2.5vw, 1rem);
     opacity: 0.95;
     margin: 0;
 }
 
-.benefits-modal .benefits-body {
+.benefits-body {
     padding: clamp(1.5rem, 4vw, 2rem);
 }
 
-.benefits-modal .welcome-bonus {
+.welcome-bonus {
     background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
     border: 2px solid #fbbf24;
     border-radius: 16px;
@@ -982,7 +987,7 @@
     animation: rotate 10s linear infinite;
 }
 
-.benefits-modal .bonus-icon {
+.bonus-icon {
     font-size: clamp(2rem, 6vw, 2.5rem);
     animation: giftWiggle 2s ease-in-out infinite;
 }
@@ -992,30 +997,30 @@
     50% { transform: rotate(5deg); }
 }
 
-.benefits-modal .bonus-text {
+.bonus-text {
     flex: 1;
 }
 
-.benefits-modal .bonus-text strong {
+.bonus-text strong {
     display: block;
     font-size: clamp(1rem, 3vw, 1.1rem);
     color: #92400e;
     margin-bottom: 0.25rem;
 }
 
-.benefits-modal .bonus-text span {
+.bonus-text span {
     font-size: clamp(0.85rem, 2.5vw, 0.95rem);
     color: #78350f;
 }
 
-.benefits-modal .benefits-grid {
+.benefits-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: clamp(0.75rem, 2vw, 1rem);
     margin-bottom: 1.5rem;
 }
 
-.benefits-modal .benefit {
+.benefit {
     background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
     border: 1px solid #e5e7eb;
     border-radius: 12px;
@@ -1025,10 +1030,10 @@
     animation: fadeInUp 0.5s ease backwards;
 }
 
-.benefits-modal .benefit:nth-child(1) { animation-delay: 0.1s; }
-.benefits-modal .benefit:nth-child(2) { animation-delay: 0.2s; }
-.benefits-modal .benefit:nth-child(3) { animation-delay: 0.3s; }
-.benefits-modal .benefit:nth-child(4) { animation-delay: 0.4s; }
+.benefit:nth-child(1) { animation-delay: 0.1s; }
+.benefit:nth-child(2) { animation-delay: 0.2s; }
+.benefit:nth-child(3) { animation-delay: 0.3s; }
+.benefit:nth-child(4) { animation-delay: 0.4s; }
 
 @keyframes fadeInUp {
     from {
@@ -1041,32 +1046,32 @@
     }
 }
 
-.benefits-modal .benefit:hover {
+.benefit:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
     background: white;
 }
 
-.benefits-modal .benefit-icon {
+.benefit-icon {
     display: block;
     font-size: clamp(2rem, 5vw, 2.5rem);
     margin-bottom: 0.5rem;
 }
 
-.benefits-modal .benefit strong {
+.benefit strong {
     display: block;
     font-size: clamp(0.9rem, 2.5vw, 1rem);
     color: #111827;
     margin-bottom: 0.25rem;
 }
 
-.benefits-modal .benefit small {
+.benefit small {
     display: block;
     font-size: clamp(0.75rem, 2vw, 0.85rem);
     color: #6b7280;
 }
 
-.benefits-modal .first-badge {
+.first-badge {
     background: linear-gradient(135deg, #ddd6fe 0%, #c4b5fd 100%);
     border-radius: 16px;
     padding: clamp(1.25rem, 3vw, 1.5rem);
