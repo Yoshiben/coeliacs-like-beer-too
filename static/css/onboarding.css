@@ -106,10 +106,11 @@
 }
 
 .welcome-body {
-    padding: clamp(1rem, 3vw, 1.5rem);
-    display: flex;
-    flex-direction: column;
-    gap: clamp(1rem, 3vh, 1.5rem);
+   padding: clamp(1rem, 3vw, 1.5rem);
+   display: flex;
+   flex-direction: column;
+   gap: clamp(1rem, 3vh, 1.5rem);
+   overflow: auto;
 }
 
 .founder-section {
@@ -231,6 +232,7 @@
 
 .nickname-body {
     padding: clamp(1rem, 3vw, 1.5rem);
+   overflow: auto;
 }
 
 .nickname-input {
@@ -866,15 +868,15 @@
 .benefits-modal .benefits-container {
     max-width: min(95vw, 460px);
     max-height: min(90vh, 700px);
+   background: var(--bg-home-page);
 }
 
 .benefits-modal .benefits-header {
     background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
-    padding: clamp(2rem, 5vh, 2.5rem);
+    padding: var(--space-md);
     text-align: center;
     color: white;
     position: relative;
-    overflow: hidden;
 }
 
 /* Animated sparkles effect */
@@ -1972,4 +1974,58 @@
     .benefit small {
         color: #d1d5db;
     }
+}
+
+/* PASSCODE MODAL SPECIFIC CHECKBOX STYLES */
+#passcodeModal .checkbox-label,
+.passcode-confirm .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    color: white;
+    font-weight: 500;
+}
+
+/* Hide the native checkbox */
+#passcodeModal input[type="checkbox"],
+.passcode-confirm input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* Style the custom checkbox */
+#passcodeModal .checkbox-custom,
+.passcode-confirm .checkbox-custom {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid white;
+    border-radius: 4px;
+    background: transparent;
+    position: relative;
+    transition: all 0.2s;
+}
+
+/* When checked, show the checkmark */
+#passcodeModal input[type="checkbox"]:checked + .checkbox-custom,
+.passcode-confirm input[type="checkbox"]:checked + .checkbox-custom {
+    background: #10b981;
+    border-color: #10b981;
+}
+
+/* The checkmark itself */
+#passcodeModal input[type="checkbox"]:checked + .checkbox-custom::after,
+.passcode-confirm input[type="checkbox"]:checked + .checkbox-custom::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
 }
