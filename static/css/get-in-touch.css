@@ -1,13 +1,14 @@
-.get-in-touch-overlay {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+.get-in-touch-container {
+    overflow: auto;
 }
 
 .founder-hero {
-    background: white;
     border-radius: 16px;
     padding: 1.5rem;
     margin: 1rem;
     box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    background: var(--primary-gradient);
+    color: white;
 }
 
 .founder-avatar {
