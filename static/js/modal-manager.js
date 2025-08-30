@@ -27,6 +27,8 @@ export const ModalManager = (() => {
 
         // Onboarding modals group (complete set)
         ageGateModal: { type: 'modal', group: 'onboarding', exclusive: true, priority: true },
+        privacyOverlay: { type: 'overlay', group: 'onboarding', exclusive: false, priority: true, zIndex: 10000 },
+        termsOverlay: { type: 'overlay', group: 'onboarding', exclusive: false, priority: true, zIndex: 10000 },
         welcomeModal: { type: 'modal', group: 'onboarding', exclusive: true },
         nicknameModal: { type: 'modal', group: 'onboarding', exclusive: true },
         signInModal: { type: 'modal', group: 'onboarding', exclusive: true },
@@ -34,8 +36,7 @@ export const ModalManager = (() => {
         benefitsModal: { type: 'modal', group: 'onboarding', exclusive: true },
         cookieModal: { type: 'modal', group: 'onboarding', exclusive: true }, 
 
-        privacyOverlay: { type: 'overlay', group: 'legal', exclusive: false, priority: true, zIndex: 10000 },
-        termsOverlay: { type: 'overlay', group: 'lega', exclusive: false, priority: true, zIndex: 10000 },
+        
 
         
         // Search overlays (mutually exclusive)
