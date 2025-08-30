@@ -81,50 +81,50 @@
     gap: 0.25rem;
 }
 
-.stat-emoji {
+#getInTouchOverlay .stat-emoji {
     font-size: 1.5rem;
 }
 
-.stat-number {
+#getInTouchOverlay .stat-number {
     font-size: 1.25rem;
     font-weight: 700;
     color: #1f2937;
 }
 
-.stat-label {
+#getInTouchOverlay .stat-label {
     font-size: 0.75rem;
     color: #6b7280;
 }
 
-.feature-cards {
+#getInTouchOverlay .feature-cards {
     display: flex;
     flex-direction: column;
     gap: 1rem;
 }
 
-.feature-card {
+#getInTouchOverlay .feature-card {
     background: rgba(255,255,255,0.95);
     border-radius: 12px;
     padding: 1.25rem;
 }
 
-.feature-icon {
+#getInTouchOverlay .feature-icon {
     font-size: 2rem;
     margin-bottom: 0.5rem;
 }
 
-.feature-card h4 {
+#getInTouchOverlay .feature-card h4 {
     margin: 0 0 0.5rem;
     color: #1f2937;
 }
 
-.feature-card p {
+#getInTouchOverlay .feature-card p {
     margin: 0 0 0.5rem;
     color: #4b5563;
     font-size: 0.95rem;
 }
 
-.feature-note {
+#getInTouchOverlay .feature-note {
     background: #fef3c7;
     color: #92400e;
     padding: 0.5rem;
@@ -133,13 +133,13 @@
     font-weight: 500;
 }
 
-.contact-options {
+#getInTouchOverlay .contact-options {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
 }
 
-.contact-card {
+#getInTouchOverlay .contact-card {
     background: rgba(255,255,255,0.95);
     border-radius: 12px;
     padding: 1rem;
@@ -154,25 +154,25 @@
     text-align: left;
 }
 
-.contact-card:active {
+#getInTouchOverlay .contact-card:active {
     transform: scale(0.98);
 }
 
-.contact-icon {
+#getInTouchOverlay .contact-icon {
     font-size: 1.5rem;
 }
 
-.contact-info strong {
+#getInTouchOverlay .contact-info strong {
     display: block;
     color: #1f2937;
 }
 
-.contact-info small {
+#getInTouchOverlay .contact-info small {
     color: #6b7280;
     font-size: 0.85rem;
 }
 
-.support-section {
+#getInTouchOverlay .support-section {
     background: rgba(255,255,255,0.95);
     border-radius: 16px;
     padding: 1.5rem;
@@ -180,7 +180,7 @@
     text-align: center;
 }
 
-.support-options {
+#getInTouchOverlay .support-options {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 0.75rem;
