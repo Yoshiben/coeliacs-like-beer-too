@@ -499,8 +499,16 @@
             </div>
             
             <div class="passcode-confirm">
-                <label class="checkbox-label">
-                    <input type="checkbox" id="passcodeConfirmCheck" data-action="toggle-passcode-confirm">
+                <label class="checkbox-label" for="passcodeConfirmCheck">
+                    <input type="checkbox" 
+                           id="passcodeConfirmCheck" 
+                           onchange="
+                               const btn = document.getElementById('continueFromPasscode');
+                               if (btn) {
+                                   btn.disabled = !this.checked;
+                                   console.log('Checkbox changed:', this.checked, 'Button disabled:', btn.disabled);
+                               }
+                           ">
                     <span>I've saved my passcode somewhere safe</span>
                 </label>
             </div>
