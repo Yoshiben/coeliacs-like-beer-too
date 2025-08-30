@@ -788,22 +788,6 @@ const App = {
             }
         },
 
-        
-
-        'show-privacy-from-age-gate': (el, modules, event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            
-            modules.modalManager?.open('privacyOverlay');
-        },
-        
-        'show-terms-from-age-gate': (el, modules, event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            
-            modules.modalManager?.open('termsOverlay');
-        },
-
 
 
 
