@@ -147,9 +147,15 @@ def create_user():
 def signin_user():
     """Sign in with nickname and passcode"""
     data = request.get_json()
-    nickname = data.get('nickname', '').strip()
-    passcode = data.get('passcode', '').strip().upper()  # Normalize to uppercase
-    uuid = data.get('uuid', '').strip()  # Device UUID for linking
+    
+    # Add safety check for null/None data
+    if not data:
+        return jsonify({'error': 'No data provided'}), 400
+    
+    # Safely get and strip values, handling None cases
+    nickname = (data.get('nickname') or '').strip()
+    passcode = (data.get('passcode') or '').strip().upper()  # Normalize to uppercase
+    uuid = (data.get('uuid') or '').strip()  # Device UUID for linking
     
     if not nickname or not passcode:
         return jsonify({'error': 'Nickname and passcode required'}), 400
@@ -2118,6 +2124,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
