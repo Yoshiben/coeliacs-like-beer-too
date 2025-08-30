@@ -1,15 +1,5 @@
 /* Breweries Overlay Structure */
-.breweries-container {
-    max-width: min(95vw, 600px);
-    max-height: min(90vh, 700px);
-    background: white;
-    border-radius: 24px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-}
 
-/* Fixed Header (was hero) */
 .breweries-header {
     text-align: center;
     background: var(--orange-gradient);
