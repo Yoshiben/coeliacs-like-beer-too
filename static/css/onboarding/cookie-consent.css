@@ -53,7 +53,8 @@
 }
 
 .cookie-body {
-    padding: clamp(1.25rem, 3vw, 1.5rem);
+   padding: clamp(1.25rem, 3vw, 1.5rem);
+   overflow: auto;
 }
 
 .cookie-message {
