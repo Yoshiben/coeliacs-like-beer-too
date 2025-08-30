@@ -787,6 +787,52 @@ const App = {
                 OnboardingFlow.underAge();
             }
         },
+
+        
+
+        'show-privacy-from-age-gate': (el, modules, event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            modules.modalManager?.open('privacyOverlay');
+        },
+        
+        'show-terms-from-age-gate': (el, modules, event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            modules.modalManager?.open('termsOverlay');
+        },
+
+
+
+
+
+        // In your action handlers:
+        'show-privacy-overlay': (el, modules) => {
+            document.getElementById('moreMenuOverlay').style.display = 'none';
+            setTimeout(() => {
+                modules.modalManager?.open('privacyOverlay');
+                modules.nav?.setPageContext('privacy'); // Add this
+            }, 100);
+        },
+        
+        'show-terms-overlay': (el, modules) => {
+            document.getElementById('moreMenuOverlay').style.display = 'none';
+            setTimeout(() => {
+                modules.modalManager?.open('termsOverlay');
+                modules.nav?.setPageContext('terms'); // Add this
+            }, 100);
+        },
+
+
+
+
+
+
+        
+
+        
         // PWA actions
         'show-install-guide': (el, modules) => {
             if (window.OnboardingFlow) {
