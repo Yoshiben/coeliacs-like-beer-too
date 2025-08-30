@@ -823,3 +823,36 @@
 #step-beer-details {
     position: relative; /* Make sure the parent is positioned */
 }
+
+/* PASSCODE CHECKBOX OVERRIDE - Add this AFTER forms.css in your HTML */
+
+/* Force the passcode modal to use a REAL checkbox, not the custom one */
+#passcodeModal .checkbox-label input[type="checkbox"],
+.passcode-confirm .checkbox-label input[type="checkbox"] {
+    /* FORCE VISIBILITY */
+    display: inline-block !important;
+    opacity: 1 !important;
+    position: static !important;
+    width: 20px !important;
+    height: 20px !important;
+    cursor: pointer !important;
+    flex-shrink: 0 !important;
+    accent-color: #10b981 !important;
+    margin: 0 !important;
+}
+
+/* HIDE the custom checkbox span completely in passcode modal */
+#passcodeModal .checkbox-custom,
+.passcode-confirm .checkbox-custom {
+    display: none !important;
+}
+
+/* Make sure the label looks right */
+#passcodeModal .checkbox-label,
+.passcode-confirm .checkbox-label {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.75rem !important;
+    cursor: pointer !important;
+    color: white !important;
+}
