@@ -2139,9 +2139,72 @@ const App = {
         },
 
         'toggle-more-menu': (el, modules) => {
-            const menu = document.getElementById('moreMenu');
-            if (menu) {
-                menu.classList.toggle('active');
+            const overlay = document.getElementById('moreMenuOverlay');
+            
+            if (!overlay) {
+                console.error('More menu overlay not found');
+                return;
+            }
+            
+            // Check if it's currently open
+            const isOpen = overlay.style.display === 'flex';
+            
+            if (!isOpen) {
+                // Open menu
+                overlay.style.display = 'flex';
+                
+                // Update user info if logged in
+                const nickname = localStorage.getItem('userNickname');
+                const avatar = localStorage.getItem('userAvatar') || '🍺';
+                
+                if (nickname) {
+                    // Show user section
+                    const userSection = document.getElementById('menuUserSection');
+                    if (userSection) userSection.style.display = 'block';
+                    
+                    // Update user details
+                    const nicknameEl = document.getElementById('menuUserNickname');
+                    const avatarEl = document.getElementById('menuUserAvatar');
+                    const pointsEl = document.getElementById('menuUserPoints');
+                    
+                    if (nicknameEl) nicknameEl.textContent = nickname;
+                    if (avatarEl) avatarEl.textContent = avatar;
+                    
+                    // Get points (you might store this differently)
+                    const points = localStorage.getItem('userPoints') || '0';
+                    if (pointsEl) pointsEl.textContent = `⭐ ${points} points`;
+                    
+                    // Show sign out option
+                    const signOutSection = document.getElementById('menuSignOutSection');
+                    if (signOutSection) signOutSection.style.display = 'block';
+                } else {
+                    // Hide user sections if not logged in
+                    const userSection = document.getElementById('menuUserSection');
+                    const signOutSection = document.getElementById('menuSignOutSection');
+                    if (userSection) userSection.style.display = 'none';
+                    if (signOutSection) signOutSection.style.display = 'none';
+                }
+                
+                // Track event
+                modules.tracking?.trackEvent('more_menu_opened', 'Navigation');
+            } else {
+                // Close menu with animation
+                overlay.classList.add('closing');
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                    overlay.classList.remove('closing');
+                }, 300);
+            }
+        },
+        
+        'close-more-menu': (el, modules) => {
+            const overlay = document.getElementById('moreMenuOverlay');
+            if (overlay) {
+                overlay.classList.add('closing');
+                setTimeout(() => {
+                    overlay.style.display = 'none';
+                    overlay.classList.remove('closing');
+                }, 300);
             }
         },
         'about-us': (el, modules) => {
