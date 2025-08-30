@@ -2761,3 +2761,25 @@
 .cookie-toggle {
     cursor: pointer; /* Make the whole label clickable */
 }
+
+
+.passcode-modal .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+}
+
+/* SIMPLE CHECKBOX - Just use the native one with basic styling */
+.passcode-modal .checkbox-label input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    margin: 0;
+    accent-color: #10b981; /* Makes it green when checked */
+}
+
+/* Hide the custom span since we're using the real checkbox */
+.passcode-modal .checkbox-label .checkbox-custom {
+    display: none;
+}
