@@ -808,30 +808,50 @@ const App = {
 
 
 
-        // In your action handlers:
+        // Action handlers in main.js:
         'show-privacy-overlay': (el, modules) => {
             document.getElementById('moreMenuOverlay').style.display = 'none';
             setTimeout(() => {
-                modules.modalManager?.open('privacyOverlay');
-                modules.nav?.setPageContext('privacy'); // Add this
+                modules.modalManager?.open('privacyModal');
             }, 100);
         },
         
         'show-terms-overlay': (el, modules) => {
             document.getElementById('moreMenuOverlay').style.display = 'none';
             setTimeout(() => {
-                modules.modalManager?.open('termsOverlay');
-                modules.nav?.setPageContext('terms'); // Add this
+                modules.modalManager?.open('termsModal');
             }, 100);
         },
-
-
-
-        'close-privacy': (el, modules) => {
-            modules.modalManager?.close('privacyOverlay');
+        
+        'show-liability-overlay': (el, modules) => {
+            document.getElementById('moreMenuOverlay').style.display = 'none';
+            setTimeout(() => {
+                modules.modalManager?.open('liabilityModal');
+            }, 100);
         },
-        'close-terms': (el, modules) => {
-            modules.modalManager?.close('termsOverlay');
+        
+        // From age gate:
+        'show-privacy-from-age-gate': (el, modules, event) => {
+            event.preventDefault();
+            modules.modalManager?.open('privacyModal');
+        },
+        
+        'show-terms-from-age-gate': (el, modules, event) => {
+            event.preventDefault();
+            modules.modalManager?.open('termsModal');
+        },
+        
+        // Close handlers:
+        'close-privacy-modal': (el, modules) => {
+            modules.modalManager?.close('privacyModal');
+        },
+        
+        'close-terms-modal': (el, modules) => {
+            modules.modalManager?.close('termsModal');
+        },
+        
+        'close-liability-modal': (el, modules) => {
+            modules.modalManager?.close('liabilityModal');
         },
 
 
