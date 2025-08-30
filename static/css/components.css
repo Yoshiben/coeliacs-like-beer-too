@@ -743,7 +743,7 @@
 }
 
 /* Benefits grid */
-.permission-benefits {
+.location-modal .permission-benefits {
     background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
     border-radius: 16px;
     padding: clamp(1rem, 3vw, 1.5rem);
@@ -754,7 +754,7 @@
     gap: clamp(0.75rem, 2vw, 1rem);
 }
 
-.benefit-item {
+.location-modal .benefit-item {
     display: flex;
     align-items: center;
     gap: clamp(0.75rem, 2vw, 1rem);
@@ -763,7 +763,7 @@
     line-height: 1.4;
 }
 
-.benefit-icon {
+.location-modal .benefit-icon {
     font-size: 1.5rem;
     width: clamp(32px, 8vw, 40px);
     height: clamp(32px, 8vw, 40px);
@@ -776,7 +776,7 @@
     flex-shrink: 0;
 }
 
-.permission-note {
+.location-modal .permission-note {
     text-align: center;
     font-size: clamp(0.75rem, 2vw, 0.85rem);
     color: var(--text-muted);
