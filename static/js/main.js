@@ -957,17 +957,23 @@ const App = {
                 continueBtn.disabled = !el.checked;
             }
             
-            // Also handle the visual state of the custom checkbox
+            // Force the custom checkbox to be visible and handle its state
             const customCheckbox = el.nextElementSibling;
             if (customCheckbox && customCheckbox.classList.contains('checkbox-custom')) {
+                // Make sure it's visible!
+                customCheckbox.style.display = 'inline-flex';
+                customCheckbox.style.width = '20px';
+                customCheckbox.style.height = '20px';
+                customCheckbox.style.border = '2px solid white';
+                customCheckbox.style.borderRadius = '4px';
+                customCheckbox.style.alignItems = 'center';
+                customCheckbox.style.justifyContent = 'center';
+                
                 if (el.checked) {
                     customCheckbox.style.background = '#10b981';
                     customCheckbox.style.borderColor = '#10b981';
                     customCheckbox.innerHTML = '✓';
                     customCheckbox.style.color = 'white';
-                    customCheckbox.style.display = 'flex';
-                    customCheckbox.style.alignItems = 'center';
-                    customCheckbox.style.justifyContent = 'center';
                 } else {
                     customCheckbox.style.background = 'transparent';
                     customCheckbox.style.borderColor = 'white';
