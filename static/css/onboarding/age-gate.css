@@ -1,0 +1,73 @@
+/* ============================
+   AGE GATE MODAL
+   ============================ */
+.age-gate-container {
+    max-width: min(90vw, 450px);
+    max-height: min(85vh, 600px);
+}
+
+.age-gate-header {
+    background: var(--primary-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+    padding: clamp(1.5rem, 4vh, 2.5rem);
+    text-align: center;
+    color: white;
+}
+
+.age-gate-emoji {
+    display: block;
+    font-size: clamp(2.5rem, 8vw, 4rem);
+    margin-bottom: 0.5rem;
+    animation: bounce 2s infinite;
+}
+
+.age-gate-title {
+    font-size: clamp(1.5rem, 5vw, 2rem);
+    margin: 0;
+    color: white;
+}
+
+.age-gate-body {
+    padding: clamp(1.5rem, 4vw, 2rem);
+    text-align: center;
+}
+
+.age-gate-message h2 {
+    font-size: clamp(1.2rem, 4vw, 1.5rem);
+    color: var(--text-primary, #333);
+    margin: 0 0 1rem;
+}
+
+.age-gate-message p {
+    font-size: clamp(0.9rem, 3vw, 1rem);
+    color: var(--text-secondary, #666);
+    margin: 0.5rem 0;
+}
+
+.age-question {
+    font-size: clamp(1.1rem, 3.5vw, 1.25rem);
+    font-weight: 600;
+    color: var(--text-primary, #333);
+    margin: 1.5rem 0;
+}
+
+.age-gate-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 1.5rem 0;
+}
+
+.age-gate-buttons .btn {
+    min-width: 140px;
+    padding: 0.8rem 1.5rem;
+    font-size: clamp(0.9rem, 3vw, 1rem);
+}
+
+.age-gate-legal {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e0e0e0;
+    font-size: clamp(0.7rem, 2.5vw, 0.8rem);
+    color: #999;
+}
