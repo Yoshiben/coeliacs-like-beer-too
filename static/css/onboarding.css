@@ -863,12 +863,12 @@
    BENEFITS/COMMUNITY WELCOME MODAL
    ============================ */
 
-.benefits-container {
+.benefits-modal .benefits-container {
     max-width: min(95vw, 460px);
     max-height: min(90vh, 700px);
 }
 
-.benefits-header {
+.benefits-modal .benefits-header {
     background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
     padding: clamp(2rem, 5vh, 2.5rem);
     text-align: center;
@@ -878,21 +878,21 @@
 }
 
 /* Animated sparkles effect */
-.benefits-header::before,
-.benefits-header::after {
+.benefits-modal .benefits-header::before,
+.benefits-modal .benefits-header::after {
     content: '✨';
     position: absolute;
     font-size: 1.5rem;
     animation: sparkle 3s ease-in-out infinite;
 }
 
-.benefits-header::before {
+.benefits-modal .benefits-header::before {
     top: 20%;
     left: 10%;
     animation-delay: 0s;
 }
 
-.benefits-header::after {
+.benefits-modal .benefits-header::after {
     top: 30%;
     right: 10%;
     animation-delay: 1.5s;
@@ -909,7 +909,7 @@
     }
 }
 
-.avatar-display {
+.benefits-modal .avatar-display {
     display: inline-block;
     width: clamp(60px, 15vw, 80px);
     height: clamp(60px, 15vw, 80px);
@@ -930,28 +930,28 @@
     100% { transform: scale(1) rotate(0deg); }
 }
 
-.benefits-header h2 {
+.benefits-modal .benefits-header h2 {
     font-size: clamp(1.4rem, 4vw, 1.7rem);
     margin: 0 0 0.5rem;
     color: white;
 }
 
-.benefits-header h2 span {
+.benefits-modal .benefits-header h2 span {
     color: #fbbf24;
     font-weight: 700;
 }
 
-.benefits-header p {
+.benefits-modal .benefits-header p {
     font-size: clamp(0.9rem, 2.5vw, 1rem);
     opacity: 0.95;
     margin: 0;
 }
 
-.benefits-body {
+.benefits-modal .benefits-body {
     padding: clamp(1.5rem, 4vw, 2rem);
 }
 
-.welcome-bonus {
+.benefits-modal .welcome-bonus {
     background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
     border: 2px solid #fbbf24;
     border-radius: 16px;
@@ -976,7 +976,7 @@
     }
 }
 
-.welcome-bonus::before {
+.benefits-modal .welcome-bonus::before {
     content: '';
     position: absolute;
     top: -50%;
@@ -987,7 +987,7 @@
     animation: rotate 10s linear infinite;
 }
 
-.bonus-icon {
+.benefits-modal .bonus-icon {
     font-size: clamp(2rem, 6vw, 2.5rem);
     animation: giftWiggle 2s ease-in-out infinite;
 }
@@ -997,30 +997,30 @@
     50% { transform: rotate(5deg); }
 }
 
-.bonus-text {
+.benefits-modal .bonus-text {
     flex: 1;
 }
 
-.bonus-text strong {
+.benefits-modal .bonus-text strong {
     display: block;
     font-size: clamp(1rem, 3vw, 1.1rem);
     color: #92400e;
     margin-bottom: 0.25rem;
 }
 
-.bonus-text span {
+.benefits-modal .bonus-text span {
     font-size: clamp(0.85rem, 2.5vw, 0.95rem);
     color: #78350f;
 }
 
-.benefits-grid {
+.benefits-modal .benefits-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: clamp(0.75rem, 2vw, 1rem);
     margin-bottom: 1.5rem;
 }
 
-.benefit {
+.benefits-modal .benefit {
     background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
     border: 1px solid #e5e7eb;
     border-radius: 12px;
@@ -1030,10 +1030,10 @@
     animation: fadeInUp 0.5s ease backwards;
 }
 
-.benefit:nth-child(1) { animation-delay: 0.1s; }
-.benefit:nth-child(2) { animation-delay: 0.2s; }
-.benefit:nth-child(3) { animation-delay: 0.3s; }
-.benefit:nth-child(4) { animation-delay: 0.4s; }
+.benefits-modal .benefit:nth-child(1) { animation-delay: 0.1s; }
+.benefits-modal .benefit:nth-child(2) { animation-delay: 0.2s; }
+.benefits-modal .benefit:nth-child(3) { animation-delay: 0.3s; }
+.benefits-modal .benefit:nth-child(4) { animation-delay: 0.4s; }
 
 @keyframes fadeInUp {
     from {
@@ -1046,32 +1046,32 @@
     }
 }
 
-.benefit:hover {
+.benefits-modal .benefit:hover {
     transform: translateY(-4px);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
     background: white;
 }
 
-.benefit-icon {
+.benefits-modal .benefit-icon {
     display: block;
     font-size: clamp(2rem, 5vw, 2.5rem);
     margin-bottom: 0.5rem;
 }
 
-.benefit strong {
+.benefits-modal .benefit strong {
     display: block;
     font-size: clamp(0.9rem, 2.5vw, 1rem);
     color: #111827;
     margin-bottom: 0.25rem;
 }
 
-.benefit small {
+.benefits-modal .benefit small {
     display: block;
     font-size: clamp(0.75rem, 2vw, 0.85rem);
     color: #6b7280;
 }
 
-.first-badge {
+.benefits-modal .first-badge {
     background: linear-gradient(135deg, #ddd6fe 0%, #c4b5fd 100%);
     border-radius: 16px;
     padding: clamp(1.25rem, 3vw, 1.5rem);
@@ -1093,14 +1093,14 @@
     }
 }
 
-.first-badge p {
+.benefits-modal .first-badge p {
     font-size: clamp(0.9rem, 2.5vw, 1rem);
     color: #5b21b6;
     margin: 0 0 1rem;
     font-weight: 600;
 }
 
-.badge-showcase {
+.benefits-modal .badge-showcase {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1110,7 +1110,7 @@
     padding: clamp(0.75rem, 2vw, 1rem);
 }
 
-.badge-showcase > span {
+.benefits-modal .badge-showcase > span {
     animation: badgeBounce 1s ease infinite alternate;
 }
 
@@ -1119,23 +1119,23 @@
     to { transform: translateY(-5px); }
 }
 
-.badge-info {
+.benefits-modal .badge-info {
     text-align: left;
 }
 
-.badge-info strong {
+.benefits-modal .badge-info strong {
     display: block;
     font-size: clamp(1rem, 3vw, 1.1rem);
     color: #5b21b6;
     margin-bottom: 0.25rem;
 }
 
-.badge-info small {
+.benefits-modal .badge-info small {
     font-size: clamp(0.8rem, 2.5vw, 0.9rem);
     color: #7c3aed;
 }
 
-.benefits-body .btn-large {
+.benefits-modal .benefits-body .btn-large {
     width: 100%;
     padding: clamp(1rem, 3vw, 1.25rem);
     background: linear-gradient(135deg, #10b981 0%, #059669 100%);
@@ -1155,12 +1155,12 @@
     box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
 }
 
-.benefits-body .btn-large:hover {
+.benefits-modal .benefits-body .btn-large:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
 }
 
-.benefits-body .btn-large::before {
+.benefits-modal .benefits-body .btn-large::before {
     content: '';
     position: absolute;
     top: 50%;
@@ -1173,7 +1173,7 @@
     transition: width 0.6s, height 0.6s;
 }
 
-.benefits-body .btn-large:hover::before {
+.benefits-modal .benefits-body .btn-large:hover::before {
     width: 300px;
     height: 300px;
 }
@@ -1962,19 +1962,6 @@
     
     .passcode-warning p {
         color: #fef3c7;
-    }
-    
-    .benefits-modal .modal-container {
-        background: #1f2937;
-    }
-    
-    .benefit {
-        background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
-        border-color: #6b7280;
-    }
-    
-    .benefit:hover {
-        background: #4b5563;
     }
     
     .benefit strong {
