@@ -1366,7 +1366,8 @@ const App = {
 
         
         'close-modal': (el, modules) => {
-            const modal = el.closest('.modal, .search-modal, .report-modal');
+            const modal = el.closest('.modal, .search-modal, .report-modal .modal-overlay') || el.closest('[id$="Modal"]');
+            
             if (modal?.id) {
                 // Special handling for report modal
                 if (modal.id === 'reportModal') {
