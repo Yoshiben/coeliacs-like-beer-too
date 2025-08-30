@@ -303,3 +303,15 @@
     height: 20px !important;
     cursor: pointer !important;
 }
+
+#passcodeConfirmCheck {
+    -webkit-appearance: checkbox !important;
+    appearance: checkbox !important;
+    width: 20px !important;
+    height: 20px !important;
+    opacity: 1 !important;
+    position: static !important;
+    display: inline-block !important;
+    visibility: visible !important;
+    margin: 0 !important;
+}
