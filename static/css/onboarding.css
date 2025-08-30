@@ -2029,3 +2029,9 @@
     font-size: 14px;
     font-weight: bold;
 }
+
+
+#passcodeModal .checkbox-custom,
+.passcode-confirm .checkbox-custom {
+    display: inline-flex !important;
+}
