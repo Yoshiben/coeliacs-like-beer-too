@@ -2036,3 +2036,29 @@
 .passcode-confirm .checkbox-custom {
     display: inline-flex !important;
 }
+
+/* Hide the native checkbox */
+#passcodeModal input[type="checkbox"],
+.passcode-confirm input[type="checkbox"],
+#passcodeConfirmCheck {
+    position: absolute !important;
+    opacity: 0 !important;
+    width: 1px !important;
+    height: 1px !important;
+    overflow: hidden !important;
+    clip: rect(0,0,0,0) !important;
+}
+
+/* Style the custom checkbox */
+#passcodeModal .checkbox-custom,
+.passcode-confirm .checkbox-custom {
+    display: inline-flex !important;
+    width: 20px;
+    height: 20px;
+    border: 2px solid white;
+    border-radius: 4px;
+    background: transparent;
+    position: relative;
+    transition: all 0.2s;
+    pointer-events: none; /* Add this */
+}
