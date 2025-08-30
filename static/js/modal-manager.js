@@ -26,8 +26,8 @@ export const ModalManager = (() => {
     const registry = {
 
         // Legal modals group
-        privacyOverlay: { type: 'modal', group: 'legal', exclusive: false, priority: true, zIndex: 10000 },
-        termsOverlay: { type: 'modal', group: 'legal', exclusive: false, priority: true, zIndex: 10000 },
+        privacyModal: { type: 'modal', group: 'legal', exclusive: false, priority: true, zIndex: 10000 },
+        termsModal: { type: 'modal', group: 'legal', exclusive: false, priority: true, zIndex: 10000 },
         liabilityModal: { type: 'modal', group: 'legal', exclusive: false, priority: true},
 
         // Onboarding modals group (complete set)
