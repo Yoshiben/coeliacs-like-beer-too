@@ -1,10 +1,75 @@
-/* Breweries Showcase Styles */
-.breweries-hero {
+/* Breweries Overlay Structure */
+.breweries-container {
+    max-width: min(95vw, 600px);
+    max-height: min(90vh, 700px);
+    background: white;
+    border-radius: 24px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Fixed Header (was hero) */
+.breweries-header {
     text-align: center;
     background: var(--orange-gradient);
     color: white;
+    padding: 2rem 1.5rem;
+    flex-shrink: 0;
 }
 
+.breweries-header h1 {
+    font-size: 1.75rem;
+    margin: 0 0 0.5rem;
+}
+
+.breweries-header p {
+    margin: 0;
+    opacity: 0.95;
+}
+
+/* Scrollable Body */
+.breweries-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+}
+
+/* Filter Section with Regular Checkbox */
+.brewery-filters {
+    padding: var(--space-sm) var(--space-md);
+    background: var(--green-gradient);
+    border-radius: var(--radius-lg);
+    margin-bottom: var(--space-md);
+}
+
+.filter-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.filter-toggle label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    color: white;
+    font-weight: 600;
+}
+
+.filter-toggle input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: white;
+}
+
+.toggle-label {
+    color: white;
+}
+
+/* Featured Section */
 .featured-section {
     margin-bottom: 3rem;
 }
@@ -84,23 +149,7 @@
     text-align: center;
 }
 
-/* Filter Toggle */
-.brewery-filters {
-    padding: var(--space-sm);
-    background: var(--green-gradient);
-    border-radius: var(--radius-pill);
-    margin: var(--space-sm);
-    width: 135vw;
-}
-
-.brewery-filters .toggle-switch {
-    gap: var(--space-xs);
-}
-
-.brewery-filters .toggle-label {
-    color: white;
-}
-
+/* Community Message */
 .community-message {
     background: var(--light-bg);
     padding: 0.75rem 1rem;
@@ -110,6 +159,7 @@
     gap: 0.5rem;
     color: var(--text-secondary);
     font-size: 0.9rem;
+    margin-bottom: 1rem;
 }
 
 .shop-badge {
@@ -125,7 +175,6 @@
 }
 
 .shop-btn {
-/*     background: linear-gradient(135deg, var(--green) 0%, var(--dark-green) 100%); */
     background: var(--orange-gradient);
 }
 
@@ -137,20 +186,7 @@
     margin-top: 2rem;
 }
 
-.breweries-container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
 /* Search bar */
-.breweries-search {
-    padding: var(--space-lg);
-    background: var(--bg-white);
-    border-bottom: 1px solid var(--border-light);
-}
-
 .brewery-search-input {
     width: 100%;
     padding: var(--space-md) var(--space-lg);
@@ -159,6 +195,7 @@
     font-size: var(--text-sm);
     background: var(--bg-section);
     transition: all var(--transition);
+    margin-bottom: 1rem;
 }
 
 .brewery-search-input:focus {
@@ -167,6 +204,19 @@
     background: var(--bg-white);
 }
 
+/* All Breweries Section */
+.all-breweries-section {
+    padding: 0;
+}
+
+.all-breweries-section h2 {
+    display: flex;
+    margin-top: 0;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Breweries Grid */
 .breweries-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(clamp(140px, 30vw, 200px), 1fr));
@@ -220,7 +270,7 @@
     line-height: 1.2;
 }
 
-/* Brewery count */
+/* Brewery Stats */
 .brewery-stats {
     display: flex;
     align-items: center;
@@ -257,6 +307,7 @@
     border-color: transparent;
 }
 
+/* Beer Items */
 .brewery-beers-list {
     max-height: 60vh;
     overflow-y: auto;
@@ -293,15 +344,3 @@
     border-radius: var(--radius-sm);
     color: var(--text-secondary);
 }
-
-.all-breweries-section {
-    padding: 0 var(--space-md);
-}
-
-.all-breweries-section .h2 {
-    display: flex;
-    margin-top: 0;
-    align-items: center;
-    justify-content: center;
-}
-
