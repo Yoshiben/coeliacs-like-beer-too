@@ -948,7 +948,8 @@
 }
 
 .benefits-modal .benefits-body {
-    padding: clamp(1.5rem, 4vw, 2rem);
+   padding: clamp(1.5rem, 4vw, 2rem);
+   overflow: auto;
 }
 
 .benefits-modal .welcome-bonus {
