@@ -34,6 +34,9 @@ export const ModalManager = (() => {
         benefitsModal: { type: 'modal', group: 'onboarding', exclusive: true },
         cookieModal: { type: 'modal', group: 'onboarding', exclusive: true }, 
 
+        privacyOverlay: { type: 'overlay', group: 'legal', exclusive: false, priority: true, zIndex: 10000 },
+        termsOverlay: { type: 'overlay', group: 'lega', exclusive: false, priority: true, zIndex: 10000 },
+
         
         // Search overlays (mutually exclusive)
         searchOverlay: { type: 'overlay', group: 'primary', exclusive: true },
@@ -48,8 +51,7 @@ export const ModalManager = (() => {
         aboutOverlay: { type: 'overlay', group: 'info', exclusive: true, zIndex: 1500 },
         gfInfoOverlay: { type: 'overlay', group: 'info', exclusive: true, zIndex: 1500 },
         getInTouchOverlay: { type: 'overlay', group: 'info', exclusive: true, zIndex: 1500 },
-        privacyOverlay: { type: 'overlay', group: 'info', exclusive: true, zIndex: 10000 },
-        termsOverlay: { type: 'overlay', group: 'info', exclusive: true, zIndex: 10000 },
+        
         
         // Search modals (mutually exclusive within group)
         nameModal: { type: 'modal', group: 'search-input', exclusive: true },
