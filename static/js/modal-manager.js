@@ -42,11 +42,14 @@ export const ModalManager = (() => {
         venueDetailsOverlay: { type: 'overlay', group: 'primary', exclusive: true },
         breweriesOverlay: { type: 'overlay', group: 'primary', exclusive: true },
         communityHubOverlay: { type: 'overlay', group: 'primary', exclusive: true },
+        communityHubOverlay: { type: 'overlay', group: 'primary', exclusive: true },
 
         // Info overlays
         aboutOverlay: { type: 'overlay', group: 'info', exclusive: true, zIndex: 1500 },
         gfInfoOverlay: { type: 'overlay', group: 'info', exclusive: true, zIndex: 1500 },
         getInTouchOverlay: { type: 'overlay', group: 'info', exclusive: true, zIndex: 1500 },
+        privacyOverlay: { type: 'overlay', group: 'info', exclusive: true, zIndex: 1500 },
+        termsOverlay: { type: 'overlay', group: 'info', exclusive: true, zIndex: 1500 },
         
         // Search modals (mutually exclusive within group)
         nameModal: { type: 'modal', group: 'search-input', exclusive: true },
