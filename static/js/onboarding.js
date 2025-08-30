@@ -734,22 +734,12 @@ export const OnboardingFlow = (() => {
         // Reset the checkbox and button
         const checkbox = document.getElementById('passcodeConfirmCheck');
         const continueBtn = document.getElementById('continueFromPasscode');
-        
-        if (checkbox) {
-            checkbox.checked = false;
-            
-            // Set up the visual state of the custom checkbox
-            const customCheckbox = checkbox.nextElementSibling;
-            if (customCheckbox && customCheckbox.classList.contains('checkbox-custom')) {
-                customCheckbox.style.display = 'inline-flex';
-                customCheckbox.innerHTML = '';
-            }
-        }
-        
+        if (checkbox) checkbox.checked = false;
         if (continueBtn) {
             continueBtn.disabled = true;
             continueBtn.onclick = () => confirmPasscodeSaved();
         }
+    
     };
     
     const showPasscodeDisplayForCommunity = (result) => {
