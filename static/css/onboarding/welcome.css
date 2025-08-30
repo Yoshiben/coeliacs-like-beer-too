@@ -1,0 +1,119 @@
+/* ============================
+   WELCOME MODAL
+   ============================ */
+.welcome-container {
+    max-width: min(95vw, 500px);
+    max-height: min(90vh, 750px);
+}
+
+.welcome-header {
+    background: var(--primary-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+    padding: 0 clamp(2rem, 5vh, 3rem) clamp(1.5rem, 4vw, 2rem);
+    text-align: center;
+    color: white;
+}
+
+.welcome-emoji {
+    display: block;
+    font-size: clamp(2.5rem, 7vw, 3.5rem);
+    margin-bottom: 1rem;
+}
+
+.welcome-header h1 {
+    font-size: clamp(1.3rem, 4vw, 1.8rem);
+    line-height: 1.3;
+    margin: 0;
+    color: white;
+}
+
+.welcome-body {
+   padding: clamp(1rem, 3vw, 1.5rem);
+   display: flex;
+   flex-direction: column;
+   gap: clamp(1rem, 3vh, 1.5rem);
+   overflow: auto;
+}
+
+.founder-section {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(109, 40, 217, 0.05) 100%);
+    border-radius: 12px;
+    padding: clamp(1rem, 3vw, 1.5rem);
+}
+
+.founder-greeting {
+    font-weight: 600;
+    color: var(--text-primary, #333);
+    font-size: clamp(1rem, 3vw, 1.1rem);
+}
+
+.founder-message p {
+    font-size: clamp(0.875rem, 2.5vw, 0.95rem);
+    color: var(--text-secondary, #666);
+    line-height: 1.6;
+    margin: 0.5rem 0;
+}
+
+.stats-showcase {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(0.5rem, 2vw, 1rem);
+}
+
+#welcomeModal .stat-item {
+   display: flex;
+   flex-direction: column;
+   text-align: center;
+   padding: clamp(0.75rem, 2vw, 1rem);
+   border-radius: 12px;
+   background: #f8f9fa;
+}
+
+.stat-featured {
+    background: var(--primary-gradient, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+    color: white;
+}
+
+.stat-number {
+    display: block;
+    font-size: clamp(1rem, 3vw, 1.25rem);
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.stat-label {
+    font-size: clamp(0.7rem, 2vw, 0.85rem);
+    opacity: 0.8;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(0.5rem, 2vw, 0.75rem);
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: clamp(0.6rem, 2vw, 0.8rem);
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.feature-icon {
+    font-size: clamp(1.2rem, 3.5vw, 1.5rem);
+    flex-shrink: 0;
+}
+
+.feature-text {
+    font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+    color: var(--text-secondary, #666);
+}
+
+.btn-hero {
+    width: 100%;
+    padding: clamp(0.8rem, 3vh, 1.2rem);
+    font-size: clamp(1rem, 3vw, 1.1rem);
+    font-weight: 600;
+    margin-top: 0.5rem;
+}
