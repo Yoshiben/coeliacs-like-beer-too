@@ -951,7 +951,7 @@ const App = {
         },
         
         'toggle-passcode-confirm': (el, modules) => {
-            // Handle the checkbox toggle for passcode confirmation
+            console.log('CHECKBOX CLICKED!', el.checked); // ADD THIS
             const continueBtn = document.getElementById('continueFromPasscode');
             if (continueBtn) {
                 continueBtn.disabled = !el.checked;
