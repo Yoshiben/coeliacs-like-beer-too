@@ -739,6 +739,14 @@ export const OnboardingFlow = (() => {
             continueBtn.disabled = true;
             continueBtn.onclick = () => confirmPasscodeSaved();
         }
+        
+        // Set up checkbox to enable/disable button
+        if (checkbox && continueBtn) {
+            checkbox.onchange = function() {
+                continueBtn.disabled = !this.checked;
+                console.log('✅ Checkbox changed:', this.checked);
+            };
+        }
     };
     
     const showPasscodeDisplayForCommunity = (result) => {
