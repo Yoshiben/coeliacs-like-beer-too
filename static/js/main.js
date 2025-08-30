@@ -827,6 +827,15 @@ const App = {
 
 
 
+        'close-privacy': (el, modules) => {
+            modules.modalManager?.close('privacyOverlay');
+        },
+        'close-terms': (el, modules) => {
+            modules.modalManager?.close('termsOverlay');
+        },
+
+
+
 
 
 
