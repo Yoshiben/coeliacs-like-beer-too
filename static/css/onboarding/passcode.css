@@ -1,0 +1,256 @@
+/* ============================
+   PASSCODE MODAL - BEAUTIFUL REDESIGN
+   ============================ */
+
+.passcode-container {
+   max-width: min(95vw, 440px);
+   max-height: min(90vh, 650px);
+   overflow: auto;
+  background: #1f2937;
+}
+
+.passcode-header {
+   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+   padding: var(--space-md);
+   text-align: center;
+   color: white;
+   position: relative;
+}
+
+/* Animated background effect */
+.passcode-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: rotate 8s linear infinite;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.success-icon {
+    display: block;
+    font-size: clamp(3rem, 8vw, 4rem);
+    margin-bottom: 1rem;
+    animation: successPop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+    position: relative;
+    z-index: 1;
+}
+
+@keyframes successPop {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+.passcode-header h2 {
+    font-size: clamp(1.5rem, 4vw, 1.8rem);
+    margin: 0 0 0.5rem;
+    color: white;
+    position: relative;
+    z-index: 1;
+}
+
+.passcode-header p {
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    opacity: 0.95;
+    margin: 0;
+    position: relative;
+    z-index: 1;
+}
+
+.passcode-body {
+    padding: clamp(1.5rem, 4vw, 2rem);
+   overflow-y:auto;
+}
+
+.passcode-section {
+    margin-bottom: 1.5rem;
+}
+
+.passcode-section h3 {
+  font-size: clamp(1rem, 3vw, 1.1rem);
+  color: white;
+  margin: 0 0 1rem;
+  text-align: center;
+  font-weight: 600;
+}
+
+.passcode-display {
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  border: 2px solid #d1d5db;
+  border-radius: 16px;
+  padding: clamp(1.2rem, 3vw, 1.5rem);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #374151 0%, #4b5563 100%);
+  border-color: #6b7280;
+}
+
+.passcode-display::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+}
+
+#passcodeValue {
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Courier New', monospace;
+    font-size: clamp(1.8rem, 5vw, 2.2rem);
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    color: white;
+    text-align: center;
+    flex: 1;
+    user-select: all;
+    cursor: text;
+}
+
+.passcode-display .btn-sm {
+    padding: 0.6rem 1rem;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+    font-weight: 600;
+    color: #4b5563;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.passcode-display .btn-sm:hover {
+    background: #10b981;
+    color: white;
+    border-color: #10b981;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.passcode-warning {
+  border: 1px solid #fbbf24;
+  border-radius: 12px;
+  padding: clamp(1rem, 3vw, 1.25rem);
+  margin-bottom: 1.5rem;
+  background: linear-gradient(135deg, #78350f 0%, #92400e 100%);
+  border-color: #b45309;
+}
+
+.passcode-warning p {
+    margin: 0 0 0.5rem;
+    font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+    color: #fef3c7;
+    line-height: 1.5;
+}
+
+.passcode-warning p:first-child {
+    font-weight: 700;
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.passcode-warning p:last-child {
+    margin-bottom: 0;
+}
+
+.passcode-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.passcode-actions .btn-secondary {
+    flex: 1;
+    min-width: 140px;
+    padding: clamp(0.7rem, 2vw, 0.9rem);
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+    font-weight: 600;
+    color: #4b5563;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.passcode-actions .btn-secondary:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.passcode-confirm {
+    background: #374151;
+    border-radius: 12px;
+    padding: clamp(1rem, 3vw, 1.25rem);
+    margin-bottom: 1.5rem;
+}
+
+/* PASSCODE MODAL CHECKBOX - CLEAN SLATE */
+.passcode-confirm .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    font-size: 1rem;
+    color: white;
+    font-weight: 500;
+}
+
+/* Hide the real checkbox */
+.passcode-confirm input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+}
+
+/* Style the custom checkbox */
+.passcode-confirm .checkbox-custom {
+    display: inline-flex;
+    width: 20px;
+    height: 20px;
+    border: 2px solid white;
+    border-radius: 4px;
+    background: transparent;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+/* When checked */
+.passcode-confirm input[type="checkbox"]:checked + .checkbox-custom {
+    background: #10b981;
+    border-color: #10b981;
+}
+
+.passcode-confirm input[type="checkbox"]:checked + .checkbox-custom::after {
+    content: '✓';
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+}
