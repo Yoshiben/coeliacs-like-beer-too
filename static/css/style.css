@@ -347,12 +347,12 @@
    flex: 1;
 }
 
-.btn-secondary:hover:not(:disabled) {
+/* .btn-secondary:hover:not(:disabled) {
    transform: translateY(-1px);
    border-color: var(--border-purple);
    background: var(--bg-purple);
    color: var(--text-primary);
-}
+} */
 
 .btn-success {
     background: var(--success-gradient);
