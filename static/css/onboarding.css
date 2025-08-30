@@ -583,16 +583,17 @@
    ============================ */
 
 .passcode-container {
-    max-width: min(95vw, 440px);
-    max-height: min(90vh, 650px);
+   max-width: min(95vw, 440px);
+   max-height: min(90vh, 650px);
+   overflow: auto;
 }
 
 .passcode-header {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    padding: clamp(2rem, 5vh, 3rem);
-    text-align: center;
-    color: white;
-    position: relative;
+   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+   padding: var(--space-md);
+   text-align: center;
+   color: white;
+   position: relative;
 }
 
 /* Animated background effect */
