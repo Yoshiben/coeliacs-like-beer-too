@@ -114,6 +114,16 @@
    --text-2xl: 1.5rem;
    --text-3xl: 1.875rem;
    --text-4xl: 2.25rem;
+
+   /* Icon Sizing */
+   --icon-xs: 1rem;
+   --icon-sm: 1.5rem;
+   --icon-md: 2rem;
+   --icon-lg: 2.5rem;
+   --icon-xl: 3rem;
+   --icon-2xl: 3.5rem;
+   --icon-3xl: 4rem;
+   --icon-4xl: 5rem;   
    
    /* Background Colors */
    --bg-white: rgba(255, 255, 255, 0.95);
