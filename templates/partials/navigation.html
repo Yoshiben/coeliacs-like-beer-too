@@ -34,7 +34,8 @@
     </div>
 </nav>
 
-<!-- Bottom Navigation Bar -->
+
+<!-- Updated Bottom Navigation Bar (cleaner, no dropdown) -->
 <nav class="bottom-nav">
     <a href="/" class="nav-item">
         <div class="nav-icon">🏠</div>
@@ -53,28 +54,166 @@
         <div class="nav-label">Community</div>
     </div>
     <div class="nav-item nav-more" data-action="toggle-more-menu">
-        <div class="nav-icon">⋯</div>
-        <div class="nav-label">More</div>
-        <div class="more-menu" id="moreMenu">
-            <a href="#" data-action="about-us" class="more-menu-item">
-                <span class="menu-icon">ℹ️</span>
-                <span>About Us</span>
-            </a>
-            <a href="#" data-action="about-gf" class="more-menu-item">
-                <span class="menu-icon">🔬</span>
-                <span>About Gluten Free</span>
-            </a>
-            <a href="/privacy" class="more-menu-item">
-                <span class="menu-icon">🔒</span>
-                <span>Privacy Policy</span>
-            </a>
-            <a href="/terms" class="more-menu-item">
-                <span class="menu-icon">📋</span>
-                <span>Terms of Service</span>
-            </a>
+        <div class="nav-icon nav-more-dots">
+            <span></span>
+            <span></span>
+            <span></span>
         </div>
+        <div class="nav-label">More</div>
+        <!-- DELETE THE OLD more-menu DIV - we don't need it anymore -->
     </div>
 </nav>
+
+<!-- Beautiful Slide-Up More Menu (place this before </body>) -->
+<div id="moreMenuOverlay" class="more-menu-overlay" style="display: none;">
+    <div class="menu-backdrop" data-action="close-more-menu"></div>
+    
+    <div class="more-menu-container">
+        <!-- Pull Handle -->
+        <div class="menu-pull-handle">
+            <div class="handle-bar"></div>
+        </div>
+        
+        <!-- User Section (shows if logged in) -->
+        <div class="menu-user-section" id="menuUserSection" style="display: none;">
+            <div class="user-gradient-bg"></div>
+            <div class="user-info">
+                <span class="user-avatar" id="menuUserAvatar">🍺</span>
+                <div class="user-details">
+                    <span class="user-nickname" id="menuUserNickname">Guest</span>
+                    <span class="user-points" id="menuUserPoints">⭐ 0 points</span>
+                </div>
+                <button class="user-settings-btn" data-action="user-settings">
+                    <span>⚙️</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Discover Section -->
+        <div class="menu-section">
+            <div class="menu-section-title">Discover</div>
+            
+            <button class="menu-item featured" data-action="get-in-touch">
+                <div class="menu-item-content">
+                    <span class="menu-icon">👋</span>
+                    <div class="menu-text">
+                        <span class="menu-label">About & Contact</span>
+                        <span class="menu-sublabel">Meet Ben & the story</span>
+                    </div>
+                </div>
+                <span class="menu-arrow">→</span>
+            </button>
+            
+            <button class="menu-item" data-action="about-gf">
+                <div class="menu-item-content">
+                    <span class="menu-icon">🌾</span>
+                    <div class="menu-text">
+                        <span class="menu-label">About Gluten Free</span>
+                        <span class="menu-sublabel">GF beer explained</span>
+                    </div>
+                </div>
+                <span class="menu-arrow">→</span>
+            </button>
+            
+            <button class="menu-item" data-action="show-guide">
+                <div class="menu-item-content">
+                    <span class="menu-icon">📖</span>
+                    <div class="menu-text">
+                        <span class="menu-label">How to Use</span>
+                        <span class="menu-sublabel">Quick guide</span>
+                    </div>
+                </div>
+                <span class="menu-arrow">→</span>
+            </button>
+        </div>
+        
+        <!-- Settings & Legal Section -->
+        <div class="menu-section">
+            <div class="menu-section-title">Settings & Legal</div>
+            
+            <button class="menu-item" data-action="app-settings">
+                <div class="menu-item-content">
+                    <span class="menu-icon">⚙️</span>
+                    <span class="menu-label">Settings</span>
+                </div>
+                <span class="menu-arrow">→</span>
+            </button>
+            
+            <button class="menu-item" data-action="show-privacy-overlay">
+                <div class="menu-item-content">
+                    <span class="menu-icon">🔒</span>
+                    <span class="menu-label">Privacy Policy</span>
+                </div>
+                <span class="menu-arrow">→</span>
+            </button>
+            
+            <button class="menu-item" data-action="show-terms-overlay">
+                <div class="menu-item-content">
+                    <span class="menu-icon">📜</span>
+                    <span class="menu-label">Terms of Service</span>
+                </div>
+                <span class="menu-arrow">→</span>
+            </button>
+            
+            <button class="menu-item liability-item" data-action="show-liability-overlay">
+                <div class="menu-item-content">
+                    <span class="menu-icon">⚠️</span>
+                    <span class="menu-label">Safety & Liability</span>
+                </div>
+                <span class="menu-badge important">Important</span>
+            </button>
+        </div>
+        
+        <!-- Support Section -->
+        <div class="menu-section">
+            <div class="menu-section-title">Support Us</div>
+            
+            <button class="menu-item support-item" data-action="support-app">
+                <div class="menu-item-content">
+                    <span class="menu-icon">☕</span>
+                    <div class="menu-text">
+                        <span class="menu-label">Buy Me a Coffee</span>
+                        <span class="menu-sublabel">Support development</span>
+                    </div>
+                </div>
+                <span class="menu-badge coffee">Donate</span>
+            </button>
+            
+            <button class="menu-item" data-action="share-app">
+                <div class="menu-item-content">
+                    <span class="menu-icon">📲</span>
+                    <span class="menu-label">Share App</span>
+                </div>
+                <span class="menu-arrow">→</span>
+            </button>
+            
+            <button class="menu-item" data-action="rate-app">
+                <div class="menu-item-content">
+                    <span class="menu-icon">⭐</span>
+                    <span class="menu-label">Rate Us</span>
+                </div>
+                <span class="menu-arrow">→</span>
+            </button>
+        </div>
+        
+        <!-- Sign Out (if logged in) -->
+        <div class="menu-section" id="menuSignOutSection" style="display: none;">
+            <button class="menu-item menu-signout" data-action="sign-out">
+                <div class="menu-item-content">
+                    <span class="menu-icon">🚪</span>
+                    <span class="menu-label">Sign Out</span>
+                </div>
+                <span class="menu-arrow">→</span>
+            </button>
+        </div>
+        
+        <!-- Footer -->
+        <div class="menu-footer">
+            <div class="app-version">Version 2.0.1</div>
+            <div class="app-tagline">Made with 🍺 by coeliacs, for coeliacs</div>
+        </div>
+    </div>
+</div>
 
 <!-- About Overlay -->
 <div id="aboutOverlay" class="overlay info-overlay">
