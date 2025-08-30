@@ -25,10 +25,13 @@ export const ModalManager = (() => {
     // Modal/Overlay Registry with types and rules
     const registry = {
 
+        // Legal modals group
+        privacyOverlay: { type: 'overlay', group: 'legal', exclusive: false, priority: true, zIndex: 10000 },
+        termsOverlay: { type: 'overlay', group: 'legal', exclusive: false, priority: true, zIndex: 10000 },
+
         // Onboarding modals group (complete set)
         ageGateModal: { type: 'modal', group: 'onboarding', exclusive: true, priority: true },
-        privacyOverlay: { type: 'overlay', group: 'onboarding', exclusive: false, priority: true, zIndex: 10000 },
-        termsOverlay: { type: 'overlay', group: 'onboarding', exclusive: false, priority: true, zIndex: 10000 },
+        
         welcomeModal: { type: 'modal', group: 'onboarding', exclusive: true },
         nicknameModal: { type: 'modal', group: 'onboarding', exclusive: true },
         signInModal: { type: 'modal', group: 'onboarding', exclusive: true },
@@ -211,6 +214,12 @@ export const ModalManager = (() => {
         // Show overlay
         overlay.style.display = 'flex';
         overlay.classList.add('active');
+        
+        // ADD THIS: Apply z-index if specified in config
+        if (config.zIndex) {
+            overlay.style.zIndex = config.zIndex;
+            console.log(`📏 Applied z-index ${config.zIndex} to ${overlayId}`);
+        }
         
         // NEW CODE: Reset to default view if it has internal views
         if (config.hasInternalViews && config.defaultView) {
