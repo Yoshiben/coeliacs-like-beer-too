@@ -951,10 +951,12 @@ const App = {
         },
         
         'toggle-passcode-confirm': (el, modules) => {
-            console.log('CHECKBOX CLICKED!', el.checked); // ADD THIS
+            console.log('CHECKBOX CLICKED!', el.checked);
             const continueBtn = document.getElementById('continueFromPasscode');
+            console.log('Button found:', continueBtn);
             if (continueBtn) {
                 continueBtn.disabled = !el.checked;
+                console.log('Button disabled state set to:', continueBtn.disabled);
             }
         },
         
