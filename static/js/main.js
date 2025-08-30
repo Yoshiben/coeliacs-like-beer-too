@@ -951,12 +951,29 @@ const App = {
         },
         
         'toggle-passcode-confirm': (el, modules) => {
-            console.log('CHECKBOX CLICKED!', el.checked);
+            console.log('🔲 Checkbox toggled:', el.checked);
+            
+            // Get the checkbox element (el might be the label or checkbox)
+            const checkbox = el.type === 'checkbox' ? el : el.querySelector('input[type="checkbox"]');
+            if (!checkbox) {
+                console.error('Checkbox not found');
+                return;
+            }
+            
             const continueBtn = document.getElementById('continueFromPasscode');
-            console.log('Button found:', continueBtn);
+            console.log('Button found:', !!continueBtn);
+            
             if (continueBtn) {
-                continueBtn.disabled = !el.checked;
-                console.log('Button disabled state set to:', continueBtn.disabled);
+                // Enable/disable based on checkbox state
+                continueBtn.disabled = !checkbox.checked;
+                console.log('Button disabled state:', continueBtn.disabled);
+                
+                // Visual feedback
+                if (checkbox.checked) {
+                    continueBtn.textContent = 'Continue to App →';
+                } else {
+                    continueBtn.textContent = 'Continue to App →';
+                }
             }
         },
         
