@@ -134,13 +134,21 @@
     font-weight: 600;
 }
 
-#venueDetailsOverlay .status-actions .btn-outline-confirm {
+#venueDetailsOverlay .status-actions .btn-confirm {
    background: var(--green-gradient);
 }
 
 #venueDetailsOverlay .status-actions .btn-outline:hover {
     background: var(--bg-purple);
     transform: translateY(-1px);
+}
+
+#venueDetailsOverlay .status-confirmation {
+   background: white;
+   border-radius: var(--radius-pill);
+   display: flex;
+   justify-content: center;
+   margin: var(--space-sm) var(--space-4xl);
 }
 
 /* Beer Section */
