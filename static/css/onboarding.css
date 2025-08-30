@@ -1021,7 +1021,7 @@
 }
 
 .benefits-modal .benefit {
-    background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+    background: white;
     border: 1px solid #e5e7eb;
     border-radius: 12px;
     padding: clamp(1rem, 3vw, 1.25rem);
