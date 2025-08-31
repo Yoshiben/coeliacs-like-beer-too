@@ -1697,6 +1697,8 @@ const App = {
         'quick-status-update': async (el, modules) => {
             const status = el.dataset.status;
             const statusPromptVenue = window.App.getState('statusPromptVenue');
+            const statusPromptSubmittedBy = window.App.getState('statusPromptSubmittedBy'); // ADD THIS
+            const statusPromptUserId = window.App.getState('statusPromptUserId'); // ADD THIS
             
             // Get venue ID from multiple possible sources
             const venueId = statusPromptVenue?.venue_id || 
@@ -1713,20 +1715,18 @@ const App = {
             console.log('👤 Submitted by:', statusPromptSubmittedBy);
             
             // Get user_id from localStorage since it's not being passed through state
-            const userId = parseInt(localStorage.getItem('user_id'));
-            console.log('🆔 User ID from localStorage:', userId);
+            const userId = statusPromptUserId || parseInt(localStorage.getItem('user_id'));
+            console.log('🆔 User ID:', userId);
             
             modules.modalManager?.close('statusPromptAfterBeerModal');
             modules.modalManager?.closeGroup('status');
-            modules.modalManager?.block('gfStatusConfirmModal');
-            modules.modalManager?.block('beerDetailsPromptModal');
             
             try {
                 const response = await fetch('/api/update-gf-status', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        venue_id: statusPromptVenue.venue_id,
+                        venue_id: parseInt(venueId),
                         status: status,
                         user_id: userId,
                         submitted_by: statusPromptSubmittedBy || 
@@ -1745,32 +1745,14 @@ const App = {
                         modules.toast?.success('🎉 Beer added + status updated! You are a legend! 🍺⭐');
                     }
                     
-                    if (!result.duplicate && statusPromptVenue) {
-                        window.App.setState('currentVenue', {
-                            ...statusPromptVenue,
-                            gf_status: status
-                        });
-                    }
-                    
-                    const communityHub = modules.communityHub || window.App?.getModule('communityHub');
-                    if (communityHub?.isUserActive()) {
-                        communityHub.trackAction('STATUS_UPDATE', { venue: statusPromptVenue.venue_name });
-                    }
-                    
+                    // Clear the state
                     window.App.setState('statusPromptVenue', null);
                     window.App.setState('statusPromptSubmittedBy', null);
-                    
-                    setTimeout(() => {
-                        modules.modalManager?.unblock('gfStatusConfirmModal');
-                        modules.modalManager?.unblock('beerDetailsPromptModal');
-                    }, 1000);
+                    window.App.setState('statusPromptUserId', null);
                 }
             } catch (error) {
                 console.error('Failed to update status:', error);
                 modules.toast?.error('Failed to update status');
-                
-                modules.modalManager?.unblock('gfStatusConfirmModal');
-                modules.modalManager?.unblock('beerDetailsPromptModal');
             }
         },
         
