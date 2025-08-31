@@ -36,7 +36,8 @@ export const NavStateManager = (() => {
         state.currentContext = context;
         
         // Remove all page classes
-        document.body.classList.remove('page-home', 'page-results', 'page-map', 'page-venue', 'page-search', 'page-search-modal', 'page-contact', 'page-breweries', 'page-community');
+        document.body.classList.remove('page-home', 'page-results', 'page-map', 'page-venue', 'page-search', 'page-search-modal', 'page-contact', 
+                                       'page-breweries', 'page-community', 'page-privacy', 'page-terms', 'page-liability', 'page-about-gf');
         
         // Add the current page class
         document.body.classList.add(`page-${context}`);
@@ -171,17 +172,32 @@ export const NavStateManager = (() => {
             switch(currentContext) {
                 case 'results':
                 case 'map':
-                case 'contact':
                 case 'breweries':
                 case 'community':
                     goToHome();
                     break;
+                
+                case 'contact':
+                case 'privacy':
+                case 'terms':
+                case 'liability':
+                case 'about-gf':
+                    // Just close the overlay - More menu stays open behind
+                    const overlayMap = {
+                        'contact': 'getInTouchOverlay',
+                        'privacy': 'privacyOverlay',
+                        'terms': 'termsOverlay',
+                        'liability': 'liabilityOverlay',
+                        'about-gf': 'gfInfoOverlay'
+                    };
+                    modules.modalManager?.close(overlayMap[currentContext]);
+                    setPageContext('home'); // Reset context
+                    break;
+                    
                 case 'venue':
                     goBackFromVenue();
                     break;
-                case 'search':
-                    goToHome();
-                    break;
+                    
                 default:
                     goToHome();
             }
