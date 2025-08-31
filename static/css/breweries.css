@@ -27,17 +27,13 @@
 
 /* Filter Section with Regular Checkbox */
 .brewery-filters {
-    padding: var(--space-sm) var(--space-md);
+    padding: var(--space-xs) var(--space-sm);
     background: var(--green-gradient);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-pill);
     margin-bottom: var(--space-md);
+    width: 40vw
 }
 
-.filter-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
 
 .filter-toggle label {
     display: flex;
