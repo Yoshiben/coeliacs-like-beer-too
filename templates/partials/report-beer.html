@@ -127,3 +127,56 @@
         </form>
     </div>
 </div>
+
+<!-- Status Prompt After Beer Report Modal -->
+<div id="statusPromptAfterBeerModal" class="modal-overlay" data-cover-nav="true" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>🎯 One More Thing!</h2>
+            <button class="modal-close" data-action="close-modal">&times;</button>
+        </div>
+        
+        <div class="modal-body">
+            <p>Thanks for adding that beer! 🍺</p>
+            
+            <p><strong>Fancy helping us out with the GF status for <span id="statusPromptVenueName">this venue</span>?</strong></p>
+            
+            <div class="status-quick-options">
+                <button class="btn btn-success status-prompt-btn" data-action="quick-status-update" data-status="always_tap_cask">
+                    <div>
+                        <span>⭐</span>
+                        <div><strong>Always has GF on tap/cask</strong>
+                            <br><small>The holy grail! Permanent GF tap/cask lines</small>
+                        </div>
+                    </div>
+                </button>
+                
+                <button class="btn btn-primary status-prompt-btn" data-action="quick-status-update" data-status="always_bottle_can">
+                    <div>
+                        <span>✅</span>
+                        <div>
+                            <strong>Always has GF bottles/cans</strong>
+                            <br><small>Reliable bottled/canned options</small>
+                        </div>
+                    </div>
+                </button>
+                
+                <button class="btn btn-secondary status-prompt-btn" data-action="quick-status-update" data-status="currently">
+                    <div>
+                        <span>🔵</span>
+                        <div>
+                            <strong>Currently has GF beer</strong>
+                            <br><small>Not always available, but they have it today</small>
+                        </div>
+                    </div>
+                </button>
+                
+<!--                 <button class="btn btn-outline" data-action="skip-status-prompt">
+                    🤷 Not sure / Skip
+                </button> -->
+            </div>
+            
+            <p>This helps others know what to expect when they visit!</p>
+        </div>
+    </div>
+</div>
