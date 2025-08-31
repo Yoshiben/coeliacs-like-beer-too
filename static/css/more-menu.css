@@ -1,0 +1,69 @@
+/* Settings Modal */
+#settingsModal .settings-modal {
+    max-width: 400px;
+    width: 90%;
+}
+
+#settingsModal .settings-content {
+    padding: var(--space-lg);
+}
+
+#settingsModal .setting-section {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: var(--space-lg);
+    margin-bottom: var(--space-lg);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+#settingsModal .setting-section:last-child {
+    margin-bottom: 0;
+}
+
+#settingsModal .setting-section h4 {
+    margin: 0 0 var(--space-sm) 0;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+#settingsModal .setting-description {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin: 0 0 var(--space-md) 0;
+    line-height: 1.4;
+}
+
+#settingsModal .setting-section .btn {
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 0.95rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+#settingsModal .setting-section .btn-secondary {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--text-primary);
+}
+
+#settingsModal .setting-section .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-1px);
+}
+
+/* Mobile adjustments */
+@media (max-width: 480px) {
+    #settingsModal .settings-modal {
+        width: 95%;
+    }
+    
+    #settingsModal .settings-content {
+        padding: var(--space-md);
+    }
+    
+    .setting-section {
+        padding: var(--space-md);
+    }
+}
