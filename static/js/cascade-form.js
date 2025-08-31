@@ -828,11 +828,21 @@ export const CascadeForm = (() => {
                 // Reset form
                 reset();
                 
-                // Show status prompt if needed
+                // Show status prompt - THIS IS THE KEY PART
                 if (result.show_status_prompt && state.currentVenue) {
-                    setTimeout(() => {
-                        window.App?.trigger?.('show-status-prompt', state.currentVenue);
-                    }, 300);
+                    // Use VenueModule's showStatusPromptAfterBeer
+                    const venueModule = window.App?.getModule('venue');
+                    if (venueModule?.showStatusPromptAfterBeer) {
+                        setTimeout(() => {
+                            venueModule.showStatusPromptAfterBeer(
+                                state.currentVenue,
+                                formData.submitted_by,
+                                formData.user_id
+                            );
+                        }, 300);
+                    } else {
+                        console.error('❌ VenueModule.showStatusPromptAfterBeer not found');
+                    }
                 }
             } else {
                 showToast(result.error || '❌ Failed to submit', 'error');
