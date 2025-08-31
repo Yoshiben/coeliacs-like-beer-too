@@ -1,0 +1,368 @@
+<!-- Beautiful Slide-Up More Menu (place this before </body>) -->
+<div id="moreMenuOverlay" class="more-menu-overlay" style="display: none;">
+    <div class="menu-backdrop" data-action="close-more-menu"></div>
+    
+    <div class="more-menu-container">
+        <!-- Pull Handle -->
+        <div class="menu-pull-handle">
+            <div class="handle-bar"></div>
+        </div>
+        
+        <!-- User Section (shows if logged in) -->
+        <div class="menu-user-section" id="menuUserSection" style="display: none;">
+            <div class="user-gradient-bg"></div>
+            <div class="user-info">
+                <span class="user-avatar" id="menuUserAvatar">🍺</span>
+                <div class="user-details">
+                    <span class="user-nickname" id="menuUserNickname">Guest</span>
+                    <span class="user-points" id="menuUserPoints">⭐ 0 points</span>
+                </div>
+                <button class="user-settings-btn" data-action="app-settings">
+                    <span>⚙️</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Discover Section -->
+        <div class="menu-section">
+            <div class="menu-section-title">Discover</div>
+            
+            <button class="menu-item featured" data-action="get-in-touch">
+                <div class="menu-item-content">
+                    <span class="menu-icon">👋</span>
+                    <div class="menu-text">
+                        <span class="menu-label">About & Contact</span>
+                        <span class="menu-sublabel">Meet Ben & the story</span>
+                    </div>
+                </div>
+                <span class="menu-arrow">→</span>
+            </button>
+            
+            <button class="menu-item" data-action="about-gf">
+                <div class="menu-item-content">
+                    <span class="menu-icon">🌾</span>
+                    <div class="menu-text">
+                        <span class="menu-label">About Gluten Free</span>
+                        <span class="menu-sublabel">GF beer explained</span>
+                    </div>
+                </div>
+                <span class="menu-arrow">→</span>
+            </button>
+            
+            <button class="menu-item" data-action="show-guide">
+                <div class="menu-item-content">
+                    <span class="menu-icon">📖</span>
+                    <div class="menu-text">
+                        <span class="menu-label">How to Use</span>
+                        <span class="menu-sublabel">Quick guide</span>
+                    </div>
+                </div>
+                <span class="menu-arrow">→</span>
+            </button>
+        </div>
+        
+        <!-- Settings & Legal Section -->
+        <div class="menu-section">
+            <div class="menu-section-title">Legal</div>
+            <button class="menu-item" data-action="show-privacy-overlay">
+                <div class="menu-item-content">
+                    <span class="menu-icon">🔒</span>
+                    <span class="menu-label">Privacy Policy</span>
+                </div>
+                <span class="menu-arrow">→</span>
+            </button>
+            
+            <button class="menu-item" data-action="show-terms-overlay">
+                <div class="menu-item-content">
+                    <span class="menu-icon">📜</span>
+                    <span class="menu-label">Terms of Service</span>
+                </div>
+                <span class="menu-arrow">→</span>
+            </button>
+            
+            <button class="menu-item liability-item" data-action="show-liability-overlay">
+                <div class="menu-item-content">
+                    <span class="menu-icon">⚠️</span>
+                    <span class="menu-label">Safety & Liability</span>
+                </div>
+                <span class="menu-badge important">Important</span>
+            </button>
+        </div>
+        
+        <!-- Support Section -->
+        <div class="menu-section">
+            <div class="menu-section-title">Support Us</div>
+            
+            <button class="menu-item support-item" data-action="support-app">
+                <div class="menu-item-content">
+                    <span class="menu-icon">☕</span>
+                    <div class="menu-text">
+                        <span class="menu-label">Buy Me a Coffee</span>
+                        <span class="menu-sublabel">Support development</span>
+                    </div>
+                </div>
+                <span class="menu-badge coffee">Donate</span>
+            </button>
+            
+            <button class="menu-item" data-action="share-app">
+                <div class="menu-item-content">
+                    <span class="menu-icon">📲</span>
+                    <span class="menu-label">Share App</span>
+                </div>
+                <span class="menu-arrow">→</span>
+            </button>
+            
+            <button class="menu-item" data-action="rate-app">
+                <div class="menu-item-content">
+                    <span class="menu-icon">⭐</span>
+                    <span class="menu-label">Rate Us</span>
+                </div>
+                <span class="menu-arrow">→</span>
+            </button>
+        </div>
+        
+        <!-- Sign Out (if logged in) -->
+        <div class="menu-section" id="menuSignOutSection" style="display: none;">
+            <button class="menu-item menu-signout" data-action="sign-out">
+                <div class="menu-item-content">
+                    <span class="menu-icon">🚪</span>
+                    <span class="menu-label">Sign Out</span>
+                </div>
+                <span class="menu-arrow">→</span>
+            </button>
+        </div>
+        
+        <!-- Footer -->
+        <div class="menu-footer">
+            <div class="app-version">Version 2.0.1</div>
+            <div class="app-tagline">Made with 🍺 by coeliacs, for coeliacs</div>
+        </div>
+    </div>
+</div>
+
+<div id="settingsModal" class="modal-overlay" data-cover-nav="true">
+    <div class="modal-content settings-modal">
+        <div class="modal-header">
+            <h3>⚙️ Settings</h3>
+            <button class="modal-close" data-action="close-modal">&times;</button>
+        </div>
+        
+        <div class="settings-content">
+            <!-- Location Settings -->
+            <div class="setting-section">
+                <h4>📍 Location</h4>
+                <p class="setting-description">Clear saved location data</p>
+                <button class="btn btn-secondary" data-action="clear-location">
+                    Reset Location Permissions
+                </button>
+            </div>
+            
+            <!-- Cache Settings -->
+            <div class="setting-section">
+                <h4>🗑️ App Data</h4>
+                <p class="setting-description">Clear all cached data and preferences</p>
+                <button class="btn btn-secondary" data-action="clear-cache">
+                    Clear Cache
+                </button>
+            </div>
+            
+            <!-- Cookie Settings -->
+            <div class="setting-section">
+                <h4>🍪 Cookies</h4>
+                <p class="setting-description">We only use essential cookies for app functionality</p>
+                <button class="btn btn-secondary" data-action="manage-cookies">
+                    Cookie Preferences
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Get in Touch Overlay - Much Sharper Design -->
+<div id="getInTouchOverlay" class="overlay get-in-touch-overlay">
+    <div class="overlay-container get-in-touch-container">
+        <!-- Hero Section - More Personal -->
+        <div class="founder-hero">
+            <div class="founder-avatar">
+                <img src="/images/ben-avatar.jpg" alt="Ben" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div class="avatar-fallback" style="display:none;">👨‍💻</div>
+            </div>
+            
+            <div class="founder-intro">
+                <h2>Hey, I'm Ben 👋</h2>
+                <div class="founder-badge">Coeliac • Beer Lover • App Creator</div>
+            </div>
+
+            <div class="founder-story">
+                <p class="story-highlight">
+                    <strong>I built this app out of frustration.</strong>
+                </p>
+                <p>
+                    After my coeliac diagnosis, I was sick of turning up at pubs only to hear 
+                    "Sorry mate, just cider" or worse - nothing at all.
+                </p>
+                <p>
+                    So, I'm building the tool I wished existed - a proper database of where 
+                    to find <em>actual</em> gluten-free beer. Not just the mainstream stuff, 
+                    but the good craft beers we deserve!
+                </p>
+            </div>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="impact-stats">
+            <div class="stat-card">
+                <span class="stat-emoji">🍺</span>
+                <span class="stat-number">500+</span>
+                <span class="stat-label">GF Beers Listed</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-emoji">📍</span>
+                <span class="stat-number">67k+</span>
+                <span class="stat-label">Venues Mapped</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-emoji">👥</span>
+                <span class="stat-number">Growing</span>
+                <span class="stat-label">Community</span>
+            </div>
+        </div>
+
+        <!-- How It Works - Cleaner -->
+        <section class="how-it-works">
+            <h3>🎯 How This Works</h3>
+            
+            <div class="feature-cards">
+                <div class="feature-card">
+                    <div class="feature-icon">👥</div>
+                    <h4>Community Powered</h4>
+                    <p>Every venue, beer, and status update comes from people like you who've been there.</p>
+                    <div class="feature-note">No paid listings, just coeliacs helping coeliacs</div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🏆</div>
+                    <h4>Earn Recognition</h4>
+                    <p>Report beers, update statuses, add venues - earn points and climb the leaderboard!</p>
+                    <div class="feature-note">Top contributors get special badges</div>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h4>Use Anywhere</h4>
+                    <p>Works on any device. Install as an app for the best experience!</p>
+                    <div class="feature-note">One account, use everywhere</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section class="contact-section">
+            <h3>💬 Got Ideas or Feedback?</h3>
+            
+            <div class="contact-options">
+                <a href="mailto:ben@coeliacslikebeer.co.uk" class="contact-card">
+                    <span class="contact-icon">✉️</span>
+                    <div class="contact-info">
+                        <strong>Email Me</strong>
+                        <small>ben@coeliacslikebeer.co.uk</small>
+                    </div>
+                </a>
+
+                <a href="https://instagram.com/coeliacslikebeer" target="_blank" class="contact-card">
+                    <span class="contact-icon">📸</span>
+                    <div class="contact-info">
+                        <strong>Instagram</strong>
+                        <small>@coeliacslikebeer</small>
+                    </div>
+                </a>
+
+                <button class="contact-card" data-action="report-bug">
+                    <span class="contact-icon">🐛</span>
+                    <div class="contact-info">
+                        <strong>Report a Bug</strong>
+                        <small>Help improve the app</small>
+                    </div>
+                </button>
+            </div>
+        </section>
+
+        <!-- Support Section -->
+        <section class="support-section">
+            <h3>Want to Support?</h3>
+            <p>This app is free. If it's helped you find great GF beer, consider buying me a pint!</p>
+            
+            <div class="support-options">
+                <a href="https://buymeacoffee.com/coeliacslikebeer" target="_blank" class="btn btn-support">
+                    <span>🍺</span> Buy Me a Pint 
+                </a>
+                <button class="btn btn-secondary" data-action="share-app">
+                    <span>📲</span> Share the App
+                </button>
+            </div>
+        </section>
+
+        <!-- Call to Action -->
+        <div class="cta-section">
+            <h3>Ready to Find GF Beer?</h3>
+            <button class="btn btn-primary btn-large" data-action="close-get-in-touch">
+                Start Exploring 🗺️
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- GF Info Overlay -->
+<div id="gfInfoOverlay" class="modal-overlay info-overlay" data-cover-nav="true">
+    <div class="info-container">
+        <div class="info-card">
+            <div class="info-header">
+                <h1 class="info-title">🔬 What is Gluten Free Beer?</h1>
+                <button class="modal-close" data-action="close-modal">&times;</button>
+            </div>
+            <div class="info-content">
+                <div class="info-section">
+                    <h3>🧪 Official Standards</h3>
+                    <div class="standards-grid">
+                        <div class="standard-item">
+                            <strong>🇬🇧 UK & EU</strong>
+                            <p>Less than 20ppm gluten</p>
+                        </div>
+                        <div class="standard-item">
+                            <strong>🇺🇸 USA</strong>
+                            <p>Made only with gluten free ingredients</p>
+                        </div>
+                        <div class="standard-item">
+                            <strong>🇦🇺 Australia</strong>
+                            <p>Made only with gluten free ingredients</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="info-section">
+                    <h3>🏷️ Types of GF Beer</h3>
+                    <div class="beer-type-item">
+                        <strong>✅ Certified Gluten Free</strong>
+                        <p>Made from naturally gluten free grains (rice, sorghum, millet). Safest option.</p>
+                    </div>
+                    <div class="beer-type-item">
+                        <strong>⚗️ Gluten Removed/Reduced</strong>
+                        <p>Made from barley/wheat but treated with enzymes to break down gluten. Some coeliacs react.</p>
+                    </div>
+                    <div class="beer-type-item">
+                        <strong>🌾 "Made Without Gluten"</strong>
+                        <p>No gluten ingredients added, but may have cross-contamination. Check carefully!</p>
+                    </div>
+                </div>
+                <div class="info-section">
+                    <h3>⚠️ Important Notes</h3>
+                    <ul class="safety-notes">
+                        <li><strong>Cross-contamination</strong> can happen in breweries that also make regular beer</li>
+                        <li><strong>Always check labels</strong> and ask staff about preparation methods</li>
+                        <li><strong>Coeliacs vs Gluten Intolerant</strong> - Coeliac disease is an autoimmune condition requiring strict gluten avoidance</li>
+                        <li><strong>When in doubt</strong>, choose certified gluten free options</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
