@@ -509,7 +509,7 @@ def get_trending_beers():
             WHERE vb.last_seen >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
             GROUP BY b.beer_id, br.brewery_id
             ORDER BY report_count DESC
-            LIMIT 5
+            LIMIT 3
         """)
         
         trending = cursor.fetchall()
@@ -2229,6 +2229,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
