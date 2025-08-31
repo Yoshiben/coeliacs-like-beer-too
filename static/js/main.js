@@ -988,29 +988,8 @@ const App = {
 
 
         'app-settings': (el, modules) => {
-            // Store that we came from More menu
-            window.App.setState('returnToMore', true);
-            
-            // Close more menu
-            const moreMenu = document.getElementById('moreMenuOverlay');
-            if (moreMenu) moreMenu.style.display = 'none';
-            
-            // Open settings with a callback
-            modules.modalManager?.open('settingsModal', {
-                onClose: () => {
-                    // Check if we should return to More
-                    if (window.App.getState('returnToMore')) {
-                        // Reopen More menu
-                        const moreMenu = document.getElementById('moreMenuOverlay');
-                        if (moreMenu) {
-                            moreMenu.style.display = 'flex';
-                            moreMenu.classList.add('active');
-                        }
-                        // Clear the flag
-                        window.App.setState('returnToMore', false);
-                    }
-                }
-            });
+            // DON'T close more menu - just open settings on top
+            modules.modalManager?.open('settingsModal');
         },
 
 
@@ -1064,10 +1043,7 @@ const App = {
         },
         
         'manage-cookies': (el, modules) => {
-            // Close settings modal first
-            modules.modalManager?.close('settingsModal');
-            
-            // Open the cookie policy modal
+            // DON'T close settings - just stack cookie modal on top
             modules.modalManager?.open('cookieModal');
         },
 
@@ -2488,17 +2464,12 @@ const App = {
             modules.modalManager.open('aboutOverlay');
             modules.tracking?.trackEvent('about_us_view', 'Navigation', 'more_menu');
         },
+        
         'about-gf': (el, modules) => {
-            // Close the more menu first
-            const moreMenu = document.getElementById('moreMenu');
-            if (moreMenu) {
-                moreMenu.classList.remove('active');
-            }
-            
-            // Then open the GF info overlay
-            modules.modalManager.open('gfInfoOverlay');
-            modules.tracking?.trackEvent('gf_info_view', 'Navigation', 'more_menu');
+            // DON'T close more menu - just open GF info on top
+            modules.modalManager?.open('gfInfoOverlay');
         },
+        
         'close-about': (el, modules) => {
             if (modules.modalManager) {
                 modules.modalManager.close('aboutOverlay');
