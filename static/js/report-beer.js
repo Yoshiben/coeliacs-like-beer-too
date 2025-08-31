@@ -479,6 +479,7 @@ export const ReportBeer = (() => {
     };
 
     const selectBreweryBeer = (beer) => {
+        // Fill beer details
         const beerNameInput = document.getElementById('reportBeerName');
         const beerStyleInput = document.getElementById('reportBeerStyle');
         const beerABVInput = document.getElementById('reportBeerABV');
@@ -489,7 +490,7 @@ export const ReportBeer = (() => {
         
         hideDropdown('beerNameDropdown');
         
-        // Show beer as confirmed
+        // Show beer as confirmed (this will hide the input)
         showBeerConfirmed(beer.beer_name, false);
         
         // Show submit button immediately
@@ -741,6 +742,19 @@ export const ReportBeer = (() => {
             confirmed.classList.add('show');
             confirmed.style.display = 'block';
         }
+        
+        // Hide the beer name input field when confirmed
+        const beerNameInput = document.getElementById('reportBeerName');
+        const beerNameLabel = beerNameInput?.previousElementSibling;
+        if (beerNameInput) {
+            beerNameInput.style.display = 'none';
+            if (beerNameLabel && beerNameLabel.tagName === 'LABEL') {
+                beerNameLabel.style.display = 'none';
+            }
+        }
+        
+        // Also hide the dropdown
+        hideDropdown('beerNameDropdown');
     };
 
     const showSubmitButton = () => {
