@@ -58,6 +58,7 @@ export const ModalManager = (() => {
         getInTouchOverlay: { type: 'overlay', group: 'info', exclusive: true, zIndex: 1500 },
         
         
+        
         // Search modals (mutually exclusive within group)
         nameModal: { type: 'modal', group: 'search-input', exclusive: true },
         areaModal: { type: 'modal', group: 'search-input', exclusive: true },
@@ -85,7 +86,10 @@ export const ModalManager = (() => {
         locationBlockedModal: { type: 'modal', group: 'system', priority: true },
         notificationsPreviewModal: { type: 'modal', group: 'system', exclusive: true },
         cookieConsent: { type: 'banner', group: 'system', priority: true },
-        cookieSettings: { type: 'modal', group: 'system', exclusive: true }
+        cookieSettings: { type: 'modal', group: 'system', exclusive: true },
+
+        // More Menu modals
+        settingsModal: { type: 'modal', group: 'menu', exclusive: true }
     };
     
     // ================================
