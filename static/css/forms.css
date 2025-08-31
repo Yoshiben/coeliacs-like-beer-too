@@ -609,3 +609,9 @@
 #step-beer-details {
     position: relative; /* Make sure the parent is positioned */
 }
+
+
+#reportModal .form-actions {
+   display: block !important;
+}
+#reportModal
