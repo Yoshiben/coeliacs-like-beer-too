@@ -1059,37 +1059,6 @@ const App = {
 
 
 
-
-        
-
-        // get in touch
-        'get-in-touch': (el, modules) => {
-            console.log('💬 Opening Get in Touch overlay');
-            modules.modalManager?.open('getInTouchOverlay');
-            modules.tracking?.trackEvent('get_in_touch_view', 'Navigation', 'community_section');
-        },
-        
-        'close-get-in-touch': (el, modules) => {
-            modules.modalManager?.close('getInTouchOverlay');
-        },
-        
-        'show-gf-guide': (el, modules) => {
-            modules.modalManager?.close('getInTouchOverlay');
-            setTimeout(() => {
-                modules.modalManager?.open('gfInfoOverlay');
-            }, 100);
-        },
-
-
-
-
-
-
-
-        
-
-
-        
         // Search actions
         'location-search': (el, modules) => {
             modules.nav?.setPageContext('search-modal'); // Set context to search-modal
@@ -1116,6 +1085,65 @@ const App = {
         'perform-beer-search': (el, modules) => {
             modules.search?.searchByBeer();
         },
+
+
+
+
+
+        
+
+        // get in touch
+        'get-in-touch': (el, modules) => {
+            console.log('💬 Opening Get in Touch overlay');
+            modules.modalManager?.open('getInTouchOverlay');
+            modules.tracking?.trackEvent('get_in_touch_view', 'Navigation', 'community_section');
+        },
+        
+        'close-get-in-touch': (el, modules) => {
+            modules.modalManager?.close('getInTouchOverlay');
+        },
+        
+        'show-gf-guide': (el, modules) => {
+            modules.modalManager?.close('getInTouchOverlay');
+            setTimeout(() => {
+                modules.modalManager?.open('gfInfoOverlay');
+            }, 100);
+        },
+
+
+
+
+
+        // Beer report form actions
+        'select-format': (el, modules) => {
+            const format = el.dataset.format;
+            if (format && window.ReportBeer) {
+                window.ReportBeer.selectFormat(format);
+            }
+        },
+        
+        'brewery-knowledge': (el, modules) => {
+            const knows = el.dataset.knowsBrewery === 'yes';
+            if (window.ReportBeer) {
+                window.ReportBeer.handleBreweryKnowledge(knows);
+            }
+        },
+        
+        'submit-beer-report': (el, modules) => {
+            if (window.ReportBeer) {
+                const form = document.getElementById('reportForm');
+                if (form) {
+                    const event = new Event('submit', { cancelable: true });
+                    window.ReportBeer.handleSubmit(event);
+                }
+            }
+        },
+
+
+        
+
+
+        
 
 
 
@@ -1857,16 +1885,6 @@ const App = {
             modules.tracking?.trackEvent('report_beer_click', 'User Action', venueData?.name || 'unknown');
         },
 
-        'submit-beer-report': (el, modules) => {
-            console.log('🎉 Submit beer report clicked!');
-            
-            // Call CascadeForm's submit handler directly
-            if (window.CascadeForm) {
-                // Create a fake event object since handleSubmit expects one
-                const fakeEvent = { preventDefault: () => {} };
-                window.CascadeForm.handleSubmit(fakeEvent);
-            }
-        },
         'clear-selected-venue': (el, modules) => {
             modules.form?.clearSelectedVenue?.();
         },
