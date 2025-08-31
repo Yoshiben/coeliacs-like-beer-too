@@ -1046,7 +1046,11 @@ const App = {
         },
         
         'manage-cookies': (el, modules) => {
-            modules.toast?.info('Only essential cookies are used - no tracking cookies');
+            // Close settings modal first
+            modules.modalManager?.close('settingsModal');
+            
+            // Open the cookie policy modal
+            modules.modalManager?.open('cookieModal');
         },
 
         
