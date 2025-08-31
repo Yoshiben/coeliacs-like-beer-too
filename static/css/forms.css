@@ -453,59 +453,11 @@
     min-height: 400px;
 }
 
-/* Progress Bar */
-/* .cascade-progress {
-    display: flex;
-    justify-content: space-between;
-    padding: 1rem 1.5rem;
-    background: var(--bg-section);
-    border-bottom: 2px solid var(--border-light);
-}
-
-.progress-step {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    opacity: 0.4;
-    transition: opacity 0.3s;
-}
-
-.progress-step.active { opacity: 1; }
-.progress-step.completed { opacity: 0.8; }
-
-.step-number {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: var(--grey);
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.75rem;
-    font-weight: bold;
-}
-
-.progress-step.active .step-number { background: var(--purple); }
-.progress-step.completed .step-number { background: var(--green); }
-
-/* Steps */
-.cascade-step {
-    display: none;
-    padding: 0 1.5rem;
-    margin-bottom: 1.5rem;
-}
-
-.cascade-step.active {
-    display: block;
-    animation: fadeInUp 0.3s forwards;
-} */
-
 /* Format Buttons */
 #reportModal .format-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
+/*     grid-template-columns: 1fr 1fr; */
+    gap: var(--space-sm);
     margin-bottom: 1rem;
 }
 
