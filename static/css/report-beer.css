@@ -1,3 +1,84 @@
+#reportModal .form-input,
+#reportModal .form-select {
+   border: 2px solid var(--border-light);
+   border-radius: var(--radius-xl);
+   font-size: var(--text-md);
+   margin: var(--space-xl);
+   transition: border-color 0.25s ease;
+   overflow: hidden;
+   padding: var(--space-xl);
+   width: -webkit-fill-available;
+   background: var(--bg-white);
+   color: var(--text-primary);
+   font-family: inherit;
+}
+
+#reportModal .form-input:focus,
+#reportModal .form-select:focus {
+   outline: none;
+   border-color: var(--border-purple);
+   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+#reportModal .form-input::placeholder {
+   color: var(--text-muted);
+   opacity: 0.8;
+}
+
+#reportModal .form-label {
+   font-weight: 600;
+   color: var(--text-secondary);
+   font-size: var(--text-lg);
+   padding: var(--space-md);
+   display: flex;
+   margin-bottom: var(--space-xs);
+}
+
+#reportModal .form-group {
+   margin-bottom: var(--space-lg);
+}
+
+#reportModal .form-group:last-child {
+   margin-bottom: 0;
+}
+
+/* Form Validation States */
+#reportModal .form-input.error,
+#reportModal .form-select.error {
+   border-color: var(--red);
+   box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+#reportModal .form-input.success,
+#reportModal .form-select.success {
+   border-color: var(--green);
+   box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+#reportModal .form-error-message {
+   color: var(--red);
+   font-size: var(--text-sm);
+   margin-top: var(--space-xs);
+   padding-left: var(--space-lg);
+   font-weight: 500;
+}
+
+#reportModal .form-success-message {
+   color: var(--green);
+   font-size: var(--text-sm);
+   margin-top: var(--space-xs);
+   padding-left: var(--space-lg);
+   font-weight: 500;
+}
+
+#reportModal .form-help-text {
+   color: var(--text-muted);
+   font-size: var(--text-sm);
+   margin-top: var(--space-xs);
+   padding-left: var(--space-lg);
+   line-height: 1.4;
+}
+
 .beer-confirmed {
     display: none;
     background: #d4edda;
