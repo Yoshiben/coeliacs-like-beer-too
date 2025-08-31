@@ -25,14 +25,15 @@ export const ModalManager = (() => {
     // Modal/Overlay Registry with types and rules
     const registry = {
 
-        // Legal modals group
-        privacyModal: { type: 'modal', group: 'legal', exclusive: false, priority: true, zIndex: 10001 },
-        termsModal: { type: 'modal', group: 'legal', exclusive: false, priority: true, zIndex: 10001 },
-        liabilityModal: { type: 'modal', group: 'legal', exclusive: false, priority: true},
+        // Info/Legal overlays - all full screen with nav visible
+        privacyOverlay: { type: 'overlay', group: 'info', exclusive: false },
+        termsOverlay: { type: 'overlay', group: 'info', exclusive: false },
+        liabilityOverlay: { type: 'overlay', group: 'info', exclusive: false },
+        getInTouchOverlay: { type: 'overlay', group: 'info', exclusive: false },
+        gfInfoOverlay: { type: 'overlay', group: 'info', exclusive: false },
 
         // Onboarding modals group (complete set)
-        ageGateModal: { type: 'modal', group: 'onboarding', exclusive: true, priority: true },
-        
+        ageGateModal: { type: 'modal', group: 'onboarding', exclusive: true, priority: true },        
         welcomeModal: { type: 'modal', group: 'onboarding', exclusive: true },
         nicknameModal: { type: 'modal', group: 'onboarding', exclusive: true },
         signInModal: { type: 'modal', group: 'onboarding', exclusive: true },
@@ -50,14 +51,7 @@ export const ModalManager = (() => {
         venueDetailsOverlay: { type: 'overlay', group: 'primary', exclusive: true },
         breweriesOverlay: { type: 'overlay', group: 'primary', exclusive: true },
         communityHubOverlay: { type: 'overlay', group: 'primary', exclusive: true },
-        communityHubOverlay: { type: 'overlay', group: 'primary', exclusive: true },
-
-        // Info overlays
-        // aboutOverlay: { type: 'overlay', group: 'info', exclusive: true, zIndex: 1500 },
-        gfInfoOverlay: { type: 'overlay', group: 'info', exclusive: true, zIndex: 10001 },
-        getInTouchOverlay: { type: 'overlay', group: 'info', exclusive: true, zIndex: 10001 },
-        
-        
+        communityHubOverlay: { type: 'overlay', group: 'primary', exclusive: true },        
         
         // Search modals (mutually exclusive within group)
         nameModal: { type: 'modal', group: 'search-input', exclusive: true },
