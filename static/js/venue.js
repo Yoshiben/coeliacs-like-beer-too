@@ -194,6 +194,70 @@ export const VenueModule = (function() {
             // Fail silently - don't break the UI if this fails
         }
     };
+
+    const confirmGFStatus = () => {
+        const venue = utils.getCurrentVenue();
+        if (!venue) return;
+        
+        // Populate the confirmation modal
+        const venueNameEl = document.getElementById('confirmVenueName');
+        const statusDisplayEl = document.getElementById('confirmStatusDisplay');
+        
+        if (venueNameEl) venueNameEl.textContent = venue.venue_name;
+        
+        // Get current status display
+        const currentStatusEl = document.getElementById('currentGFStatus');
+        if (statusDisplayEl && currentStatusEl) {
+            // Clone the current status display into the modal
+            statusDisplayEl.innerHTML = currentStatusEl.innerHTML;
+        }
+        
+        // Open the confirmation modal
+        modules.modalManager?.open('statusConfirmModal');
+    };
+    
+    /**
+     * Actually submit the confirmation
+     */
+    const doConfirmStatus = async () => {
+        const venue = utils.getCurrentVenue();
+        const userId = parseInt(localStorage.getItem('user_id'));
+        
+        if (!venue || !userId) {
+            utils.showToast('Error: Missing data', 'error');
+            return;
+        }
+        
+        modules.modalManager?.close('statusConfirmModal');
+        utils.showLoadingToast('Confirming status...');
+        
+        try {
+            const response = await fetch('/api/venue/confirm-status', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    venue_id: venue.venue_id,
+                    status: venue.gf_status,
+                    user_id: userId
+                })
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                utils.hideLoadingToast();
+                utils.showToast(`✅ Status confirmed! +${result.points_earned} points`);
+                
+                // Reload the confirmation text
+                loadStatusConfirmations(venue.venue_id);
+            } else {
+                throw new Error('Failed to confirm');
+            }
+        } catch (error) {
+            console.error('Error confirming status:', error);
+            utils.hideLoadingToast();
+            utils.showToast('Failed to confirm status', 'error');
+        }
+    };
     
     /**
      * Setup the beer details section
