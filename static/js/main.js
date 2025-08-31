@@ -790,25 +790,37 @@ const App = {
 
 
         // Legal stuff
-        'show-privacy-overlay': (el, modules) => {
+        'show-privacy-modal': (el, modules) => {
             document.getElementById('moreMenuOverlay').style.display = 'none';
             setTimeout(() => {
                 modules.modalManager?.open('privacyModal');
             }, 100);
         },
         
-        'show-terms-overlay': (el, modules) => {
+        'show-terms-modal': (el, modules) => {
             document.getElementById('moreMenuOverlay').style.display = 'none';
             setTimeout(() => {
                 modules.modalManager?.open('termsModal');
             }, 100);
         },
         
-        'show-liability-overlay': (el, modules) => {
+        'show-liability-modal': (el, modules) => {
             document.getElementById('moreMenuOverlay').style.display = 'none';
             setTimeout(() => {
                 modules.modalManager?.open('liabilityModal');
             }, 100);
+        },
+
+        'show-privacy-overlay': (el, modules) => {
+            modules.modalManager?.open('privacyOverlay');
+        },
+        
+        'show-terms-overlay': (el, modules) => {
+            modules.modalManager?.open('termsOverlay');
+        },
+        
+        'show-liability-overlay': (el, modules) => {
+            modules.modalManager?.open('liabilityOverlay');
         },
         
         'show-privacy-from-age-gate': (el, modules, event) => {
