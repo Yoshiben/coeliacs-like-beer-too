@@ -19,7 +19,7 @@ export const CascadeForm = (() => {
         isNewBeer: false,
         currentVenue: null,
         initialized: false,
-        dropdownLoading: false  // Add this flag
+        dropdownLoading: false
     };
 
     // ================================
@@ -114,6 +114,7 @@ export const CascadeForm = (() => {
         
         console.log('✅ CASCADE RESET COMPLETE');
     };
+
     // Set venue context (called from main.js when opening modal)
     const setVenue = (venue) => {
         state.currentVenue = venue;
@@ -144,7 +145,7 @@ export const CascadeForm = (() => {
             const formatBtn = e.target.closest('.format-btn');
             if (formatBtn) {
                 e.preventDefault();
-                e.stopPropagation(); // Stop event from bubbling to other handlers
+                e.stopPropagation();
                 console.log('🔘 Format clicked:', formatBtn.dataset.format);
                 selectFormat(formatBtn.dataset.format);
                 return;
@@ -160,34 +161,15 @@ export const CascadeForm = (() => {
                 return;
             }
             
-           const suggestionItem = e.target.closest('.suggestion-item');
-            if (suggestionItem) {  // Remove the modal check - it's breaking things
+            // Suggestion items
+            const suggestionItem = e.target.closest('.suggestion-item');
+            if (suggestionItem) {
                 e.preventDefault();
                 e.stopPropagation(); 
                 console.log('🎯 Clicked suggestion:', suggestionItem.dataset.action, suggestionItem.dataset.brewery);
                 handleSuggestionClick(suggestionItem);
                 return;
             }
-
-            const beerNameInput = document.getElementById('reportBeerName');
-            if (beerNameInput) {
-                // ... existing input event listener ...
-                
-                // Add focus event to show beers immediately
-                beerNameInput.addEventListener('focus', async (e) => {
-                    if (state.selectedBrewery && !beerNameInput.value) {
-                        // Load and show brewery beers
-                        try {
-                            const response = await fetch(`/api/brewery/${encodeURIComponent(state.selectedBrewery)}/beers`);
-                            const beers = await response.json();
-                            // ... same dropdown display logic as above ...
-                        } catch (error) {
-                            console.error('Error loading beers on focus:', error);
-                        }
-                    }
-                });
-            }
-            
         }, true); // Use capture phase to handle before other listeners
         
         // Brewery input with debounce
@@ -211,9 +193,9 @@ export const CascadeForm = (() => {
             // Keep dropdown open when clicking on input
             breweryInput.addEventListener('mousedown', (e) => {
                 if (!breweryInput.value) {
-                    e.preventDefault(); // Prevent default focus behavior
+                    e.preventDefault();
                     showAllBreweries();
-                    breweryInput.focus(); // Manually focus after
+                    breweryInput.focus();
                 }
             });
         }
@@ -234,6 +216,8 @@ export const CascadeForm = (() => {
         const beerNameInput = document.getElementById('reportBeerName');
         if (beerNameInput) {
             let beerNameTimeout;
+            
+            // Input event for typing
             beerNameInput.addEventListener('input', (e) => {
                 clearTimeout(beerNameTimeout);
                 beerNameTimeout = setTimeout(() => {
@@ -241,6 +225,55 @@ export const CascadeForm = (() => {
                         searchBreweryBeers(e.target.value);
                     }
                 }, 300);
+            });
+            
+            // Focus event to show beers immediately
+            beerNameInput.addEventListener('focus', async (e) => {
+                if (state.selectedBrewery && !beerNameInput.value) {
+                    // Load and show brewery beers
+                    try {
+                        const response = await fetch(`/api/brewery/${encodeURIComponent(state.selectedBrewery)}/beers`);
+                        const beers = await response.json();
+                        
+                        const dropdown = document.getElementById('beerNameDropdown');
+                        if (!dropdown) return;
+                        
+                        let html = '';
+                        
+                        if (beers.length > 0) {
+                            html = `<div class="dropdown-header">🍺 ${beers.length} ${state.selectedBrewery} beers</div>`;
+                            beers.forEach(beer => {
+                                html += `
+                                    <div class="suggestion-item" data-action="select-brewery-beer" data-beer='${JSON.stringify(beer)}'>
+                                        <strong>${escapeHtml(beer.beer_name)}</strong>
+                                        <small>${escapeHtml(beer.style || 'Unknown')} • ${beer.abv || '?'}% ABV</small>
+                                    </div>
+                                `;
+                            });
+                            
+                            // Add "Add new beer" option at the bottom
+                            html += `
+                                <div class="suggestion-item new-beer" data-action="prompt-new-beer">
+                                    <strong>➕ Add new ${state.selectedBrewery} beer</strong>
+                                </div>
+                            `;
+                        } else {
+                            // No beers yet, show add new option
+                            html = `
+                                <div class="dropdown-header">🆕 No ${state.selectedBrewery} beers yet</div>
+                                <div class="suggestion-item new-beer" data-action="prompt-new-beer">
+                                    <strong>➕ Add the first ${state.selectedBrewery} beer!</strong>
+                                </div>
+                            `;
+                        }
+                        
+                        dropdown.innerHTML = html;
+                        showDropdown('beerNameDropdown');
+                        
+                    } catch (error) {
+                        console.error('Error loading beers on focus:', error);
+                    }
+                }
             });
         }
         
@@ -356,7 +389,7 @@ export const CascadeForm = (() => {
         if (dropdown) {
             dropdown.innerHTML = '<div class="dropdown-header">Loading breweries...</div>';
             dropdown.classList.add('show');
-            dropdown.style.display = 'block'; // Force display
+            dropdown.style.display = 'block';
         }
         
         try {
@@ -454,24 +487,24 @@ export const CascadeForm = (() => {
         });
     };
 
-    const selectBrewery = async (breweryName) => {  // Make it async
-    state.selectedBrewery = breweryName;
-    state.isNewBrewery = false;
-    
-    // Fill input
-    const breweryInput = document.getElementById('reportBrewery');
-    if (breweryInput) breweryInput.value = breweryName;
-    hideDropdown('breweryDropdown');
-    
-    // Show beer details step
-    showStep('beer-details');
-    updateProgress('beer');
-    
-    // Show brewery confirmation
-    showBreweryConfirmed(breweryName);
-    
-    // Focus beer name input
-    const beerNameInput = document.getElementById('reportBeerName');
+    const selectBrewery = async (breweryName) => {
+        state.selectedBrewery = breweryName;
+        state.isNewBrewery = false;
+        
+        // Fill input
+        const breweryInput = document.getElementById('reportBrewery');
+        if (breweryInput) breweryInput.value = breweryName;
+        hideDropdown('breweryDropdown');
+        
+        // Show beer details step
+        showStep('beer-details');
+        updateProgress('beer');
+        
+        // Show brewery confirmation
+        showBreweryConfirmed(breweryName);
+        
+        // Focus beer name input
+        const beerNameInput = document.getElementById('reportBeerName');
         if (beerNameInput) {
             beerNameInput.focus();
             
@@ -727,7 +760,6 @@ export const CascadeForm = (() => {
                 break;
                 
             case 'prompt-new-brewery':
-                // Fixed: Don't redeclare breweryInput
                 const input = document.getElementById('reportBrewery');
                 if (input) {
                     hideDropdown('breweryDropdown');
@@ -742,7 +774,6 @@ export const CascadeForm = (() => {
                 selectFoundBeer(JSON.parse(item.dataset.beer));
                 break;
 
-            // In handleSuggestionClick, add this case:
             case 'prompt-new-beer':
                 // User wants to add a new beer to the selected brewery
                 const beerNameInput = document.getElementById('reportBeerName');
@@ -782,8 +813,8 @@ export const CascadeForm = (() => {
                 
             case 'add-brewery-beer':
                 // Adding new beer to known brewery
-                const beerNameInput = document.getElementById('reportBeerName');
-                if (beerNameInput) beerNameInput.value = item.dataset.beer;
+                const addBeerNameInput = document.getElementById('reportBeerName');
+                if (addBeerNameInput) addBeerNameInput.value = item.dataset.beer;
                 hideDropdown('beerNameDropdown');
                 const beerStyleInput = document.getElementById('reportBeerStyle');
                 if (beerStyleInput) beerStyleInput.focus();
@@ -793,6 +824,7 @@ export const CascadeForm = (() => {
                 break;
         }
     };
+
     // ================================
     // FORM SUBMISSION
     // ================================
@@ -875,41 +907,30 @@ export const CascadeForm = (() => {
     // ================================
     // UI HELPERS
     // ================================
-    // In cascade-form.js, update the showStep function:
     const showStep = (stepName) => {
         console.log('🔄 showStep called with:', stepName);
         
-        // Hide ALL steps first - more thorough reset
+        // Hide ALL steps first
         const allSteps = document.querySelectorAll('.cascade-step');
         console.log('🔄 Found', allSteps.length, 'cascade steps');
         
         allSteps.forEach(step => {
             console.log('  Hiding step:', step.id);
             step.classList.remove('active');
-            step.style.display = 'none';  // Force hide with inline style
-            // Also reset any form elements within this step
-            step.querySelectorAll('input, select, textarea').forEach(input => {
-                if (input.type !== 'hidden') {
-                    input.value = '';
-                }
-            });
-            // Reset button states within this step
-            step.querySelectorAll('.selected').forEach(btn => {
-                btn.classList.remove('selected');
-            });
+            step.style.display = 'none';
         });
         
         // Show ONLY the target step
         const targetStep = document.getElementById(`step-${stepName}`);
         if (targetStep) {
             targetStep.classList.add('active');
-            targetStep.style.display = 'block';  // Force show with inline style
+            targetStep.style.display = 'block';
             console.log('🔄 Activated step:', stepName);
         } else {
             console.error('❌ Step not found:', `step-${stepName}`);
         }
         
-        // Hide/show submit button based on step
+        // Show/hide submit button based on step
         const formActions = document.getElementById('formActions');
         if (formActions) {
             if (stepName === 'beer-details') {
@@ -943,7 +964,7 @@ export const CascadeForm = (() => {
         const dropdown = document.getElementById(dropdownId);
         if (dropdown) {
             dropdown.classList.add('show');
-            dropdown.style.display = 'block'; // This might be the issue
+            dropdown.style.display = 'block';
         }
     };
 
@@ -956,7 +977,7 @@ export const CascadeForm = (() => {
         const dropdown = document.getElementById(dropdownId);
         if (dropdown) {
             dropdown.classList.remove('show');
-            dropdown.style.display = 'none'; // Force hide with inline style
+            dropdown.style.display = 'none';
         }
     };
 
@@ -970,7 +991,6 @@ export const CascadeForm = (() => {
         }
     };
 
-    // In your searchBreweryBeers function, after a beer is selected:
     const showBeerConfirmed = (beerName) => {
         const confirmed = document.getElementById('beerConfirmed');
         const nameEl = document.getElementById('confirmedBeerName');
