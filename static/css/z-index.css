@@ -1,0 +1,29 @@
+/* Z-INDEX HIERARCHY */
+
+/* Base level - normal content */
+.community-home { z-index: 1; }
+
+/* Navigation bars */
+.top-nav { z-index: 1000; }
+.bottom-nav { z-index: 1000; }
+
+/* Primary overlays (search, results, venues) */
+.overlay { z-index: 2000; }
+
+/* Modals over overlays */
+.modal-overlay { z-index: 3000; }
+
+/* More menu - slides up over everything except modals from it */
+.more-menu-overlay { z-index: 4000; }
+
+/* Things opened FROM more menu */
+.legal-overlay,
+.info-overlay,
+.settings-modal { z-index: 4100; }
+
+/* Critical system modals (age gate, cookies) */
+.age-gate-modal { z-index: 9999; }
+.cookie-consent { z-index: 9998; }
+
+/* Loading spinners/toasts */
+.toast-container { z-index: 10000; }
