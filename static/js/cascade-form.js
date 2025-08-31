@@ -168,6 +168,26 @@ export const CascadeForm = (() => {
                 handleSuggestionClick(suggestionItem);
                 return;
             }
+
+            const beerNameInput = document.getElementById('reportBeerName');
+            if (beerNameInput) {
+                // ... existing input event listener ...
+                
+                // Add focus event to show beers immediately
+                beerNameInput.addEventListener('focus', async (e) => {
+                    if (state.selectedBrewery && !beerNameInput.value) {
+                        // Load and show brewery beers
+                        try {
+                            const response = await fetch(`/api/brewery/${encodeURIComponent(state.selectedBrewery)}/beers`);
+                            const beers = await response.json();
+                            // ... same dropdown display logic as above ...
+                        } catch (error) {
+                            console.error('Error loading beers on focus:', error);
+                        }
+                    }
+                });
+            }
+            
         }, true); // Use capture phase to handle before other listeners
         
         // Brewery input with debounce
@@ -434,28 +454,77 @@ export const CascadeForm = (() => {
         });
     };
 
-    const selectBrewery = (breweryName) => {
-        state.selectedBrewery = breweryName;
-        state.isNewBrewery = false;
-        
-        // Fill input
-        const breweryInput = document.getElementById('reportBrewery');
-        if (breweryInput) breweryInput.value = breweryName;
-        hideDropdown('breweryDropdown');
-        
-        // Show beer details step
-        showStep('beer-details');
-        updateProgress('beer');
-        
-        // Show brewery confirmation
-        showBreweryConfirmed(breweryName);
-        
-        // Focus beer name input
-        const beerNameInput = document.getElementById('reportBeerName');
-        if (beerNameInput) beerNameInput.focus();
-        
-        // Load this brewery's beers
-        loadBreweryBeers(breweryName);
+    const selectBrewery = async (breweryName) => {  // Make it async
+    state.selectedBrewery = breweryName;
+    state.isNewBrewery = false;
+    
+    // Fill input
+    const breweryInput = document.getElementById('reportBrewery');
+    if (breweryInput) breweryInput.value = breweryName;
+    hideDropdown('breweryDropdown');
+    
+    // Show beer details step
+    showStep('beer-details');
+    updateProgress('beer');
+    
+    // Show brewery confirmation
+    showBreweryConfirmed(breweryName);
+    
+    // Focus beer name input
+    const beerNameInput = document.getElementById('reportBeerName');
+        if (beerNameInput) {
+            beerNameInput.focus();
+            
+            // Load and show this brewery's beers immediately
+            try {
+                const response = await fetch(`/api/brewery/${encodeURIComponent(breweryName)}/beers`);
+                const beers = await response.json();
+                
+                const dropdown = document.getElementById('beerNameDropdown');
+                if (!dropdown) return;
+                
+                let html = '';
+                
+                if (beers.length > 0) {
+                    html = `<div class="dropdown-header">🍺 ${beers.length} ${breweryName} beers</div>`;
+                    beers.forEach(beer => {
+                        html += `
+                            <div class="suggestion-item" data-action="select-brewery-beer" data-beer='${JSON.stringify(beer)}'>
+                                <strong>${escapeHtml(beer.beer_name)}</strong>
+                                <small>${escapeHtml(beer.style || 'Unknown')} • ${beer.abv || '?'}% ABV</small>
+                            </div>
+                        `;
+                    });
+                    
+                    // Add "Add new beer" option at the bottom
+                    html += `
+                        <div class="suggestion-item new-beer" data-action="prompt-new-beer">
+                            <strong>➕ Add new ${breweryName} beer</strong>
+                        </div>
+                    `;
+                    
+                    dropdown.innerHTML = html;
+                    showDropdown('beerNameDropdown');
+                    
+                    // Show toast about available beers
+                    showToast(`🍺 ${breweryName} has ${beers.length} beers in our database`);
+                } else {
+                    // No beers yet, show add new option
+                    html = `
+                        <div class="dropdown-header">🆕 No ${breweryName} beers yet</div>
+                        <div class="suggestion-item new-beer" data-action="prompt-new-beer">
+                            <strong>➕ Add the first ${breweryName} beer!</strong>
+                        </div>
+                    `;
+                    dropdown.innerHTML = html;
+                    showDropdown('beerNameDropdown');
+                    showToast(`🆕 You're adding the first ${breweryName} beer!`);
+                }
+                
+            } catch (error) {
+                console.error('Error loading brewery beers:', error);
+            }
+        }
     };
 
     const createNewBrewery = (breweryName) => {
