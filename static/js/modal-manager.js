@@ -147,6 +147,12 @@ export const ModalManager = (() => {
             console.log(`🔒 ModalManager: Closing ${elementId}`);
         }
         
+        // Special handling for report modal - reset cascade form
+        if (elementId === 'reportModal' && window.CascadeForm) {
+            window.CascadeForm.reset();
+            console.log('🔄 Reset cascade form on modal close');
+        }
+        
         if (config.type === 'overlay') {
             return closeOverlay(elementId);
         } else if (config.type === 'modal') {
