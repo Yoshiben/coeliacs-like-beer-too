@@ -182,7 +182,7 @@ export const NavStateManager = (() => {
                 case 'terms':
                 case 'liability':
                 case 'about-gf':
-                    // Just close the overlay - More menu stays open behind
+                    // Close the overlay
                     const overlayMap = {
                         'contact': 'getInTouchOverlay',
                         'privacy': 'privacyOverlay',
@@ -191,7 +191,15 @@ export const NavStateManager = (() => {
                         'about-gf': 'gfInfoOverlay'
                     };
                     modules.modalManager?.close(overlayMap[currentContext]);
-                    setPageContext('home'); // Reset context
+                    
+                    // Reopen More menu
+                    const moreMenu = document.getElementById('moreMenuOverlay');
+                    if (moreMenu) {
+                        moreMenu.style.display = 'flex';
+                        moreMenu.classList.add('active');
+                    }
+                    
+                    setPageContext('home');
                     break;
                     
                 case 'venue':
