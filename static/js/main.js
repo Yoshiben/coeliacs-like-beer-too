@@ -1929,38 +1929,6 @@ const App = {
                 searchModule.PlacesSearchModule.openPlacesSearch();
             }
         },
-
-        'create-brewery': (el, modules) => {
-            const breweryName = el.dataset.brewery;
-            
-            if (breweryName && window.CascadeForm) {
-                // This is what should happen - just call createNewBrewery
-                window.CascadeForm.createNewBrewery(breweryName);
-            }
-        },
-
-        'add-brewery-beer': (el, modules) => {
-            const beerName = el.dataset.beer;
-            if (beerName && window.CascadeForm) {
-                // Just set the beer name and show submit button
-                const beerNameInput = document.getElementById('reportBeerName');
-                if (beerNameInput) {
-                    beerNameInput.value = beerName;
-                }
-                
-                // Hide dropdown
-                const dropdown = document.getElementById('beerNameDropdown');
-                if (dropdown) {
-                    dropdown.style.display = 'none';
-                }
-                
-                // Show submit button
-                const formActions = document.getElementById('formActions');
-                if (formActions) {
-                    formActions.classList.add('show');
-                }
-            }
-        },
         
         // Also add this one if you don't have it:
         'add-new-brewery': (el, modules) => {
@@ -2246,6 +2214,12 @@ const App = {
                 modules.breweries?.searchBreweryBeers(brewery);
             }
         },
+
+
+
+
+        // REPORT BEER MODALS
+        
         'select-brewery': (el, modules) => {
             const brewery = el.dataset.brewery;
             if (brewery && window.CascadeForm) {
@@ -2253,19 +2227,71 @@ const App = {
             }
         },
 
+        'create-brewery': (el, modules) => {
+            const brewery = el.dataset.brewery;
+            if (brewery && window.CascadeForm) {
+                window.CascadeForm.createNewBrewery(brewery);
+            }
+        },
+
         'select-brewery-beer': (el, modules) => {
             const beerData = el.dataset.beer;
             if (beerData && window.CascadeForm) {
-                window.CascadeForm.selectBreweryBeer(JSON.parse(beerData));
+                try {
+                    const beer = JSON.parse(beerData);
+                    window.CascadeForm.selectBreweryBeer(beer);
+                } catch (e) {
+                    console.error('Invalid beer data:', e);
+                }
             }
         },
         
         'select-found-beer': (el, modules) => {
             const beerData = el.dataset.beer;
             if (beerData && window.CascadeForm) {
-                window.CascadeForm.selectFoundBeer(JSON.parse(beerData));
+                try {
+                    const beer = JSON.parse(beerData);
+                    window.CascadeForm.selectFoundBeer(beer);
+                } catch (e) {
+                    console.error('Invalid beer data:', e);
+                }
             }
         },
+
+        'prompt-new-beer': (el, modules) => {
+            if (window.CascadeForm) {
+                window.CascadeForm.promptNewBeer();
+            }
+        },
+        
+        'create-new-beer': (el, modules) => {
+            const beerName = el.dataset.beer;
+            if (beerName && window.CascadeForm) {
+                window.CascadeForm.createNewBeer(beerName);
+            }
+        },
+        
+        'add-brewery-beer': (el, modules) => {
+            const beerName = el.dataset.beer;
+            if (beerName && window.CascadeForm) {
+                window.CascadeForm.addBreweryBeer(beerName);
+            }
+        },
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
         
         'retry-breweries': (el, modules) => {
             modules.breweries?.loadBreweries();
