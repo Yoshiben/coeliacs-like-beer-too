@@ -215,7 +215,7 @@ const App = {
         const modules = await Promise.all([
             import('./map.js'),
             import('./search.js'),
-            import('./home-page.js'),
+            import('./community.js'),
             import('./nav.js'),
             import('./breweries.js'),
             import('./venue.js')
@@ -224,16 +224,16 @@ const App = {
         const [
             { MapModule },
             { SearchModule },
-            { HomePageModule },
+            { CommunityModule },
             { NavStateManager },
             breweriesImport,
             { VenueModule }
+            
         ] = modules;
         
         App.registerModule('map', MapModule);
         App.registerModule('search', SearchModule);
-        App.registerModule('homePage', HomePageModule);  // Changed key and module name
-        App.registerModule('community', HomePageModule);  // Keep this alias for backwards compatibility!
+        App.registerModule('community', CommunityModule);
         App.registerModule('venue', VenueModule);
 
         const { CommunityHubModule } = await import('./community-hub.js');
@@ -1474,12 +1474,9 @@ const App = {
         
         // Venue actions
         'view-venue': (el, modules) => {
-            const venueId = el.dataset.venueId;
-            if (venueId) {
-                modules.venue?.showVenueDetails(venueId);
-            }
+            const venueId = el.dataset.venueId || el.closest('[data-venue-id]')?.dataset.venueId;
+            if (venueId) modules.venue?.showVenueDetails?.(venueId);
         },
-        
         'view-venue-from-map': (el, modules) => {
             const venueId = el.dataset.venueId;
             if (venueId) {
@@ -2120,13 +2117,15 @@ const App = {
 
         // Community actions
         'quick-nearby': (el, modules) => {
-            modules.homePage?.handleQuickNearby();
+            const community = modules.community || window.App?.getModule('community');
+            community?.handleQuickNearby();
         },
         
         'thanks': (el, modules) => {
             const findId = el.dataset.findId;
             if (findId) {
-                modules.homePage?.handleThanks(parseInt(findId));
+                const community = modules.community || window.App?.getModule('community');
+                community?.handleThanks(parseInt(findId));
             }
         },
         
