@@ -1,7 +1,7 @@
 /* ================================
    UPDATE SEARCH CONTAINER
    ================================ */
-.search-container {
+#searchOverlay .search-container {
    height: auto;
    display: flex;
    flex: 1;
@@ -11,18 +11,18 @@
    padding-bottom: env(safe-area-inset-bottom);
 }
 
-.search-header {
+#searchOverlay .search-header {
    text-align: center;
    padding: var(--space-xl) var(--space-4xl);
 }
 
-.search-header-title {
+#searchOverlay .search-header-title {
     font-size: var(--text-3xl);
     color: var(--text-primary);
     margin-bottom: 0; 
 }
 
-.search-body {
+#searchOverlay .search-body {
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -30,14 +30,14 @@
     min-height: 0;
 }
 
-.search-options {
+#searchOverlay .search-options {
    flex: 1;
    display: grid;
    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
    gap: clamp(0.75rem, 2vw, 1rem);
 }   
 
-.search-option {
+#searchOverlay .search-option {
     border: 3px solid var(--border-light);
     border-radius: var(--radius-xl);
     padding: var(--space-md);
@@ -53,29 +53,29 @@
     color: var(--text-primary);
 }
 
-.search-option:hover {
+#searchOverlay .search-option:hover {
     transform: translateY(-3px);
     box-shadow: var(--shadow-lg);
 }
 
 /* Search option colors */
-.search-option.location {
+#searchOverlay .search-option.location {
     border-color: rgba(16, 185, 129, 0.2);
 }
 
-.search-option.name {
+#searchOverlay .search-option.name {
     border-color: rgba(59, 130, 246, 0.2);
 }
 
-.search-option.area {
+#searchOverlay .search-option.area {
     border-color: rgba(139, 92, 246, 0.2);
 }
 
-.search-option.beer {
+#searchOverlay .search-option.beer {
     border-color: rgba(245, 158, 11, 0.2);
 }
 
-.search-option.beer:hover {
+#searchOverlay .search-option.beer:hover {
     border-color: var(--orange);
     background: linear-gradient(135deg, 
         rgba(249, 115, 22, 0.15) 0%, 
@@ -84,19 +84,19 @@
     box-shadow: 0 4px 16px var(--light-orange);
 }
 
-.search-icon {
+#searchOverlay .search-icon {
    font-size: 4rem;
    line-height: 1;
-   padding-top: (var--space-sm);
+   padding-top: var(--space-sm);
 }
 
-.search-title {
+#searchOverlay .search-title {
     font-size: var(--text-md);
     margin-bottom: 0; 
    color: var(--text-primary);
 }
 
-.search-description {
+#searchOverlay .search-description {
    font-size: var(--text-sm);
    text-align: center;
    color: var(--text-secondary);
