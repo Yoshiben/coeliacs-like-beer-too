@@ -103,3 +103,30 @@
    margin: 0;
    padding: var(--space-sm);
 }
+
+.search-modal .form-input,
+.search-modal .form-select {
+   border: 2px solid var(--border-light);
+   border-radius: var(--radius-xl);
+   font-size: var(--text-md);
+   margin: var(--space-xl);
+   transition: border-color 0.25s ease;
+   overflow: hidden;
+   padding: var(--space-xl);
+   width: -webkit-fill-available;
+   background: var(--bg-white);
+   color: var(--text-primary);
+   font-family: inherit;
+}
+
+.search-modal .form-input:focus,
+.search-modal .form-select:focus {
+   outline: none;
+   border-color: var(--border-purple);
+   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.search-modal .form-input::placeholder {
+   color: var(--text-muted);
+   opacity: 0.8;
+}
