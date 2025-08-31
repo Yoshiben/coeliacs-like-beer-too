@@ -168,6 +168,31 @@ export const VenueModule = (function() {
         
         // GF Status display
         setupGFStatusDisplay(venue);
+
+        // Load and display status confirmations
+        loadStatusConfirmations(venue.venue_id);
+    };
+
+    const loadStatusConfirmations = async (venueId) => {
+        try {
+            const response = await fetch(`/api/venue/${venueId}/status-confirmations`);
+            if (response.ok) {
+                const confirmData = await response.json();
+                const confirmationEl = document.getElementById('statusConfirmation');
+                if (confirmationEl) {
+                    confirmationEl.textContent = confirmData.text;
+                    // Optional: Add styling based on confirmation status
+                    if (confirmData.has_confirmations) {
+                        confirmationEl.classList.add('confirmed');
+                    } else {
+                        confirmationEl.classList.add('unconfirmed');
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error loading status confirmations:', error);
+            // Fail silently - don't break the UI if this fails
+        }
     };
     
     /**
