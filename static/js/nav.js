@@ -137,6 +137,10 @@ export const NavStateManager = (() => {
                 modules.modalManager?.open('breweriesOverlay');
                 setPageContext('breweries');
                 break;
+            case 'contact':
+                modules.modalManager?.open('contactOverlay');
+                setPageContext('contact');
+                break;
             case 'search':
                 // Open search overlay
                 const searchOverlay = document.getElementById('searchOverlay');
