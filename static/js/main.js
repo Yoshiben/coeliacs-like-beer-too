@@ -1096,6 +1096,7 @@ const App = {
         'get-in-touch': (el, modules) => {
             console.log('💬 Opening Get in Touch overlay');
             modules.modalManager?.open('getInTouchOverlay');
+            modules.nav?.setPageContext('contact');  // ADD THIS
             modules.tracking?.trackEvent('get_in_touch_view', 'Navigation', 'community_section');
         },
         
