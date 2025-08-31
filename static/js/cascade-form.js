@@ -67,26 +67,15 @@ export const CascadeForm = (() => {
         
         console.log('📊 State AFTER reset:', {...state});
         
-        // Reset UI - hide all steps
-        document.querySelectorAll('.cascade-step').forEach(step => {
-            step.classList.remove('active');
-        });
-        
-        // Show only format step
-        const formatStep = document.getElementById('step-format');
-        if (formatStep) {
-            formatStep.classList.add('active');
-            console.log('✅ Format step activated');
-        }
-        
-        // Clear form inputs
+        // Clear form inputs FIRST
         const form = document.getElementById('reportForm');
         if (form) {
             form.reset();
             console.log('✅ Form inputs cleared');
         }
         
-        // Reset format buttons
+        // Reset ALL visual elements
+        // Reset format buttons specifically
         document.querySelectorAll('.format-btn').forEach(btn => {
             btn.classList.remove('selected');
         });
@@ -96,19 +85,35 @@ export const CascadeForm = (() => {
         document.querySelectorAll('.suggestions').forEach(dropdown => {
             dropdown.classList.remove('show');
             dropdown.style.display = 'none';
+            dropdown.innerHTML = ''; // Clear dropdown content too
         });
         
-        // Hide brewery confirmed section
+        // Hide confirmation sections
         const breweryConfirmed = document.getElementById('breweryConfirmed');
-        if (breweryConfirmed) breweryConfirmed.classList.remove('show');
+        if (breweryConfirmed) {
+            breweryConfirmed.classList.remove('show');
+            breweryConfirmed.style.display = 'none';
+        }
+        
+        const beerConfirmed = document.getElementById('beerConfirmed');
+        if (beerConfirmed) {
+            beerConfirmed.classList.remove('show');
+            beerConfirmed.style.display = 'none';
+        }
         
         // Hide submit button
         const formActions = document.getElementById('formActions');
-        if (formActions) formActions.classList.remove('show');
+        if (formActions) {
+            formActions.classList.remove('show');
+            formActions.style.display = 'none';
+        }
+        
+        // NOW reset the steps - do this LAST
+        showStep('format');
+        updateProgress('format');
         
         console.log('✅ CASCADE RESET COMPLETE');
     };
-
     // Set venue context (called from main.js when opening modal)
     const setVenue = (venue) => {
         state.currentVenue = venue;
