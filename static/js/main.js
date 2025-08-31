@@ -996,10 +996,34 @@ const App = {
         },
 
 
-        'clear-location': (el, modules) => {
+        'clear-location': async (el, modules) => {
+            // Clear stored location data
             localStorage.removeItem('lastKnownLocation');
             window.App.setState('userLocation', null);
-            modules.toast?.success('Location data cleared');
+            window.App.setState('locationTimestamp', null);
+            
+            // Try to revoke the permission (this only works in some browsers)
+            if (navigator.permissions && navigator.permissions.revoke) {
+                try {
+                    await navigator.permissions.revoke({ name: 'geolocation' });
+                    modules.toast?.success('Location permission reset - you\'ll be asked next time');
+                } catch (error) {
+                    // Most browsers don't support revoke() yet
+                    modules.toast?.success('Location data cleared - permission must be reset in browser settings');
+                }
+            } else {
+                // Show instructions for manual reset
+                modules.toast?.success('Location data cleared');
+                modules.toast?.info('To fully reset, go to browser settings > Site settings > Location');
+            }
+            
+            // Optional: Show instructions modal
+            setTimeout(() => {
+                if (confirm('Location data cleared. To fully reset permissions, you need to do this in your browser settings. Open browser settings?')) {
+                    // This opens browser settings page (works on some browsers)
+                    window.open('chrome://settings/content/location', '_blank');
+                }
+            }, 500);
         },
         
         'clear-cache': (el, modules) => {
