@@ -282,3 +282,44 @@ html {
     display: flex; 
     flex-direction: column;
 }
+
+/* ================================
+   TOGGLE SWITCHES
+   ================================ */
+
+/* .toggle-switch {
+   display: flex;
+   align-items: center;
+   gap: var(--space-md);
+   cursor: pointer;
+}
+
+.toggle-input {
+   position: absolute;
+   opacity: 0;
+   width: 0;
+   height: 0;
+}
+
+.toggle-slider {
+   width: 50px;
+   height: 26px;
+   background: var(--border-light);
+   border-radius: 13px;
+   position: relative;
+   transition: all var(--transition);
+}
+
+.toggle-input:checked + .toggle-slider {
+   background: var(--purple);
+}
+
+.toggle-input:checked + .toggle-slider::after {
+   transform: translateX(24px);
+}
+
+.toggle-label {
+   font-weight: 500;
+   color: var(--text-primary);
+   cursor: pointer;
+} */
