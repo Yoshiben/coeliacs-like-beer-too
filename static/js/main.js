@@ -773,7 +773,7 @@ const App = {
     actionHandlers: {
         
         // ================================
-        // ONBOARDING ACTION HANDLERS
+        // ONBOARDING START
         // ================================
         
         // Age Gate actions
@@ -787,9 +787,6 @@ const App = {
                 OnboardingFlow.underAge();
             }
         },
-
-
-
 
 
         // Legal stuff
@@ -835,12 +832,6 @@ const App = {
         'close-liability-modal': (el, modules) => {
             modules.modalManager?.close('liabilityModal');
         },
-
-
-
-
-
-
         
 
         
@@ -1060,6 +1051,10 @@ const App = {
                 OnboardingFlow.finishOnboarding();
             }
         },
+
+        // ================================
+        // ONBOARDING END
+        // ================================
 
 
 
@@ -1878,19 +1873,12 @@ const App = {
 
         // Status actions
         'change-gf-status': (el, modules) => {
-            console.trace('🔍 DEBUG: Opening GF status modal from main.js action handler');
-            modules.modalManager?.open('gfStatusModal');
+            modules.venue?.openGFStatusModal();
         },
-
-
+        
         'select-status': (el, modules) => {
-            const status = el.dataset.status;
-            console.log('📊 Status selected:', status);
-            modules.venue?.selectStatus?.(status);
-        },
-
-        
-        
+            modules.venue?.selectStatus(el.dataset.status);
+        },        
         
         'confirm-status': (el, modules) => {
             modules.venue?.confirmStatusUpdate?.();
@@ -1899,25 +1887,47 @@ const App = {
             modules.modalManager?.close('gfStatusConfirmModal');
         },
         'skip-details': (el, modules) => {
-            modules.modalManager?.close('beerDetailsPromptModal');
-            modules.toast?.success('✅ Status updated successfully!');
+            modules.venue?.skipBeerDetails();
         },
+        
         'add-beer-details': (el, modules) => {
-            modules.modalManager?.close('beerDetailsPromptModal');
-            window.App.setState('cameFromBeerDetailsPrompt', true);
-            
-            const currentVenue = window.App.getState('currentVenue');
-            
-            modules.modalManager.open('reportModal', {
-                onOpen: () => {
-                    // Just set venue and reset, don't initialize
-                    if (window.CascadeForm) {
-                        window.CascadeForm.setVenue(currentVenue);
-                        window.CascadeForm.reset();
-                    }
-                }
-            });
+            modules.venue?.addBeerDetailsFromPrompt();
         },
+
+        // Beer list actions
+        'beer-options': (el, modules) => {
+            const beerId = el.dataset.beerId;
+            if (beerId) {
+                modules.venue?.toggleBeerDropdown(beerId);
+            }
+        },
+        
+        'verify-beer': (el, modules) => {
+            modules.venue?.verifyBeer(el.dataset.beerId, el.dataset.beerName);
+        },
+        
+        'delete-beer': (el, modules) => {
+            modules.venue?.deleteBeer(el.dataset.beerId, el.dataset.beerName);
+        },
+        
+        'quick-add-beer': (el, modules) => {
+            modules.venue?.quickAddBeer();
+        },
+
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
       
         'add-new-venue-from-results': (el, modules) => {
             // Close results overlay
@@ -2429,15 +2439,6 @@ const App = {
                 venueModule.loadBeerList(currentVenue);
             } else {
                 console.error('❌ loadBeerList function not found');
-            }
-        },
-        
-        'delete-beer': (el, modules) => {
-            const beerId = el.dataset.beerId;
-            const beerName = el.dataset.beerName;
-            
-            if (confirm(`Remove "${beerName}" from this venue?`)) {
-                modules.api?.deleteBeerFromVenue?.(beerId);
             }
         },
 
