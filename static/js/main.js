@@ -812,15 +812,21 @@ const App = {
         },
 
         'show-privacy-overlay': (el, modules) => {
+            document.getElementById('moreMenuOverlay').style.display = 'none';
             modules.modalManager?.open('privacyOverlay');
+            modules.nav?.setPageContext('privacy');
         },
         
         'show-terms-overlay': (el, modules) => {
+            document.getElementById('moreMenuOverlay').style.display = 'none';
             modules.modalManager?.open('termsOverlay');
+            modules.nav?.setPageContext('terms');
         },
         
         'show-liability-overlay': (el, modules) => {
+            document.getElementById('moreMenuOverlay').style.display = 'none';
             modules.modalManager?.open('liabilityOverlay');
+            modules.nav?.setPageContext('liability');
         },
         
         'show-privacy-from-age-gate': (el, modules, event) => {
@@ -1163,10 +1169,9 @@ const App = {
 
         // get in touch
         'get-in-touch': (el, modules) => {
-            console.log('💬 Opening Get in Touch overlay');
+            document.getElementById('moreMenuOverlay').style.display = 'none';
             modules.modalManager?.open('getInTouchOverlay');
-            modules.nav?.setPageContext('contact');  // ADD THIS
-            modules.tracking?.trackEvent('get_in_touch_view', 'Navigation', 'community_section');
+            modules.nav?.setPageContext('contact');
         },
         
         'close-get-in-touch': (el, modules) => {
@@ -2478,8 +2483,9 @@ const App = {
         },
         
         'about-gf': (el, modules) => {
-            // DON'T close more menu - just open GF info on top
+            document.getElementById('moreMenuOverlay').style.display = 'none';
             modules.modalManager?.open('gfInfoOverlay');
+            modules.nav?.setPageContext('about-gf');
         },
         
         'close-about': (el, modules) => {
