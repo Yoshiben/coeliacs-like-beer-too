@@ -45,12 +45,16 @@ export const CascadeForm = (() => {
 
     // Reset form to initial state
     const reset = () => {
+        console.log('🔄 CASCADE RESET CALLED');
+        
         // Check if modal exists first
         const modal = document.getElementById('reportModal');
         if (!modal) {
             console.log('📝 Report modal not found, skipping reset');
             return;
         }
+        
+        console.log('📊 State BEFORE reset:', {...state});
         
         // Reset state
         state.currentStep = 'format';
@@ -61,6 +65,8 @@ export const CascadeForm = (() => {
         state.isNewBrewery = false;
         state.isNewBeer = false;
         
+        console.log('📊 State AFTER reset:', {...state});
+        
         // Reset UI - hide all steps
         document.querySelectorAll('.cascade-step').forEach(step => {
             step.classList.remove('active');
@@ -68,11 +74,28 @@ export const CascadeForm = (() => {
         
         // Show only format step
         const formatStep = document.getElementById('step-format');
-        if (formatStep) formatStep.classList.add('active');
+        if (formatStep) {
+            formatStep.classList.add('active');
+            console.log('✅ Format step activated');
+        }
+        
+        // Clear form inputs
+        const form = document.getElementById('reportForm');
+        if (form) {
+            form.reset();
+            console.log('✅ Form inputs cleared');
+        }
+        
+        // Reset format buttons
+        document.querySelectorAll('.format-btn').forEach(btn => {
+            btn.classList.remove('selected');
+        });
+        console.log('✅ Format buttons reset');
         
         // Hide all dropdowns
         document.querySelectorAll('.suggestions').forEach(dropdown => {
             dropdown.classList.remove('show');
+            dropdown.style.display = 'none';
         });
         
         // Hide brewery confirmed section
@@ -83,17 +106,7 @@ export const CascadeForm = (() => {
         const formActions = document.getElementById('formActions');
         if (formActions) formActions.classList.remove('show');
         
-        // Reset format buttons
-        document.querySelectorAll('.format-btn').forEach(btn => {
-            btn.classList.remove('selected');
-        });
-        
-        // Reset progress bar
-        updateProgress('format');
-        
-        // Clear form inputs
-        const form = document.getElementById('reportForm');
-        if (form) form.reset();
+        console.log('✅ CASCADE RESET COMPLETE');
     };
 
     // Set venue context (called from main.js when opening modal)
