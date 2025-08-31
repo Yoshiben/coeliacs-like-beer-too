@@ -741,6 +741,25 @@ export const CascadeForm = (() => {
             case 'select-found-beer':
                 selectFoundBeer(JSON.parse(item.dataset.beer));
                 break;
+
+            // In handleSuggestionClick, add this case:
+            case 'prompt-new-beer':
+                // User wants to add a new beer to the selected brewery
+                const beerNameInput = document.getElementById('reportBeerName');
+                if (beerNameInput) {
+                    hideDropdown('beerNameDropdown');
+                    beerNameInput.value = '';
+                    beerNameInput.placeholder = `Enter new ${state.selectedBrewery} beer name...`;
+                    beerNameInput.focus();
+                    
+                    // Show submit button since they're adding new
+                    const formActions = document.getElementById('formActions');
+                    if (formActions) formActions.classList.add('show');
+                    
+                    state.isNewBeer = true;
+                    showToast(`💡 Type the new ${state.selectedBrewery} beer name`);
+                }
+                break;
                 
             case 'create-new-beer':
                 // User doesn't know brewery, creating new beer
