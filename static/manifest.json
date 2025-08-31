@@ -56,7 +56,7 @@
       "url": "/?shortcut=nearby",
       "icons": [
         {
-          "src": "/static/images/icon-192.png",
+          "src": "/static/images/android-chrome-192x192.png",
           "sizes": "192x192"
         }
       ]
