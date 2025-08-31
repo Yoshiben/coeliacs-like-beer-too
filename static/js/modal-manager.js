@@ -26,8 +26,8 @@ export const ModalManager = (() => {
     const registry = {
 
         // Legal modals group
-        privacyModal: { type: 'modal', group: 'legal', exclusive: false, priority: true, zIndex: 10000 },
-        termsModal: { type: 'modal', group: 'legal', exclusive: false, priority: true, zIndex: 10000 },
+        privacyModal: { type: 'modal', group: 'legal', exclusive: false, priority: true, zIndex: 10001 },
+        termsModal: { type: 'modal', group: 'legal', exclusive: false, priority: true, zIndex: 10001 },
         liabilityModal: { type: 'modal', group: 'legal', exclusive: false, priority: true},
 
         // Onboarding modals group (complete set)
@@ -54,8 +54,8 @@ export const ModalManager = (() => {
 
         // Info overlays
         // aboutOverlay: { type: 'overlay', group: 'info', exclusive: true, zIndex: 1500 },
-        gfInfoOverlay: { type: 'overlay', group: 'info', exclusive: true },
-        getInTouchOverlay: { type: 'overlay', group: 'info', exclusive: true },
+        gfInfoOverlay: { type: 'overlay', group: 'info', exclusive: true, zIndex: 10001 },
+        getInTouchOverlay: { type: 'overlay', group: 'info', exclusive: true, zIndex: 10001 },
         
         
         
