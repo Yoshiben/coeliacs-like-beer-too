@@ -1379,9 +1379,15 @@ const App = {
             const modal = el.closest('.modal, .search-modal, .report-modal .modal-overlay') || el.closest('[id$="Modal"]');
             
             if (modal?.id) {
-                // Special handling for report modal
+                // Special handling for report modal - RESET the form when closing
                 if (modal.id === 'reportModal') {
-                    const currentVenue = window.App.getState(STATE_KEYS.CURRENT_VENUE || STATE_KEYS.CURRENT_VENUE);
+                    // Reset the cascade form
+                    if (window.CascadeForm) {
+                        window.CascadeForm.reset();
+                        console.log('🔄 Reset cascade form on modal close');
+                    }
+                    
+                    const currentVenue = window.App.getState(STATE_KEYS.CURRENT_VENUE || 'currentVenue');
                     if (currentVenue) {
                         // We have a current venue, so we came from venue details
                         modules.modalManager?.close(modal.id);
