@@ -988,11 +988,29 @@ const App = {
 
 
         'app-settings': (el, modules) => {
-            // Close more menu first
+            // Store that we came from More menu
+            window.App.setState('returnToMore', true);
+            
+            // Close more menu
             const moreMenu = document.getElementById('moreMenuOverlay');
             if (moreMenu) moreMenu.style.display = 'none';
             
-            modules.modalManager?.open('settingsModal');
+            // Open settings with a callback
+            modules.modalManager?.open('settingsModal', {
+                onClose: () => {
+                    // Check if we should return to More
+                    if (window.App.getState('returnToMore')) {
+                        // Reopen More menu
+                        const moreMenu = document.getElementById('moreMenuOverlay');
+                        if (moreMenu) {
+                            moreMenu.style.display = 'flex';
+                            moreMenu.classList.add('active');
+                        }
+                        // Clear the flag
+                        window.App.setState('returnToMore', false);
+                    }
+                }
+            });
         },
 
 
