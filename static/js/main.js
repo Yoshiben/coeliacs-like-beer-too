@@ -1852,21 +1852,27 @@ const App = {
         'report-beer': (el, modules) => {
             const venueData = window.App.getState('currentVenue');
             
+            console.log('🍺 Opening report modal...');
+            
             // Open report modal on top of venue details
             if (modules.modalManager) {
                 modules.modalManager.open('reportModal', {
                     onOpen: () => {
+                        console.log('📝 Report modal opened callback');
+                        
                         // Initialize cascade form if needed
                         if (window.initCascadeForm) {
                             window.initCascadeForm();
                         }
                         
-                        // Set venue and reset cascade form
+                        // ALWAYS reset when opening
                         if (window.CascadeForm) {
-                            window.CascadeForm.setVenue(venueData);
+                            console.log('🔄 Resetting cascade form on open');
                             window.CascadeForm.reset();
+                            
+                            // Then set venue after reset
+                            window.CascadeForm.setVenue(venueData);
                         }
-                        
                     }
                 });
             }
