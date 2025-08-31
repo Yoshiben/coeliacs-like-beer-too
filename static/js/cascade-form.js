@@ -772,10 +772,11 @@ export const CascadeForm = (() => {
     // ================================
     // UI HELPERS
     // ================================
+    // In cascade-form.js, update the showStep function:
     const showStep = (stepName) => {
         console.log('🔄 showStep called with:', stepName);
         
-        // Hide ALL steps first
+        // Hide ALL steps first - more thorough reset
         const allSteps = document.querySelectorAll('.cascade-step');
         console.log('🔄 Found', allSteps.length, 'cascade steps');
         
@@ -783,6 +784,16 @@ export const CascadeForm = (() => {
             console.log('  Hiding step:', step.id);
             step.classList.remove('active');
             step.style.display = 'none';  // Force hide with inline style
+            // Also reset any form elements within this step
+            step.querySelectorAll('input, select, textarea').forEach(input => {
+                if (input.type !== 'hidden') {
+                    input.value = '';
+                }
+            });
+            // Reset button states within this step
+            step.querySelectorAll('.selected').forEach(btn => {
+                btn.classList.remove('selected');
+            });
         });
         
         // Show ONLY the target step
@@ -795,12 +806,15 @@ export const CascadeForm = (() => {
             console.error('❌ Step not found:', `step-${stepName}`);
         }
         
-        // Show submit button when on beer details
-        if (stepName === 'beer-details') {
-            const formActions = document.getElementById('formActions');
-            if (formActions) {
+        // Hide/show submit button based on step
+        const formActions = document.getElementById('formActions');
+        if (formActions) {
+            if (stepName === 'beer-details') {
                 formActions.classList.add('show');
                 console.log('🔄 Showed form actions');
+            } else {
+                formActions.classList.remove('show');
+                console.log('🔄 Hid form actions');
             }
         }
     };
