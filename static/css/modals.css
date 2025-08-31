@@ -814,8 +814,4 @@
     scroll-padding-bottom: calc(20px + env(safe-area-inset-bottom));
 }
 
-.trending-list {
-   padding: var(--space-sm);
-}
    
-
