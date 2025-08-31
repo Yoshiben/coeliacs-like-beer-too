@@ -228,6 +228,10 @@ body.page-venue .nav-back-btn { display: flex !important; }
 body.page-contact .nav-back-btn { display: flex !important; }
 body.page-breweries .nav-back-btn { display: flex !important; }
 body.page-community .nav-back-btn { display: flex !important; }
+body.page-privacy .nav-back-btn { display: flex !important; }
+body.page-terms .nav-back-btn { display: flex !important; }
+body.page-liability .nav-back-btn { display: flex !important; }
+body.page-about-gf .nav-back-btn { display: flex !important; }
 
 body {
     background: var(--primary-gradient);
