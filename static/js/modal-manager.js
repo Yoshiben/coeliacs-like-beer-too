@@ -25,15 +25,11 @@ export const ModalManager = (() => {
     // Modal/Overlay Registry with types and rules
     const registry = {
 
-        // Info/Legal overlays - all full screen with nav visible
-        privacyOverlay: { type: 'overlay', group: 'info', exclusive: false },
-        termsOverlay: { type: 'overlay', group: 'info', exclusive: false },
-        liabilityOverlay: { type: 'overlay', group: 'info', exclusive: false },
-        getInTouchOverlay: { type: 'overlay', group: 'info', exclusive: false },
-        gfInfoOverlay: { type: 'overlay', group: 'info', exclusive: false },
 
         // Onboarding modals group (complete set)
-        ageGateModal: { type: 'modal', group: 'onboarding', exclusive: true, priority: true },        
+        ageGateModal: { type: 'modal', group: 'onboarding', exclusive: true, priority: true }, 
+        privacyModal: { type: 'modal', group: 'onboarding', exclusive: false, priority: true, zIndex: 10001 },
+        termsModal: { type: 'modal', group: 'onboarding', exclusive: false, priority: true, zIndex: 10001 },
         welcomeModal: { type: 'modal', group: 'onboarding', exclusive: true },
         nicknameModal: { type: 'modal', group: 'onboarding', exclusive: true },
         signInModal: { type: 'modal', group: 'onboarding', exclusive: true },
@@ -41,7 +37,12 @@ export const ModalManager = (() => {
         benefitsModal: { type: 'modal', group: 'onboarding', exclusive: true },
         cookieModal: { type: 'modal', group: 'onboarding', exclusive: true }, 
 
-        
+        // Info/Legal overlays - all full screen with nav visible
+        privacyOverlay: { type: 'overlay', group: 'info', exclusive: false },
+        termsOverlay: { type: 'overlay', group: 'info', exclusive: false },
+        liabilityOverlay: { type: 'overlay', group: 'info', exclusive: false },
+        getInTouchOverlay: { type: 'overlay', group: 'info', exclusive: false },
+        gfInfoOverlay: { type: 'overlay', group: 'info', exclusive: false },
 
         
         // Search overlays (mutually exclusive)
