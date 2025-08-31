@@ -991,6 +991,9 @@ export const VenueModule = (function() {
         // Status functions
         openStatusModal,
         selectStatus,
+        confirmGFStatus,
+        doConfirmStatus,
+        
         confirmStatusUpdate,
         showStatusPromptAfterBeer,
         
