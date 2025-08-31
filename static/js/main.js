@@ -1490,18 +1490,49 @@ const App = {
         },
         
         'do-confirm-status': async (el, modules) => {
-            // Debug logging
             console.log('🔍 Attempting to confirm status...');
             
             const venue = window.App.getState('currentVenue');
             console.log('📍 Current venue from state:', venue);
             
-            const userId = parseInt(localStorage.getItem('user_id'));
+            // Check if user is logged in first
+            const nickname = localStorage.getItem('userNickname');
+            if (!nickname) {
+                modules.modalManager?.close('statusConfirmModal');
+                modules.toast?.info('Please create a nickname first to confirm status!');
+                
+                // Open nickname modal after a short delay
+                setTimeout(() => {
+                    if (window.OnboardingFlow) {
+                        window.OnboardingFlow.showNicknameSelection();
+                    }
+                }, 500);
+                return;
+            }
+            
+            // Try to get user_id
+            let userId = parseInt(localStorage.getItem('user_id'));
             console.log('👤 User ID from localStorage:', userId);
             
-            if (!venue || !userId) {
+            // If we have nickname but no user_id, we need to fetch it
+            if (nickname && !userId) {
+                try {
+                    const response = await fetch(`/api/get-user-id/${nickname}`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        userId = data.user_id;
+                        localStorage.setItem('user_id', userId);
+                        console.log('✅ Fetched user_id:', userId);
+                    }
+                } catch (error) {
+                    console.error('Failed to get user_id:', error);
+                }
+            }
+            
+            if (!venue || !userId || isNaN(userId)) {
                 console.error('❌ Missing data:', { venue, userId });
-                modules.toast?.error('Error: Missing data');
+                modules.toast?.error('Please sign in to confirm status');
+                modules.modalManager?.close('statusConfirmModal');
                 return;
             }
             
