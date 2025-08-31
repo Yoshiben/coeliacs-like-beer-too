@@ -150,6 +150,7 @@
    justify-content: center;
    margin: var(--space-sm) var(--space-4xl);
    color: white;
+   font-size: var(--text-sm);
 }
 
 /* Beer Section */
