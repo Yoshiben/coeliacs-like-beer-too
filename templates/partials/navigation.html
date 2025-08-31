@@ -211,6 +211,44 @@
     </div>
 </div>
 
+<div id="settingsModal" class="modal-overlay">
+    <div class="modal-content settings-modal">
+        <div class="modal-header">
+            <h3>⚙️ Settings</h3>
+            <button class="modal-close" data-action="close-modal">&times;</button>
+        </div>
+        
+        <div class="settings-content">
+            <!-- Location Settings -->
+            <div class="setting-section">
+                <h4>📍 Location</h4>
+                <p class="setting-description">Clear saved location data</p>
+                <button class="btn btn-secondary" data-action="clear-location">
+                    Reset Location Permissions
+                </button>
+            </div>
+            
+            <!-- Cache Settings -->
+            <div class="setting-section">
+                <h4>🗑️ App Data</h4>
+                <p class="setting-description">Clear all cached data and preferences</p>
+                <button class="btn btn-secondary" data-action="clear-cache">
+                    Clear Cache
+                </button>
+            </div>
+            
+            <!-- Cookie Settings -->
+            <div class="setting-section">
+                <h4>🍪 Cookies</h4>
+                <p class="setting-description">We only use essential cookies for app functionality</p>
+                <button class="btn btn-secondary" data-action="manage-cookies">
+                    Cookie Preferences
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- About Overlay -->
 <div id="aboutOverlay" class="overlay info-overlay">
     <div class="info-container">
