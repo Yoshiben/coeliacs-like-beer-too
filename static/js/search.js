@@ -1296,30 +1296,47 @@ export const SearchModule = (function() {
         if (elements.list) elements.list.style.display = 'none';
         
         const toggle = document.getElementById('searchToggle');
-        const isGfOnly = toggle ? toggle.checked : true;
+        const isGfOnly = toggle ? toggle.checked : (window.App.getState('gfOnlyFilter') !== false);
         
-        if (isGfOnly && elements.noResults) {
+        if (elements.noResults) {
             elements.noResults.style.display = 'flex';
-            elements.noResults.innerHTML = `
-                <div class="no-results-content">
-                    <h3>No venues with confirmed GF beer found</h3>
-                    <p class="no-results-text">${message}</p>
-                    
-                    <div class="toggle-prompt" style="margin-top: 1.5rem; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 10px;">
-                        <p style="margin-bottom: 1rem;">💡 There might be venues that serve GF beer but haven't been confirmed yet!</p>
-                        <button class="btn btn-primary" data-action="search-all-venues">
-                            🔍 Search all venues instead
-                        </button>
+            
+            if (isGfOnly) {
+                // GF-only search with no results
+                elements.noResults.innerHTML = `
+                    <div class="no-results-content">
+                        <h3>No venues with confirmed GF beer found</h3>
+                        <p class="no-results-text">${message}</p>
+                        
+                        <div class="toggle-prompt" style="margin-top: 1.5rem; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 10px;">
+                            <p style="margin-bottom: 1rem;">💡 There might be venues that serve GF beer but haven't been confirmed yet!</p>
+                            <button class="btn btn-primary" data-action="search-all-venues">
+                                🔍 Search all venues instead
+                            </button>
+                        </div>
+                        
+                        <p style="margin-top: 1rem; opacity: 0.8;">💙 Found a venue with GF beer? Please report it!</p>
                     </div>
-                    
-                    <p style="margin-top: 1rem; opacity: 0.8;">💙 Found a venue with GF beer? Please report it!</p>
-                </div>
-            `;
-        } else {
-            if (elements.noResults) {
-                elements.noResults.style.display = 'flex';
-                const noResultsText = document.querySelector('.no-results-text');
-                if (noResultsText) noResultsText.textContent = message;
+                `;
+            } else {
+                // All venues search with no results - different message
+                elements.noResults.innerHTML = `
+                    <div class="no-results-content">
+                        <h3>No venues found</h3>
+                        <p class="no-results-text">${message}</p>
+                        
+                        <div class="toggle-prompt" style="margin-top: 1.5rem; padding: 1rem; background: rgba(255,255,255,0.1); border-radius: 10px;">
+                            <p style="margin-bottom: 1rem;">🤔 Can't find the venue you're looking for?</p>
+                            <p style="font-size: 1.1em;">
+                                👆 Use the <strong>"Add Venue"</strong> button at the top of the screen to add it!
+                            </p>
+                        </div>
+                        
+                        <p style="margin-top: 1rem; opacity: 0.8;">
+                            💡 Tip: Try searching with a different name or postcode
+                        </p>
+                    </div>
+                `;
             }
         }
     };
