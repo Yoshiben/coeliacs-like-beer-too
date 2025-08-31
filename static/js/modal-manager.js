@@ -28,8 +28,8 @@ export const ModalManager = (() => {
 
         // Onboarding modals group (complete set)
         ageGateModal: { type: 'modal', group: 'onboarding', exclusive: true, priority: true }, 
-        privacyModal: { type: 'modal', group: 'onboarding', exclusive: false, priority: true, zIndex: 10001 },
-        termsModal: { type: 'modal', group: 'onboarding', exclusive: false, priority: true, zIndex: 10001 },
+        privacyModal: { type: 'modal', group: 'onboarding', exclusive: false, priority: true },
+        termsModal: { type: 'modal', group: 'onboarding', exclusive: false, priority: true },
         welcomeModal: { type: 'modal', group: 'onboarding', exclusive: true },
         nicknameModal: { type: 'modal', group: 'onboarding', exclusive: true },
         signInModal: { type: 'modal', group: 'onboarding', exclusive: true },
