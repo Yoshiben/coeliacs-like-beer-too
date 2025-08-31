@@ -297,11 +297,11 @@
    INFO OVERLAYS (About & GF Info)
    ================================ */
 
-.info-overlay {
+#gfInfoOverlay .info-overlay {
     /* Inherits from .overlay */
 }
 
-.info-container {
+#gfInfoOverlay .info-container {
     flex: 1;
     display: flex;
     align-items: center;
@@ -310,73 +310,52 @@
     overflow-y: auto;
 }
 
-.info-card {
+#gfInfoOverlay .info-card {
    background: var(--bg-white);
-   border-radius: var(--radius-xl);
    max-width: 800px;
    width: 100%;
-   max-height: 90vh;
    overflow-y: auto;
    box-shadow: var(--shadow-xl);
-   max-height: calc(80vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-   max-height: calc(80dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+   height: 100%;
 }
 
-.info-header {
+#gfInfoOverlay .info-header {
     padding: var(--space-xl);
     background: var(--primary-gradient);
     color: var(--white);
     position: relative;
 }
 
-.info-title {
+#gfInfoOverlay .info-title {
     margin: 0;
     font-size: var(--text-2xl);
 }
 
-.info-close {
-    position: absolute;
-    top: var(--space-lg);
-    right: var(--space-lg);
-    background: rgba(255, 255, 255, 0.2);
-    border: none;
-    color: var(--white);
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    font-size: 1.5rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all var(--transition);
-}
-
-.info-close:hover {
+#gfInfoOverlay .info-close:hover {
     background: rgba(255, 255, 255, 0.3);
     transform: rotate(90deg);
 }
 
-.info-content {
+#gfInfoOverlay .info-content {
     padding: var(--space-xl);
 }
 
-.info-section {
+#gfInfoOverlay .info-section {
     margin-bottom: var(--space-2xl);
 }
 
-.info-section h3 {
+#gfInfoOverlay .info-section h3 {
     color: var(--text-primary);
     margin-bottom: var(--space-md);
 }
 
-.info-section p {
+#gfInfoOverlay .info-section p {
     color: var(--text-secondary);
     line-height: 1.6;
 }
 
 /* GF Info Specific */
-.standards-grid {
+#gfInfoOverlay .standards-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: var(--space-md);
