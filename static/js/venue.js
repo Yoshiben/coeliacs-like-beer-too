@@ -16,13 +16,12 @@ export const VenueModule = (function() {
         currentVenue: null,
         beerListCache: new Map(),
         lastViewedVenueId: null,
-        // GF Status state
         selectedStatus: null,
         statusModalOpen: false
     };
     
     // ================================
-    // MODULE GETTERS (for accessing other modules)
+    // MODULE GETTERS
     // ================================
     const modules = {
         get api() { return window.App?.getModule('api'); },
@@ -37,53 +36,44 @@ export const VenueModule = (function() {
     // ================================
     // UTILITIES
     // ================================
-    const utils = {
-        getCurrentVenue() {
-            return state.currentVenue || window.App.getState(STATE_KEYS.CURRENT_VENUE);
-        },
-        
-        setCurrentVenue(venue) {
-            state.currentVenue = venue;
-            window.App.setState(STATE_KEYS.CURRENT_VENUE, venue);
-        },
-        
-        showToast(message, type = 'success') {
-            if (modules.toast) {
-                type === 'error' ? modules.toast.error(message) : modules.toast.success(message);
-            } else if (window.showSuccessToast && window.showErrorToast) {
-                type === 'error' ? window.showErrorToast(message) : window.showSuccessToast(message);
-            } else {
-                console.log(`${type === 'success' ? '✅' : '❌'} ${message}`);
-            }
-        },
-        
-        showLoadingToast(message) {
-            if (window.showLoadingToast) {
-                window.showLoadingToast(message);
-            }
-        },
-        
-        hideLoadingToast() {
-            if (window.hideLoadingToast) {
-                window.hideLoadingToast();
-            }
+    const getCurrentVenue = () => {
+        return state.currentVenue || window.App.getState(STATE_KEYS.CURRENT_VENUE);
+    };
+    
+    const setCurrentVenue = (venue) => {
+        state.currentVenue = venue;
+        window.App.setState(STATE_KEYS.CURRENT_VENUE, venue);
+    };
+    
+    const showToast = (message, type = 'success') => {
+        if (modules.toast) {
+            type === 'error' ? modules.toast.error(message) : modules.toast.success(message);
+        } else if (window.showSuccessToast && window.showErrorToast) {
+            type === 'error' ? window.showErrorToast(message) : window.showSuccessToast(message);
+        } else {
+            console.log(`${type === 'success' ? '✅' : '❌'} ${message}`);
+        }
+    };
+    
+    const showLoadingToast = (message) => {
+        if (window.showLoadingToast) {
+            window.showLoadingToast(message);
+        }
+    };
+    
+    const hideLoadingToast = () => {
+        if (window.hideLoadingToast) {
+            window.hideLoadingToast();
         }
     };
     
     // ================================
     // VENUE DETAILS DISPLAY
     // ================================
-    
-    /**
-     * Load and display venue details
-     * @param {string|number} venueId - The venue ID to load
-     * @returns {Promise<object>} The venue data
-     */
     const showVenueDetails = async (venueId) => {
         console.log('🏠 Loading venue details:', venueId);
         
         try {
-            // First try to load fresh data from API
             const results = await modules.api.searchVenues({ 
                 venueId: venueId
             });
@@ -92,7 +82,6 @@ export const VenueModule = (function() {
             if (venues && venues.length > 0) {
                 const venue = venues[0];
                 
-                // ADD THIS DEBUG LOGGING HERE 👇
                 console.log('🔍 VENUE STRUCTURE:', {
                     venue,
                     keys: Object.keys(venue),
@@ -102,56 +91,42 @@ export const VenueModule = (function() {
                     has_id: 'id' in venue
                 });
                 
-                utils.setCurrentVenue(venue);
+                setCurrentVenue(venue);
                 state.lastViewedVenueId = venueId;
                 
                 displayVenueDetails(venue);
                 return venue;
             } else {
-                utils.showToast('Venue not found.', 'error');
+                showToast('Venue not found.', 'error');
                 return null;
             }
             
         } catch (error) {
             console.error('❌ Error loading venue:', error);
-            utils.showToast('Error loading venue details.', 'error');
+            showToast('Error loading venue details.', 'error');
             return null;
         }
     };
     
-    /**
-     * Display the venue details in the UI
-     * @param {object} venue - The venue data to display
-     */
     const displayVenueDetails = (venue) => {
         modules.modalManager.open('venueDetailsOverlay', {
             onOpen: () => {
-                // Reset view to details (not map)
                 resetVenueDetailsView();
                 
-                // Update navigation title
                 const navTitle = document.getElementById('venueNavTitle');
                 if (navTitle) navTitle.textContent = venue.venue_name;
                 
-                // Populate all the venue information
                 populateVenueDetails(venue);
                 setupVenueButtons(venue);
                 setupMapButton(venue);
                 
-                // Track the view
                 modules.tracking?.trackVenueView(venue.venue_name);
-                
-                // Update navigation context
                 modules.nav?.showVenueDetailsWithContext();
             }
         });
     };
     
-    /**
-     * Populate venue information into the UI elements
-     */
     const populateVenueDetails = (venue) => {
-        // Basic info
         const elements = {
             title: document.getElementById('venueDetailsTitle'),
             address: document.getElementById('venueDetailsAddress'),
@@ -163,13 +138,8 @@ export const VenueModule = (function() {
         if (elements.address) elements.address.textContent = venue.address;
         if (elements.location) elements.location.textContent = `${venue.postcode} • ${venue.city}`;
         
-        // Beer details section
         setupBeerDetails(venue, elements.beer);
-        
-        // GF Status display
         setupGFStatusDisplay(venue);
-
-        // Load and display status confirmations
         loadStatusConfirmations(venue.venue_id);
     };
 
@@ -181,7 +151,6 @@ export const VenueModule = (function() {
                 const confirmationEl = document.getElementById('statusConfirmation');
                 if (confirmationEl) {
                     confirmationEl.textContent = confirmData.text;
-                    // Optional: Add styling based on confirmation status
                     if (confirmData.has_confirmations) {
                         confirmationEl.classList.add('confirmed');
                     } else {
@@ -191,45 +160,37 @@ export const VenueModule = (function() {
             }
         } catch (error) {
             console.error('Error loading status confirmations:', error);
-            // Fail silently - don't break the UI if this fails
         }
     };
 
     const confirmGFStatus = () => {
-        const venue = utils.getCurrentVenue();
+        const venue = getCurrentVenue();
         if (!venue) return;
         
-        // Populate the confirmation modal
         const venueNameEl = document.getElementById('confirmVenueName');
         const statusDisplayEl = document.getElementById('confirmStatusDisplay');
         
         if (venueNameEl) venueNameEl.textContent = venue.venue_name;
         
-        // Get current status display
         const currentStatusEl = document.getElementById('currentGFStatus');
         if (statusDisplayEl && currentStatusEl) {
-            // Clone the current status display into the modal
             statusDisplayEl.innerHTML = currentStatusEl.innerHTML;
         }
         
-        // Open the confirmation modal
         modules.modalManager?.open('statusConfirmModal');
     };
     
-    /**
-     * Actually submit the confirmation
-     */
     const doConfirmStatus = async () => {
-        const venue = utils.getCurrentVenue();
+        const venue = getCurrentVenue();
         const userId = parseInt(localStorage.getItem('user_id'));
         
         if (!venue || !userId) {
-            utils.showToast('Error: Missing data', 'error');
+            showToast('Error: Missing data', 'error');
             return;
         }
         
         modules.modalManager?.close('statusConfirmModal');
-        utils.showLoadingToast('Confirming status...');
+        showLoadingToast('Confirming status...');
         
         try {
             const response = await fetch('/api/venue/confirm-status', {
@@ -244,24 +205,19 @@ export const VenueModule = (function() {
             
             if (response.ok) {
                 const result = await response.json();
-                utils.hideLoadingToast();
-                utils.showToast(`✅ Status confirmed! +${result.points_earned} points`);
-                
-                // Reload the confirmation text
+                hideLoadingToast();
+                showToast(`✅ Status confirmed! +${result.points_earned} points`);
                 loadStatusConfirmations(venue.venue_id);
             } else {
                 throw new Error('Failed to confirm');
             }
         } catch (error) {
             console.error('Error confirming status:', error);
-            utils.hideLoadingToast();
-            utils.showToast('Failed to confirm status', 'error');
+            hideLoadingToast();
+            showToast('Failed to confirm status', 'error');
         }
     };
     
-    /**
-     * Setup the beer details section
-     */
     const setupBeerDetails = (venue, beerEl) => {
         const beerSection = document.getElementById('beerSection');
         if (!beerSection || !beerEl) return;
@@ -295,9 +251,6 @@ export const VenueModule = (function() {
         }
     };
     
-    /**
-     * Setup GF status display with proper styling
-     */
     const setupGFStatusDisplay = (venue) => {
         const statusEl = document.getElementById('currentGFStatus');
         if (!statusEl) return;
@@ -347,65 +300,37 @@ export const VenueModule = (function() {
     };
 
     const setupVenueButtons = (venue) => {
-        utils.setCurrentVenue(venue);
+        setCurrentVenue(venue);
     };
     
     // ================================
     // GF STATUS UPDATES
     // ================================
-    
-    /**
-     * Open the GF status selection modal
-     */
     const openStatusModal = () => {
-        const venue = utils.getCurrentVenue();
+        const venue = getCurrentVenue();
         
         if (!venue?.venue_id) {
             console.error('❌ No current venue data');
-            utils.showToast('❌ No venue selected', 'error');
+            showToast('❌ No venue selected', 'error');
             return;
         }
         
         state.selectedStatus = null;
         state.statusModalOpen = true;
         
-        // Set venue name in modal if element exists
         const venueNameEl = document.getElementById('statusPromptVenueName');
         if (venueNameEl) {
             venueNameEl.textContent = venue.venue_name || venue.name || 'this venue';
         }
         
-        // Open the status selection modal
-        if (modules.modalManager) {
-            modules.modalManager.open('gfStatusModal');
-        } else {
-            const modal = document.getElementById('gfStatusModal');
-            if (modal) {
-                modal.style.display = 'flex';
-                modal.classList.add('active');
-                document.body.style.overflow = 'hidden';
-            }
-        }
+        modules.modalManager?.open('gfStatusModal');
     };
     
-    /**
-     * Handle status selection
-     */
     const selectStatus = (status) => {
         state.selectedStatus = status;
         
-        // Close selection modal
-        if (modules.modalManager) {
-            modules.modalManager.close('gfStatusModal');
-        } else {
-            const modal = document.getElementById('gfStatusModal');
-            if (modal) {
-                modal.style.display = 'none';
-                modal.classList.remove('active');
-            }
-        }
+        modules.modalManager?.close('gfStatusModal');
         
-        // Update confirmation modal with selected status
         const statusLabels = {
             'always_tap_cask': '⭐ Always Has Tap/Cask',
             'always_bottle_can': '✅ Always Has Bottles/Cans',
@@ -419,59 +344,26 @@ export const VenueModule = (function() {
             confirmStatusEl.innerHTML = statusLabels[status] || status;
         }
         
-        // Open confirmation modal
         setTimeout(() => {
-            if (modules.modalManager) {
-                modules.modalManager.open('gfStatusConfirmModal');
-            } else {
-                const modal = document.getElementById('gfStatusConfirmModal');
-                if (modal) {
-                    modal.style.display = 'flex';
-                    modal.classList.add('active');
-                }
-            }
+            modules.modalManager?.open('gfStatusConfirmModal');
         }, 100);
     };
     
-    /**
-     * Confirm and submit the status update
-     */
     const confirmStatusUpdate = async () => {
-        const venue = utils.getCurrentVenue();
-        
-        // More robust venue ID extraction
+        const venue = getCurrentVenue();
         const venueId = venue?.venue_id || venue?.id || window.App.getState('currentVenue')?.venue_id;
         
         if (!venueId || !state.selectedStatus) {
             console.error('❌ Missing data:', { venueId, status: state.selectedStatus, venue });
-            utils.showToast('❌ Error: Missing venue or status', 'error');
+            showToast('❌ Error: Missing venue or status', 'error');
             return;
         }
         
-        // Close confirmation modal
-        if (modules.modalManager) {
-            modules.modalManager.closeGroup('status');
-        } else {
-            ['gfStatusConfirmModal', 'gfStatusModal'].forEach(id => {
-                const modal = document.getElementById(id);
-                if (modal) {
-                    modal.style.display = 'none';
-                    modal.classList.remove('active');
-                }
-            });
-        }
-        
-        utils.showLoadingToast('Updating status...');
+        modules.modalManager?.closeGroup('status');
+        showLoadingToast('Updating status...');
         
         try {
             const userId = parseInt(localStorage.getItem('user_id'));
-            
-            // Log what we're sending
-            console.log('📤 Sending status update:', {
-                venue_id: parseInt(venueId),
-                status: state.selectedStatus,
-                user_id: userId
-            });
             
             const response = await fetch('/api/update-gf-status', {
                 method: 'POST',
@@ -480,7 +372,7 @@ export const VenueModule = (function() {
                     'Accept': 'application/json'
                 },
                 body: JSON.stringify({
-                    venue_id: parseInt(venueId),  // Use the extracted venueId
+                    venue_id: parseInt(venueId),
                     status: state.selectedStatus,
                     user_id: userId,
                     submitted_by: window.App.getState('userNickname') || 
@@ -492,27 +384,21 @@ export const VenueModule = (function() {
             if (!response.ok) {
                 const errorData = await response.json();
                 console.error('❌ Server error:', errorData);
-                throw new Error(`Server error: ${response.status} - ${errorData.error || 'Unknown'}`);
+                throw new Error(`Server error: ${response.status}`);
             }
             
             const result = await response.json();
-            console.log('✅ Status update response:', result);
+            hideLoadingToast();
             
-            utils.hideLoadingToast();
-            
-            // Update the display immediately
             updateStatusDisplay(state.selectedStatus);
-            
-            // Update the venue state
-            utils.setCurrentVenue({
+            setCurrentVenue({
                 ...venue,
                 gf_status: state.selectedStatus
             });
             
-            utils.showToast('✅ Status updated successfully!');
+            showToast('✅ Status updated successfully!');
             modules.tracking?.trackEvent('gf_status_updated', 'Venue', state.selectedStatus);
             
-            // Check if we should show beer details prompt
             const cameFromBeerReport = window.App.getState('statusPromptVenue') !== null;
             
             if (!cameFromBeerReport && ['always_tap_cask', 'always_bottle_can', 'currently'].includes(state.selectedStatus)) {
@@ -523,14 +409,11 @@ export const VenueModule = (function() {
             
         } catch (error) {
             console.error('❌ Error updating status:', error);
-            utils.hideLoadingToast();
-            utils.showToast('❌ Failed to update status. Please try again.', 'error');
+            hideLoadingToast();
+            showToast('❌ Failed to update status. Please try again.', 'error');
         }
     };
     
-    /**
-     * Update the status display in the UI
-     */
     const updateStatusDisplay = (status) => {
         const statusEl = document.getElementById('currentGFStatus');
         if (!statusEl) return;
@@ -553,53 +436,50 @@ export const VenueModule = (function() {
         `;
     };
     
-    /**
-     * Show prompt to add beer details after status update
-     */
     const showBeerDetailsPrompt = () => {
-        if (modules.modalManager) {
-            modules.modalManager.open('beerDetailsPromptModal');
-        } else {
-            const modal = document.getElementById('beerDetailsPromptModal');
-            if (modal) {
-                modal.style.display = 'flex';
-                modal.classList.add('active');
-            }
+        modules.modalManager?.open('beerDetailsPromptModal');
+    };
+    
+    const skipBeerDetails = () => {
+        modules.modalManager?.close('beerDetailsPromptModal');
+        // NO TOAST HERE - already shown in confirmStatusUpdate!
+    };
+    
+    const addBeerDetailsFromPrompt = () => {
+        modules.modalManager?.close('beerDetailsPromptModal');
+        window.App.setState('cameFromBeerDetailsPrompt', true);
+        
+        if (window.ReportBeer || window.CascadeForm) {
+            modules.modalManager?.open('reportModal');
+            const venue = getCurrentVenue();
+            const reportModule = window.ReportBeer || window.CascadeForm;
+            reportModule.setVenue(venue);
+            reportModule.reset();
         }
     };
     
-    /**
-     * Show status prompt after beer report (called from cascade-form)
-     */
     const showStatusPromptAfterBeer = (venue, submittedBy, userId) => {
         console.log('🎯 Showing status prompt for venue:', venue);
-        console.log('👤 Submitted by:', submittedBy, 'User ID:', userId);
         
-        // Store venue data for the action handlers
         window.App.setState('statusPromptVenue', venue);
         window.App.setState('statusPromptSubmittedBy', submittedBy);
         window.App.setState('statusPromptUserId', userId);
         
-        // Close venue details overlay first if it's open
         if (modules.modalManager?.isOpen('venueDetailsOverlay')) {
             modules.modalManager.close('venueDetailsOverlay');
         }
         
-        // Small delay to ensure overlay is closed
         setTimeout(() => {
-            // Set the venue name in the modal
             const venueNameEl = document.getElementById('statusPromptVenueName');
             if (venueNameEl && venue) {
                 venueNameEl.textContent = venue.venue_name || venue.name || 'this venue';
             }
             
-            // Set venue ID on all status buttons
             const statusButtons = document.querySelectorAll('.status-prompt-btn');
             statusButtons.forEach(btn => {
                 btn.dataset.venueId = venue.venue_id;
             });
             
-            // Open the status prompt modal
             modules.modalManager?.open('statusPromptAfterBeerModal');
         }, 300);
     };
@@ -607,21 +487,15 @@ export const VenueModule = (function() {
     // ================================
     // BEER LIST MANAGEMENT
     // ================================
-    
-    /**
-     * Load and display the beer list for a venue
-     */
     const loadBeerList = async (venue) => {
         console.log('Loading beer list for:', venue.venue_name);
         
-        // Update header
         const venueNameEl = document.getElementById('beerListVenueName');
         if (venueNameEl) {
             venueNameEl.textContent = venue.venue_name;
         }
         
         try {
-            // Fetch structured beer data
             const response = await fetch(`/api/venue/${venue.venue_id}/beers`);
             const data = await response.json();
             
@@ -636,9 +510,6 @@ export const VenueModule = (function() {
         }
     };
     
-    /**
-     * Display the beer list with new design
-     */
     const displayBeerList = (beers) => {
         const contentEl = document.getElementById('beerListContent');
         const emptyEl = document.getElementById('beerListEmpty');
@@ -646,18 +517,11 @@ export const VenueModule = (function() {
         if (contentEl) contentEl.style.display = 'block';
         if (emptyEl) emptyEl.style.display = 'none';
         
-        // Generate beer cards
         if (contentEl) {
             contentEl.innerHTML = beers.map((beer, index) => createBeerCard(beer, index)).join('');
         }
-        
-        // Initialize dropdown handlers
-        initializeBeerDropdowns();
     };
     
-    /**
-     * Create a single beer card HTML
-     */
     const createBeerCard = (beer, index) => {
         const isBottleCan = beer.format && (beer.format.toLowerCase() === 'bottle' || beer.format.toLowerCase() === 'can');
         const isCask = beer.format && beer.format.toLowerCase() === 'cask';
@@ -721,9 +585,6 @@ export const VenueModule = (function() {
         `;
     };
     
-    /**
-     * Show empty beer list state
-     */
     const showEmptyBeerList = () => {
         const contentEl = document.getElementById('beerListContent');
         const emptyEl = document.getElementById('beerListEmpty');
@@ -732,57 +593,42 @@ export const VenueModule = (function() {
         if (emptyEl) emptyEl.style.display = 'block';
     };
     
-    /**
-     * Initialize dropdown menu handlers for beer options
-     */
-    const initializeBeerDropdowns = () => {
-        // Remove existing listeners to avoid duplicates
-        document.querySelectorAll('[data-action="beer-options"]').forEach(btn => {
-            const newBtn = btn.cloneNode(true);
-            btn.parentNode.replaceChild(newBtn, btn);
+    const toggleBeerDropdown = (beerId) => {
+        const dropdown = document.getElementById(`dropdown-${beerId}`);
+        
+        // Close all other dropdowns
+        document.querySelectorAll('.beer-dropdown-menu').forEach(menu => {
+            if (menu !== dropdown) menu.classList.remove('active');
         });
         
-        // Add fresh listeners
-        document.querySelectorAll('[data-action="beer-options"]').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const beerId = btn.dataset.beerId;
-                const dropdown = document.getElementById(`dropdown-${beerId}`);
-                
-                // Close all other dropdowns
-                document.querySelectorAll('.beer-dropdown-menu').forEach(menu => {
-                    if (menu !== dropdown) menu.classList.remove('active');
-                });
-                
-                // Toggle this dropdown
-                if (dropdown) {
-                    dropdown.classList.toggle('active');
-                }
-            });
+        // Toggle this dropdown
+        if (dropdown) {
+            dropdown.classList.toggle('active');
+        }
+    };
+    
+    const closeAllBeerDropdowns = () => {
+        document.querySelectorAll('.beer-dropdown-menu').forEach(menu => {
+            menu.classList.remove('active');
         });
     };
-
-    // ================================
-    // VENUE ACTIONS
-    // ================================
     
-    /**
-     * Handle beer verification
-     */
+    // ================================
+    // BEER ACTIONS
+    // ================================
     const verifyBeer = async (beerId, beerName) => {
         console.log('✅ Verifying beer:', beerName);
         
-        const venue = utils.getCurrentVenue();
+        const venue = getCurrentVenue();
         if (!venue) {
-            utils.showToast('No venue selected', 'error');
+            showToast('No venue selected', 'error');
             return;
         }
         
         try {
-            // TODO: Implement API call to verify beer
-            utils.showToast(`✅ ${beerName} verified!`);
+            // TODO: Implement API call
+            showToast(`✅ ${beerName} verified!`);
             
-            // Update the badge to show verified
             const card = document.querySelector(`[data-beer-id="${beerId}"]`);
             if (card) {
                 const badge = card.querySelector('.badge-unverified');
@@ -792,20 +638,14 @@ export const VenueModule = (function() {
                 }
             }
             
-            // Close dropdown
-            document.querySelectorAll('.beer-dropdown-menu').forEach(menu => {
-                menu.classList.remove('active');
-            });
+            closeAllBeerDropdowns();
             
         } catch (error) {
             console.error('Error verifying beer:', error);
-            utils.showToast('Failed to verify beer', 'error');
+            showToast('Failed to verify beer', 'error');
         }
     };
     
-    /**
-     * Handle beer deletion
-     */
     const deleteBeer = async (beerId, beerName) => {
         console.log('🗑️ Deleting beer:', beerName);
         
@@ -813,17 +653,16 @@ export const VenueModule = (function() {
             return;
         }
         
-        const venue = utils.getCurrentVenue();
+        const venue = getCurrentVenue();
         if (!venue) {
-            utils.showToast('No venue selected', 'error');
+            showToast('No venue selected', 'error');
             return;
         }
         
         try {
-            // TODO: Implement API call to delete beer
-            utils.showToast(`Removed ${beerName}`);
+            // TODO: Implement API call
+            showToast(`Removed ${beerName}`);
             
-            // Remove the card from DOM
             const card = document.querySelector(`[data-beer-id="${beerId}"]`);
             if (card) {
                 card.style.animation = 'slideOutRight 0.3s ease';
@@ -832,13 +671,10 @@ export const VenueModule = (function() {
             
         } catch (error) {
             console.error('Error deleting beer:', error);
-            utils.showToast('Failed to remove beer', 'error');
+            showToast('Failed to remove beer', 'error');
         }
     };
     
-    /**
-     * Setup map button handler
-     */
     const setupMapButton = (venue) => {
         const mapBtn = document.querySelector('[data-action="toggle-venue-map"]');
         if (!mapBtn) return;
@@ -852,133 +688,34 @@ export const VenueModule = (function() {
         }
     };
     
-    /**
-     * Reset venue details view to default state
-     */
     const resetVenueDetailsView = () => {
         const venueContainer = document.getElementById('venueContainer');
         const venueMapContainer = document.getElementById('venueMapContainer');
         const mapBtnText = document.getElementById('venueMapBtnText');
         
-        // Removes the split-screen class
         if (venueContainer) venueContainer.classList.remove('split-view');
-        
-        // Hides the map container completely
         if (venueMapContainer) venueMapContainer.style.display = 'none';
-        
-        // Resets button text to "Show on Map"
         if (mapBtnText) mapBtnText.textContent = 'Show on Map';
     };
     
-    /**
-     * Quick add beer to current venue
-     */
     const quickAddBeer = () => {
-        const venue = utils.getCurrentVenue();
+        const venue = getCurrentVenue();
         if (!venue) {
-            utils.showToast('No venue selected', 'error');
+            showToast('No venue selected', 'error');
             return;
         }
         
-        // Close beer list modal
         modules.modalManager?.close('beerListModal');
         
-        // Open cascade form for beer reporting
-        if (window.CascadeForm) {
+        if (window.ReportBeer || window.CascadeForm) {
             modules.modalManager?.open('reportModal');
-            window.CascadeForm.setVenue(venue);
-            window.CascadeForm.reset();
+            const reportModule = window.ReportBeer || window.CascadeForm;
+            reportModule.setVenue(venue);
+            reportModule.reset();
         } else {
-            console.log('CascadeForm not available');
+            console.log('Beer report module not available');
         }
     };
-    
-    // ================================
-    // EVENT HANDLERS
-    // ================================
-    
-    /**
-     * Handle all venue-related actions
-     */
-    const handleVenueActions = (e) => {
-        const action = e.target.closest('[data-action]');
-        if (!action) return;
-        
-        // Only handle venue/status related actions
-        const venueActions = [
-            'change-gf-status',
-            'select-status',
-            'confirm-status',
-            'cancel-status',
-            'skip-details',
-            'add-beer-details'
-        ];
-        
-        if (!venueActions.includes(action.dataset.action)) return;
-        
-        e.preventDefault();
-        e.stopPropagation();
-        
-        const actionHandlers = {
-            'change-gf-status': () => openStatusModal(),
-            'select-status': () => selectStatus(action.dataset.status),
-            'confirm-status': () => confirmStatusUpdate(),
-            'cancel-status': () => {
-                modules.modalManager?.close('gfStatusConfirmModal');
-            },
-            'skip-details': () => {
-                modules.modalManager?.close('beerDetailsPromptModal');
-                utils.showToast('✅ Status updated successfully!');
-            },
-            'add-beer-details': () => {
-                modules.modalManager?.close('beerDetailsPromptModal');
-                window.App.setState('cameFromBeerDetailsPrompt', true);
-                
-                // Open cascade form
-                if (window.CascadeForm) {
-                    modules.modalManager?.open('reportModal');
-                    const venue = utils.getCurrentVenue();
-                    window.CascadeForm.setVenue(venue);
-                    window.CascadeForm.reset();
-                }
-            }
-        };
-        
-        const handler = actionHandlers[action.dataset.action];
-        if (handler) handler();
-    };
-    
-    /**
-     * Initialize all venue-related event handlers
-     */
-    const initializeEventHandlers = () => {
-        // Status action handlers
-        document.addEventListener('click', handleVenueActions);
-        
-        // Close dropdowns when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!e.target.closest('.beer-dropdown-menu') && 
-                !e.target.closest('[data-action="beer-options"]')) {
-                document.querySelectorAll('.beer-dropdown-menu').forEach(menu => {
-                    menu.classList.remove('active');
-                });
-            }
-        });
-        
-        // Handle quick add beer button
-        const quickAddBtn = document.querySelector('[data-action="quick-add-beer"]');
-        if (quickAddBtn) {
-            quickAddBtn.addEventListener('click', quickAddBeer);
-        }
-    };
-    
-    // ================================
-    // INITIALIZATION
-    // ================================
-    document.addEventListener('DOMContentLoaded', () => {
-        console.log('🔧 Initializing VenueModule with GF Status...');
-        initializeEventHandlers();
-    });
     
     // ================================
     // PUBLIC API
@@ -993,17 +730,23 @@ export const VenueModule = (function() {
         selectStatus,
         confirmGFStatus,
         doConfirmStatus,
-        
         confirmStatusUpdate,
         showStatusPromptAfterBeer,
+        
+        // Beer details prompt
+        skipBeerDetails,
+        addBeerDetailsFromPrompt,
         
         // Beer actions
         verifyBeer,
         deleteBeer,
+        toggleBeerDropdown,
+        closeAllBeerDropdowns,
         
         // Utilities
-        getCurrentVenue: utils.getCurrentVenue,
-        setCurrentVenue: utils.setCurrentVenue,
+        getCurrentVenue,
+        setCurrentVenue,
+        quickAddBeer,
         
         // For debugging
         getState: () => state
