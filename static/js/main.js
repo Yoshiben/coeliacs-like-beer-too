@@ -1772,6 +1772,7 @@ const App = {
                     window.App.setState('statusPromptVenue', null);
                     window.App.setState('statusPromptSubmittedBy', null);
                     window.App.setState('statusPromptUserId', null);
+                    modules.nav?.showHomeWithContext();
                 }
             } catch (error) {
                 console.error('Failed to update status:', error);
