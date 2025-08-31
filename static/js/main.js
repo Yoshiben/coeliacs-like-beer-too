@@ -1490,10 +1490,17 @@ const App = {
         },
         
         'do-confirm-status': async (el, modules) => {
+            // Debug logging
+            console.log('🔍 Attempting to confirm status...');
+            
             const venue = window.App.getState('currentVenue');
+            console.log('📍 Current venue from state:', venue);
+            
             const userId = parseInt(localStorage.getItem('user_id'));
+            console.log('👤 User ID from localStorage:', userId);
             
             if (!venue || !userId) {
+                console.error('❌ Missing data:', { venue, userId });
                 modules.toast?.error('Error: Missing data');
                 return;
             }
