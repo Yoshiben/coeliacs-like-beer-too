@@ -45,7 +45,29 @@
     </div>
 </div>
 
-<!-- Status Modals -->
+<!-- Confirm Status Modal -->
+<div id="statusConfirmModal" class="modal confirm-modal">
+    <div class="modal-content confirm-modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Confirm Status</h2>
+        </div>
+        <div class="modal-body">
+            <div class="confirm-message">
+                <p>You're confirming that <strong id="confirmVenueName"></strong>:</p>
+                <div class="confirm-status-display" id="confirmStatusDisplay">
+                    <!-- Status will be populated here -->
+                </div>
+                <p class="confirm-points">✨ You'll earn 5 points for confirming!</p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" data-action="cancel-confirm">Cancel</button>
+                <button class="btn btn-primary" data-action="do-confirm-status">Yes, Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Update Status Modal -->
 <div id="gfStatusModal" class="modal status-modal">
     <div class="modal-content status-modal-content">
         <div class="modal-header">
@@ -95,6 +117,7 @@
     </div>
 </div>
 
+<!-- Confirm Status Update Modal -->
 <div id="gfStatusConfirmModal" class="modal confirm-modal">
     <div class="modal-content confirm-modal-content">
         <div class="modal-header">
@@ -114,7 +137,7 @@
     </div>
 </div>
 
-<!-- CLEAN CASCADE BEER REPORT MODAL -->
+<!-- Cascade Beer Report Modal -->
 <div id="reportModal" class="modal-overlay report-modal" data-cover-nav="true">
     <div class="modal-content">
         <!-- Fixed header -->
