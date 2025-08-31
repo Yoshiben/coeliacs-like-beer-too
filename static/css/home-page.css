@@ -264,6 +264,8 @@
 .trending-list {
    display: flex;
    flex-direction: column;
+   padding: var(--space-sm);
+   gap: var(--space-lg);
 }
 
 .trending-item {
