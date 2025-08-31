@@ -73,6 +73,7 @@ export const ModalManager = (() => {
         gfStatusModal: { type: 'modal', group: 'status', stackable: true, order: 1, priority: true },
         gfStatusConfirmModal: { type: 'modal', group: 'status', stackable: true, order: 2 },
         beerDetailsPromptModal: { type: 'modal', group: 'status', stackable: true, order: 3 },
+        statusconfirmModal: { type: 'modal', group: 'status', stackable: true, order: 2 },
         
         // Form modals
         reportModal: { type: 'modal', group: 'form', exclusive: true, priority: false },
