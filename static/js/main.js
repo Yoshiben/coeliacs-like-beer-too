@@ -1474,9 +1474,12 @@ const App = {
         
         // Venue actions
         'view-venue': (el, modules) => {
-            const venueId = el.dataset.venueId || el.closest('[data-venue-id]')?.dataset.venueId;
-            if (venueId) modules.venue?.showVenueDetails?.(venueId);
+            const venueId = el.dataset.venueId;
+            if (venueId) {
+                modules.venue?.showVenueDetails(venueId);
+            }
         },
+        
         'view-venue-from-map': (el, modules) => {
             const venueId = el.dataset.venueId;
             if (venueId) {
@@ -2117,15 +2120,13 @@ const App = {
 
         // Community actions
         'quick-nearby': (el, modules) => {
-            const community = modules.community || window.App?.getModule('community');
-            community?.handleQuickNearby();
+            modules.homePage?.handleQuickNearby();
         },
         
         'thanks': (el, modules) => {
             const findId = el.dataset.findId;
             if (findId) {
-                const community = modules.community || window.App?.getModule('community');
-                community?.handleThanks(parseInt(findId));
+                modules.homePage?.handleThanks(parseInt(findId));
             }
         },
         
