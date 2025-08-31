@@ -138,7 +138,7 @@ export const NavStateManager = (() => {
                 setPageContext('breweries');
                 break;
             case 'contact':
-                modules.modalManager?.open('contactOverlay');
+                modules.modalManager?.open('getInTouchOverlay');  // Change from 'contactOverlay'
                 setPageContext('contact');
                 break;
             case 'search':
