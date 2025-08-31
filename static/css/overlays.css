@@ -306,7 +306,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: var(--space-lg);
     overflow-y: auto;
 }
 
@@ -321,7 +320,7 @@
 
 #gfInfoOverlay .info-header {
     padding: var(--space-xl);
-    background: var(--primary-gradient);
+    background: var(--pink-gradient);
     color: var(--white);
     position: relative;
 }
