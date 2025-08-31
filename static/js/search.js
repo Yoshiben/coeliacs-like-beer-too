@@ -1885,8 +1885,6 @@ export const SearchModule = (function() {
               modules.modalManager.close('placesSearchModal');
           }
           
-          modules.toast?.success(`🎉 ${result.message}`);
-          
           setTimeout(() => {
               if (modules.modalManager) {
                   modules.modalManager.open('venueAddedPromptModal');
