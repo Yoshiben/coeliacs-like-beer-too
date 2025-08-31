@@ -1550,9 +1550,11 @@ const App = {
                     })
                 });
                 
-                if (response.ok) {
-                    const result = await response.json();
-                    modules.toast?.hideLoadingToast();
+                const result = await response.json();
+                modules.toast?.hideLoadingToast();
+                
+                // Check the actual success field, not just response.ok
+                if (result.success) {
                     modules.toast?.success(`✅ Status confirmed! +${result.points_earned || 5} points`);
                     
                     // Reload the confirmation text
@@ -1565,13 +1567,14 @@ const App = {
                         }
                     }
                 } else {
-                    const error = await response.json();
-                    throw new Error(error.message || 'Failed to confirm');
+                    // Handle the "already confirmed" case
+                    modules.toast?.info(result.message || 'Already confirmed');
                 }
+                
             } catch (error) {
                 console.error('Error confirming status:', error);
                 modules.toast?.hideLoadingToast();
-                modules.toast?.error(error.message || 'Failed to confirm status');
+                modules.toast?.error('Failed to confirm status');
             }
         },
         
