@@ -875,7 +875,7 @@ const App = {
 
 
 
-        // COokies
+        // Cookies
         'accept-all-cookies': (el, modules) => {
             console.log('🔥 ACTION HANDLER CALLED');
             console.log('OnboardingFlow exists?', !!window.OnboardingFlow);
@@ -987,8 +987,43 @@ const App = {
 
 
 
+        'app-settings': (el, modules) => {
+            // Close more menu first
+            const moreMenu = document.getElementById('moreMenuOverlay');
+            if (moreMenu) moreMenu.style.display = 'none';
+            
+            modules.modalManager?.open('settingsModal');
+        },
 
 
+        'clear-location': (el, modules) => {
+            localStorage.removeItem('lastKnownLocation');
+            window.App.setState('userLocation', null);
+            modules.toast?.success('Location data cleared');
+        },
+        
+        'clear-cache': (el, modules) => {
+            if (confirm('This will clear all saved data. Continue?')) {
+                // Keep user login info
+                const userId = localStorage.getItem('user_id');
+                const nickname = localStorage.getItem('userNickname');
+                
+                // Clear everything
+                localStorage.clear();
+                sessionStorage.clear();
+                
+                // Restore user info
+                if (userId) localStorage.setItem('user_id', userId);
+                if (nickname) localStorage.setItem('userNickname', nickname);
+                
+                modules.toast?.success('Cache cleared');
+                setTimeout(() => window.location.reload(), 1000);
+            }
+        },
+        
+        'manage-cookies': (el, modules) => {
+            modules.toast?.info('Only essential cookies are used - no tracking cookies');
+        },
 
         
         // Passcode actions
