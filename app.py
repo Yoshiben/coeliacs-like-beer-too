@@ -1282,6 +1282,75 @@ def get_status_confirmations(venue_id):
             'text': "Not yet confirmed",
             'has_confirmations': False
         })
+
+@app.route('/api/venue/confirm-status', methods=['POST'])
+def confirm_venue_status():
+    """Confirm a venue's GF status"""
+    try:
+        data = request.get_json()
+        venue_id = data.get('venue_id')
+        status = data.get('status')
+        user_id = data.get('user_id')
+        
+        if not venue_id or not status or not user_id:
+            return jsonify({'error': 'Missing required fields'}), 400
+        
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        # Check if user exists
+        cursor.execute("SELECT nickname FROM users WHERE user_id = %s AND is_active = 1", (user_id,))
+        user = cursor.fetchone()
+        if not user:
+            return jsonify({'error': 'Invalid user'}), 401
+        
+        # Check if user already confirmed this status in last 24 hours
+        cursor.execute("""
+            SELECT confirmed_at 
+            FROM status_confirmations 
+            WHERE venue_id = %s 
+            AND user_id = %s 
+            AND confirmed_at > DATE_SUB(NOW(), INTERVAL 48 HOUR)
+        """, (venue_id, user_id))
+        
+        recent_confirmation = cursor.fetchone()
+        
+        if recent_confirmation:
+            return jsonify({
+                'success': False,
+                'message': 'You already confirmed this venue today',
+                'points_earned': 0
+            }), 200
+        
+        # Insert confirmation
+        cursor.execute("""
+            INSERT INTO status_confirmations (venue_id, user_id, status_confirmed, confirmed_at)
+            VALUES (%s, %s, %s, NOW())
+        """, (venue_id, user_id, status))
+        
+        conn.commit()
+        
+        # Award points
+        points_earned = 5
+        update_user_stats(user_id, 'status_confirmation', points_earned)
+        
+        logger.info(f"Status confirmed for venue {venue_id} by user {user_id} ({user['nickname']})")
+        
+        return jsonify({
+            'success': True,
+            'message': 'Status confirmed!',
+            'points_earned': points_earned
+        })
+        
+    except Exception as e:
+        logger.error(f"Error confirming status: {str(e)}")
+        if 'conn' in locals():
+            conn.rollback()
+        return jsonify({'error': 'Failed to confirm status'}), 500
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
                     
 @app.route('/autocomplete')
 def autocomplete():
@@ -2160,6 +2229,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
