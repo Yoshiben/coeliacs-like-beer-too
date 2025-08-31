@@ -53,9 +53,9 @@ export const ModalManager = (() => {
         communityHubOverlay: { type: 'overlay', group: 'primary', exclusive: true },
 
         // Info overlays
-        aboutOverlay: { type: 'overlay', group: 'info', exclusive: true, zIndex: 1500 },
-        gfInfoOverlay: { type: 'overlay', group: 'info', exclusive: true, zIndex: 1500 },
-        getInTouchOverlay: { type: 'overlay', group: 'info', exclusive: true, zIndex: 1500 },
+        // aboutOverlay: { type: 'overlay', group: 'info', exclusive: true, zIndex: 1500 },
+        gfInfoOverlay: { type: 'overlay', group: 'info', exclusive: true },
+        getInTouchOverlay: { type: 'overlay', group: 'info', exclusive: true },
         
         
         
