@@ -792,7 +792,7 @@ const App = {
 
 
 
-        // Action handlers in main.js:
+        // Legal stuff
         'show-privacy-overlay': (el, modules) => {
             document.getElementById('moreMenuOverlay').style.display = 'none';
             setTimeout(() => {
@@ -814,7 +814,6 @@ const App = {
             }, 100);
         },
         
-        // From age gate:
         'show-privacy-from-age-gate': (el, modules, event) => {
             event.preventDefault();
             modules.modalManager?.open('privacyModal');
@@ -825,7 +824,6 @@ const App = {
             modules.modalManager?.open('termsModal');
         },
         
-        // Close handlers:
         'close-privacy-modal': (el, modules) => {
             modules.modalManager?.close('privacyModal');
         },
@@ -883,6 +881,10 @@ const App = {
                 OnboardingFlow.handleContinueBrowser();
             }
         },
+
+
+
+        // COokies
         'accept-all-cookies': (el, modules) => {
             console.log('🔥 ACTION HANDLER CALLED');
             console.log('OnboardingFlow exists?', !!window.OnboardingFlow);
@@ -907,11 +909,6 @@ const App = {
 
 
 
-
-
-
-
-
         
         
         // Welcome actions
@@ -926,6 +923,8 @@ const App = {
                 OnboardingFlow.showNicknameSelection();
             }
         },
+
+        
         
         // Nickname actions
         'skip-nickname': (el, modules) => {
@@ -941,8 +940,6 @@ const App = {
         },
         
         'check-nickname-input': (el, modules) => {
-            // Note: This needs special handling for input events
-            // We'll handle this in the global input handler instead
             const value = el.value;
             if (window.OnboardingFlow && value !== undefined) {
                 OnboardingFlow.checkNickname(value);
@@ -970,6 +967,12 @@ const App = {
                 OnboardingFlow.saveNickname();
             }
         },
+
+
+
+
+
+        
         
         // Sign In actions
         'close-signin': (el, modules) => {
@@ -989,6 +992,13 @@ const App = {
                 OnboardingFlow.performSignIn();
             }
         },
+
+
+
+
+
+
+
         
         // Passcode actions
         'copy-passcode': (el, modules) => {
@@ -1012,7 +1022,6 @@ const App = {
         'toggle-passcode-confirm': (el, modules) => {
             console.log('🔲 Checkbox toggled:', el.checked);
             
-            // Get the checkbox element (el might be the label or checkbox)
             const checkbox = el.type === 'checkbox' ? el : el.querySelector('input[type="checkbox"]');
             if (!checkbox) {
                 console.error('Checkbox not found');
@@ -1023,11 +1032,9 @@ const App = {
             console.log('Button found:', !!continueBtn);
             
             if (continueBtn) {
-                // Enable/disable based on checkbox state
                 continueBtn.disabled = !checkbox.checked;
                 console.log('Button disabled state:', continueBtn.disabled);
                 
-                // Visual feedback
                 if (checkbox.checked) {
                     continueBtn.textContent = 'Continue to App →';
                 } else {
@@ -1050,11 +1057,17 @@ const App = {
         
         'start-exploring': (el, modules) => {
             if (window.OnboardingFlow) {
-                OnboardingFlow.finishOnboarding();  // This will now check for cookies
+                OnboardingFlow.finishOnboarding();
             }
         },
 
 
+
+
+
+        
+
+        // get in touch
         'get-in-touch': (el, modules) => {
             console.log('💬 Opening Get in Touch overlay');
             modules.modalManager?.open('getInTouchOverlay');
@@ -1066,23 +1079,11 @@ const App = {
         },
         
         'show-gf-guide': (el, modules) => {
-            // This would open your existing GF info overlay or create a new guide
             modules.modalManager?.close('getInTouchOverlay');
             setTimeout(() => {
                 modules.modalManager?.open('gfInfoOverlay');
             }, 100);
         },
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -1121,6 +1122,11 @@ const App = {
             modules.search?.searchByBeer();
         },
 
+
+
+
+        
+
          // Map actions
         'toggle-results-map': (el, modules) => {
             modules.map?.toggleSearchResultsFullMap?.();
@@ -1153,6 +1159,11 @@ const App = {
                 }
             }, 500);
         },
+
+
+
+
+        
         
         // Navigation actions
         'close-results': (el, modules) => {
@@ -1225,7 +1236,6 @@ const App = {
             }
         },
 
-        // Add these to your main.js action handlers:
 
         'quick-update-status': async (el, modules) => {
             const status = el.dataset.status;
@@ -1427,6 +1437,11 @@ const App = {
             });
         },
 
+
+
+
+        
+
         
         // Venue actions
         'view-venue': (el, modules) => {
@@ -1447,6 +1462,88 @@ const App = {
                 modules.venue?.showVenueDetails?.(venueId);
             }
         },
+
+
+        // confirm status
+
+        'confirm-gf-status': async (el, modules) => {
+            const venue = window.App.getState('currentVenue');
+            if (!venue) {
+                modules.toast?.error('No venue selected');
+                return;
+            }
+            
+            // Populate the confirmation modal
+            const venueNameEl = document.getElementById('confirmVenueName');
+            const statusDisplayEl = document.getElementById('confirmStatusDisplay');
+            
+            if (venueNameEl) venueNameEl.textContent = venue.venue_name;
+            
+            // Copy current status display into modal
+            const currentStatusEl = document.getElementById('currentGFStatus');
+            if (statusDisplayEl && currentStatusEl) {
+                statusDisplayEl.innerHTML = currentStatusEl.innerHTML;
+            }
+            
+            // Open the confirmation modal
+            modules.modalManager?.open('statusConfirmModal');
+        },
+        
+        'do-confirm-status': async (el, modules) => {
+            const venue = window.App.getState('currentVenue');
+            const userId = parseInt(localStorage.getItem('user_id'));
+            
+            if (!venue || !userId) {
+                modules.toast?.error('Error: Missing data');
+                return;
+            }
+            
+            modules.modalManager?.close('statusConfirmModal');
+            modules.toast?.showLoadingToast('Confirming status...');
+            
+            try {
+                const response = await fetch('/api/venue/confirm-status', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        venue_id: venue.venue_id,
+                        status: venue.gf_status,
+                        user_id: userId
+                    })
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    modules.toast?.hideLoadingToast();
+                    modules.toast?.success(`✅ Status confirmed! +${result.points_earned || 5} points`);
+                    
+                    // Reload the confirmation text
+                    const confirmResponse = await fetch(`/api/venue/${venue.venue_id}/status-confirmations`);
+                    if (confirmResponse.ok) {
+                        const confirmData = await confirmResponse.json();
+                        const confirmationEl = document.getElementById('statusConfirmation');
+                        if (confirmationEl) {
+                            confirmationEl.textContent = confirmData.text;
+                        }
+                    }
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Failed to confirm');
+                }
+            } catch (error) {
+                console.error('Error confirming status:', error);
+                modules.toast?.hideLoadingToast();
+                modules.toast?.error(error.message || 'Failed to confirm status');
+            }
+        },
+        
+        'cancel-confirm-status': (el, modules) => {
+            modules.modalManager?.close('statusConfirmModal');
+        },
+
+
+
+        
         'find-venue-online': (el, modules) => {
             App.openVenueExternalSearch(modules);
         },
