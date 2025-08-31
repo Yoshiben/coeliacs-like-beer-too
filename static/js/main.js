@@ -215,7 +215,7 @@ const App = {
         const modules = await Promise.all([
             import('./map.js'),
             import('./search.js'),
-            import('./community.js'),
+            import('./home-page.js'),
             import('./nav.js'),
             import('./breweries.js'),
             import('./venue.js')
@@ -224,16 +224,16 @@ const App = {
         const [
             { MapModule },
             { SearchModule },
-            { CommunityModule },
+            { HomePageModule },
             { NavStateManager },
             breweriesImport,
             { VenueModule }
-            
         ] = modules;
         
         App.registerModule('map', MapModule);
         App.registerModule('search', SearchModule);
-        App.registerModule('community', CommunityModule);
+        App.registerModule('homePage', HomePageModule);  // Changed key and module name
+        App.registerModule('community', HomePageModule);  // Keep this alias for backwards compatibility!
         App.registerModule('venue', VenueModule);
 
         const { CommunityHubModule } = await import('./community-hub.js');
