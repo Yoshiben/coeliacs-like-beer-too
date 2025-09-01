@@ -1980,7 +1980,7 @@ const App = {
 
         // Status actions
         'change-gf-status': (el, modules) => {
-            modules.venue?.openGFStatusModal();
+            modules.venue?.openStatusModal();
         },
         
         'select-status': (el, modules) => {
