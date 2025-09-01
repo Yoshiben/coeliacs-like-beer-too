@@ -414,21 +414,44 @@ export const VenueModule = (function() {
             const result = await response.json();
             hideLoadingToast();
             
-            updateStatusDisplay(state.selectedStatus);
-            setCurrentVenue({
+            // Update the venue in state with new status
+            const updatedVenue = {
                 ...venue,
                 gf_status: state.selectedStatus
-            });
+            };
+            setCurrentVenue(updatedVenue);
+            
+            // Update the status display immediately
+            updateStatusDisplay(state.selectedStatus);
+            setupGFStatusDisplay(updatedVenue);
+            
+            // Refresh the beer list if venue details are open
+            if (modules.modalManager?.isOpen('venueDetailsOverlay')) {
+                loadBeerList(updatedVenue);
+                // Also refresh the beer count display
+                const beerEl = document.getElementById('venueDetailsBeer');
+                if (beerEl) {
+                    setupBeerDetails(updatedVenue, beerEl);
+                }
+            }
             
             showToast('✅ Status updated successfully!');
             modules.tracking?.trackEvent('gf_status_updated', 'Venue', state.selectedStatus);
             
             const cameFromBeerReport = window.App.getState('statusPromptVenue') !== null;
             
+            // Only show beer prompt if NOT from beer report and status is positive
             if (!cameFromBeerReport && ['always_tap_cask', 'always_bottle_can', 'currently'].includes(state.selectedStatus)) {
                 setTimeout(() => {
                     showBeerDetailsPrompt();
                 }, 500);
+            }
+            
+            // Clear the status prompt state if we came from beer report
+            if (cameFromBeerReport) {
+                window.App.setState('statusPromptVenue', null);
+                window.App.setState('statusPromptSubmittedBy', null);
+                window.App.setState('statusPromptUserId', null);
             }
             
         } catch (error) {
@@ -489,9 +512,8 @@ export const VenueModule = (function() {
         window.App.setState('statusPromptSubmittedBy', submittedBy);
         window.App.setState('statusPromptUserId', userId);
         
-        if (modules.modalManager?.isOpen('venueDetailsOverlay')) {
-            modules.modalManager.close('venueDetailsOverlay');
-        }
+        // DON'T close venue details - keep it visible behind the status prompt
+        // This way users can see their venue and the beer they just added
         
         setTimeout(() => {
             const venueNameEl = document.getElementById('statusPromptVenueName');
