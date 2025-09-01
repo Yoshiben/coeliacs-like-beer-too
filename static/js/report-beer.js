@@ -648,6 +648,13 @@ export const ReportBeer = (() => {
                     window.App.getModule('modalManager').close('reportModal');
                 }
                 
+                // ADD THIS: Refresh venue to show the new beer
+                const venueModule = window.App?.getModule('venue');
+                if (state.currentVenue?.venue_id) {
+                    // This will reload the venue with fresh data
+                    venueModule?.showVenueDetails(state.currentVenue.venue_id);
+                }
+                
                 reset();
                 
                 if (result.show_status_prompt && state.currentVenue) {
@@ -670,7 +677,6 @@ export const ReportBeer = (() => {
             showToast('❌ Failed to submit. Please try again.', 'error');
         }
     };
-
     // ================================
     // UI HELPERS
     // ================================
