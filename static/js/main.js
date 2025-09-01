@@ -1856,11 +1856,18 @@ const App = {
                         modules.toast?.success('🎉 Beer added + status updated! You are a legend! 🍺⭐');
                     }
                     
+                    // Refresh the venue to show updated status
+                    if (venueId && modules.venue) {
+                        await modules.venue.showVenueDetails(venueId);
+                    }
+                    
                     // Clear the state
                     window.App.setState('statusPromptVenue', null);
                     window.App.setState('statusPromptSubmittedBy', null);
                     window.App.setState('statusPromptUserId', null);
-                    modules.nav?.showHomeWithContext();
+                    
+                    // Don't go home - stay on venue
+                    // modules.nav?.showHomeWithContext();  // Remove or comment this line
                 }
             } catch (error) {
                 console.error('Failed to update status:', error);
