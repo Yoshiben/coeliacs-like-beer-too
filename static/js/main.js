@@ -2514,9 +2514,16 @@ const App = {
                     if (nicknameEl) nicknameEl.textContent = nickname;
                     if (avatarEl) avatarEl.textContent = '🍺';
                     
-                    // TODO: Get actual points from API
-                    const points = localStorage.getItem('userPoints') || '0';
-                    if (pointsEl) pointsEl.textContent = `⭐ ${points} points`;
+                    // Fetch actual points
+                    fetch(`/api/user/${userId}/points`)
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success && pointsEl) {
+                                pointsEl.textContent = `⭐ ${data.points} points`;
+                                localStorage.setItem('userPoints', data.points);
+                            }
+                        })
+                        .catch(err => console.error('Failed to load points:', err));
                     
                     // Show sign out option
                     const signOutSection = document.getElementById('menuSignOutSection');
