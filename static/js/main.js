@@ -2414,6 +2414,7 @@ const App = {
             modules.breweries?.loadBreweries();
         },
 
+        // Remove all the swipe code and just keep this simple version:
         'toggle-more-menu': (el, modules) => {
             const overlay = document.getElementById('moreMenuOverlay');
             
@@ -2422,7 +2423,6 @@ const App = {
                 return;
             }
             
-            // Check if it's currently open
             const isOpen = overlay.style.display === 'flex';
             
             if (!isOpen) {
@@ -2433,69 +2433,6 @@ const App = {
                 overlay.style.display = 'flex';
                 overlay.classList.add('active');
                 document.body.style.overflow = 'hidden';
-                
-                // Initialize swipe-to-close (only once)
-                const moreMenuContainer = document.querySelector('.more-menu-container');
-                if (moreMenuContainer && !moreMenuContainer.hasAttribute('data-swipe-initialized')) {
-                    moreMenuContainer.setAttribute('data-swipe-initialized', 'true');
-                    
-                    let startY = 0;
-                    let currentY = 0;
-                    let isDragging = false;
-                    
-                    const handleTouchStart = (e) => {
-                        startY = e.touches[0].clientY;
-                        isDragging = true;
-                        moreMenuContainer.style.transition = 'none';
-                    };
-                    
-                    const handleTouchMove = (e) => {
-                        if (!isDragging) return;
-                        currentY = e.touches[0].clientY;
-                        const diff = currentY - startY;
-                        
-                        // Only allow dragging down
-                        if (diff > 0) {
-                            moreMenuContainer.style.transform = `translateY(${diff}px)`;
-                            // Fade out as you drag
-                            const opacity = Math.max(0, 1 - (diff / 400));
-                            moreMenuContainer.style.opacity = opacity;
-                        }
-                    };
-                    
-                    const handleTouchEnd = (e) => {
-                        if (!isDragging) return;
-                        isDragging = false;
-                        
-                        const diff = currentY - startY;
-                        moreMenuContainer.style.transition = 'all 0.3s ease';
-                        
-                        if (diff > 100) { // Swipe threshold - close it
-                            moreMenuContainer.style.transform = 'translateY(100%)';
-                            moreMenuContainer.style.opacity = '0';
-                            
-                            setTimeout(() => {
-                                overlay.style.display = 'none';
-                                overlay.classList.remove('active');
-                                document.body.style.overflow = '';
-                                // Reset for next time
-                                moreMenuContainer.style.transform = '';
-                                moreMenuContainer.style.opacity = '';
-                            }, 300);
-                        } else {
-                            // Snap back
-                            moreMenuContainer.style.transform = '';
-                            moreMenuContainer.style.opacity = '';
-                        }
-                        
-                        startY = 0;
-                        currentY = 0;
-                    };
-                    
-                    moreMenuContainer.addEventListener('touchstart', handleTouchStart);
-                    moreMenuContainer.addEventListener('touchmove', handleTouchMove);
-                    moreMenuContainer.addEventListener('touchend', handleTouchEnd);
-                }
                 
                 // Update user info if logged in
                 const nickname = localStorage.getItem('userNickname');
@@ -2523,7 +2460,12 @@ const App = {
                                 localStorage.setItem('userPoints', data.points);
                             }
                         })
-                        .catch(err => console.error('Failed to load points:', err));
+                        .catch(err => {
+                            console.error('Failed to load points:', err);
+                            // Show cached points as fallback
+                            const cachedPoints = localStorage.getItem('userPoints') || '0';
+                            if (pointsEl) pointsEl.textContent = `⭐ ${cachedPoints} points`;
+                        });
                     
                     // Show sign out option
                     const signOutSection = document.getElementById('menuSignOutSection');
@@ -2536,28 +2478,12 @@ const App = {
                     if (signOutSection) signOutSection.style.display = 'none';
                 }
                 
-                // Track event
                 modules.tracking?.trackEvent('more_menu_opened', 'Navigation');
-                
             } else {
-                // Close menu with animation
-                const moreMenuContainer = document.querySelector('.more-menu-container');
-                if (moreMenuContainer) {
-                    moreMenuContainer.style.transition = 'all 0.3s ease';
-                    moreMenuContainer.style.transform = 'translateY(100%)';
-                    moreMenuContainer.style.opacity = '0';
-                }
-                
-                setTimeout(() => {
-                    overlay.style.display = 'none';
-                    overlay.classList.remove('active');
-                    document.body.style.overflow = '';
-                    // Reset for next time
-                    if (moreMenuContainer) {
-                        moreMenuContainer.style.transform = '';
-                        moreMenuContainer.style.opacity = '';
-                    }
-                }, 300);
+                // Simple close
+                overlay.style.display = 'none';
+                overlay.classList.remove('active');
+                document.body.style.overflow = '';
             }
         },
         
