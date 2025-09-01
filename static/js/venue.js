@@ -229,35 +229,25 @@ export const VenueModule = (function() {
         const beerSection = document.getElementById('beerSection');
         if (!beerSection || !beerEl) return;
         
-        // ALWAYS show the beer section for venues with any GF status
-        const hasGFStatus = venue.gf_status === 'currently' || 
-                          venue.gf_status === 'always_tap_cask' || 
-                          venue.gf_status === 'always_bottle_can';
+        // ALWAYS show the beer section regardless of status
+        beerSection.style.display = 'block';
+        beerSection.style.cursor = 'pointer';
+        beerSection.setAttribute('data-action', 'show-beer-list');
         
-        // Show for any venue with GF status (even if no beers reported yet)
-        if (hasGFStatus) {
-            beerSection.style.display = 'block';
-            beerSection.style.cursor = 'pointer';
-            beerSection.setAttribute('data-action', 'show-beer-list');
-            
-            const beerCount = venue.beer_details ? venue.beer_details.split(',').length : 0;
-            
-            // Always show the section with appropriate message
-            beerEl.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div>
-                        ${beerCount > 0 ? 
-                            `<strong>${beerCount} GF beer${beerCount > 1 ? 's' : ''} reported</strong>` : 
-                            '<strong>No beers listed yet</strong>'}
-                        <br><small style="opacity: 0.8;">Click to view/add beers</small>
-                    </div>
-                    <div style="font-size: 1.5rem; opacity: 0.6;">›</div>
+        const beerCount = venue.beer_details ? venue.beer_details.split(',').length : 0;
+        
+        // Always show the section with appropriate message
+        beerEl.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    ${beerCount > 0 ? 
+                        `<strong>${beerCount} GF beer${beerCount > 1 ? 's' : ''} reported</strong>` : 
+                        '<strong>No beers listed yet</strong>'}
+                    <br><small style="opacity: 0.8;">Click to view/add beers</small>
                 </div>
-            `;
-        } else {
-            beerSection.style.display = 'none';
-            beerEl.innerHTML = '';
-        }
+                <div style="font-size: 1.5rem; opacity: 0.6;">›</div>
+            </div>
+        `;
     };
     
     const setupGFStatusDisplay = (venue) => {
