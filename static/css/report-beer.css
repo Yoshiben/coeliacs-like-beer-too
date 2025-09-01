@@ -162,3 +162,8 @@
    display: grid;
    gap: var(--space-md);
 }
+
+#statusPromptAfterBeerModal .status-quick-options {
+   display: grid;
+   gap: var(--space-md);
+}
