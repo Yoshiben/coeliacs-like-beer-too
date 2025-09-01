@@ -89,6 +89,16 @@ export const ReportBeer = (() => {
             beerConfirmed.style.display = 'none';
         }
         
+        // IMPORTANT: Show beer name input and label again (they get hidden when beer is confirmed)
+        const beerNameInput = document.getElementById('reportBeerName');
+        const beerNameLabel = beerNameInput?.previousElementSibling;
+        if (beerNameInput) {
+            beerNameInput.style.display = 'block';
+            if (beerNameLabel && beerNameLabel.tagName === 'LABEL') {
+                beerNameLabel.style.display = 'block';
+            }
+        }
+        
         // Remove any highlight classes
         document.querySelectorAll('.optional-highlight').forEach(el => {
             el.classList.remove('optional-highlight');
