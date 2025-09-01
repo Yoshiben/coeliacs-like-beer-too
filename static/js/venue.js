@@ -306,6 +306,16 @@ export const VenueModule = (function() {
             <span class="status-text">${config.text}</span>
             <span class="status-meta">${config.meta}</span>
         `;
+
+            // ADD THIS BIT HERE - Hide/show confirm button based on status
+        const confirmBtn = document.querySelector('[data-action="confirm-gf-status"]');
+        if (confirmBtn) {
+            if (status === 'unknown' || !venue.gf_status) {
+                confirmBtn.style.display = 'none';
+            } else {
+                confirmBtn.style.display = 'block';
+            }
+        }
     };
 
     const setupVenueButtons = (venue) => {
