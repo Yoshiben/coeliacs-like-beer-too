@@ -293,20 +293,30 @@ def check_device(uuid):
 @app.route('/api/user/<int:user_id>/points')
 def get_user_points(user_id):
     try:
-        result = db.execute('''
-            SELECT SUM(points) as total_points 
-            FROM user_stats 
-            WHERE user_id = ?
-        ''', (user_id,)).fetchone()
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
         
-        points = result['total_points'] if result['total_points'] else 0
+        # Get points from user_stats VIEW (which sums from source tables)
+        cursor.execute("""
+            SELECT points 
+            FROM user_stats 
+            WHERE user_id = %s
+        """, (user_id,))
+        
+        result = cursor.fetchone()
+        points = result['points'] if result and result['points'] else 0
         
         return jsonify({
             'success': True,
             'points': points
         })
     except Exception as e:
+        print(f"Error getting points: {e}")
         return jsonify({'success': False, 'points': 0})
+    finally:
+        if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
 
 # ================================================================================
 # CORE ROUTES
@@ -2247,6 +2257,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
