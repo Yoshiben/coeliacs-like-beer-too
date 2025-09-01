@@ -164,9 +164,16 @@ export const VenueModule = (function() {
     };
 
     const confirmGFStatus = () => {
-        const venue = getCurrentVenue();
+        const venue = utils.getCurrentVenue();
         if (!venue) return;
         
+        // Don't allow confirming "unknown" status - that's silly!
+        if (!venue.gf_status || venue.gf_status === 'unknown') {
+            modules.toast?.info('Update the status first - we need actual info!');
+            return;
+        }
+        
+        // Rest of the existing code...
         const venueNameEl = document.getElementById('confirmVenueName');
         const statusDisplayEl = document.getElementById('confirmStatusDisplay');
         
