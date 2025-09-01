@@ -2453,8 +2453,12 @@ const App = {
                     
                     // Fetch actual points
                     fetch(`/api/user/${userId}/points`)
-                        .then(res => res.json())
+                        .then(res => {
+                            console.log('Response status:', res.status);  // Add this
+                            return res.json();
+                        })
                         .then(data => {
+                            console.log('Points data received:', data);  // Add this
                             if (data.success && pointsEl) {
                                 pointsEl.textContent = `⭐ ${data.points} points`;
                                 localStorage.setItem('userPoints', data.points);
@@ -2462,7 +2466,6 @@ const App = {
                         })
                         .catch(err => {
                             console.error('Failed to load points:', err);
-                            // Show cached points as fallback
                             const cachedPoints = localStorage.getItem('userPoints') || '0';
                             if (pointsEl) pointsEl.textContent = `⭐ ${cachedPoints} points`;
                         });
