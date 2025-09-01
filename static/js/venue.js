@@ -145,10 +145,25 @@ export const VenueModule = (function() {
 
     const loadStatusConfirmations = async (venueId) => {
         try {
+            const venue = utils.getCurrentVenue();
+            const confirmationEl = document.getElementById('statusConfirmation');
+            
+            // Hide if no status or unknown
+            if (!venue?.gf_status || venue.gf_status === 'unknown') {
+                if (confirmationEl) {
+                    confirmationEl.style.display = 'none';
+                }
+                return;
+            }
+            
+            // Show and load confirmations for real statuses
+            if (confirmationEl) {
+                confirmationEl.style.display = 'block';
+            }
+            
             const response = await fetch(`/api/venue/${venueId}/status-confirmations`);
             if (response.ok) {
                 const confirmData = await response.json();
-                const confirmationEl = document.getElementById('statusConfirmation');
                 if (confirmationEl) {
                     confirmationEl.textContent = confirmData.text;
                     if (confirmData.has_confirmations) {
