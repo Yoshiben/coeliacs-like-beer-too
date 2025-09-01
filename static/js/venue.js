@@ -425,13 +425,23 @@ export const VenueModule = (function() {
             updateStatusDisplay(state.selectedStatus);
             setupGFStatusDisplay(updatedVenue);
             
-            // Refresh the beer list if venue details are open
-            if (modules.modalManager?.isOpen('venueDetailsOverlay')) {
-                loadBeerList(updatedVenue);
-                // Also refresh the beer count display
-                const beerEl = document.getElementById('venueDetailsBeer');
-                if (beerEl) {
-                    setupBeerDetails(updatedVenue, beerEl);
+            // Fetch fresh venue data from server to get updated beer list
+            if (venue?.venue_id) {
+                try {
+                    const response = await fetch(`/search?venue_id=${venue.venue_id}`);
+                    const data = await response.json();
+                    if (data && data[0]) {
+                        const freshVenue = data[0];
+                        setCurrentVenue(freshVenue);
+                        
+                        // Update all venue displays with fresh data
+                        if (modules.modalManager?.isOpen('venueDetailsOverlay')) {
+                            populateVenueDetails(freshVenue);
+                            loadBeerList(freshVenue);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error refreshing venue data:', error);
                 }
             }
             
