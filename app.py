@@ -290,6 +290,24 @@ def check_device(uuid):
         cursor.close()
         conn.close()
 
+@app.route('/api/user/<int:user_id>/points')
+def get_user_points(user_id):
+    try:
+        result = db.execute('''
+            SELECT SUM(points) as total_points 
+            FROM user_stats 
+            WHERE user_id = ?
+        ''', (user_id,)).fetchone()
+        
+        points = result['total_points'] if result['total_points'] else 0
+        
+        return jsonify({
+            'success': True,
+            'points': points
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'points': 0})
+
 # ================================================================================
 # CORE ROUTES
 # ================================================================================
@@ -2229,6 +2247,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
