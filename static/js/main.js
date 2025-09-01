@@ -820,21 +820,21 @@ const App = {
         },
 
         'show-privacy-overlay': (el, modules) => {
-            closePrimaryOverlays(modules);
+            App.closePrimaryOverlays(modules);
             document.getElementById('moreMenuOverlay').style.display = 'none';
             modules.modalManager?.open('privacyOverlay');
             modules.nav?.setPageContext('privacy');
         },
         
         'show-terms-overlay': (el, modules) => {
-            closePrimaryOverlays(modules);
+            App.closePrimaryOverlays(modules);
             document.getElementById('moreMenuOverlay').style.display = 'none';
             modules.modalManager?.open('termsOverlay');
             modules.nav?.setPageContext('terms');
         },
         
         'show-liability-overlay': (el, modules) => {
-            closePrimaryOverlays(modules);
+            App.closePrimaryOverlays(modules);
             document.getElementById('moreMenuOverlay').style.display = 'none';
             modules.modalManager?.open('liabilityOverlay');
             modules.nav?.setPageContext('liability');
@@ -1017,7 +1017,7 @@ const App = {
 
 
         'app-settings': (el, modules) => {
-            closePrimaryOverlays(modules);
+            App.closePrimaryOverlays(modules);
             // Don't hide More for settings - let it stack
             modules.modalManager?.open('settingsModal');
         },
@@ -1181,7 +1181,7 @@ const App = {
 
         // get in touch
         'get-in-touch': (el, modules) => {
-            closePrimaryOverlays(modules);
+            App.closePrimaryOverlays(modules);
             document.getElementById('moreMenuOverlay').style.display = 'none';
             modules.modalManager?.open('getInTouchOverlay');
             modules.nav?.setPageContext('contact');
@@ -2600,7 +2600,7 @@ const App = {
         },
         
         'about-gf': (el, modules) => {
-            closePrimaryOverlays(modules);
+            App.closePrimaryOverlays(modules);
             document.getElementById('moreMenuOverlay').style.display = 'none';
             modules.modalManager?.open('gfInfoOverlay');
             modules.nav?.setPageContext('about-gf');
