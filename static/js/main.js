@@ -903,31 +903,27 @@ const App = {
         'view-all-discoveries': (el, modules) => {
             modules.modalManager?.open('discoveriesOverlay', {
                 onOpen: () => {
-                    // Store reference to the module
-                    const recentFinds = window.RecentFindsModule || modules.recentFinds;
-                    
-                    if (!recentFinds) {
-                        console.error('RecentFindsModule not found');
-                        return;
-                    }
-                    
-                    // Load initial data
-                    recentFinds.loadAllDiscoveries('today');
-                    
-                    // Set up filter buttons with closure to keep module reference
-                    const filterButtons = document.querySelectorAll('.filter-chip');
-                    filterButtons.forEach(btn => {
-                        btn.addEventListener('click', (e) => {
-                            // Remove active class from all
-                            filterButtons.forEach(b => b.classList.remove('active'));
-                            // Add to clicked
-                            e.target.classList.add('active');
+                    // Wait a tick for the DOM to be ready
+                    setTimeout(() => {
+                        // Initial load
+                        if (window.RecentFindsModule) {
+                            window.RecentFindsModule.loadAllDiscoveries('today');
                             
-                            // Load with new filter - use the stored reference
-                            const filter = e.target.dataset.filter || 'today';
-                            recentFinds.loadAllDiscoveries(filter);
-                        });
-                    });
+                            // Set up filter buttons
+                            const filterButtons = document.querySelectorAll('.filter-chip');
+                            filterButtons.forEach(btn => {
+                                btn.addEventListener('click', (e) => {
+                                    filterButtons.forEach(b => b.classList.remove('active'));
+                                    e.target.classList.add('active');
+                                    
+                                    const filter = e.target.dataset.filter || 'today';
+                                    window.RecentFindsModule.loadAllDiscoveries(filter);
+                                });
+                            });
+                        } else {
+                            console.error('RecentFindsModule not available');
+                        }
+                    }, 100);
                 }
             });
         },
