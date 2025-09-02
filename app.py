@@ -85,6 +85,12 @@ def hash_passcode(passcode):
 @app.route('/api/user/create', methods=['POST'])
 def create_user():
     data = request.get_json()
+
+    # ADD THIS CHECK
+    if not data:
+        logger.error("No data received in create_user request")
+        return jsonify({'error': 'No data provided'}), 400
+            
     nickname = data.get('nickname', '').strip()
     uuid = data.get('uuid', '').strip()
     avatar_emoji = data.get('avatar_emoji', '🍺')
@@ -2257,6 +2263,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
