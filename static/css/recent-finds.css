@@ -348,3 +348,40 @@
     color: var(--text-muted);
     margin-top: 0.25rem;
 }
+
+#discoveriesOverlay .discovery-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(0,0,0,0.1);
+}
+
+#discoveriesOverlay .discovery-actions .btn {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.875rem;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+#discoveriesOverlay .discovery-actions .btn-outline {
+    background: white;
+    border: 1px solid var(--border-purple);
+    color: var(--border-purple);
+}
+
+#discoveriesOverlay .discovery-actions .btn-outline:hover {
+    background: var(--border-purple);
+    color: white;
+}
+
+#discoveriesOverlay .discovery-actions .btn-text {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+}
+
+#discoveriesOverlay .discovery-actions .btn-text:hover {
+    color: var(--border-purple);
+}
