@@ -933,8 +933,11 @@ const App = {
                                             <small>${find.location}</small>
                                         </div>
                                         <div class="discovery-actions">
-                                            <button class="btn btn-outline" data-action="show-venue" data-venue-id="${find.venue_id}">
+                                            <button class="btn btn-outline" data-action="view-venue" data-venue-id="${find.venue_id}">
                                                 View Venue
+                                            </button>
+                                            <button class="btn btn-text" data-action="thanks" data-find-id="${find.id}">
+                                                🙌 Thanks! (${find.times_reported || 0})
                                             </button>
                                         </div>
                                     </div>
