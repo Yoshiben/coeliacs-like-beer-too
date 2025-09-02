@@ -430,13 +430,32 @@ def get_stats():
 
 @app.route('/api/recent-finds')
 def get_recent_finds():
-    """Get the 2 most recent venue beer discoveries"""
+    """Get recent venue beer discoveries with optional filtering"""
     try:
+        # Get query parameters
+        limit = request.args.get('limit', 2, type=int)
+        filter_type = request.args.get('filter', 'all')  # all, today, week
+        page = request.args.get('page', 1, type=int)
+        
+        # Validate parameters
+        if limit > 100:
+            limit = 100  # Cap at 100 for performance
+        if page < 1:
+            page = 1
+            
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor(dictionary=True)
         
-        # Get the 2 most recent venue_beers entries with venue and beer details
-        sql = """
+        # Build WHERE clause based on filter
+        where_clause = ""
+        if filter_type == 'today':
+            where_clause = "WHERE DATE(vb.last_seen) = CURDATE()"
+        elif filter_type == 'week':
+            where_clause = "WHERE vb.last_seen >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)"
+        
+        # Get the venue_beers entries with venue and beer details
+        offset = (page - 1) * limit
+        sql = f"""
             SELECT 
                 vb.report_id,
                 vb.venue_id,
@@ -455,17 +474,34 @@ def get_recent_finds():
             LEFT JOIN beers b ON vb.beer_id = b.beer_id
             LEFT JOIN breweries br ON b.brewery_id = br.brewery_id
             LEFT JOIN users u ON vb.user_id = u.user_id
+            {where_clause}
             ORDER BY vb.last_seen DESC
-            LIMIT 2
+            LIMIT %s OFFSET %s
         """
         
-        cursor.execute(sql)
+        cursor.execute(sql, (limit, offset))
         recent_finds = cursor.fetchall()
+        
+        # Get stats if requesting more than 2 (full view)
+        stats = None
+        if limit > 2:
+            stats_sql = """
+                SELECT 
+                    COUNT(DISTINCT vb.beer_id) as total_beers,
+                    COUNT(DISTINCT vb.venue_id) as total_venues,
+                    COUNT(DISTINCT vb.user_id) as contributors
+                FROM venue_beers vb
+            """
+            if where_clause:
+                stats_sql += " " + where_clause
+                
+            cursor.execute(stats_sql)
+            stats = cursor.fetchone()
         
         # Format the response
         formatted_finds = []
         for find in recent_finds:
-            # Calculate time ago using last_seen instead of added_at
+            # Calculate time ago using last_seen
             time_diff = datetime.now().date() - find['last_seen']
             
             if time_diff.days == 0:
@@ -489,7 +525,7 @@ def get_recent_finds():
                 beer_description = f"{find['brewery_name']} beer"
             
             # Format location
-            location = find['city']
+            location = find['city'] or 'Unknown location'
             if find['postcode']:
                 location = f"{find['city']}, {find['postcode'][:4]}..."
             
@@ -508,11 +544,19 @@ def get_recent_finds():
             
             formatted_finds.append(formatted_find)
         
-        return jsonify({
+        response_data = {
             'success': True,
             'finds': formatted_finds,
-            'count': len(formatted_finds)
-        })
+            'count': len(formatted_finds),
+            'filter': filter_type,
+            'page': page
+        }
+        
+        # Add stats if available
+        if stats:
+            response_data['stats'] = stats
+            
+        return jsonify(response_data)
         
     except mysql.connector.Error as e:
         logger.error(f"Database error in recent finds: {str(e)}")
@@ -532,7 +576,6 @@ def get_recent_finds():
         if 'conn' in locals() and conn.is_connected():
             cursor.close()
             conn.close()
-
 @app.route('/api/community/trending')
 def get_trending_beers():
     """Get trending beers from the last 7 days, fallback to all-time if none"""
@@ -2274,6 +2317,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
