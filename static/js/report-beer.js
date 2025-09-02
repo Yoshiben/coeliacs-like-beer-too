@@ -261,54 +261,61 @@ export const ReportBeer = (() => {
     
     const searchBreweries = async (query) => {
         try {
-            // CHANGE THIS LINE - Remove the query parameter to get ALL breweries
-            const response = await fetch('/api/breweries');  // <-- No ?q parameter
+            const response = await fetch('/api/breweries');
             const allBreweries = await response.json();
             
-            // If no query, just show first 50
             if (!query) {
                 displayBreweryDropdown(allBreweries.slice(0, 50), '');
                 return;
             }
             
+            const queryLower = query.toLowerCase();
+            
             // Find exact matches
             const exactMatches = allBreweries.filter(brewery => 
-                brewery.toLowerCase().includes(query.toLowerCase())
+                brewery.toLowerCase().includes(queryLower)
             );
             
-            // Find fuzzy matches (allow 2 character differences)
+            // Find fuzzy matches - check if query matches START of any word in brewery name
             const fuzzyMatches = allBreweries.filter(brewery => {
-                const distance = levenshteinDistance(
-                    query.toLowerCase(), 
-                    brewery.toLowerCase()
-                );
-                // Allow typos based on query length
-                const maxDistance = query.length <= 5 ? 1 : 2;
-                return distance <= maxDistance && !exactMatches.includes(brewery);
+                const breweryLower = brewery.toLowerCase();
+                
+                // Direct substring match
+                if (breweryLower.includes(queryLower)) return true;
+                
+                // Check if query matches start of any word
+                const words = breweryLower.split(' ');
+                if (words.some(word => word.startsWith(queryLower))) return true;
+                
+                // Check Levenshtein distance for each word
+                return words.some(word => {
+                    const distance = levenshteinDistance(queryLower, word);
+                    return distance <= 1;  // Allow 1 character difference per word
+                });
             });
             
-            // Combine results: exact matches first, then fuzzy matches
-            const combinedResults = [...exactMatches, ...fuzzyMatches];
+            // Remove duplicates
+            const uniqueResults = [...new Set([...exactMatches, ...fuzzyMatches])];
             
-            // If user typed "dura damm", also check each word separately
-            if (query.includes(' ')) {
-                const words = query.split(' ');
-                const wordMatches = allBreweries.filter(brewery => 
-                    words.every(word => 
-                        brewery.toLowerCase().includes(word.toLowerCase()) ||
-                        levenshteinDistance(word.toLowerCase(), brewery.toLowerCase()) <= 2
-                    )
+            // Special handling for known common typos
+            const typoMap = {
+                'dura': 'daura',
+                'estrella': 'estrella damm',
+                'peroni': 'peroni nastro'
+            };
+            
+            if (typoMap[queryLower]) {
+                const corrected = allBreweries.filter(b => 
+                    b.toLowerCase().includes(typoMap[queryLower])
                 );
-                
-                // Add word matches if not already included
-                wordMatches.forEach(match => {
-                    if (!combinedResults.includes(match)) {
-                        combinedResults.push(match);
+                corrected.forEach(match => {
+                    if (!uniqueResults.includes(match)) {
+                        uniqueResults.unshift(match);  // Add to front
                     }
                 });
             }
             
-            displayBreweryDropdown(combinedResults.slice(0, 20), query);
+            displayBreweryDropdown(uniqueResults.slice(0, 20), query);
         } catch (error) {
             console.error('Error searching breweries:', error);
             hideDropdown('breweryDropdown');
