@@ -234,17 +234,80 @@ export const ReportBeer = (() => {
     // ================================
     // BREWERY FUNCTIONS
     // ================================
+    // Add Levenshtein distance function first
+    const levenshteinDistance = (str1, str2) => {
+        const matrix = [];
+        for (let i = 0; i <= str2.length; i++) {
+            matrix[i] = [i];
+        }
+        for (let j = 0; j <= str1.length; j++) {
+            matrix[0][j] = j;
+        }
+        for (let i = 1; i <= str2.length; i++) {
+            for (let j = 1; j <= str1.length; j++) {
+                if (str2.charAt(i - 1) === str1.charAt(j - 1)) {
+                    matrix[i][j] = matrix[i - 1][j - 1];
+                } else {
+                    matrix[i][j] = Math.min(
+                        matrix[i - 1][j - 1] + 1,
+                        matrix[i][j - 1] + 1,
+                        matrix[i - 1][j] + 1
+                    );
+                }
+            }
+        }
+        return matrix[str2.length][str1.length];
+    };
+    
     const searchBreweries = async (query) => {
         try {
             const response = await fetch(`/api/breweries?q=${encodeURIComponent(query)}`);
-            const breweries = await response.json();
-            displayBreweryDropdown(breweries, query);
+            const allBreweries = await response.json();
+            
+            // Find exact matches
+            const exactMatches = allBreweries.filter(brewery => 
+                brewery.toLowerCase().includes(query.toLowerCase())
+            );
+            
+            // Find fuzzy matches (allow 2 character differences)
+            const fuzzyMatches = allBreweries.filter(brewery => {
+                const distance = levenshteinDistance(
+                    query.toLowerCase(), 
+                    brewery.toLowerCase()
+                );
+                // Allow typos based on query length
+                const maxDistance = query.length <= 5 ? 1 : 2;
+                return distance <= maxDistance && !exactMatches.includes(brewery);
+            });
+            
+            // Combine results: exact matches first, then fuzzy matches
+            const combinedResults = [...exactMatches, ...fuzzyMatches];
+            
+            // If user typed "dura damm", also check each word separately
+            if (query.includes(' ')) {
+                const words = query.split(' ');
+                const wordMatches = allBreweries.filter(brewery => 
+                    words.every(word => 
+                        brewery.toLowerCase().includes(word.toLowerCase()) ||
+                        levenshteinDistance(word.toLowerCase(), brewery.toLowerCase()) <= 2
+                    )
+                );
+                
+                // Add word matches if not already included
+                wordMatches.forEach(match => {
+                    if (!combinedResults.includes(match)) {
+                        combinedResults.push(match);
+                    }
+                });
+            }
+            
+            displayBreweryDropdown(combinedResults.slice(0, 20), query);
         } catch (error) {
             console.error('Error searching breweries:', error);
             hideDropdown('breweryDropdown');
         }
     };
-
+    
     const showAllBreweries = async () => {
         state.dropdownLoading = true;
         
