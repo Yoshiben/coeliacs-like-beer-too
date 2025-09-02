@@ -903,12 +903,18 @@ const App = {
         'view-all-discoveries': (el, modules) => {
             modules.modalManager?.open('discoveriesOverlay', {
                 onOpen: () => {
-                    // Load discoveries when overlay opens
-                    if (window.RecentFindsModule) {
-                        window.RecentFindsModule.loadAllDiscoveries('today'); // Start with today's filter
+                    // Store reference to the module
+                    const recentFinds = window.RecentFindsModule || modules.recentFinds;
+                    
+                    if (!recentFinds) {
+                        console.error('RecentFindsModule not found');
+                        return;
                     }
                     
-                    // Set up filter buttons
+                    // Load initial data
+                    recentFinds.loadAllDiscoveries('today');
+                    
+                    // Set up filter buttons with closure to keep module reference
                     const filterButtons = document.querySelectorAll('.filter-chip');
                     filterButtons.forEach(btn => {
                         btn.addEventListener('click', (e) => {
@@ -917,9 +923,9 @@ const App = {
                             // Add to clicked
                             e.target.classList.add('active');
                             
-                            // Load with new filter
+                            // Load with new filter - use the stored reference
                             const filter = e.target.dataset.filter || 'today';
-                            window.RecentFindsModule.loadAllDiscoveries(filter);
+                            recentFinds.loadAllDiscoveries(filter);
                         });
                     });
                 }
