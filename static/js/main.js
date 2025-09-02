@@ -861,6 +861,48 @@ const App = {
         'close-liability-modal': (el, modules) => {
             modules.modalManager?.close('liabilityModal');
         },
+
+
+        'sign-out': (el, modules) => {
+            // Confirm sign out
+            if (!confirm('Are you sure you want to sign out?')) {
+                return;
+            }
+            
+            // Clear user data from localStorage
+            localStorage.removeItem('userNickname');
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('userPoints');
+            localStorage.removeItem('userAuth');
+            
+            // Clear app state
+            window.App.setState('userNickname', null);
+            window.App.setState('userId', null);
+            window.App.setState('userPoints', 0);
+            window.App.setState('isAuthenticated', false);
+            
+            // If UserSession module exists, call logout
+            if (window.UserSession) {
+                window.UserSession.logout();
+            }
+            
+            // Close the more menu
+            const moreMenuOverlay = document.getElementById('moreMenuOverlay');
+            if (moreMenuOverlay) {
+                moreMenuOverlay.style.display = 'none';
+            }
+            
+            // Show success message
+            modules.toast?.success('Signed out successfully');
+            
+            // Redirect to home
+            modules.nav?.goToHome();
+            
+            // Optionally refresh to clear any cached data
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        },
         
 
         
