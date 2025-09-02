@@ -902,28 +902,61 @@ const App = {
 
         'view-all-discoveries': (el, modules) => {
             modules.modalManager?.open('discoveriesOverlay', {
-                onOpen: () => {
-                    // Wait a tick for the DOM to be ready
-                    setTimeout(() => {
-                        // Initial load
-                        if (window.RecentFindsModule) {
-                            window.RecentFindsModule.loadAllDiscoveries('today');
+                onOpen: async () => {
+                    // Directly call the API here instead of relying on the module
+                    const loadDiscoveries = async (filter = 'today') => {
+                        const container = document.getElementById('discoveriesList');
+                        const loading = document.getElementById('discoveriesLoading');
+                        const empty = document.getElementById('discoveriesEmpty');
+                        
+                        loading.style.display = 'block';
+                        container.style.display = 'none';
+                        empty.style.display = 'none';
+                        
+                        try {
+                            const response = await fetch(`/api/recent-finds?limit=50&filter=${filter}`);
+                            const data = await response.json();
                             
-                            // Set up filter buttons
-                            const filterButtons = document.querySelectorAll('.filter-chip');
-                            filterButtons.forEach(btn => {
-                                btn.addEventListener('click', (e) => {
-                                    filterButtons.forEach(b => b.classList.remove('active'));
-                                    e.target.classList.add('active');
-                                    
-                                    const filter = e.target.dataset.filter || 'today';
-                                    window.RecentFindsModule.loadAllDiscoveries(filter);
-                                });
-                            });
-                        } else {
-                            console.error('RecentFindsModule not available');
+                            if (data.success && data.finds?.length > 0) {
+                                loading.style.display = 'none';
+                                container.style.display = 'block';
+                                container.innerHTML = data.finds.map(find => `
+                                    <div class="discovery-item" data-venue-id="${find.venue_id}">
+                                        <div class="discovery-header">
+                                            <span class="discovery-user">${find.user_name}</span>
+                                            <span class="discovery-time">${find.time_ago}</span>
+                                        </div>
+                                        <div class="discovery-beer">
+                                            Found <strong>${find.beer_description}</strong> ${find.format}
+                                        </div>
+                                        <div class="discovery-venue">
+                                            📍 ${find.venue_name}
+                                            <small>${find.location}</small>
+                                        </div>
+                                    </div>
+                                `).join('');
+                            } else {
+                                loading.style.display = 'none';
+                                empty.style.display = 'block';
+                            }
+                        } catch (error) {
+                            console.error('Error:', error);
+                            loading.style.display = 'none';
+                            empty.style.display = 'block';
                         }
-                    }, 100);
+                    };
+                    
+                    // Initial load
+                    await loadDiscoveries('today');
+                    
+                    // Setup filters
+                    document.querySelectorAll('.filter-chip').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
+                            e.target.classList.add('active');
+                            loadDiscoveries(e.target.dataset.filter);
+                        });
+                    });
                 }
             });
         },
