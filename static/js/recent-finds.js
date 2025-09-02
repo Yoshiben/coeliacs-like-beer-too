@@ -148,6 +148,80 @@ const RecentFindsModule = (() => {
         }
     };
 
+    const loadAllDiscoveries = async (filter = 'today') => {
+        // Use different elements for the full view
+        const container = document.getElementById('discoveriesList');
+        const loading = document.getElementById('discoveriesLoading');
+        const empty = document.getElementById('discoveriesEmpty');
+        
+        if (!container) return;
+        
+        // Show loading
+        loading.style.display = 'block';
+        container.style.display = 'none';
+        empty.style.display = 'none';
+        
+        try {
+            const response = await fetch(`/api/discoveries?filter=${filter}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Cache-Control': 'no-cache'
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (data.success && data.discoveries.length > 0) {
+                loading.style.display = 'none';
+                container.style.display = 'block';
+                
+                // Render all discoveries
+                container.innerHTML = data.discoveries.map(find => {
+                    const formatIcon = {
+                        'tap': '🚰',
+                        'bottle': '🍺',
+                        'can': '🥫',
+                        'cask': '🛢️'
+                    }[find.format?.toLowerCase()] || '🍺';
+                    
+                    return `
+                        <div class="discovery-item">
+                            <div class="discovery-header">
+                                <span class="discovery-user">${escapeHtml(find.user_name)}</span>
+                                <span class="discovery-time">${escapeHtml(find.time_ago)}</span>
+                            </div>
+                            
+                            <div class="discovery-beer">
+                                Found <strong>${escapeHtml(find.beer_description)}</strong> 
+                                ${formatIcon} ${find.format}
+                            </div>
+                            
+                            <div class="discovery-venue" data-action="show-venue" data-venue-id="${find.venue_id}">
+                                📍 ${escapeHtml(find.venue_name)}
+                                <small>${escapeHtml(find.location)}</small>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                // Update stats if provided
+                if (data.stats) {
+                    document.getElementById('totalBeers').textContent = data.stats.total_beers || 0;
+                    document.getElementById('totalVenues').textContent = data.stats.total_venues || 0;
+                    document.getElementById('totalContributors').textContent = data.stats.contributors || 0;
+                }
+            } else {
+                loading.style.display = 'none';
+                empty.style.display = 'block';
+            }
+        } catch (error) {
+            console.error('Error loading all discoveries:', error);
+            loading.style.display = 'none';
+            empty.style.display = 'block';
+        }
+    };
+
     // ================================
     // UI RENDERING
     // ================================
@@ -327,6 +401,7 @@ const RecentFindsModule = (() => {
     return {
         init,
         loadRecentFinds,
+        loadAllDiscoveries,
         cleanup,
         
         // For integration with other modules
@@ -341,6 +416,7 @@ const RecentFindsModule = (() => {
         }
     };
 })();
+
 
 // ================================
 // INTEGRATION WITH MAIN APP
