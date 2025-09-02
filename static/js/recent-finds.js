@@ -145,38 +145,7 @@ const RecentFindsModule = (() => {
             
         } catch (error) {
             console.error('❌ API Error:', error);
-            
-            // Return mock data for development/fallback
-            return getMockData();
         }
-    };
-
-    const getMockData = () => {
-        console.log('📝 Using mock data for Recent Finds');
-        return [
-            {
-                id: 1,
-                user_name: 'Sarah M.',
-                venue_id: 23456,
-                venue_name: 'The Old Bell',
-                beer_description: 'Vagabond Pale Ale',
-                format: 'tap',
-                location: 'Leeds',
-                time_ago: '2 hours ago',
-                times_reported: 12
-            },
-            {
-                id: 2,
-                user_name: 'Mike R.',
-                venue_id: 34567,
-                venue_name: 'Scaredy Cats Cafe',
-                beer_description: 'Left Handed Giant Nine Years Later',
-                format: 'bottle',
-                location: 'Cardiff',
-                time_ago: '5 hours ago',
-                times_reported: 24
-            }
-        ];
     };
 
     // ================================
