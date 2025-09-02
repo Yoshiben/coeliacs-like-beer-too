@@ -1,0 +1,306 @@
+.home-page .recent-finds-section {
+  background: var(--bg-recent-finds);
+  border: 1px solid var(--border-recent-finds);
+  border-radius: var(--border-recent-finds-radius);
+  padding: var(--recent-finds-padding);
+  margin: var(--space-xl) 0;
+  box-shadow: var(--shadow-recent-finds);
+  position: relative;
+  overflow: hidden;
+}
+
+.home-page .recent-finds-section::before {
+  content: '🍺';
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  font-size: 4rem;
+  opacity: 0.03;
+  transform: rotate(-15deg);
+  pointer-events: none;
+}
+
+.home-page .recent-finds-title {
+  color: var(--text-primary);
+  font-size: var(--recent-finds-title-size);
+  font-weight: 700;
+  margin: 0 0 var(--recent-finds-gap) 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.home-page .recent-finds-icon {
+  background: var(--purple-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 1.2em;
+}
+
+.home-page .recent-finds-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--recent-finds-gap);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.home-page .recent-find-item {
+  background: var(--white);
+  border: 1px solid var(--border-recent-finds);
+  border-radius: calc(var(--border-recent-finds-radius) * 0.7);
+  padding: var(--recent-finds-padding);
+  transition: all var(--transition);
+  position: relative;
+  cursor: pointer;
+}
+
+.home-page .recent-find-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(139, 92, 246, 0.15);
+  border-color: rgba(139, 92, 246, 0.2);
+}
+
+.home-page .recent-find-content {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.home-page .recent-find-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-sm);
+}
+
+.home-page .recent-find-user {
+  color: var(--text-primary);
+  font-size: var(--recent-finds-text-size);
+  font-weight: 600;
+  margin: 0;
+}
+
+.home-page .recent-find-time {
+  color: var(--text-muted);
+  font-size: var(--recent-finds-time-size);
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+.home-page .recent-find-beer {
+  color: var(--text-primary);
+  font-size: var(--recent-finds-text-size);
+  font-weight: 500;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.home-page .recent-find-beer strong {
+  color: var(--border-purple);
+  font-weight: 700;
+}
+
+.home-page .recent-find-venue {
+  color: var(--text-secondary);
+  font-size: var(--recent-finds-text-size);
+  margin: 0;
+  font-weight: 500;
+}
+
+.home-page .recent-find-location {
+  color: var(--text-muted);
+  font-size: var(--recent-finds-location-size);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-weight: 400;
+}
+
+.home-page .recent-find-actions {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--divider-color);
+}
+
+.home-page .recent-find-actions .btn {
+  padding: var(--space-xs) var(--space-md);
+  font-size: var(--recent-finds-location-size);
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.home-page .recent-find-actions .btn-outline {
+  background: rgba(139, 92, 246, 0.05);
+  color: var(--border-purple);
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.home-page .recent-find-actions .btn-outline:hover {
+  background: rgba(139, 92, 246, 0.1);
+  transform: translateY(-1px);
+}
+
+.home-page .recent-find-actions .btn-text {
+  background: transparent;
+  color: var(--text-muted);
+}
+
+.home-page .recent-find-actions .btn-text:hover {
+  color: var(--border-purple);
+}
+
+.home-page .recent-finds-loading {
+  text-align: center;
+  color: var(--text-muted);
+  font-style: italic;
+  padding: var(--space-xl);
+  font-size: var(--recent-finds-text-size);
+}
+
+.home-page .recent-finds-error {
+  text-align: center;
+  color: #dc3545;
+  font-size: var(--recent-finds-text-size);
+  padding: var(--space-xl);
+}
+
+.home-page .recent-finds-empty {
+  text-align: center;
+  color: var(--text-muted);
+  font-style: italic;
+  padding: var(--space-xl);
+  font-size: var(--recent-finds-text-size);
+}
+
+/* Animation for new items */
+.home-page .recent-find-item {
+  animation: slideInUp 0.4s ease-out;
+  animation-fill-mode: both;
+}
+
+.home-page .recent-find-item:nth-child(1) { animation-delay: 0.1s; }
+.home-page .recent-find-item:nth-child(2) { animation-delay: 0.2s; }
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+#discoveriesOverlay .discoveries-stats-bar {
+    display: flex;
+    justify-content: space-around;
+    padding: 1rem;
+    background: linear-gradient(135deg, rgba(139,92,246,0.05), rgba(59,130,246,0.05));
+    border-radius: 12px;
+    margin-bottom: 1rem;
+}
+
+#discoveriesOverlay .stat-item {
+    text-align: center;
+}
+
+#discoveriesOverlay .stat-icon {
+    font-size: 1.5rem;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+#discoveriesOverlay .stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: block;
+}
+
+#discoveriesOverlay .stat-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+#discoveriesOverlay .discoveries-filter {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+#discoveriesOverlay .filter-chip {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    border: 1px solid var(--border-color);
+    background: white;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+#discoveriesOverlay .filter-chip.active {
+    background: var(--purple-gradient);
+    color: white;
+    border-color: transparent;
+}
+
+#discoveriesOverlay .discovery-item {
+    padding: 1rem;
+    border-bottom: 1px solid var(--divider-color);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+#discoveriesOverlay .discovery-item:hover {
+    background: rgba(139,92,246,0.02);
+}
+
+#discoveriesOverlay .discovery-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+#discoveriesOverlay .discovery-user {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+#discoveriesOverlay .discovery-time {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+#discoveriesOverlay .discovery-beer {
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+#discoveriesOverlay .discovery-venue {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+#discoveriesOverlay .discovery-venue small {
+    display: block;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+}
