@@ -283,14 +283,25 @@ export const ReportBeer = (() => {
                 // Direct substring match
                 if (breweryLower.includes(queryLower)) return true;
                 
-                // Check if query matches start of any word
-                const words = breweryLower.split(' ');
-                if (words.some(word => word.startsWith(queryLower))) return true;
+                // Check if query matches start of brewery name (with tolerance)
+                if (breweryLower.startsWith(queryLower)) return true;
                 
-                // Check Levenshtein distance for each word
+                // Check if brewery starts with something SIMILAR to query
+                const queryLen = queryLower.length;
+                const breweryStart = breweryLower.substring(0, queryLen + 2); // Get start of brewery
+                const distance = levenshteinDistance(queryLower, breweryStart);
+                if (distance <= 2) return true;
+                
+                // Check each word
+                const words = breweryLower.split(' ');
                 return words.some(word => {
-                    const distance = levenshteinDistance(queryLower, word);
-                    return distance <= 1;  // Allow 1 character difference per word
+                    // Check if query matches start of word
+                    if (word.startsWith(queryLower)) return true;
+                    
+                    // Check distance to start of word
+                    const wordStart = word.substring(0, queryLen + 2);
+                    const dist = levenshteinDistance(queryLower, wordStart);
+                    return dist <= 1;
                 });
             });
             
