@@ -84,18 +84,29 @@ def hash_passcode(passcode):
 
 @app.route('/api/user/create', methods=['POST'])
 def create_user():
+    # Check if request has JSON data
+    if not request.is_json:
+        logger.error(f"Request is not JSON. Content-Type: {request.content_type}")
+        return jsonify({'error': 'Request must be JSON'}), 400
+    
     data = request.get_json()
-
-    # ADD THIS CHECK
+    
+    # Check if data is None or empty
     if not data:
-        logger.error("No data received in create_user request")
+        logger.error(f"Empty request body. Headers: {dict(request.headers)}")
         return jsonify({'error': 'No data provided'}), 400
-            
-    nickname = data.get('nickname', '').strip()
-    uuid = data.get('uuid', '').strip()
+    
+    # Safely get values with defaults
+    nickname = data.get('nickname', '')
+    uuid = data.get('uuid', '')
     avatar_emoji = data.get('avatar_emoji', '🍺')
     
+    # Strip only if not empty
+    nickname = nickname.strip() if nickname else ''
+    uuid = uuid.strip() if uuid else ''
+    
     if not nickname or not uuid:
+        logger.error(f"Missing fields - nickname: '{nickname}', uuid: '{uuid}'")
         return jsonify({'error': 'Missing required fields'}), 400
     
     conn = mysql.connector.connect(**db_config)
@@ -2263,6 +2274,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
