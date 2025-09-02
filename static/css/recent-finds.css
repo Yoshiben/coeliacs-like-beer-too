@@ -241,6 +241,15 @@
   }
 }
 
+#discoveriesOverlay .info-header {
+  background: var(--pink-gradient);
+}
+
+#discoveriesOverlay .info-title {
+  margin: 0;
+  color: white;
+}
+
 #discoveriesOverlay .discoveries-stats-bar {
     display: flex;
     justify-content: space-around;
@@ -275,8 +284,9 @@
 
 #discoveriesOverlay .discoveries-filter {
     display: flex;
-    gap: 0.5rem;
-    margin-top: 1rem;
+    gap: var(--space-2xl);
+    justify-content: center;
+    padding: var(--space-md);
 }
 
 #discoveriesOverlay .filter-chip {
