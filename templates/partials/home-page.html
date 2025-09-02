@@ -82,6 +82,12 @@
                 <ul class="recent-finds-list" id="recentFindsList" style="display: none;">
                     <!-- Dynamic content will be inserted here by JavaScript -->
                 </ul>
+
+                <div class="recent-finds-footer" style="text-align: center; margin-top: 1rem;">
+                    <button class="btn btn-link" data-action="view-all-discoveries" style="color: var(--border-purple); font-weight: 600;">
+                        View all discoveries →
+                    </button>
+                </div>
             </div>
         </div>
         
@@ -117,14 +123,6 @@
         
         <!-- Quick Actions -->
         <div class="quick-actions">
-<!--             <button class="action-card" data-action="get-in-touch">
-                <span class="action-icon">👋</span>
-                <span class="action-label">Get in Touch</span>
-            </button> -->
-<!--             <button class="action-card" data-action="browse-breweries">
-                <span class="action-icon">🏭</span>
-                <span class="action-label">Browse Breweries</span>
-            </button> -->
             <button class="action-card" data-action="review-beers">
                 <span class="action-icon">⭐</span>
                 <span class="action-label">Beer Reviews</span>
@@ -135,6 +133,64 @@
                 <span class="action-label">Saved Venues</span>
                 <span class="venue-badge-soon">Soon</span>
             </button>
+        </div>
+    </div>
+</div>
+
+<!-- Discoveries Feed Overlay -->
+<div id="discoveriesOverlay" class="overlay info-overlay" data-overlay-type="primary">
+    <div class="overlay-container info-container">
+        <div class="info-card">
+            <div class="info-header">
+                <h1 class="info-title">🆕 Community Discoveries</h1>
+                <div class="discoveries-filter">
+                    <button class="filter-chip active" data-filter="today">Today</button>
+                    <button class="filter-chip" data-filter="week">This Week</button>
+                    <button class="filter-chip" data-filter="all">All Time</button>
+                </div>
+            </div>
+            
+            <div class="info-content discoveries-feed">
+                <!-- Stats Bar -->
+                <div class="discoveries-stats-bar">
+                    <div class="stat-item">
+                        <span class="stat-icon">🍺</span>
+                        <span class="stat-value" id="totalBeers">0</span>
+                        <span class="stat-label">beers</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-icon">📍</span>
+                        <span class="stat-value" id="totalVenues">0</span>
+                        <span class="stat-label">venues</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-icon">👥</span>
+                        <span class="stat-value" id="totalContributors">0</span>
+                        <span class="stat-label">heroes</span>
+                    </div>
+                </div>
+                
+                <!-- Loading State -->
+                <div class="discoveries-loading" id="discoveriesLoading">
+                    <div class="loading-spinner"></div>
+                    <p>Loading discoveries...</p>
+                </div>
+                
+                <!-- Discoveries List -->
+                <div class="discoveries-list" id="discoveriesList" style="display: none;">
+                    <!-- Dynamic content here -->
+                </div>
+                
+                <!-- Empty State -->
+                <div class="discoveries-empty" id="discoveriesEmpty" style="display: none;">
+                    <div class="empty-icon">🍺</div>
+                    <h3>No discoveries yet!</h3>
+                    <p>Be the first to report a GF beer today</p>
+                    <button class="btn btn-primary" data-action="report-beer">
+                        Report a Beer
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
