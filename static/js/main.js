@@ -903,13 +903,25 @@ const App = {
         'view-all-discoveries': (el, modules) => {
             modules.modalManager?.open('discoveriesOverlay', {
                 onOpen: () => {
-                    // Nav.js will handle the back button automatically
-                    modules.nav?.setPageContext('discoveries');
-                    
-                    // Load discoveries
-                    if (window.DiscoveriesModule) {
-                        window.DiscoveriesModule.init();
+                    // Load discoveries when overlay opens
+                    if (window.RecentFindsModule) {
+                        window.RecentFindsModule.loadAllDiscoveries('today'); // Start with today's filter
                     }
+                    
+                    // Set up filter buttons
+                    const filterButtons = document.querySelectorAll('.filter-chip');
+                    filterButtons.forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            // Remove active class from all
+                            filterButtons.forEach(b => b.classList.remove('active'));
+                            // Add to clicked
+                            e.target.classList.add('active');
+                            
+                            // Load with new filter
+                            const filter = e.target.dataset.filter || 'today';
+                            window.RecentFindsModule.loadAllDiscoveries(filter);
+                        });
+                    });
                 }
             });
         },
