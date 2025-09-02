@@ -10,7 +10,7 @@
 }
 
 /* Community Header */
-.community-header {
+#communityHubOverlay .community-header {
     background: linear-gradient(135deg, var(--purple) 0%, var(--dark-purple) 100%);
     color: white;
     padding: clamp(1rem, 3vw, 1.5rem);
@@ -20,7 +20,7 @@
     box-shadow: var(--shadow-md);
 }
 
-.user-summary {
+#communityHubOverlay .user-summary {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -28,12 +28,12 @@
     flex-wrap: wrap;
 }
 
-.user-greeting {
+#communityHubOverlay .user-greeting {
     font-size: clamp(1.1rem, 3vw, 1.3rem);
     font-weight: 600;
 }
 
-.user-stats {
+#communityHubOverlay .user-stats {
     display: flex;
     gap: clamp(1rem, 2vw, 1.5rem);
     background: rgba(255,255,255,0.2);
@@ -42,24 +42,24 @@
     backdrop-filter: blur(10px);
 }
 
-.stat-item {
+#communityHubOverlay .stat-item {
     display: flex;
     align-items: center;
     gap: 0.5rem;
 }
 
-.stat-value {
+#communityHubOverlay .stat-value {
     font-weight: 700;
     font-size: clamp(1rem, 2vw, 1.1rem);
 }
 
-.stat-label {
+#communityHubOverlay .stat-label {
     font-size: 0.8rem;
     opacity: 0.9;
 }
 
 /* Add the floating beer animation */
-.floating-beer {
+#communityHubOverlay .floating-beer {
     position: absolute;
     font-size: 4rem;
     opacity: 0.1;
@@ -71,11 +71,11 @@
     50% { transform: translateY(-20px) rotate(10deg); }
 }
 
-.floating-beer:nth-child(1) { right: 10%; top: 20%; animation-delay: 0s; }
-.floating-beer:nth-child(2) { left: 5%; bottom: 20%; animation-delay: 2s; }
-.floating-beer:nth-child(3) { right: 30%; bottom: 10%; animation-delay: 4s; }
+#communityHubOverlay .floating-beer:nth-child(1) { right: 10%; top: 20%; animation-delay: 0s; }
+#communityHubOverlay .floating-beer:nth-child(2) { left: 5%; bottom: 20%; animation-delay: 2s; }
+#communityHubOverlay .floating-beer:nth-child(3) { right: 30%; bottom: 10%; animation-delay: 4s; }
 
-.level-progress {
+#communityHubOverlay .level-progress {
     background: rgba(255,255,255,0.3);
     height: 12px;
     border-radius: 10px;
@@ -83,14 +83,14 @@
     margin: 1rem 0 0.5rem;
 }
 
-.level-fill {
+#communityHubOverlay .level-fill {
     background: linear-gradient(90deg, var(--level-gold), var(--orange));
     height: 100%;
     transition: width 0.5s ease;
     position: relative;
 }
 
-.level-fill::after {
+#communityHubOverlay .level-fill::after {
     content: '';
     position: absolute;
     top: 0;
@@ -107,7 +107,7 @@
 }
 
 /* Section Tabs */
-.section-tabs {
+#communityHubOverlay .section-tabs {
    display: grid;
    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
    gap: var(--space-sm);
@@ -120,7 +120,7 @@
    -webkit-overflow-scrolling: touch;
 }
 
-.tab {
+#communityHubOverlay .tab {
    flex: 1;
    min-width: fit-content;
    padding: clamp(0.5rem, 2vw, 0.75rem);
@@ -136,20 +136,20 @@
    
 }
 
-.tab.active {
+#communityHubOverlay .tab.active {
     background: var(--primary-gradient);
     color: white;
 }
 
 /* Impact Grid */
-.impact-grid {
+#communityHubOverlay .impact-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: clamp(0.75rem, 2vw, 1rem);
     padding: 1rem;
 }
 
-.impact-card {
+#communityHubOverlay .impact-card {
     background: white;
     padding: clamp(1rem, 3vw, 1.5rem);
     border-radius: 15px;
@@ -159,17 +159,17 @@
     cursor: pointer;
 }
 
-.impact-card:hover {
+#communityHubOverlay .impact-card:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow-md);
 }
 
-.impact-icon {
+#communityHubOverlay .impact-icon {
     font-size: clamp(2rem, 4vw, 2.5rem);
     margin-bottom: 0.5rem;
 }
 
-.impact-number {
+#communityHubOverlay .impact-number {
     font-size: clamp(1.5rem, 3vw, 2rem);
     font-weight: 700;
     background: linear-gradient(135deg, var(--purple) 0%, var(--dark-purple) 100%);
@@ -177,20 +177,20 @@
     margin-bottom: 0.25rem;
 }
 
-.impact-label {
+#communityHubOverlay .impact-label {
     color: var(--text-secondary);
     font-size: clamp(0.8rem, 2vw, 0.9rem);
 }
 
 /* Leaderboard */
-.leaderboard-section {
+#communityHubOverlay .leaderboard-section {
     background: white;
     border-radius: 20px;
     padding: clamp(1rem, 3vw, 1.5rem);
     box-shadow: var(--shadow-sm);
 }
 
-.leaderboard-header {
+#communityHubOverlay .leaderboard-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -199,12 +199,12 @@
     gap: 1rem;
 }
 
-.leaderboard-title {
+#communityHubOverlay .leaderboard-title {
     font-size: clamp(1.1rem, 3vw, 1.3rem);
     font-weight: 700;
 }
 
-.leader-row {
+#communityHubOverlay .leader-row {
     display: flex;
     align-items: center;
     gap: clamp(0.5rem, 2vw, 1rem);
@@ -215,17 +215,17 @@
     transition: var(--transition);
 }
 
-.leader-row:hover {
+#communityHubOverlay .leader-row:hover {
     background: var(--border-light);
     transform: translateX(4px);
 }
 
-.leader-row.you {
+#communityHubOverlay .leader-row.you {
     background: linear-gradient(135deg, rgba(102,126,234,0.1) 0%, rgba(118,75,162,0.1) 100%);
     border: 1px solid rgba(102,126,234,0.3);
 }
 
-.rank {
+#communityHubOverlay .rank {
     width: 35px;
     height: 35px;
     background: var(--border-light);
@@ -237,27 +237,27 @@
     flex-shrink: 0;
 }
 
-.rank.gold { 
+#communityHubOverlay .rank.gold { 
     background: linear-gradient(135deg, var(--level-gold), var(--orange)); 
     color: white; 
 }
 
-.rank.silver { 
+#communityHubOverlay .rank.silver { 
    background: linear-gradient(135deg, var(--level-silver), var(--grey-white));
    color: white; 
 }
 
-.rank.bronze { 
+#communityHubOverlay .rank.bronze { 
     background: linear-gradient(135deg, var(--level-bronze), var(--red)); 
     color: white; 
 }
 
-.leader-info {
+#communityHubOverlay .leader-info {
     flex: 1;
     min-width: 0;
 }
 
-.leader-name {
+#communityHubOverlay .leader-name {
     font-weight: 600;
     margin-bottom: 0.25rem;
     overflow: hidden;
@@ -265,12 +265,12 @@
     white-space: nowrap;
 }
 
-.leader-stats {
+#communityHubOverlay .leader-stats {
     font-size: 0.8rem;
     color: var(--text-secondary);
 }
 
-.leader-points {
+#communityHubOverlay .leader-points {
     font-size: clamp(1rem, 2vw, 1.1rem);
     font-weight: 700;
     color: var(--purple);
@@ -278,7 +278,7 @@
 }
 
 /* Achievement Popup */
-.achievement-popup {
+#communityHubOverlay .achievement-popup {
     position: fixed;
     bottom: 100px;
     right: 20px;
@@ -303,33 +303,33 @@
     }
 }
 
-.achievement-content {
+#communityHubOverlay .achievement-content {
     display: flex;
     align-items: center;
     gap: 1rem;
 }
 
-.achievement-icon {
+#communityHubOverlay .achievement-icon {
     font-size: 2.5rem;
     flex-shrink: 0;
 }
 
-.achievement-text {
+#communityHubOverlay .achievement-text {
     flex: 1;
 }
 
-.achievement-title {
+#communityHubOverlay .achievement-title {
     font-weight: 700;
     color: var(--text-primary);
     margin-bottom: 0.25rem;
 }
 
-.achievement-desc {
+#communityHubOverlay .achievement-desc {
     font-size: 0.85rem;
     color: var(--text-secondary);
 }
 
-.close-achievement {
+#communityHubOverlay .close-achievement {
     background: none;
     border: none;
     color: var(--text-secondary);
@@ -350,7 +350,7 @@
         align-items: flex-start;
     }
     
-    .achievement-popup {
+    #communityHubOverlay .achievement-popup {
         bottom: 80px;
         right: 10px;
         left: 10px;
@@ -360,7 +360,7 @@
 
 
 /* Updated level banner with integrated stats */
-.level-banner {
+#communityHubOverlay .level-banner {
     background: var(--green-gradient);
     color: white;
     padding: clamp(1.5rem, 4vw, 2rem) clamp(1rem, 3vw, 1.5rem);
@@ -369,7 +369,7 @@
     overflow: hidden;
 }
 
-.level-user-info {
+#communityHubOverlay .level-user-info {
     position: absolute;
     top: 1rem;
     right: 1rem;
@@ -382,11 +382,11 @@
     backdrop-filter: blur(10px);
 }
 
-.username {
+#communityHubOverlay .username {
     font-weight: 600;
 }
 
-.change-nickname-btn {
+#communityHubOverlay .change-nickname-btn {
     background: none;
     border: none;
     color: white;
@@ -397,17 +397,17 @@
     transition: opacity 0.3s;
 }
 
-.change-nickname-btn:hover {
+#communityHubOverlay .change-nickname-btn:hover {
     opacity: 1;
 }
 
-.level-stats {
+#communityHubOverlay .level-stats {
     display: flex;
     gap: 1rem;
     margin-top: 0.5rem;
 }
 
-.stat-bubble {
+#communityHubOverlay .stat-bubble {
     background: rgba(255,255,255,0.2);
     padding: 0.25rem 0.75rem;
     border-radius: 20px;
@@ -417,23 +417,23 @@
 
 
 /* Badges Section */
-.badges-section {
+#communityHubOverlay .badges-section {
     padding: 0 var(--space-lg);
 }
 
-.badges-section h3 {
+#communityHubOverlay .badges-section h3 {
     font-size: 1.3rem;
     font-weight: 700;
     text-align: center;
 }
 
-.badges-grid {
+#communityHubOverlay .badges-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: 1rem;
 }
 
-.badge-card {
+#communityHubOverlay .badge-card {
     background: white;
     border-radius: 15px;
     padding: 1rem;
@@ -444,55 +444,55 @@
     overflow: hidden;
 }
 
-.badge-card.earned {
+#communityHubOverlay .badge-card.earned {
     background: linear-gradient(135deg, rgba(16,185,129,0.1) 0%, rgba(5,150,105,0.1) 100%);
     border: 2px solid var(--green);
 }
 
-.badge-card.locked {
+#communityHubOverlay .badge-card.locked {
     background: #f8f9fa;
     opacity: 0.6;
     filter: grayscale(100%);
 }
 
-.badge-card:hover {
+#communityHubOverlay .badge-card:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow-md);
 }
 
-.badge-icon {
+#communityHubOverlay .badge-icon {
    font-size: var(--text-xl);
 }
 
-.badge-name {
+#communityHubOverlay .badge-name {
     font-weight: 700;
     font-size: 0.9rem;
     margin-bottom: 0.25rem;
     color: var(--text-primary);
 }
 
-.badge-description {
+#communityHubOverlay .badge-description {
     font-size: 0.75rem;
     color: var(--text-secondary);
     margin-bottom: 0.5rem;
     line-height: 1.3;
 }
 
-.badge-status {
+#communityHubOverlay .badge-status {
     font-size: 0.7rem;
     font-weight: 600;
 }
 
-.badge-card.earned .badge-status {
+#communityHubOverlay .badge-card.earned .badge-status {
     color: var(--green);
 }
 
-.badge-card.locked .badge-status {
+#communityHubOverlay .badge-card.locked .badge-status {
     color: var(--text-secondary);
 }
 
 /* Shine effect for earned badges */
-.badge-card.earned::before {
+#communityHubOverlay .badge-card.earned::before {
     content: '';
     position: absolute;
     top: -50%;
@@ -516,27 +516,27 @@
 
 /* Mobile adjustments */
 @media (max-width: 767px) {
-    .badges-grid {
+    #communityHubOverlay .badges-grid {
         grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
         gap: 0.75rem;
     }
     
-    .badge-card {
+    #communityHubOverlay .badge-card {
         padding: 0.75rem;
     }
     
-    .badge-name {
+    #communityHubOverlay .badge-name {
         font-size: 0.8rem;
     }
     
-    .badge-description {
+    #communityHubOverlay .badge-description {
         font-size: 0.65rem;
     }
 }
 
 
 @media (min-width:1025px) {
-   .tab {
+   #communityHubOverlay .tab {
       font-size:: var(--text-md);
    }
 }
