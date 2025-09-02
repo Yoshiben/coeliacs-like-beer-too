@@ -52,7 +52,8 @@ export const ModalManager = (() => {
         venueDetailsOverlay: { type: 'overlay', group: 'primary', exclusive: true },
         breweriesOverlay: { type: 'overlay', group: 'primary', exclusive: true },
         communityHubOverlay: { type: 'overlay', group: 'primary', exclusive: true },
-        communityHubOverlay: { type: 'overlay', group: 'primary', exclusive: true },        
+        communityHubOverlay: { type: 'overlay', group: 'primary', exclusive: true },     
+        discoveriesOverlay: { type: 'overlay', group: 'primary', exclusive: true },  
         
         // Search modals (mutually exclusive within group)
         nameModal: { type: 'modal', group: 'search-input', exclusive: true },
