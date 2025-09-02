@@ -862,6 +862,44 @@ const App = {
             modules.modalManager?.close('liabilityModal');
         },
 
+        'share-app': async (el, modules) => {
+            const shareData = {
+                title: 'Coeliacs Like Beer Too!',
+                text: 'Find gluten-free beer at 67,000+ UK venues 🍺',
+                url: 'https://coeliacslikebeer.com'
+            };
+            
+            // Check if Web Share API is available (mobile)
+            if (navigator.share) {
+                try {
+                    await navigator.share(shareData);
+                    modules.toast?.success('Thanks for sharing! 🍺');
+                    modules.tracking?.trackEvent('app_shared', 'Social', 'native');
+                } catch (err) {
+                    // User cancelled share, that's fine
+                    if (err.name !== 'AbortError') {
+                        console.error('Share failed:', err);
+                    }
+                }
+            } else {
+                // Fallback: Copy link to clipboard
+                try {
+                    await navigator.clipboard.writeText(shareData.url);
+                    modules.toast?.success('Link copied to clipboard! 📋');
+                    modules.tracking?.trackEvent('app_shared', 'Social', 'clipboard');
+                } catch (err) {
+                    // Final fallback: Show the URL
+                    prompt('Copy this link to share:', shareData.url);
+                }
+            }
+            
+            // Close the more menu
+            const moreMenuOverlay = document.getElementById('moreMenuOverlay');
+            if (moreMenuOverlay) {
+                moreMenuOverlay.style.display = 'none';
+            }
+},
+
 
         'sign-out': (el, modules) => {
             // Confirm sign out
