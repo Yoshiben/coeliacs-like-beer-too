@@ -900,10 +900,9 @@ const App = {
             }
         },
 
-        'view-all-discoveries': (el, modules) => {
+       'view-all-discoveries': (el, modules) => {
             modules.modalManager?.open('discoveriesOverlay', {
                 onOpen: async () => {
-                    // Directly call the API here instead of relying on the module
                     const loadDiscoveries = async (filter = 'today') => {
                         const container = document.getElementById('discoveriesList');
                         const loading = document.getElementById('discoveriesLoading');
@@ -933,6 +932,11 @@ const App = {
                                             📍 ${find.venue_name}
                                             <small>${find.location}</small>
                                         </div>
+                                        <div class="discovery-actions">
+                                            <button class="btn btn-outline" data-action="show-venue" data-venue-id="${find.venue_id}">
+                                                View Venue
+                                            </button>
+                                        </div>
                                     </div>
                                 `).join('');
                             } else {
@@ -946,10 +950,8 @@ const App = {
                         }
                     };
                     
-                    // Initial load
                     await loadDiscoveries('today');
                     
-                    // Setup filters
                     document.querySelectorAll('.filter-chip').forEach(btn => {
                         btn.addEventListener('click', (e) => {
                             document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
@@ -960,7 +962,6 @@ const App = {
                 }
             });
         },
-
 
         'sign-out': (el, modules) => {
             // Confirm sign out
