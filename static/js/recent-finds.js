@@ -162,7 +162,8 @@ const RecentFindsModule = (() => {
         empty.style.display = 'none';
         
         try {
-            const response = await fetch(`/api/discoveries?filter=${filter}`, {
+            // CHANGE: Use the actual endpoint with correct parameters
+            const response = await fetch(`/api/recent-finds?limit=50&filter=${filter}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -172,12 +173,13 @@ const RecentFindsModule = (() => {
             
             const data = await response.json();
             
-            if (data.success && data.discoveries.length > 0) {
+            // CHANGE: Use 'finds' instead of 'discoveries'
+            if (data.success && data.finds.length > 0) {
                 loading.style.display = 'none';
                 container.style.display = 'block';
                 
-                // Render all discoveries
-                container.innerHTML = data.discoveries.map(find => {
+                // Render all discoveries - using 'finds' array
+                container.innerHTML = data.finds.map(find => {
                     const formatIcon = {
                         'tap': '🚰',
                         'bottle': '🍺',
@@ -207,9 +209,14 @@ const RecentFindsModule = (() => {
                 
                 // Update stats if provided
                 if (data.stats) {
-                    document.getElementById('totalBeers').textContent = data.stats.total_beers || 0;
-                    document.getElementById('totalVenues').textContent = data.stats.total_venues || 0;
-                    document.getElementById('totalContributors').textContent = data.stats.contributors || 0;
+                    // Update element IDs if they exist
+                    const beersEl = document.getElementById('totalBeers');
+                    const venuesEl = document.getElementById('totalVenues');
+                    const contributorsEl = document.getElementById('totalContributors');
+                    
+                    if (beersEl) beersEl.textContent = data.stats.total_beers || 0;
+                    if (venuesEl) venuesEl.textContent = data.stats.total_venues || 0;
+                    if (contributorsEl) contributorsEl.textContent = data.stats.contributors || 0;
                 }
             } else {
                 loading.style.display = 'none';
