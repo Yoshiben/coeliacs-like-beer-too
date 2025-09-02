@@ -898,7 +898,21 @@ const App = {
             if (moreMenuOverlay) {
                 moreMenuOverlay.style.display = 'none';
             }
-},
+        },
+
+        'view-all-discoveries': (el, modules) => {
+            modules.modalManager?.open('discoveriesOverlay', {
+                onOpen: () => {
+                    // Nav.js will handle the back button automatically
+                    modules.nav?.setPageContext('discoveries');
+                    
+                    // Load discoveries
+                    if (window.DiscoveriesModule) {
+                        window.DiscoveriesModule.init();
+                    }
+                }
+            });
+        },
 
 
         'sign-out': (el, modules) => {
