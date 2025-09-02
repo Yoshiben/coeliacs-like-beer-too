@@ -261,8 +261,15 @@ export const ReportBeer = (() => {
     
     const searchBreweries = async (query) => {
         try {
-            const response = await fetch(`/api/breweries?q=${encodeURIComponent(query)}`);
+            // CHANGE THIS LINE - Remove the query parameter to get ALL breweries
+            const response = await fetch('/api/breweries');  // <-- No ?q parameter
             const allBreweries = await response.json();
+            
+            // If no query, just show first 50
+            if (!query) {
+                displayBreweryDropdown(allBreweries.slice(0, 50), '');
+                return;
+            }
             
             // Find exact matches
             const exactMatches = allBreweries.filter(brewery => 
