@@ -207,6 +207,40 @@
   }
 }
 
+/* Recent Finds - Add orange accent option */
+.home-page .recent-finds-section {
+    /* Keep existing but add orange border option */
+    border: 1px solid var(--border-orange);
+}
+
+.home-page .recent-finds-title {
+    /* Add orange gradient to icon */
+    background: var(--orange-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Action Cards - Add orange hover for "Add a Find" */
+.home-page .action-card[data-action="add-find"]:hover {
+    border-color: var(--border-orange);
+    background: linear-gradient(135deg, 
+        var(--bg-orange) 0%, 
+        rgba(255, 255, 255, 1) 100%
+    );
+    box-shadow: 0 4px 12px var(--light-orange);
+}
+
+
+/* Responsive grid for larger screens */
+@media (min-width: 768px) {
+  .home-page .recent-finds-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--recent-finds-gap);
+  }
+}
+
 #discoveriesOverlay .discoveries-stats-bar {
     display: flex;
     justify-content: space-around;
