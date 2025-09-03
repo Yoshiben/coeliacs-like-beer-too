@@ -139,6 +139,7 @@
 #communityHubOverlay .tab.active {
     background: var(--primary-gradient);
     color: white;
+   border-radius: var(--radius-pill);
 }
 
 /* Impact Grid */
