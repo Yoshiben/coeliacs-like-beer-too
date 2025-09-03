@@ -1752,33 +1752,73 @@ export const SearchModule = (function() {
         // Extract country from address_components if available
         let country = '';
         let countryCode = '';
+        let city = '';
+        let state = '';
         
         if (place.address_components) {
-            const countryComponent = place.address_components.find(
-                component => component.types.includes('country')
-            );
-            if (countryComponent) {
-                country = countryComponent.long_name;  // e.g., "Netherlands"
-                countryCode = countryComponent.short_name;  // e.g., "NL"
-            }
+            // Parse all components properly
+            place.address_components.forEach(component => {
+                const types = component.types;
+                
+                if (types.includes('country')) {
+                    country = component.long_name;  // e.g., "Netherlands", "Australia"
+                    countryCode = component.short_name;  // e.g., "NL", "AU"
+                }
+                if (types.includes('locality')) {
+                    city = component.long_name;  // City name
+                }
+                if (types.includes('administrative_area_level_1')) {
+                    state = component.long_name;  // State/Province
+                }
+            });
         }
         
         // If no address_components, try to extract from formatted_address
         if (!country && place.formatted_address) {
             const addressParts = place.formatted_address.split(',');
             if (addressParts.length > 0) {
-                country = addressParts[addressParts.length - 1].trim();
+                // Last part is usually the country
+                const lastPart = addressParts[addressParts.length - 1].trim();
+                
+                // Common country names to check
+                const commonCountries = [
+                    'United Kingdom', 'UK', 'England', 'Scotland', 'Wales', 'Northern Ireland',
+                    'Netherlands', 'The Netherlands', 'Nederland',
+                    'Germany', 'Deutschland',
+                    'France', 'España', 'Spain', 'Italy', 'Italia',
+                    'Australia', 'Canada', 'United States', 'USA', 'US',
+                    'New Zealand', 'Ireland', 'Belgium', 'Switzerland',
+                    'Austria', 'Denmark', 'Sweden', 'Norway', 'Finland',
+                    'Poland', 'Portugal', 'Greece', 'Czech Republic',
+                    'Japan', 'China', 'India', 'Singapore', 'Thailand',
+                    'Brazil', 'Argentina', 'Mexico', 'Colombia',
+                    'South Africa', 'Egypt', 'Kenya', 'Morocco',
+                    'Israel', 'UAE', 'Turkey', 'Saudi Arabia'
+                ];
+                
+                // Check if last part matches any known country
+                if (commonCountries.some(c => lastPart.toLowerCase().includes(c.toLowerCase()))) {
+                    country = lastPart;
+                }
             }
+        }
+        
+        // Build a better address (without country)
+        let cleanAddress = place.formatted_address || '';
+        if (country && cleanAddress.includes(country)) {
+            cleanAddress = cleanAddress.replace(`, ${country}`, '').replace(country, '').trim();
         }
         
         this.selectedPlace = {
             name: placeName,
-            address: placeAddress,
+            address: cleanAddress,  // Address without country
+            formatted_address: place.formatted_address,  // Keep original too
+            city: city,
+            state: state,
             lat: lat,
             lon: lng,
             type: placeType,
             place_id: place.place_id,
-            formatted_address: place.formatted_address,
             types: place.types || [],
             country: country,
             country_code: countryCode,
@@ -1788,6 +1828,12 @@ export const SearchModule = (function() {
         document.getElementById('selectedPlaceName').textContent = this.selectedPlace.name;
         document.getElementById('selectedPlaceAddress').textContent = this.selectedPlace.address;
         document.getElementById('selectedPlaceType').textContent = this.selectedPlace.type;
+        
+        // Show country if not UK
+        if (country && !['United Kingdom', 'UK', 'England', 'Scotland', 'Wales', 'Northern Ireland'].includes(country)) {
+            document.getElementById('selectedPlaceAddress').textContent += ` (${country})`;
+        }
+        
         document.getElementById('selectedPlacePreview').style.display = 'block';
         
         this.hideResults();
@@ -1804,7 +1850,11 @@ export const SearchModule = (function() {
         const place = this.selectedPlace;
         let postcode = '';
         
-        if (place.formatted_address) {
+        // Use the address from our enhanced selectPlace (without country)
+        // instead of formatted_address (which includes country)
+        const addressToSearch = place.formatted_address || place.address || '';
+        
+        if (addressToSearch) {
             // Different patterns for different countries
             const patterns = {
                 // UK postcode
@@ -1814,59 +1864,114 @@ export const SearchModule = (function() {
                 // US ZIP
                 us: /\b[0-9]{5}(-[0-9]{4})?\b/,
                 // Canada
-                ca: /\b[A-Z][0-9][A-Z]\s?[0-9][A-Z][0-9]\b/,
+                ca: /\b[A-Z][0-9][A-Z]\s?[0-9][A-Z][0-9]\b/i,
                 // Germany
                 de: /\b[0-9]{5}\b/,
                 // France
                 fr: /\b[0-9]{5}\b/,
                 // Ireland Eircode
-                ie: /\b[A-Z][0-9]{2}\s?[A-Z0-9]{4}\b/,
+                ie: /\b[A-Z][0-9]{2}\s?[A-Z0-9]{4}\b/i,
                 // Belgium
                 be: /\b[1-9][0-9]{3}\b/,
                 // Spain
                 es: /\b[0-9]{5}\b/,
                 // Italy
-                it: /\b[0-9]{5}\b/
+                it: /\b[0-9]{5}\b/,
+                // Australia
+                au: /\b[0-9]{4}\b/,
+                // New Zealand
+                nz: /\b[0-9]{4}\b/,
+                // Japan
+                jp: /\b[0-9]{3}-[0-9]{4}\b/,
+                // Brazil
+                br: /\b[0-9]{5}-[0-9]{3}\b/,
+                // Argentina
+                ar: /\b[A-Z][0-9]{4}[A-Z]{3}\b/,
+                // South Africa
+                za: /\b[0-9]{4}\b/,
+                // India
+                in: /\b[0-9]{6}\b/,
+                // Mexico
+                mx: /\b[0-9]{5}\b/,
+                // Singapore
+                sg: /\b[0-9]{6}\b/
             };
             
-            // Try each pattern
-            for (const [country, pattern] of Object.entries(patterns)) {
-                const match = place.formatted_address.match(pattern);
-                if (match) {
-                    postcode = match[0];
-                    console.log(`Found ${country} postcode: ${postcode}`);
-                    break;
+            // Try to match based on country if we have it
+            if (place.country_code) {
+                const countryPattern = patterns[place.country_code.toLowerCase()];
+                if (countryPattern) {
+                    const match = addressToSearch.match(countryPattern);
+                    if (match) {
+                        postcode = match[0];
+                        console.log(`Found ${place.country_code} postcode: ${postcode}`);
+                    }
                 }
             }
             
-            // Special handling for Netherlands
+            // If no match yet, try all patterns
             if (!postcode) {
-                if (place.formatted_address.includes('Netherlands') || place.formatted_address.includes('Nederland')) {
-                    const nlMatch = place.formatted_address.match(/\b[1-9][0-9]{3}\s?[A-Z]{2}\b/);
-                    if (nlMatch) postcode = nlMatch[0];
+                for (const [country, pattern] of Object.entries(patterns)) {
+                    const match = addressToSearch.match(pattern);
+                    if (match) {
+                        postcode = match[0];
+                        console.log(`Found ${country} postcode: ${postcode}`);
+                        break;
+                    }
                 }
             }
         }
         
-        // Clean up address
-        let address = place.formatted_address || place.address || '';
+        // Use the clean address from selectPlace if available
+        let address = place.address || '';
         
-        // Remove postcode and everything after it if we found one
-        if (postcode) {
-            const postcodePattern = postcode.replace(/\s/g, '\\s*');
-            address = address.replace(new RegExp(`,?\\s*${postcodePattern}.*$`, 'i'), '').trim();
-        }
-        
-        // Remove venue name if it's at the start of address
-        if (place.name) {
-            const namePattern = place.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-            address = address.replace(new RegExp(`^${namePattern},?\\s*`, 'i'), '').trim();
+        // If we don't have a clean address, build one
+        if (!address && place.formatted_address) {
+            address = place.formatted_address;
+            
+            // Remove country from the end if present
+            if (place.country) {
+                const countryVariations = [
+                    place.country,
+                    place.country_code,
+                    // Add common variations
+                    place.country === 'United Kingdom' ? 'UK' : null,
+                    place.country === 'United States' ? 'USA' : null,
+                    place.country === 'United States' ? 'US' : null,
+                    place.country === 'Netherlands' ? 'Nederland' : null,
+                    place.country === 'Netherlands' ? 'The Netherlands' : null
+                ].filter(Boolean);
+                
+                for (const countryVar of countryVariations) {
+                    // Remove country from end of address
+                    const patterns = [
+                        new RegExp(`,\\s*${countryVar.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*$`, 'i'),
+                        new RegExp(`\\s+${countryVar.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*$`, 'i')
+                    ];
+                    
+                    for (const pattern of patterns) {
+                        address = address.replace(pattern, '').trim();
+                    }
+                }
+            }
+            
+            // Remove postcode if we found one
+            if (postcode) {
+                const postcodePattern = postcode.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/\s/g, '\\s*');
+                address = address.replace(new RegExp(`,?\\s*${postcodePattern}`, 'gi'), '').trim();
+            }
+            
+            // Remove venue name if it's at the start
+            if (place.name) {
+                const namePattern = place.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                address = address.replace(new RegExp(`^${namePattern},?\\s*`, 'i'), '').trim();
+            }
         }
         
         // If no postcode found, use empty string
         if (!postcode) {
             postcode = '';
-            console.log('No postcode found for this address - that\'s OK for international venues');
+            console.log(`No postcode found for ${place.country || 'this location'} - that's OK`);
         }
         
         const newVenueData = {
@@ -1877,7 +1982,10 @@ export const SearchModule = (function() {
             longitude: place.lon || place.lng,
             place_id: place.place_id,
             types: place.types || [],
-            country: place.country || '',  // Include country
+            country: place.country || '',
+            country_code: place.country_code || '',
+            city: place.city || '',
+            state: place.state || '',
             source: 'google_places'
         };
         
