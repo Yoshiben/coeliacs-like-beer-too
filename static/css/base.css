@@ -232,6 +232,7 @@ body.page-privacy .nav-back-btn { display: flex !important; }
 body.page-terms .nav-back-btn { display: flex !important; }
 body.page-liability .nav-back-btn { display: flex !important; }
 body.page-about-gf .nav-back-btn { display: flex !important; }
+body.page-discoveries .nav-back-btn { display: flex !important; }
 
 body {
     background: var(--primary-gradient);
