@@ -176,6 +176,11 @@ export const CommunityHubModule = (() => {
         container.querySelectorAll('[data-hub-tab]').forEach(tab => {
             tab.addEventListener('click', () => switchTab(tab.dataset.hubTab));
         });
+
+        const rankCard = container.querySelector('[data-action="switch-to-leaderboard"]');
+        if (rankCard) {
+            rankCard.addEventListener('click', () => switchTab('leaderboard'));
+        }
     };
     
     const renderTabContent = () => {
@@ -255,7 +260,7 @@ export const CommunityHubModule = (() => {
                     <div class="impact-number">${updates.venues}</div>
                     <div class="impact-label">Venues</div>
                 </div>
-                <div class="impact-card">
+                <div class="impact-card" data-action="switch-to-leaderboard" style="cursor: pointer;">
                     <div class="impact-icon">🏆</div>
                     <div class="impact-number">#${getUserRank()}</div>
                     <div class="impact-label">Rank</div>
