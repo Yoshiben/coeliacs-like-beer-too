@@ -1581,94 +1581,94 @@ export const SearchModule = (function() {
                console.error('❌ ModalManager not available');
                modules.toast?.error('Error: Modal system not available');
            }
-       },
+    },
        
-       setupInputListener() {
-           const input = document.getElementById('placesSearchInput');
-           if (!input) return;
-           
-           input.removeEventListener('input', this.inputHandler);
-           
-           this.inputHandler = (e) => {
-               console.log('🔍 Input changed:', e.target.value);
-               this.handleSearch(e.target.value);
-           };
-           
-           input.addEventListener('input', this.inputHandler);
-           console.log('✅ Input listener setup complete');
-       },
+    setupInputListener() {
+        const input = document.getElementById('placesSearchInput');
+        if (!input) return;
+        
+        input.removeEventListener('input', this.inputHandler);
+        
+        this.inputHandler = (e) => {
+           console.log('🔍 Input changed:', e.target.value);
+           this.handleSearch(e.target.value);
+        };
+        
+        input.addEventListener('input', this.inputHandler);
+        console.log('✅ Input listener setup complete');
+    },
        
-       handleSearch(query) {
-           console.log('🔍 handleSearch called with:', query);
-           
-           clearTimeout(this.searchTimeout);
-           
-           const resultsDiv = document.getElementById('placesResults');
-           if (!resultsDiv) {
-               console.error('❌ placesResults div not found');
-              return;
+    handleSearch(query) {
+        console.log('🔍 handleSearch called with:', query);
+        
+        clearTimeout(this.searchTimeout);
+        
+        const resultsDiv = document.getElementById('placesResults');
+        if (!resultsDiv) {
+           console.error('❌ placesResults div not found');
+          return;
+        }
+        
+        if (!query || query.length < 3) {
+          resultsDiv.style.display = 'none';
+          console.log('ℹ️ Query too short, hiding results');
+          return;
+        }
+        
+        console.log('⏳ Starting search timeout for:', query);
+        resultsDiv.innerHTML = '<div style="padding: 20px; text-align: center; color: #666;">Searching...</div>';
+        resultsDiv.style.display = 'block';
+        
+        this.searchTimeout = setTimeout(() => {
+          console.log('🚀 Executing search for:', query);
+          this.searchGooglePlaces(query);
+        }, 300);
+    },
+
+    async searchGooglePlaces(query) {
+        console.log('🌍 searchGooglePlaces called with:', query);
+        
+        try {
+          console.log('📡 Making API request to /api/search-places');
+          
+          const response = await fetch('/api/search-places', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ query: query })
+          });
+          
+          console.log('📡 API response status:', response.status);
+          
+          if (!response.ok) {
+              const errorText = await response.text();
+              console.error('❌ API Error Response:', response.status, errorText);
+              throw new Error(`API Error: ${response.status} - ${errorText}`);
           }
           
-          if (!query || query.length < 3) {
-              resultsDiv.style.display = 'none';
-              console.log('ℹ️ Query too short, hiding results');
-              return;
-          }
+          const data = await response.json();
+          console.log('✅ API response data:', data);
           
-          console.log('⏳ Starting search timeout for:', query);
-          resultsDiv.innerHTML = '<div style="padding: 20px; text-align: center; color: #666;">Searching...</div>';
-          resultsDiv.style.display = 'block';
+          const places = data.results || [];
+          console.log(`📍 Found ${places.length} places:`, places);
           
-          this.searchTimeout = setTimeout(() => {
-              console.log('🚀 Executing search for:', query);
-              this.searchGooglePlaces(query);
-          }, 300);
-      },
+          this.displayResults(places);
+          
+        } catch (error) {
+          console.error('❌ Google Places search error:', error);
+          this.showError(`Search failed: ${error.message}. Please try again.`);
+        }
+    },
       
-      async searchGooglePlaces(query) {
-          console.log('🌍 searchGooglePlaces called with:', query);
-          
-          try {
-              console.log('📡 Making API request to /api/search-places');
-              
-              const response = await fetch('/api/search-places', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ query: query })
-              });
-              
-              console.log('📡 API response status:', response.status);
-              
-              if (!response.ok) {
-                  const errorText = await response.text();
-                  console.error('❌ API Error Response:', response.status, errorText);
-                  throw new Error(`API Error: ${response.status} - ${errorText}`);
-              }
-              
-              const data = await response.json();
-              console.log('✅ API response data:', data);
-              
-              const places = data.results || [];
-              console.log(`📍 Found ${places.length} places:`, places);
-              
-              this.displayResults(places);
-              
-          } catch (error) {
-              console.error('❌ Google Places search error:', error);
-              this.showError(`Search failed: ${error.message}. Please try again.`);
-          }
-      },
-      
-      displayResults(places) {
-          const resultsDiv = document.getElementById('placesResults');
-          if (!resultsDiv) return;
-          
-          const selectedPreview = document.getElementById('selectedPlacePreview');
-          if (selectedPreview) {
+    displayResults(places) {
+        const resultsDiv = document.getElementById('placesResults');
+            if (!resultsDiv) return;
+            
+            const selectedPreview = document.getElementById('selectedPlacePreview');
+            if (selectedPreview) {
               selectedPreview.style.display = 'none';
-          }
-          
-          if (places.length === 0) {
+            }
+            
+            if (places.length === 0) {
               resultsDiv.innerHTML = `
                   <div class="no-places-found">
                       <p>No venues found. Try a different search.</p>
@@ -1677,11 +1677,11 @@ export const SearchModule = (function() {
               `;
               resultsDiv.style.display = 'block';
               return;
-          }
-          
-          this.searchResults = places;
-          
-          resultsDiv.innerHTML = places.map((place, index) => {
+            }
+            
+            this.searchResults = places;
+            
+            resultsDiv.innerHTML = places.map((place, index) => {
               const name = place.name || place.display_name?.split(',')[0] || 'Unknown Venue';
               const address = place.formatted_address || this.formatAddress(place);
               const type = this.getPlaceTypeFromGoogle(place);
@@ -1696,127 +1696,185 @@ export const SearchModule = (function() {
                       </div>
                   </div>
               `;
-          }).join('');
-      
-          resultsDiv.innerHTML += `
+            }).join('');
+            
+            resultsDiv.innerHTML += `
               <div style="padding: var(--space-lg); border-top: 1px solid var(--border-light); margin-top: var(--space-md);">
                   <button class="btn btn-secondary" data-action="manual-venue-entry" style="width: 100%;">
                       ✏️ Can't find it? Enter manually
                   </button>
               </div>
-          `;
-          
-          resultsDiv.style.display = 'block';
-      },
+            `;
+            
+            resultsDiv.style.display = 'block';
+    },
       
-      getPlaceTypeFromGoogle(place) {
-          if (!place.types) return 'Venue';
-          
-          const types = place.types;
-          if (types.includes('bar')) return 'Bar';
-          if (types.includes('restaurant')) return 'Restaurant';
-          if (types.includes('cafe')) return 'Café';
-          if (types.includes('night_club')) return 'Club';
-          if (types.includes('meal_takeaway')) return 'Takeaway';
-          if (types.includes('lodging')) return 'Hotel';
-          
-          return 'Venue';
-      },
+    getPlaceTypeFromGoogle(place) {
+        if (!place.types) return 'Venue';
+        
+        const types = place.types;
+        if (types.includes('bar')) return 'Bar';
+        if (types.includes('restaurant')) return 'Restaurant';
+        if (types.includes('cafe')) return 'Café';
+        if (types.includes('night_club')) return 'Club';
+        if (types.includes('meal_takeaway')) return 'Takeaway';
+        if (types.includes('lodging')) return 'Hotel';
+        
+        return 'Venue';
+    },
       
-      selectPlace(placeOrIndex) {
-          console.log('🏠 Selecting place:', placeOrIndex);
-          const place = typeof placeOrIndex === 'number' 
-              ? this.searchResults[placeOrIndex]
-              : placeOrIndex;
-              
-          if (!place) {
-              console.error('❌ No place found to select');
-              return;
-          }
+    selectPlace(placeOrIndex) {
+        console.log('🏠 Selecting place:', placeOrIndex);
+        const place = typeof placeOrIndex === 'number' 
+          ? this.searchResults[placeOrIndex]
+          : placeOrIndex;
           
-          console.log('✅ Place selected:', place);
-          
-          const placeName = place.name || 'Unknown Venue';
-          const placeAddress = place.formatted_address || 'Address not available';
-          const placeType = this.getPlaceTypeFromGoogle(place);
-          
-          const lat = place.geometry?.location?.lat;
-          const lng = place.geometry?.location?.lng;
-          
-          if (!lat || !lng) {
-              console.error('❌ No coordinates available for place:', place);
-              modules.toast?.error('This venue has no location data available');
-              return;
-          }
-          
-          this.selectedPlace = {
-              name: placeName,
-              address: placeAddress,
-              lat: lat,
-              lon: lng,
-              type: placeType,
-              place_id: place.place_id,
-              formatted_address: place.formatted_address,
-              types: place.types || [],
-              source: 'google_places'
-          };
-          
-          document.getElementById('selectedPlaceName').textContent = this.selectedPlace.name;
-          document.getElementById('selectedPlaceAddress').textContent = this.selectedPlace.address;
-          document.getElementById('selectedPlaceType').textContent = this.selectedPlace.type;
-          document.getElementById('selectedPlacePreview').style.display = 'block';
-          
-          this.hideResults();
-      },
+        if (!place) {
+          console.error('❌ No place found to select');
+          return;
+        }
+        
+        console.log('✅ Place selected:', place);
+        
+        const placeName = place.name || 'Unknown Venue';
+        const placeAddress = place.formatted_address || 'Address not available';
+        const placeType = this.getPlaceTypeFromGoogle(place);
+        
+        const lat = place.geometry?.location?.lat;
+        const lng = place.geometry?.location?.lng;
+        
+        if (!lat || !lng) {
+          console.error('❌ No coordinates available for place:', place);
+          modules.toast?.error('This venue has no location data available');
+          return;
+        }
+        
+        this.selectedPlace = {
+          name: placeName,
+          address: placeAddress,
+          lat: lat,
+          lon: lng,
+          type: placeType,
+          place_id: place.place_id,
+          formatted_address: place.formatted_address,
+          types: place.types || [],
+          source: 'google_places'
+        };
+        
+        document.getElementById('selectedPlaceName').textContent = this.selectedPlace.name;
+        document.getElementById('selectedPlaceAddress').textContent = this.selectedPlace.address;
+        document.getElementById('selectedPlaceType').textContent = this.selectedPlace.type;
+        document.getElementById('selectedPlacePreview').style.display = 'block';
+        
+        this.hideResults();
+    },
       
-      useSelectedPlace() {
-          if (!this.selectedPlace) {
-              console.error('❌ No selected place');
-              return;
-          }
-          
-          console.log('📝 Using selected place to add new venue');
-          
-          const place = this.selectedPlace;
-          
-          let postcode = '';
-          if (place.formatted_address) {
-              const postcodeMatch = place.formatted_address.match(/[A-Z]{1,2}[0-9R][0-9A-Z]?\s?[0-9][A-Z]{2}/i);
-              if (postcodeMatch) {
-                  postcode = postcodeMatch[0];
-              }
-          }
-          
-          let address = place.formatted_address || place.address || '';
-          if (postcode) {
-              address = address.replace(new RegExp(`,?\\s*${postcode.replace(/\s/g, '\\s*')}.*$`, 'i'), '').trim();
-              const nameRegex = new RegExp(`^${place.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')},?\\s*`, 'i');
-              address = address.replace(nameRegex, '').trim();
-          }
-          
-          const newVenueData = {
-              name: place.name,
-              address: address,
-              postcode: postcode,
-              latitude: place.lat,
-              longitude: place.lon,
-              place_id: place.place_id,
-              source: 'google_places'
-          };
-          
-          console.log('🏠 New venue data:', newVenueData);
-          
-          if (modules.modalManager) {
-              modules.modalManager.close('placesSearchModal');
-          } else {
-              document.getElementById('placesSearchModal').style.display = 'none';
-              document.body.style.overflow = '';
-          }
-          
-          this.submitNewVenue(newVenueData);
-      },
+    useSelectedPlace() {
+        if (!this.selectedPlace) {
+            console.error('❌ No selected place');
+            return;
+        }
+        
+        console.log('📝 Using selected place to add new venue');
+        
+        const place = this.selectedPlace;
+        let postcode = '';
+        
+        if (place.formatted_address) {
+            // Different patterns for different countries
+            const patterns = {
+                // UK postcode
+                uk: /[A-Z]{1,2}[0-9R][0-9A-Z]?\s?[0-9][A-Z]{2}/i,
+                // Netherlands (4 digits + 2 letters)
+                nl: /\b[1-9][0-9]{3}\s?[A-Z]{2}\b/,
+                // US ZIP
+                us: /\b[0-9]{5}(-[0-9]{4})?\b/,
+                // Canada
+                ca: /\b[A-Z][0-9][A-Z]\s?[0-9][A-Z][0-9]\b/,
+                // Germany
+                de: /\b[0-9]{5}\b/,
+                // France
+                fr: /\b[0-9]{5}\b/,
+                // Ireland Eircode
+                ie: /\b[A-Z][0-9]{2}\s?[A-Z0-9]{4}\b/,
+                // Belgium
+                be: /\b[1-9][0-9]{3}\b/,
+                // Spain
+                es: /\b[0-9]{5}\b/,
+                // Italy
+                it: /\b[0-9]{5}\b/
+            };
+            
+            // Try each pattern
+            for (const [country, pattern] of Object.entries(patterns)) {
+                const match = place.formatted_address.match(pattern);
+                if (match) {
+                    postcode = match[0];
+                    console.log(`Found ${country} postcode: ${postcode}`);
+                    break;
+                }
+            }
+            
+            // Special handling for specific countries in address
+            if (!postcode) {
+                if (place.formatted_address.includes('Netherlands') || place.formatted_address.includes('Nederland')) {
+                    const nlMatch = place.formatted_address.match(/\b[1-9][0-9]{3}\s?[A-Z]{2}\b/);
+                    if (nlMatch) postcode = nlMatch[0];
+                }
+            }
+        }
+        
+        // Clean up address
+        let address = place.formatted_address || place.address || '';
+        
+        // Remove postcode and everything after it if we found one
+        if (postcode) {
+            // Create a regex pattern that handles spaces in postcodes
+            const postcodePattern = postcode.replace(/\s/g, '\\s*');
+            address = address.replace(new RegExp(`,?\\s*${postcodePattern}.*$`, 'i'), '').trim();
+        }
+        
+        // Remove venue name if it's at the start of address
+        if (place.name) {
+            const namePattern = place.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            address = address.replace(new RegExp(`^${namePattern},?\\s*`, 'i'), '').trim();
+        }
+        
+        // If no postcode found, use empty string (not 'N/A')
+        if (!postcode) {
+            postcode = '';
+            console.log('No postcode found for this address - that\'s OK for international venues');
+        }
+        
+        const newVenueData = {
+            name: place.name,
+            address: address,
+            postcode: postcode,
+            latitude: place.lat,
+            longitude: place.lon || place.lng,  // Handle both lon and lng
+            place_id: place.place_id,
+            types: place.types || [],
+            source: 'google_places'
+        };
+        
+        console.log('🏠 New venue data:', newVenueData);
+        
+        // Close the modal
+        if (modules.modalManager) {
+            modules.modalManager.close('placesSearchModal');
+        } else {
+            const modal = document.getElementById('placesSearchModal');
+            if (modal) {
+                modal.style.display = 'none';
+                document.body.style.overflow = '';
+            }
+        }
+        
+        // Submit the venue
+        this.submitNewVenue(newVenueData);
+    },
       
-      async submitNewVenue(venueData) {
+    async submitNewVenue(venueData) {
         try {
             // Get user_id from localStorage (same as status updates)
             const userId = parseInt(localStorage.getItem('user_id'));
@@ -1880,75 +1938,75 @@ export const SearchModule = (function() {
         }
     },
 
-      showVenueAddedPrompt(result) {
-          console.log('🎉 Showing venue added prompt for:', result);
-          
-          window.App.setState('lastAddedVenueId', result.venue_id);
-          window.App.setState('lastAddedVenueName', result.message.split(' added successfully!')[0]);
-          
-          const newVenue = {
-              venue_id: result.venue_id,
-              name: result.message.split(' added successfully!')[0],
-              venue_name: result.message.split(' added successfully!')[0]
-          };
-          window.App.setState('currentVenue', newVenue);
-          
-          const venueNameEl = document.getElementById('addedVenueName');
-          if (venueNameEl) {
-              venueNameEl.textContent = newVenue.name;
-          }
-          
+    showVenueAddedPrompt(result) {
+        console.log('🎉 Showing venue added prompt for:', result);
+        
+        window.App.setState('lastAddedVenueId', result.venue_id);
+        window.App.setState('lastAddedVenueName', result.message.split(' added successfully!')[0]);
+        
+        const newVenue = {
+          venue_id: result.venue_id,
+          name: result.message.split(' added successfully!')[0],
+          venue_name: result.message.split(' added successfully!')[0]
+        };
+        window.App.setState('currentVenue', newVenue);
+        
+        const venueNameEl = document.getElementById('addedVenueName');
+        if (venueNameEl) {
+          venueNameEl.textContent = newVenue.name;
+        }
+        
+        if (modules.modalManager) {
+          modules.modalManager.close('placesSearchModal');
+        }
+        
+        setTimeout(() => {
           if (modules.modalManager) {
-              modules.modalManager.close('placesSearchModal');
+              modules.modalManager.open('venueAddedPromptModal');
           }
-          
-          setTimeout(() => {
-              if (modules.modalManager) {
-                  modules.modalManager.open('venueAddedPromptModal');
-              }
-          }, 500);
-      },
+        }, 500);
+    },
       
-      formatAddress(place) {
-          if (place.formatted_address) {
-              return place.formatted_address;
-          }
-          return place.address || 'Address not available';
-      },
+    formatAddress(place) {
+        if (place.formatted_address) {
+          return place.formatted_address;
+        }
+        return place.address || 'Address not available';
+    },
       
-      getPlaceIcon(type) {
-          const icons = {
-              'Bar': '🍹',
-              'Restaurant': '🍽️',
-              'Café': '☕',
-              'Club': '🎵',
-              'Takeaway': '🥡',
-              'Hotel': '🏨',
-              'Venue': '🍺'
-          };
-          return icons[type] || '📍';
-      },
+    getPlaceIcon(type) {
+        const icons = {
+            'Bar': '🍹',
+            'Restaurant': '🍽️',
+            'Café': '☕',
+            'Club': '🎵',
+            'Takeaway': '🥡',
+            'Hotel': '🏨',
+            'Venue': '🍺'
+        };
+        return icons[type] || '📍';
+    },
       
-      hideResults() {
-          const resultsDiv = document.getElementById('placesResults');
-          if (resultsDiv) {
-              resultsDiv.style.display = 'none';
-          }
-      },
+    hideResults() {
+        const resultsDiv = document.getElementById('placesResults');
+        if (resultsDiv) {
+            resultsDiv.style.display = 'none';
+        }
+    },
       
-      escapeHtml(text) {
-          const div = document.createElement('div');
-          div.textContent = text;
-          return div.innerHTML;
-      },
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    },
       
-      showError(message) {
-          const resultsDiv = document.getElementById('placesResults');
-          if (resultsDiv) {
+    showError(message) {
+        const resultsDiv = document.getElementById('placesResults');
+            if (resultsDiv) {
               resultsDiv.innerHTML = `<div class="search-error">${message}</div>`;
               resultsDiv.style.display = 'block';
-          }
-      }
+            }
+        }
   };
   
   // ================================
