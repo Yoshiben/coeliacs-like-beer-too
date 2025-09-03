@@ -903,6 +903,11 @@ const App = {
        'view-all-discoveries': (el, modules) => {
             modules.modalManager?.open('discoveriesOverlay', {
                 onOpen: async () => {
+                    // Set nav context for back button
+                    const navModule = window.App?.getModule('nav');
+                    if (navModule) {
+                        navModule.setPageContext('discoveries');
+                    }
                     const loadDiscoveries = async (filter = 'today') => {
                         const container = document.getElementById('discoveriesList');
                         const loading = document.getElementById('discoveriesLoading');
@@ -962,6 +967,13 @@ const App = {
                             loadDiscoveries(e.target.dataset.filter);
                         });
                     });
+                },
+                onClose: () => {
+                    // Reset context when closing
+                    const navModule = window.App?.getModule('nav');
+                    if (navModule) {
+                        navModule.setPageContext('home');
+                    }
                 }
             });
         },
