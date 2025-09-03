@@ -286,16 +286,6 @@ export const CommunityHubModule = (() => {
         </div>
     `;
     
-    const switchTab = (tabName) => {
-        state.currentView = tabName;
-        document.getElementById('hubTabContent').innerHTML = 
-            state.currentView === 'impact' ? renderImpactTab() : renderLeaderboardTab();
-        
-        document.querySelectorAll('[data-hub-tab]').forEach(tab => {
-            tab.classList.toggle('active', tab.dataset.hubTab === tabName);
-        });
-    };
-    
     // ================================
     // PUBLIC API
     // ================================
