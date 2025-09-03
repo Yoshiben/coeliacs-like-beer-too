@@ -2401,7 +2401,7 @@ const App = {
             community?.handleQuickAction('saved-venues');
         },
 
-        'open-community-hub': (el, modules) => {
+       'open-community-hub': (el, modules) => {
             const communityHub = window.App?.getModule('communityHub');
             if (communityHub) {
                 communityHub.open();
@@ -2412,6 +2412,7 @@ const App = {
         
         'close-community-hub': (el, modules) => {
             modules.modalManager?.close('communityHubOverlay');
+            modules.nav?.setPageContext('home');  // ADD THIS to ensure context is reset
         },
 
         'open-search': (el, modules) => {
