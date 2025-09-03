@@ -297,9 +297,22 @@ export const CommunityHubModule = (() => {
     const open = () => {
         modules.modalManager?.open('communityHubOverlay', {
             onOpen: async () => {
+                // ADD THIS: Set nav context to show back button
+                const navModule = window.App?.getModule('nav');
+                if (navModule) {
+                    navModule.setPageContext('community');
+                }
+                
                 renderHub(); // Show loading state
                 await Promise.all([loadUserStats(), loadLeaderboard()]);
                 renderHub(); // Re-render with data
+            },
+            onClose: () => {
+                // ADD THIS: Reset context when closing
+                const navModule = window.App?.getModule('nav');
+                if (navModule) {
+                    navModule.setPageContext('home');
+                }
             }
         });
     };
