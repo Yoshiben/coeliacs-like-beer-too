@@ -161,16 +161,77 @@ export const CommunityHubModule = (() => {
                         data-hub-tab="impact">📊 My Impact</button>
                 <button class="tab ${state.currentView === 'leaderboard' ? 'active' : ''}" 
                         data-hub-tab="leaderboard">🏆 Leaderboard</button>
+                <button class="tab ${state.currentView === 'challenges' ? 'active' : ''}" 
+                        data-hub-tab="challenges">🎯 Challenges</button>
+                <button class="tab ${state.currentView === 'badges' ? 'active' : ''}" 
+                        data-hub-tab="badges">🏅 Badges</button>
             </div>
-
+    
             <div id="hubTabContent">
-                ${state.currentView === 'impact' ? renderImpactTab() : renderLeaderboardTab()}
+                ${renderTabContent()}
             </div>
         `;
         
         // Attach tab listeners
         container.querySelectorAll('[data-hub-tab]').forEach(tab => {
             tab.addEventListener('click', () => switchTab(tab.dataset.hubTab));
+        });
+    };
+    
+    const renderTabContent = () => {
+        switch(state.currentView) {
+            case 'impact': return renderImpactTab();
+            case 'leaderboard': return renderLeaderboardTab();
+            case 'challenges': return renderChallengesTab();
+            case 'badges': return renderBadgesTab();
+            default: return renderImpactTab();
+        }
+    };
+
+    const renderChallengesTab = () => `
+        <div class="challenges-section">
+            <h3>🎯 Weekly Challenges</h3>
+            <p style="padding: 1rem; text-align: center;">Coming soon!</p>
+        </div>
+    `;
+    
+    const renderBadgesTab = () => {
+        const updates = state.userProfile.updates;
+        const totalUpdates = updates.beers + updates.statuses + updates.venues;
+        
+        const badges = [
+            { id: 'first_steps', name: 'First Steps', icon: '👶', description: 'Make your first update', earned: totalUpdates >= 1 },
+            { id: 'regular', name: 'Regular', icon: '⭐', description: 'Make 10 updates', earned: totalUpdates >= 10 },
+            { id: 'explorer', name: 'Explorer', icon: '🗺️', description: 'Update 25 venues', earned: updates.venues >= 25 },
+            { id: 'beer_hunter', name: 'Beer Hunter', icon: '🍺', description: 'Report 50 beers', earned: updates.beers >= 50 },
+            { id: 'status_hero', name: 'Status Hero', icon: '✅', description: '100 status updates', earned: updates.statuses >= 100 },
+            { id: 'legend', name: 'GF Legend', icon: '👑', description: 'Reach level 10', earned: state.userProfile.level >= 10 },
+            { id: 'community_champion', name: 'Champion', icon: '🏆', description: 'Top 10 leaderboard', earned: getUserRank() <= 10 }
+        ];
+        
+        return `
+            <div class="badges-section">
+                <h3>🏅 Your Badge Collection</h3>
+                <div class="badges-grid">
+                    ${badges.map(badge => `
+                        <div class="badge-card ${badge.earned ? 'earned' : 'locked'}">
+                            <div class="badge-icon">${badge.icon}</div>
+                            <div class="badge-name">${badge.name}</div>
+                            <div class="badge-description">${badge.description}</div>
+                            ${badge.earned ? '<div class="badge-status">✅ Earned</div>' : '<div class="badge-status">🔒 Locked</div>'}
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    };
+    
+    const switchTab = (tabName) => {
+        state.currentView = tabName;
+        document.getElementById('hubTabContent').innerHTML = renderTabContent();
+        
+        document.querySelectorAll('[data-hub-tab]').forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.hubTab === tabName);
         });
     };
     
