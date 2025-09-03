@@ -1906,7 +1906,7 @@ def get_all_venues_for_map():
 
 @app.route('/api/add-venue', methods=['POST'])
 def add_venue():
-    """Add a new venue to the database"""
+    """Add a new venue to the database - works internationally"""
     conn = None
     try:
         data = request.get_json()
@@ -1914,7 +1914,7 @@ def add_venue():
         # Log incoming data for debugging
         logger.info(f"Add venue request: {data}")
         
-        # Get user_id instead of submitted_by
+        # Get user_id
         user_id = data.get('user_id')
         
         if not user_id:
@@ -1923,88 +1923,144 @@ def add_venue():
                 'error': 'User authentication required'
             }), 401
         
-        # Validate required fields
-        required_fields = ['venue_name', 'address', 'postcode']
-        missing_fields = [field for field in required_fields if not data.get(field)]
-        
-        if missing_fields:
+        # Only venue_name and address are truly required
+        # Postcode is optional for international venues
+        if not data.get('venue_name') or not data.get('address'):
             return jsonify({
                 'success': False,
-                'error': f'Missing required fields: {", ".join(missing_fields)}'
+                'error': 'Venue name and address are required'
             }), 400
+        
+        # Get postcode, use empty string if not provided
+        postcode = data.get('postcode', '').strip()
+        
+        # If no postcode provided or it's 'N/A', use empty string for database
+        if not postcode or postcode == 'N/A':
+            postcode = ''
         
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor(dictionary=True)
         
-        # Verify user exists (same as status update)
+        # Verify user exists
         cursor.execute("SELECT nickname FROM users WHERE user_id = %s AND is_active = 1", (user_id,))
         user = cursor.fetchone()
         if not user:
             return jsonify({'error': 'Invalid user'}), 401
         
         # Check if venue already exists
-        cursor.execute("""
-            SELECT venue_id FROM venues 
-            WHERE LOWER(venue_name) = LOWER(%s) AND postcode = %s
-        """, (data['venue_name'], data['postcode']))
+        # For venues without postcodes, check by name and coordinates
+        if postcode:
+            cursor.execute("""
+                SELECT venue_id FROM venues 
+                WHERE LOWER(venue_name) = LOWER(%s) AND postcode = %s
+            """, (data['venue_name'], postcode))
+        else:
+            # For international venues without postcodes, check by name and location
+            cursor.execute("""
+                SELECT venue_id FROM venues 
+                WHERE LOWER(venue_name) = LOWER(%s) 
+                AND ABS(latitude - %s) < 0.001 
+                AND ABS(longitude - %s) < 0.001
+            """, (data['venue_name'], data.get('latitude', 0), data.get('longitude', 0)))
         
         existing = cursor.fetchone()
         if existing:
             return jsonify({
                 'success': False,
-                'error': 'A venue with this name and postcode already exists',
-                'venue_id': existing['venue_id']  # Note: dictionary cursor means existing['venue_id'] not existing[0]
+                'error': 'This venue already exists in our database',
+                'venue_id': existing['venue_id']
             }), 409
         
         # Parse the address to extract components
         address_parts = data['address'].split(',')
         street = address_parts[0].strip() if len(address_parts) > 0 else ''
-        city = address_parts[-1].strip() if len(address_parts) > 1 else ''
         
-        # Determine venue_type from Google Places data or default to 'pub'
-        venue_type = 'pub'  # Default fallback
+        # Extract city - usually second to last part of address
+        if len(address_parts) >= 2:
+            # For international addresses, city is often 2nd or 3rd from end
+            city = address_parts[-2].strip()
+            # Remove postcode from city if it got included
+            if postcode and postcode in city:
+                city = city.replace(postcode, '').strip()
+        else:
+            city = address_parts[-1].strip() if len(address_parts) > 0 else ''
+        
+        # Determine country from address if possible
+        country = 'Unknown'
+        if len(address_parts) > 0:
+            last_part = address_parts[-1].strip()
+            # Common country names in addresses
+            country_map = {
+                'Netherlands': 'NL',
+                'Nederland': 'NL',
+                'Germany': 'DE',
+                'Deutschland': 'DE',
+                'France': 'FR',
+                'Belgium': 'BE',
+                'België': 'BE',
+                'Ireland': 'IE',
+                'Spain': 'ES',
+                'España': 'ES',
+                'Italy': 'IT',
+                'Italia': 'IT',
+                'United Kingdom': 'GB',
+                'UK': 'GB',
+                'USA': 'US',
+                'United States': 'US'
+            }
+            
+            for country_name, code in country_map.items():
+                if country_name.lower() in last_part.lower():
+                    country = code
+                    break
+        
+        # Determine venue_type from Google Places data
+        venue_type = 'pub'  # Default
         
         if 'types' in data and data['types']:
             google_types = data['types']
             if 'bar' in google_types:
                 venue_type = 'bar'
             elif 'restaurant' in google_types:
-                venue_type = 'restaurant' 
+                venue_type = 'restaurant'
             elif 'lodging' in google_types:
                 venue_type = 'hotel'
             elif 'night_club' in google_types:
                 venue_type = 'club'
+            elif 'cafe' in google_types:
+                venue_type = 'cafe'
         
-        # Insert new venue with user_id in added_by_user_id column
+        # Insert new venue
         cursor.execute("""
             INSERT INTO venues (
                 venue_name, street, city, postcode, 
                 address, latitude, longitude, 
-                venue_type, added_by_user_id
+                venue_type, country, added_by_user_id
             ) VALUES (
-                %s, %s, %s, %s, %s, %s, %s, %s, %s
+                %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
             )
         """, (
             data['venue_name'],
             street,
             city,
-            data['postcode'],
+            postcode if postcode else NULL,  # Use NULL for empty postcodes
             data['address'],
             data.get('latitude'),
             data.get('longitude'),
             venue_type,
-            user_id  # Use user_id instead of submitted_by
+            country,
+            user_id
         ))
         
         venue_id = cursor.lastrowid
         conn.commit()
         
-        # Award points for adding venue (20 points)
+        # Award points for adding venue
         points_earned = 20
         update_user_stats(user_id, 'venue_add', points_earned)
         
-        # Log the addition with user info
-        logger.info(f"New venue added: {data['venue_name']} (ID: {venue_id}) as {venue_type} by user {user_id} ({user['nickname']})")
+        # Log the addition
+        logger.info(f"New venue added: {data['venue_name']} (ID: {venue_id}) in {country} by user {user_id} ({user['nickname']})")
         
         cursor.close()
         conn.close()
@@ -2015,8 +2071,9 @@ def add_venue():
             'message': f'{data["venue_name"]} added successfully!',
             'venue_id': venue_id,
             'venue_type': venue_type,
+            'country': country,
             'points_earned': points_earned,
-            'contributor': user['nickname']  # Can return nickname for display
+            'contributor': user['nickname']
         })
         
     except mysql.connector.IntegrityError as e:
@@ -2286,6 +2343,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
