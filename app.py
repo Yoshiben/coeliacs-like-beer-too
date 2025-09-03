@@ -1677,6 +1677,15 @@ def get_user_stats(nickname):
     try:
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor()
+
+
+        cursor.execute("""
+            SELECT us.points, us.beers_reported, us.statuses_confirmed, us.statuses_updated, us.venues_reported, us.venues_added
+            FROM user_stats us
+            LEFT JOIN users u ON us.user_id = u.user_id
+            WHERE nickname = %s
+        """, (nickname,))
+        all_stats = cursor.fetchone()
         
         # Get beer contributions
         cursor.execute("""
@@ -1697,9 +1706,9 @@ def get_user_stats(nickname):
         status_stats = cursor.fetchone()
         
         # Calculate totals
-        total_beers = beer_stats[0] if beer_stats else 0
-        total_statuses = status_stats[0] if status_stats else 0
-        unique_venues = (beer_stats[1] if beer_stats else 0) + (status_stats[1] if status_stats else 0)
+        total_beers = all_stats[1] if all_stats else 0
+        total_statuses = all_stats[2] if all_stats else 0
+        unique_venues = all_stats[4] if all_stats else 0
         
         # Calculate points
         points = (total_beers * 15) + (total_statuses * 5) + (unique_venues * 10)
