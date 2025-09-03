@@ -1967,44 +1967,163 @@ def add_venue():
                 'venue_id': existing['venue_id']
             }), 409
         
-        # Parse the address to extract components
-        address_parts = data['address'].split(',')
-        street = address_parts[0].strip() if len(address_parts) > 0 else ''
-        
-        # Extract city
-        if len(address_parts) >= 2:
-            city = address_parts[-2].strip()
-            if postcode and postcode in city:
-                city = city.replace(postcode, '').strip()
-        else:
-            city = address_parts[-1].strip() if len(address_parts) > 0 else ''
+        # FIX: Better address parsing
+        full_address = data['address']
+        address_parts = full_address.split(',')
         
         # Get country from request data first (from Google Places)
-        country = data.get('country', '')
+        country = data.get('country', '').strip()
         
-        # If no country from Google, try to extract from address
-        if not country and len(address_parts) > 0:
-            last_part = address_parts[-1].strip()
-            country = last_part  # Use the last part as country name
+        # Clean up the address parts
+        cleaned_parts = [part.strip() for part in address_parts]
         
-        # If still no country, use coordinates to guess
+        # If we have a country in the data, remove it from address parts if it's at the end
+        if country and cleaned_parts and cleaned_parts[-1] == country:
+            cleaned_parts = cleaned_parts[:-1]
+        
+        # Extract street and city more intelligently
+        street = ''
+        city = ''
+        
+        if len(cleaned_parts) >= 2:
+            # Usually: street, city, [region], [country]
+            street = cleaned_parts[0]
+            
+            # For city, try to get the second-to-last part (before country)
+            # But make sure we're not getting a postcode
+            if postcode and postcode in cleaned_parts[-1]:
+                # Postcode is in the last part, so city is probably second-to-last
+                city = cleaned_parts[-2] if len(cleaned_parts) >= 2 else cleaned_parts[-1]
+            else:
+                # No postcode in last part, so city is likely the last or second-to-last
+                city = cleaned_parts[-1] if len(cleaned_parts) >= 1 else ''
+            
+            # Clean city - remove postcode if it's there
+            if postcode and postcode in city:
+                city = city.replace(postcode, '').strip()
+        elif len(cleaned_parts) == 1:
+            # Only one part, use it as street
+            street = cleaned_parts[0]
+            city = ''
+        
+        # If still no country, try to detect from coordinates or formatted address
+        if not country:
+            # Try to extract from the original formatted_address if it wasn't in the data
+            if len(address_parts) > 0:
+                last_part = address_parts[-1].strip()
+                # Check if it looks like a country name (no numbers, not too short)
+                if not any(char.isdigit() for char in last_part) and len(last_part) > 2:
+                    country = last_part
+                    # Remove country from city if it ended up there
+                    if city == country:
+                        city = address_parts[-2].strip() if len(address_parts) >= 2 else ''
+        
+        # If still no country and we have coordinates, use rough geolocation
         if not country and data.get('latitude') and data.get('longitude'):
             lat = data.get('latitude')
             lng = data.get('longitude')
             
             # Rough boundaries for common countries
-            if 50 < lat < 54 and 3 < lng < 7:
+            if 49.5 < lat < 61 and -8 < lng < 2:
+                country = 'United Kingdom'
+            elif 51.2 < lat < 53.6 and 3.3 < lng < 7.3:
                 country = 'Netherlands'
             elif 47 < lat < 55 and 5 < lng < 15:
                 country = 'Germany'
             elif 42 < lat < 51 and -5 < lng < 9:
                 country = 'France'
-            elif 51 < lat < 61 and -8 < lng < 2:
-                country = 'United Kingdom'
-            elif 40 < lat < 45 and -10 < lng < 3:
+            elif 35.5 < lat < 43.5 and -10 < lng < 4:
                 country = 'Spain'
             elif 36 < lat < 47 and 6 < lng < 19:
                 country = 'Italy'
+            elif 52 < lat < 55 and -10 < lng < -5.5:
+                country = 'Ireland'
+            elif 49 < lat < 60 and 8 < lng < 32:
+                country = 'Poland'
+            elif 45.5 < lat < 48.5 and 16 < lng < 23:
+                country = 'Romania'
+            elif 55 < lat < 71 and 4 < lng < 31:
+                country = 'Norway'
+            elif 55 < lat < 70 and 11 < lng < 24:
+                country = 'Sweden'
+            elif 54.5 < lat < 60.5 and 19 < lng < 28:
+                country = 'Finland'
+            elif 54.5 < lat < 58 and 7.5 < lng < 15:
+                country = 'Denmark'
+            elif 49 < lat < 51.5 and 2.5 < lng < 6.5:
+                country = 'Belgium'
+            elif 49.4 < lat < 50.2 and 5.7 < lng < 6.5:
+                country = 'Luxembourg'
+            elif 46.5 < lat < 49 and 9 < lng < 17:
+                country = 'Austria'
+            elif 45.5 < lat < 48 and 5.5 < lng < 10.5:
+                country = 'Switzerland'
+            elif 35.8 < lat < 42 and 19.3 < lng < 29.7:
+                country = 'Greece'
+            elif 36 < lat < 42.2 and -9.5 < lng < -6:
+                country = 'Portugal'
+            elif 45 < lat < 54 and 13 < lng < 24:
+                country = 'Czech Republic'
+            # North America
+            elif 41 < lat < 84 and -141 < lng < -52:
+                country = 'Canada'
+            elif 24 < lat < 49 and -125 < lng < -66:
+                country = 'United States'
+            elif 14 < lat < 33 and -118 < lng < -86:
+                country = 'Mexico'
+            # Australia & New Zealand
+            elif -44 < lat < -10 and 113 < lng < 154:
+                country = 'Australia'
+            elif -47 < lat < -34 and 166 < lng < 179:
+                country = 'New Zealand'
+            # Asia
+            elif 20 < lat < 46 and 73 < lng < 135:
+                country = 'China'
+            elif 24 < lat < 46 and 122 < lng < 146:
+                country = 'Japan'
+            elif 33 < lat < 43 and 124 < lng < 132:
+                country = 'South Korea'
+            elif 1.2 < lat < 1.5 and 103.6 < lng < 104:
+                country = 'Singapore'
+            elif 4.5 < lat < 21 and 95 < lng < 109:
+                country = 'Thailand'
+            elif 8 < lat < 23 and 102 < lng < 110:
+                country = 'Vietnam'
+            elif 8 < lat < 37 and 68 < lng < 97:
+                country = 'India'
+            # South America
+            elif -55 < lat < -22 and -73 < lng < -53:
+                country = 'Argentina'
+            elif -34 < lat < 5 and -74 < lng < -34:
+                country = 'Brazil'
+            elif -56 < lat < -17 and -76 < lng < -66:
+                country = 'Chile'
+            elif -5 < lat < 14 and -82 < lng < -67:
+                country = 'Colombia'
+            elif -18 < lat < 1.5 and -81 < lng < -75:
+                country = 'Peru'
+            # Africa
+            elif -35 < lat < -22 and 16 < lng < 33:
+                country = 'South Africa'
+            elif 22 < lat < 31.5 and 25 < lng < 37:
+                country = 'Egypt'
+            elif -1.5 < lat < 4.5 and 36 < lng < 41:
+                country = 'Kenya'
+            elif 30 < lat < 37 and -13 < lng < -1:
+                country = 'Morocco'
+            elif 4 < lat < 14 and 2 < lng < 15:
+                country = 'Nigeria'
+            # Middle East
+            elif 29 < lat < 34 and 34 < lng < 36:
+                country = 'Israel'
+            elif 12 < lat < 32 and 34 < lng < 60:
+                country = 'Saudi Arabia'
+            elif 23 < lat < 40 and 44 < lng < 64:
+                country = 'Iran'
+            elif 36 < lat < 42 and 26 < lng < 45:
+                country = 'Turkey'
+            elif 22.5 < lat < 26.5 and 51 < lng < 56.5:
+                country = 'United Arab Emirates'
             else:
                 country = 'Unknown'
         
@@ -2028,6 +2147,15 @@ def add_venue():
             elif 'cafe' in google_types:
                 venue_type = 'cafe'
         
+        # Rebuild a clean address for storage (without country at the end)
+        clean_address = full_address
+        if country and country != 'Unknown' and full_address.endswith(country):
+            # Remove country from the end of the address
+            clean_address = full_address.rsplit(country, 1)[0].strip()
+            # Also remove trailing comma if present
+            if clean_address.endswith(','):
+                clean_address = clean_address[:-1].strip()
+        
         # Insert new venue
         cursor.execute("""
             INSERT INTO venues (
@@ -2042,7 +2170,7 @@ def add_venue():
             street,
             city,
             postcode if postcode else None,  # Use None for NULL
-            data['address'],
+            clean_address,  # Use cleaned address
             data.get('latitude'),
             data.get('longitude'),
             venue_type,
@@ -2059,6 +2187,7 @@ def add_venue():
         
         # Log the addition
         logger.info(f"New venue added: {data['venue_name']} (ID: {venue_id}) in {country} by user {user_id} ({user['nickname']})")
+        logger.info(f"Address stored - Street: {street}, City: {city}, Country: {country}")
         
         return jsonify({
             'success': True,
@@ -2101,7 +2230,7 @@ def add_venue():
         if conn and conn.is_connected():
             cursor.close()
             conn.close()
-
+                    
 @app.route('/api/search-places', methods=['POST'])
 def search_places():
     """Proxy to Google Places API to hide API key"""
@@ -2337,6 +2466,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
