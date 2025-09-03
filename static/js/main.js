@@ -953,7 +953,7 @@ const App = {
                         }
                     };
                     
-                    await loadDiscoveries('today');
+                    await loadDiscoveries('week');
                     
                     document.querySelectorAll('.filter-chip').forEach(btn => {
                         btn.addEventListener('click', (e) => {
