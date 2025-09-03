@@ -1726,12 +1726,12 @@ export const SearchModule = (function() {
     selectPlace(placeOrIndex) {
         console.log('🏠 Selecting place:', placeOrIndex);
         const place = typeof placeOrIndex === 'number' 
-          ? this.searchResults[placeOrIndex]
-          : placeOrIndex;
-          
+            ? this.searchResults[placeOrIndex]
+            : placeOrIndex;
+            
         if (!place) {
-          console.error('❌ No place found to select');
-          return;
+            console.error('❌ No place found to select');
+            return;
         }
         
         console.log('✅ Place selected:', place);
@@ -1744,21 +1744,45 @@ export const SearchModule = (function() {
         const lng = place.geometry?.location?.lng;
         
         if (!lat || !lng) {
-          console.error('❌ No coordinates available for place:', place);
-          modules.toast?.error('This venue has no location data available');
-          return;
+            console.error('❌ No coordinates available for place:', place);
+            modules.toast?.error('This venue has no location data available');
+            return;
+        }
+        
+        // Extract country from address_components if available
+        let country = '';
+        let countryCode = '';
+        
+        if (place.address_components) {
+            const countryComponent = place.address_components.find(
+                component => component.types.includes('country')
+            );
+            if (countryComponent) {
+                country = countryComponent.long_name;  // e.g., "Netherlands"
+                countryCode = countryComponent.short_name;  // e.g., "NL"
+            }
+        }
+        
+        // If no address_components, try to extract from formatted_address
+        if (!country && place.formatted_address) {
+            const addressParts = place.formatted_address.split(',');
+            if (addressParts.length > 0) {
+                country = addressParts[addressParts.length - 1].trim();
+            }
         }
         
         this.selectedPlace = {
-          name: placeName,
-          address: placeAddress,
-          lat: lat,
-          lon: lng,
-          type: placeType,
-          place_id: place.place_id,
-          formatted_address: place.formatted_address,
-          types: place.types || [],
-          source: 'google_places'
+            name: placeName,
+            address: placeAddress,
+            lat: lat,
+            lon: lng,
+            type: placeType,
+            place_id: place.place_id,
+            formatted_address: place.formatted_address,
+            types: place.types || [],
+            country: country,
+            country_code: countryCode,
+            source: 'google_places'
         };
         
         document.getElementById('selectedPlaceName').textContent = this.selectedPlace.name;
@@ -1768,7 +1792,7 @@ export const SearchModule = (function() {
         
         this.hideResults();
     },
-      
+    
     useSelectedPlace() {
         if (!this.selectedPlace) {
             console.error('❌ No selected place');
@@ -1815,7 +1839,7 @@ export const SearchModule = (function() {
                 }
             }
             
-            // Special handling for specific countries in address
+            // Special handling for Netherlands
             if (!postcode) {
                 if (place.formatted_address.includes('Netherlands') || place.formatted_address.includes('Nederland')) {
                     const nlMatch = place.formatted_address.match(/\b[1-9][0-9]{3}\s?[A-Z]{2}\b/);
@@ -1829,7 +1853,6 @@ export const SearchModule = (function() {
         
         // Remove postcode and everything after it if we found one
         if (postcode) {
-            // Create a regex pattern that handles spaces in postcodes
             const postcodePattern = postcode.replace(/\s/g, '\\s*');
             address = address.replace(new RegExp(`,?\\s*${postcodePattern}.*$`, 'i'), '').trim();
         }
@@ -1840,7 +1863,7 @@ export const SearchModule = (function() {
             address = address.replace(new RegExp(`^${namePattern},?\\s*`, 'i'), '').trim();
         }
         
-        // If no postcode found, use empty string (not 'N/A')
+        // If no postcode found, use empty string
         if (!postcode) {
             postcode = '';
             console.log('No postcode found for this address - that\'s OK for international venues');
@@ -1851,9 +1874,10 @@ export const SearchModule = (function() {
             address: address,
             postcode: postcode,
             latitude: place.lat,
-            longitude: place.lon || place.lng,  // Handle both lon and lng
+            longitude: place.lon || place.lng,
             place_id: place.place_id,
             types: place.types || [],
+            country: place.country || '',  // Include country
             source: 'google_places'
         };
         
