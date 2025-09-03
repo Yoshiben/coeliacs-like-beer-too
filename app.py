@@ -1924,7 +1924,6 @@ def add_venue():
             }), 401
         
         # Only venue_name and address are truly required
-        # Postcode is optional for international venues
         if not data.get('venue_name') or not data.get('address'):
             return jsonify({
                 'success': False,
@@ -1933,8 +1932,6 @@ def add_venue():
         
         # Get postcode, use empty string if not provided
         postcode = data.get('postcode', '').strip()
-        
-        # If no postcode provided or it's 'N/A', use empty string for database
         if not postcode or postcode == 'N/A':
             postcode = ''
         
@@ -1948,7 +1945,6 @@ def add_venue():
             return jsonify({'error': 'Invalid user'}), 401
         
         # Check if venue already exists
-        # For venues without postcodes, check by name and coordinates
         if postcode:
             cursor.execute("""
                 SELECT venue_id FROM venues 
@@ -1975,44 +1971,46 @@ def add_venue():
         address_parts = data['address'].split(',')
         street = address_parts[0].strip() if len(address_parts) > 0 else ''
         
-        # Extract city - usually second to last part of address
+        # Extract city
         if len(address_parts) >= 2:
-            # For international addresses, city is often 2nd or 3rd from end
             city = address_parts[-2].strip()
-            # Remove postcode from city if it got included
             if postcode and postcode in city:
                 city = city.replace(postcode, '').strip()
         else:
             city = address_parts[-1].strip() if len(address_parts) > 0 else ''
         
-        # Determine country from address if possible
-        country = 'Unknown'
-        if len(address_parts) > 0:
+        # Get country from request data first (from Google Places)
+        country = data.get('country', '')
+        
+        # If no country from Google, try to extract from address
+        if not country and len(address_parts) > 0:
             last_part = address_parts[-1].strip()
-            # Common country names in addresses
-            country_map = {
-                'Netherlands': 'NL',
-                'Nederland': 'NL',
-                'Germany': 'DE',
-                'Deutschland': 'DE',
-                'France': 'FR',
-                'Belgium': 'BE',
-                'België': 'BE',
-                'Ireland': 'IE',
-                'Spain': 'ES',
-                'España': 'ES',
-                'Italy': 'IT',
-                'Italia': 'IT',
-                'United Kingdom': 'GB',
-                'UK': 'GB',
-                'USA': 'US',
-                'United States': 'US'
-            }
+            country = last_part  # Use the last part as country name
+        
+        # If still no country, use coordinates to guess
+        if not country and data.get('latitude') and data.get('longitude'):
+            lat = data.get('latitude')
+            lng = data.get('longitude')
             
-            for country_name, code in country_map.items():
-                if country_name.lower() in last_part.lower():
-                    country = code
-                    break
+            # Rough boundaries for common countries
+            if 50 < lat < 54 and 3 < lng < 7:
+                country = 'Netherlands'
+            elif 47 < lat < 55 and 5 < lng < 15:
+                country = 'Germany'
+            elif 42 < lat < 51 and -5 < lng < 9:
+                country = 'France'
+            elif 51 < lat < 61 and -8 < lng < 2:
+                country = 'United Kingdom'
+            elif 40 < lat < 45 and -10 < lng < 3:
+                country = 'Spain'
+            elif 36 < lat < 47 and 6 < lng < 19:
+                country = 'Italy'
+            else:
+                country = 'Unknown'
+        
+        # Default to Unknown if still no country
+        if not country:
+            country = 'Unknown'
         
         # Determine venue_type from Google Places data
         venue_type = 'pub'  # Default
@@ -2043,7 +2041,7 @@ def add_venue():
             data['venue_name'],
             street,
             city,
-            postcode if postcode else NULL,  # Use NULL for empty postcodes
+            postcode if postcode else None,  # Use None for NULL
             data['address'],
             data.get('latitude'),
             data.get('longitude'),
@@ -2061,10 +2059,6 @@ def add_venue():
         
         # Log the addition
         logger.info(f"New venue added: {data['venue_name']} (ID: {venue_id}) in {country} by user {user_id} ({user['nickname']})")
-        
-        cursor.close()
-        conn.close()
-        conn = None
         
         return jsonify({
             'success': True,
@@ -2343,6 +2337,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
