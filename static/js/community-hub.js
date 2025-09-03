@@ -604,32 +604,6 @@ export const CommunityHubModule = (() => {
         close,
         addPoints,
         switchTab,
-        trackAction: (action, metadata) => {
-            // Called when user performs actions
-            if (!state.userProfile) return;
-            
-            // Update counts
-            switch(action) {
-                case 'VENUE_UPDATE':
-                    state.userProfile.updates.venues++;
-                    break;
-                case 'BEER_REPORT':
-                    state.userProfile.updates.beers++;
-                    break;
-                case 'STATUS_UPDATE':
-                    state.userProfile.updates.statuses++;
-                    break;
-            }
-            
-            // Add points
-            addPoints(action, metadata);
-            
-            // Check achievements
-            checkForAchievements();
-            
-            // Save
-            saveUserProfile();
-        },
         getUserProfile: () => state.userProfile,
         isUserActive: () => !!state.userProfile
     };
