@@ -1499,70 +1499,51 @@ def autocomplete():
 
 @app.route('/api/community/leaderboard')
 def get_community_leaderboard():
-    """Get top contributors from real data including status updates"""
+    """Get top contributors using the user_stats view"""
     try:
         conn = mysql.connector.connect(**db_config)
         cursor = conn.cursor(dictionary=True)
         
-        # Get contributions from venue_beers
+        # Get all user stats from the view
         cursor.execute("""
             SELECT 
-                nickname,
-                COUNT(*) as beer_contributions,
-                COUNT(DISTINCT venue_id) as venues_with_beers
-            FROM venue_beers vb
-            LEFT JOIN users u ON vb.user_id = u.user_id
-            WHERE 1=1
-            AND vb.user_id IS NOT NULL
-            GROUP BY nickname
+                u.nickname, 
+                us.points, 
+                us.beers_reported, 
+                us.statuses_confirmed, 
+                us.statuses_updated, 
+                us.venues_reported, 
+                us.venues_added
+            FROM user_stats us
+            LEFT JOIN users u ON us.user_id = u.user_id
+            WHERE u.nickname IS NOT NULL
+            ORDER BY us.points DESC
+            LIMIT 20
         """)
-        beer_contributors = {row['nickname']: row for row in cursor.fetchall()}
-        
-        # Get status updates
-        cursor.execute("""
-            SELECT 
-                nickname,
-                COUNT(*) as status_updates,
-                COUNT(DISTINCT venue_id) as venues_updated
-            FROM status_updates s
-            LEFT JOIN users u ON s.user_id = u.user_id
-            WHERE 1=1
-            AND s.user_id IS NOT NULL
-            GROUP BY nickname
-        """)
-        status_contributors = {row['nickname']: row for row in cursor.fetchall()}
-        
-        # Combine all contributors
-        all_nicknames = set(beer_contributors.keys()) | set(status_contributors.keys())
         
         leaderboard = []
-        for nickname in all_nicknames:
-            beer_data = beer_contributors.get(nickname, {'beer_contributions': 0, 'venues_with_beers': 0})
-            status_data = status_contributors.get(nickname, {'status_updates': 0, 'venues_updated': 0})
+        for row in cursor.fetchall():
+            # Calculate total contributions
+            total_contributions = (row['beers_reported'] or 0) + 
+                                (row['statuses_updated'] or 0) + 
+                                (row['venues_added'] or 0)
             
-            total_contributions = beer_data['beer_contributions'] + status_data['status_updates']
-            total_venues = beer_data['venues_with_beers'] + status_data['venues_updated']
-            
-            # Calculate points: beers=15pts, statuses=5pts, unique venues=10pts
-            points = (beer_data['beer_contributions'] * 15) + \
-                    (status_data['status_updates'] * 5) + \
-                    (total_venues * 10)
+            # Calculate unique venues touched
+            venues_touched = (row['venues_reported'] or 0) + (row['venues_added'] or 0)
             
             leaderboard.append({
-                'nickname': nickname,
+                'nickname': row['nickname'],
+                'points': row['points'] or 0,
                 'contributions': total_contributions,
-                'beer_reports': beer_data['beer_contributions'],
-                'status_updates': status_data['status_updates'],
-                'venues_touched': total_venues,
-                'points': points
+                'beer_reports': row['beers_reported'] or 0,
+                'status_updates': row['statuses_updated'] or 0,
+                'venues_touched': venues_touched,
+                'status_confirmations': row['statuses_confirmed'] or 0
             })
-        
-        # Sort by points
-        leaderboard.sort(key=lambda x: x['points'], reverse=True)
         
         return jsonify({
             'success': True,
-            'leaderboard': leaderboard[:20]  # Top 20
+            'leaderboard': leaderboard
         })
         
     except Exception as e:
@@ -2328,6 +2309,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
