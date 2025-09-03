@@ -455,9 +455,10 @@ export const ReportBeer = (() => {
             if (beers.length > 0) {
                 html = `<div class="dropdown-header">🍺 ${beers.length} ${breweryName} beers</div>`;
                 beers.forEach(beer => {
-                    const beerData = escapeHtml(JSON.stringify(beer));
+                    // Use the new escape function for JSON
+                    const beerData = escapeJsonForHtml(beer);
                     html += `
-                        <div class="suggestion-item" data-action="select-brewery-beer" data-beer='${beerData}'>
+                        <div class="suggestion-item" data-action="select-brewery-beer" data-beer="${beerData}">
                             <strong>${escapeHtml(beer.beer_name)}</strong>
                             <small>${escapeHtml(beer.style || 'Unknown')} • ${beer.abv || '?'}% ABV</small>
                         </div>
@@ -507,9 +508,10 @@ export const ReportBeer = (() => {
             if (beers.length > 0) {
                 html = `<div class="dropdown-header">🔍 ${beers.length} beers found</div>`;
                 beers.forEach(beer => {
-                    const beerData = escapeHtml(JSON.stringify(beer));
+                    // Use the new escape function
+                    const beerData = escapeJsonForHtml(beer);
                     html += `
-                        <div class="suggestion-item beer-item" data-action="select-found-beer" data-beer='${beerData}'>
+                        <div class="suggestion-item beer-item" data-action="select-found-beer" data-beer="${beerData}">
                             <strong>${escapeHtml(beer.beer_name)}</strong>
                             <small>🏭 ${escapeHtml(beer.brewery_name)} • ${escapeHtml(beer.style || 'Unknown style')}</small>
                         </div>
@@ -548,9 +550,10 @@ export const ReportBeer = (() => {
             if (beers.length > 0) {
                 html = `<div class="dropdown-header">🍺 ${beers.length} ${state.selectedBrewery} beers</div>`;
                 beers.forEach(beer => {
-                    const beerData = escapeHtml(JSON.stringify(beer));
+                    // Use the new escape function
+                    const beerData = escapeJsonForHtml(beer);
                     html += `
-                        <div class="suggestion-item" data-action="select-brewery-beer" data-beer='${beerData}'>
+                        <div class="suggestion-item" data-action="select-brewery-beer" data-beer="${beerData}">
                             <strong>${escapeHtml(beer.beer_name)}</strong>
                             <small>${escapeHtml(beer.style || 'Unknown')} • ${beer.abv || '?'}% ABV</small>
                         </div>
@@ -890,6 +893,15 @@ export const ReportBeer = (() => {
         const div = document.createElement('div');
         div.textContent = text || '';
         return div.innerHTML;
+    };
+    
+    const escapeJsonForHtml = (obj) => {
+        // Convert to JSON and escape for HTML attribute
+        return JSON.stringify(obj)
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
     };
 
     // ================================
