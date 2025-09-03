@@ -736,16 +736,18 @@ export const ReportBeer = (() => {
                     window.App.getModule('modalManager').close('reportModal');
                 }
                 
-                // ADD THIS: Refresh venue to show the new beer
+                // Refresh venue to show the new beer
                 const venueModule = window.App?.getModule('venue');
                 if (state.currentVenue?.venue_id) {
-                    // This will reload the venue with fresh data
                     venueModule?.showVenueDetails(state.currentVenue.venue_id);
                 }
                 
                 reset();
                 
-                if (result.show_status_prompt && state.currentVenue) {
+                // CHECK: Don't show status prompt if we came from the beer details prompt
+                const cameFromBeerDetailsPrompt = window.App?.getState('cameFromBeerDetailsPrompt');
+                
+                if (result.show_status_prompt && state.currentVenue && !cameFromBeerDetailsPrompt) {
                     const venueModule = window.App?.getModule('venue');
                     if (venueModule?.showStatusPromptAfterBeer) {
                         setTimeout(() => {
@@ -756,6 +758,11 @@ export const ReportBeer = (() => {
                             );
                         }, 300);
                     }
+                }
+                
+                // Clear the flag after checking
+                if (cameFromBeerDetailsPrompt) {
+                    window.App?.setState('cameFromBeerDetailsPrompt', false);
                 }
             } else {
                 showToast(result.error || '❌ Failed to submit', 'error');
