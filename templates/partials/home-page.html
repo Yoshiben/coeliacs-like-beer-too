@@ -144,31 +144,13 @@
             <div class="info-header">
                 <h1 class="info-title">🆕 Community Discoveries</h1>
                 <div class="discoveries-filter">
-                    <button class="filter-chip active" data-filter="today">Today</button>
-                    <button class="filter-chip" data-filter="week">This Week</button>
+                    <button class="filter-chip active" data-filter="today">This Week</button>
+                    <button class="filter-chip" data-filter="week">This Month</button>
                     <button class="filter-chip" data-filter="all">All Time</button>
                 </div>
             </div>
             
             <div class="info-content discoveries-feed">
-                <!-- Stats Bar -->
-<!--                 <div class="discoveries-stats-bar">
-                    <div class="stat-item">
-                        <span class="stat-icon">🍺</span>
-                        <span class="stat-value" id="totalBeers">0</span>
-                        <span class="stat-label">beers</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-icon">📍</span>
-                        <span class="stat-value" id="totalVenues">0</span>
-                        <span class="stat-label">venues</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-icon">👥</span>
-                        <span class="stat-value" id="totalContributors">0</span>
-                        <span class="stat-label">heroes</span>
-                    </div>
-                </div> -->
                 
                 <!-- Loading State -->
                 <div class="discoveries-loading" id="discoveriesLoading">
@@ -185,9 +167,9 @@
                 <div class="discoveries-empty" id="discoveriesEmpty" style="display: none;">
                     <div class="empty-icon">🍺</div>
                     <h3>No discoveries yet!</h3>
-                    <p>Be the first to report a GF beer today</p>
-                    <button class="btn btn-primary" data-action="report-beer">
-                        Report a Beer
+                    <p>Find a venue to report a beer nearby!</p>
+                    <button class="btn btn-primary" data-action="quick-nearby">
+                        Find venue
                     </button>
                 </div>
             </div>
