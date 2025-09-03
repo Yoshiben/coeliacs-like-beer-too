@@ -36,8 +36,8 @@ export const NavStateManager = (() => {
         state.currentContext = context;
         
         // Remove all page classes
-        document.body.classList.remove('page-home', 'page-results', 'page-map', 'page-venue', 'page-search', 'page-search-modal', 'page-contact', 
-                                       'page-breweries', 'page-community', 'page-privacy', 'page-terms', 'page-liability', 'page-about-gf');
+        document.body.classList.remove('page-home', 'page-results', 'page-map', 'page-venue', 'page-search', 'page-search-modal', 'page-contact', 'page-breweries', 
+                                       'page-community', 'page-privacy', 'page-terms', 'page-liability', 'page-about-gf', 'page-discoveries');
         
         // Add the current page class
         document.body.classList.add(`page-${context}`);
@@ -89,6 +89,7 @@ export const NavStateManager = (() => {
             'map': '/map',
             'contact': '/contact',
             'breweries': '/breweries'
+            'discoveries': 'discoveries'
         };
         return urlMap[context] || '/';
     };
@@ -142,6 +143,10 @@ export const NavStateManager = (() => {
                 modules.modalManager?.open('getInTouchOverlay');  // Change from 'contactOverlay'
                 setPageContext('contact');
                 break;
+            case 'discoveries':
+                modules.modalManager?.open('discoveriesOverlay');
+                setPageContext('discoveries');
+                break;
             case 'search':
                 // Open search overlay
                 const searchOverlay = document.getElementById('searchOverlay');
@@ -174,6 +179,7 @@ export const NavStateManager = (() => {
                 case 'map':
                 case 'breweries':
                 case 'community':
+                case 'discoveries':
                     goToHome();
                     break;
                 
