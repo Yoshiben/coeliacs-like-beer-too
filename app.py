@@ -1524,9 +1524,7 @@ def get_community_leaderboard():
         leaderboard = []
         for row in cursor.fetchall():
             # Calculate total contributions
-            total_contributions = (row['beers_reported'] or 0) + 
-                                (row['statuses_updated'] or 0) + 
-                                (row['venues_added'] or 0)
+            total_contributions = (row['beers_reported'] or 0) + (row['statuses_updated'] or 0) + (row['venues_added'] or 0)
             
             # Calculate unique venues touched
             venues_touched = (row['venues_reported'] or 0) + (row['venues_added'] or 0)
@@ -2309,6 +2307,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
