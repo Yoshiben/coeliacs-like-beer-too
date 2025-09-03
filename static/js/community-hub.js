@@ -93,19 +93,33 @@ export const CommunityHubModule = (() => {
     const calculateProgress = () => {
         if (!state.userProfile) return 0;
         
-        const currentLevel = state.userProfile.level;
-        const currentThreshold = LEVEL_THRESHOLDS[currentLevel - 1] || 0;
-        const nextThreshold = LEVEL_THRESHOLDS[currentLevel] || 10000;
+        const currentLevel = state.userProfile.level || 1;
+        const currentPoints = state.userProfile.points || 0;
         
-        const progress = ((state.userProfile.points - currentThreshold) / (nextThreshold - currentThreshold)) * 100;
+        // Get thresholds for current and next level
+        const currentThreshold = LEVEL_THRESHOLDS[currentLevel - 1] || 0;
+        const nextThreshold = LEVEL_THRESHOLDS[currentLevel] || LEVEL_THRESHOLDS[LEVEL_THRESHOLDS.length - 1];
+        
+        // Calculate progress between current and next threshold
+        const pointsInCurrentLevel = currentPoints - currentThreshold;
+        const pointsNeededForLevel = nextThreshold - currentThreshold;
+        
+        const progress = (pointsInCurrentLevel / pointsNeededForLevel) * 100;
         return Math.min(Math.max(progress, 0), 100);
     };
     
     const calculatePointsToNext = () => {
         if (!state.userProfile) return 0;
         
-        const nextThreshold = LEVEL_THRESHOLDS[state.userProfile.level] || 10000;
-        return Math.max(0, nextThreshold - state.userProfile.points);
+        const currentLevel = state.userProfile.level || 1;
+        const currentPoints = state.userProfile.points || 0;
+        
+        // Get next level threshold
+        const nextThreshold = LEVEL_THRESHOLDS[currentLevel] || LEVEL_THRESHOLDS[LEVEL_THRESHOLDS.length - 1];
+        
+        // Points needed to reach next level
+        const pointsNeeded = nextThreshold - currentPoints;
+        return Math.max(0, pointsNeeded);
     };
     
     const getTotalUpdates = () => {
