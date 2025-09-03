@@ -69,7 +69,6 @@ def admin_required(f):
 # ONBOARDING & USER SESSIONS
 # ==================================================
 
-
 def generate_passcode():
     """Generate a memorable 6-character passcode"""
     # Use a mix of letters and numbers for memorability
@@ -332,6 +331,102 @@ def get_user_points(user_id):
         return jsonify({'success': False, 'points': 0})
     finally:
         if 'conn' in locals() and conn.is_connected():
+            cursor.close()
+            conn.close()
+
+@app.route('/api/community/my-stats/<nickname>')
+def get_user_stats(nickname):
+    """Single endpoint for user stats"""
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        cursor.execute("""
+            SELECT 
+                us.user_id,
+                us.points, 
+                us.level,
+                us.beers_reported, 
+                us.statuses_updated, 
+                us.statuses_confirmed,
+                us.venues_reported,
+                us.venues_added
+            FROM user_stats us
+            JOIN users u ON us.user_id = u.user_id
+            WHERE u.nickname = %s
+        """, (nickname,))
+        
+        stats = cursor.fetchone()
+        
+        if not stats:
+            return jsonify({
+                'success': True,
+                'stats': {
+                    'points': 0,
+                    'level': 1,
+                    'beers_reported': 0,
+                    'status_updates': 0,
+                    'status_confirmations': 0,
+                    'venues_updated': 0,
+                    'venues_added': 0
+                }
+            })
+        
+        return jsonify({
+            'success': True,
+            'stats': {
+                'points': stats['points'],
+                'level': stats['level'],
+                'beers_reported': stats['beers_reported'],
+                'status_updates': stats['statuses_updated'],
+                'status_confirmations': stats['statuses_confirmed'],
+                'venues_updated': stats['venues_reported'] + stats['venues_added'],
+                'venues_added' : stats['venues_added']
+            }
+        })
+        
+    except Exception as e:
+        logger.error(f"User stats error: {e}")
+        return jsonify({'success': False}), 500
+    finally:
+        if 'conn' in locals():
+            cursor.close()
+            conn.close()
+
+@app.route('/api/community/leaderboard')
+def get_community_leaderboard():
+    """Leaderboard using the same view"""
+    try:
+        conn = mysql.connector.connect(**db_config)
+        cursor = conn.cursor(dictionary=True)
+        
+        cursor.execute("""
+            SELECT 
+                u.nickname,
+                us.points,
+                us.level,
+                us.beers_reported as beer_reports,
+                us.statuses_updated as status_updates,
+                (us.venues_reported + us.venues_added) as venues_touched
+            FROM user_stats us
+            JOIN users u ON us.user_id = u.user_id
+            WHERE u.nickname IS NOT NULL
+            ORDER BY us.points DESC
+            LIMIT 20
+        """)
+        
+        leaderboard = cursor.fetchall()
+        
+        return jsonify({
+            'success': True,
+            'leaderboard': leaderboard
+        })
+        
+    except Exception as e:
+        logger.error(f"Leaderboard error: {e}")
+        return jsonify({'success': False}), 500
+    finally:
+        if 'conn' in locals():
             cursor.close()
             conn.close()
 
@@ -1497,63 +1592,7 @@ def autocomplete():
             cursor.close()
             conn.close()
 
-@app.route('/api/community/leaderboard')
-def get_community_leaderboard():
-    """Get top contributors using the user_stats view"""
-    try:
-        conn = mysql.connector.connect(**db_config)
-        cursor = conn.cursor(dictionary=True)
-        
-        # Get all user stats from the view
-        cursor.execute("""
-            SELECT 
-                u.nickname, 
-                us.points, 
-                us.beers_reported, 
-                us.statuses_confirmed, 
-                us.statuses_updated, 
-                us.venues_reported, 
-                us.venues_added
-            FROM user_stats us
-            LEFT JOIN users u ON us.user_id = u.user_id
-            WHERE u.nickname IS NOT NULL
-            ORDER BY us.points DESC
-            LIMIT 20
-        """)
-        
-        leaderboard = []
-        for row in cursor.fetchall():
-            # Calculate total contributions
-            total_contributions = (row['beers_reported'] or 0) + (row['statuses_updated'] or 0) + (row['venues_added'] or 0)
-            
-            # Calculate unique venues touched
-            venues_touched = (row['venues_reported'] or 0) + (row['venues_added'] or 0)
-            
-            leaderboard.append({
-                'nickname': row['nickname'],
-                'points': row['points'] or 0,
-                'contributions': total_contributions,
-                'beer_reports': row['beers_reported'] or 0,
-                'status_updates': row['statuses_updated'] or 0,
-                'venues_touched': venues_touched,
-                'status_confirmations': row['statuses_confirmed'] or 0
-            })
-        
-        return jsonify({
-            'success': True,
-            'leaderboard': leaderboard
-        })
-        
-    except Exception as e:
-        logger.error(f"Leaderboard error: {str(e)}")
-        return jsonify({
-            'success': False,
-            'error': str(e)
-        }), 500
-    finally:
-        if 'conn' in locals() and conn.is_connected():
-            cursor.close()
-            conn.close()
+
 
 # Add these to your app.py
 
@@ -1650,67 +1689,7 @@ def update_last_active(uuid):
         cursor.close()
         conn.close()
 
-@app.route('/api/community/my-stats/<nickname>')
-def get_user_stats(nickname):
-    """Get real stats for a specific user"""
-    try:
-        conn = mysql.connector.connect(**db_config)
-        cursor = conn.cursor()
 
-
-        cursor.execute("""
-            SELECT us.points, us.beers_reported, us.statuses_confirmed, us.statuses_updated, us.venues_reported, us.venues_added
-            FROM user_stats us
-            LEFT JOIN users u ON us.user_id = u.user_id
-            WHERE nickname = %s
-        """, (nickname,))
-        all_stats = cursor.fetchone()
-        
-        # Get beer contributions
-        cursor.execute("""
-            SELECT COUNT(*) as count, COUNT(DISTINCT venue_id) as venues
-            FROM venue_beers vb
-            LEFT JOIN users u ON vb.user_id = u.user_id
-            WHERE nickname = %s
-        """, (nickname,))
-        beer_stats = cursor.fetchone()
-        
-        # Get status updates
-        cursor.execute("""
-            SELECT COUNT(*) as count, COUNT(DISTINCT venue_id) as venues
-            FROM status_updates s
-            LEFT JOIN users u ON s.user_id = u.user_id
-            WHERE nickname = %s
-        """, (nickname,))
-        status_stats = cursor.fetchone()
-        
-        # Calculate totals
-        total_beers = all_stats[1] if all_stats else 0
-        total_statuses = all_stats[2] if all_stats else 0
-        unique_venues = all_stats[4] if all_stats else 0
-        
-        # Calculate points
-        points = (total_beers * 15) + (total_statuses * 5) + (unique_venues * 10)
-        
-        return jsonify({
-            'success': True,
-            'stats': {
-                'beers_reported': total_beers,
-                'status_updates': total_statuses,
-                'venues_updated': unique_venues,
-                'total_contributions': total_beers + total_statuses,
-                'points': points,
-                'people_helped': unique_venues * 5  # Rough estimate
-            }
-        })
-        
-    except Exception as e:
-        logger.error(f"User stats error: {str(e)}")
-        return jsonify({'success': False, 'error': str(e)}), 500
-    finally:
-        if 'conn' in locals() and conn.is_connected():
-            cursor.close()
-            conn.close()
 
 # ================================================================================
 # API ROUTES
@@ -2307,6 +2286,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
