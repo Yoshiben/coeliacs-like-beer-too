@@ -452,6 +452,8 @@ def get_recent_finds():
             where_clause = "WHERE DATE(vb.last_seen) = CURDATE()"
         elif filter_type == 'week':
             where_clause = "WHERE vb.last_seen >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)"
+        elif filter_type == 'month':
+            where_clause = "WHERE vb.last_seen >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)"
         
         # Get the venue_beers entries with venue and beer details
         offset = (page - 1) * limit
@@ -2317,6 +2319,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
