@@ -25,7 +25,8 @@ export const CommunityHubModule = (() => {
         VENUE_UPDATE: 10,
         BEER_REPORT: 15,
         STATUS_UPDATE: 5,
-        NEW_VENUE: 25,
+        STATUS_CONFIRM: 2,
+        NEW_VENUE: 10,
         DAILY_STREAK: 5,
         MILESTONE_MULTIPLIER: 2
     };
@@ -348,40 +349,39 @@ export const CommunityHubModule = (() => {
     };
     
     const renderImpactTab = () => {
+        // Use the data we already loaded
         const updates = state.userProfile.updates;
         
-        // Find user's rank from leaderboard
+        // Find user's rank from leaderboard  
         let userRank = '?';
-        if (state.leaderboard && state.leaderboard.length > 0) {
-            const rankIndex = state.leaderboard.findIndex(user => 
-                user.nickname === state.userProfile.nickname
-            );
-            if (rankIndex !== -1) {
-                userRank = rankIndex + 1;
-            }
+        const userIndex = state.leaderboard.findIndex(u => 
+            u.nickname === state.userProfile.nickname
+        );
+        if (userIndex !== -1) {
+            userRank = userIndex + 1;
         }
         
         return `
             <div class="impact-grid">
-                <div class="impact-card" data-action="view-impact-details" data-type="venues">
+                <div class="impact-card">
                     <div class="impact-icon">📍</div>
                     <div class="impact-number">${updates.venues || 0}</div>
-                    <div class="impact-label">Venues Updated</div>
+                    <div class="impact-label">Venues</div>
                 </div>
-                <div class="impact-card" data-action="view-impact-details" data-type="beers">
+                <div class="impact-card">
                     <div class="impact-icon">🍺</div>
                     <div class="impact-number">${updates.beers || 0}</div>
-                    <div class="impact-label">Beers Reported</div>
+                    <div class="impact-label">Beers</div>
                 </div>
-                <div class="impact-card" data-action="view-impact-details" data-type="statuses">
+                <div class="impact-card">
                     <div class="impact-icon">✅</div>
                     <div class="impact-number">${updates.statuses || 0}</div>
-                    <div class="impact-label">Status Updates</div>
+                    <div class="impact-label">Updates</div>
                 </div>
                 <div class="impact-card" data-action="switch-to-leaderboard">
                     <div class="impact-icon">🏆</div>
                     <div class="impact-number">#${userRank}</div>
-                    <div class="impact-label">Your Rank</div>
+                    <div class="impact-label">Rank</div>
                 </div>
             </div>
         `;
@@ -394,20 +394,23 @@ export const CommunityHubModule = (() => {
                     <div class="leaderboard-title">🏆 Community Champions</div>
                 </div>
                 <div class="leaderboard-list">
-                    ${state.leaderboard.map((user, index) => `
-                        <div class="leader-row ${user.nickname === state.userProfile?.nickname ? 'you' : ''}">
-                            <div class="rank ${index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : ''}">${index + 1}</div>
-                            <div class="leader-info">
-                                <div class="leader-name">${user.nickname} ${user.nickname === state.userProfile?.nickname ? '(You)' : ''}</div>
-                                <div class="leader-stats">
-                                    ${user.beer_reports > 0 ? `🍺 ${user.beer_reports} beers` : ''}
-                                    ${user.status_updates > 0 ? `✅ ${user.status_updates} updates` : ''}
-                                    ${user.venues_touched > 0 ? `📍 ${user.venues_touched} venues` : ''}
+                    ${state.leaderboard.map((user, index) => {
+                        const isCurrentUser = user.nickname === state.userProfile?.nickname;
+                        return `
+                            <div class="leader-row ${isCurrentUser ? 'you' : ''}">
+                                <div class="rank ${index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : ''}">${index + 1}</div>
+                                <div class="leader-info">
+                                    <div class="leader-name">${user.nickname} ${isCurrentUser ? '(You)' : ''}</div>
+                                    <div class="leader-stats">
+                                        ${user.beer_reports > 0 ? `🍺 ${user.beer_reports}` : ''}
+                                        ${user.status_updates > 0 ? `✅ ${user.status_updates}` : ''}
+                                        ${user.venues_touched > 0 ? `📍 ${user.venues_touched}` : ''}
+                                    </div>
                                 </div>
+                                <div class="leader-points">${user.points} pts</div>
                             </div>
-                            <div class="leader-points">${user.points} pts</div>
-                        </div>
-                    `).join('')}
+                        `;
+                    }).join('')}
                 </div>
             </div>
         `;
@@ -482,40 +485,33 @@ export const CommunityHubModule = (() => {
     // API CALLS
     // ================================
     const loadUserStats = async () => {
-        if (!state.userProfile?.nickname) return;
+    if (!state.userProfile?.nickname) return;
+    
+    try {
+        const response = await fetch(`/api/community/my-stats/${encodeURIComponent(state.userProfile.nickname)}`);
+        const data = await response.json();
         
-        console.log('📊 Loading stats for:', state.userProfile.nickname);
-        
-        try {
-            const response = await fetch(`/api/community/my-stats/${encodeURIComponent(state.userProfile.nickname)}`);
-            const data = await response.json();
+        if (data.success) {
+            // Update everything from single source
+            state.userProfile = {
+                ...state.userProfile,
+                points: data.stats.points,
+                level: data.stats.level,
+                updates: {
+                    venues: data.stats.venues_updated,
+                    beers: data.stats.beers_reported,
+                    statuses: data.stats.status_updates,
+                    confirmations: data.stats.status_confirmations
+                }
+            };
             
-            console.log('📊 Raw stats response:', data);
-            
-            if (data.success) {
-                // Update the profile with real data
-                state.userProfile.updates = {
-                    venues: data.stats.venues_updated || 0,
-                    beers: data.stats.beers_reported || 0,
-                    statuses: data.stats.status_updates || 0
-                };
-                state.userProfile.points = data.stats.points || 0;
-                
-                console.log('📊 Updated profile:', state.userProfile);
-                
-                // Recalculate level based on real points
-                state.userProfile.level = calculateLevel(data.stats.points);
-                
-                // Save and re-render
-                saveUserProfile();
-                renderHub();
-                
-                console.log('✅ Stats loaded and rendered');
-            }
-        } catch (error) {
-            console.error('Failed to load user stats:', error);
+            saveUserProfile();
+            renderHub();
         }
-    };
+    } catch (error) {
+        console.error('Failed to load user stats:', error);
+    }
+};
     
     const loadLeaderboard = async () => {
         console.log('📊 Loading leaderboard...');
@@ -557,28 +553,18 @@ export const CommunityHubModule = (() => {
     // MAIN OPEN FUNCTION
     // ================================
     const open = () => {
-        console.log('🏆 Opening Community Hub');
-        
-        // Clean up any lingering toasts using the toast module
-        modules.toast?.clear();
-        
-        // SET THE PAGE CONTEXT TO COMMUNITY
-        const navModule = window.App?.getModule('nav');
-        if (navModule) {
-            navModule.setPageContext('community');
-        }
-        
         modules.modalManager?.open('communityHubOverlay', {
-            onOpen: () => {
+            onOpen: async () => {
+                renderHub();  // Show loading state
+                
+                // Load both in parallel
+                await Promise.all([
+                    loadUserStats(),
+                    loadLeaderboard()
+                ]);
+                
+                // Everything is loaded, render final state
                 renderHub();
-                loadUserStats();
-                loadLeaderboard();
-            },
-            onClose: () => {
-                // Reset to home context when closing
-                if (navModule) {
-                    navModule.setPageContext('home');
-                }
             }
         });
     };
