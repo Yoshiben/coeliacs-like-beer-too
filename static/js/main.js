@@ -2519,7 +2519,13 @@ const App = {
             const beerData = el.dataset.beer;
             if (beerData && window.CascadeForm) {
                 try {
-                    const beer = JSON.parse(beerData);
+                    // Unescape HTML entities before parsing
+                    const unescapedData = beerData
+                        .replace(/&quot;/g, '"')
+                        .replace(/&#39;/g, "'")
+                        .replace(/&lt;/g, '<')
+                        .replace(/&gt;/g, '>');
+                    const beer = JSON.parse(unescapedData);
                     window.CascadeForm.selectBreweryBeer(beer);
                 } catch (e) {
                     console.error('Invalid beer data:', e);
@@ -2531,7 +2537,13 @@ const App = {
             const beerData = el.dataset.beer;
             if (beerData && window.CascadeForm) {
                 try {
-                    const beer = JSON.parse(beerData);
+                    // Unescape HTML entities before parsing
+                    const unescapedData = beerData
+                        .replace(/&quot;/g, '"')
+                        .replace(/&#39;/g, "'")
+                        .replace(/&lt;/g, '<')
+                        .replace(/&gt;/g, '>');
+                    const beer = JSON.parse(unescapedData);
                     window.CascadeForm.selectFoundBeer(beer);
                 } catch (e) {
                     console.error('Invalid beer data:', e);
