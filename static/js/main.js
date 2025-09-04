@@ -2616,9 +2616,14 @@ const App = {
                 const userId = localStorage.getItem('user_id');
                 
                 if (nickname && userId) {
-                    // Show user section
+                    // Show user section and sign out
                     const userSection = document.getElementById('menuUserSection');
+                    const signOutSection = document.getElementById('menuSignOutSection');
+                    const signInSection = document.getElementById('menuSignInSection');
+                    
                     if (userSection) userSection.style.display = 'block';
+                    if (signOutSection) signOutSection.style.display = 'block';
+                    if (signInSection) signInSection.style.display = 'none';  // Hide sign in
                     
                     // Update user details
                     const nicknameEl = document.getElementById('menuUserNickname');
@@ -2630,12 +2635,8 @@ const App = {
                     
                     // Fetch actual points
                     fetch(`/api/user/${userId}/points`)
-                        .then(res => {
-                            console.log('Response status:', res.status);  // Add this
-                            return res.json();
-                        })
+                        .then(res => res.json())
                         .then(data => {
-                            console.log('Points data received:', data);  // Add this
                             if (data.success && pointsEl) {
                                 pointsEl.textContent = `⭐ ${data.points} points`;
                                 localStorage.setItem('userPoints', data.points);
@@ -2646,16 +2647,15 @@ const App = {
                             const cachedPoints = localStorage.getItem('userPoints') || '0';
                             if (pointsEl) pointsEl.textContent = `⭐ ${cachedPoints} points`;
                         });
-                    
-                    // Show sign out option
-                    const signOutSection = document.getElementById('menuSignOutSection');
-                    if (signOutSection) signOutSection.style.display = 'block';
                 } else {
-                    // Hide user sections if not logged in
+                    // NOT logged in - show sign in option, hide user sections
                     const userSection = document.getElementById('menuUserSection');
                     const signOutSection = document.getElementById('menuSignOutSection');
+                    const signInSection = document.getElementById('menuSignInSection');
+                    
                     if (userSection) userSection.style.display = 'none';
                     if (signOutSection) signOutSection.style.display = 'none';
+                    if (signInSection) signInSection.style.display = 'block';  // Show sign in!
                 }
                 
                 modules.tracking?.trackEvent('more_menu_opened', 'Navigation');
