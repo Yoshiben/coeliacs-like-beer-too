@@ -528,6 +528,16 @@ export const OnboardingFlow = (() => {
         }
         
         try {
+            // Debug logging
+            console.log('Device ID before save:', UserSession.getDeviceId());
+            console.log('Nickname to save:', state.nickname);
+            console.log('Avatar:', state.avatarEmoji);
+            
+            // Ensure we have a device ID
+            if (!UserSession.getDeviceId()) {
+                throw new Error('Device ID not generated');
+            }
+            
             // Use UserSession to create the user
             const result = await UserSession.createUser(state.nickname, state.avatarEmoji);
             
@@ -539,7 +549,7 @@ export const OnboardingFlow = (() => {
                 // Store everything locally
                 localStorage.setItem('userNickname', state.nickname);
                 localStorage.setItem('userAvatar', state.avatarEmoji);
-                localStorage.setItem('user_id', result.user?.userId || result.user_id);
+                localStorage.setItem('user_id', String(result.user?.userId || result.user_id));
                 localStorage.setItem('hasSeenWelcome', 'true');
                 
                 if (window.App) {
@@ -558,11 +568,13 @@ export const OnboardingFlow = (() => {
                 } else {
                     showPasscodeDisplay(result);
                 }
+                
             } else if (result.error === 'account_exists') {
                 // This device already has an account
                 alert(`This device already has an account: ${result.existing_nickname}. Please sign in with your passcode.`);
                 hideModal('nicknameModal');
                 showSignInWithNickname(result.existing_nickname);
+                
             } else if (result.error === 'Nickname already taken') {
                 // Nickname taken by someone else
                 const statusEl = document.getElementById('nicknameStatus');
@@ -573,13 +585,47 @@ export const OnboardingFlow = (() => {
                     saveBtn.disabled = false;
                     saveBtn.textContent = 'Create Account!';
                 }
+                
             } else {
-                // Other error
+                // Log detailed error for debugging
+                console.error('Account creation failed:', {
+                    error: result.error,
+                    response: result,
+                    deviceId: UserSession.getDeviceId(),
+                    nickname: state.nickname
+                });
+                
+                // Send error to server for tracking
+                fetch('/api/log-client-error', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        error: result.error || 'Unknown error',
+                        context: 'create_user_failed',
+                        deviceId: UserSession.getDeviceId(),
+                        nickname: state.nickname,
+                        userAgent: navigator.userAgent
+                    })
+                }).catch(e => console.log('Could not log error:', e));
+                
                 throw new Error(result.error || 'Failed to create account');
             }
+            
         } catch (error) {
             console.error('❌ Error saving nickname:', error);
-            alert(`Failed to create account: ${error.message}`);
+            
+            // More user-friendly error messages
+            let errorMessage = 'Failed to create account';
+            if (error.message.includes('Device ID')) {
+                errorMessage = 'Could not generate device ID. Please refresh and try again.';
+            } else if (error.message.includes('network')) {
+                errorMessage = 'Network error. Please check your connection.';
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+            
+            alert(errorMessage);
+            
             if (saveBtn) {
                 saveBtn.disabled = false;
                 saveBtn.textContent = 'Create Account!';
@@ -1112,11 +1158,44 @@ Website: https://coeliacslikebeer.co.uk
     };
     
     const generateUUID = () => {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+        // Method 1: Try native crypto.randomUUID (best option)
+        if (window.crypto && window.crypto.randomUUID) {
+            try {
+                return window.crypto.randomUUID();
+            } catch (e) {
+                console.warn('crypto.randomUUID failed:', e);
+            }
+        }
+        
+        // Method 2: Use crypto.getRandomValues (more secure than Math.random)
+        if (window.crypto && window.crypto.getRandomValues) {
+            try {
+                const bytes = new Uint8Array(16);
+                window.crypto.getRandomValues(bytes);
+                
+                // Set version (4) and variant bits
+                bytes[6] = (bytes[6] & 0x0f) | 0x40;
+                bytes[8] = (bytes[8] & 0x3f) | 0x80;
+                
+                // Convert to hex string
+                const hex = Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+                return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20,32)}`;
+            } catch (e) {
+                console.warn('crypto.getRandomValues failed:', e);
+            }
+        }
+        
+        // Method 3: Fallback using Math.random (least secure but always works)
+        const template = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx';
+        const uuid = template.replace(/[xy]/g, (c) => {
             const r = Math.random() * 16 | 0;
             const v = c === 'x' ? r : (r & 0x3 | 0x8);
             return v.toString(16);
         });
+        
+        // Add timestamp to make it more unique even with Math.random
+        const timestamp = Date.now().toString(16);
+        return uuid.substring(0, uuid.length - timestamp.length) + timestamp;
     };
     
     // ================================
