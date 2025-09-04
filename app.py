@@ -83,30 +83,41 @@ def hash_passcode(passcode):
 
 @app.route('/api/user/create', methods=['POST'])
 def create_user():
-    # Check if request has JSON data
-    if not request.is_json:
-        logger.error(f"Request is not JSON. Content-Type: {request.content_type}")
+    # Better error handling for different content types
+    if request.content_type and 'application/json' not in request.content_type:
+        logger.error(f"Wrong content type: {request.content_type}")
         return jsonify({'error': 'Request must be JSON'}), 400
     
-    data = request.get_json()
+    # Try to parse JSON with force=True to handle missing content-type header
+    try:
+        data = request.get_json(force=True)
+    except Exception as e:
+        logger.error(f"Failed to parse JSON: {e}, Body: {request.data[:200]}")
+        return jsonify({'error': 'Invalid JSON data'}), 400
     
     # Check if data is None or empty
     if not data:
         logger.error(f"Empty request body. Headers: {dict(request.headers)}")
         return jsonify({'error': 'No data provided'}), 400
     
-    # Safely get values with defaults
-    nickname = data.get('nickname', '')
-    uuid = data.get('uuid', '')
+    # Safely get and validate values
+    nickname = (data.get('nickname') or '').strip()
+    uuid = (data.get('uuid') or '').strip()
     avatar_emoji = data.get('avatar_emoji', '🍺')
     
-    # Strip only if not empty
-    nickname = nickname.strip() if nickname else ''
-    uuid = uuid.strip() if uuid else ''
+    # More detailed error messages
+    missing_fields = []
+    if not nickname:
+        missing_fields.append('nickname')
+    if not uuid:
+        missing_fields.append('uuid')
     
-    if not nickname or not uuid:
-        logger.error(f"Missing fields - nickname: '{nickname}', uuid: '{uuid}'")
-        return jsonify({'error': 'Missing required fields'}), 400
+    if missing_fields:
+        logger.error(f"Missing fields: {missing_fields}. Data received: {data}")
+        return jsonify({
+            'error': f'Missing required fields: {", ".join(missing_fields)}',
+            'missing': missing_fields
+        }), 400
     
     conn = mysql.connector.connect(**db_config)
     cursor = conn.cursor(dictionary=True)
@@ -118,6 +129,7 @@ def create_user():
         
         if existing:
             # User exists but trying to create new account - needs passcode
+            logger.info(f"UUID {uuid[:8]}... already has account: {existing['nickname']}")
             return jsonify({
                 'success': False,
                 'error': 'account_exists',
@@ -128,6 +140,7 @@ def create_user():
         # Check if nickname exists
         cursor.execute("SELECT user_id FROM users WHERE nickname = %s", (nickname,))
         if cursor.fetchone():
+            logger.info(f"Nickname '{nickname}' already taken")
             return jsonify({'error': 'Nickname already taken'}), 409
         
         # Generate passcode
@@ -143,6 +156,8 @@ def create_user():
         user_id = cursor.lastrowid
         conn.commit()
         
+        logger.info(f"Created new user: {nickname} (ID: {user_id})")
+        
         return jsonify({
             'success': True,
             'user_id': user_id,
@@ -151,10 +166,16 @@ def create_user():
             'message': 'Account created! Save your passcode!'
         })
         
+    except mysql.connector.IntegrityError as e:
+        conn.rollback()
+        logger.error(f"Database integrity error creating user: {e}")
+        return jsonify({'error': 'Database error - nickname may already exist'}), 409
+        
     except Exception as e:
         conn.rollback()
-        logger.error(f"Error creating user: {e}")
+        logger.error(f"Unexpected error creating user: {e}")
         return jsonify({'error': 'Failed to create account'}), 500
+        
     finally:
         cursor.close()
         conn.close()
@@ -2466,6 +2487,7 @@ if __name__ == '__main__':
     
     logger.info(f"Starting app on port {port}, debug mode: {debug}")
     app.run(debug=debug, host='0.0.0.0', port=port)
+
 
 
 
