@@ -1096,9 +1096,19 @@ const App = {
         },
         
         'show-nickname-selection': (el, modules) => {
-            if (window.OnboardingFlow) {
-                OnboardingFlow.showNicknameSelection();
+            // Close the More menu FIRST
+            const moreMenuOverlay = document.getElementById('moreMenuOverlay');
+            if (moreMenuOverlay) {
+                moreMenuOverlay.style.display = 'none';
+                moreMenuOverlay.classList.remove('active');
             }
+            
+            // Small delay to let the More menu close animation finish
+            setTimeout(() => {
+                if (window.OnboardingFlow) {
+                    OnboardingFlow.showNicknameSelection();
+                }
+            }, 100);
         },
 
         
